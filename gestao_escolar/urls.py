@@ -112,10 +112,13 @@ urlpatterns = [
     # path('image-to-doc/', Image_to_doc, name='image_to_doc'),
 
     # QR_code
-    path('gestao_escolar/Criar_Qrcode/', Create_QrCode, name="GE_QrCode"),     
+    path('gestao_escolar/Criar_Qrcode/', Create_QrCode, name="GE_QrCode"),        
 ]
 
 
+urlpatterns.append(path('gestao_escolar/Pessoas/Criar/', Create_Pessoa_Professores.as_view(), name="GE_Create_Professores"))
+
+"""
 
 from django.db import connection
 from django.urls import path
@@ -137,5 +140,4 @@ try:
     else:
         urlpatterns.append(path('gestao_escolar/Pessoas/Criar/', Create_Pessoa_Professores.as_view(), name="GE_Create_Professores"))
 except Exception as e:
-    urlpatterns.append(path('gestao_escolar/Pessoas/Criar/', Create_Pessoa_Professores.as_view(), name="GE_Create_Professores"))
-    print(f"An error occurred: {e}")
+"""

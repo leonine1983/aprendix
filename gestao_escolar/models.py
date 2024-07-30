@@ -14,6 +14,19 @@ class AnoLetivo(models.Model):
     data_fim = models.DateField(blank=True, null=True)   
     def __str__(self):
         return str(self.ano.ano)
+    
+    @receiver(post_migrate)
+    def create_AnoLetivo(sender, **kwargs):
+        if not AnoLetivo.objects.exists():
+            try:
+                ano = Ano.objects.get(id=1)  
+                AnoLetivo.objects.create(
+                    ano=ano,
+                    data_inicio='2024-01-01',  
+                    data_fim='2024-12-31',    
+                )
+            except Ano.DoesNotExist:
+                print("Ano com ID 1 não encontrado.")
 
 
 class Cargo(models.Model):
@@ -501,22 +514,10 @@ class GestaoTurmas(models.Model):
 
 # REGISTROS INICIAIS ---------------------
 
-@receiver(post_migrate, sender='gestao_escolar')
+@receiver(post_migrate)
 def post_migrate_setup(sender, **kwargs):
     if sender.name != 'gestao_escolar':  # Verifica se o app é 'gestao_escolar'
         return
-
-    # Cria o registro AnoLetivo se não existir
-    if not AnoLetivo.objects.exists():
-        try:
-            ano = Ano.objects.get(id=1)  # Ajuste o ID conforme necessário
-            AnoLetivo.objects.create(
-                ano=ano,
-                data_inicio='2024-01-01',  # Ajuste a data conforme necessário
-                data_fim='2024-12-31',    # Ajuste a data conforme necessário
-            )
-        except Ano.DoesNotExist:
-            print("Ano com ID 1 não encontrado.")
 
     # Cria os registros Cargo se não existirem
     if not Cargo.objects.exists():
