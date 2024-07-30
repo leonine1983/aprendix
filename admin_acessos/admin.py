@@ -1,3 +1,8 @@
 from django.contrib import admin
+from .models import *
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import UserChangeForm
 
-# Register your models here.
+
+
+admin.site.register(NomeclaturaJanelas)
