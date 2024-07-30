@@ -1,0 +1,168 @@
+
+<!-- Bootstrap Datepicker CSS -->
+
+
+{% block script_head %}
+
+<style>
+  <style>
+    /* Seletor de classe para o ícone do seletor de datas */
+    .datepicker-input[type="date"]::before {
+        font-family: 'Font Awesome 5 Free';
+        content: "f073\f073"; /* Código do ícone do calendário do Font Awesome */
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+    }
+    
+/* Estilizar a caixa de seleção quando ela estiver com foco */
+select[name="deficiencia_aluno"] option:checked {
+  background-color: blue; /* Substitua "blue" pela cor desejada */
+  color: white; /* Substitua "white" pela cor do texto desejada */
+}
+input[type=checkbox]{
+  scale: 2;
+  margin-bottom: 2rem!important;
+  border-radius: 1rem!important;
+  border: #79a1e2 solid 1rem;
+  padding: 1rem;
+}
+.select2 {
+  width:100% !important;
+}
+
+td, tr {
+            text-align: center; /* Alinhamento horizontal central */
+            vertical-align: middle !important; /* Alinhamento vertical central */
+        }
+
+</style>
+
+
+{% endblock script_head %}  
+<!-- Modal -->
+
+    
+
+<!-- Bootstrap Datepicker CSS -->
+<!-- Modal -->
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'global/css/search.css' %}">
+{% endblock css %}
+<div class="modal fade" id="modal_escola" style='background:#000'  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    
+    <div class="modal-dialog w-100">
+    <div class="modal-content bg-secondary-subtle" >
+        <div class="modal-header">
+        <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3 "><i class="fs-4 fa-duotone fa-chart-network"></i> {{titulo_page}}</span></h4>        
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        
+        </div>
+        <div class="modal-body shadow-sm bg-light-subtle">            
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"><i class="fs-4 fa-solid fa-people-roof bi fs-4"></i> Todas as turmas {{turma_ativa}}</button>
+                </li>
+                {% if ativa == 'Grades' %}
+                <li class="nav-item bg-secondary-subtle" role="presentation">
+                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Adicionar disciplina à turma <i class="fs-4 fa-duotone fa-chart-network"></i> </button>
+                </li>  
+                {% endif %}
+              </ul> 
+            <div  class='p-2 fs-6 border-danger-subtle border-right d-flex text-light' style= 'box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgb(209, 213, 219) 0px 0px 0px 1px inset; background-color:rgb(116, 145, 140)'>
+              <div  class="  mr-4  fs-5 d-flex  w-100">             
+                <div class="mt-0 mb-0" style='margin:auto;  width:90%; '>
+                  <form action="?" method="GET" class="form-inline">
+                      {% csrf_token %}            
+                      <div class="search-wrapper" style='margin:1rem auto 1rem auto;  width:110%; '>
+                        <input type="text" class="search-input rounded-3 m-0 mr-2 ml-2" placeholder="Buscar turma" name="busca-turma" style='margin:1rem auto 1rem auto;  width:90%; ' >
+                        <button class="search-button" type="submit"  style='height: 10rem importamt;border-radius: 1rem;'>
+                          <i class="fs-4 fa-solid fa-people-roof bi fs-4"></i>
+                        </button>
+                      </div>
+                    </form> 
+                </div>  
+              </div>              
+              </div>
+            </div>  
+              <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active pl-4 pr-4" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">  
+                  <table class="table table-striped ">
+                    <thead>
+                  <tr>
+                    <th>Ico</th>
+                    <th scope="col">Turma</th>
+                    <th scope="col">Série</th>
+                    <th scope="col">Turno</th>
+                    <th scope="col">Ano Letivo</th>             
+                    <th scope="col">Ação</th>           
+                  </tr>
+                </thead>
+                <tbody>
+                {% for n in turmas %}
+                  <tr class="fs-5">
+                    <td><i class="fa-duotone fa-graduation-cap" style="--fa-primary-color: #0d5e1a; --fa-secondary-color: #18d838;"></i></td>
+                    <td class='text-align'>{{n.nome}}</td>                    
+                    <td class='text-align'>{{n.serie}}</td>
+                    <td class='text-align'>{{n.turno}}</td>
+                    <td class='text-align'>{{n.ano_letivo}}</td>
+                    <td class='text-align'><a class="btn btn-sm btn-success" href="{% url 'Gestao_Escolar:Grades_create' n.pk %} ">Criar Grade de disciplinas  <i class="fa-duotone fa-chart-network"></i></a></td>
+                  </tr>    
+                {% endfor %}                
+                </tbody>                  
+                </table>
+                </div>
+                {% if ativa == 'Grades' %}
+                <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                  <div class="form-group ">
+                    <form method="post"class='m-3 p-3 row row-cols-3' >
+                      {{ form.non_field_errors }}
+                      {% csrf_token %}
+                      {% for field in form %}
+                      <div class="form-group">
+                          {{ field.label_tag }}
+                          {{ field }}
+                          {{ field.errors }}
+                      </div>
+                      {% endfor %}  
+                      <button class="btn btn-sm btn-primary" type="submit">Salvar registro do aluno ssssssssssssssssssssssssssss</button>
+                  </form> 
+                </div>  
+                {% endif %}             
+              </div>
+        </div>        
+    </div>
+    </div>
+</div>     
+    
+
+{% load static %}
+
+<!-- Mascara para formularios-->
+<!--FIM Mascara para formularios-->
+
+
+<script src="{% static 'base_static/select2/select2.min.css' %}"></script>
+    <script>
+        // In your Javascript (external .js resource or <script> tag)
+    $(document).ready(function() {
+        $('#id_aluno').select2();
+  
+    });
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+

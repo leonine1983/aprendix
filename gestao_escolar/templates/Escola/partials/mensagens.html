@@ -1,0 +1,45 @@
+{% load static %}
+          {% for message in messages %}
+          <div class="alert {% if message.tags %} {{ message.tags }}{% endif %} shadow" role="alert">
+              {% if message.tags == 'alert-danger' %}
+              <div style='margin:-1rem -1rem 0 !important' class="p-2 fs-3">
+                  <i class="fa-thin fa-bomb"></i> Error!!
+                  <hr class="m-0">
+              </div>
+              {% endif %}
+              <div class="messages">
+                  <div class='text-center fs-4 border-3 m-auto rounded-3 border-light'>{{ message|safe }}</div>
+              </div>
+          </div>
+          {% endfor %}
+<script>
+  $(document).ready(function() {
+      // Quando um modal é aberto
+      $(document).on('show.bs.modal', '.modal', function() {
+          var zIndex = 1050 + (10 * $('.modal:visible').length);
+          $(this).css('z-index', zIndex);
+          setTimeout(function() {
+              $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+          }, 0);
+      });
+  
+      // Quando um modal é fechado
+      $(document).on('hidden.bs.modal', '.modal', function() {
+          if ($('.modal:visible').length) {
+              // Restaura o foco para o modal anterior
+              setTimeout(function() {
+                  $(document.body).addClass('modal-open');
+              }, 0);
+          }
+      });
+  });
+  </script>
+  
+
+
+
+
+
+
+
+

@@ -1,0 +1,207 @@
+{% extends 'Geral_RH/template.html' %}
+{% load static %}
+{% block script_head %}    
+    <script src="{% static 'global/js/js/multi-select/js/jquery.multi-select.js' %}"></script>    
+    <link href="{% static 'global/js/js/multi-select/css/multi-select.css' %}" rel="stylesheet">   
+    
+    <link href="{% static 'global/css/modals.css' %}" rel="stylesheet">   
+
+ 
+{% endblock script_head %}
+
+{% block css %}{% endblock css %}
+{% block main %}
+
+<div class="w-100 shadow mt-1" style='margin-left:1rem; background-color: #f8fcfa'>
+    <div class="mt-n5">        
+        <h1 class="h1 p-2 d-flex" style="background-color: #d9e0ed"><span class="w-75" style="display: block;">{{svg | safe}} {{titulo_page}}</span> 
+            <button type="button" onclick="abreModal()" class="btn  w-25" data-toggle="modal" data-target="#exampleModal">
+            Dúvida? Clique aqui!!   <i class="fa-solid fa-circle-question fa-bounce " style="color: #4d19da; font-size: 2rem;margin-left: 1rem;"></i>
+            </button>
+        </h1>
+        <!-- Button trigger modal -->
+    </div>
+    <div class="grid row " {% if conteudo_page == 'Digita Contrato' %}style='width:149vw'{% endif%}>
+        <div class="
+            {% if titulo_page == 'Contrato de Trabalho' %}col-12 {% endif %} 
+            {% if conteudo_page == 'Digita Contrato' %} col-8 {% else %}col-4{% endif %} 
+            {% if titulo_page == 'Pessoas'  %}col-5{% endif %}" style="">  
+            <div id="form_all" class="m-4 border rounded-top ">
+                <!--Titulo da Página-->
+                <div class="m-2 ">
+                    <h1 class="text-light">{{conteudo_page}} <strong >{{nome_instancia}}</strong></h1>
+                    <hr>
+                </div>
+                <!--FIM Titulo da Página-->        
+                {% if not titulo_page == 'Contrato de Trabalho' %}
+                    <!--FORMULARIO-->        
+                    {% include 'rh/partials/formulario.html' %} 
+                    <!-- FIM FORMULARIO-->                  
+                {% endif %}  
+            </div>            
+           
+            {% if titulo_page == 'Profissões'  %} 
+                <!--Atençaõ profissão cadastradas-->
+                {% include 'rh/partials/profissoes_Atencao.html' %}  
+                <!-- FIM Atençaõ profissão cadastradas-->
+            {% endif %}          
+        </div>
+        {% if titulo_page == 'Contrato de Trabalho' %}
+        <div class="grid row gap-1" >
+            <div class="col-7 ">
+                <div class="col" id='id_texto'>   
+                    <!-- Exibe ckeditor com contrato do profissional -->                              
+                    {{conteudo}}
+                    <!-- Fim Exibe ckeditor com contrato do profissional -->                              
+                </div>
+            </div>    
+            <div class="col-4  bg-secondary">
+            {% include 'rh/partials/tag_texto_contrato_PERFIL.html' %} 
+            </div>              
+        </div> 
+        {% endif %} 
+        <!--Relação de profissões cadastradas-->
+        {% if titulo_page == 'Profissões'  %}
+            {% include 'rh/partials/profissoes.html' %}                
+        {% endif %}
+        <!--Relação de Pessoas cadastradas no sistema-->
+        {% if titulo_page == 'Pessoas'  %}
+          {% include 'rh/partials/pessoas.html' %}
+        {% endif %}
+        <!--Relação de Anos cadastrados no sistema-->
+        {% if titulo_page == 'Ano'  %}
+            {% include 'rh/partials/ano.html' %}
+        {% endif %}
+        <!--Relação de Contratos cadastrados no sistema-->
+        {% if titulo_page == 'Contratos' %}
+            {% include 'rh/partials/contratos.html' %}        
+        {% endif %}     
+    </div>
+    <!--Relação de textos de Contratos-->
+    {% if conteudo_page == 'Digita Contrato' %}
+        {% include 'rh/partials/contratos_texto.html' %}   
+    {% endif %}
+    <style>
+        /* Add overlay background for modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            display: none;
+        }
+        @keyframes fadeIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .modal-content {
+            background-color: white;
+            width: 75%;
+            margin: auto;
+            padding: 20px;
+            position: absolute;
+            top: 10%;
+            transform: translate(-50%, -30%);
+            z-index: 1000;
+            display: none;
+            animation: fadeIn 2s ease;
+        }
+    </style>
+  
+    <div class="modal-overlay " id="modalOverlay">
+        <div class="modal-content" id="myModalContent">                                 
+            <h1 class="border p-2 bg-secondary"> <i class="fa-solid fa-circle-question fa-bounce m-1" style="color: #4d19da; font-size: 2rem;margin-left: 1rem;"></i>{{titulo_page}}<span class="close" style="position: absolute;right: 5rem;" onclick="fecharModal()"><i class="fa-solid fa-xmark mt-2"></i></span></h1>
+             <div>{{page_ajuda|safe}}</div>
+             {% if link  %}<div><a href=" {% url link %} " class='btn btn-sm bg-secondary'>Ir para cadastro de profissões</a></div>{% endif %}
+             
+        </div>
+    </div>
+
+
+
+
+
+  
+
+    
+</div>  
+{% endblock main %}
+
+{% block script_foooter %}
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+    <!-- MULTI SELECT -->
+    <script src="{% static 'global/js/js/multi-select/js/jquery.multi-select.js' %}"></script>
+    {% if titulo_page == 'Pessoas'  %}
+        <script type="text/javascript">
+        // run pre selected options
+            $('#id_nome_profissao').multiSelect({ keepOrder: true });
+        </script>  
+    {% endif %}    
+
+
+    
+    <script>
+        function popupPDF(url) {
+            var modal = document.getElementById("myModal");
+            var span = document.getElementsByClassName("close")[0];
+          
+            modal.style.display = "block";
+          
+            span.onclick = function() {
+              modal.style.display = "none";
+            }
+          
+            window.onclick = function(event) {
+              if (event.target == modal) {
+                modal.style.display = "none";
+              }
+            }
+          }      
+    </script>
+    <!--MODAL-->
+    <script>
+        function abreModal() {
+            var modalOverlay = document.getElementById("modalOverlay");
+            var modalContent = document.getElementById("myModalContent");
+
+            modalOverlay.style.display = "block";
+            modalContent.style.display = "block";
+        }
+
+        function fecharModal() {
+            var modalOverlay = document.getElementById("modalOverlay");
+            var modalContent = document.getElementById("myModalContent");
+
+            modalOverlay.style.display = "none";
+            modalContent.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            var modalOverlay = document.getElementById("modalOverlay");
+            if (event.target == modalOverlay) {
+                fecharModal();
+            }
+        };
+    </script>
+    
+
+{% endblock script_foooter %}
+
+
+
+
+
+
+
+
+

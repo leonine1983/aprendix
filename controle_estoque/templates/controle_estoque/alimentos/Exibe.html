@@ -1,0 +1,99 @@
+{% extends 'global/template.html' %}
+{% load static %}
+{% block css %}
+.modal-sheet .modal-dialog {
+    width: 380px;
+    transition: bottom .75s ease-in-out;
+  }
+  .modal-sheet .modal-footer {
+    padding-bottom: 2rem;
+  }
+
+{% endblock css %}
+{% block menu_horizontal %}
+<!--Menu horizontal Local-->
+{% include 'global/partials/breadcrumbs/index.html' %}
+{% endblock menu_horizontal %}
+{% block main %}
+{% if title %}
+<p></p>&nbsp;</p>
+  <div class="d-flex bg-body-secondary p-2 ">
+    <h2 class='raleway'>{{svg|safe}} {{title}}</h2> 
+      {% if active == 'categoria' %}
+      <a class="ml-5 w-50 " href="{% url 'controle_estoque:categoria_view' %}">
+        <button type="button" class="btn btn-primary btn-sm mt-2" onclick="">Adicionar <svg xmlns="http://www.w3.org/2000/svg" class=" text-light " height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg></button>
+      </a>
+        {% else %}
+      <a class="ml-5 w-50 " href="{% url 'controle_estoque:alimento_view' %}">
+        <button type="button" class="btn btn-primary btn-sm mt-2" onclick="">Adicionar <svg xmlns="http://www.w3.org/2000/svg" class=" text-light " height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg></button>
+      </a>
+      {% endif %}
+    </a>
+  </div>
+  <hr>
+{% endif %}
+
+<div class="modal-content rounded-4 shadow">
+  <table class="table table-striped">
+    <thead>
+    {% if active == "alimentos"  %}
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Alimento</th>
+        <th scope="col">Categoria</th>
+        <th scope="col">AÇÕES</th>      
+      </tr>      
+    {% else %}
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Nome da Categoria</th>
+        <th scope="col">AÇÕES</th>      
+      </tr>
+    {% endif %}
+    </thead>
+    <tbody> 
+      {% for p in object_list %}      
+        {% if active == "alimentos"  %}
+        <!-- alimentos ----------------------------- -->
+        <tr>            
+          <th scope="row">{{p.id}}</th>
+          <td>{{p.nome}}</td>
+          <td>{{p.categoria_alimento}}</td> 
+          <td class="">
+            <a href="{% url 'controle_estoque:alimentos_update' p.pk %}" class="pt-0" title="Editar">
+              <span class="material-symbols-outlined  text-primary ">edit_square</span></a> 
+            <a href="{% url 'controle_estoque:alimento_delete' p.pk %}" title="Excluir"> 
+              <span class="material-symbols-outlined text-danger">delete</span>
+            </a></td>
+        </tr>
+        {% else %}
+        <!-- CATEGORIA-------------->
+        <tr>            
+          <th scope="row">1</th>
+          <td>{{p.nome}}</td>
+          <td class="">
+            <a href="{% url 'controle_estoque:categoria_update' p.pk %}" class="pt-0" title="Editar">
+              <span class="material-symbols-outlined  text-primary ">edit_square</span></a> 
+            <a href="{% url 'controle_estoque:categoria_delete' p.pk %}" title="Excluir"> 
+              <span class="material-symbols-outlined text-danger">delete</span>
+            </a></td>
+        </tr>
+        {% endif %}
+      {% endfor %}                  
+    </tbody>
+  </table>        
+</div>
+{% endblock main %}
+{% block script %}
+
+ 
+
+ 
+<script>
+        // In your Javascript (external .js resource or <script> tag)
+    $(document).ready(function() {
+        $('#id_bairro').select2();
+        $('#id_rua').select2();
+    });
+</script>
+{% endblock script %}

@@ -8,7 +8,7 @@ from django.views import View
 from django import forms
 from ckeditor.widgets import CKEditorWidget
 
-from .models import message_user, PaletaCores
+from .models import MessageUser, PaletaCores
 
 # Login
 class CreateLoginView(LoginView):
@@ -33,18 +33,18 @@ class PainelAcessoView(TemplateView):
 
 # Message User Form
 class MessageUserForm(forms.ModelForm):
-    messagem = forms.CharField(widget=CKEditorWidget())
+    mensagem = forms.CharField(widget=CKEditorWidget())  # Atualizado para o campo correto
 
     class Meta:
-        model = message_user
-        fields = ['user', 'assunto', 'messagem']
+        model = MessageUser
+        fields = ['destinatario', 'assunto', 'mensagem']  # Removido 'user' e ajustado para refletir os campos do modelo
         widgets = {
-            'remetente': forms.HiddenInput,
+            'remetente': forms.HiddenInput(),  # Manter o remetente como um campo oculto
         }
 
 # Create Message
 class MensagemCreateView(CreateView):
-    model = message_user
+    model = MessageUser
     form_class = MessageUserForm
     template_name = 'Controle_Estoque/mensagem/mensagem_envia.html'
     success_url = reverse_lazy("admin_acessos:mensagem_lista")
@@ -57,21 +57,21 @@ class MensagemCreateView(CreateView):
 
 # List Messages
 class MensagemListView(ListView):
-    model = message_user
+    model = MessageUser
     template_name = 'Controle_Estoque/mensagem/mensage_lista.html'
 
     def get_queryset(self):
-        return message_user.objects.filter(user=self.request.user)
+        return MessageUser.objects.filter(user=self.request.user)
 
 # Update Message
 class MensagemUpdateView(UpdateView):
-    model = message_user
+    model = MessageUser
     fields = '__all__'
     template_name = 'Controle_Estoque/mensagem/mensagem_envia.html'
 
 # Delete Message
 class MensagemDeleteView(DeleteView):
-    model = message_user
+    model = MessageUser
     template_name = 'Controle_Estoque/mensagem/mensagem_envia.html'
     success_url = reverse_lazy('admin_acessos:mensagem_lista')
 
@@ -79,14 +79,14 @@ class MensagemDeleteView(DeleteView):
 class UpdateMessageView(View):
     def get(self, request, *args, **kwargs):
         message_id = kwargs.get('pk')
-        message = get_object_or_404(message_user, id=message_id)
+        message = get_object_or_404(MessageUser, id=message_id)
         message.aberta = True
         message.save()
         return redirect(reverse('admin_acessos:mensagem_detalhe', args=[message_id]))
 
 # Message Detail
 class DetalheMensagemView(DetailView):
-    model = message_user
+    model = MessageUser
     template_name = 'Controle_Estoque/mensagem/mensage_lista.html'
     context_object_name = 'mensagem'
 

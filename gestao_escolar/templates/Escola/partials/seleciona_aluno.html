@@ -1,0 +1,132 @@
+{% load static %}
+{% load meus_filtros %}
+{% block css %}
+<link rel="stylesheet" href="{% static "global/css/search.css" %}">
+<style>.hidden-details{display:none;}</style>
+{% endblock css %}
+<div class="modal fade" id="modal_escola"   tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">   
+  <div class="modal-dialog">
+    <div class="modal-content bg-secondary-subtle ">
+      <div class="modal-header">
+        <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3 "><i class="fa-sharp fa-solid fa-people fs-5"></i> {{titulo_page}}</span></h4>        
+        <button type="button" class="close" data-dismiss="modal">&times;</button>      
+      </div>      
+      <img src="{% static 'aluno-.png' %}" style='position:absolute; z-index:-0,1;top:3rem; left:0.3rem'  alt="">
+      <div class="modal-body shadow-sm bg-light-subtle" style='margin-left:10.5rem;' >
+        <div class="modal_windows_title mb-3 p-2 ">
+            <i class="fa-regular fa-face-grin-squint"></i> <span class="text-capitalize fs-7"> Olá {% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}{{request.user}}{% endif %}!! CADASTROS DE ALUNOS</span>  
+        </div>
+        {% if not oculta_tab %}            
+        <ul class="nav nav-tabs" id="myTab" role="tablist">          
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"><i class="fa-sharp fa-solid fa-people fs-5"></i> Toda os alunos</button>
+          </li>
+          <li class="nav-item bg-secondary-subtle " role="presentation">
+            <button class="nav-link {% if oculta_tab %}active{% endif %} btn btn-sm btn-orange text-uppercase  fs-family-nunito" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Novo Aluno <i class="fa-sharp fa-solid fa-plus"></i> </button>
+          </li>  
+        </ul>                         
+        <div class="tab-content" id="myTabContent">          
+            <div class="tab-pane fade show active bg-secondary-subtle" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">  
+              <div class="win11-search-wrapper bg-p-5 m-0 p-1 d-flex">
+                <form action="?" method="GET" class="form-inline">
+                    {% csrf_token %}            
+                    <div class="win11-search-wrapper-inner">
+                        <input type="text" class="win11-search-input" placeholder="Buscar por aluno" name="busca-aluno">
+                        <button class="win11-search-button" type="submit"><i class="fa-regular fa-user-magnifying-glass"></i></button>
+                    </div>
+                </form> 
+                <div class="win11-pagination">
+                  <span class="win11-step-links">
+                      {% if matriculas.has_previous %}
+                          <a href="?page=1" class="win11-pagination-link">&laquo; Primeiro</a>
+                          <a href="?page={{ matriculas.previous_page_number }}" class="win11-pagination-link">Anterior</a>
+                      {% endif %}              
+                      <span class="win11-current">
+                          Página {{ matriculas.number }} de {{ matriculas.paginator.num_pages }}.
+                      </span>              
+                      {% if matriculas.has_next %}
+                          <a href="?page={{ matriculas.next_page_number }}" class="win11-pagination-link">Próximo</a>
+                          <a href="?page={{ matriculas.paginator.num_pages }}" class="win11-pagination-link">Último &raquo;</a>
+                      {% endif %}
+                  </span>
+                  <span class="win11-total-records">
+                    <i class="fa-thin fa-address-card"></i> Total de alunos cadastrados: {{ matriculas.paginator.count }}
+                  </span>
+                </div>
+              </div>    
+              <table class="win11-table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col" style='width:13rem' class='text-left'>Aluno</th>
+                    <th scope="col" style='width:3rem' class='text-left'>Perfil</th>
+                    <th scope="col" style='width:6rem'>Idade</th>
+                    <th scope="col">Sexo</th>
+                    <th scope="col" style='width:11rem'>Data de Nascimento</th>
+                    <th scope="col" style='width:13rem' class="text-center">Nome da Mãe</th>
+                    <th scope="col" style='width:15rem'>Matrícula Atual</th>
+                    <th scope="col" class='text-center border' style='width:10rem'>Ação</th>                      
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for n in Alunos %}
+                    <tr > 
+                      <th scope="row">{{forloop.counter}}</th>
+                      <td class='text-left fs-7'>{{n.nome_completo}}</td>
+                      <td><a href="{% url 'Gestao_Escolar:alunos_perfil' n.id %}"><i class="fa-duotone fa-eye fs-3" title='Ver perfil do aluno'></i></a></td>
+                      <td>{{n.idade}} anos</td>
+                      <td>{{n.sexo}}</td>
+                      <td>{{n.data_nascimento}}</td>
+                      <td class='text-center'>{{n.nome_mae}}</td>   
+                      <td class='text-center '>                          
+                        {% if n.related_matricula_alunos.first.turma.ano_letivo.ano.id == request.session.anoLetivo_id %}
+                          {% for matricula in n.related_matricula_alunos.all %}   
+                            <div>
+                              <div>
+                                <p class='m-0 p-0 text-primary '>{{matricula.turma}}<i class="fa-thin fa-school mx-2"></i><abbr title="{{matricula.turma.escola.nome_escola}}">{{ matricula.turma.escola.nome_escola | criar_sigla }}</abbr>
+                                </p>                                
+                              </div>                                
+                            </div>                                                       
+                          {% endfor %} 
+                        {% else %}
+                        <div>
+                          <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_create_aluno' n.pk %}"><span class='btn btn-sm btn-success '>Matricular o aluno</span></a>
+                        </div>  
+                        {% endif %}
+                      </td>                     
+                      <td class="border">
+                        <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_update' n.pk %}"><span class='btn btn-sm btn-info mr-1'>Editar</span></a>
+                        {% if not n.related_matricula_alunos.all %}
+                          <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_delete' n.pk %}"><span class='btn btn-sm btn-danger '>Excluir</span></a>
+                        {% endif %}                           
+                      </td>                       
+                    </tr>    
+                  {% endfor %}                
+                </tbody>                  
+              </table>           
+        </div>        
+        <div class="tab-pane fade  active" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+          <div class="form-group ">
+            {% block script_head %}            
+            <style>
+              .form-group div p{margin-bottom: -0.5rem;}
+            </style>
+            {% endblock script_head %}  
+            <h1><i class="fa-thin fa-id-card"></i>{{conteudo_page}}</h1>
+            <div style='background-color: rgb(248, 242, 242);' class="pt-4  rounded-3">
+              <div class="border p-2 m-2 rounded-3 bg-light-subtle">
+                <h2 class="fs-4"><i class="fa-thin fa-message-smile fa-flip-horizontal"></i> {{sub_Info_page}}</h2>
+              </div>      
+              {% include "Escola/partials/partials_alunos/aluno_form.html" %}
+            </div>
+          </div> 
+        </div>
+        {% else %}
+          <!-- form de atualização do registro do aluno - ALUNO UPDATE -->
+          <div class="form-group ">{% include "Escola/partials/partials_alunos/aluno_update.html" %}</div>  
+        {% endif %}    
+    </div>        
+  </div>
+</div>
+</div>  
+{% load static %}

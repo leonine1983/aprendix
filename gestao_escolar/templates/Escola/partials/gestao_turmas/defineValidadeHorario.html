@@ -1,0 +1,38 @@
+{% load static %}
+{% load meus_filtros %}
+{% block script_head %}<link rel="stylesheet" href="{% static 'global/css/css3_tab.css' %}">
+
+
+
+{% endblock script_head %} 
+{% block script_footer %}{% endblock script_footer %} 
+
+<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    
+    <div class="modal-dialog w-100">
+        <div class="modal-content bg-secondary-subtle p-5">
+            {% include "Escola/partials/mensagens.html" %}
+            
+            <div class="modal-header w-100 d-flex border-bottom border-secondary">
+            <div class='d-flex justify-content-between w-100'> 
+                <div><h1><img src="{% static 'svg/grade_horario.svg' %}" alt=""> Validade de Horários de Aula</h1></div>              
+            </div>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>                
+            </div>
+            <div>
+                <h2>É essencial estabelecer a data de início e de término em que o horário estará ativo.</h2>
+                <ul>
+                    <li><strong>Data de Início:</strong> Indica quando o horário começa a vigorar, organizando as aulas e outras atividades da turma.</li>
+                    <li><strong>Data de Término:</strong> Representa o último dia em que o horário estará ativo. Após essa data, ajustes devem ser feitos em um novo horário, se necessário.</li>
+                </ul>
+                <form method="post" class="win11-form d-flex gap-5 m-5">
+                    {% csrf_token %}
+                    {{form.as_div}}                    
+                    <button type="submit" class="m-4">Criar Validade</button>
+                </form>
+                
+                           
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,50 @@
+  
+  
+<div class='p-2 fs-5 border-danger-subtle border-right d-flex text-light bg-danger' style= 'box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgb(209, 213, 219) 0px 0px 0px 1px inset;'>               
+    <div class=" p-1 mr-4 col-5"><i class="fa-thin fa-tally "></i> Total: {{lista_pessoas.count}} pessoas não vinculadas à escola</div>              
+    <!-- Exibir a paginação -->
+    <div class="pagination ">
+    <span class="step-links">
+        {% if lista_pessoas.has_previous %}
+            <a class='text-decoration-none link-light btn btn-sm btn-info m-1' href="?page=1"><i class="fa-light fa-angles-left"></i> Inicio</a>
+            <a class='text-decoration-none link-light btn btn-sm btn-info m-1' href="?page={{ lista_pessoas.previous_page_number }}"><i class="fa-light fa-angle-left"></i> Anterior</a>
+        {% endif %}  
+    </span>
+    <span class="current-page"><i class="fa-light fa-file"></i> {{ lista_pessoas.number }}° página</span>
+    <span>
+        {% if lista_pessoas.has_next %}
+            <a class='text-decoration-none link-light btn btn-sm btn-info m-1' href="?page={{ lista_pessoas.next_page_number }}">Próxima <i class="fa-light fa-angle-left fa-flip-horizontal"></i></a>
+            <a class='text-decoration-none link-light btn btn-sm btn-info m-1' href="?page={{ lista_pessoas.paginator.num_pages }}">Última<i class="fa-light fa-angles-left fa-flip-horizontal"></i></a>
+        {% endif %}
+    </span>
+    </div> 
+</div>   
+<div class="border mt-4 p-2 bg-dark-subtle ">
+    <div class="fs-5">Relação de pessoas sem vinculos contratuais definidos para o corrente ano</div>    
+        <table class="table table-striped bg-white">
+            <thead>
+                <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nome Completo</th>
+                <th scope="col">Idade</th>
+                <th scope="col">Sexo</th>
+                <th scope="col">Data de Nascimento</th>
+                <th scope="col" class="text-center">Ação</th> 
+                <th scope="col">Outros</th> 
+                </tr>
+            </thead>
+            <tbody>                  
+                {% for n in lista_pessoas %}
+                <tr>
+                    <th scope="row">{{n.id}}</th>
+                    <td>{{n.nome}} {{n.sobrenome}}</td>
+                    <td>{{n.idade}} anos</td>
+                    <td>{{n.sexo}}</td>
+                    <td>{{n.data_nascimento}}</td>                
+                   <td><a href="{% url 'Gestao_Escolar:Professores_Pessoa_vinculo_create' n.pk %}"><span class='btn btn-sm btn-info mr-1'>Editar</span></a><a href="{% url 'Gestao_Escolar:GE_Escola_alunos_delete' n.pk %}"><span class='btn btn-sm btn-danger '>Excluir</span></a></td>
+                   <td><a href="{% url 'Gestao_Escolar:Professores_Pessoa_vinculo_create' n.id %}" class="btn btn-sm btn-success">Definir Vinculo</a></td>
+                </tr>
+                {% endfor %}                                 
+            </tbody>        
+        </table>  
+    </div>

@@ -1,0 +1,86 @@
+{% extends 'global/template.html' %}
+{% load static %}
+{% block css %}
+.modal-sheet .modal-dialog {
+    width: 380px;
+    transition: bottom .75s ease-in-out;
+  }
+  .modal-sheet .modal-footer {
+    padding-bottom: 2rem;
+  }
+
+{% endblock css %}
+{% block menu_horizontal %}
+<!--Menu horizontal Local-->
+{% include 'global/partials/breadcrumbs/index.html' %}
+
+{% endblock menu_horizontal %}
+{% block main %}
+  <div class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalTour">
+    {% for p in object_list  %}
+    <h2 class='raleway'><span class="material-symbols-outlined">
+      apartment
+    </span> {{p.prefeitura_nome}}</h2>   
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-body p-5">
+        <h2 class="fw-bold mb-0">{{p.instituto}}</h2>
+        {{p.endereco}}, {{p.cidade}}, {{p.estado}}
+
+        <ul class="d-grid gap-4 my-5 list-unstyled small">
+          <li class="d-flex gap-4">
+            <svg class="bi text-body-secondary flex-shrink-0" width="48" height="48"><use xlink:href="#grid-fill"></use></svg>
+            <div>
+              <h5 class="mb-0">{{p.pessoa_publica}}</h5>
+              Secretário Municipal da Educação
+            </div>
+          </li>          
+          {% if not  p.nutricionista1 == 'nulo' %}
+          <li class="d-flex gap-4">
+            <svg class="bi text-warning flex-shrink-0" width="48" height="48"><use xlink:href="#bookmark-star"></use></svg>
+            <div>
+              <h5 class="mb-0">{{p.nutricionista1}} </h5>
+              Nutricionista Responsável |<b> CFN nº {{p.cfn1}}</b>
+            </div>
+          </li>
+          {% endif %}
+          {% if not p.nutricionista2 == 'nulo' %}
+          <li class="d-flex gap-4">
+            <svg class="bi text-warning flex-shrink-0" width="48" height="48"><use xlink:href="#bookmark-star"></use></svg>
+            <div>
+              <h5 class="mb-0">{{p.nutricionista2}} </h5>
+              Nutricionista Responsável |<b> CFN nº {{p.cfn1}}</b>
+            </div>
+          </li>
+          {% endif %}
+          {% if not p.nutricionista3 == 'nulo' %}
+          <li class="d-flex gap-4">
+            <svg class="bi text-warning flex-shrink-0" width="48" height="48"><use xlink:href="#bookmark-star"></use></svg>
+            <div>
+              <h5 class="mb-0">{{p.nutricionista3}} </h5>
+              Nutricionista Responsável |<b> CFN nº {{p.cfn1}}</b>
+            </div>
+          </li>
+          {% endif %}
+        
+          
+        </ul>
+        
+      </div>
+    </div>
+   
+    {% endfor %}
+  </div>
+{% endblock main %}
+{% block script %}
+
+ 
+
+ 
+<script>
+        // In your Javascript (external .js resource or <script> tag)
+    $(document).ready(function() {
+        $('#id_bairro').select2();
+        $('#id_rua').select2();
+    });
+</script>
+{% endblock script %}

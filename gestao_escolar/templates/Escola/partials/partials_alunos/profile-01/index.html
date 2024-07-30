@@ -1,0 +1,230 @@
+    {% load static %}
+    <div class=" p-2 w-75 m-auto bg-light-subtle shadow-sm"  >
+        <link rel="preconnect" href="https://fonts.googleapis.com"> 
+        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'profile-01/style.css' %}">
+
+        <header class="profile__header" >
+            <div class="profile__highlight__wrapper">
+                <div class="profile__highlight">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-school" width="24"
+                        height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M22 9l-10 -4l-10 4l10 4l10 -4v6" />
+                        <path d="M6 10.6v5.4a6 3 0 0 0 12 0v-5.4" />
+                    </svg>
+                    {{object.sexo.nome}}
+                </div>
+                Estudante
+            </div>
+            <div class="profile__avatar">
+                {% if object.sexo.nome == 'Masculino' %}
+                    <img src="{% static 'man.png' %}" class='object-fit-cover rounded-circle w-75' loading="lazy"> 
+                {% else %}       
+                    <img src="{% static 'woman.png' %}" class='object-fit-cover rounded-circle w-75' loading="lazy">
+                {% endif %}
+            </div>
+            <div class="profile__highlight__wrapper">
+                <div class="profile__highlight">
+
+                    {% if object.idade < 2 %}
+                            <i class="fa-solid fa-baby-carriage fs-5"></i>
+                        {% elif object.idade > 1 and object.idade < 12 %}
+                            <i class="fa-solid fa-child fs-5"></i>
+                        {% elif object.idade > 11 and object.idade < 18 %}
+                            <i class="fa-solid fa-child-reaching"></i>
+                        {% else %}
+                            <i class="fa-solid fa-user fs-5"></i>
+                    {% endif %} 
+                    {{object.idade}} anos
+                </div>
+                {% if object.idade < 2 %}
+                    Etapa creche
+                    {% elif object.idade > 1 and object.idade < 12 %}
+                    Criança
+                    {% elif object.idade > 11 and object.idade < 18 %}
+                    Adolescente
+                    {% else %}
+                    Adulto
+                {% endif %}
+            </div>
+        </header>
+
+        <div class="profile__name">
+            <h2 class='text-uppercase h2'>{{object}}<img src="{% static 'profile-01/assets/verified.svg' %}"  alt="Verified Ticker"></h2>
+            <p class="text-center">{{object.related_matricula_alunos.first.turma}} {{object.related_matricula_alunos.first.turma.ano_letivo}}</p>
+        </div>
+        <ul class="social-links">
+            <li>
+                <a href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24"
+                        height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path
+                            d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+                    </svg>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-linkedin"
+                        width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" />
+                        <path d="M8 11l0 5" />
+                        <path d="M8 8l0 .01" />
+                        <path d="M12 16l0 -5" />
+                        <path d="M16 16v-3a2 2 0 0 0 -4 0" />
+                    </svg>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-x" width="24"
+                        height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M4 4l11.733 16h4.267l-11.733 -16z" />
+                        <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
+                    </svg>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-instagram"
+                        width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M4 4m0 4a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4z" />
+                        <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                        <path d="M16.5 7.5l0 .01" />
+                    </svg>
+                </a>
+            </li>
+            <li>
+                <a href="#"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-youtube"
+                        width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M2 8a4 4 0 0 1 4 -4h12a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-12a4 4 0 0 1 -4 -4v-8z" />
+                        <path d="M10 9l5 3l-5 3z" />
+                    </svg>
+                </a>
+            </li>
+            <li>
+                <a href="#"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24"
+                        height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M9 15l6 -6" />
+                        <path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464" />
+                        <path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463" />
+                    </svg>
+                </a>
+            </li>
+        </ul>
+
+        <main>
+            <div class="tabs-wrapper">
+                <ul class="tabs">
+                    <li class="active">
+                        <a id="tab1" href="#about">Sobre o aluno </a>
+                    </li>
+                    <li>
+                        <a id="tab2" href="#skills">Matriculas</a>
+                    </li>
+                    <!--
+                        <li>
+                            <a id="tab3" href="#reviews">Reviews</a>
+                        </li>
+                    -->
+                    <li id="active-bg"></li>
+                </ul>
+            </div>
+            <div id="tab1-content" class="tab-content tab-content--active">
+                <ul class="content-links">
+                    <li><a><b class="fw-bold">Nome completo: </b><span class="text-uppercase">{{object.nome_completo}}</span></a></li>
+                    {% if object.nome_social %}
+                    <li><a><b class="fw-bold">Nome social: </b><span class="text-uppercase">{{object.nome_social}}</span></a></li>
+                    {% endif %}   
+                    <li class='d-flex'><a><b class="fw-bold">Data de nascimento: </b><span class="text-uppercase me-5">{{object.data_nascimento}}</span></a></li>                    
+                    <li class='d-flex'><a><b class="fw-bold">Idade: </b>{{object.idade}} anos</a></li>
+                    <li class='d-flex'><a><b class="fw-bold">Nome da mãe: </b><span class="text-uppercase">{{object.nome_mae}}</span></a></li>  
+                    {% if object.nome_pai%}   
+                        <li class='d-flex'><a><b class="fw-bold">Nome da pai: </b><span class="text-uppercase">{{object.nome_pai}}</span></a></li>  
+                        {% else %}
+                        <li class='d-flex'><a><b class="fw-bold">Nome da pai: </b><span class="text-uppercase">Não declarado</span></a></li>  
+                    {% endif %}
+                </ul>
+            </div>
+            <div id="tab2-content" class="tab-content">
+                <ul class="content-links">
+                    <!--
+                    <li>
+                        <a href="#html-css">
+                            HTML, CSS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#javascript">
+                            JavaScript
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#react-and-nextjs">
+                            React and Next.js
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#nodejs">
+                            Node.js (REST, GraphQL)
+                        </a>
+                    </li>
+                    -->
+                </ul>
+            </div>
+            <!--
+            <div id="tab3-content" class="tab-content">
+                <p>
+                    Here are some of the reviews from my students 📚
+                </p>
+                <ul class="reviews">
+                    <li>
+                        <article class="review">
+                            <div class="review__avatar">
+                                <img src="{% static 'profile-01/assets/joe.jpg' %}" alt="Avatar">
+                            </div>
+                            <div class="review__content">
+                                <h4>Joe Doe</h4>
+                                <p>
+                                    Melissa is a great mentor. She helped me to prepare for the interview and
+                                    provided me with valuable feedback on my projects. I would highly recommend her
+                                    to anyone who is looking for a mentor.
+                                </p>
+                            </div>
+                        </article>
+                    </li>
+                    <li>
+                        <article class="review">
+                            <div class="review__avatar">
+                                <img src="{% static "profile-01/assets/jane.jpg" %}" alt="Avatar">
+                            </div>
+                            <div class="review__content">
+                                <h4>Jane Doe</h4>
+                                <p>
+                                    Melissa is awesome at explaining complex topics in a simple way. I have
+                                    learned a lot from her and would recommend her to anyone who is looking for a
+                                    mentor.
+                                </p>
+                            </div>
+                        </article>
+                    </li>
+                </ul>
+            </div>
+            -->
+        </main>
+    </div>
+    <script src="{% static 'profile-01/script.js' %}"></script>

@@ -1,0 +1,80 @@
+{% extends 'global/template.html' %}
+{% load static %}
+{% block css %}
+.modal-sheet .modal-dialog {
+    width: 380px;
+    transition: bottom .75s ease-in-out;
+  }
+  .modal-sheet .modal-footer {
+    padding-bottom: 2rem;
+  }
+
+{% endblock css %}
+{% block menu_horizontal %}
+<!--Menu horizontal Local-->
+{% include 'global/partials/breadcrumbs/index.html' %}
+
+{% endblock menu_horizontal %}
+{% block main %}
+<div class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalTour">
+    <h2 class='raleway'>{{svg|safe}} {{title}}</h2>
+      <div class="modal-content rounded-4 shadow">
+        {% if not tipo == 'visualiza' %}
+          <table class="table table-striped">
+            <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Data</th>
+              <th scope="col">Destinatário</th>
+              <th scope="col">Assunto</th>            
+              <th scope="col">Mensagem</th>
+              
+              <th scope="col">AÇÕES</th>
+            </tr>
+            </thead>
+            <tbody>
+          
+              {% for n in object_list %}
+            <tr>            
+              <th scope="row">{{n.pk}}</th>
+              <th scope="row">{{n.data_envio}}</th>
+              <td>{{n.user}}</td>
+              <td>{{n.assunto}}</td>
+              <td>{{n.messagem|safe}}</td>
+              <td class=''>
+                <a href="{% url 'controle_estoque:escolas_update' n.pk %}" class='pt-0' title='Editar'>
+                  <span class="material-symbols-outlined  text-primary ">edit_square</span></a> 
+                <a href="{% url 'controle_estoque:escolas_delete' n.pk %}" title='Excluir'> 
+                  <span class="material-symbols-outlined text-danger">delete</span>
+                </a></td>
+            </tr>  
+            {% endfor %}        
+            </tbody>
+          </table>
+          {% else %}
+          <div class="m-5">
+            <p class='h5'><b>Enviado por:</b><span class='text-capitalize'> {{mensagem.user.first_name}} {{mensagem.user.last_name}}</b><p>
+            <p class='h5'><b>Assunto:</b><span class='text-capitalize'> {{mensagem.assunto}} </b><p>
+            <p class='h5'><b>Mensagem:</b><div class='h5 m-3 border p-3'>{{mensagem.messagem|safe}}</div></p>
+            <p class='h5 w-100' style="text-align:right!important;font-size: 0.9rem;"><b>Enviado em:</b> {{mensagem.data_envio}}<p>
+          </div>
+        {% endif %} 
+      </div>      
+      <a href="{% url 'admin_acessos:mensagem' %}" class='btn bts-sm btn-primary w-25 right m-2' title='Eviar mensagem'><i class="fa-regular fa-envelope"></i> Enviar mensagem <i class="fa-solid fa-plus"></i></a>
+    
+  </div>
+{% endblock main %}
+{% block script %}
+
+      
+</script>
+
+ 
+<script>
+        // In your Javascript (external .js resource or <script> tag)
+    $(document).ready(function() {
+        $('#id_bairro').select2();
+        $('#id_rua').select2();
+    });
+</script>
+{% endblock script %}

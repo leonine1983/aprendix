@@ -1,9 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.dispatch import receiver
 from django.db.models.signals import post_migrate
 from ckeditor.fields import RichTextField
-
 
 class MessageUser(models.Model):
     remetente = models.ForeignKey(User, null=True, on_delete=models.CASCADE, editable=False, verbose_name="Remetente da mensagem", related_name="sent_messages")
@@ -13,7 +12,7 @@ class MessageUser(models.Model):
     aberta = models.BooleanField(default=False)
     foi_consultado = models.BooleanField(default=False)
     data_envio = models.DateTimeField(auto_now_add=True)
-    exclude_msg = models.CharField(null=True, max_length=5)
+    exclude_msg = models.CharField(max_length=5, blank=True, null=True)  # Corrigido para permitir valores em branco
 
     class Meta:
         ordering = ["-data_envio"]
@@ -51,14 +50,14 @@ def setup_post_migrate(sender, **kwargs):
     if sender.name == 'admin_acessos':
         if not MessageUser.objects.exists():
             for user in User.objects.all():
-                MessageUser.objects.create(
+                MessageUser.objects.get_or_create(
                     destinatario=user,
                     assunto="Olá!",
                     mensagem="Bem-vindo ao nosso sistema!",
                 )
 
     if not NomeclaturaJanelas.objects.exists():
-        NomeclaturaJanelas.objects.create(
+        NomeclaturaJanelas.objects.get_or_create(
             nome_disciplina='Objetos da Aprendizagem/Disciplinas',
             notas='Notas do Aluno'
         )

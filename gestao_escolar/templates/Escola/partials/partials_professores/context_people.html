@@ -1,0 +1,52 @@
+  
+  
+<div class='p-2 fs-5 border-danger-subtle border-right d-flex text-light' style= 'box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgb(209, 213, 219) 0px 0px 0px 1px inset; background-color:rgb(116, 145, 140)'>               
+    <div class=" p-1 mr-4 col-6"><i class="fa-thin fa-tally "></i> Total: {{lista_all.count}} profissionais associados à escola para o ano letivo de {{request.session.anoLetivo_nome}}</div>              
+    <!-- Exibir a paginação -->
+    <div class="pagination ">
+    <span class="step-links">
+        {% if lista_all.has_previous %}
+            <a class='text-decoration-none link-light btn btn-sm btn-info m-1' href="?page=1"><i class="fa-light fa-angles-left"></i> Inicio</a>
+            <a class='text-decoration-none link-light btn btn-sm btn-info m-1' href="?page={{ matriculas.previous_page_number }}"><i class="fa-light fa-angle-left"></i> Anterior</a>
+        {% endif %}  
+    </span>
+    <span class="current-page"><i class="fa-light fa-file"></i> {{ lista_all.number }}° página</span>
+    <span>
+        {% if lista_all.has_next %}
+            <a class='text-decoration-none link-light btn btn-sm btn-info m-1' href="?page={{ lista_all.next_page_number }}">Próxima <i class="fa-light fa-angle-left fa-flip-horizontal"></i></a>
+            <a class='text-decoration-none link-light btn btn-sm btn-info m-1' href="?page={{ lista_all.paginator.num_pages }}">Última<i class="fa-light fa-angles-left fa-flip-horizontal"></i></a>
+        {% endif %}
+    </span>
+    </div> 
+</div>           
+
+<div class="border mt-4 p-2 bg-dark-subtle ">
+    <div class="fs-5">Lista de profissionais disponíveis (encaminhamentos) à escola em {{request.session.anoLetivo_nome}}. </div>
+        <table class="table table-striped bg-white">
+            <thead>
+                <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nome Completo</th>
+                <th scope="col">Idade</th>
+                <th scope="col">Sexo</th>
+                <th scope="col">Data de Nascimento</th>
+                <th scope="col">Profissão</th>   
+                <th scope="col" class="text-center">Ação</th> 
+                </tr>
+            </thead>
+            <tbody>                  
+                {% for n in lista_all %}
+                <tr>
+                    <th scope="row">{{n.id}}</th>
+                    <td>{{n.encaminhamento.contratado.nome}} {{n.encaminhamento.contratado.sobrenome}}</td>
+                    <td>{{n.encaminhamento.contratado.idade}} anos</td>
+                    <td>{{n.encaminhamento.contratado.sexo}}</td>
+                    <td>{{n.encaminhamento.contratado.data_nascimento}}</td>
+                    <td>{{n.encaminhamento.nome_profissao}}</td>
+                
+                    <td><a href="{% url 'Gestao_Escolar:GE_Escola_alunos_update' n.pk %}"><span class='btn btn-sm btn-info mr-1'>Editar</span></a><a href="{% url 'Gestao_Escolar:GE_Escola_alunos_delete' n.pk %}"><span class='btn btn-sm btn-danger '>Excluir</span></a></td>                   
+                </tr>    
+                {% endfor %}                                 
+            </tbody>        
+        </table>  
+    </div>

@@ -1,0 +1,116 @@
+
+<!-- Bootstrap Datepicker CSS -->
+
+
+{% block script_head %}
+
+<style>
+    /* Seletor de classe para o ícone do seletor de datas */
+    .datepicker-input[type="date"]::before {
+        font-family: 'Font Awesome 5 Free';
+        content: "f073\f073"; /* Código do ícone do calendário do Font Awesome */
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+    }
+    
+/* Estilizar a caixa de seleção quando ela estiver com foco */
+select[name="deficiencia_aluno"] option:checked {
+  background-color: blue; /* Substitua "blue" pela cor desejada */
+  color: white; /* Substitua "white" pela cor do texto desejada */
+}
+input[type=checkbox]{
+  scale: 2;
+  margin-bottom: 2rem!important;
+  border-radius: 1rem!important;
+  border: #79a1e2 solid 1rem;
+  padding: 1rem;
+}
+.select2 {
+  width:100% !important;
+}
+
+</style>
+
+
+{% endblock script_head %}  
+<!-- Modal -->
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'global/css/search.css' %}">
+{% endblock css %}
+<div class="modal fade" id="modal_escola" style='background:#000'  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    
+    <div class="modal-dialog w-100">
+    <div class="modal-content bg-secondary-subtle ">
+        <div class="modal-header">
+        <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3 "><i class="fa-solid fa-people-roof" style="--fa-primary-color: #c11f1f; --fa-secondary-color: #c11f1f;"></i> Nenhuma turma registrada</span></h4>        
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        
+        </div>
+        <div class="modal-body shadow-sm bg-light-subtle">            
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"><i class="fa-solid fa-people-roof" style="--fa-primary-color: #c11f1f; --fa-secondary-color: #c11f1f;"></i> Turmas </button>
+                </li>
+              </ul> 
+            <div  class='p-2 fs-6 border-danger-subtle border-right d-flex text-light' style= 'box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgb(209, 213, 219) 0px 0px 0px 1px inset; background-color:rgb(116, 145, 140)'>
+              <div  class="  mr-4  fs-5 d-flex  w-100">             
+                <div class="mt-0 mb-0" style='margin:auto;  width:90%; '>
+
+                  <div class="fs-5 text-center">
+                    "Não encontramos nenhuma turma registrada no sistema para o ano letivo de {{request.session.anoLetivo_nome}}.<p>Clique no botão abaixo para adicionar um novo professor."</p>
+                    <p><a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}" class="btn btn-sm btn-success w-100 p-1 m-2 fs-3">Adicionar <i class="fa-solid fa-people-roof"></i></i></i><i class="fa-duotone fa-plus "></i></a></p>
+                  </div>                  
+
+                </div>             
+              
+              </div>           
+            </div>  
+              <div class="tab-content" id="myTabContent">
+
+                <div class="tab-pane fade show active pl-4 pr-4" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">  
+                 
+
+                </div>
+
+
+                             
+              </div>
+
+
+        </div>        
+    </div>
+    </div>
+</div>     
+    
+
+{% load static %}
+
+<!-- Mascara para formularios-->
+<!--FIM Mascara para formularios-->
+
+
+<script src="{% static 'base_static/select2/select2.min.css' %}"></script>
+    <script>
+        // In your Javascript (external .js resource or <script> tag)
+    $(document).ready(function() {
+        $('#id_aluno').select2();
+  
+    });
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+

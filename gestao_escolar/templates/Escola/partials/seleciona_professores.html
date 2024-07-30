@@ -1,0 +1,109 @@
+
+<!-- Bootstrap Datepicker CSS -->
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="modal_escola" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    
+    <div class="modal-dialog w-100">
+    <div class="modal-content bg-secondary-subtle ">
+        <div class="modal-header">
+        <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3 "><i class="fs-6 fa-duotone fa-person-chalkboard"></i> {{titulo_page}}</span></h4>        
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        
+        </div>
+        <div class="modal-body shadow-sm bg-light-subtle">
+            <div style="background-image: radial-gradient(circle at 50% -20.71%, #edf3ff 0, #b5c9f2 50%, #79a1e2 100%); margin:-1rem" class="mb-3 p-2">
+                <i class="fa-regular fa-face-grin-squint"></i> Olá, <span class="text-capitalize ">{{request.user.first_name}} {{request.user.last_name}}!!</span>            
+                <span class="m-0">Por favor, utilize os campos abaixo para realizar o remanejamento do aluno na turma:</span>                
+            </div>
+          
+        
+        
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          
+          <li class="nav-item bg-secondary-subtle" role="presentation">
+            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Remanejar aluno  <i class="fa-sharp fa-solid fa-plus text-info"></i></button>
+          </li>
+          <li>
+            <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_create' %}" class="nav-link">Adicionar aluno no sistema <i class="fa-sharp fa-solid fa-plus text-info"></i></a>
+          </li>
+        
+          
+        </ul>
+        <div class="tab-content" id="myTabContent">
+           
+          <div class="tab-pane fade bg-secondary-subtle  show active" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+            <div class="form-group ">
+              <div class=" p-2 d-flex" style="box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;">
+                {% for n in info_matrilula %}
+                <div class=" mr-3"><b><i class="fa-thin fa-pen-line"></i> Nome do aluno:</b><span class="text-uppercase pl-1">{{n.aluno}}</span></div>
+                <div class="mr-3 ml-3"><b><i class="fa-thin fa-pen-line"></i> Turma de origem:</b><span class="text-uppercase pl-1">{{n.turma}}</span></div>
+                <div class="mr-3 ml-3"><b><i class="fa-thin fa-pen-line"></i> Matrícula realizada no dia:</b><span class="text-uppercase pl-1">{{n.data_matricula}}</span></div>
+                {% endfor%}
+              </div>
+              <form method="post"class='m-3 p-3 row row-cols-3' >
+                {{ form.non_field_errors }}
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+                {% endfor %}  
+                <div id="id_aluno_matricula" class="mt-2">
+                  <p style="margin-bottom:-1rem !important" class="p-0 m-0">Escolha a turma para onde o aluno será remanejado.</p>.
+                  <a class="btn btn-sm btn-primary  w-100 p-2 m-0" href="">Escolher Turma <i class="fa-solid fa-people-roof bi fs-4"></i></a></div>
+                <button id="button-some" class="btn btn-sm btn-primary h-25 p-2 mt-5 " type="submit">Confirmar Remanejamento aluno <i class="fa-sharp fa-regular fa-layer-plus"></i></button>
+            </form> 
+
+            
+          </div>               
+        </div>
+    </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+{% block script_head %}
+
+<style>
+  #id_aluno_matricula{
+      display: none;
+  }
+</style>
+
+{% endblock script_head %}  
+
+{% block script_footer %}
+<script>
+  document.getElementById('id_tipo').addEventListener('change', function () {
+      var tipoSelect = document.getElementById('id_tipo');
+      var alunoMatricula = document.getElementById('id_aluno_matricula');
+      var button_some = document.getElementById('button-some');
+      var label_description = document.querySelector('label[for="id_description"]');
+      var description = document.getElementById('id_description');
+
+      if (tipoSelect.value === 'mudou_turma') {
+          alunoMatricula.style.display = 'block';
+          button_some.style.display = 'none';
+          label_description.style.display = 'none';
+          description.style.display = 'none';
+      } else {
+          alunoMatricula.style.display = 'none';
+          button_some.style.display = 'block';
+          label_description.style.display = 'block';
+          description.style.display = 'block';
+      }
+  });
+</script>
+
+{% endblock script_footer %} 

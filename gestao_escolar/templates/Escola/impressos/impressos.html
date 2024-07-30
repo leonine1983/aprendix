@@ -1,0 +1,223 @@
+{% extends 'gestao_escolar/template.html' %}
+{% load static %}
+{% block script_head %}
+ {% include 'gestao_escolar/links_modal.html' %}
+<script src="{% static 'select2/js/select2.full.min.js' %}"></script>
+<style>
+    #id_aluno_matricula{
+        display: none;
+    }
+    
+    /* Seletor de classe para o ícone do seletor de datas */
+    .datepicker-input[type="date"]::before {
+        font-family: 'Font Awesome 5 Free';
+        content: "f073\f073"; /* Código do ícone do calendário do Font Awesome */
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+    }
+        
+    /* Estilizar a caixa de seleção quando ela estiver com foco */
+    select[name="deficiencia_aluno"] option:checked {
+      background-color: blue; /* Substitua "blue" pela cor desejada */
+      color: white; /* Substitua "white" pela cor do texto desejada */
+    }
+    input[type=checkbox]{
+      scale: 2;
+      margin-bottom: 2rem!important;
+      border-radius: 1rem!important;
+      border: #79a1e2 solid 1rem;
+      padding: 1rem;
+    }
+    .border-verde-desgastado{
+        border-color: rgb(116, 145, 140)!important;
+    }
+    .fs-7{
+        font-size: 1rem !important;
+    }
+    .fs-8{
+        font-size: 0.8rem !important;
+    }
+    .bg-secondary-subtle{
+        background-color: #666;
+    }
+
+    .modal-content{        
+        width: 90vw!important;
+        min-height: 90vh!important;
+    }
+    .modal-dialog{
+        margin-left: 2.5%!important;
+    }
+    .modal-body{
+        min-height: 10rem!important;
+        width: 90%;
+        margin: 2% auto;
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+        border-bottom-left-radius: 1em;
+        border-bottom-right-radius: 1em;
+    } 
+    .modal_windows_title{
+        margin:-2rem -1rem -1rem -1rem;
+        box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px; 
+        background:#009BFF;
+        color:#fff;
+        border-top-left-radius: 1em;
+    border-top-right-radius: 1em;}
+    .bg-neutral_light{background-color: rgb(183,200,185);}
+    .bg-pale_green{background-color: rgb(212,236,216);}
+    tr { vertical-align: middle !important; text-align: center !important;}
+    
+</style>
+{% endblock script_head %} 
+{% block main %}
+
+<div class="shadow-sm p-3 mb-3 bg-skin w-100">    
+    <button onclick="imprimirConteudo()">Imprimir Conteúdo</button>
+    <div class=" m-auto  shadow " id="content_imprimir" style="width: 900px;max-height: 800px;min-height: 1080px;padding:0.5rem" >
+        <style>
+          @media print {    
+            @import url('https://fonts.googleapis.com');         
+            @import url('https://fonts.gstatic.com');
+            @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&display=swap');
+            body {
+                font-family: "M PLUS Rounded 1c", sans-serif !important;
+                font-weight: 400;
+                font-style: normal;
+            }
+            h2{
+                font-size:0.9rem!important;
+                font-family: "M PLUS Rounded 1c", sans-serif !important;
+            }   
+            table th, table td{
+                padding:0.5rem;
+                font-size:0.8rem!important;
+            }     
+                
+        } 
+        </style>
+        <div style="max-height: 7rem; display:flex; justify-content: space-between" class='d-flex'>
+            <div id='prefeitura' style='margin:0.5rem; display:flex; width:auto '>
+                <img style='margin-right:1rem; height:5rem' src='{% static "brasao-veracruz.png " %}' alt="" srcset="">
+                <div style='font-size: 0.8rem;'>                    
+                    ESTADO DA BAHIA</br>
+                    Prefeitura Municipal de Vera Cruz</br>
+                    CNPJ:13.891.130/0001-03</br>
+                    Rua São Bento,123 – Centro – Mar Grande</br>
+                    Cep: 44.470-000 – Vera Cruz / Bahia www.veracruz.ba.gov.br</br>
+                </div>                
+            </div>
+            <div id='sme' style='width:25%; padding-top:0.2rem'>                
+                <img  src='{% static "SME - 2 PNG.png " %}' alt=""  style="height: 70% !important;"  srcset="">                
+            </div>           
+        </div>
+        <hr>
+        <h2 >Relação de Turmas | <span class='text-capitalize'>{{request.session.escola_nome}}</span> </h2>
+        <table  style='width:100%'>
+            <tr style='background:#ccc'>
+                <th >Turma</th>
+                <th>Ano Letivo</th>
+                <th>Turno</th>
+                <th>Quantidade de Vagas</th>
+                <th>Multiseriada</th>
+            </tr>
+            {% for l  in list_turmas %}
+            <tr style='text-align:center; border: #ccc 0.1rem solid'>
+                <td>{{l.nome}}</td>
+                <td>{{l.ano_letivo}}</td>
+                <td>{{l.turno}}</td>
+                <td>{{l.quantidade_vagas }}</td>
+                <td>{% if turma_multiserie %}Sim {% else %}Não{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <div style="position:absolute;bottom: 0;display: flex;">
+            <img src="{% static "rh/S-RHE.svg" %}" alt="" sizes="" srcset="">
+            <div style='font-size: 0.8rem;'>
+                {{list_escola.nome_escola}}</br>
+                {{list_escola.endereco_escola}}</br>                
+                {{list_escola.telefone_escola}}</br>
+                
+            </div>
+        </div>
+    </div>
+  
+
+</div>
+
+{% block script_footer %}
+<script>
+        function imprimirConteudo() {
+            // Obtém o conteúdo da div
+            var conteudo = document.getElementById('content_imprimir').innerHTML;
+            
+            // Abre uma nova janela para impressão
+            var janela = window.open('', '', 'height=600,width=800');
+            janela.document.write('<html><head><title>Conteúdo</title></head>');
+            janela.document.write('<body>');
+            janela.document.write(conteudo); // Escreve o conteúdo na nova janela
+            janela.document.write('</body></html>');
+            
+            // Fecha a nova janela após a impressão
+            janela.document.close();
+            janela.print();
+        }
+    </script>
+
+
+<script>
+    // Small using Bootstrap 5 classes
+$("#form-select-sm").select2({
+    theme: "bootstrap-5",
+    dropdownParent: $("#form-select-sm").parent(), // Required for dropdown styling
+});
+</script>
+
+<script>
+var datepickers = [].slice.call(document.querySelectorAll('[data-datepicker]'))
+var datepickersList = datepickers.map(function (el) {
+    return new Datepicker(el, {
+        buttonClass: 'btn'
+    });
+});
+</script>
+<!--Esconde e exibe detalhes-->
+<script>
+    function toggleDetails(button) {
+        var details = button.nextElementSibling;
+        if (details.style.display === "none" || details.style.display === "") {
+            details.style.display = "block";
+            button.innerHTML = "Fechar";
+        } else {
+            details.style.display = "none";
+            button.innerHTML = "Leia mais...";
+        }
+    }
+</script>
+
+<!--Imprimir-->
+
+<script>
+   function imprimirConteudo() {
+            // Obtém o conteúdo da div
+            var conteudo = document.getElementById('content_imprimir').innerHTML;
+            
+            // Abre uma nova janela para impressão
+            var janela = window.open('', '', 'height=600,width=800');
+            janela.document.write('<html><head><title>Conteúdo</title></head>');
+            janela.document.write('<body>');
+            janela.document.write(conteudo); // Escreve o conteúdo na nova janela
+            janela.document.write('</body></html>');
+            
+            // Fecha a nova janela após a impressão
+            janela.document.close();
+            janela.print();
+        }
+</script>
+
+
+
+{% endblock script_footer %} 
+{% endblock main %}

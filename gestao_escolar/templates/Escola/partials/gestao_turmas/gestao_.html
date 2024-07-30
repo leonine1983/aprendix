@@ -1,0 +1,142 @@
+{% load static %}
+{% block script_head %}<link rel="stylesheet" href="{% static 'global/css/css3_tab.css' %}">{% endblock script_head %} 
+{% block script_footer %}{% endblock script_footer %} 
+<!-- Modal -->
+<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    
+  <div class="modal-dialog w-100">
+  <div class="modal-content bg-secondary-subtle">
+      <div class="modal-header">
+        <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3 "><i style="font-size: 1.65rem;" class="fs-4 fa-solid fa-users-gear"></i> {{titulo_page}} <i class="fa-solid fa-angles-right"></i> {{matriculas.0.turma}}</span></h4>        
+        <button type="button" class="close" data-dismiss="modal">&times;</button>      
+      </div>
+      <!-- tabs -->
+      <div class="pcss3t pcss3t-effect-scale pcss3t-theme-1">
+        {% if not matriculas  %}
+          <input type="radio" name="pcss3t" checked  id="tab1"class="tab-content-first">
+          <label for="tab1" class='col-3'><h1>Todas as turmas</h1></label>
+        {% else %}        
+          <input type="radio" name="pcss3t" checked  id="tab1"class="tab-content-first">
+          <label for="tab1" class='col-3'><h1>Alunos ({{matriculas|length}})</h1></label>
+          
+          <input type="radio" name="pcss3t" id="tab3" class="tab-content-3">
+          <label for="tab3"><i class="icon-cogs"></i>Disciplinas</label>
+          <input type="radio" name="pcss3t" id="tab4" class="tab-content-4">
+          <label for="tab4"><i class="icon-cogs"></i><img src="{% static 'svg/grade_horario.svg' %}" alt=""> Grade de Horários da Turma</label>
+          <a class='btn btn-success fs-7' href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}">Mudar Turma <i class="fa-regular fa-arrows-repeat"></i></i></a>                  
+          
+          
+        {% endif %}
+        
+        <ul>
+          {% if not matriculas  %}
+          <li class="tab-content tab-content-first typography">            
+            <table class='win11-table bg-p-3'>
+              <thead>
+                <tr>                  
+                  <th class='p-2 text-center bg-secondary-subtle '>#</th>
+                  <th class='p-2 text-center'>Turma</th>
+                  <th class='p-2 text-center'>Turno</th>
+                  <th class='p-2 text-center'>Série</th> 
+                  <th class='p-2 text-center'>Ano Letivo</th> 
+                  <th class='p-2 text-center'>Ação</th> 
+                </tr>
+              </thead>
+              <tbody>
+                {% for n in turmas %}
+                <tr >
+                  <td class='p-2 text-center '>{{forloop.counter}}</td>                  
+                  <td class='p-2 text-left text-capitalize'>{{n.nome}} {{n.descritivo_turma}}</td>
+                  <td class='p-2 text-center'>{{n.turno}}</td>
+                  <td class='p-2 text-center'>{{n.serie}}</td>
+                  <td class='p-2 text-center'>{{n.ano_letivo}}</td>
+                  <td class='p-2 text-center'>                      
+                    <a href='{% url "Gestao_Escolar:NotasAluno_one_create" n.pk %}' class='btn btn-sm btn-primary link-light  '>Coordenar essa turma: <b class='text-uppercase'>{{n.nome}}</b> <i class="ml-3  fa-duotone fa-circle-chevron-right fa-bounce" style="--fa-primary-color: #c565d2; --fa-secondary-color: #ffffff;"></i></a></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table> 
+          </li>
+          {% else %}  
+          <li class="tab-content tab-content-first typography bg-secondary-subtle"> 
+            <nav class="nav-win11" style="margin-top:-0.5rem ;">
+              <a href="{% url 'Gestao_Escolar:NotasAluno' matriculas.0.turma.pk %}"><i class="fa-thin fa-hundred-points"></i> Notas </a>
+              <a href="http://"><i class="fa-solid fa-person-to-door"></i> Faltas</a>
+              <a href="http://"><i class="fa-solid fa-align-justify"></i> Justficar Faltas</a>
+              <a href="http://"><i class="fa-duotone fa-notebook"></i> Relatar Ocorrência</a>
+              <a href="http://"><i class="fa-light fa-message-pen"></i> Enviar Mensagem ao aluno</a>
+            </nav>                        
+            <table class="win11-table shadow">
+              <h1>Alunos da turma {{matriculas.0.turma}}</h1>
+              <thead>
+                <tr class="mt-2">
+                  <th class="text-center">#</th> 
+                  <th class="">Codigo da matrícula</th> 
+                  <th class="text-left ">Aluno</th>                     
+                  <th class="text-center">Situação</th>     
+                  <th class="text-center">Data de Matricula</th>  
+                </tr>
+              </thead>
+              <tbody>                     
+                {% for n in matriculas %}
+                <tr>                    
+                  <td >{{forloop.counter}}</td>                    
+                  <td >{{n.cod_matricula}}</td>
+                  <td >{{n.aluno}}</td>                                    
+                  <td >{{n.situacao}}</td>
+                  <td >{{n.data_matricula}}</td>
+                </tr> 
+                {% endfor %}                                            
+              </tbody>
+            </table> 
+          </li>          
+          <li class="tab-content tab-content-3 typography">
+            <h1>Albert Einstein</h1>
+            <p>German-born theoretical physicist who developed the general theory of relativity, one of the two pillars of modern physics (alongside quantum mechanics). While best known for his mass–energy equivalence formula E = mc2 (which has been dubbed "the world's most famous equation"), he received the 1921 Nobel Prize in Physics "for his services to theoretical physics, and especially for his discovery of the law of the photoelectric effect". The latter was pivotal in establishing quantum theory.</p>
+            <p>Near the beginning of his career, Einstein thought that Newtonian mechanics was no longer enough to reconcile the laws of classical mechanics with the laws of the electromagnetic field. This led to the development of his special theory of relativity. He realized, however, that the principle of relativity could also be extended to gravitational fields, and with his subsequent theory of gravitation in 1916, he published a paper on the general theory of relativity.</p>
+            <p class="text-right"><em>Find out more about Albert Einstein from <a href="http://en.wikipedia.org/wiki/Albert_Einstein" target="_blank">Wikipedia</a>.</em></p>				
+          </li>     
+          <li class="tab-content tab-content-4 typography">
+            <div class= 'd-flex p-2 bg-p-5 justify-content-between'>
+              <h1 class=''><img src="{% static 'svg/grade_horario.svg' %}" alt=""> Horários do {{matriculas.0.turma}}</h1>  
+              <div>Validade: {{horarios.0.data_inicio}}</div>
+              <div>
+                <a class='btn btn-primary fs-7' href="{% url 'Gestao_Escolar:validadeHorario' matriculas.0.turma.pk %}">Nova Grade de Horários para a turma <i class="fa-solid fa-plus text-light"></i></a>                  
+              </div>
+            </div>
+            <table class="win11-table">
+              <thead class='bg-p-3 text-uppercase'>
+                <tr>
+                  <th class='text-center'>Período</th>
+                  <th class='text-center'>Segunda</th>
+                  <th class='text-center'>Terça</th>
+                  <th class='text-center'>Quarta</th>
+                  <th class='text-center'>Quinta</th>
+                  <th class='text-center'>Sexta</th>
+                  <th class='text-center'>EDITAR</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for horario in horarios %}  
+                  <td class='text-center'>{{ horario.periodo }} {{ horario.turma }}</td>
+                  <td class='text-center'>{{ horario.turma_Horario_relatedsegunda}}</td>
+                  <td class='text-center'>{{ horario.terca}}</td>
+                  <td class='text-center'>{{ horario.quarta}}</td>
+                  <td class='text-center'>{{ horario.quinta}}</td>
+                  <td class='text-center'>{{ horario.sexta}}</td>
+                  <td class='text-center'><a href="{% url 'Gestao_Escolar:horario_update' pk=horario.id turma_id=horario.turma.id %}">Editar <i class="fa-regular fa-pen-to-square"></i></a>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </li>          
+          {% endif %}
+        </ul>
+      </div>
+  </div> 
+</div>
+<!-- Bootstrap Datepicker CSS -->
+
+
+
+

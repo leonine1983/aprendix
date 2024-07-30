@@ -1,0 +1,48 @@
+{% load static %}
+<!--Etapa 1 Nome completo e nome da mae-->
+
+{% if bottom_ativo %}
+<style>
+  #botao{display:none}
+</style>
+{% endif %}
+<form method="post"class='m-3 ' > 
+    <div>
+      {% csrf_token %}
+      {{form.as_p}}  
+      {{ form.non_field_errors }}  
+    </div> 
+    <button id="botao" type="submit" class='fs-family-nunito btn btn-orange m-auto {{btn_bg}}'> {{bottom}} {{object}} {{btn_bg}}<img style='margin:-10rem 0' src="{% static 'animations/paperAvion.gif' %}" class='anime-h' srcset=""></button>                             
+</form> 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var checkbox = document.getElementById('id_aluno_exterior');
+    var paisOrigem = document.getElementById('id_pais_origem');
+    var dataEntrada = document.getElementById('id_data_entrada_no_pais');
+    var documentoEstrangeiro = document.getElementById('id_documento_estrangeiro');
+    var avanca = document.getElementById('avanca')
+    var botao = document.getElementById('botao')
+
+    checkbox.addEventListener('change', function() {
+        if (checkbox.checked) {
+            paisOrigem.disabled = false;
+            paisOrigem.required = true;
+            dataEntrada.disabled = false;
+            dataEntrada.required = true;
+            documentoEstrangeiro.disabled = false;
+            documentoEstrangeiro.required = true;
+            avanca.style.display = "none";
+            botao.style.display = "block"
+        } else {
+            paisOrigem.disabled = true;
+            paisOrigem.required = false;
+            dataEntrada.disabled = true;
+            dataEntrada.required = false;
+            documentoEstrangeiro.disabled = true;
+            dataEntrada.required = false;
+            avanca.style.display = 'block';
+            botao.style.display = 'none'
+        }
+    });
+});
+</script>

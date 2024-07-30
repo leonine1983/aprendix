@@ -1,0 +1,105 @@
+
+<!-- Bootstrap Datepicker CSS -->
+
+
+
+{% block script_head %}
+  <style>
+    /* Seletor de classe para o ícone do seletor de datas */
+    .datepicker-input[type="date"]::before {
+        font-family: 'Font Awesome 5 Free';
+        content: "f073\f073"; /* Código do ícone do calendário do Font Awesome */
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+    }
+    
+/* Estilizar a caixa de seleção quando ela estiver com foco */
+select[name="deficiencia_aluno"] option:checked {
+  background-color: blue; /* Substitua "blue" pela cor desejada */
+  color: white; /* Substitua "white" pela cor do texto desejada */
+}
+input[type=checkbox]{
+  scale: 2;
+  margin-bottom: 2rem!important;
+  border-radius: 1rem!important;
+  border: #79a1e2 solid 1rem;
+  padding: 1rem;
+}
+</style>
+{% endblock script_head %}  
+<!-- Modal -->
+<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    
+    <div class="modal-dialog w-100">
+    <div class="modal-content bg-secondary-subtle " >
+        <div class="modal-header">
+          <h4 class="modal-title fs-6"><span class="text-uppercase ml-5 fs-3 "><i class="fa-solid fa-people-roof"></i> {{titulo_page}}</span></h4>        
+          <button type="button" class="close" data-dismiss="modal">&times;</button>          
+        </div>
+        <div class="modal-body shadow-sm bg-light-subtle">   
+            <div class="modal_windows_title mb-3 p-2  bg-p-4 ">
+              <i class="fa-regular fa-face-grin-squint"></i> <span class="text-capitalize fs-7"> Olá, {% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}{{request.user}}{% endif %}!!</span> 
+               Por favor, selecione uma das turmas para prosseguir com a matrícula:
+            </div>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Todas as turmas</button>
+                </li>                   
+              </ul>
+              <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                    <table class="win11-table">
+                        <thead>
+                      <tr>                        
+                        <th scope="col" class='text-center'>#</th>
+                        <th scope="col" class='text-left'>Turma / Serie</th>
+                        <th scope="col">Alunos matriculados</th>
+                        <th scope="col">Máximo de alunos </th>
+                        <th scope="col">Ano Letivo</th>
+                        <th scope="col">Turma Multisérie</th>          
+                        <th scope="col" class='text-center'>Ação</th>                 
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for n in object_list %}
+                      <tr>
+                        <td class='text-center'>{{forloop.counter}}</td>
+                        <td class='text-left'><span class='text-uppercase '>{{n.nome}} {{n.descritivo_turma}}</span> <a class='btn btn-sm  me-1' href="{% url 'Gestao_Escolar:GE_Escola_Turmas_update' n.pk %}"><i class="fa-thin fa-pen-to-square"></i><span>Editar</span></a></td>
+                        <td>{{n.related_matricula_turma.all|length}}</td>
+                        <td>{{n.quantidade_vagas}} </td>
+                        <td>{{n.ano_letivo}}</td>
+                        {% if turma_multiserie %}                        
+                        <td>Sim</td>
+                        {%else%}
+                        <td>Não</td>
+                        {%endif%}
+                        <td class='d-flex'>
+                          <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_create' n.pk %}"><span class='btn btn-sm btn-info mr-1'>Prosseguir com a matrícula</span></a>
+                        </td>
+                      </tr>    
+                    {% endfor %}                
+                    </tbody>                  
+                    </table>
+                </div>               
+        </div>        
+    </div>
+    </div>
+</div>
+<script>
+  // Adicione um ouvinte de evento de mudança ao <select>
+document.getElementById("mySelect").addEventListener("change", function() {
+  // Remove a classe 'selected' de todas as opções
+  var options = this.getElementsByTagName("option");
+  for (var i = 0; i < options.length; i++) {
+    options[i].classList.remove("selected");
+  }
+
+  // Adiciona a classe 'selected' à opção selecionada
+  var selectedOption = this.options[this.selectedIndex];
+  selectedOption.classList.add("selected");
+});
+
+</script>

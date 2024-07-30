@@ -1,0 +1,151 @@
+{% load static %}
+<header class=" mb-3 border-bottom shadow-bottom w-100 m-0">  
+  <link
+  href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+  rel="stylesheet"
+/>
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+/>
+<link rel="stylesheet" href="{% static 'global/css/styles_google.css' %}" />
+
+
+  <nav class='nav_google bg-p-1 p-5 '
+  style='box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;margin-top:-0.3rem'
+
+  >
+    <div class="logo col-8">      
+      <img class='w-25' src="{% static 's-ge/S-GE.svg' %}" />
+      <h1 class="text-uppercase h1 fs-6 txt-p mx-5">{{request.session.escola_nome}} </h1>
+      <h2 class="text-uppercase h2 fs-5 txt-p mx-5">
+          <i class="fa-solid fa-calendar-days"></i> Ano Letivo: {{request.session.anoLetivo_nome}}
+      </h2>
+    </div>
+    <div class="nav-right">
+      <a href="#" class="d-block  text-decoration-none txt-p " data-bs-toggle="dropdown" aria-expanded="false">
+           
+        {% if not aberto %}         
+          <i class="fa-solid fa-comment fa-flip-horizontal"></i>
+        {% else %}  
+          <i class="fa-solid fa-comments fa-beat text-info h5 "> <b style="font-size:0.5rem; color:black">MSG</b><sup style="font-size:0.4rem; color:black; margin-right: -0.1rem;"></sup></i>                    
+        {% endif %}
+
+      </a>
+      {% for n in usuario %}                  
+              {% if n.aberta %}   
+              <a class="dropdown-item m-0 p-0 text-secondary " href=" {% url 'admin_acessos:mensagem_detalhe' n.pk %} " >
+                <div class=' p-1 m-0 d-flex'>
+                  <span class="w-100" ><img src="{% static n.remetente.foto %}" alt="mdo" width="32" height="32" class="rounded-circle"> {{n.assunto}} </span>
+                  <span class="w-25 " style="padding-left: 1rem;">
+                    <i class="fa-regular fa-eye"></i>
+                  </span>
+                </div>
+              </a>               
+              {% else %}   
+              <a class=" dropdown-item m-0 p-0  txt-p" href="{% url 'admin_acessos:mensagem_update' n.pk %} ">                 
+                <div class='p-1 m-0 d-flex'>
+                  <div class="w-100" ><img src="{% static n.remetente.foto %}" alt="mdo" width="32" height="32" class="rounded-circle"><i class="w-25 fa-solid fa-volume-high"></i> {{n.assunto}}  </div>
+                  <div class="w-25 " style="padding-left: 1rem;">
+                    <i class="fa-solid fa-envelope fa-beat text-info  "></i>
+                  </div>
+                </div>
+                </a>
+              {% endif %} 
+            {% endfor %}
+      <a class="dropdown-item txt-p" href="{% url 'admin_acessos:mensagem'%}">
+        <i class="fa-regular fa-envelope"></i>
+        <span>Enviar mensagem</span>        
+      </a>
+      <a class="dropdown-item txt-p" href="{% url 'admin_acessos:logout'%}"><i class="fa-thin fa-door-closed txt-p"></i> Sair </a>
+      <span class="material-symbols-outlined txt-p"> <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M476-280q21 0 35.5-14.5T526-330q0-21-14.5-35.5T476-380q-21 0-35.5 14.5T426-330q0 21 14.5 35.5T476-280Zm-36-154h74q0-17 1.5-29t6.5-23q5-11 12.5-20.5T556-530q35-35 49.5-58.5T620-642q0-53-36-85.5T487-760q-55 0-93.5 27T340-658l66 26q7-27 28-43.5t49-16.5q27 0 45 14.5t18 38.5q0 17-11 36t-37 42q-17 14-27.5 27.5T453-505q-7 15-10 31.5t-3 39.5Zm40 394L360-160H200q-33 0-56.5-23.5T120-240v-560q0-33 23.5-56.5T200-880h560q33 0 56.5 23.5T840-800v560q0 33-23.5 56.5T760-160H600L480-40ZM200-240h192l88 88 88-88h192v-560H200v560Zm280-280Z"/></svg></span>     
+      <div class="dropdown txt-p">
+        <div class="button material-symbols-outlined"><a href="">apps</a></div>
+
+
+
+        <div class="menu_google shadow bg-p-5 ">
+          <div class="button">
+            <a href="#" class="d-block  text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="{% if user.foto is not None %}{% static user.foto %}{% else %}{% static 'man.png' %}{% endif %}" alt="mdo" width="32" height="32" class="rounded-circle">     
+              {% if user.is_authenticated %}
+              <span> <b class='text-capitalize'>{{ user.username }}</b></span>              
+              {% else %}
+              <span>Você ainda não está logado.</span>
+              {% endif %}       
+            </a>
+          </div>
+          <div class="button">  
+            <a href="{% url 'admin_acessos:painel_acesso' %}">
+              <img src="{% static 'svg/grade_horario.svg' %}" alt="mdo" width="32" class="rounded-circle">     
+            <span>
+               Área de Acessos
+            </span>  
+            </a>                    
+          </div>
+          <div class="button">
+            <a href="">
+              <img src="{% static 'svg/grade_horario.svg' %}" alt="mdo" width="50" class="rounded-circle">     
+              <span>Horários</span>
+            </a>
+          </div>
+          <div class="button">
+            <a href="">
+              <span style="background-position: 0 -897px"></span>
+              <span>Play</span>
+            </a>
+          </div>
+          <div class="button">
+            <a href="">
+              <span style="background-position: 0 -414px"></span>
+              <span>News</span>
+            </a>
+          </div>
+          <div class="button">
+            <a href="">
+              <span style="background-position: 0 -2415px"></span>
+              <span>Gmail</span>
+            </a>
+          </div>
+          <div class="button">
+            <a href="">
+              <span style="background-position: 0 -1104px"></span>
+              <span>Meet</span>
+            </a>
+          </div>
+          <div class="button">
+            <a href="">
+              <span style="background-position: 0 -69px"></span>
+              <span>Chat</span>
+            </a>
+          </div>
+          <div class="button">
+            <a href="">
+              <span style="background-position: 0 -1449px"></span>
+              <span>Contacts</span>
+            </a>
+          </div>
+          <div class="button">
+            <a href="">
+              <span style="background-position: 0 0"></span>
+              <span>Drive</span>
+            </a>
+          </div>
+          <div class="button">
+            <a href="">
+              <span style="background-position: 0 -759px"></span>
+              <span>Calendar</span>
+            </a>
+          </div>
+          <div class="button">
+            <a href="http://" >
+              <span style="background-position: 0 -2346px"></span>
+              <span>Translate</span>
+            </a>
+          </div>        
+        </div>
+      </div>
+        <img src="{% if user.foto is not None %}{% static user.foto %}{% else %}{% static 'man.png' %}{% endif %}" alt="mdo" width="32" height="32" class="rounded-circle">           
+    </div>
+  </nav>
+</header>

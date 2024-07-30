@@ -1,0 +1,577 @@
+
+@import url("https://fonts.googleapis.com");
+@import url("https://fonts.gstatic.com");
+@import url("https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+:root{
+    --f-nunico: 'Nunito', sans-serif !important;
+    --f-Montserrat: "Montserrat", sans-serif !important;
+    --f-Nanugot: "Nanum Gothic", sans-serif !important;
+
+}
+
+/* Estilo para h1 */
+body,h1,h2, h3, h4, h5, h6{font-family: var(--f-Nanugot);}
+h1 {
+  font-size: 2rem !important; /* Tamanho de fonte grande */
+  font-weight: 600 !important; /* Peso médio */
+  color: #1d1d1d !important; /* Cor de texto escura */
+  margin: 0.5rem 0 !important; /* Margem vertical */
+}
+
+/* Estilo para h2 */
+h2 {
+  font-size: 1.75rem !important; /* Tamanho de fonte menor que h1 */
+  font-weight: 500 !important; /* Peso médio */
+  color: #2a2a2a !important; /* Cor de texto um pouco mais clara que h1 */
+  margin: 0.5rem 0 !important; /* Margem vertical */
+}
+
+/* Estilo para h3 */
+h3 {
+  font-size: 1.5rem !important; /* Tamanho de fonte menor que h2 */
+  font-weight: 450 !important; /* Peso leve */
+  color: #3c3c3c !important; /* Cor de texto intermediária */
+  margin: 0.5rem 0 !important; /* Margem vertical */
+}
+
+/* Estilo para h4 */
+h4 {
+  font-size: 1.25rem !important; /* Tamanho de fonte menor que h3 */
+  font-weight: 300 !important; /* Peso leve */
+  color: #4e4e4e !important; /* Cor de texto clara */
+  margin: 0.5rem 0 !important; /* Margem vertical */
+}
+
+/* Estilo para h5 */
+h5 {
+  font-size: 1.05rem !important; /* Tamanho de fonte menor que h4 */
+  font-weight: 250 !important; /* Peso normal */
+  color: #606060 !important; /* Cor de texto suave */
+  margin: 0.5rem 0 !important; /* Margem vertical */
+}
+
+/* Adiciona sombra sutil para um efeito moderno */
+h1, h2, h3, h4, h5 {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+.fs-family-nunito {
+    font-family:var(--f-nunico);
+}
+#id_aluno_matricula{
+    display: none;
+}
+/* Seletor de classe para o ícone do seletor de datas */
+.datepicker-input[type="date"]::before {
+    font-family: 'Font Awesome 5 Free';
+    content: "f073\f073"; /* Código do ícone do calendário do Font Awesome */
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}    
+/* Estilizar a caixa de seleção quando ela estiver com foco */
+select[name="deficiencia_aluno"] option:checked {
+  background-color: blue; /* Substitua "blue" pela cor desejada */
+  color: white; /* Substitua "white" pela cor do texto desejada */
+}
+input[type=checkbox]{
+  scale: 2;
+  margin-bottom: 2rem!important;
+  border-radius: 1rem!important;
+  border: #79a1e2 solid 1rem;
+  padding: 1rem;
+}
+.border-verde-desgastado{
+    border-color: rgb(116, 145, 140)!important;
+}
+.fs-7{
+    font-size: 1rem !important;
+}
+.fs-8{
+    font-size: 0.8rem !important;
+}
+.bg-secondary-subtle{
+    background-color: #666;
+}
+.bg-danger-subtle{
+    background-color: #F4998d!important;
+}
+.modal-content{        
+    width: 80vw!important;
+    min-height:93vh!important  
+}
+.modal-dialog{ 
+    margin-left:10%    
+}
+.modal-body{
+    min-height: 10rem!important;
+    width: 90%;
+    margin: 2% auto;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+    border-bottom-left-radius: 1em;
+    border-bottom-right-radius: 1em;
+} 
+.modal_windows_title{
+    margin:-2rem -1rem -1rem -1rem;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px; 
+    background:#009BFF;
+    color:#fff;
+    border-top-left-radius: 1em;
+border-top-right-radius: 1em;}
+.bg-neutral_light{background-color: rgb(183,200,185);}
+.bg-pale_green{background-color: rgb(212,236,216);}
+tr { vertical-align: middle !important; text-align: center !important;}
+
+
+
+/* Corpo da janela */
+.win11-window {
+width: 600px;
+margin: 20px auto;
+border: 1px solid #ddd;
+border-radius: 10px;
+font-family: "Segoe UI", Tahoma, Geneva, sans-serif;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+overflow: hidden;
+}
+/* Cabeçalho da janela */
+.win11-window-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+background-color: #0078d4;
+color: white;
+padding: 10px 16px;
+border-top-left-radius: 10px;
+border-top-right-radius: 10px;
+}
+.win11-window-title {
+font-size: 16px;
+font-weight: bold;
+}
+.win11-window-controls {
+display: flex;
+gap: 6px;
+}
+.win11-control {
+width: 12px;
+height: 12px;
+background-color: white;
+border-radius: 50%;
+display: inline-block;
+cursor: pointer;
+}
+.win11-control.win11-close {
+background-color: #e81123;
+}
+
+/* Estilo geral da tabela */
+.win11-table {
+width: 100%;
+border-collapse: collapse;
+font-size: 18px;
+box-shadow: rgba(0, 0, 0, 0.18) 0px 2px 4px!important;
+border-radius: 8px;
+overflow: hidden;
+}
+.win11-table h1 {
+text-align: center;
+color: #333;
+font-size: 24px;
+margin-bottom: 1px;
+}
+.win11-table thead {
+background-color: #0078d4!important;
+color: #493b3b;
+}
+.win11-table thead th {
+padding: 12px 15px;
+text-align: center;
+}
+.win11-table tbody tr {
+border-bottom: 1px solid #dddddd;
+}
+.win11-table tbody tr:nth-of-type(even) {
+background-color: #f3f3f3;
+}
+.win11-table tbody tr:last-of-type {
+border-bottom: 2px solid #0078d4;
+}
+.win11-table tbody td {
+padding: 1px ;
+text-align: center;
+}
+.win11-table tbody td:first-child {
+text-align: center;
+}
+.win11-table th,
+.win11-table td {
+border: 1px solid #dddddd;
+}
+.win11-table th {
+background-color: #f4f4f4;
+}
+
+
+/* Estilo da paginação Windows 11 */
+.win11-pagination {
+display: flex;
+justify-content: center;
+align-items: center;
+margin: 20px 1rem;
+font-family: "Segoe UI", Tahoma, Geneva, sans-serif;
+}
+.win11-step-links {
+display: flex;
+gap: 10px;
+}
+.win11-pagination-link {
+padding: 8px 12px;
+color: #0078d4;
+text-decoration: none;
+border: 1px solid #0078d4;
+border-radius: 4px;
+transition: background-color 0.3s ease, color 0.3s ease;
+}
+.win11-pagination-link:hover {
+background-color: #0078d4;
+color: white;
+}
+
+.win11-current {
+padding: 8px 12px;
+background-color: #f3f3f3;
+border: 1px solid #ddd;
+border-radius: 4px;
+color: #333;
+}
+.win11-total-records {
+font-size: 14px;
+color: #333;
+margin-left:1rem;
+font-weight: bold;
+}
+/* Estilo geral da navbar */
+.nav-win11 {
+display: flex;
+justify-content: space-around;
+align-items: center;
+padding: 15px;
+background: rgba(255, 255, 255, 0.7); /* Transparência */
+backdrop-filter: blur(10px); /* Efeito de desfoque */
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+border-radius: 10px;
+margin: 20px;
+}
+/* Estilo geral da barra de navegação */
+.nav-win11 {
+display: flex;
+justify-content: space-around;
+align-items: center;
+background: rgba(255, 255, 255, 0.8);
+backdrop-filter: blur(10px); /* Efeito de desfoque */
+padding: 10px 20px;
+border-radius: 8px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+margin: 20px 0;
+}
+/* Estilo geral da navbar */
+.nav-win11 {
+display: flex;
+justify-content:space-evenly!important;
+align-items: center;
+background: rgba(255, 255, 255, 0.7);
+backdrop-filter: blur(10px);
+padding: 10px 20px;
+border-radius: 8px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+/* Estilo geral da navbar */
+.nav-win11 {
+display: flex;
+background: rgba(255, 255, 255, 0.7);
+backdrop-filter: blur(10px);
+border-radius: 8px;
+overflow: hidden;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+padding: 10px 0;
+margin: 20px 0;
+}
+/* Estilo dos links na navbar */
+.nav-win11 a {
+flex: 1;
+padding: 10px 20px;
+text-align: center;
+text-decoration: none;
+color: #333;
+font-size: 16px;
+font-weight: 500;
+display: flex;
+align-items: center;
+justify-content: center;
+background-color: rgba(240, 240, 240, 0.9);
+border-right: 1px solid rgba(200, 200, 200, 0.5);
+transition: background-color 0.3s, color 0.3s;
+cursor: pointer;
+}
+.nav-win11 a:hover {
+background-color: rgba(200, 200, 200, 0.9) !important;
+}
+.nav-win11 a:last-child {
+border-right: none; /* Remover borda do último link */
+}
+/* Estilo dos ícones e texto */
+.nav-win11 a i, .nav-win11 a {
+color: #333 !important;
+}
+/* Remover espaço entre links */
+.nav-win11 a:not(:last-child) {
+margin-right: 0 !important;
+}
+.errorlist {
+border: 2px solid #d32f2f;
+background-color: #ffebee;
+color: #d32f2f;
+padding: 10px;
+border-radius: 5px;
+font-family: Arial, sans-serif;
+text-align:center
+}
+.errorlist h2 {
+font-size: 18px;
+margin-top: 0;
+margin-bottom: 10px;
+}
+.errorlist p {
+font-size: 14px;
+margin-top: 0;
+margin-bottom: 10px;
+}
+.errorlist .solution {
+font-weight: bold;
+color: #388e3c;
+}
+.errorlist .button {
+background-color: #d32f2f;
+color: #fff;
+border: none;
+padding: 8px 16px;
+border-radius: 3px;
+font-size: 14px;
+cursor: pointer;
+transition: background-color 0.3s;
+}
+.errorlist .button:hover {
+background-color: #b71c1c;
+}
+
+/* Classes Btn personalizadas*/
+.btn-orange{display:inline-block;font-weight:400;text-align:center;white-space:nowrap;vertical-align:middle;user-select:none;border:1px solid transparent;padding:0.375rem 0.75rem;font-size:1rem;line-height:1.5;border-radius:0.25rem;transition:color 0.15s ease-in-out,background-color 0.15s ease-in-out,border-color 0.15s ease-in-out,box-shadow 0.15s ease-in-out;background-color:#ffa500;color:#443304;border-color:#ffa500}.btn-orange:hover{background-color:#e69500;border-color:#e69500;color:#fff}.btn-orange:focus,.btn-orange.focus{box-shadow:0 0 0 0.2rem rgba(255,165,0,0.5)}.btn-orange.disabled,.btn-orange:disabled{opacity:0.65}.btn-orange:not(:disabled):not(.disabled):active,.btn-orange:not(:disabled):not(.disabled).active,.show>.btn-orange.dropdown-toggle{background-color:#cc7a00;border-color:#cc7a00}.btn-orange:not(:disabled):not(.disabled):active:focus,.btn-orange:not(:disabled):not(.disabled).active:focus,.show>.btn-orange.dropdown-toggle:focus{box-shadow:0 0 0 0.2rem rgba(255,165,0,0.5)}
+
+
+
+/* Estilo base para o formulário */
+form div {
+  font-family: Segoe UI, Arial, sans-serif !important;
+  padding: 10px !important;
+  background-color: #f0f0f0 !important;
+  border: 1px solid #ccc !important;
+  border-radius: 5px !important;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1) !important;
+  width: 100%!important;
+  max-width: 100% !important; /* Largura máxima ocupando todo o espaço disponível */
+  margin: auto !important;
+  display: grid; /* Utiliza display grid para controlar a disposição dos campos */
+  grid-gap: 5px; /* Espaçamento entre os campos */
+  grid-template-columns: repeat(2, 1fr)!important; /* 3 colunas para telas maiores */
+}
+
+/* Estilo para todos os campos de input */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="tel"],
+textarea,
+select {
+  width: 100%; /* Ocupa toda a largura da coluna */
+  padding: 10px !important;
+  margin: 8px 0 !important;
+  font-size: 16px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 3px !important;
+  box-sizing: border-box !important;
+  background-color: white!important;
+}
+
+/* Estilo para botões de radio e checkbox */
+input[type="radio"],
+input[type="checkbox"] {
+  margin-right: 5px !important;
+}
+
+/* Estilo para o botão de submit */
+input[type="submit"],
+button[type="submit"] {
+  background-color: #0078d7 !important;
+  color: white !important;
+  padding: 12px 20px !important;
+  border: none !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+}
+
+/* Estilo para o hover do botão de submit */
+input[type="submit"]:hover,
+button[type="submit"]:hover {
+  background-color: #0056b3 !important;
+}
+
+/* Estilo para campos desabilitados */
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background-color: #f0f0f0 !important;
+  color: #999 !important;
+  cursor: not-allowed !important;
+}
+
+/* Media queries para reorganizar os campos conforme a largura da tela */
+@media (max-width: 900px) {
+  form {
+    grid-template-columns: repeat(2, 1fr); /* 2 colunas para telas médias */
+  }
+}
+
+@media (max-width: 600px) {
+  form {
+    grid-template-columns: 1fr; /* 1 coluna para telas menores */
+  }
+}
+
+
+
+/* Forms windwosForm*/
+.win11-form {
+  font-family: 'Roboto', sans-serif;
+  background-color: #f3f3f3;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 75%;
+  margin:1% auto;
+}
+.win11-form label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #333;
+}
+.win11-form input[type="text"],
+.win11-form input[type="time"],
+.win11-form input[type="date"],
+.win11-form select,
+.win11-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+  box-sizing: border-box;
+}
+.win11-form input[type="text"]:focus,
+.win11-form input[type="time"]:focus,
+.win11-form input[type="date"]:focus,
+.win11-form select:focus,
+.win11-form textarea:focus {
+  border-color: #0078d4;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 120, 212, 0.5);
+}
+.win11-form button {
+  background-color: #0078d4;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+.win11-form button:hover {
+  background-color: #005a9e;
+}
+
+/* Estilo dos elementos de formulário */
+.win11-input,
+.win11-select,
+.win11-button, .win11-table {
+width: calc(100% - 20px);
+padding: 8px 10px;
+margin: 4px 0;
+font-family: "Segoe UI", Tahoma, Geneva, sans-serif;
+font-size: 14px;
+border: 1px solid #ccc;
+border-radius: 5px;
+box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.win11-input:focus,
+.win11-select:focus,
+.win11-button:focus {
+border-color: #0078d4;
+outline: none;
+}
+.win11-button {
+background-color: #0078d4;
+color: white;
+cursor: pointer;
+transition: background-color 0.3s ease;
+}
+.win11-button:hover {
+background-color: #005a9e;
+}
+/* Estilo do campo de busca Windows 11 */
+.win11-search-wrapper {
+display: flex;
+align-items: center;
+justify-content: center;
+margin: 1rem auto;
+}
+.win11-search-wrapper-inner {
+display: flex;
+align-items: center;
+border: 1px solid #0078d4;
+border-radius: 4px;
+background-color: white;
+padding: 4px;
+}
+.win11-search-input {
+border: none;
+outline: none;
+padding: 6px;
+font-size: 14px;
+width: 200px;
+}
+.win11-search-button {
+background-color: #0078d4;
+color: white;
+border: none;
+border-top-right-radius: 4px;
+border-bottom-right-radius: 4px;
+padding: 6px 10px;
+cursor: pointer;
+transition: background-color 0.3s ease;
+}
+.win11-search-button:hover {
+background-color: #005a9e;
+}

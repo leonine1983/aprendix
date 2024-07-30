@@ -1,0 +1,240 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <meta name="description" content="">
+    <meta name="author" content="Rogério Cerqueria da Silva">
+   
+    
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    
+    <!--link google--> 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400&display=swap" rel="stylesheet">    
+    <link href="https://fonts.googleapis.com/css2?family=El+Messiri&family=Gruppo&display=swap" rel="stylesheet">
+
+    <!-- css -->  
+    <link href="{% static 'global/css/partials/sidebars.css' %}" rel="stylesheet">
+    <link href="{% static 'global/css/partials/headers.css' %}" rel="stylesheet">    
+    <link href="{% static 'global/css/bootstrap.min.css' %}" rel="stylesheet"> 
+
+  
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.css' %}">
+   
+   
+   <link rel="stylesheet" href="{% static 'select2/select2.min.css' %}" />   
+   <link rel="stylesheet" href="{% static 'select2/select2-bootstrap-5-theme.min.css' %}" />
+   <!-- Or for RTL support -->
+   <link rel="stylesheet" href="{% static 'select2/select2-bootstrap-5-theme.rtl.min.css' %}" />
+   
+   <script src="{% static 'select2/js/jquery.slim.min.js' %}"></script>
+   <script src="{% static 'select2/js/bootstrap.bundle.min.js' %}"></script>
+   <script src="{% static 'select2/js/select2.full.min.js' %}"></script>
+
+
+    <!-- js -->
+    <script src="{% static 'global/js/partials/sidebars.js' %}"></script>
+    <script src="{% static 'global/js/color-modes.js' %}"></script>
+   
+   <style>
+       body{
+           font-family: 'El Messiri', sans-serif !important;
+           font-family: 'Gruppo', sans-serif;
+           font-weight:200!important;
+         
+       }
+       .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+        }
+
+        @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+        }
+        }
+
+        .b-example-divider {
+        width: 100%;
+        height: 3rem;
+        background-color: rgba(0, 0, 0, .1);
+        border: solid rgba(0, 0, 0, .15);
+        border-width: 1px 0;
+        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+        }
+
+        .b-example-vr {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 100vh;
+        }
+
+        .bi {
+        vertical-align: -.125em;
+        fill: currentColor;
+        }
+
+        .nav-scroller {
+        position: relative;
+        z-index: 10;
+        height: 2.75rem;
+        overflow-y: hidden;
+        }
+
+        .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        }
+
+        .btn-bd-primary {
+        --bd-violet-bg: #712cf9;
+        --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+
+        --bs-btn-font-weight: 600;
+        --bs-btn-color: var(--bs-white);
+        --bs-btn-bg: var(--bd-violet-bg);
+        --bs-btn-border-color: var(--bd-violet-bg);
+        --bs-btn-hover-color: var(--bs-white);
+        --bs-btn-hover-bg: #6528e0;
+        --bs-btn-hover-border-color: #6528e0;
+        --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+        --bs-btn-active-color: var(--bs-btn-hover-color);
+        --bs-btn-active-bg: #5a23c8;
+        --bs-btn-active-border-color: #5a23c8;
+        }
+        .bg-silver{
+          background:#d3dfdf!important;
+        }
+        .bg-silver-2{
+          background:#bbd8d8!important;
+        }
+        .bd-mode-toggle {
+        z-index: 1500;
+        }
+        #oculto {
+            display: none;
+            width: 0;
+            overflow: hidden;
+            transition: width 0.5s ease-in-out !important;
+        }
+        #oculto.exibindo {
+            width: 200px;
+        }
+        #sidebar{
+          box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+        }      
+        .shadow-bottom {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          margin-left: -1rem !important;
+          margin-right: -1rem !important;
+          width: calc(100% + 2rem) !important;
+        }
+        h1 {
+          font-family: 'Darker Grotesque', sans-serif !important;
+          font-size: 1.6rem;
+        }
+        h2 {
+          font-family: 'Darker Grotesque', sans-serif !important;
+          font-size: 1.3rem;
+        }
+        table thead tr th {
+          font-family: 'Darker Grotesque', sans-serif !important;
+          font-size: 1rem;
+        }
+        input{
+          text-transform: uppercase;
+        }
+        /*paleta*/
+        .bg-verde-1{background: #b4d6c1;}
+        .bg-verde-2{background: #dfeae2;}
+        
+  /** Padrão azul
+  .bg-p-1{background-color: #bafcf7 !important}
+  .bg-p-2{background-color: #6297a8 !important}
+  .bg-p-3{background-color: #7cbac4 !important}
+  .bg-p-4{background-color: #94dee0 !important}
+  .bg-p-5{background-color: #bafcf7 !important}
+  .txt-p{color:#28444b !important} */
+
+ 
+  /** Padrão cinza */
+  .bg-p-1{background-color: #d0dce2}
+  .bg-p-2{background-color: #809aa9}
+  .bg-p-3{background-color: #97adba!important}
+  .bg-p-4{background-color: #b4c5ce !important}
+  .bg-p-5{background-color: #ddecf5 !important}
+    
+  .bg-trimestre-1 {background-color: #5b2b10;}
+  .bg-trimestre-2 {background-color: #a76036;}
+  .bg-trimestre-3 {background-color: #b68d7a;}  
+  .bg-trimestre-4 {background-color: #85685a;}
+  .txt-p{color:#000 !important;}
+
+  /** Padrão marron 
+  .bg-p-1{background-color: #e4cdcc}
+  .bg-p-2{background-color: #844c44}
+  .bg-p-3{background-color: #a46f69}
+  .bg-p-4{background-color: #c49996}
+  .bg-p-5{background-color: #e4cdcc}
+  .txt-p{color:#240c04;}*/
+
+  /** Padrão amarelo
+  .bg-p-1{background-color: #d0dce2}
+  .bg-p-2{background-color: #809aa9}
+  .bg-p-3{background-color: #97adba}
+  .bg-p-4{background-color: #b4c5ce}
+  .bg-p-5{background-color: #d0dce2}
+  .txt-p{color:#000;}*/
+</style>
+    {% block css %}{% endblock css %}
+    {% block script_head %}{% endblock script_head %}   
+    <title>{% block title_page %}{% endblock title_page %}</title> 
+</head>
+<body>    
+  <main class='shadow  mb-2 bg-white rounded mt-2'>   
+    <!--Botão muda tema-->
+      {% include 'gestao_escolar/botom_cores/cores.html' %}
+    <!-- Fim Botão muda tema-->
+
+    {% comment "Head" %} Cabeçalho ----------------------------------------------- {% endcomment %}
+        {% include 'gestao_escolar/headers/index.html' %}      
+    
+    <div class="d-flex">
+      {% comment "Sidebar" %} Menu lateral esquerdo  ------------------------------- {% endcomment %}
+        {% include 'gestao_escolar/sidebars/index.html' %}
+      {% comment "Main" %} Conteudo Principal{% endcomment %}
+        {% block main %}{% endblock main %}
+    </div>
+
+    {% comment "Footer" %} Rodape do site ----------------------------------------- {% endcomment %}
+        {% block footer %}rodape{% endblock footer %}
+    {% comment "Scripts" %} Área pra scripts fim da pagina {% endcomment %}
+        {% block script_footer %}{% endblock script_footer %}   
+  </main> 
+  <script>
+    function exibirDiv() {
+        var divOculta = document.getElementById('oculto');        
+        divOculta.style.display = 'block';
+    }
+    function ocultarDiv() {
+        var divOculta = document.getElementById('oculto');
+        divOculta.style.display = 'none';
+    }
+</script>
+
+</body>
+</html>

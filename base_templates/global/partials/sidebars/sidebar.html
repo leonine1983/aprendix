@@ -1,0 +1,85 @@
+{% load static %}
+
+
+
+<main class="d-flex flex-nowrap">  
+
+     
+      <!--ALIMENTOS / CATEGORIA ---------------------------------------------------------------------------     
+      <li>
+        <a id="orders-link" href="{% url 'controle_estoque:alimento_lista' %}" class="nav-link py-3 border-bottom rounded-0 {% if active == 'alimentos' %}active{% endif %}" title="Alimentos" data-bs-toggle="tooltip" data-bs-placement="right">
+          <svg class="bi" width="30"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <path d="M346.7 6C337.6 17 320 42.3 320 72c0 40 15.3 55.3 40 80s40 40 80 40c29.7 0 55-17.6 66-26.7c4-3.3 6-8.2 6-13.3s-2-10-6-13.2c-11.4-9.1-38.3-26.8-74-26.8c-32 0-40 8-40 8s8-8 8-40c0-35.7-17.7-62.6-26.8-74C370 2 365.1 0 360 0s-10 2-13.3 6zM244.6 136c-40 0-77.1 18.1-101.7 48.2l60.5 60.5c6.2 6.2 6.2 16.4 0 22.6s-16.4 6.2-22.6 0l-55.3-55.3 0 .1L2.2 477.9C-2 487-.1 497.8 7 505s17.9 9 27.1 4.8l134.7-62.4-52.1-52.1c-6.2-6.2-6.2-16.4 0-22.6s16.4-6.2 22.6 0L199.7 433l100.2-46.4c46.4-21.5 76.2-68 76.2-119.2C376 194.8 317.2 136 244.6 136z"/></svg>
+        </a>
+      </li>----------> 
+      
+      <!--Movimentação de Saida Estoque ------------------------------------------------------------------------------------->
+      
+ 
+  <div class="b-example-divider b-example-vr b-example-divider-modify"></div> 
+
+    <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary" style="width: 280px;">
+    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+      <span class="fs-4">Controles</span>
+    </a>
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+      <li class="nav-item">
+        <a href="{% url 'controle_estoque:index' %}" class="nav-link {% if active == 'index' %}active{% endif %}" aria-current="page">
+          <svg class="bi pe-none  me-2" width="24" height="24" role="img" aria-label="Home"><use xlink:href="#home"/></svg>
+          Informações Gerais
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'controle_estoque:movi_estoque_listaView' %}"  class="nav-link link-body-emphasis {% if active == 'Deposito Central' %}active{% endif %}">          
+          {% if not active == 'Deposito Central' %}
+          <img class="bi pe-none me-2" width="25" src="{% static 'gme/icones/deposito.svg' %}" alt="">
+          {% else %}
+          <img class="bi pe-none me-2" width="26" src="{% static 'gme/icones/deposito_active.svg' %}" alt="">
+          {% endif %} 
+          Ítens / Depósito Central
+        </a>
+      </li>
+      {% comment "Entrada De EStoque" %}Movimentação ENTRADA de Estoque{% endcomment %}     
+      <li>
+        <a href="{% url 'controle_estoque:movi_estoque_CreateVies' %}" class="nav-link link-body-emphasis  {% if active == 'envio às Escolas' %}active{% endif %}">
+          <svg class="bi pe-none me-2 text-primary" width="20"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Pro 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M0 48C0 21.5 21.5 0 48 0H368c26.5 0 48 21.5 48 48V96h50.7c17 0 33.3 6.7 45.3 18.7L589.3 192c12 12 18.7 28.3 18.7 45.3V256v32 64c17.7 0 32 14.3 32 32s-14.3 32-32 32H576c0 53-43 96-96 96s-96-43-96-96H256c0 53-43 96-96 96s-96-43-96-96H48c-26.5 0-48-21.5-48-48V48zM416 256H544V237.3L466.7 160H416v96zM160 464a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm368-48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM257 95c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l39 39H96c-13.3 0-24 10.7-24 24s10.7 24 24 24H262.1l-39 39c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l80-80c9.4-9.4 9.4-24.6 0-33.9L257 95z"/></svg>
+          Envio de Gêneros às Escolas ou Outros Departamentos
+        </a>
+      </li>     
+      <li>
+        <a href="{% url 'controle_estoque:program_estoque_listaView' %}" class="nav-link link-body-emphasis {% if active == 'program' %}active{% endif %}">
+          <svg class="bi pe-none me-2 text-primary" width="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M128 0c17.7 0 32 14.3 32 32V64H288V32c0-17.7 14.3-32 32-32s32 14.3 32 32V64h48c26.5 0 48 21.5 48 48v48H0V112C0 85.5 21.5 64 48 64H96V32c0-17.7 14.3-32 32-32zM0 192H448V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V192zm64 80v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V272c0-8.8-7.2-16-16-16H80c-8.8 0-16 7.2-16 16zm128 0v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V272c0-8.8-7.2-16-16-16H208c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V272c0-8.8-7.2-16-16-16H336zM64 400v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V400c0-8.8-7.2-16-16-16H80c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V400c0-8.8-7.2-16-16-16H208zm112 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V400c0-8.8-7.2-16-16-16H336c-8.8 0-16 7.2-16 16z"/></svg>
+          Programação de entrega de produtos às escolas
+        </a>
+      </li>
+    </ul>
+    <hr>
+    <div class="dropdown">
+      <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+        <strong class="text-capitalize">{{request.user}}</strong>
+      </a>
+      <ul class="dropdown-menu text-small shadow">
+        <!--
+        <li><a class="dropdown-item" href="#">New project...</a></li>
+        <li><a class="dropdown-item" href="#">Settings</a></li>
+        <li><a class="dropdown-item" href="#">Profile</a></li>
+        <li><hr class="dropdown-divider"></li>-->
+        <li><a class="dropdown-item" href="#">Sair</a></li>
+      </ul>
+
+
+      
+    </div>
+  </div>
+  <div class="b-example-divider b-example-vr b-example-divider-modify"></div> 
+
+ 
+
+ 
+
+  
+
+
+

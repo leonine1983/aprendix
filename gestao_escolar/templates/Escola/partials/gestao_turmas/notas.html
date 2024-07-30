@@ -1,0 +1,116 @@
+{% load static %}
+{% block script_head %}<link rel="stylesheet" href="{% static 'global/css/css3_tab.css' %}">{% endblock script_head %} 
+{% block script_footer %}{% endblock script_footer %} 
+
+
+
+
+
+
+
+
+<!-- Modal -->
+
+<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    {% include "Escola/partials/mensagens.html" %}
+  <div class="modal-dialog w-100">
+      <div class="modal-content bg-secondary-subtle">
+          <div class="modal-header">
+              <h4 class="modal-title fs-6"><span class="text-uppercase ml-5 fs-3 "><i style="font-size: 1.65rem;" class="fs-4 fa-solid fa-users-gear"></i> {{ titulo_page }} {{ matriculas.0.turma }} <i class="fa-solid fa-angles-right me-1 mx-1"></i> {{ matriculas|length }} alunos </span></h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+
+          <div class="pcss3t pcss3t-effect-scale pcss3t-theme-1">
+            {% for t in trimestre %}
+                <input type="radio" name="pcss3t" {% if t.id == 1 %} checked {% endif %} id="tab{{ t.id }}" class="{% if t.id == 1 %}tab-content-first{% else %}tab-content-{{ t.id }}{% endif %}">
+                <label for="tab{{ t.id }}" class="col-2"><h1>{{ t.numero_nome }}</h1></label>
+            {% endfor %}
+        
+            <ul>
+                {% for t in trimestre %}                
+                    <li class="tab-content {% if t.id == 1 %}tab-content-first bg-trimestre-{{t.id}}{% else %}tab-content-{{ t.id }}{% endif %}  typography">
+                        <table class="win11-table " >
+                            <thead class="{% if t.final  %}bg-success{% else %}bg-p-3 {% endif %}">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Aluno </th>
+                                    {% for disciplina in disciplinas %}
+                                        <th colspan="2" class="text-center">
+                                            <table class="w-100 table-bordered">
+                                                <tr class="bg-p-3" >
+                                                    <th colspan="8">{{ disciplina.disciplina }}</th>
+                                                </tr>
+                                                {% if not t.final  %}
+                                                <tr>
+                                                    <td style="width: 55px;" class="txt-p">Média</td>
+                                                    <td class="bg-p-5 txt-p text-center">Faltas</td>
+                                                </tr>
+                                                {% else %}
+                                                <tr>
+                                                    <td style="width: 55px;" class="txt-p">Média Final</td>
+                                                    <td style="width: 55px;"  class="bg-p-5 txt-p text-center">Total Faltas</td>
+                                                </tr>
+                                                {% endif %}
+                                            </table>
+                                        </th>
+                                    {% endfor %}
+                                    <th class="text-center">Ação</th>    
+                                    
+                                    <th class="text-center">Profissional Resp.</th>                               
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for aluno in matriculas %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ aluno.aluno }}</td>
+                                        {% for disciplina in disciplinas %}
+                                            <td class="text-center" style="width: 55px;">
+                                                {% for gestao_turma in aluno.gestao_turmas_related.all %}
+                                                    {% if gestao_turma.grade == disciplina %}
+                                                        {% if gestao_turma.trimestre_id == t.id %}
+                                                            {% if not t.final  %}
+                                                                {% if gestao_turma.notas is not None  %}
+                                                                        {{ gestao_turma.notas }}                                                                 
+                                                                    {% else %}
+                                                                {% endif %} 
+                                                                {% else %} 
+                                                                {% if gestao_turma.media_final is not None  %}
+                                                                        {{gestao_turma.media_final}}                                                                    
+                                                                    {% else %}
+                                                                {% endif %} 
+                                                            {% endif %}                                                          
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}                                                                                                    
+                                            </td>    
+                                            <td class="text-center bg-p-5">
+                                                {% for gestao_turma in aluno.gestao_turmas_related.all %}
+                                                    {% if gestao_turma.grade == disciplina %}
+                                                        {% if gestao_turma.trimestre_id == t.id %}
+                                                            {% if gestao_turma.faltas is not None %}
+                                                                {{ gestao_turma.faltas}}
+                                                                {% else %}
+                                                            {% endif %}
+                                                            
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>                                    
+
+                                        {% endfor %}
+                                        <td><a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:create_or_update_gestao_turmas' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Lançar ou Editar Notas</a></td>
+                                        
+                                      
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+      </div>
+  </div>
+</div>

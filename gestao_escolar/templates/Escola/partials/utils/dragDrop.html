@@ -1,0 +1,22 @@
+<!--Bibliotecas Jquery para tornar o elemento redimensionavel na tela-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/smoothness/jquery-ui.css">
+<script>
+  $(document).ready(function() {
+
+    $(".modal-body").resizable({
+      handles: "n, e, s, w", // permite redimensionamento apenas pelo lado leste (direito)
+      minWidth: 700, // largura mínima permitida
+      
+    });
+  });
+</script>
+<!--DRAG AND DROP-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+  $(document).ready(function(){
+    $(".modal-body").draggable();
+  })
+</script>

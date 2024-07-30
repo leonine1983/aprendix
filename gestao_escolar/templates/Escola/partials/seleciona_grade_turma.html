@@ -1,0 +1,199 @@
+
+<!-- Bootstrap Datepicker CSS -->
+
+
+{% block script_head %}
+<style>
+    /* Seletor de classe para o ícone do seletor de datas */
+    .datepicker-input[type="date"]::before {
+        font-family: 'Font Awesome 5 Free';
+        content: "f073\f073"; /* Código do ícone do calendário do Font Awesome */
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+    }
+    
+/* Estilizar a caixa de seleção quando ela estiver com foco */
+select[name="deficiencia_aluno"] option:checked {
+  background-color: blue; /* Substitua "blue" pela cor desejada */
+  color: white; /* Substitua "white" pela cor do texto desejada */
+}
+input[type=checkbox]{
+  scale: 2;
+  margin-bottom: 2rem!important;
+  border-radius: 1rem!important;
+  border: #79a1e2 solid 1rem;
+  padding: 1rem;
+}
+.select2 {
+  width:100% !important;
+}
+
+td, tr {
+            text-align: center; /* Alinhamento horizontal central */
+            vertical-align: middle !important; /* Alinhamento vertical central */
+        }
+
+</style>
+
+
+{% endblock script_head %}  
+<!-- Modal -->
+
+    
+
+<!-- Bootstrap Datepicker CSS -->
+<!-- Modal -->
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'global/css/search.css' %}">
+{% endblock css %}
+<div class="modal fade" id="modal_escola" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    
+    <div class="modal-dialog w-100">
+    <div class="modal-content bg-secondary-subtle">
+        <div class="modal-header">
+        <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3 "><i class="fs-4 fa-duotone fa-chart-network"></i> {{titulo_page}}</span></h4>        
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        
+        </div>
+        <div class="modal-body shadow-sm bg-light-subtle">    
+          <div class="modal_windows_title bg-p-3 mb-3 p-2 txt-p ">
+            <i class="fa-regular fa-face-grin-squint"></i> <span class="text-capitalize fs-7"> Olá, seja muito bem-vindo, {% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}{{request.user}}{% endif %}!!</span>  
+          </div>        
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"> <b class="text-uppercase fs-4"> {{turma_ativa}} </b></button>
+                </li>
+                {% if ativa == 'Grades' %}
+                <li class="nav-item bg-secondary-subtle" role="presentation">
+                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Adicionar disciplina à turma <i class="fs-4 fa-duotone fa-chart-network"></i> </button>
+                </li>  
+                {% endif %}
+              </ul>                
+              <div class="tab-content " id="myTabContent">
+                <div class="tab-pane fade show active pl-4 pr-4" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">  
+                  {% if not ativa  %}  
+                        <div class="win11-search-wrapper bg-p-5 m-0 p-1 d-flex">
+                          <form action="?" method="GET" class="form-inline">
+                              {% csrf_token %}            
+                              <div class="win11-search-wrapper-inner">
+                                  <input type="text" class="win11-search-input" placeholder="Buscar turma" name="busca-turma"  name="busca-aluno">
+                                  <button class="win11-search-button" type="submit"><i class="fa-regular fa-user-magnifying-glass"></i></button>
+                              </div>
+                          </form> 
+                          <div class="win11-pagination">
+                            <span class="win11-step-links">
+                                {% if turmas.has_previous %}
+                                    <a href="?page=1" class="win11-pagination-link">&laquo; Primeiro</a>
+                                    <a href="?page={{ turmas.previous_page_number }}" class="win11-pagination-link">Anterior</a>
+                                {% endif %}
+                        
+                                <span class="win11-current">
+                                    Página {{ turmas.number }} de {{ turmas.paginator.num_pages }}.
+                                </span>
+                        
+                                {% if matriculas.has_next %}
+                                    <a href="?page={{ turmas.next_page_number }}" class="win11-pagination-link">Próximo</a>
+                                    <a href="?page={{ turmas.paginator.num_pages }}" class="win11-pagination-link">Último &raquo;</a>
+                                {% endif %}
+                            </span>
+                            <span class="win11-total-records">
+                              <i class="fa-thin fa-address-card"></i> Total de turmas cadastrados: {{ turmas.paginator.count }}
+                            </span>
+                          </div>
+                        </div> 
+                    {% else %}
+                    <div>ddd</div>
+                  {% endif %}
+                  <table class="win11-table">
+                    {% if not ativa  %}
+                    <thead>
+                      <tr class="bg-p-2">
+                        <th>Ico</th>
+                        <th scope="col" class='text-left'>Turmas</th>
+                        <th scope="col">Série</th>
+                        <th scope="col">Turno</th>
+                        <th scope="col">Ano</th>             
+                        <th scope="col" class='text-center'>Ação</th>           
+                      </tr>
+                    </thead>
+                    <tbody>                
+                    {% for n in turmas %}
+                      <tr class="fs-5">
+                        <td><i class="fa-duotone fa-graduation-cap" style="--fa-primary-color: #0d5e1a; --fa-secondary-color: #18d838;"></i></td>
+                        <td class='text-left text-uppercase'>{{n.nome}} {{n.descritivo_turma}}</td>                    
+                        <td >{{n.serie}}</td>
+                        <td >{{n.turno}}</td>
+                        <td >{{n.ano_letivo}}</td>
+                        <td class='text-center'><a class="btn btn-sm btn-success" href="{% url 'Gestao_Escolar:Grades_create' n.pk %} ">Criar Grade de disciplinas  <i class="fa-duotone fa-chart-network"></i></a></td>
+                        
+                      </tr>                    
+                    {% endfor %}                       
+                    </tbody>
+                    {% else %}
+                    <!----------------- EScolha das Turmas ----------------->
+                    <thead>
+                      <tr>
+                        <th>Ico</th>
+                        <th scope="col">Disciplina</th>
+                        <th scope="col">Professor</th>
+                        <th scope="col">Carga Horária Anual</th>
+                        <th scope="col">Limite de Faltas</th>             
+                        <th scope="col" class="text-center">Ação</th>           
+                      </tr> 
+                    </thead>  
+                    <tbody>               
+                    {% for n in turmas_disciplinas  %}
+                      <tr class="fs-5">
+                        <td><i class="fa-duotone fa-graduation-cap" style="--fa-primary-color: #0d5e1a; --fa-secondary-color: #18d838;"></i></td>
+                        <td class='text-align'>{{n.disciplina}}</td>                    
+                        <td class='text-align text-capitalize '>{{n.professor}}</td>
+                        <td class='text-align'>{{n.carga_horaria_anual}}</td>
+                        <td class='text-align'>{{n.limite_faltas}}</td>
+                        <td class='text-align d-flex text-center gap-2 c'><a href="http://" class='btn btn-primary'>Editar</a><a href="http://" class='btn btn-danger'>Excluir</a> </td>   
+                      </tr>    
+                    {% endfor %}  
+                    </tbody>                  
+                    {% endif%}  
+                  </table>
+
+
+
+                </div>
+                {% if ativa == 'Grades' %}
+                <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                  <div class="form-group ">
+                    <form method="post"class='m-3 p-3 ' >
+                      <div class='m-3 p-3 row row-cols-2 bg-secondary-subtle'>
+                      {{ form.non_field_errors }}
+                      {% csrf_token %}
+                      {% for field in form %}
+                      <div class="form-group">
+                          <p class='m-0 p-0'>{{ field.label_tag }}</p>
+                          {{ field }}
+                          {{ field.errors }}
+                      </div>
+                      {% endfor %}  
+                    </div>
+                      <button class="btn btn-sm btn-primary w-100 p-2 fs-3" type="submit"> Salvar <i class="fa-sharp fa-solid fa-floppy-disk-circle-arrow-right"></i></button>
+                  </form> 
+                </div>  
+                {% endif %}             
+              </div>
+        </div>        
+    </div>
+    </div>
+</div>         
+
+{% load static %}
+<script src="{% static 'base_static/select2/select2.min.css' %}"></script>
+    <script>
+        // In your Javascript (external .js resource or <script> tag)
+    $(document).ready(function() {
+        $('#id_aluno').select2();
+  
+    });
+    </script>
