@@ -155,6 +155,7 @@ class ProgramacaoSaidaEstoque(models.Model):
 
 
 
+"""
 @receiver(post_migrate)
 def cria_registro(sender, **kwargs):
     if not Fornecedor.objects.exists():            
@@ -169,7 +170,6 @@ def cria_registro(sender, **kwargs):
 
          
 
-"""
 class ProgramacaoSaidaEstoque(models.Model):
     alimentos_a_enviar = models.ManyToManyField('Alimento')
     escola_beneficiaria = models.OneToOneField('Escola', on_delete=models.CASCADE)
