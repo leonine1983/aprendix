@@ -6,7 +6,7 @@ class Pessoas_form(forms.ModelForm):
     class Meta:
         model = Pessoas
         fields = ['nome', 'sobrenome', 'data_nascimento', 'nome_profissao',
-                    'cpf', 'rg', 'rua', 'complemento', 'numero_casa', 'bairro',
+                    'cpf', 'rg', 'rua', 'complemento', 'numero_casa', 'bairro', 'cidade',
                     'cep']
         
     nome = forms.CharField(

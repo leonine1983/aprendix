@@ -1,60 +1,62 @@
 from django import forms
 from rh.models import Escola
 from gestao_escolar.models import Turmas, Matriculas
-from rh.models import Pessoas, Vinculo_empregaticio, Ano, Contrato, Profissao, Encaminhamentos
+from rh.models import Pessoas, Vinculo_empregaticio, Ano, Contrato, Profissao, Encaminhamentos, Cidade, Bairro
 
-# widget personalizado que usa as classes (form-control, border, p-3, pb-3 e bg-transparent) para ser atribuido ao campo 'tempo_meses' 
+# widget personalizado que usa as classes (form-control, border, p-3, pb-3 e ) para ser atribuido ao campo 'tempo_meses' 
 
 # 1º Esse
 class Pessoa_form(forms.ModelForm):   
     nome = forms.CharField(
         label="Nome do Professor",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1"})
+        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
     )
     sobrenome = forms.CharField(
         label="Sobrenome do Professor",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1"})
+        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
     )
   
     data_nascimento = forms.DateField(
         label='Data de Nascimento:',
-        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col2 m-2 rounded-1', 'type': 'date'}),        
+        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3  text-secondary col2  rounded-1', 'type': 'date'}),        
     )
     cpf= forms.CharField(
         label="Nº do CPF",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1"})
+        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
     )
     rg= forms.CharField(
         label="Nº do RG",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1"})
+        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
     )
     rua= forms.CharField(
         label=" Nome da Rua",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1"})
+        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
     )
     complemento= forms.CharField(
         label="Complemento",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1"})
+        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
     )
     rg= forms.CharField(
         label="Nº do RG",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1"})
+        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
     )
     numero_casa= forms.CharField(
         label="Nº da casa (ou SN)",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1"})
+        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
     )
-    bairro= forms.CharField(
+    bairro= forms.ModelChoiceField(
+        queryset=Bairro.objects.all(),
         label="Bairro",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1"})
+        widget=forms.Select(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
     )
-    cidade= forms.CharField(
+    cidade= forms.ModelChoiceField(
+        queryset=Cidade.objects.all(),        
         label="Cidade onde mora",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1"})
+        widget=forms.Select(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
     )
     cep= forms.CharField(
         label="CEP",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1"})
+        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
     )
 
     class Meta:
@@ -76,15 +78,15 @@ class Create_Pessoa_Vinculo_FORM(forms.ModelForm):
 
     pessoa = forms.ModelChoiceField(
         queryset= Pessoas.objects.none(),        
-        widget=forms.Select(attrs={'class': 'p-2 pb-1 bg-transparent text-light col m-2 rounded-1 text-uppercase '}),        
+        widget=forms.Select(attrs={'class': 'p-2 pb-1  text-light col  rounded-1 text-uppercase '}),        
     )
     vinculo = forms.ChoiceField(
         choices = choice_vinculo,        
-        widget=forms.Select(attrs={'class': "border border-info p-2 pb-1 bg-light text-muted  col m-2 rounded-1"})
+        widget=forms.Select(attrs={'class': "border border-info p-2 pb-1 bg-light text-muted  col  rounded-1"})
     ) 
     ano = forms.ModelChoiceField (
         queryset=Ano.objects.all(),      
-        widget=forms.Select(attrs={'class': "border border-info p-2 pb-1 bg-light text-muted  col m-2 rounded-1"})
+        widget=forms.Select(attrs={'class': "border border-info p-2 pb-1 bg-light text-muted  col  rounded-1"})
     )
 
     def __init__(self, *args, **kwargs):
@@ -109,17 +111,17 @@ class Contrato_form(forms.ModelForm):
     contratado = forms.ModelChoiceField(
         label='Nome do profissional:',
         queryset=Pessoas.objects.none(),  # Query to fetch all Pessoas objects
-        widget=forms.Select(attrs={'class': ' p-1 mb-3 bg-transparent'}),
+        widget=forms.Select(attrs={'class': ' p-1 mb-3 '}),
     )
     ano_contrato = forms.ModelChoiceField(
         label='Ano:',
         queryset=Ano.objects.none(),  # Query to fetch all Ano objects
-        widget=forms.Select(attrs={'class': 'border p-1 mb-3 bg-transparent'}),
+        widget=forms.Select(attrs={'class': 'border p-1 mb-3 '}),
     )  
     nome_escola = forms.ModelChoiceField(
         label='Escola',
         queryset=Escola.objects.all(),  # Query to fetch all Ano objects
-        widget=forms.Select(attrs={'class': 'border p-1 mb-3 bg-transparent'}),
+        widget=forms.Select(attrs={'class': 'border p-1 mb-3 '}),
     )    
     nome_profissao = forms.ModelChoiceField(
         label='Defina a função que o profissional irá desempenhar na escola. Deve escolher somente uma:',
@@ -159,7 +161,7 @@ class Professor_form(forms.ModelForm):
 
     description = forms.CharField(
         label='Descreva o motivo do Remanejamento. Ex.: Escola para onde o aluno será remanejado e o porquê.',        
-        widget=forms.Textarea(attrs={'class': 'border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1'}),
+        widget=forms.Textarea(attrs={'class': 'border border-info p-2 pb-1  text-secondary col  rounded-1'}),
     )    
 
 
@@ -192,17 +194,17 @@ class Create_Pessoa_Encaminhamento_form(forms.ModelForm):
     encaminhamento = forms.ModelChoiceField(
         label='Profissional a ser encaminhado:',
         queryset=Contrato.objects.none(),  # Query to fetch all Pessoas objects
-        widget=forms.Select(attrs={'class': 'border border-verde-desgastado p-1 mb-3 bg-transparent  text-light text-uppercase fs-6'}),
+        widget=forms.Select(attrs={'class': 'border border-verde-desgastado p-1 mb-3   text-light text-uppercase fs-6'}),
     )
     destino = forms.ModelChoiceField(
         label='Encaminhado para:',
         queryset=Escola.objects.none(),  # Query to fetch all Pessoas objects
-        widget=forms.Select(attrs={'class': 'border border-verde-desgastado p-1 mb-3 bg-transparent  text-light text-uppercase fs-6'}),
+        widget=forms.Select(attrs={'class': 'border border-verde-desgastado p-1 mb-3   text-light text-uppercase fs-6'}),
     )
     profissao = forms.ModelChoiceField(
         label='Atividade profissional:',
         queryset=Profissao.objects.none(),  # Query to fetch all Pessoas objects
-        widget=forms.Select(attrs={'class': 'border border-verde-desgastado p-1 mb-3 bg-transparent  text-light text-uppercase fs-6'}),
+        widget=forms.Select(attrs={'class': 'border border-verde-desgastado p-1 mb-3   text-light text-uppercase fs-6'}),
     )
 
     def __init__(self, *args, **kwargs):

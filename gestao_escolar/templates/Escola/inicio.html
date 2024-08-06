@@ -151,10 +151,13 @@
     {% if  conteudo_page == 'update' %}
         {% include 'Escola/partials/seleciona_UPDATE.html' %}
     {% endif %}   
-    
+    <!-- Bairros -->
+    {% if  conteudo_page == 'Criar Bairros' %}
+        {% include 'Escola/partials/bairros/seleciona_bairros.html' %}
+    {% endif %}      
     <!--Ferramentas-->
     {% if  conteudo_page == 'imagem-docx' %}
-    {% include 'Escola/partials/seleciona_image_to_word.html' %}
+        {% include 'Escola/partials/bairros/seleciona_bairros.html' %}
     {% endif %} 
 
 

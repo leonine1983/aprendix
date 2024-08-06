@@ -11,4 +11,6 @@ from .remanejamento import *
 from .professores import *
 from .cria_qrcode import *
 from .impressos import *
+from .bairro import *
+from .cidade import *
 #from .ferramentas import *

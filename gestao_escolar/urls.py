@@ -6,7 +6,6 @@ from gestao_escolar.views.views import   Pagina_inicio
 from rh.models import Config_plataforma
 #from dal import autocomplete
 from .models import Alunos
-
 app_name = "Gestao_Escolar"
 
 
@@ -112,8 +111,15 @@ urlpatterns = [
     # path('image-to-doc/', Image_to_doc, name='image_to_doc'),
 
     # QR_code
-    path('gestao_escolar/Criar_Qrcode/', Create_QrCode, name="GE_QrCode"),        
-]
+    path('gestao_escolar/Criar_Qrcode/', Create_QrCode, name="GE_QrCode"),       
+
+    # Bairro   
+    path('bairro', BairroListView.as_view(), name='bairro-list'),
+    path('bairro/<int:pk>/', BairroDetailView.as_view(), name='bairro-detail'),
+    path('bairro/novo/', BairroCreateView.as_view(), name='bairro-create'),
+    path('bairro/<int:pk>/editar/', BairroUpdateView.as_view(), name='bairro-update'),
+    path('bairro/<int:pk>/deletar/', BairroDeleteView.as_view(), name='bairro-delete'),
+] 
 
 
 urlpatterns.append(path('gestao_escolar/Pessoas/Criar/', Create_Pessoa_Professores.as_view(), name="GE_Create_Professores"))

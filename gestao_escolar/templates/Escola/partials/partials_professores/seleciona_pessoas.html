@@ -28,7 +28,7 @@
                 </li>
                 <li id="cadastra_people" class="nav-item bg-secondary-subtle rh-list mt-3" role="presentation">
                   <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false"><i class="fa-duotone fa-address-card" style="--fa-secondary-color: #511f3c;"></i> Cadastrar nova pessoa <i class="fa-duotone fa-person-sign"></i><i class="fa-sharp fa-solid fa-plus text-info"></i></button>
-                </li>                 
+                </li>                               
               {% endif %}              
               <li class="nav-item" role="presentation">
                 <button class="nav-link" id="profile-tab2" data-bs-toggle="tab" data-bs-target="#profile-tab-pane2" type="button" role="tab" aria-controls="profile-tab-pane2" aria-selected="false">CARGOS/PROFISSIONAIS na escola <i class="fs-6 fa-duotone fa-person-chalkboard"></i><i class="fa-sharp fa-solid fa-plus text-info"></i></button>
@@ -71,16 +71,28 @@
 
               <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">    
                 <h3 class='p-3 border-bottom'><i class="fa-duotone fa-person-sign"></i> Cadastrar nova pessoa </h3><hr>           
-                <div class="form-group ">
+                <div class="form-group "><div>ddd</div>
                   <form method="post" class='' >
+                    
                     
                     {{ form.non_field_errors }}
                     {% csrf_token %}
                     <div>
                     {% for field in form %}
-                      <section>
+                      <section>                        
                         {{ field.label_tag }}
-                        {{ field }}
+                        {% if field.label == "Bairro" %}
+                          <section class="d-flex">
+                            {{ field }} <a class='m-2 p-2' href='{% url "Gestao_Escolar:bairro-create" %}'><i class="fa-solid fa-plus text-primary"></i> Bairro</a>
+                          </section>  
+                        {% elif field.label == "Cidade onde mora" %}  
+                        <section class="d-flex">
+                          {{ field }} <p>Texto Condicional para Bairro</p>
+                        </section>                      
+                        {% else %}
+                          {{ field }}
+                        {% endif %}
+
                         {{ field.errors }}
                       </section>
                     {% endfor %}  

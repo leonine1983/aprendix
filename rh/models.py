@@ -87,7 +87,7 @@ class Pessoas(models.Model):
     complemento= models.CharField(max_length=30, null=True, verbose_name='casa, apartamento etc.')
     numero_casa= models.CharField(max_length=10, null=True, verbose_name='Numero da casa ou s/n')
     bairro = models.ForeignKey(Bairro, on_delete=models.CASCADE, related_name='pessoas_bairro_related', null=True, verbose_name='Bairro')     
-    cidade = models.ForeignKey(Bairro, on_delete=models.CASCADE, related_name='pessoas_cidade_related', null=True, verbose_name='Cidade')
+    cidade = models.ForeignKey(Cidade, on_delete=models.CASCADE, related_name='pessoas_cidade_related', null=True, verbose_name='Cidade')
     cep= models.CharField(max_length=30, null=True, verbose_name='CEP')       
 
     def calcula_idade (self):
