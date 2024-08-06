@@ -32,7 +32,7 @@
             <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">
               Criar novo
               <i class="fa-sharp fa-solid fa-plus"></i> </button>
-          </li>
+          </li>  
         </ul>         
         <div class="tab-content" id="myTabContent">          
           <div class="tab-pane fade show active bg-light" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">  
@@ -42,7 +42,7 @@
                   <form action="?" method="GET" class="form-inline">
                     {% csrf_token %}            
                     <div class="search-wrapper" style='margin:1rem auto 1rem auto;  width:110%; '>
-                      <input type="text" class="search-input rounded-3 m-0 mr-2 ml-2" placeholder="Buscar bairro" name="busca-bairro" style='margin:1rem auto 1rem auto;  width:90%; ' >
+                      <input type="text" class="search-input rounded-3 m-0 mr-2 ml-2" placeholder="Buscar cidade" name="busca-cidade" style='margin:1rem auto 1rem auto;  width:90%; ' >
                       <button class="search-button" type="submit"  style='height: 10rem importamt;border-radius: 1rem;'><i class="fa-regular fa-user-magnifying-glass"></i></button>
                     </div>
                   </form> 
@@ -52,21 +52,21 @@
               <table class="win11-table">
                     <thead>
                   <tr>
-                    <th scope="col" style='width:5rem'>Ordem</th> 
-                    <th scope="col" style='width:20rem'>Bairro</th>                                               
-                    <th scope="col" style='width:20rem'>Cidade</th>                                               
+                    <th scope="col" style='width:5rem'>Ordem</th>                                                                   
+                    <th scope="col" style='width:20rem'>Cidade</th>
+                    <th scope="col" style='width:20rem'>Estado</th>                                              
                     <th scope="col" class='center'>Ação</th>                        
                   </tr>
                 </thead>
                 <tbody>
                 {% for n in lista_all %}
                   <tr>
-                    <th scope="row">{{forloop.counter}}</th>
-                    <td>{{n.nome_bairro}}</td>  
-                    <td>{{n.nome_cidade}}</td>  
+                    <th scope="row">{{forloop.counter}}</th>                     
+                    <td>{{n.nome_cidade}}</td> 
+                     <td>{{n.nome_estado }}</td> 
                     <td>
-                      <a href="{% url 'Gestao_Escolar:bairro-update' n.pk %}"><span class='btn btn-sm btn-info mr-1'>Editar</span></a>
-                      <a href="{% url 'Gestao_Escolar:bairro-delete' n.pk %}"><span class='btn btn-sm btn-danger '>Excluir</span></a>
+                      <a href="{% url 'Gestao_Escolar:cidade-update' n.pk %}"><span class='btn btn-sm btn-info mr-1'>Editar</span></a>
+                      <a href="{% url 'Gestao_Escolar:cidade-delete' n.pk %}"><span class='btn btn-sm btn-danger '>Excluir</span></a>
                     </td>
                   </tr>    
                 {% endfor %}                
@@ -78,23 +78,12 @@
               <form method="post" class='m-3'>
                 {{ form.non_field_errors }}
                 {% csrf_token %}
-                  <div>
-                    {% for field in form %}
-                      <section>                        
-                        {{ field.label_tag }}
-                        {% if field.label == "Nome cidade" %}  
-                        <section class="d-flex border border-success px-2 pe-2">
-                          {{ field }} <a class='m-2 p-2' href='{% url "Gestao_Escolar:cidade-create" %}'><i class="fa-solid fa-plus text-primary"></i> Cidade</a>
-                        </section>                      
-                        {% else %}
-                          {{ field }}
-                        {% endif %}
-                        {{ field.errors }}
-                      </section>
-                    {% endfor %}  
-                  </div>
-                </div>               
-                  <button class="btn btn-sm btn-primary p-1 w-100" type="submit">Criar novo bairro <i class="fa-sharp fa-solid fa-people fs-5"></i></button>
+                <div>
+                  {{form.as_p}}
+                </div>
+
+               
+                  <button class="btn btn-sm btn-primary p-1 w-100" type="submit">Criar Cidade <i class="fa-sharp fa-solid fa-people fs-5"></i></button>
                 </div>
               </form>   
             </div>                 

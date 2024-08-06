@@ -158,6 +158,13 @@
     {% if  conteudo_page == 'update_or_delete' %}
         {% include 'Escola/partials/bairros/update_or_delete.html' %}
     {% endif %}     
+    <!-- Cidade -->
+    {% if  conteudo_page == 'Criar Cidade' %}
+        {% include 'Escola/partials/cidade/seleciona_cidade.html' %}
+    {% endif %}    
+    {% if  conteudo_page == 'update_or_delete' %}
+        {% include 'Escola/partials/cidade/update_or_delete.html' %}
+    {% endif %}    
     <!--Ferramentas-->
     {% if  conteudo_page == 'imagem-docx' %}
         {% include 'Escola/partials/bairros/seleciona_bairros.html' %}
