@@ -82,12 +82,12 @@
                       <section>                        
                         {{ field.label_tag }}
                         {% if field.label == "Bairro" %}
-                          <section class="d-flex">
+                          <section class="d-flex border border-success px-2 pe-2">
                             {{ field }} <a class='m-2 p-2' href='{% url "Gestao_Escolar:bairro-create" %}'><i class="fa-solid fa-plus text-primary"></i> Bairro</a>
                           </section>  
                         {% elif field.label == "Cidade onde mora" %}  
-                        <section class="d-flex">
-                          {{ field }} <p>Texto Condicional para Bairro</p>
+                        <section class="d-flex border border-success px-2 pe-2">
+                          {{ field }} <a class='m-2 p-2' href='{% url "Gestao_Escolar:bairro-create" %}'><i class="fa-solid fa-plus text-primary"></i> Cidade</a>
                         </section>                      
                         {% else %}
                           {{ field }}

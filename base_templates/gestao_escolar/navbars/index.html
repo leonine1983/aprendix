@@ -30,8 +30,21 @@ height: 3.5rem;">
             <li>                      
               <a class="dropdown-item" href='{% url "Gestao_Escolar:imprime_list_turmas" %}'>Relação de Turmas</a>
             </li>
-          </ul>
-         
+          </ul>         
+        </li>
+        <!--Localização-->
+        <li class="nav-item dropdown  border-right">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-solid fa-print"></i><i class="fa-duotone fa-solid fa-location-dot"></i> Localização 
+          </a>
+          <ul class="dropdown-menu bg-p-5" style="margin-top: -1rem;">
+            <li>                      
+              <a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Cidade</a>
+            </li>
+            <li>                      
+              <a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Bairros</a>
+            </li>
+          </ul>         
         </li>
       </ul>
     </div>

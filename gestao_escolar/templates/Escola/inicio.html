@@ -154,7 +154,10 @@
     <!-- Bairros -->
     {% if  conteudo_page == 'Criar Bairros' %}
         {% include 'Escola/partials/bairros/seleciona_bairros.html' %}
-    {% endif %}      
+    {% endif %}    
+    {% if  conteudo_page == 'update_or_delete' %}
+        {% include 'Escola/partials/bairros/update_or_delete.html' %}
+    {% endif %}     
     <!--Ferramentas-->
     {% if  conteudo_page == 'imagem-docx' %}
         {% include 'Escola/partials/bairros/seleciona_bairros.html' %}

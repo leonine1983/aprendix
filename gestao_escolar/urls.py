@@ -114,8 +114,6 @@ urlpatterns = [
     path('gestao_escolar/Criar_Qrcode/', Create_QrCode, name="GE_QrCode"),       
 
     # Bairro   
-    path('bairro', BairroListView.as_view(), name='bairro-list'),
-    path('bairro/<int:pk>/', BairroDetailView.as_view(), name='bairro-detail'),
     path('bairro/novo/', BairroCreateView.as_view(), name='bairro-create'),
     path('bairro/<int:pk>/editar/', BairroUpdateView.as_view(), name='bairro-update'),
     path('bairro/<int:pk>/deletar/', BairroDeleteView.as_view(), name='bairro-delete'),

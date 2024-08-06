@@ -13,6 +13,9 @@
           <span class="text-uppercase ml-5 fs-3 ">
             <i class="fa-sharp fa-solid fa-people fs-5"></i>
             {{titulo_page}}
+            {% if messages %}                
+              {% include 'Escola/partials/mensagens.html' %}          
+            {% endif %}
           </span>
         </h4>        
         <button type="button" class="close" data-dismiss="modal">&times;</button>        
@@ -39,7 +42,7 @@
                   <form action="?" method="GET" class="form-inline">
                     {% csrf_token %}            
                     <div class="search-wrapper" style='margin:1rem auto 1rem auto;  width:110%; '>
-                      <input type="text" class="search-input rounded-3 m-0 mr-2 ml-2" placeholder="Buscar disciplina" name="busca-disciplina" style='margin:1rem auto 1rem auto;  width:90%; ' >
+                      <input type="text" class="search-input rounded-3 m-0 mr-2 ml-2" placeholder="Buscar bairro" name="busca-bairro" style='margin:1rem auto 1rem auto;  width:90%; ' >
                       <button class="search-button" type="submit"  style='height: 10rem importamt;border-radius: 1rem;'><i class="fa-regular fa-user-magnifying-glass"></i></button>
                     </div>
                   </form> 
@@ -62,8 +65,8 @@
                     <td>{{n.nome_bairro}}</td>  
                     <td>{{n.nome_cidade}}</td>  
                     <td>
-                      <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_update' n.pk %}"><span class='btn btn-sm btn-info mr-1'>Editar</span></a>
-                      <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_delete' n.pk %}"><span class='btn btn-sm btn-danger '>Excluir</span></a>
+                      <a href="{% url 'Gestao_Escolar:bairro-update' n.pk %}"><span class='btn btn-sm btn-info mr-1'>Editar</span></a>
+                      <a href="{% url 'Gestao_Escolar:bairro-delete' n.pk %}"><span class='btn btn-sm btn-danger '>Excluir</span></a>
                     </td>
                   </tr>    
                 {% endfor %}                
