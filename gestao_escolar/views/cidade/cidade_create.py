@@ -10,7 +10,7 @@ class CidadeCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Cidade
     template_name = 'Escola/inicio.html'
     fields = "__all__"
-    success_url = reverse_lazy('Gestao_Escolar:cidade-create-create')
+    success_url = reverse_lazy('Gestao_Escolar:cidade-create')
     success_message = "Cidade criado com sucesso!!!"
      
 
@@ -36,7 +36,7 @@ class CidadeUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Cidade
     template_name = 'Escola/inicio.html'
     fields = "__all__"
-    success_url = reverse_lazy('Gestao_Escolar:cidade-create-create')
+    success_url = reverse_lazy('Gestao_Escolar:cidade-create')
     success_message = "Cidade atualizado com sucesso!!!"
 
     def get_context_data(self, **kwargs):

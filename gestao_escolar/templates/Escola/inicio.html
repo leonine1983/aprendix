@@ -31,13 +31,15 @@
                     Turmas 
                     </div>
                     <div class="card-body">
-                        {% for t  in turmas %}
-                            <ul class='list-group'>
-                                <li class='list-group-item border'>
-                                    <span class="text-capitalize fw-bold"> {{t.nome}} {{t.descritivo_turma}}</span></span> | {{t.turno}} | {% if t.turma_multiserie  %} Multiseriada {% else %} Normal {% endif %} | {{t.quantidade_vagas}} vagas
-                                </li>                                                           
-                            </ul>
-                        {% endfor %}
+                        {% if not conteudo_page == 'Criar Turmas update' %}
+                            {% for t  in turmas %}
+                                <ul class='list-group'>
+                                    <li class='list-group-item border'>
+                                        <span class="text-capitalize fw-bold"> {{t.nome}} {{t.descritivo_turma}}</span></span> | {{t.turno}} | {% if t.turma_multiserie  %} Multiseriada {% else %} Normal {% endif %} | {{t.quantidade_vagas}} vagas
+                                    </li>                                                           
+                                </ul>
+                            {% endfor %}
+                        {% endif %}
                     </div>
                 </div>  
                 
@@ -68,8 +70,12 @@
     {% if  conteudo_page == 'info_escola' %}
         {{contexto}}
     {% endif %}
+    <!--Turmas-->
     {% if  conteudo_page == 'Criar Turmas' %}
         {% include 'Escola/partials/seleciona_turma.html' %}
+    {% endif %}
+    {% if  conteudo_page == 'Criar Turmas update' %}
+        {% include 'Escola/partials/turmas/update_or_delete.html' %}
     {% endif %}
     {% if  conteudo_page == 'Registrar Alunos' %}
         {% include 'Escola/partials/seleciona_aluno.html' %}

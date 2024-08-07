@@ -78,7 +78,7 @@ class Create_Pessoa_Vinculo_FORM(forms.ModelForm):
 
     pessoa = forms.ModelChoiceField(
         queryset= Pessoas.objects.none(),        
-        widget=forms.Select(attrs={'class': 'p-2 pb-1  text-light col  rounded-1 text-uppercase '}),        
+        widget=forms.Select(attrs={'class': 'p-2 pb-1  col  rounded-1 text-uppercase '}),        
     )
     vinculo = forms.ChoiceField(
         choices = choice_vinculo,        
@@ -194,17 +194,17 @@ class Create_Pessoa_Encaminhamento_form(forms.ModelForm):
     encaminhamento = forms.ModelChoiceField(
         label='Profissional a ser encaminhado:',
         queryset=Contrato.objects.none(),  # Query to fetch all Pessoas objects
-        widget=forms.Select(attrs={'class': 'border border-verde-desgastado p-1 mb-3   text-light text-uppercase fs-6'}),
+        widget=forms.Select(attrs={'class': 'border border-verde-desgastado p-1 mb-3  text-uppercase fs-6'}),
     )
     destino = forms.ModelChoiceField(
         label='Encaminhado para:',
         queryset=Escola.objects.none(),  # Query to fetch all Pessoas objects
-        widget=forms.Select(attrs={'class': 'border border-verde-desgastado p-1 mb-3   text-light text-uppercase fs-6'}),
+        widget=forms.Select(attrs={'class': 'border border-verde-desgastado p-1 mb-3   text-uppercase fs-6'}),
     )
     profissao = forms.ModelChoiceField(
         label='Atividade profissional:',
         queryset=Profissao.objects.none(),  # Query to fetch all Pessoas objects
-        widget=forms.Select(attrs={'class': 'border border-verde-desgastado p-1 mb-3   text-light text-uppercase fs-6'}),
+        widget=forms.Select(attrs={'class': 'border border-verde-desgastado p-1 mb-3   text-uppercase fs-6'}),
     )
 
     def __init__(self, *args, **kwargs):

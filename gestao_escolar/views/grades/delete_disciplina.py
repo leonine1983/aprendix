@@ -6,7 +6,7 @@ from datetime import datetime, date
 from django.urls import reverse_lazy
 
 
-class Delete_Turmas(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+class DeleteGrades(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Turmas
     template_name = 'Escola/inicio.html'
     success_message = "Deletado com sucesso"

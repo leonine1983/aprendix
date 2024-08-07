@@ -6,7 +6,7 @@ from datetime import datetime, date
 from django.urls import reverse_lazy
 
 
-class Delete_Turmas(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+class Delete_Disciplina(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Turmas
     template_name = 'Escola/inicio.html'
     success_message = "Deletado com sucesso"
@@ -19,7 +19,7 @@ class Delete_Turmas(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
         context['titulo_page'] = 'Atualização do Registro da Turma'          
         context['svg'] = svg 
         context['btn_bg'] = " btn-danger "
-        context['button'] = "Deletar cadastro da"
+        context['button'] = "Deletar cadastro do"
         context['Alunos'] = Turmas.objects.all()
         context['now'] = datetime.now()
         context['update'] = "update"

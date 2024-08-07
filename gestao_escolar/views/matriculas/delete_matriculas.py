@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from .matriculas_form import Turma_form
 
 
-class Delete_Turmas(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+class Delete_Matriculas(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Matriculas
     template_name = 'Escola/inicio.html'
     success_message = "Deletado com sucesso"

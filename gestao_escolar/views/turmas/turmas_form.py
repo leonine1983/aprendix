@@ -14,19 +14,15 @@ class Turma_form(forms.ModelForm):
     
     nome = forms.CharField(
         label='Nome da Turma:',
-        widget=forms.TextInput(attrs={'class': ' border border-info p-1 pb-1 text-center   m-2 rounded-1 col-2'}),
     )
     descritivo_turma = forms.CharField(
-        label='Descritivo da Turma (ex: única, A, B, C):',
-        widget=forms.TextInput(attrs={'class': ' border border-info p-1 pb-1 text-center  m-2 rounded-1 col-2'}),
+        label='Descritivo da Turma (ex: única, A, B, C):',        
     )
     serie = forms.ModelChoiceField(
-        queryset= Serie_Escolar.objects.all(),
-        widget=forms.Select(attrs={'class': ' border border-info p-1 pb-1 text-center   m-2 rounded-1 col-auto'}),
+        queryset= Serie_Escolar.objects.all(),        
     ) 
     turno = forms.ChoiceField(
-        choices= turno,
-        widget= forms.Select(attrs={'class': ' border border-info p-1 pb-1 text-center  m-2 rounded-1 col-auto'})
+        choices= turno,        
     )  
     quantidade_vagas = forms.IntegerField(
         widget=forms.NumberInput(attrs={'class': ' border border-info p-1 pb-1 text-center   m-2 rounded-1 col-2'})
