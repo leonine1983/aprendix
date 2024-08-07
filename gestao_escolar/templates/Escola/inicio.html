@@ -86,9 +86,14 @@
     {% if  conteudo_page == 'Todas as matriculas' %}
         {% include 'Escola/partials/seleciona_matricula_turmas.html' %}
     {% endif %}  
+    <!--Matriculas-->
     {% if  conteudo_page == 'Matricular Aluno' %}
-        {% include 'Escola/partials/seleciona_matricular_aluno.html' %}
+        {% include 'Escola/partials/matriculas/seleciona_matricular_aluno.html' %}
     {% endif %} 
+    {% if  conteudo_page == 'matricula_update_or_delete' %}
+        {% include 'Escola/partials/matriculas/update_or_delete.html' %}
+    {% endif %} 
+    <!--Matriculas END-->
 
     {% if  conteudo_page == 'Remaneja Aluno' %}
         {% include 'Escola/partials/seleciona_matricular_remanejamento.html' %}

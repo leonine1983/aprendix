@@ -23,11 +23,11 @@ class Update_Matricula(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         aluno_turma = self.object.turma   
         context = super().get_context_data(**kwargs)        
         context['titulo_page'] = 'Matrículas'          
-        context['conteudo_page'] = "update"               
+        context['conteudo_page'] = "matricula_update_or_delete"               
         context['page_ajuda'] = "<div class='border bg-secondary p-2'><h2>Pessoar a ser contratada</h2><div>"        
         context['titulo_page'] = f'Atualizar Matrícula de {aluno}'
         context['sub_Info_page'] = f"Use os campos abaixo para atualizar os dados de <b class='text-capitalize '>{aluno}</b> do {aluno_turma}"
         context['table'] = True   
-        context['bottom'] = "Atualizar Informações"   
+        context['bottom'] = "Atualizar Informações de"   
         context['btn_bg'] = " btn-secondary "  
         return context   

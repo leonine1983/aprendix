@@ -51,10 +51,9 @@ urlpatterns = [
     path('gestao_escolar/Matricula/comprovante/imprime/<int:pk>', ComprovanteMatricula.as_view(), name="Matricula_comprovante"),    
 
     # Matriculas retorno aluno
-    path('gestao_escolar/Matricula/create/aluno/<int:pk>', Create_Matriculas_Retorno_alunos.as_view(), name="GE_Escola_Matricula_create_aluno"), 
-   
+    path('gestao_escolar/Matricula/create/aluno/<int:pk>', Create_Matriculas_Retorno_alunos.as_view(), name="GE_Escola_Matricula_create_aluno"),    
     path('gestao_escolar/Matricula/atualiza/<int:pk>', Update_Matricula.as_view(), name="GE_Escola_Matricula_update"),    
-    path('gestao_escolar/Matricula/delete/<int:pk>', Delete_Turmas.as_view(), name="GE_Escola_Matricula_delete"),
+    path('gestao_escolar/Matricula/delete/<int:pk>', Delete_Matriculas.as_view(), name="GE_Escola_Matricula_delete"),
 
     # Remanejamento
     path('gestao_escolar/Matricula/remaneja_aluno/<int:pk>', Create_Remanejamento.as_view(), name="GE_Escola_Remaneja_create"),     
