@@ -3,11 +3,9 @@ from gestao_escolar.views.GE_pasta_escola import *
 from gestao_escolar.views.pasta_session import *
 from gestao_escolar.views import *
 from gestao_escolar.views.views import   Pagina_inicio
-from rh.models import Config_plataforma
 #from dal import autocomplete
-from .models import Alunos
-app_name = "Gestao_Escolar"
 
+app_name = "Gestao_Escolar"
 
 urlpatterns = [
     path('gestao_escolar', ListView_Escola.as_view(), name="GE_inicio"),    
@@ -66,7 +64,9 @@ urlpatterns = [
 
     # Grades
     path('gestao_escolar/Grades/create/turmas', View_turmas_Grade.as_view(), name="Grades_turmas"),   
-    path('gestao_escolar/Grades/create/<int:pk>', Create_Grades.as_view(), name="Grades_create"),     
+    path('gestao_escolar/Grades/create/<int:pk>', Create_Grades.as_view(), name="Grades_create"),   
+    path('gestao_escolar/Grades/update/<int:pk>', Update_Grade.as_view(), name="Grades_update"),     
+    path('gestao_escolar/Grades/delete/<int:pk>', Delete_Grade.as_view(), name="Grades_delete"),  
     path('gestao_escolar/Matricula/remaneja_aluno/Turma/<int:pk>', Update_Matricula_remanejamento.as_view(), name="GE_Escola_Remaneja_update"), 
 
     # Professores

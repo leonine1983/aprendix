@@ -122,9 +122,14 @@
     {% if  conteudo_page == 'Turmas Escolha' %}
         {% include 'Escola/partials/seleciona_Turma_retorno_aluno.html' %}
     {% endif %} 
+    <!--Grades-->
     {% if  conteudo_page == 'Todas as turmas-grade' %}
-        {% include 'Escola/partials/seleciona_grade_turma.html' %}
+        {% include 'Escola/partials/grades/seleciona_grade_turma.html' %}
     {% endif %} 
+    {% if  conteudo_page == "Updade_or_Delete Grade" %}
+        {% include 'Escola/partials/grades/update_or_delete.html' %}
+    {% endif %}
+    <!--Grades End-->
     {% if  conteudo_page == 'cargos/funcionarios' %}
         {% include 'Escola/partials/selecionar_cargos_funcionarios.html' %}
     {% endif %}    

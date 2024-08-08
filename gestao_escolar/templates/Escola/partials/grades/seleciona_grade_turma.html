@@ -1,7 +1,3 @@
-
-<!-- Bootstrap Datepicker CSS -->
-
-
 {% block script_head %}
 <style>
     /* Seletor de classe para o ícone do seletor de datas */
@@ -40,12 +36,6 @@ td, tr {
 
 
 {% endblock script_head %}  
-<!-- Modal -->
-
-    
-
-<!-- Bootstrap Datepicker CSS -->
-<!-- Modal -->
 {% load static %}
 {% block css %}
 <link rel="stylesheet" href="{% static 'global/css/search.css' %}">
@@ -61,7 +51,7 @@ td, tr {
         </div>
         <div class="modal-body shadow-sm bg-light-subtle">    
           <div class="modal_windows_title bg-p-3 mb-3 p-2 txt-p ">
-            <i class="fa-regular fa-face-grin-squint"></i> <span class="text-capitalize fs-7"> Olá, seja muito bem-vindo, {% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}{{request.user}}{% endif %}!!</span>  
+            <i class="fa-regular fa-face-grin-squint"></i> <span class="text-capitalize fs-7"> Olá, seja muito bem-vindo, {% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}<b class='uppercase'>{{request.user}}</b>{% endif %}!!</span>  
           </div>        
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -78,7 +68,7 @@ td, tr {
                   {% if not ativa  %}  
                         <div class="win11-search-wrapper bg-p-5 m-0 p-1 d-flex">
                           <form action="?" method="GET" class="form-inline">
-                              {% csrf_token %}            
+                              {% csrf_token %}           
                               <div class="win11-search-wrapper-inner">
                                   <input type="text" class="win11-search-input" placeholder="Buscar turma" name="busca-turma"  name="busca-aluno">
                                   <button class="win11-search-button" type="submit"><i class="fa-regular fa-user-magnifying-glass"></i></button>
@@ -106,7 +96,6 @@ td, tr {
                           </div>
                         </div> 
                     {% else %}
-                    <div>ddd</div>
                   {% endif %}
                   <table class="win11-table">
                     {% if not ativa  %}
@@ -153,7 +142,7 @@ td, tr {
                         <td class='text-align text-capitalize '>{{n.professor}}</td>
                         <td class='text-align'>{{n.carga_horaria_anual}}</td>
                         <td class='text-align'>{{n.limite_faltas}}</td>
-                        <td class='text-align d-flex text-center gap-2 c'><a href="http://" class='btn btn-primary'>Editar</a><a href="http://" class='btn btn-danger'>Excluir</a> </td>   
+                        <td class='text-align d-flex text-center gap-2 c'><a href="{% url "Gestao_Escolar:Grades_update" n.pk %}" class='btn btn-primary'>Editar</a><a href="{% url "Gestao_Escolar:Grades_delete" n.pk %}" class='btn btn-danger'>Excluir</a> </td>   
                       </tr>    
                     {% endfor %}  
                     </tbody>                  
@@ -166,16 +155,30 @@ td, tr {
                 {% if ativa == 'Grades' %}
                 <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
                   <div class="form-group ">
-                    <form method="post"class='m-3 p-3 ' >
-                      <div class='m-3 p-3 row row-cols-2 bg-secondary-subtle'>
+                    {% include "Escola/partials/grades/explica_AddProfissionais.html" %}                    
+                    <form method="post"class='m-3 p-3 ' >                      
+                      <div class='m-3 p-3 bg-secondary-subtle'>
                       {{ form.non_field_errors }}
                       {% csrf_token %}
                       {% for field in form %}
-                      <div class="form-group">
-                          <p class='m-0 p-0'>{{ field.label_tag }}</p>
-                          {{ field }}
-                          {{ field.errors }}
-                      </div>
+                        {% if field.label == 'Selecione o professor:' or field.label == 'Selicione o professor se houver necessidade de atribuir mais um professor na turma:' or field.label == 'Selecione professores de Reserva Técnica, se houver necessidade:' or field.label == 'Selecione os auxiliares de classe, se houver necessidade:' %}                          
+                            <section>
+                                <p class='m-0 p-0'>{{ field.label_tag }}</p>
+                                <section class='d-flex border border-success'>
+                                  {{ field }}
+                                  <a class='btn btn-success m-2 ' href="{% url "Gestao_Escolar:Professores_Pessoa_create" %}">Add Profissionais <i class="fa-solid fa-plus"></i></a>
+                                  {{ field.errors }}
+                                </section>
+                            </section>                          
+                          {% else %}
+                          <section>
+                            <section>
+                                <p class='m-0 p-0'>{{ field.label_tag }}</p>
+                                {{ field }}
+                                {{ field.errors }}
+                            </section>
+                          </section>
+                        {% endif %}
                       {% endfor %}  
                     </div>
                       <button class="btn btn-sm btn-primary w-100 p-2 fs-3" type="submit"> Salvar <i class="fa-sharp fa-solid fa-floppy-disk-circle-arrow-right"></i></button>
@@ -197,3 +200,5 @@ td, tr {
   
     });
     </script>
+
+
