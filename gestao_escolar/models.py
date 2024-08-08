@@ -1,32 +1,10 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
-from django.db.models.signals import post_migrate, post_save
+from django.db.models.signals import post_migrate
 from django.dispatch import receiver
-from rh.models import Ano, Uf_Unidade_Federativa, Sexo, Bairro, Cidade
+from rh.models import Ano as AnoLetivo, Uf_Unidade_Federativa, Sexo, Bairro, Cidade
 from ckeditor_uploader.fields import RichTextUploadingField
-
-
-
-class AnoLetivo(models.Model):
-    ano = models.ForeignKey(Ano, on_delete=models.CASCADE)
-    data_inicio = models.DateField(blank=True, null=True)
-    data_fim = models.DateField(blank=True, null=True)   
-    def __str__(self):
-        return str(self.ano.ano)
-    
-    @receiver(post_migrate)
-    def create_AnoLetivo(sender, **kwargs):
-        if not AnoLetivo.objects.exists():
-            try:
-                ano = Ano.objects.get(id=1)  
-                AnoLetivo.objects.create(
-                    ano=ano,
-                    data_inicio='2024-01-01',  
-                    data_fim='2024-12-31',    
-                )
-            except Ano.DoesNotExist:
-                print("Ano com ID 1 não encontrado.")
 
 
 class Cargo(models.Model):
@@ -225,10 +203,6 @@ class Disciplina(models.Model):
         return self.nome
 
 
-from django.db import models
-from django.db.models.signals import post_migrate
-from django.dispatch import receiver
-
 class Compatibilidade_EducaCenso(models.Model):
     nome = models.CharField(max_length=100)
 
@@ -370,12 +344,7 @@ niveis = {
     ('2', "Superior")
 }
 
-# ---- Esta sessão inicia herdando do model Encaminhamentos do App RH.Models -------------------------------------
-from django.db import models
-from django.dispatch import receiver
-from django.db.models.signals import post_migrate
 
-# ---- Esta sessão inicia herdando do model Encaminhamentos do App RH.Models -------------------------------------
 class Profissionais(models.Model):
     nome = models.ForeignKey('rh.Encaminhamentos', on_delete=models.CASCADE, null=True)
     cargo = models.ForeignKey(Cargo, on_delete=models.CASCADE)

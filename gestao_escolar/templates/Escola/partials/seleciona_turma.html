@@ -50,11 +50,12 @@
                     <thead>
                       <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Turma</th>
+                        <th scope="col">Turma</th>                        
                         <th scope="col">Série</th>
                         <th scope="col">Multiseriada</th>
                         <th scope="col">Turno</th>
                         <th scope="col">Vagas</th>
+                        <th scope="col">Ano</th>
                         <th scope="col" class='text-center'>Ação</th>
                       </tr>
                     </thead>
@@ -70,7 +71,8 @@
                         <td>Não</td>
                         {% endif %}
                         <td>{{n.turno}}</td>    
-                        <td>{{n.quantidade_vagas}}</td>                      
+                        <td>{{n.ano_letivo}}</td>   
+                        <td>{{n.quantidade_vagas}}</td>                   
                         <td class='text-center'><a class='btn btn-sm btn-info me-1' href="{% url 'Gestao_Escolar:GE_Escola_Turmas_update' n.pk %}"><span>Editar</span></a><a class='btn btn-sm btn-danger mx-1 ' href="{% url 'Gestao_Escolar:GE_Escola_Turmas_delete' n.pk %}"><span>Excluir</span></a></td>
                       </tr>    
                     {% endfor %}                

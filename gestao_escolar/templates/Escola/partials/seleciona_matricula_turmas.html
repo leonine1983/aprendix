@@ -64,7 +64,7 @@ input[type=checkbox]{
                       </tr>
                     </thead>
                     <tbody>
-                    {% for n in object_list %}
+                    {% for n in object_list %} {{turmas_matriculas}}
                       <tr>
                         <td class='text-center'>{{forloop.counter}}</td>
                         <td class='text-left'><span class='text-uppercase '>{{n.nome}} {{n.descritivo_turma}}</span> <a class='btn btn-sm  me-1' href="{% url 'Gestao_Escolar:GE_Escola_Turmas_update' n.pk %}"><i class="fa-thin fa-pen-to-square"></i><span>Editar</span></a></td>

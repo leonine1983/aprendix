@@ -47,6 +47,23 @@ class Prefeitura(models.Model):
 
 class Ano(models.Model):
     ano = models.CharField(max_length=4, null=False, verbose_name='Ano', default='2023')
+    data_inicio = models.DateField(blank=True, null=True)
+    data_fim = models.DateField(blank=True, null=True)   
+
+    @receiver(post_migrate)
+    def create_AnoLetivo(sender, **kwargs):
+        if not Ano.objects.exists():
+            try:
+                Ano.objects.create(
+                    ano=2024,
+                    data_inicio='2024-01-01',  
+                    data_fim='2024-12-31',    
+                )
+            except Ano.DoesNotExist:
+                print("Ano com ID 1 não encontrado.")
+    
+    class Meta:
+        ordering = ['-ano']
 
     def __str__(self):
         return self.ano   
