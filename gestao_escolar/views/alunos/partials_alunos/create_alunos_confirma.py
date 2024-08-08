@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from datetime import datetime, date
 from django.urls import reverse_lazy
-from gestao_escolar.views.alunos.alunos_form import Alunos_form
+from gestao_escolar.views.alunos.partials_alunos.alunos_form import Alunos_form
 from django.db.models import Q
 from django.shortcuts import redirect
 

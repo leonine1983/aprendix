@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from datetime import datetime, date
 from django.urls import reverse_lazy
-from .alunos_form import *
+from .partials_alunos.alunos_form import *
 from django.db.models import Q
 from django.shortcuts import redirect
 
@@ -48,7 +48,6 @@ class Create_Alunos(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         # Verifica se já existe um aluno com o mesmo nome
         nome_completo = form.cleaned_data['nome_completo']
         nome_mae = form.cleaned_data['nome_mae']        
-        #if Alunos.objects.filter(nome_completo__iexact=nome_completo).exists():
         if Alunos.objects.filter(nome_completo__icontains=nome_completo, nome_mae__icontains = nome_mae).exists():
             return redirect('Gestao_Escolar:alunos_encontred', nome_completo=nome_completo, nome_mae=nome_mae)
         if self.request.user.first_name:        

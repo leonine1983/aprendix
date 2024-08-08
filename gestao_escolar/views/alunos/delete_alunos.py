@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from datetime import datetime, date
 from django.urls import reverse_lazy
-from .alunos_form import *
+from .partials_alunos.alunos_form import *
 
 
 class Delete_Alunos(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
