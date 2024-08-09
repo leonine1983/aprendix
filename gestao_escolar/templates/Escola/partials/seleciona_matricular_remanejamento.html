@@ -1,11 +1,4 @@
-
-<!-- Bootstrap Datepicker CSS -->
-
-
-
-<!-- Modal -->
-<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    
+<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">    
     <div class="modal-dialog w-100">
     <div class="modal-content bg-secondary-subtle " >
         <div class="modal-header">
@@ -40,11 +33,9 @@
                 {{ form.non_field_errors }}
                 {% csrf_token %}
                 {% for field in form %}
-                <div class="form-group">
                     {{ field.label_tag }}
                     {{ field }}
-                    {{ field.errors }}
-                </div>
+                    {{ field.errors }}                
                 {% endfor %}  
                 <div id="id_aluno_matricula" class="mt-2">
                   <p style="margin-bottom:-1rem !important" class="p-0 m-0">Escolha a turma para onde o aluno será remanejado.</p>.

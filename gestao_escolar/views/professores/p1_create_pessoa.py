@@ -24,14 +24,11 @@ class Create_Pessoa_Professores(LoginRequiredMixin, SuccessMessageMixin, CreateV
         context = super().get_context_data(**kwargs)        
         context['titulo_page'] = 'Professores'          
         context['svg'] = svg 
-        #ano = 
-        #  context['lista_all'] = Encaminhamentos.objects.filter(encaminhamento__ano_decreto = request.session['anoLetivo_id'])
         escola = self.request.session['escola_id']
-        context['lista_all'] = Encaminhamentos.objects.filter(destino = escola, encaminhamento__ano_contrato__anoletivo = self.request.session['anoLetivo_id'] )
-
+        context['lista_all'] = Encaminhamentos.objects.filter(destino = escola, encaminhamento__ano_contrato = self.request.session['anoLetivo_id'] )
         contratos_condicoes_contrato = Contrato.objects.filter(
                                                                     nome_escola=escola,
-                                                                    ano_contrato__anoletivo=self.request.session['anoLetivo_id']
+                                                                    ano_contrato=self.request.session['anoLetivo_id']
                                                                 )
 
                                                                 # Passo 2: Excluir contratos que atendem às condições do modelo Encaminhamentos
@@ -40,7 +37,7 @@ class Create_Pessoa_Professores(LoginRequiredMixin, SuccessMessageMixin, CreateV
                                                                 )
 
         context['lista_all_pessoas'] = lista_all_pessoas
-        context['lista_all_escola'] = Profissionais.objects.filter(nome__destino = escola, nome__encaminhamento__ano_contrato__anoletivo = self.request.session['anoLetivo_id'] )
+        context['lista_all_escola'] = Profissionais.objects.filter(nome__destino = escola, nome__encaminhamento__ano_contrato = self.request.session['anoLetivo_id'] )
         contratados_anoLetivo = Contrato.objects.values_list('id', flat=True)
         context['lista_pessoas'] = Pessoas.objects.exclude(pessoa_contratada__id__in= contratados_anoLetivo)
 

@@ -3,7 +3,7 @@
 <!-- Modal -->
 {% load static %}
 {% block css %}
-<link rel="stylesheet" href="{% static "global/css/search.css" %}">
+
 {% endblock css %}
 <div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">    
   <div class="modal-dialog w-100">
@@ -61,18 +61,10 @@
                 <button class="btn btn-sm btn-primary w-100 p-2 fs-3" type="submit"> {{bottom}} {{object}} <i class="fa-solid fa-trash-can"></i></button>
             </form> 
           </div>  
-
-
-
-
-
-
-
-
-
-
           </div>         
         </div>
       </div>        
     </div>
   </div>
+  <!--Multiselect-->
+  {% include "Escola/partials/grades/multiselect.html" %}

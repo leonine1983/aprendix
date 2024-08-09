@@ -23,7 +23,7 @@ class Create_Define_Profissional(LoginRequiredMixin, CreateView):
         kwargs = super().get_form_kwargs()  
         escola = self.request.session['escola_id']  
         profissionais_list = Profissionais.objects.values_list('nome__id', flat=True)
-        encaminhamento_esc = Encaminhamentos.objects.filter(destino = escola, encaminhamento__ano_contrato__anoletivo = self.request.session['anoLetivo_id'] )
+        encaminhamento_esc = Encaminhamentos.objects.filter(destino = escola, encaminhamento__ano_contrato = self.request.session['anoLetivo_id'] )
         kwargs['nome_query'] = encaminhamento_esc.exclude(id__in = profissionais_list )
         return kwargs
     
@@ -35,7 +35,7 @@ class Create_Define_Profissional(LoginRequiredMixin, CreateView):
         context['svg'] = svg 
 
         
-        context['lista_all'] = Profissionais.objects.filter(nome__destino = escola, nome__encaminhamento__ano_contrato__anoletivo = self.request.session['anoLetivo_id'] )       
+        context['lista_all'] = Profissionais.objects.filter(nome__destino = escola, nome__encaminhamento__ano_contrato = self.request.session['anoLetivo_id'] )       
         context['cargo_all'] = Cargo.objects.all()       
         context['conteudo_page'] = "cargos/funcionarios" 
         context['page_ajuda'] = "<h3>Definir cargo para o funcionário</h3>\

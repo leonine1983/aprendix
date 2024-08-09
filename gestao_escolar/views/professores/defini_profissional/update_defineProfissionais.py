@@ -24,7 +24,7 @@ class Update_Define_Profissional(LoginRequiredMixin, SuccessMessageMixin, Update
         context['svg'] = svg 
 
         
-        context['lista_all'] = Profissionais.objects.filter(nome__destino = escola, nome__encaminhamento__ano_contrato__anoletivo = self.request.session['anoLetivo_id'] )       
+        context['lista_all'] = Profissionais.objects.filter(nome__destino = escola, nome__encaminhamento__ano_contrato = self.request.session['anoLetivo_id'] )       
         context['cargo_all'] = Cargo.objects.all()       
         context['conteudo_page'] = "cargos/funcionarios" 
         context['active'] = 'active'

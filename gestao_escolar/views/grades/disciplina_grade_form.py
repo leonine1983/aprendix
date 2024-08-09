@@ -5,8 +5,7 @@ from gestao_escolar.models import Disciplina, Turmas,  TurmaDisciplina, Profissi
 # widget personalizado que usa as classes (form-control, border, p-3, pb-3 e bg-transparent) para ser atribuido ao campo 'tempo_meses' 
 
 
-class Diciplina_Grade_form (forms.ModelForm):
-    
+class Diciplina_Grade_form (forms.ModelForm):    
     
     turma = forms.ModelChoiceField(
         label='Turma:',
@@ -65,6 +64,34 @@ class Diciplina_Grade_form (forms.ModelForm):
     class Meta:
         model = TurmaDisciplina
         fields =['turma', 'disciplina', 'professor', 'carga_horaria_anual', 'limite_faltas']
+
+
+
+
+class Diciplina_Grade_update_form(forms.ModelForm):
+    disciplina = forms.ModelChoiceField(
+        label='Selecione a Disciplina:',
+        queryset=Disciplina.objects.all(),
+        widget=forms.Select(attrs={'class': 'border border-info p-1 pb-1 text-info m-2 rounded-1 col'}),
+    )
+   
+   
+    auxiliar_classe = forms.ModelMultipleChoiceField(
+        label='Selecione os auxiliares de classe, se houver necessidade:',
+        queryset=Profissionais.objects.all(),
+        widget=forms.SelectMultiple(attrs={'class': 'border border-info p-1 pb-1 text-info m-2 rounded-1 w-75'}),
+        required=False
+    )
+    carga_horaria_anual = forms.CharField(
+        label='Carga horária anual da disciplina:',
+        widget=forms.NumberInput(attrs={'class': 'border border-info p-1 pb-1 text-info m-2 rounded-1'}),
+    )
+    limite_faltas = forms.CharField(
+        label='Atribua o número máximo de faltas que o aluno pode ter na disciplina e não ser reprovado:',
+        widget=forms.NumberInput(attrs={'class': 'border border-info p-1 pb-1 text-info m-2 rounded-1'}),
+    )
     
 
-
+    class Meta:
+        model = TurmaDisciplina
+        fields = ['turma', 'disciplina', 'professor', 'carga_horaria_anual', 'limite_faltas']

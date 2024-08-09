@@ -112,7 +112,7 @@ td, tr {
                     <tbody>                
                     {% for n in turmas %}
                       <tr class="fs-5">
-                        <td><i class="fa-duotone fa-graduation-cap" style="--fa-primary-color: #0d5e1a; --fa-secondary-color: #18d838;"></i></td>
+                        <td><i class="fa-duotone fa-graduation-cap" style="--fa-primary-color: #0d5e1a; --fa-secondary-color: #18d838;"></i>{{forloop.counter}}</td>
                         <td class='text-left text-uppercase'>{{n.nome}} {{n.descritivo_turma}}</td>                    
                         <td >{{n.serie}}</td>
                         <td >{{n.turno}}</td>
@@ -124,6 +124,10 @@ td, tr {
                     </tbody>
                     {% else %}
                     <!----------------- EScolha das Turmas ----------------->
+                    <div class="text-end">
+                      <a class="btn btn-sm btn-secondary m-2" href="{% url 'Gestao_Escolar:Grades_turmas' %} "><i class="fa-regular fa-arrows-repeat"></i> Escolher outra turma 
+                      </a>
+                    </div>                    
                     <thead>
                       <tr>
                         <th>Ico</th>
@@ -142,7 +146,7 @@ td, tr {
                         <td class='text-align text-capitalize '>{{n.professor}}</td>
                         <td class='text-align'>{{n.carga_horaria_anual}}</td>
                         <td class='text-align'>{{n.limite_faltas}}</td>
-                        <td class='text-align d-flex text-center gap-2 c'><a href="{% url "Gestao_Escolar:Grades_update" n.pk %}" class='btn btn-primary'>Editar</a><a href="{% url "Gestao_Escolar:Grades_delete" n.pk %}" class='btn btn-danger'>Excluir</a> </td>   
+                        <td class='text-align d-flex text-center gap-2 c'><a href="{% url "Gestao_Escolar:Grades_update" n.pk %}" class='btn btn-primary'>Editar</a><a href="{% url 'Gestao_Escolar:Grades_delete' n.pk %}" class='btn btn-danger'>Excluir</a> </td>   
                       </tr>    
                     {% endfor %}  
                     </tbody>                  
@@ -192,13 +196,5 @@ td, tr {
 </div>         
 
 {% load static %}
-<script src="{% static 'base_static/select2/select2.min.css' %}"></script>
-    <script>
-        // In your Javascript (external .js resource or <script> tag)
-    $(document).ready(function() {
-        $('#id_aluno').select2();
-  
-    });
-    </script>
-
+{% include "Escola/partials/grades/multiselect.html" %}
 

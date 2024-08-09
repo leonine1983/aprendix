@@ -373,8 +373,8 @@ class TurmaDisciplina(models.Model):
     quant_aulas_dia = models.IntegerField(default=3, null=True)
     professor = models.ForeignKey(Profissionais, related_name='gradeProfessor1_related', on_delete=models.CASCADE, null=True)
     professo2 = models.ForeignKey(Profissionais, related_name='gradeProfessor2_related', on_delete=models.CASCADE, null=True, blank=True)
-    reserva_tecnica = models.ManyToManyField(Profissionais, related_name='reservaTecnica_related', null=True)
-    auxiliar_classe = models.ManyToManyField(Profissionais, related_name='auxiliarClasse_related', null=True)
+    reserva_tecnica = models.ManyToManyField(Profissionais, related_name='reservaTecnica_related', null=True, blank=True)
+    auxiliar_classe = models.ManyToManyField(Profissionais, related_name='auxiliarClasse_related', null=True, blank=True)
 
     carga_horaria_anual = models.IntegerField(null=True)
     limite_faltas = models.IntegerField(null=True)
