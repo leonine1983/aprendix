@@ -8,8 +8,8 @@ from .remanejamento_form import Matricula_form
 
 class Create_Remanejamento(LoginRequiredMixin, CreateView):
     model = Remanejamento
-    #fields = '__all__'
-    form_class = Matricula_form
+    fields = '__all__'
+    #form_class = Matricula_form
     template_name = 'Escola/inicio.html'
     success_url = reverse_lazy('Gestao_Escolar:GE_Escola_inicio')    
     success_message = "Aluno remanejado com sucesso!"
