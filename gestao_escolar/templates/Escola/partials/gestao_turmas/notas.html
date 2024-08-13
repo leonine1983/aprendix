@@ -28,8 +28,8 @@
         
             <ul>
                 {% for t in trimestre %}                
-                    <li class="tab-content {% if t.id == 1 %}tab-content-first bg-trimestre-{{t.id}}{% else %}tab-content-{{ t.id }}{% endif %}  typography">
-                        <table class="win11-table " >
+                    <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography">
+                        <table class="win11-table" >
                             <thead class="{% if t.final  %}bg-success{% else %}bg-p-3 {% endif %}">
                                 <tr>
                                     <th>#</th>
@@ -101,7 +101,8 @@
 
                                         {% endfor %}
                                         <td><a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:create_or_update_gestao_turmas' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Lançar ou Editar Notas</a></td>
-                                        
+                                    
+
                                       
                                     </tr>
                                 {% endfor %}

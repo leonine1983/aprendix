@@ -21,6 +21,7 @@ class GestaoTurmasForm(forms.ModelForm):
 
 from django.http import QueryDict
 from django.db.models import Sum
+
 @login_required
 def create_or_update_gestao_turmas(request, aluno_id, trimestre_id):
     aluno = get_object_or_404(Matriculas, pk=aluno_id)

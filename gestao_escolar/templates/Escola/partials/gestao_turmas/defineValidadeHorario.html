@@ -25,9 +25,11 @@
                     <li><strong>Data de Início:</strong> Indica quando o horário começa a vigorar, organizando as aulas e outras atividades da turma.</li>
                     <li><strong>Data de Término:</strong> Representa o último dia em que o horário estará ativo. Após essa data, ajustes devem ser feitos em um novo horário, se necessário.</li>
                 </ul>
-                <form method="post" class="win11-form d-flex gap-5 m-5">
+                <form method="post">
                     {% csrf_token %}
-                    {{form.as_div}}                    
+                    <div>
+                    {{form.as_p}}                    
+                    </div>
                     <button type="submit" class="m-4">Criar Validade</button>
                 </form>
                 

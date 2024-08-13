@@ -97,7 +97,7 @@ urlpatterns = [
 
     # Notas Trimestre
     path('criar-gestao-turma/notas/trimestre/<int:aluno_id>/', GestaoTurmasNotas.as_view(), name='criar_gestao_turma'), 
-    path('gestao_turmas/<int:turma_id>/<int:trimestre_id>/', create_or_update_gestao_turmas, name='edit_horario'),    
+    path('gestao_turmas/<int:turma_id>/<int:trimestre_id>/', create_or_update_gestao_turmas, name='create_or_update_gestao_turmas'),
     path('gestao_turmas/media/<int:aluno_id>/', create_or_update_Media_turmas, name='create_or_update_media_turmas'),
     
 

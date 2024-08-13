@@ -99,7 +99,7 @@
           <li class="tab-content tab-content-4 typography">
             <div class= 'd-flex p-2 bg-p-5 justify-content-between'>
               <h1 class=''><img src="{% static 'svg/grade_horario.svg' %}" alt=""> Horários do {{matriculas.0.turma}}</h1>  
-              <div>Validade: {{horarios.0.data_inicio}}</div>
+              <div class=" mt-2">Validade: <mark class='rounded-2 p-2 shadow-sm'><b class='text-success '>{{horarios.0.validade.data_inicio }}</b> a <b class='text-success'>{{horarios.0.validade.data_fim }}</b></mark></div>
               <div>
                 <a class='btn btn-primary fs-7' href="{% url 'Gestao_Escolar:validadeHorario' matriculas.0.turma.pk %}">Nova Grade de Horários para a turma <i class="fa-solid fa-plus text-light"></i></a>                  
               </div>
@@ -118,12 +118,12 @@
               </thead>
               <tbody>
                 {% for horario in horarios %}  
-                  <td class='text-center'>{{ horario.periodo }} {{ horario.turma }}</td>
-                  <td class='text-center'>{{ horario.turma_Horario_relatedsegunda}}</td>
-                  <td class='text-center'>{{ horario.terca}}</td>
-                  <td class='text-center'>{{ horario.quarta}}</td>
-                  <td class='text-center'>{{ horario.quinta}}</td>
-                  <td class='text-center'>{{ horario.sexta}}</td>
+                  <td class='text-center'>{{ horario.periodo }} </td>
+                  <td class='text-center'>{% if horario.segunda is not None %}{{ horario.segunda }}{% endif %}</td>
+                  <td class='text-center'>{% if horario.terca is not None %}{{ horario.terca }}{% endif %}</td>
+                  <td class='text-center'>{% if horario.quarta is not None %}{{ horario.quarta }}{% endif %}</td>
+                  <td class='text-center'>{% if horario.quinta is not None %}{{ horario.quinta }}{% endif %}</td>
+                  <td class='text-center'>{% if  horario.sexta is not None %}{{  horario.sexta }}{% endif %}</td>
                   <td class='text-center'><a href="{% url 'Gestao_Escolar:horario_update' pk=horario.id turma_id=horario.turma.id %}">Editar <i class="fa-regular fa-pen-to-square"></i></a>
                 </tr>
               {% endfor %}
@@ -135,8 +135,3 @@
       </div>
   </div> 
 </div>
-<!-- Bootstrap Datepicker CSS -->
-
-
-
-
