@@ -1,5 +1,9 @@
 {% load static %}
-{% block script_head %}<link rel="stylesheet" href="{% static 'global/css/css3_tab.css' %}">{% endblock script_head %} 
+
+{% block script_head %}<link rel="stylesheet" href="{% static 'global/css/css3_tab.css' %}">
+
+
+{% endblock script_head %} 
 {% block script_footer %}{% endblock script_footer %} 
 <!-- Modal -->
 <div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
@@ -23,9 +27,7 @@
           <label for="tab3"><i class="icon-cogs"></i>Disciplinas</label>
           <input type="radio" name="pcss3t" id="tab4" class="tab-content-4">
           <label for="tab4"><i class="icon-cogs"></i><img src="{% static 'svg/grade_horario.svg' %}" alt=""> Grade de Horários da Turma</label>
-          <a class='btn btn-success fs-7' href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}">Mudar Turma <i class="fa-regular fa-arrows-repeat"></i></i></a>                  
-          
-          
+          <a class='btn btn-success fs-7' href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}">Mudar Turma <i class="fa-regular fa-arrows-repeat"></i></i></a>               
         {% endif %}
         
         <ul>
@@ -96,42 +98,95 @@
             <p>Near the beginning of his career, Einstein thought that Newtonian mechanics was no longer enough to reconcile the laws of classical mechanics with the laws of the electromagnetic field. This led to the development of his special theory of relativity. He realized, however, that the principle of relativity could also be extended to gravitational fields, and with his subsequent theory of gravitation in 1916, he published a paper on the general theory of relativity.</p>
             <p class="text-right"><em>Find out more about Albert Einstein from <a href="http://en.wikipedia.org/wiki/Albert_Einstein" target="_blank">Wikipedia</a>.</em></p>				
           </li>     
-          <li class="tab-content tab-content-4 typography">
-            <div class= 'd-flex p-2 bg-p-5 justify-content-between'>
-              <h1 class=''><img src="{% static 'svg/grade_horario.svg' %}" alt=""> Horários do {{matriculas.0.turma}}</h1>  
-              <div class=" mt-2">Validade: <mark class='rounded-2 p-2 shadow-sm'><b class='text-success '>{{horarios.0.validade.data_inicio }}</b> a <b class='text-success'>{{horarios.0.validade.data_fim }}</b></mark></div>
-              <div>
-                <a class='btn btn-primary fs-7' href="{% url 'Gestao_Escolar:validadeHorario' matriculas.0.turma.pk %}">Nova Grade de Horários para a turma <i class="fa-solid fa-plus text-light"></i></a>                  
-              </div>
+             <!-- O conteúdo que você deseja imprimir -->
+             <style>
+              /* Estilos para impressão */
+              @media print {
+                table.win11-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                table.win11-table th, table.win11-table td {
+                    padding: 8px;
+                    border: 1px solid #d1d1d1;
+                    text-align: center;
+                }
+                table.win11-table thead {
+                    background-color: #f3f3f3;
+                }
+                .no-print {
+                  display: none !important;
+              }
+              @page {
+                size: landscape;
+            }
+            }
+            
+             
+          </style>
+          <li id="content-to-print" class="tab-content tab-content-4 typography">
+            <button onclick="printContent()" class='btn btn-sm btn-info no-print m-1' title="Imprime a tabela de horários da turma">Imprimir Horário <i class="fa-thin fa-print text-light"></i></button>        
+            <div class="d-flex p-2 bg-p-5 justify-content-between">
+                <h1><img src="{% static 'svg/grade_horario.svg' %}" alt=""> Horários do {{matriculas.0.turma}}</h1>
+                <div class="mt-2">Validade: <mark class='rounded-2 p-2 shadow-sm'><b class='text-success '>{{horarios.0.validade.data_inicio }}</b> a <b class='text-success'>{{horarios.0.validade.data_fim }}</b></mark></div>
+                <div class='no-print'>
+                    <a class='btn btn-primary fs-7 no-print' href="{% url 'Gestao_Escolar:validadeHorario' matriculas.0.turma.pk %}">Nova Grade de Horários para a turma <i class="fa-solid fa-plus text-light"></i></a>
+                    
+                </div>
             </div>
             <table class="win11-table">
               <thead class='bg-p-3 text-uppercase'>
-                <tr>
-                  <th class='text-center'>Período</th>
-                  <th class='text-center'>Segunda</th>
-                  <th class='text-center'>Terça</th>
-                  <th class='text-center'>Quarta</th>
-                  <th class='text-center'>Quinta</th>
-                  <th class='text-center'>Sexta</th>
-                  <th class='text-center'>EDITAR</th>
-                </tr>
+                  <tr>
+                      <th class='text-center'>Período</th>
+                      <th class='text-center'>Segunda</th>
+                      <th class='text-center'>Terça</th>
+                      <th class='text-center'>Quarta</th>
+                      <th class='text-center'>Quinta</th>
+                      <th class='text-center'>Sexta</th>
+                      <th class='text-center no-print'>EDITAR</th>
+                  </tr>
               </thead>
               <tbody>
-                {% for horario in horarios %}  
-                  <td class='text-center'>{{ horario.periodo }} </td>
-                  <td class='text-center'>{% if horario.segunda is not None %}{{ horario.segunda }}{% endif %}</td>
-                  <td class='text-center'>{% if horario.terca is not None %}{{ horario.terca }}{% endif %}</td>
-                  <td class='text-center'>{% if horario.quarta is not None %}{{ horario.quarta }}{% endif %}</td>
-                  <td class='text-center'>{% if horario.quinta is not None %}{{ horario.quinta }}{% endif %}</td>
-                  <td class='text-center'>{% if  horario.sexta is not None %}{{  horario.sexta }}{% endif %}</td>
-                  <td class='text-center'><a href="{% url 'Gestao_Escolar:horario_update' pk=horario.id turma_id=horario.turma.id %}">Editar <i class="fa-regular fa-pen-to-square"></i></a>
-                </tr>
-              {% endfor %}
+                  {% for horario in horarios %}
+                      <tr>
+                          <td class='text-center'>{{ horario.periodo }}</td>
+                          <td class='text-center'>{% if horario.segunda is not None %}{{ horario.segunda }}{% endif %}</td>
+                          <td class='text-center'>{% if horario.terca is not None %}{{ horario.terca }}{% endif %}</td>
+                          <td class='text-center'>{% if horario.quarta is not None %}{{ horario.quarta }}{% endif %}</td>
+                          <td class='text-center'>{% if horario.quinta is not None %}{{ horario.quinta }}{% endif %}</td>
+                          <td class='text-center'>{% if horario.sexta is not None %}{{ horario.sexta }}{% endif %}</td>
+                          <td class='text-center no-print'><a href="{% url 'Gestao_Escolar:horario_update' pk=horario.id turma_id=horario.turma.id %}">Editar <i class="fa-regular fa-pen-to-square"></i></a></td>
+                      </tr>
+                  {% endfor %}
               </tbody>
             </table>
-          </li>          
+          </li>    
+           
           {% endif %}
         </ul>
       </div>
   </div> 
 </div>
+
+
+<script>
+  function printContent() {
+    var content = document.getElementById('content-to-print').innerHTML;
+    var printWindow = window.open('', '', 'height=600,width=800');
+
+    printWindow.document.write('<html><head><title>Impressão</title>');
+    printWindow.document.write('<style>@media print { .no-print { display: none !important; }');
+    printWindow.document.write('table.win11-table { width: 100%; border-collapse: collapse; }');
+    printWindow.document.write('table.win11-table th, table.win11-table td { padding: 8px; border: 1px solid #d1d1d1; text-align: center; }');
+    printWindow.document.write('table.win11-table thead { background-color: #f3f3f3; }');
+    printWindow.document.write('@page { size: landscape; }');
+    printWindow.document.write('}</style>');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write(content);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+}
+
+</script>

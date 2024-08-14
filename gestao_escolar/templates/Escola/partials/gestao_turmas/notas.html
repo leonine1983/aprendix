@@ -54,10 +54,8 @@
                                             </table>
                                         </th>
                                     {% endfor %}
-                                    <th class="text-center">Ação</th>    
-                                    
-                                    <th class="text-center">Profissional Resp.</th>                               
-                                    
+                                    <th class="text-center" >Profissional Resp.</th>     
+                                    <th class="text-center">Ação</th> 
                                 </tr>
                             </thead>
                             <tbody>
@@ -97,11 +95,27 @@
                                                         {% endif %}
                                                     {% endif %}
                                                 {% endfor %}
-                                            </td>                                    
+                                            </td>  
+                                            <td>
+                                                {% for gestao_turma in aluno.gestao_turmas_related.all %}
+                                                        {% if gestao_turma.grade == disciplina %}
+                                                            {% if gestao_turma.trimestre_id == t.id %}
+                                                                {% if gestao_turma.profissional_resp  is not None %}
+                                                                    <div>
+                                                                        <span title="Profissional que fez o lançamento das notas ou faltas" class="text-capitalize">
+                                                                        {{ gestao_turma.profissional_resp }}</span><br>                                                                    
+                                                                        {{ gestao_turma.data_hora_mod}}
+                                                                    </div>       
+                                                                {% endif %}                                                                
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                            </td>
+                                                                          
 
                                         {% endfor %}
                                         <td><a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:create_or_update_gestao_turmas' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Lançar ou Editar Notas</a></td>
-                                    
+                                        
 
                                       
                                     </tr>

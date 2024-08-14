@@ -509,23 +509,6 @@ class DiaSemana(models.Model):
         return self.nome_dia
     
 
-"""
-class Horario(models.Model):
-    validade = models.ForeignKey(Validade_horario, null=True, related_name='horarios', on_delete=models.CASCADE)
-    turma = models.ForeignKey(Turmas, null=True, related_name='horarios', on_delete=models.CASCADE)
-    periodo = models.ForeignKey(Periodo, null=True, related_name='horarios', on_delete=models.CASCADE)
-    dia_semana = models.ForeignKey(DiaSemana, null=True, related_name='horarios', on_delete=models.CASCADE)
-    data = models.DateField(null=True, blank=True)
-    turma_disciplina = models.ForeignKey(TurmaDisciplina, related_name='horarios', null=True, blank=True, on_delete=models.SET_NULL)
-
-    class Meta:
-        ordering = ['periodo__nome_periodo']
-
-    def __str__(self):
-        return f'{self.turma} - {self.periodo} - {self.dia_semana}'
-"""
-
-
 class Horario(models.Model):
     validade = models.ForeignKey(Validade_horario,null=True, related_name='turma_Horario_related', on_delete=models.CASCADE)  
     turma = models.ForeignKey(Turmas,null=True, related_name='turma_Horario_related', on_delete=models.CASCADE)  
@@ -554,8 +537,7 @@ class SequenciaDidatica(models.Model):
     descricao = models.TextField()
 
     def __str__(self):
-        return f'Sequência didática em {self.horario.data} - {self.horario.turma_disciplina.disciplina.nome}'
- 
+        return f'Sequência didática em {self.horario.data} - {self.horario.turma_disciplina.disciplina.nome}' 
 
 
 class GestaoTurmas(models.Model):
