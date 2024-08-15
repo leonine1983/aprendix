@@ -10,14 +10,12 @@
         left: 5; /* Alinhar à esquerda da li */
     }
 </style>
-<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    
+<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">    
   <div class="modal-dialog w-100">
   <div class="modal-content bg-secondary-subtle">
       <div class="modal-header">
-      <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3 "><i class="fa-solid fa-people-roof"></i> {{titulo_page}}</span></h4>        
-      <button type="button" class="close" data-dismiss="modal">&times;</button>
-      
+        <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3 "><i class="fa-solid fa-people-roof"></i> {{titulo_page}}</span></h4>        
+        <button type="button" class="close" data-dismiss="modal">&times;</button>      
       </div>
       <div class="modal-body shadow-sm bg-light-subtle">
             <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -27,7 +25,10 @@
                   <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"><i class="fa-duotone fa-person-sign"></i><i class="fa-duotone fa-address-card" style="--fa-secondary-color: #511f3c;"></i> Todos as pessoas {{turma_ativa}} </button>
                 </li>
                 <li id="cadastra_people" class="nav-item bg-secondary-subtle rh-list mt-3" role="presentation">
-                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false"><i class="fa-duotone fa-address-card" style="--fa-secondary-color: #511f3c;"></i> Cadastrar nova pessoa <i class="fa-duotone fa-person-sign"></i><i class="fa-sharp fa-solid fa-plus text-info"></i></button>
+                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false"><i class="fa-duotone fa-address-card" style="--fa-secondary-color: #511f3c;"></i> Encaminhamentos para a escola <i class="fa-duotone fa-person-sign"></i><i class="fa-sharp fa-solid fa-plus text-info"></i></button>
+                </li> 
+                <li id="cadastra_people" class="nav-item bg-secondary-subtle rh-list mt-3" role="presentation">
+                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane1" type="button" role="tab" aria-controls="profile-tab-pane1" aria-selected="false"><i class="fa-duotone fa-address-card" style="--fa-secondary-color: #511f3c;"></i> Cadastrar nova pessoa <i class="fa-duotone fa-person-sign"></i><i class="fa-sharp fa-solid fa-plus text-info"></i></button>
                 </li>                               
               {% endif %}              
               <li class="nav-item" role="presentation">
@@ -36,165 +37,31 @@
             </ul>
             <div class="tab-content" id="myTabContent">
               <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">   
-                <!--Iniciar tabs verticais com opções dos professores-->
-                <div class="row  pt-3 bg-dark-subtle w-100 ml-1">
-                  <div class="col-2">
-                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                      <button class="nav-link active" id="v-pills-home-tab" data-toggle="pill" data-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">Disponível à escola em {{request.session.anoLetivo_nome}}</button>
-                      <button class="nav-link" id="v-pills-profile-tab" data-toggle="pill" data-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false">Não Vinculados</button>
-                      <!--<button class="nav-link" id="v-pills-messages-tab" data-toggle="pill" data-target="#v-pills-messages" type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false">Messages</button>
-                      <button class="nav-link" id="v-pills-settings-tab" data-toggle="pill" data-target="#v-pills-settings" type="button" role="tab" aria-controls="v-pills-settings" aria-selected="false">Settings</button>-->
-                    </div>
-                  </div>
-                  <div class="col-10">
-                    <div class="tab-content" id="v-pills-tabContent">
-                      <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
-                        {% include "Escola/partials/partials_professores/context_people.html" %}
-                      </div>
-                      <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
-                        {% include "Escola/partials/partials_professores/context_people_exclude.html" %}
-                        <hr>
-                        <div class="border border-danger p-2 bg-danger-subtle">
-                        <h3>Sem vínculos (Contrato, Decreto ou Estágio) para o ano letivo de {{request.session.anoLetivo_nome}}</h3>
-                        <p class='p-0 m-1 fs-7 text-justify'>
-                          Aqui estão todas as pessoas registradas no sistema que não possuem contratos ativos para o ano letivo atual. Pode haver situações em que algumas delas tiveram seus contratos renovados para o próximo ano. Nestes casos, é necessário refazer a vinculação contratual clicando no botão "Definir Vínculo".
-                        </p>
-                        {% include "Escola/partials/partials_professores/falta_definir_vinculo.html" %}
-                        </div>
-                      </div>
-                      <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">...</div>
-                      <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">...</div>
-                    </div>
-                  </div>
-                </div>
+                <!-- Todos -->
+                 {% include "Escola/partials/partials_professores/partials_seleciona _pessoas/Todos.html" %}                
               </div>
-
-              <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">    
-                <h3 class='p-3 border-bottom'><i class="fa-duotone fa-person-sign"></i> Cadastrar nova pessoa </h3><hr>           
-                <div class="form-group "><div>ddd</div>
-                  <form method="post" class='' >
-                    
-                    
-                    {{ form.non_field_errors }}
-                    {% csrf_token %}
-                    <div>
-                    {% for field in form %}
-                      <section>                        
-                        {{ field.label_tag }}
-                        {% if field.label == "Bairro" %}
-                          <section class="d-flex border border-success px-2 pe-2">
-                            {{ field }} <a class='m-2 p-2' href='{% url "Gestao_Escolar:bairro-create" %}'><i class="fa-solid fa-plus text-primary"></i> Bairro</a>
-                          </section>  
-                        {% elif field.label == "Cidade onde mora" %}  
-                        <section class="d-flex border border-success px-2 pe-2">
-                          {{ field }} <a class='m-2 p-2' href='{% url "Gestao_Escolar:cidade-create" %}'><i class="fa-solid fa-plus text-primary"></i> Cidade</a>
-                        </section>                      
-                        {% else %}
-                          {{ field }}
-                        {% endif %}
-
-                        {{ field.errors }}
-                      </section>
-                    {% endfor %}  
-                    </div>
-                    <button class="btn btn-sm btn-primary" type="submit">Salvar registro do professor</button>
-                </form> 
-              </div>             
-            </div>
-
-            <div class="tab-pane fade  p-3" id="profile-tab-pane2" role="tabpanel" aria-labelledby="profile-tab2" tabindex="0">
-              <div class='border-success border-bottom mt-4'>
-                <h3 class='p-2 bg-primary-subtle'><i class="fs-6 fa-duotone fa-person-chalkboard"></i> CARGOS/PROFISSIONAIS | Relação de profissionais cadastrado na escola: Ano Letivo {{request.session.anoLetivo_nome}}  </h3>
-                <div class="text-end">
-                  <h4 class="mx-5">Relação de todos os profissionais e seus respectivos cargos nessa instituição <b>{{request.session.escola_nome}}</b></h4>                 
-                  <a class='btn btn-secondary btn-sm m-1' href="{% url 'Gestao_Escolar:Professores_Profissionais_create' %}" class="nav-link">Novo | Atualizar <i class="fa-sharp fa-solid fa-plus text-info"></i></a>              
-                </div>
-              </div>
-                
-              <table class='win11-table'>
-                <thead>
-                  <tr>
-                    <th>ICON</th>
-                    <th>Profissional</th>
-                    <th>Gênero Sexual</th>
-                    <th>Cargo</th> 
-                    <th>Açãos</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for n in lista_all_escola %}
-                  <tr>
-                    {% if n.nome.encaminhamento.contratado.sexo.nome == "Masculino" %}
-                    <td><i class="fs-2 fa-duotone fa-person text-info"></i></td>
-                    {% else %}
-                    <td><i class="fs-2 fa-duotone fa-person-dress text-danger"></i></td>
-                    {% endif %}
-                    <td>{{n.nome}}</td>
-                    <td>{{n.nome.encaminhamento.contratado.sexo}}</td>
-                    <td>{{n.cargo}}</td>
-                    <td>{{n.area_especializacao}}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>                       
+              <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">  
+                <!-- Encaminhamentos para a escola -->  
+                {% include "Escola/partials/partials_professores/partials_seleciona _pessoas/Encaminhamentos_paraEncaminhamentos_para_escola.html" %}
+              </div> 
+              <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane1" role="tabpanel" aria-labelledby="profile-tab" tabindex="0"> 
+                <!--  Cadastrar nova pessoa -->     
+                {% include "Escola/partials/partials_professores/partials_seleciona _pessoas/Cadastrar_nova_pessoa.html" %}
+              </div>                         
+              <div class="tab-pane fade  p-3" id="profile-tab-pane2" role="tabpanel2" aria-labelledby="profile-tab2" tabindex="0">
+                {% include "Escola/partials/partials_professores/partials_seleciona _pessoas/PROFISSIONAIS_na_escola.html" %}
+              </div>              
           </div>      
       </div>        
   </div>
   </div>
 </div>
-
-
-
-
-{% block script_head %}
-
-<style>
-  #id_aluno_matricula{
-      display: none;
-  }
-</style>
-
-{% endblock script_head %}  
-
 {% block script_footer %}
-<script>
-  document.getElementById('id_tipo').addEventListener('change', function () {
-      var tipoSelect = document.getElementById('id_tipo');
-      var alunoMatricula = document.getElementById('id_aluno_matricula');
-      var button_some = document.getElementById('button-some');
-      var label_description = document.querySelector('label[for="id_description"]');
-      var description = document.getElementById('id_description');
-
-      if (tipoSelect.value === 'mudou_turma') {
-          alunoMatricula.style.display = 'block';
-          button_some.style.display = 'none';
-          label_description.style.display = 'none';
-          description.style.display = 'none';
-      } else {
-          alunoMatricula.style.display = 'none';
-          button_some.style.display = 'block';
-          label_description.style.display = 'block';
-          description.style.display = 'block';
-      }
-  });
-</script>
-
-<link rel="stylesheet" href="{% static "multi-select/css/multi-select.css" %}">
-<script src="{% static "multi-select/js/jquery.multi-select.js" %}"></script>
-<script type="text/javascript">
-// run pre selected options
-$('#id_nome_profissao').multiSelect();
-</script>
+  <link rel="stylesheet" href="{% static "multi-select/css/multi-select.css" %}">
+  <script src="{% static "multi-select/js/jquery.multi-select.js" %}"></script>
+  <script type="text/javascript">
+    // run pre selected options
+    $('#id_nome_profissao').multiSelect();
+  </script>
 
 {% endblock script_footer %} 
-
-
-
-
-
-
-<!-- Bootstrap Datepicker CSS -->
-
-
-
-

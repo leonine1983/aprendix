@@ -1,5 +1,5 @@
 from django.db import models
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 from django.dispatch import receiver
 from django.db.models.signals import post_migrate
 from django.core.exceptions import ValidationError
@@ -118,6 +118,17 @@ class Pessoas(models.Model):
         else:
             return None
         
+    """
+    Função e_aniversario_hoje:
+    determinar se a data de nascimento de uma pessoa coincide
+     com a data atual, ou seja, se hoje é o aniversário dessa pessoa.
+    """  
+    def e_aniversario_hoje(self):
+        hoje = datetime.now().date()
+        return (self.data_nascimento and 
+                self.data_nascimento.month == hoje.month and 
+                self.data_nascimento.day == hoje.day)
+        
     def save(self, *args, **kwargs):
         self.idade = self.calcula_idade()
         existing_pessoas = Pessoas.objects.filter(
@@ -207,7 +218,7 @@ class Contrato(models.Model):
         super().save(*args, **kwargs)
 
     class Meta :
-        ordering = ['ano_contrato']
+        ordering = ['-ano_contrato']
 
     def __str__(self):
         return str(self.contratado)

@@ -1,0 +1,34 @@
+<div class='border-success border-bottom mt-4'>
+    <h3 class='p-2 bg-primary-subtle'><i class="fs-6 fa-duotone fa-person-chalkboard"></i> CARGOS/PROFISSIONAIS | Relação de profissionais cadastrado na escola: Ano Letivo {{request.session.anoLetivo_nome}}  </h3>
+    <div class="text-end">
+      <h4 class="mx-5">Relação de todos os profissionais e seus respectivos cargos nessa instituição <b>{{request.session.escola_nome}}</b></h4>                 
+      <a class='btn btn-secondary btn-sm m-1' href="{% url 'Gestao_Escolar:Professores_Profissionais_create' %}" class="nav-link">Novo | Atualizar <i class="fa-sharp fa-solid fa-plus text-info"></i></a>              
+    </div>
+  </div>
+    
+  <table class='win11-table'>
+    <thead>
+      <tr>
+        <th>ICON</th>
+        <th>Profissional</th>
+        <th>Gênero Sexual</th>
+        <th>Cargo</th> 
+        <th>Açãos</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for n in lista_all_escola %}
+      <tr>
+        {% if n.nome.encaminhamento.contratado.sexo.nome == "Masculino" %}
+        <td><i class="fs-2 fa-duotone fa-person text-info"></i></td>
+        {% else %}
+        <td><i class="fs-2 fa-duotone fa-person-dress text-danger"></i></td>
+        {% endif %}
+        <td>{{n.nome}}</td>
+        <td>{{n.nome.encaminhamento.contratado.sexo}}</td>
+        <td>{{n.cargo}}</td>
+        <td>{{n.area_especializacao}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>                       

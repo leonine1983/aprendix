@@ -1,0 +1,100 @@
+<style>
+    /* Estilo do título */
+.option_form {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 colunas de largura igual */
+    padding: 5px;
+    background-color: #f3f4f6; /* Cor de fundo similar ao estilo Windows 11 */
+    border-radius: 8px;   
+    font-weight: bold;
+    margin:0 -1.25rem -1.1rem -1.25rem!important;
+}
+
+/* Estilo das linhas do cliente */
+.option_form_cliente {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 colunas de largura igual */
+    padding: 5px;
+    border-radius: 8px;
+    margin: -0.4rem!important;
+}
+
+/* Estilo das células individuais */
+.option_form div, .option_form_cliente div {
+    padding: 8px;
+    text-align: center; /* Centraliza o texto dentro das células */
+    border-left: 0.1rem solid rgb(230, 223, 218);
+    border-right: 0.1rem solid rgb(230, 223, 218);
+}
+
+/* Ícone para o título */
+.option_form i {
+    font-size: 1.5em;
+    color: #0078d4; /* Cor azul do Windows 11 */
+}
+</style>
+<table class="win11-table">
+    <thead>
+        <tr>
+            <th>Ordem</th>
+            <th>Nome completo</th>
+            <th>Gênero Sexual</th>
+            <th>Data Nascimento </th>
+            <th>Idade</th>
+            <th>RG</th>
+            <th>
+                <div class="option_form">
+                    <div><i class="fa-sharp fa-light fa-user-shakespeare" title="Contratado para ano letivo de {{request.session.anoLetivo_nome}}?"></i></div>
+                    <div><i class="fa-regular fa-book-copy" title="Ver todos os contratos da pessoa"></i></div>
+                    <div><i class="fa-duotone fa-solid fa-school-flag" title="Vinculado a escolar {{request.session.escola_nome}}?"></i></div>
+                    <div><i class="fa-duotone fa-solid fa-chalkboard-user" title="Professor?"></i></div>
+                </div>   
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for l in lista_pessoas_ALL %}
+        <tr>
+            <td>{{forloop.counter}}</td>
+            <td class="text-uppercase text-start"> {{l.nome}} {{l.sobrenome}}</td>
+            <td>{% if l.sexo is not None %}{{l.sexo}}{% else %} Não especificou {% endif %}</td>
+            <td>{{ l.data_nascimento }} {% if l.e_aniversario_hoje %}<span class="e_aniversario btn border "><i class="fa-thin fa-balloons"></i>  Aniversariante <i class="fa-sharp-duotone fa-solid fa-cake-candles"></i></span>{% endif %}</td>
+            <td>{{l.idade}}</td>
+            <td>{{l.rg}}</td>
+            <td>                
+                
+                <div class="option_form_cliente">                    
+                    <div>
+                        {% if request.session.anoLetivo_nome == l.pessoa_contratada.last.ano_contrato.ano %} 
+                            <i class="fa-duotone fa-solid fa-check fa-beat text-success fs-4" title="Contratado para o ano letivo atual"></i> 
+                            {% else %}
+                                {{l.pessoa_contratada.last.ano_contrato.ano}}
+                                <a class="btn btn-sm btn-info pt-0 px-1 pe-1" href="{% url "Gestao_Escolar:Professores_Pessoa_vinculo_create" l.id %}">Novo <i class="fa-solid fa-plus"></i></a>
+                        {% endif %}   
+                    </div>
+                    <div>{% include "Escola/partials/partials_professores/partials_seleciona _pessoas/anos_contratos.html" %}   </div>
+                    <div>c</div>
+                    <div>d</div>
+                </div>          
+               
+
+                
+            </td>
+            
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+    const dialog = document.getElementById('instructionsDialog');
+    const openButton = document.getElementById('openDialog');
+    const closeButton = document.getElementById('closeDialog');
+
+    openButton.addEventListener('click', () => {
+        dialog.showModal(); // Abre a caixa de diálogo como modal
+        });
+
+    closeButton.addEventListener('click', () => {
+        dialog.close(); // Fecha a caixa de diálogo
+        });
+</script>

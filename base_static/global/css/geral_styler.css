@@ -575,3 +575,13 @@ transition: background-color 0.3s ease;
 .win11-search-button:hover {
 background-color: #005a9e;
 }
+
+/* Extras */
+.e_aniversario{
+  background-color: #ffeb3b; /* Amarelo brilhante para destaque */
+color: #d32f2f;            /* Vermelho para o texto */
+text-align: center;        /* Centralizar o texto */
+border: 1px solid #c49494; /* Borda vermelha */
+border-radius: 5px;       /* Bordas arredondadas */
+padding: 2px;          /* Espaçamento interno */
+}

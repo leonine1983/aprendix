@@ -40,6 +40,7 @@ class Create_Pessoa_Professores(LoginRequiredMixin, SuccessMessageMixin, CreateV
         context['lista_all_escola'] = Profissionais.objects.filter(nome__destino = escola, nome__encaminhamento__ano_contrato = self.request.session['anoLetivo_id'] )
         contratados_anoLetivo = Contrato.objects.values_list('id', flat=True)
         context['lista_pessoas'] = Pessoas.objects.exclude(pessoa_contratada__id__in= contratados_anoLetivo)
+        context['lista_pessoas_ALL'] = Pessoas.objects.all()
 
         # Realize a consulta para obter informações do Contrato com base nas condições e exclua aqueles que atendem às condições de Encaminhamentos 
         if Config_plataforma.objects.exists():

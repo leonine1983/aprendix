@@ -1,0 +1,26 @@
+<h3 class='p-3 border-bottom'><i class="fa-duotone fa-person-sign"></i> Cadastrar nova pessoa </h3><hr>           
+<form method="post" class='' >  
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+    <div>
+    {% for field in form %}
+        <section>                        
+        {{ field.label_tag }}
+        {% if field.label == "Bairro" %}
+            <section class="d-flex border border-success px-2 pe-2">
+            {{ field }} <a class='m-2 p-2' href='{% url "Gestao_Escolar:bairro-create" %}'><i class="fa-solid fa-plus text-primary"></i> Bairro</a>
+            </section>  
+        {% elif field.label == "Cidade onde mora" %}  
+        <section class="d-flex border border-success px-2 pe-2">
+            {{ field }} <a class='m-2 p-2' href='{% url "Gestao_Escolar:cidade-create" %}'><i class="fa-solid fa-plus text-primary"></i> Cidade</a>
+        </section>                      
+        {% else %}
+            {{ field }}
+        {% endif %}
+
+        {{ field.errors }}
+        </section>
+    {% endfor %}  
+    </div>
+    <button class="btn btn-sm btn-primary" type="submit">Salvar registro do professor</button>
+</form> 
