@@ -73,7 +73,7 @@
                         {% endif %}   
                     </div>
                     <div>{% include "Escola/partials/partials_professores/partials_seleciona _pessoas/anos_contratos.html" %}   </div>
-                    <div>c</div>
+                    <div><a class='btn btn-primary p-1 fs-8' title='Disponibiliza o profissional para a escola' href="{% url "Gestao_Escolar:Professores_Pessoa_vinculo_create" l.pk %}">Add  {{l.encaminhamento_escolar.destino.nome_escola}}t</a></div>
                     <div>d</div>
                 </div>          
                
