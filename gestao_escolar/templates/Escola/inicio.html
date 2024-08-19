@@ -98,6 +98,7 @@
     {% if  conteudo_page == 'Remaneja Aluno' %}
         {% include 'Escola/partials/seleciona_matricular_remanejamento.html' %}
     {% endif %} 
+    <!-- Professores -->
     {% if  conteudo_page == 'Professores' %}
         {% include 'Escola/partials/seleciona_professores.html' %}
     {% endif %} 
@@ -110,6 +111,10 @@
     {% if  conteudo_page == 'seleciona_pessoas-vinculo_contrato' %}
         {% include 'Escola/partials/partials_professores/seleciona_pessoas-vinculo_contrato.html' %}
     {% endif %} 
+    {% if  conteudo_page == 'encaminha_para_escola' %}
+        {% include 'Escola/partials/partials_professores/encaminhamentos/encaminha_para_escola.html' %}
+    {% endif %} 
+    <!-- Professores -->
     {% if  conteudo_page == 'Criar Disciplina' %}
         {% include 'Escola/partials/seleciona_disciplinas.html' %}
     {% endif %} 

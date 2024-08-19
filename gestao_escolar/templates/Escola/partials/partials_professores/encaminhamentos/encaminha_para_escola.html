@@ -1,0 +1,237 @@
+
+<!-- Bootstrap Datepicker CSS -->
+
+{% load static %}
+<!-- Modal -->
+<div class="modal fade" id="modal_escola" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog w-100">
+    <div class="modal-content bg-secondary-subtle ">
+      <div class="modal-header">
+        <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3 "><i class="fa-solid fa-people-roof"></i> {{titulo_page}}</span></h4>        
+        <button type="button" class="close" data-dismiss="modal">&times;</button>      
+      </div>
+      <div class="modal-body shadow-sm bg-light-subtle">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Criar Vínculo </button>
+          </li>                         
+        </ul>
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+            <div class='bg-primary-subtle p-2 m-2'>
+              <h2>Escola Atual: {{request.session.escola_nome}}
+              <p class='fs-5'>Outros Encaminhamentos do professor para o ano atual - {{request.session.anoLetivo_nome}}</p>
+              <table class='win11-table mb-5'>
+                <thead>
+                  <tr>
+                    <th>Escolas</th>
+                    <th>Função</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for l in lista_all %}
+                  <tr>
+                    <td>{{l.destino}}</td>
+                    <td>{{l.profissao}}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>  
+            
+            <div class='p-2 fs-6 border-danger-subtle border-right d-flex text-light' style= 'box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgb(209, 213, 219) 0px 0px 0px 1px inset; background-color:rgb(116, 145, 140)'>
+              
+              <form method="post" class='form-win11' >
+                {{ form.non_field_errors }}
+                {% csrf_token %}
+                  <div>
+                    {{form.as_p}}
+                  </div>
+                </div>                    
+                <button class="btn btn-sm btn-primary w-100 p-2" type="submit">Confirmar o tipo de vínculo com a instituição</button>
+              </form> 
+            </div>
+          </div>   
+        </div>        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="modal_escola" style='background:#000'  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    
+    <div class="modal-dialog w-100">
+      <div class="modal-content bg-secondary-subtle " style="width: 80rem; margin-left: -70%;">
+        <div class="modal-header">
+        <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3 "><i class="fs-6 fa-duotone fa-person-chalkboard"></i> {{titulo_page}}</span></h4>        
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        
+        </div>
+        <div class="modal-body shadow-sm bg-light-subtle">
+            <div style="background-image: radial-gradient(circle at 50% -20.71%, #edf3ff 0, #b5c9f2 50%, #79a1e2 100%); margin:-1rem" class="mb-3 p-2">
+                <i class="fa-regular fa-face-grin-squint"></i> Olá, <span class="text-capitalize ">{{request.user.first_name}} {{request.user.last_name}}!!</span>            
+                <span class="m-0">Por favor, utilize os campos abaixo para realizar o cadastro do professor:</span>                
+            </div>     
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+              
+              
+              
+            </ul>
+
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0" style= 'box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;'>
+              
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col">Aluno</th>
+                    <th scope="col">Idade</th>
+                    <th scope="col">Sexo</th>
+                    <th scope="col">INEP</th>
+                    <th scope="col">Nome da Mãe</th>
+                    {% if serie_multi %}
+                    <th scope="col">Multiseriada</th>
+                    {% endif %}  
+                    <th scope="col">Síndrome de Down</th>
+                    <th scope="col">Deficiência Física</th>        
+                    <th scope="col text-align">Ações</th>       
+                  </tr>
+                </thead>
+                <tbody>
+                {% for n in lista_all %}
+                  <tr>
+                    <td class='text-align'>{{n.aluno}}sssssssssssss</td>
+                    <td class='text-align'>{{n.aluno.idade}} anos</td>
+                    <td class='text-align'>{{n.aluno.sexo}}</td>
+                    <td class='text-align'>{{n.inep}}ddd</td>
+                    <td class='text-align'>{{n.aluno.nome_mae}}ddd</td>
+
+                    {% if n.aluno.sindrome_de_Down  %}
+                    <td class='text-align'>Sim</td>
+                    {% else %}
+                    <td class='text-align'>Não</td>
+                    {% endif %}
+
+                    <td class='text-align'>
+                      {{n.aluno.deficiencia_aluno}} 
+                    </td>
+
+                    {% if serie_multi %}
+                    <td class='text-align'>{{n.serie_multiseriada}}</td>
+                    {% endif %}  
+                    <td class='text-align d-flex'>
+                      <a class='btn btn-sm btn-secondary pt-2' href="{% url 'Gestao_Escolar:GE_Escola_Remaneja_create' n.pk %}" class="nav-link">Remanejar aluno <i class="fa-sharp fa-solid fa-plus text-info"></i></a>
+                      <a class='p-1' href="{% url 'Gestao_Escolar:GE_Escola_alunos_update' n.pk %}"><span class='btn btn-sm btn-info mr-1'>Editar</span></a>
+                      <a class='p-1' href="{% url 'Gestao_Escolar:GE_Escola_alunos_delete' n.pk %}"><span class='btn btn-sm btn-danger '>Excluir</span></a></td>
+                  </tr>    
+                {% endfor %}                
+                </tbody>                  
+              </table>
+            </div>
+          </div>       
+          
+          <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+            <div class="form-group ">
+              <div class=" p-2 d-flex" style="box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;">
+                
+              </div>
+              <form method="post"class='m-3 p-3 row row-cols-3' >
+                {{ form.non_field_errors }}
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+                {% endfor %}  
+                <div id="id_aluno_matricula" class="mt-2">
+                  <p style="margin-bottom:-1rem !important" class="p-0 m-0">Escolha a turma para onde o aluno será remanejado.</p>.
+                  <a class="btn btn-sm btn-primary  w-100 p-2 m-0" href="">Escolher Turma <i class="fa-solid fa-people-roof bi fs-4"></i></a></div>
+                <button id="button-some" class="btn btn-sm btn-primary h-25 p-2 mt-5 " type="submit">Salvar  <i class="fa-duotone fa-floppy-disk-circle-arrow-right"></i></button>
+            </form>           
+          </div>               
+        </div>
+      </div>      
+    </div>
+</div>
+
+
+
+
+
+
+
+{% block script_head %}
+
+<style>
+  #id_aluno_matricula{
+      display: none;
+  }
+</style>
+
+{% endblock script_head %}  
+
+{% block script_footer %}
+<script>
+  document.getElementById('id_tipo').addEventListener('change', function () {
+      var tipoSelect = document.getElementById('id_tipo');
+      var alunoMatricula = document.getElementById('id_aluno_matricula');
+      var button_some = document.getElementById('button-some');
+      var label_description = document.querySelector('label[for="id_description"]');
+      var description = document.getElementById('id_description');
+
+      if (tipoSelect.value === 'mudou_turma') {
+          alunoMatricula.style.display = 'block';
+          button_some.style.display = 'none';
+          label_description.style.display = 'none';
+          description.style.display = 'none';
+      } else {
+          alunoMatricula.style.display = 'none';
+          button_some.style.display = 'block';
+          label_description.style.display = 'block';
+          description.style.display = 'block';
+      }
+  });
+</script>
+
+<link rel="stylesheet" href="{% static "multi-select/css/multi-select.css" %}">
+<script src="{% static "multi-select/js/jquery.multi-select.js" %}"></script>
+<script type="text/javascript">
+// run pre selected options
+$('#id_nome_profissao').multiSelect();
+</script>
+
+{% endblock script_footer %} 
+
+
+
+
+
+
+<!-- Bootstrap Datepicker CSS -->
+
+
+
+

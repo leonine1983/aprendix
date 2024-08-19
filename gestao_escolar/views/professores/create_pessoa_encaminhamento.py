@@ -37,15 +37,5 @@ class Create_Pessoa_Encaminhamento(LoginRequiredMixin, CreateView):
         self.object = form.save()
         return HttpResponseRedirect(self.get_success_url())      
 
-    def get_context_data(self, **kwargs):
-        svg = '<i class="fs-6 fa-duotone fa-person-chalkboard"></i>'
-        context = super().get_context_data(**kwargs)        
-        context['titulo_page'] = 'Professores | Criar Vínculo'          
-        context['svg'] = svg 
-        context['lista_all'] = Vinculo_empregaticio.objects.all()
-        #context['now'] = datetime.now()     
-        context['conteudo_page'] = "Professores-Pessoas-Vinculo" 
-        context['page_ajuda'] = "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional."
-        
-        return context  
+     
             
