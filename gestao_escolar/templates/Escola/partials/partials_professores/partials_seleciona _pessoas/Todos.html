@@ -44,7 +44,7 @@
             <th>RG</th>
             <th>
                 <div class="option_form">
-                    <div><i class="fa-sharp fa-light fa-user-shakespeare" title="Contratado para ano letivo de {{request.session.anoLetivo_nome}}?"></i></div>
+                    <div><i class="fa-duotone fa-solid fa-check fa-beat text-success fs-4" title="Contratado para ano letivo de {{request.session.anoLetivo_nome}}?"></i> {{request.session.anoLetivo_nome}}</div>
                     <div><i class="fa-regular fa-book-copy" title="Ver todos os contratos da pessoa"></i></div>
                     <div><i class="fa-duotone fa-solid fa-school-flag" title="Vinculado a escolar {{request.session.escola_nome}}?"></i></div>
                     <div><i class="fa-duotone fa-solid fa-chalkboard-user" title="Professor?"></i></div>
@@ -68,20 +68,19 @@
                         {% if request.session.anoLetivo_nome == l.pessoa_contratada.last.ano_contrato.ano %} 
                             <i class="fa-duotone fa-solid fa-check fa-beat text-success fs-4" title="Contratado para o ano letivo atual"></i> 
                             {% else %}
+                                <span>Último contrato</span><br>
                                 {{l.pessoa_contratada.last.ano_contrato.ano}}
-                                <a class="btn btn-sm btn-info pt-0 px-1 pe-1" href="{% url "Gestao_Escolar:Professores_Pessoa_vinculo_create" l.id %}">Novo <i class="fa-solid fa-plus"></i></a>
+                                <!-- <a class="btn btn-sm btn-info pt-0 px-1 pe-1" href="{% url "Gestao_Escolar:Professores_Pessoa_vinculo_create" l.id %}">Novo <i class="fa-solid fa-plus"></i></a> -->
                         {% endif %}   
                     </div>
                     <div>{% include "Escola/partials/partials_professores/partials_seleciona _pessoas/anos_contratos.html" %}   </div>
-                    <div><a class='btn btn-primary p-1 fs-8' title='Disponibiliza o profissional para a escola' href="{% url 'Gestao_Escolar:encaminha_escola' l.pessoa_contratada.last.id %}">Add 
-                        
-                   
-                        
-                        {% for contrato in l.pessoa_contratada.all  %}
-                            {% for encaminhamento in contrato.encaminhamento_escolar.all %}
-                                {% if encaminhamento.destino.nome_escola == request.session.escola_nome %}ok{% endif %}
-                            {% endfor %}                        
-                        {% endfor %}</a></div>
+                    <div>
+                    {% if l.pessoa_contratada.last.ano_contrato.ano %}
+                        {% if not request.session.anoLetivo_nome == l.pessoa_contratada.last.ano_contrato.ano %} 
+                            <a class='btn btn-primary p-1 fs-8' title='Disponibiliza o profissional para a escola' href="{% url 'Gestao_Escolar:encaminha_escola' l.pessoa_contratada.last.id %}">Add 
+                        {% endif %}                        
+                    {% endif %}</a>
+                    </div>
                     <div>d</div>
                 </div>          
                
