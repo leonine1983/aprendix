@@ -232,7 +232,7 @@ class Contrato(models.Model):
             nome_escola= self.nome_escola,
             ano_contrato = self.ano_contrato
         )
-
+        
         # Exclua o contrato da atual consulta, se estiver atualizando
         if self.pk:
             existing_contracts = existing_contracts.exclude(pk=self.pk)

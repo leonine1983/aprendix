@@ -56,7 +56,7 @@
         {% for l in lista_pessoas_ALL %}
         <tr>
             <td>{{forloop.counter}}</td>
-            <td class="text-uppercase text-start"> {{l.nome}} {{l.sobrenome}}</td>
+            <td class="text-uppercase text-start"> {{l.nome}} {{l.sobrenome}} </td>
             <td>{% if l.sexo is not None %}{{l.sexo}}{% else %} Não especificou {% endif %}</td>
             <td>{{ l.data_nascimento }} {% if l.e_aniversario_hoje %}<span class="e_aniversario btn border "><i class="fa-thin fa-balloons"></i>  Aniversariante <i class="fa-sharp-duotone fa-solid fa-cake-candles"></i></span>{% endif %}</td>
             <td>{{l.idade}}</td>
@@ -73,7 +73,15 @@
                         {% endif %}   
                     </div>
                     <div>{% include "Escola/partials/partials_professores/partials_seleciona _pessoas/anos_contratos.html" %}   </div>
-                    <div><a class='btn btn-primary p-1 fs-8' title='Disponibiliza o profissional para a escola' href="{% url 'Gestao_Escolar:encaminha_escola' l.pk %}">Add  {{l.pessoa_contratada.pk}}t</a></div>
+                    <div><a class='btn btn-primary p-1 fs-8' title='Disponibiliza o profissional para a escola' href="{% url 'Gestao_Escolar:encaminha_escola' l.pessoa_contratada.last.id %}">Add 
+                        
+                   
+                        
+                        {% for contrato in l.pessoa_contratada.all  %}
+                            {% for encaminhamento in contrato.encaminhamento_escolar.all %}
+                                {% if encaminhamento.destino.nome_escola == request.session.escola_nome %}ok{% endif %}
+                            {% endfor %}                        
+                        {% endfor %}</a></div>
                     <div>d</div>
                 </div>          
                

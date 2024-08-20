@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.views.generic import TemplateView, CreateView, ListView, UpdateView, DeleteView, DetailView
 from django.views import View
@@ -20,15 +21,16 @@ class CreateLoginView(LoginView):
         return super().form_invalid(form)
 
 # Logout
-class LogoutView(LogoutView):
-    next_page = reverse_lazy('admin_acessos:login_create')
+class LogoutView_logout(LogoutView):
+    next_page = reverse_lazy('admin_acessos:painel_acesso')    
+    success_url = reverse_lazy('admin_acessos:login_create')
 
     def dispatch(self, request, *args, **kwargs):
         logout(request)
         return super().dispatch(request, *args, **kwargs)
 
 # Painel de Acesso
-class PainelAcessoView(TemplateView):
+class PainelAcessoView(LoginRequiredMixin, TemplateView):
     template_name = 'admin_acessos/features/panel_acesso.html'
 
 # Message User Form

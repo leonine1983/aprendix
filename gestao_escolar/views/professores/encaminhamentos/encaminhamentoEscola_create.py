@@ -3,8 +3,10 @@ from django.forms import BaseModelForm
 from django.http import HttpResponse
 from django.views.generic import CreateView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rh.models import Encaminhamentos, Escola, Contrato
+from django.urls import reverse_lazy
 
 
 class EncaminhaEscola (LoginRequiredMixin, CreateView, SuccessMessageMixin):
@@ -15,14 +17,19 @@ class EncaminhaEscola (LoginRequiredMixin, CreateView, SuccessMessageMixin):
 
     def form_valid(self, form: BaseModelForm):
         escola_id = self.request.session['escola_id']
+        ano_letivo = self.request.session['anoLetivo_id']
+        print(f'anoletivo {ano_letivo}')
         pk = self.kwargs['pk']
         escola =  Escola.objects.get(id = escola_id)
-        contrato = Contrato.objects.get(id = pk)
+        contrato = Contrato.objects.get(id = pk, ano_contrato = ano_letivo)
         form.instance.encaminhamento = contrato
         form.instance.destino = escola
-        form.save()        
-        
+        form.save()               
         return super().form_valid(form)
+    
+    def get_success_url(self):
+        messages.success(self.request, self.success_message)
+        return reverse_lazy('Gestao_Escolar:Professores_Pessoa_create')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)        

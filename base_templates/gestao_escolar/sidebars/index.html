@@ -73,15 +73,18 @@
   <hr>
   <div class="dropdown">
     <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-      <strong>mdo</strong>
+      <img src="{% if user.foto is not None %}{% static user.foto %}{% else %}{% static 'man.png' %}{% endif %}" alt="mdo" width="32" height="32" class="rounded-circle">     
+      <strong class="text-capitalize mx-2">{{request.user}}</strong>
     </a>
     <ul class="dropdown-menu text-small shadow">
-      <li><a class="dropdown-item" href="#">New project...</a></li>
-      <li><a class="dropdown-item" href="#">Settings</a></li>
-      <li><a class="dropdown-item" href="#">Profile</a></li>
       <li><hr class="dropdown-divider"></li>
-      <li><a class="dropdown-item" href="#">Sign out</a></li>
+      
+      <li>
+        <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="w-100"><i class="fa-thin fa-door-closed txt-p"></i> Sair</button>
+        </form>
+      </li>
     </ul>
   </div>
 </div>
