@@ -77,7 +77,7 @@
                     <div>
                     {% if l.pessoa_contratada.last.ano_contrato.ano %}
                         {% if not request.session.anoLetivo_nome == l.pessoa_contratada.last.ano_contrato.ano %} 
-                            <a class='btn btn-primary p-1 fs-8' title='Disponibiliza o profissional para a escola' href="{% url 'Gestao_Escolar:encaminha_escola' l.pessoa_contratada.last.id %}">Add 
+                            <a class='btn btn-primary p-1 fs-8' title='Disponibiliza o profissional para a escola' href="{% url 'Gestao_Escolar:encaminha_escola' l.id %}">Add 
                         {% endif %}                        
                     {% endif %}</a>
                     </div>

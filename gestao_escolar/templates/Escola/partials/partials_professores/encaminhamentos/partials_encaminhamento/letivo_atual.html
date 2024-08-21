@@ -1,0 +1,21 @@
+<p class='fs-5 p-2 bg-info-subtle'>Encaminhamentos do professor para o ano atual - {{request.session.anoLetivo_nome}}</p>
+<table class='win11-table mb-5'>
+    <thead>
+        <tr>
+        <th>Escolas</th>
+        <th>Função</th>
+        <th>Ano Letivo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for l in lista_all %}
+            {% if l.encaminhamento.ano_contrato.ano == request.session.anoLetivo_nome  %}
+                <tr>
+                    <td>{{l.destino}}</td>
+                    <td>{{l.profissao}}</td>
+                    <td>{{l.encaminhamento.ano_contrato}}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,12 @@
+<p class='fs-5 p-2 bg-info-subtle'>Encaminhamentos do professor para o ano atual - {{request.session.anoLetivo_nome}}</p>
+<p>Esse formulário será utilizado para realizar o encaminhamento de {{lista_all.0.encaminhamento}} para a ({{request.session.escola_nome}}) com base em uma função definida. </p>
+<form method="post" class='form-win11' >
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+      <div>
+        {{form.as_p}}
+      </div>
+    </div>                    
+    <button class="btn btn-sm btn-primary w-100 p-2" type="submit">Confirmar o tipo de vínculo com a instituição</button>
+</form> 
+

@@ -348,7 +348,6 @@ niveis = {
 class Profissionais(models.Model):
     nome = models.ForeignKey('rh.Encaminhamentos', on_delete=models.CASCADE, null=True)
     cargo = models.ForeignKey(Cargo, on_delete=models.CASCADE)
-    area_especializacao = models.CharField(max_length=100, null=True)
 
     def __str__(self):
         return self.nome.encaminhamento.contratado.nome

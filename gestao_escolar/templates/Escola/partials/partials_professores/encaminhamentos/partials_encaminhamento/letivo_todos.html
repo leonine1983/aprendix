@@ -1,0 +1,20 @@
+<p class='fs-5 p-2 bg-info-subtle'>Todos os encaminhamentos realizados ao professor ao longo dos anos letivos</p>
+<p class='text-black'>Essa tabela documenta cada vez que o professor foi direcionado para uma escola ou função específica, organizando essas informações por ano letivo. Isso permite acompanhar a trajetória do professor e os diferentes papéis que ele desempenhou ao longo do tempo.</p>
+<table class='win11-table mb-5'>
+    <thead>
+        <tr>
+        <th>Escolas</th>
+        <th>Função</th>
+        <th>Ano Letivo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for l in lista_all %}
+            <tr>
+                <td>{{l.destino}}</td>
+                <td>{{l.profissao}}</td>
+                <td>{{l.encaminhamento.ano_contrato}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

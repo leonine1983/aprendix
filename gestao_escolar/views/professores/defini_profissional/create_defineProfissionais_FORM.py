@@ -15,9 +15,7 @@ class Form_defineProfissionais(forms.ModelForm):
         queryset=Cargo.objects.all(),        
         widget=forms.Select(attrs={'class':' border border-info p-3 pb-3 bg-transparent text-info col-8 m-2 rounded-1'})    
     )
-    area_especializacao = forms.CharField(        
-        widget=forms.TextInput(attrs={'class':' border border-info p-3 pb-3 bg-transparent text-info col-7 m-2 rounded-1'})      
-    )
+   
 
     def __init__(self, *args, **kwargs):
         nome_query = kwargs.pop('nome_query', None)
@@ -34,4 +32,4 @@ class Form_defineProfissionais(forms.ModelForm):
 class Form_defineProfissionais_update(forms.ModelForm):
     class Meta:
         model =  Profissionais
-        fields = ['area_especializacao', 'cargo']
+        fields = [ 'cargo']
