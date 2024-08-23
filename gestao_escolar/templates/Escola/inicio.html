@@ -114,6 +114,9 @@
     {% if  conteudo_page == 'encaminha_para_escola' %}
         {% include 'Escola/partials/partials_professores/encaminhamentos/encaminha_para_escola.html' %}
     {% endif %} 
+    {% if  conteudo_page == 'encaminha_para_escola_deleteORupdate' %}
+        {% include 'Escola/partials/partials_professores/encaminhamentos/update_or_delete.html' %}
+    {% endif %} 
     <!-- Professores -->
     {% if  conteudo_page == 'Criar Disciplina' %}
         {% include 'Escola/partials/seleciona_disciplinas.html' %}

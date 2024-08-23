@@ -76,6 +76,7 @@ urlpatterns = [
     path('gestao_escolar/Professores/Pessoas/encaminhamento/<int:pk>,<int:destino>,<int:profissao>', Create_Pessoa_Encaminhamento.as_view(), name="Professores_Encaminhamento"), 
     path('gestao_escolar/Professores/', Create_Professores.as_view(), name="GE_Professores_create"),    
     path('gestao_escolar/Professores/encaminhamento/<int:pk>', EncaminhaEscola.as_view(), name="encaminha_escola"),   
+    path('gestao_escolar/Professores/encaminhamento/apagar/<int:pk>', EncaminhaEscolaDelete.as_view(), name="encaminha_escolaDelete"),   
     
 
     # Definir o cargo que o profissional irá exercer na escola

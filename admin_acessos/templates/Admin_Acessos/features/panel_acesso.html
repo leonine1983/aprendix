@@ -84,14 +84,28 @@
         z-index: 1500;
       }
 
-    
+      .bg-p-1
+      {
+        --s: 50px;
+        --c: #191b22;
+        --_s: calc(2*var(--s)) calc(2*var(--s));
+        --_g: 35.36% 35.36% at;
+        --_c: #0000 66%,#20222a 68% 70%,#0000 72%;
+        background: 
+          radial-gradient(var(--_g) 100% 25%,var(--_c)) var(--s) var(--s)/var(--_s), 
+          radial-gradient(var(--_g) 0 75%,var(--_c)) var(--s) var(--s)/var(--_s), 
+          radial-gradient(var(--_g) 100% 25%,var(--_c)) 0 0/var(--_s), 
+          radial-gradient(var(--_g) 0 75%,var(--_c)) 0 0/var(--_s), 
+          repeating-conic-gradient(var(--c) 0 25%,#0000 0 50%) 0 0/var(--_s), 
+          radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
+        background-attachment: fixed;
+      }    
     </style>
-
     
     <!-- Custom styles for this template -->
     <link href="{% static 'global/css/features.css' %}" rel="stylesheet">
   </head>
-  <body>
+  <body class='bg-p-1'>
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
       <symbol id="check2" viewBox="0 0 16 16">
         <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
@@ -203,8 +217,8 @@
 
     <div class="row g-4 py-5 row-cols-lg-4">
       <!--RH-->
-      <div class="feature  shadow rounded-4 p-4 m-2 ">
-        <a href="{% url 'RH:Contrato_createView' %}">
+      <div class="feature  shadow bg-light rounded-4 p-4 m-2 ">
+        <a href="">
           <img  class='w-75' src="{% static 'rh/S-RHE.svg' %}" alt="">
         </a>     
         <div class='text-center'>***</div>      
@@ -216,10 +230,14 @@
         </a>
       </div>
 
-      <div class="feature col shadow rounded-4 p-4 m-2 ">
+      <div class="feature col shadow bg-secondary-subtle rounded-4 p-4 m-2 ">
         <a href="{% url 'Gestao_Escolar:GE_inicio' %}">
-          <img  class='w-75' src="{% static 's-ge/S-GE.svg' %}" alt="">
-        </a>     
+          <img 
+            class='w-75 m-auto' 
+            style='filter: drop-shadow(8px 3px 4px rgba(0, 0, 0, 0.9)) !important;' 
+            src="{% static 'logo.png' %}" 
+            alt="">
+        </a>  
         <div class='text-center'>***</div>      
         <p>Nesta aplicação, <b>Sistema de Gestão Escolar</b> você terá acesso a uma variedade de ferramentas que possibilitam acompanhar a quantidade de turmas em uma escola específica, controlar a matrícula de alunos, registrar notas e faltas, aplicar atividades, imprimir históricos escolares e muito mais. Essas ferramentas abrangentes oferecem suporte completo às necessidades administrativas e acadêmicas, permitindo um gerenciamento eficiente e simplificado de todas as informações relacionadas ao ambiente escolar.</p>
         <a href="{% url 'Gestao_Escolar:GE_inicio' %}" class="icon-link">
@@ -229,7 +247,7 @@
       </div>
 
 
-      <div class="feature col shadow  rounded-4 p-4 m-2">
+      <div class="feature col shadow bg-light  rounded-4 p-4 m-2">
         <a href="{% url 'controle_estoque:index' %}">
           <img class="w-75" src="{% static 'gme/GME.svg' %}" alt="">
         </a>

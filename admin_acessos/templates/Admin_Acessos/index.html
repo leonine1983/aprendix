@@ -146,19 +146,38 @@ body{
   height:100vh!important;
 }
 
+.bg-p-1
+{
+  --s: 50px;
+  --c: #191b22;
+  --_s: calc(2*var(--s)) calc(2*var(--s));
+  --_g: 35.36% 35.36% at;
+  --_c: #0000 66%,#20222a 68% 70%,#0000 72%;
+  background: 
+    radial-gradient(var(--_g) 100% 25%,var(--_c)) var(--s) var(--s)/var(--_s), 
+    radial-gradient(var(--_g) 0 75%,var(--_c)) var(--s) var(--s)/var(--_s), 
+    radial-gradient(var(--_g) 100% 25%,var(--_c)) 0 0/var(--_s), 
+    radial-gradient(var(--_g) 0 75%,var(--_c)) 0 0/var(--_s), 
+    repeating-conic-gradient(var(--c) 0 25%,#0000 0 50%) 0 0/var(--_s), 
+    radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
+  background-attachment: fixed;
+}
+.txt-p{color:#d8d8d5 !important;}
+
 </style>
 
     
     <!-- Custom styles for this template -->
     <link href="{% static 'global/css/sign-in.css' %}" rel="stylesheet">
   </head>
-  <body class="text-center">
+  <body class="text-center bg-p-1">
+    <!--
     <video autoplay loop muted style="width: 100%;">
       <source src = "{% static 'videos/particulas-34007.mp4' %}">
     </video>
     <video autoplay loop muted style="width: 100%;" id="video_espelho">
       <source src = "{% static 'videos/particulas-34007.mp4' %}">
-    </video>
+    </video>-->
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
       <symbol id="check2" viewBox="0 0 16 16">
         <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
@@ -216,12 +235,10 @@ body{
     </div>
 {% endif %}
    
-<main class="form-signin w-100 m-auto" >
-  <form method='post'  id="form-principal" style="margin-top:-13rem ; margin-bottom: 25%;">
+<main class="form-signin w-100 m-auto " >
+  <form method='post'  id="form-principal" style="margin-top:-13rem ; margin-bottom: 25%;" class='bg-p-1'>
     {% csrf_token %}
-    <img class="mb-4" src="{% static 'cauans/cauas_svg.svg' %}" alt="" width="200" >
-    <h1 class="h3 mb-3 fw-normal">Acesso ao GSME</h1>
-
+    <img class="mb-4" src="{% static 'logo.png' %}" alt="" width="200" >
     <div class="form-floating">
       <input type="text" name='username' class="form-control" id="floatingInput" placeholder="name@example.com">
       <label for="floatingInput">Usuário</label>
@@ -243,8 +260,7 @@ body{
 
   <form method='post' class="mirror-effect"  style="margin-bottom:-150% ;margin-top:-50% ;">
     {% csrf_token %}
-    <img class="mb-4" src="{% static 'cauans/cauas_svg.svg' %}" alt="" width="200" >
-    <h1 class="h3 mb-3 fw-normal">Acesso ao GSME</h1>
+    <img class="mb-4" src="{% static 'logo.png' %}" alt="" width="200" >
 
     <div class="form-floating">
       <input type="text" name='username' class="form-control" id="floatingInputMirror" placeholder="name@example.com">

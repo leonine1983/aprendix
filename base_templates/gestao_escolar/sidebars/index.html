@@ -33,39 +33,39 @@
 <div class="d-flex flex-column flex-shrink-0 p-3 bg-p-3" style="margin-top: 4.5rem!important;">
   <ul class="nav nav-pills flex-column mb-auto">    
     <li>
-      <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_create' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p" title="Alunos" data-bs-toggle="tooltip" data-bs-placement="right">
-        <i class="fa-sharp fa-solid fa-people fs-5 txt-p me-2"></i>
+      <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_create' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p-nav" title="Alunos" data-bs-toggle="tooltip" data-bs-placement="right">
+        <i class="fa-sharp fa-solid fa-people fs-5 txt-p-nav me-2"></i>
         Cadastro de Alunos
       </a>      
     </li>
     <li >
-      <a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p" title="Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
-        <i class="fa-solid fa-people-roof bi fs-4 txt-p me-2"></i>
+      <a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p-nav" title="Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
+        <i class="fa-solid fa-people-roof bi fs-4 txt-p-nav me-2"></i>
         Cadastro de Turmas
       </a>
      
     </li>
     <li>
-      <a href="{% url 'Gestao_Escolar:GE_Create_Professores' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p" title="Professores" data-bs-toggle="tooltip" data-bs-placement="right">
-        <i class="fs-6 fa-duotone fa-person-chalkboard txt-p me-2"></i>
+      <a href="{% url 'Gestao_Escolar:GE_Create_Professores' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p-nav" title="Professores" data-bs-toggle="tooltip" data-bs-placement="right">
+        <i class="fs-6 fa-duotone fa-person-chalkboard txt-p-nav me-2"></i>
         Cadastro de Profissionais
       </a>
     </li>
     <li>
-      <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p" title="Matrícula" data-bs-toggle="tooltip" data-bs-placement="right">
-        <i class="fs-4 fa-solid fa-screen-users txt-p me-2"></i>
+      <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p-nav" title="Matrícula" data-bs-toggle="tooltip" data-bs-placement="right">
+        <i class="fs-4 fa-solid fa-screen-users txt-p-nav me-2"></i>
         Matrícula de alunos nas turmas
       </a>
     </li>
     <li>
-      <a href="{% url 'Gestao_Escolar:Grades_turmas' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p" title="Grade de Disciplinas" data-bs-toggle="tooltip" data-bs-placement="right">
-        <i style="font-size: 1.65rem;" class="fs-4 fa-duotone fa-chart-network txt-p me-2"></i>
+      <a href="{% url 'Gestao_Escolar:Grades_turmas' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p-nav" title="Grade de Disciplinas" data-bs-toggle="tooltip" data-bs-placement="right">
+        <i style="font-size: 1.65rem;" class="fs-4 fa-duotone fa-chart-network txt-p-nav me-2"></i>
         Grade de disciplinas
       </a>
     </li>
     <li>
-      <a href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p" title="Gestão das Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
-        <i style="font-size: 1.65rem;" class="fs-4 fa-solid fa-users-gear txt-p me-2"></i>
+      <a href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p-nav" title="Gestão das Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
+        <i style="font-size: 1.65rem;" class="fs-4 fa-solid fa-users-gear txt-p-nav me-2"></i>
         Gestão de Turmas
       </a>
     </li>
@@ -82,7 +82,7 @@
       <li>
         <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}">
           {% csrf_token %}
-          <button type="submit" class="w-100"><i class="fa-thin fa-door-closed txt-p"></i> Sair</button>
+          <button type="submit" class="w-100"><i class="fa-thin fa-door-closed txt-p-nav"></i> Sair</button>
         </form>
       </li>
     </ul>

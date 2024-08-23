@@ -5,6 +5,7 @@
         <th>Escolas</th>
         <th>Função</th>
         <th>Ano Letivo</th>
+        <th>Excluir encaminhamento</th>
         </tr>
     </thead>
     <tbody>
@@ -14,6 +15,8 @@
                     <td>{{l.destino}}</td>
                     <td>{{l.profissao}}</td>
                     <td>{{l.encaminhamento.ano_contrato}}</td>
+                    <td><a href="{% url 'Gestao_Escolar:encaminha_escolaDelete' l.pk %}"><i class="fa-duotone fa-solid fa-eraser text-danger"></i></a>
+                        </td>
                 </tr>
             {% endif %}
         {% endfor %}

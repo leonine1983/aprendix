@@ -11,39 +11,17 @@
 <link rel="stylesheet" href="{% static 'global/css/styles_google.css' %}" />
 
 <style>
-  .bg-textura
-    {
-      --s: 50px;
-      --c: #191b22;
-      --_s: calc(2*var(--s)) calc(2*var(--s));
-      --_g: 35.36% 35.36% at;
-      --_c: #0000 66%,#20222a 68% 70%,#0000 72%;
-      background: 
-        radial-gradient(var(--_g) 100% 25%,var(--_c)) var(--s) var(--s)/var(--_s), 
-        radial-gradient(var(--_g) 0 75%,var(--_c)) var(--s) var(--s)/var(--_s), 
-        radial-gradient(var(--_g) 100% 25%,var(--_c)) 0 0/var(--_s), 
-        radial-gradient(var(--_g) 0 75%,var(--_c)) 0 0/var(--_s), 
-        repeating-conic-gradient(var(--c) 0 25%,#0000 0 50%) 0 0/var(--_s), 
-        radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
-      background-attachment: fixed;
-    }
-    .txt-textura{
-      color: #b8b2ac!important;
-    }
-    .bg-textura2 {
-      background-image: linear-gradient(to right top, #f9783e, #f27239, #eb6b33, #e4652e, #dd5f29, #de6628, #df6d27, #e07426, #e88a2c, #ee9f35, #f4b441, #f9c94f);
-}
 
 
 
 </style>
-  <nav class='nav_google p-5 bg-textura '
+  <nav class='nav_google p-5  bg-p-1 '
   style=' box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;margin-top:-0.3rem; '>
     <div class="logo col-8">      
       <img style="width: 6rem; margin-top: 0.5rem;" width="3000" src="{% static 'logo.png' %}" />
       <div>
-        <h1 class="text-uppercase h1 fs-6 txt-textura  mx-5">{{request.session.escola_nome}} </h1>
-        <h2 class="text-uppercase h2 fs-7 txt-textura  mx-5">
+        <h1 class="text-uppercase h1 fs-6 txt-p  mx-5">{{request.session.escola_nome}} </h1>
+        <h2 class="text-uppercase h2 fs-7 txt-p  mx-5">
           <i class="fa-solid fa-calendar-days "></i> Ano Letivo: {{request.session.anoLetivo_nome}}
         </h2>
       </div>
