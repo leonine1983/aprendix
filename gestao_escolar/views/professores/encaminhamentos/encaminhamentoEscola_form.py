@@ -5,7 +5,7 @@ from django.views.generic import CreateView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from rh.models import Encaminhamentos, Escola, Contrato,Ano, Profissao
+from rh.models import Encaminhamentos, Escola, Contrato,Ano
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import redirect
 
@@ -17,35 +17,7 @@ class EncaminhaEscola(LoginRequiredMixin, CreateView, SuccessMessageMixin):
     template_name = 'Escola/inicio.html'
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        return kwargs
-
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-
-        # Obtém os parâmetros necessários
-        escola_id = self.request.session['escola_id']
-        ano_letivo = self.request.session['anoLetivo_id']
-        contratado_id = self.kwargs['pk']
-
-        # Obtém as profissões usadas
-        encaminhamentos = Encaminhamentos.objects.filter(
-            encaminhamento__contratado=contratado_id,
-            encaminhamento__ano_contrato=ano_letivo,
-            destino=escola_id
-        )
-        profissoes_usadas = encaminhamentos.values_list('profissao', flat=True)
-
-        # Filtra o queryset de profissões
-        profissoes = Profissao.objects.exclude(id__in=profissoes_usadas)
-
-        # Atualiza o queryset do campo 'profissao'
-        form.fields['profissao'].queryset = profissoes
-
-        return form
-
-
-
+        return super().get_form_kwargs()
 
     def form_valid(self, form: BaseModelForm):
         escola_id = self.request.session['escola_id']
