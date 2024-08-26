@@ -1,67 +1,121 @@
-<nav class="navbar navbar-expand-lg  rounded-top-3 bg-p-4"  style="
-box-shadow: rgba(0, 0, 0, 0.18) 0px 2px 4px;
-height: 3.5rem;">
-  <div class="container-fluid m-0 p-0 mt-2">
-    <a class="navbar-brand" href="#">
+<style>
+.navbar {
+  background-color: #f3f3f3; /* Cor de fundo clara */
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 4px; /* Sombra sutil */
+  border-radius: 0.75rem; /* Bordas arredondadas no topo */
+}
+.navbar li{
+  height:3.5rem!important;
+  margin-right: 2rem!important;
+}
+
+.navbar-brand img {
+  margin-left: -1rem; /* Ajuste da margem da imagem */
+}
+
+.navbar-toggler {
+  border: none; /* Remove a borda do botão */
+}
+
+.navbar-toggler-icon {
+  background-color: #0078d4; /* Cor do ícone de toggle */
+}
+
+.nav-link {
+  color: #333; /* Cor do texto do link */
+  transition: color 0.2s ease, background-color 0.2s ease; /* Transições suaves */
+}
+
+.nav-link:hover, .nav-link:focus {
+  color: #0078d4; /* Cor do texto ao passar o mouse */
+  background-color: #e1e1e1; /* Cor de fundo ao passar o mouse */
+}
+
+.dropdown-menu {
+  background-color: #ffffff; /* Cor de fundo do menu dropdown */
+  border: none; /* Remove a borda padrão */
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px; /* Sombra para o dropdown */
+  border-radius: 0.5rem; /* Bordas arredondadas no menu dropdown */
+  padding: 0; /* Remove o padding interno para ajustar o estilo das barras */
+}
+
+.dropdown-item {
+  display: block; /* Exibir como bloco para criar a aparência de barras */
+  color: #333; /* Cor do texto dos itens */
+  padding: 0.75rem 1.25rem; /* Padding interno para os itens */
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 1) 100%); /* Gradiente sutil */
+  border-bottom: 1px solid #ddd; /* Borda inferior leve para separar os itens */
+  border-radius: 0.5rem; /* Bordas arredondadas nos itens */
+  transition: background-color 0.2s ease, transform 0.2s ease; /* Transição suave para o efeito de fundo e transformação */
+}
+
+.dropdown-item:hover {
+  background-color: #e1e1e1; /* Cor de fundo ao passar o mouse no item */
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 1) 100%); /* Gradiente ao passar o mouse */
+  transform: scale(1.02); /* Leve aumento no tamanho ao passar o mouse */
+}
+
+.dropdown-item:last-child {
+  border-bottom: none; /* Remove a borda inferior do último item */
+}
+
+.fs-6 {
+  font-size: 0.9rem !important;
+}
+
+
+</style>
+<nav class="navbar navbar-expand-lg rounded-top-3 bg-light shadow-sm bg-p-4" style="height: 3.5rem;">
+  <div class="container-fluid m-0 p-0">
+    <a class="navbar-brand pl-2" href="#">
       {% load static %}
-      <img src="{% static 'man.png' %}" height='50' style='margin-left:-1rem' alt="">
-    </a> 
+      <img src="{% static 'man.png' %}" height='50' alt="">
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavDropdown" >
-      <ul class="navbar-nav h-25" >  
-        <!--Parametros-->
-        <li class="nav-item dropdown border-right">
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+        <!-- Parâmetros -->
+        <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa-solid fa-screwdriver-wrench fs-4"></i><br> Parâmetros
+            <i class="fa-solid fa-screwdriver-wrench fs-6"></i><br> Parâmetros
           </a>
-          <ul class="dropdown-menu bg-p-5 " style="margin-top: -1rem;">
-            <li><a class="dropdown-item border-bottom" href="#">Série</a></li>
-            <li><a class="dropdown-item border-bottom" href="#">Grau/Nível Escolar</a></li>
-            
-            <li><a class="dropdown-item border-bottom" href="#">Tipo de Remanejamentos</a></li>
-            <li><a class="dropdown-item border-bottom" href="{% url 'Gestao_Escolar:GE_Disciplina_create' %}">Disciplinas</a></li>            
+          <ul class="dropdown-menu bg-light" style="margin-top: -1rem;">
+            <li><a class="dropdown-item" href="#">Série</a></li>
+            <li><a class="dropdown-item" href="#">Grau/Nível Escolar</a></li>
+            <li><a class="dropdown-item" href="#">Tipo de Remanejamentos</a></li>
+            <li><a class="dropdown-item" href="{% url 'Gestao_Escolar:GE_Disciplina_create' %}">Disciplinas</a></li>
           </ul>
         </li>
-        <!--Relatórios-->
-        <li class="nav-item dropdown  border-right">
+        <!-- Relatórios -->
+        <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa-solid fa-print fs-4"></i><br> Relatórios
+            <i class="fa-solid fa-print fs-6"></i><br> Relatórios
           </a>
-          <ul class="dropdown-menu bg-p-5" style="margin-top: -1rem;">
-            <li>                      
-              <a class="dropdown-item" href='{% url "Gestao_Escolar:imprime_list_turmas" %}'>Relação de Turmas</a>
-            </li>
-          </ul>         
+          <ul class="dropdown-menu bg-light" style="margin-top: -1rem;">
+            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:imprime_list_turmas" %}'>Relação de Turmas</a></li>
+          </ul>
         </li>
-        <!--Localização-->
-        <li class="nav-item dropdown  border-right">
-          <a class="nav-link dropdown-toggle text-center " href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa-duotone fa-solid fa-location-dot fs-4"></i><br> Localização 
-          </a>
-          <ul class="dropdown-menu bg-p-5" style="margin-top: -1rem;">
-            <li>                      
-              <a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Cidade</a>
-            </li>
-            <li >                      
-              <a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Bairros</a>
-            </li>
-          </ul>         
-        </li>
-        <!--Localização-->
-        <li class="nav-item dropdown  border-right">
+        <!-- Localização -->
+        <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa-sharp-duotone fa-solid fa-face-smiling-hands fs-4"></i><br> Apoio/Suporte
+            <i class="fa-duotone fa-solid fa-location-dot fs-6"></i><br> Localização
           </a>
-          <ul class="dropdown-menu bg-p-5" style="margin-top: -1rem;">
-            <li>                      
-              <a class="dropdown-item" href='{% url "Gestao_Escolar:GE_anoLetivo" %}'>Alternar entre Anos Letivos | Mudar Exercício</a>
-            </li>
-            <li>                      
-              <a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Bairros</a>
-            </li>
-          </ul>         
+          <ul class="dropdown-menu bg-light" style="margin-top: -1rem;">
+            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Cidade</a></li>
+            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Bairros</a></li>
+          </ul>
+        </li>
+        <!-- Apoio/Suporte -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-sharp-duotone fa-solid fa-face-smiling-hands fs-6"></i><br> Apoio/Suporte
+          </a>
+          <ul class="dropdown-menu bg-light" style="margin-top: -1rem;">
+            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:GE_anoLetivo" %}'>Alternar entre Anos Letivos | Mudar Exercício</a></li>
+            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Bairros</a></li>
+          </ul>
         </li>
       </ul>
     </div>

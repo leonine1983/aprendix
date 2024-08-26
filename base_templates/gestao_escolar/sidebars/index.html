@@ -23,6 +23,51 @@
   .fs-6{
     font-size: 1.65rem !important;
   }
+
+
+
+  .bg-light {
+  background-color: #f3f3f3; /* Cor de fundo leve */
+}
+
+.nav-link {
+  color: #333; /* Cor do texto dos links */
+  transition: background-color 0.2s ease;
+}
+
+.nav-link:hover {
+  background-color: #e1e1e1; /* Cor de fundo ao passar o mouse */
+}
+
+.txt-p-nav {
+  color: #0078d4; /* Cor dos ícones e texto */
+}
+
+.shadow-sm {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Sombra leve */
+}
+
+.rounded-3 {
+  border-radius: 0.75rem; /* Bordas arredondadas */
+}
+
+.dropdown-menu {
+  background-color: #ffffff; /* Fundo do menu dropdown */
+  border: 1px solid #ddd; /* Borda do menu dropdown */
+}
+
+.dropdown-item {
+  color: #333; /* Cor dos itens do menu dropdown */
+}
+
+.dropdown-item:hover {
+  background-color: #e1e1e1; /* Cor de fundo ao passar o mouse no item do menu dropdown */
+}
+
+.img {
+  border: 2px solid #0078d4; /* Borda da imagem do usuário */
+}
+
 </style>
 <link rel="stylesheet" href="{% static 'fontawesome/css/fontWaseome_pro.css' %}">
 <link rel="stylesheet" href="{% static 'fontawesome/css/PRO/sharp.css' %}">
@@ -30,64 +75,65 @@
 <link rel="stylesheet" href="{% static 'fontawesome/css/PRO/sharp_light.css' %}">
 
   {% endblock css %}
-<div class="d-flex flex-column flex-shrink-0 p-3 bg-p-3" style="margin-top: 4.5rem!important;">
-  <ul class="nav nav-pills flex-column mb-auto">    
-    <li>
-      <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_create' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p-nav" title="Alunos" data-bs-toggle="tooltip" data-bs-placement="right">
-        <i class="fa-sharp fa-solid fa-people fs-5 txt-p-nav me-2"></i>
-        Cadastro de Alunos
-      </a>      
-    </li>
-    <li >
-      <a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p-nav" title="Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
-        <i class="fa-solid fa-people-roof bi fs-4 txt-p-nav me-2"></i>
-        Cadastro de Turmas
-      </a>
-     
-    </li>
-    <li>
-      <a href="{% url 'Gestao_Escolar:GE_Create_Professores' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p-nav" title="Professores" data-bs-toggle="tooltip" data-bs-placement="right">
-        <i class="fs-6 fa-duotone fa-person-chalkboard txt-p-nav me-2"></i>
-        Cadastro de Profissionais
-      </a>
-    </li>
-    <li>
-      <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p-nav" title="Matrícula" data-bs-toggle="tooltip" data-bs-placement="right">
-        <i class="fs-4 fa-solid fa-screen-users txt-p-nav me-2"></i>
-        Matrícula de alunos nas turmas
-      </a>
-    </li>
-    <li>
-      <a href="{% url 'Gestao_Escolar:Grades_turmas' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p-nav" title="Grade de Disciplinas" data-bs-toggle="tooltip" data-bs-placement="right">
-        <i style="font-size: 1.65rem;" class="fs-4 fa-duotone fa-chart-network txt-p-nav me-2"></i>
-        Grade de disciplinas
-      </a>
-    </li>
-    <li>
-      <a href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}" class="nav-link py-3 shadown shadow-sm rounded-0 txt-p-nav" title="Gestão das Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
-        <i style="font-size: 1.65rem;" class="fs-4 fa-solid fa-users-gear txt-p-nav me-2"></i>
-        Gestão de Turmas
-      </a>
-    </li>
-  </ul>
-  <hr>
-  <div class="dropdown">
-    <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      <img src="{% if user.foto is not None %}{% static user.foto %}{% else %}{% static 'man.png' %}{% endif %}" alt="mdo" width="32" height="32" class="rounded-circle">     
-      <strong class="text-capitalize mx-2">{{request.user}}</strong>
-    </a>
-    <ul class="dropdown-menu text-small shadow">
-      <li><hr class="dropdown-divider"></li>
-      
+  <div class="d-flex flex-column flex-shrink-0 p-3 bg-light shadow-sm rounded-3 bg-p-3" style="margin-top: 4.5rem;">
+    <ul class="nav nav-pills flex-column mb-auto">
       <li>
-        <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}">
-          {% csrf_token %}
-          <button type="submit" class="w-100"><i class="fa-thin fa-door-closed txt-p-nav"></i> Sair</button>
-        </form>
+        <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_create' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Alunos" data-bs-toggle="tooltip" data-bs-placement="right">
+          <i class="fa-sharp fa-solid fa-people fs-5 txt-p-nav me-2"></i>
+          Cadastro de Alunos
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
+          <i class="fa-solid fa-people-roof fs-4 txt-p-nav me-2"></i>
+          Cadastro de Turmas
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'Gestao_Escolar:GE_Create_Professores' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Professores" data-bs-toggle="tooltip" data-bs-placement="right">
+          <i class="fs-6 fa-duotone fa-person-chalkboard txt-p-nav me-2"></i>
+          Cadastro de Profissionais
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Matrícula" data-bs-toggle="tooltip" data-bs-placement="right">
+          <i class="fs-4 fa-solid fa-screen-users txt-p-nav me-2"></i>
+          Matrícula de alunos nas turmas
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'Gestao_Escolar:Grades_turmas' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Grade de Disciplinas" data-bs-toggle="tooltip" data-bs-placement="right">
+          <i class="fs-4 fa-duotone fa-chart-network txt-p-nav me-2" style="font-size: 1.65rem;"></i>
+          Grade de disciplinas
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Gestão das Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
+          <i class="fs-4 fa-solid fa-users-gear txt-p-nav me-2" style="font-size: 1.65rem;"></i>
+          Gestão de Turmas
+        </a>
       </li>
     </ul>
+    <hr class="my-3">
+    <div class="dropdown">
+      <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="{% if user.foto is not None %}{% static user.foto %}{% else %}{% static 'man.png' %}{% endif %}" alt="User Photo" width="32" height="32" class="rounded-circle">
+        <strong class="text-capitalize mx-2">{{request.user}}</strong>
+      </a>
+      <ul class="dropdown-menu text-small shadow rounded-3">
+        <li><hr class="dropdown-divider"></li>
+        <li>
+          <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="dropdown-item d-flex align-items-center">
+              <i class="fa-thin fa-door-closed me-2"></i> Sair
+            </button>
+          </form>
+        </li>
+      </ul>
+    </div>
   </div>
-</div>
+  
 <div class="b-example-divider b-example-vr" style="margin-top: -1rem;"></div>
 
 

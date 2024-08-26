@@ -172,23 +172,65 @@
 
  
   /** Padrão cinza */
-  .bg-p-1
-    {
-      --s: 50px;
-      --c: #191b22;
-      --_s: calc(2*var(--s)) calc(2*var(--s));
-      --_g: 35.36% 35.36% at;
-      --_c: #0000 66%,#20222a 68% 70%,#0000 72%;
-      background: 
-        radial-gradient(var(--_g) 100% 25%,var(--_c)) var(--s) var(--s)/var(--_s), 
-        radial-gradient(var(--_g) 0 75%,var(--_c)) var(--s) var(--s)/var(--_s), 
-        radial-gradient(var(--_g) 100% 25%,var(--_c)) 0 0/var(--_s), 
-        radial-gradient(var(--_g) 0 75%,var(--_c)) 0 0/var(--_s), 
-        repeating-conic-gradient(var(--c) 0 25%,#0000 0 50%) 0 0/var(--_s), 
-        radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
-      background-attachment: fixed;
-    }
-    .txt-p{color:#d8d8d5 !important;}
+  .bg-p-1 {
+  background-color: #f3f3f3; /* Cor de fundo clara, base neutra */
+  color: #333; /* Cor do texto principal */
+  border: 1px solid #d1d1d1; /* Borda suave cinza */
+  border-radius: 10px; /* Bordas arredondadas */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); /* Sombra sutil */
+  padding: 1rem; /* Espaçamento interno */
+  transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s; /* Transições suaves para interações */
+}
+
+/* Efeito de hover para bg-p-1 */
+.bg-p-1:hover {
+  background-color: #faf6ef; /* Fundo ligeiramente mais escuro ao passar o mouse */
+  border-color: #f9a825; /* Cor da borda muda para um laranja suave */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08); /* Sombra mais pronunciada ao passar o mouse */
+}
+
+/* Adicionando uma borda laranja sutil para foco */
+.bg-p-1:focus-within {
+  border-color: #f9a825; /* Cor da borda muda para um laranja suave quando em foco */
+}
+/* Estilo para a classe txt-p */
+.txt-p {
+  color: #333 !important; /* Cor do texto principal, boa para legibilidade */
+  font-size: 1rem !important; /* Tamanho padrão da fonte */
+  line-height: 1.5 !important; /* Espaçamento entre linhas para melhor leitura */
+  text-align: left !important; /* Alinhamento do texto */
+  margin: 0 !important; /* Remover margens adicionais */
+  padding: 0 !important; /* Remover padding adicional */
+  transition: color 0.3s !important; /* Transição suave para a cor do texto */
+}
+
+/* Efeito de hover para txt-p, se aplicável */
+.txt-p:hover {
+  color: #0078d4 !important; /* Cor de texto azul clara similar ao Windows 11 ao passar o mouse */
+}
+
+/* Efeito para texto secundário */
+.txt-p.secondary {
+  color: #666 !important; /* Cor de texto secundária para menos destaque */
+  font-size: 0.875rem !important; /* Tamanho da fonte menor para texto secundário */
+}
+
+/* Efeito para texto de destaque ou título */
+.txt-p.highlight {
+  color: #0078d4 !important; /* Cor de destaque azul clara */
+  font-weight: bold !important; /* Texto em negrito para destacar */
+}
+
+/* Efeito para texto de link */
+.txt-p a {
+  color: #0078d4 !important; /* Cor azul clara para links */
+  text-decoration: none !important; /* Remover sublinhado padrão */
+  transition: color 0.3s !important; /* Transição suave para a cor do link */
+}
+
+.txt-p a:hover {
+  text-decoration: underline !important; /* Sublinhado ao passar o mouse para links */
+}
 
 
 
@@ -207,10 +249,96 @@
         radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
       background-attachment: fixed;
     }
-  .bg-p-3{background-color: #97adba!important}
-  .bg-p-4{background-color: #b4c5ce !important}
-  .bg-p-5{background-color: #ddecf5 !important}
-    
+    .bg-p-3 {
+  background-color: #f3f3f3; /* Cor de fundo clara, base neutra */
+  color: #333; /* Cor do texto principal */
+  border: 1px solid #d1d1d1; /* Borda suave cinza */
+  border-radius: 10px; /* Bordas arredondadas */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); /* Sombra sutil */
+  padding: 1rem; /* Espaçamento interno */
+  transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s; /* Transições suaves para interações */
+}
+
+/* Efeito de hover para bg-p-3 */
+.bg-p-3:hover {
+  background-color: #f3fcf3; /* Fundo ligeiramente mais escuro ao passar o mouse */
+  border-color: #4caf50; /* Cor da borda muda para um verde suave */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08); /* Sombra mais pronunciada ao passar o mouse */
+}
+
+/* Adicionando uma borda verde sutil para foco */
+.bg-p-3:focus-within {
+  border-color: #4caf50; /* Cor da borda muda para um verde suave quando em foco */
+}
+
+
+.bg-p-4 {
+  background-color: #f3f3f3; /* Cor de fundo clara, base neutra */
+  color: #333; /* Cor do texto principal */
+  border: 1px solid #d1d1d1; /* Borda suave cinza */
+  border-radius: 10px; /* Bordas arredondadas */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); /* Sombra sutil */
+  padding: 1rem; /* Espaçamento interno */
+  transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s; /* Transições suaves para interações */
+}
+
+/* Efeito de hover para bg-p-3 */
+.bg-p-4:hover {
+  background: linear-gradient(to bottom, #fceff3, #f5d9e2);
+  border-color: #e91e63; /* Cor da borda muda para um rosa suave */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08); /* Sombra mais pronunciada ao passar o mouse */
+}
+
+
+/* Adicionando uma borda rosa sutil para foco */
+.bg-p-4:focus-within {
+  border-color: #e91e63; /* Cor da borda muda para um rosa suave quando em foco */
+}
+
+.bg-p-4 {
+  background-color: #f3f3f3; /* Cor de fundo clara, base neutra */
+  color: #333; /* Cor do texto principal */
+  border: 1px solid #d1d1d1; /* Borda suave cinza */
+  border-radius: 10px; /* Bordas arredondadas */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); /* Sombra sutil */
+  padding: 1rem; /* Espaçamento interno */
+  transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s; /* Transições suaves para interações */
+}
+
+/* Efeito de hover para bg-p-3 */
+.bg-p-4:hover {
+  background: linear-gradient(to bottom, #fceff3, #f5d9e2);
+  border-color: #e91e63; /* Cor da borda muda para um rosa suave */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08); /* Sombra mais pronunciada ao passar o mouse */
+}
+
+
+/* Adicionando uma borda rosa sutil para foco */
+.bg-p-4:focus-within {
+  border-color: #e91e63; /* Cor da borda muda para um rosa suave quando em foco */
+}
+.bg-p-5 {
+  background-color: #f3f3f3; /* Cor de fundo clara, base neutra */
+  color: #333; /* Cor do texto principal */
+  border: 1px solid #d1d1d1; /* Borda suave cinza */
+  border-radius: 10px; /* Bordas arredondadas */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); /* Sombra sutil */
+  padding: 1rem; /* Espaçamento interno */
+  transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s; /* Transições suaves para interações */
+}
+
+/* Efeito de hover para bg-p-3 */
+.bg-p-5:hover {
+  background: linear-gradient(to bottom, #f1effc, #dcd9f5);
+  border-color: #1e07f0; /* Cor da borda muda para um rosa suave */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08); /* Sombra mais pronunciada ao passar o mouse */
+}
+
+
+/* Adicionando uma borda rosa sutil para foco */
+.bg-p-5:focus-within {
+  border-color: #1e07f0;; /* Cor da borda muda para um rosa suave quando em foco */
+}
   .bg-trimestre-1 {background-color: #5b2b10;}
   .bg-trimestre-2 {background-color: #a76036;}
   .bg-trimestre-3 {background-color: #b68d7a;}  
