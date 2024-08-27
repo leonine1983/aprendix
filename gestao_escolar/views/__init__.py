@@ -13,4 +13,5 @@ from .cria_qrcode import *
 from .impressos import *
 from .bairro import *
 from .cidade import *
+from .minhaEscola import *
 #from .ferramentas import *

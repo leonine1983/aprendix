@@ -167,15 +167,6 @@ class Escola(models.Model):
     nome_escola = models.CharField(max_length=60, null=False, default='', verbose_name='Nome da Escola ou Departamento')
     endereco_escola = models.CharField(max_length=100, null=False, default='', verbose_name='Endereço')
     telefone_escola = models.CharField(max_length=30, null=True, default='', verbose_name='Telefone')
-    # diretor
-    # vice_diretor
-    # coordenador1
-    # coordenador1_turno
-    # coordenador2
-    # coordenador2_turno
-    # coordenador3
-    # coordenador3_turno
-    # secretario
     def __str__(self):
         return self.nome_escola
     
