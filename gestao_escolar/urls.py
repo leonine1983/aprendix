@@ -16,6 +16,8 @@ urlpatterns = [
     path('gestao_escolar/Escola/', Pagina_inicio.as_view(), name="GE_Escola_inicio"),
     
     # Dados escola
+    path('gestao_escolar/Escola/Create', CreateEscola.as_view(), name="CreateEscola"),
+    path('gestao_escolar/Escola/Dados/Update/<int:pk>', UpdateEscolaDados.as_view(), name="UPdateEscolaDados"),
     path('gestao_escolar/Escola/<int:pk>', UpdateEscola.as_view(), name="DadosEscola"),
 
     # Turmas

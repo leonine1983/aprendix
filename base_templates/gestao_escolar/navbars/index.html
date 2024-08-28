@@ -45,13 +45,15 @@
 
 .dropdown-item {
   display: block;
-  margin-right:  -2rem;
-  color: #1b1b1b; /* Cor do texto dos itens */
-  padding: 0.75rem 1.25rem; /* Padding interno para os itens */
-  border-bottom: 1px solid #ddd; /* Borda inferior leve para separar os itens */
-  border-radius: 0.5rem; /* Bordas arredondadas nos itens */
-  transition: background-color 0.2s ease, transform 0.2s ease; /* Transição suave para o efeito de fundo e transformação */
+  color: #1b1b1b; 
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid #000000; 
+  border-radius: 0.5rem; 
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  margin-left: 1rem;
+  margin-top: 0.5rem;
 }
+  
 
 
 .dropdown-item:last-child {
@@ -108,8 +110,8 @@
             <i class="fa-sharp-duotone fa-solid fa-face-smiling-hands fs-6"></i><br> Apoio/Suporte
           </a>
           <ul class="dropdown-menu " style="margin-top: -1rem;">
-            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:GE_anoLetivo" %}'>Alternar entre Anos Letivos | Mudar Exercício</a></li>
-            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Bairros</a></li>
+            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:GE_anoLetivo" %}'><i class="fa-regular fa-arrows-retweet txt-p-nav fs-4"></i><sup class="txt-p-nav ">{{request.session.anoLetivo_nome}}</sup> Alternar entre Anos Letivos | Mudar Exercício</a></li>
+            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:CreateEscola" %}'><i class="fa-duotone fa-solid fa-school-flag txt-p-nav me-2 fs-4"></i> Criar nova Escola</a></li>
           </ul>
         </li>
       </ul>

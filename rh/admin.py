@@ -5,6 +5,7 @@ from rh.models import *
 admin.site.register(Ano)
 admin.site.register(Prefeitura)
 admin.site.register(Escola)
+admin.site.register(Escola_admin)
 admin.site.register(Profissao)
 admin.site.register(Salario)
 admin.site.register(Sexo)

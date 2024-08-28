@@ -3,6 +3,7 @@ from datetime import timedelta, date, datetime
 from django.dispatch import receiver
 from django.db.models.signals import post_migrate
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 
 
 class Config_plataforma(models.Model):
@@ -162,11 +163,20 @@ class Texto_Contrato(models.Model):
         return self.tipo
     
     
+
 class Escola(models.Model):
-    prefeitura = models.ForeignKey(Prefeitura, on_delete=models.PROTECT, default='', verbose_name='Nome da Instituição Responsável')
-    nome_escola = models.CharField(max_length=60, null=False, default='', verbose_name='Nome da Escola ou Departamento')
-    endereco_escola = models.CharField(max_length=100, null=False, default='', verbose_name='Endereço')
-    telefone_escola = models.CharField(max_length=30, null=True, default='', verbose_name='Telefone')
+    prefeitura = models.ForeignKey(Prefeitura, on_delete=models.PROTECT, verbose_name='Nome da Instituição Responsável')
+    nome_escola = models.CharField(max_length=60, verbose_name='Nome da Escola ou Departamento')
+    #endereco_escola = models.CharField(max_length=100, null=True, blank=True, verbose_name='Endereço')
+    #telefone_escola = models.CharField(max_length=30, null=True, blank=True, verbose_name='Telefone')
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
+    author_created = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da criação')
+    atualizado_em = models.DateTimeField(auto_now=True, verbose_name='Data da Última Atualização')
+    author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
+
+    class Meta:
+        ordering = ['nome_escola']
+
     def __str__(self):
         return self.nome_escola
     
@@ -244,7 +254,77 @@ class Decreto(models.Model):
     ano_decreto = models.ForeignKey(Ano, on_delete=models.CASCADE, related_name='Ano_decreto', verbose_name="Ano do")   
 
     def __str__(self):
-        return self.profissional.nome
+        return self.profissional.nome    
+
+
+class Escola_admin(models.Model):
+    # Dados Gerais
+    nome = models.OneToOneField(Escola, related_name="related_dadosEscola", on_delete=models.CASCADE, blank=True, null=True)
+    cnpj = models.CharField(max_length=14, blank=True, null=True, unique=True)  # CNPJ no formato XXX.XXX.XXX/0001-XX
+    endereco = models.CharField(max_length=255, blank=True, null=True)
+    numero = models.CharField(max_length=10, blank=True, null=True)
+    complemento = models.CharField(max_length=100, blank=True, null=True)
+    bairro = models.ForeignKey(Bairro, related_name="related_dadosEscola_bairro", on_delete=models.CASCADE, blank=True, null=True)
+    cidade = models.ForeignKey(Cidade, related_name="related_dadosEscola_cidade", on_delete=models.CASCADE, blank=True, null=True)
+    estado = models.ForeignKey(Uf_Unidade_Federativa, related_name="related_UF_escola", on_delete=models.CASCADE, blank=True, null=True)
+    cep = models.CharField(max_length=8, blank=True, null=True)  # CEP no formato XXXXX-XXX
+    telefone = models.CharField(max_length=15, blank=True, null=True)  # Telefone com DDD
+    email = models.EmailField(blank=True, null=True)
+    
+    # Dados de Identificação
+    codigo_mec = models.CharField(max_length=10, blank=True, null=True, unique=True)  # Código do MEC
+    tipo = models.CharField(max_length=50, blank=True, null=True)  # Ex.: 'Pública', 'Privada', 'Filantrópica'
+    
+    # Dados de Direção
+    nome_diretor = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_diretor", on_delete=models.CASCADE, blank=True, null=True)
+    nome_secretario = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_secretaria", on_delete=models.CASCADE, blank=True, null=True)
+    nome_vice_diretor = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_Vicediretor", on_delete=models.CASCADE, blank=True, null=True)
+
+    # Dados de Coordenação por Turno
+    coordenacao_matutino = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_coordMat", on_delete=models.CASCADE, blank=True, null=True)
+    coordenacao_vespertino = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_coordVesp", on_delete=models.CASCADE, blank=True, null=True)
+    coordenacao_noturno = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_coordNot", on_delete=models.CASCADE, blank=True, null=True)
+
+    # Dados de Funcionamento
+    data_fundacao = models.DateField(blank=True, null=True)
+    turno = models.CharField(max_length=50, blank=True, null=True)  # Ex.: 'Matutino', 'Vespertino', 'Noturno'
+    num_alunos = models.PositiveIntegerField(blank=True, null=True)
+    num_funcionarios_n_docente = models.PositiveIntegerField(blank=True, null=True)
+    num_funcionarios_docente = models.PositiveIntegerField(blank=True, null=True)
+    num_funcionarios_total = models.PositiveIntegerField(blank=True, null=True)
+    
+    # Dados da Infraestrutura
+    qtd_salas = models.PositiveIntegerField(blank=True, null=True)
+    qtd_bibliotecas = models.PositiveIntegerField(default=0, blank=True, null=True)
+    qtd_laboratorios = models.PositiveIntegerField(default=0, blank=True, null=True)
+    qtd_quadras = models.PositiveIntegerField(default=0, blank=True, null=True)
+    qtd_auditórios = models.PositiveIntegerField(default=0, blank=True, null=True)
+    qtd_refeitórios = models.PositiveIntegerField(default=0, blank=True, null=True)
+    qtd_areas_verdes = models.PositiveIntegerField(default=0, blank=True, null=True)
+
+    # Dados de Curso
+    possui_educacao_infantil = models.BooleanField(default=False, blank=True, null=True)
+    possui_ensino_fundamental = models.BooleanField(default=False, blank=True, null=True)
+    possui_ensino_medio = models.BooleanField(default=False, blank=True, null=True)
+    possui_ensino_tecnico = models.BooleanField(default=False, blank=True, null=True)
+    
+    # Dados de Convênios e Parcerias
+    convênios = models.TextField(blank=True, null=True)
+        
+    # Dados de Segurança e Acessibilidade
+    possui_acessibilidade = models.BooleanField(default=False, blank=True, null=True)
+    possui_sistema_seguranca = models.BooleanField(default=False, blank=True, null=True)
+    
+    # Dados Pedagógicos
+    numero_turmas = models.PositiveIntegerField(blank=True, null=True)
+    numero_professores = models.PositiveIntegerField(blank=True, null=True)
+    
+    # Outros Campos
+    observacoes = models.TextField(blank=True, null=True)
+    
+    def __str__(self):
+        return self.nome.nome_escola
+
 
 
 class Encaminhamentos(models.Model):
