@@ -260,6 +260,7 @@ class Decreto(models.Model):
 class Escola_admin(models.Model):
     # Dados Gerais
     nome = models.OneToOneField(Escola, related_name="related_dadosEscola", on_delete=models.CASCADE, blank=True, null=True)
+    imagem = models.ImageField(upload_to='escolas/', blank=True, null=True)
     cnpj = models.CharField(max_length=14, blank=True, null=True, unique=True)  # CNPJ no formato XXX.XXX.XXX/0001-XX
     endereco = models.CharField(max_length=255, blank=True, null=True)
     numero = models.CharField(max_length=10, blank=True, null=True)
@@ -278,7 +279,11 @@ class Escola_admin(models.Model):
     # Dados de Direção
     nome_diretor = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_diretor", on_delete=models.CASCADE, blank=True, null=True)
     nome_secretario = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_secretaria", on_delete=models.CASCADE, blank=True, null=True)
-    nome_vice_diretor = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_Vicediretor", on_delete=models.CASCADE, blank=True, null=True)
+    nome_vice_diretor_matutino = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_Vicediretor_matutino", verbose_name='Vice Diretor Matutino', on_delete=models.CASCADE, blank=True, null=True)
+    nome_vice_diretor_vespertino = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_Vicediretor_vespertino",verbose_name='Vice Diretor Vespertino', on_delete=models.CASCADE, blank=True, null=True)
+    nome_vice_diretor_Noturno = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_Vicediretor_noturno",verbose_name='Vice Diretor Noturno', on_delete=models.CASCADE, blank=True, null=True)
+
+
 
     # Dados de Coordenação por Turno
     coordenacao_matutino = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_coordMat", on_delete=models.CASCADE, blank=True, null=True)
@@ -292,6 +297,8 @@ class Escola_admin(models.Model):
     num_funcionarios_n_docente = models.PositiveIntegerField(blank=True, null=True)
     num_funcionarios_docente = models.PositiveIntegerField(blank=True, null=True)
     num_funcionarios_total = models.PositiveIntegerField(blank=True, null=True)
+    numero_turmas = models.PositiveIntegerField(blank=True, null=True)
+    
     
     # Dados da Infraestrutura
     qtd_salas = models.PositiveIntegerField(blank=True, null=True)
@@ -309,15 +316,14 @@ class Escola_admin(models.Model):
     possui_ensino_tecnico = models.BooleanField(default=False, blank=True, null=True)
     
     # Dados de Convênios e Parcerias
-    convênios = models.TextField(blank=True, null=True)
+    convenios = models.TextField(blank=True, null=True)
         
     # Dados de Segurança e Acessibilidade
     possui_acessibilidade = models.BooleanField(default=False, blank=True, null=True)
     possui_sistema_seguranca = models.BooleanField(default=False, blank=True, null=True)
     
     # Dados Pedagógicos
-    numero_turmas = models.PositiveIntegerField(blank=True, null=True)
-    numero_professores = models.PositiveIntegerField(blank=True, null=True)
+    
     
     # Outros Campos
     observacoes = models.TextField(blank=True, null=True)

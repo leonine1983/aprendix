@@ -1,0 +1,148 @@
+{% load static %}
+<style>
+    /* Estilização geral do formulário */
+#brasaoEscolar {
+    border: 1px solid #d3d3d3;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #e9f5fb;
+}
+
+/* Estilo da imagem exibida */
+#brasaoEscolar img {
+    border-radius: 8px;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Estilo para o link da imagem */
+#brasaoEscolar a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#brasaoEscolar a:hover {
+    text-decoration: underline;
+}
+
+/* Estilo do checkbox e do label */
+#brasaoEscolar .form-check {
+    margin-bottom: 15px;
+}
+
+#brasaoEscolar .form-check-input {
+    margin-right: 10px;
+}
+
+#brasaoEscolar .form-check-label {
+    font-weight: 600;
+}
+
+/* Estilo do input de arquivo */
+#brasaoEscolar .form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+}
+
+/* Estilo dos labels */
+#brasaoEscolar .form-label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
+
+
+</style>
+
+<div>
+    {% if escola_dados_form.non_field_errors %}
+        <div class="form-errors">
+            {% for error in escola_dados_form.non_field_errors %}
+                <p class="error">{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+  </div>
+  <div class='win11-form p-3'>  
+    <section>
+      {{escola_dados_form.cnpj.label_tag}}
+      {{escola_dados_form.cnpj}}   <br>
+      {{escola_dados_form.cnpj.error}}
+    </section>
+    <section>
+      {{escola_dados_form.endereco.label_tag}} 
+      {{escola_dados_form.endereco}}   <br>
+      {{escola_dados_form.endereco.error}}
+    </section>
+    <section>
+      {{escola_dados_form.numero.label_tag}} 
+      {{escola_dados_form.numero}}   <br>
+      {{escola_dados_form.numero.error}}
+    </section>
+    <section>
+      {{escola_dados_form.complemento.label_tag}} 
+      {{escola_dados_form.complemento}}   <br>
+      {{escola_dados_form.complemento.error}}
+    </section>
+    <section>
+      {{escola_dados_form.bairro.label_tag}} 
+      {{escola_dados_form.bairro}}   <br>
+      {{escola_dados_form.bairro.error}}
+    </section>
+    <section>
+      {{escola_dados_form.cidade.label_tag}} 
+      {{escola_dados_form.cidade}}   <br>
+      {{escola_dados_form.cidade.error}}
+    </section>
+    <section>
+      {{escola_dados_form.estado.label_tag}} 
+      {{escola_dados_form.estado}}   <br>
+      {{escola_dados_form.estado.error}}
+    </section>
+    <section>
+      {{escola_dados_form.cep.label_tag}} 
+      {{escola_dados_form.cep}}   <br>
+      {{escola_dados_form.cep.error}}
+    </section>
+    <section>
+      {{escola_dados_form.telefone.label_tag}} 
+      {{escola_dados_form.telefone}}   <br>
+      {{escola_dados_form.telefone.error}}
+    </section>
+    <section>
+      {{escola_dados_form.email.label_tag}} 
+      {{escola_dados_form.email}}   <br>
+      {{escola_dados_form.email.error}}
+    </section>
+    <section>
+      {{escola_dados_form.codigo_mec.label_tag}} 
+      {{escola_dados_form.codigo_mec}}   <br>
+      {{escola_dados_form.codigo_mec.error}}
+    </section>
+    <section>
+      {{escola_dados_form.tipo.label_tag}}
+      {{escola_dados_form.tipo}}   <br>
+      {{escola_dados_form.tipo.error}}
+    </section>
+    <section id="brasaoEscolar" class="border p-3 m-3 bg-light-subtle">
+        <section class="mb-3">
+            {{ escola_dados_form.imagem.label_tag }} 
+            {% if object.related_dadosEscola.imagem %}
+                <img src="{{ object.related_dadosEscola.imagem.url }}" alt="Imagem atual" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">                
+            {% else %}
+                <p>Nenhuma imagem disponível.</p>
+            {% endif %}   
+            <section class='p-2 border border-secondary m-2'>   
+                {{ escola_dados_form.imagem }} 
+                {{ escola_dados_form.imagem.error }}
+            </section>
+        </section>
+    </section>
+  </div>
+  <button type="submit" class="btn btn-sm btn-success w-100">Atualizar Gerais <i class="fa-solid fa-people-roof"></i></button>     

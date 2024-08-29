@@ -10,6 +10,11 @@
   label{
     color:black
   }
+  .active{
+    border: 0.1rem solid rgb(196, 102, 34)!important;
+    border-radius: 0.5rem;
+
+  }
  </style>
  {% endblock script_head %}
 <!-- Modal -->
@@ -32,7 +37,13 @@
                   <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"><i class="fa-duotone fa-solid fa-school-flag"></i> {{request.session.escola_nome}}</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Criar <i class="fa-solid fa-plus"></i> </button>
+                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Informações Gerais <i class="fa-solid fa-plus"></i> </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="profile-tab2" data-bs-toggle="tab" data-bs-target="#profile-tab-pane2" type="button" role="tab" aria-controls="profile-tab-pane2" aria-selected="false"> Gestão | Coordenação<i class="fa-solid fa-plus"></i> </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="profile-tab3" data-bs-toggle="tab" data-bs-target="#profile-tab-pane3" type="button" role="tab" aria-controls="profile-tab-pane3" aria-selected="false">Outros<i class="fa-solid fa-plus"></i> </button>
                 </li>
               
                 <li class="nav-item" role="imprimir">
@@ -48,24 +59,38 @@
                         {{form.as_p}}   
                       </div>
                       <button type="submit" class="btn btn-sm btn-success w-100"> {{button}} {{object}} <i class="fa-solid fa-people-roof"></i></button>     
-                    </form>
-                  </div>        
+                    </form>                    
+                  </div> 
+                  {% include "Escola/partials/minhaEscola/dados_impressao.html" %}
                 </div> 
+                <!--Informações Gerais -->
                 <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                  <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post">                        
+                  <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post" enctype="multipart/form-data">                        
                       {% csrf_token %}
-                      <div>
-                        {{escola_dados_form.as_p}}   
-                      </div>
-                      <button type="submit" class="btn btn-sm btn-success w-100">Atualizar Dados <i class="fa-solid fa-people-roof"></i></button>     
+                      {% include "Escola/partials/minhaEscola/form_Informações_Gerais.html" %}                      
                   </form>
                 </div> 
-              </div>              
-            </div>  
+                <!--Identificação | Gestão | Coordenação-->
+                <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane2" role="tabpanel" aria-labelledby="profile-tab2" tabindex="0">
+                  <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post">                        
+                      {% csrf_token %}   
+                      {% include "Escola/partials/minhaEscola/form_IdentificaçãoGestãoCoordenação.html" %}                   
+                  </form>
+                </div> 
+                <!--Outros-->
+                <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane3" role="tabpanel" aria-labelledby="profile-tab3" tabindex="0">
+                  <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post">                        
+                      {% csrf_token %}     
+                      {% include "Escola/partials/minhaEscola/form_Outros.html" %}                 
+                  </form>                 
+                </div> 
+          </div>              
+        </div>  
              
-
+                </div>              
+              </div> 
             </div>                          
-          {% endif %}
+          {% endif %}          
         </div>        
     </div>
     </div>

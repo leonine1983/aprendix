@@ -1,0 +1,53 @@
+<h2>Gestão</h2>
+                      Obs.:
+                        <ol>
+                            <li>Se houver um único vice-diretor para todos os turnos, repita o nome dele em todos os campos.</li>
+                            <li>Se um vice-diretor responde por mais de um turno, repita o nome dele no(s) respectivo(s) turno(s).</li>
+                            <li>Se não houver vice-diretor, deixe os campos em branco.</li>
+                        </ol> 
+                      <div>                        
+                        <section>
+                          {{escola_dados_form.nome_diretor.label_tag}}
+                          {{escola_dados_form.nome_diretor}}   <br>
+                          {{escola_dados_form.nome_diretor.error}}
+                        </section>
+                        <section>
+                          {{escola_dados_form.nome_vice_diretor_matutino.label_tag}}
+                          {{escola_dados_form.nome_vice_diretor_matutino}}   <br>
+                          {{escola_dados_form.nome_vice_diretor_matutino.error}}
+                        </section>
+                        <section>
+                          {{escola_dados_form.nome_vice_diretor_vespertino.label_tag}}
+                          {{escola_dados_form.nome_vice_diretor_vespertino}}   <br>
+                          {{escola_dados_form.nome_vice_diretor_vespertino.error}}
+                        </section>
+                        <section>
+                          {{escola_dados_form.nome_vice_diretor_Noturno.label_tag}}
+                          {{escola_dados_form.nome_vice_diretor_Noturno}}   <br>
+                          {{escola_dados_form.nome_vice_diretor_Noturno.error}}
+                        </section>
+                        <section>
+                          {{escola_dados_form.nome_secretario.label_tag}}
+                          {{escola_dados_form.nome_secretario}}   <br>
+                          {{escola_dados_form.nome_secretario.error}}
+                        </section>
+                      </div>
+                      <h2>Coordenação</h2> Obs.: Se for um único coordenador para todos os turnos. Repita o nome dele em todos os campos.
+                      <div>
+                        <section>
+                          {{escola_dados_form.coordenacao_matutino.label_tag}}
+                          {{escola_dados_form.coordenacao_matutino}}   <br>
+                          {{escola_dados_form.coordenacao_matutino.error}}
+                        </section>
+                        <section>
+                          {{escola_dados_form.coordenacao_vespertino.label_tag}}
+                          {{escola_dados_form.coordenacao_vespertino}}   <br>
+                          {{escola_dados_form.coordenacao_vespertino.error}}
+                        </section>
+                        <section>
+                          {{escola_dados_form.coordenacao_noturno.label_tag}}
+                          {{escola_dados_form.coordenacao_noturno}}   <br>
+                          {{escola_dados_form.coordenacao_noturno.error}}
+                        </section>
+                      </div>
+                      <button type="submit" class="btn btn-sm btn-success w-100">Atualizar Identificação | Gestão | Coordenação <i class="fa-solid fa-people-roof"></i></button>     

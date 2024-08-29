@@ -1,0 +1,169 @@
+{% load static %}
+    <style>
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            color: #1a73e8;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            border-bottom: 2px solid #e1e1e1;
+            padding-bottom: 10px;
+            border-radius: 0.2rem;
+            padding-left: 10px;
+            margin-bottom: 10px;
+            background-color: rgb(229, 241, 241);
+            
+        }
+        .field-label {
+            font-weight: bold;
+        }
+        .four-column {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .column {
+            flex: 1;
+            min-width: 220px; /* Adjusted for four columns */
+        }
+    </style>
+
+            <div class="container">
+              <h1>Detalhes da Escola</h1>
+      
+              <!-- Dados da Escola -->
+              <div class="section">
+                  <h2>Informações Gerais</h2>
+                  <div class="four-column">
+                    <div class="d-flex">
+                        <div>
+                            {% if object.related_dadosEscola.imagem %}
+                                <img src="{{ object.related_dadosEscola.imagem.url }}" alt="Imagem atual" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">                
+                            {% else %}
+                                <p>Nenhuma imagem disponível.</p>
+                            {% endif %}  
+                        </div>
+                        <div class="column">                            
+                            <p><span class="field-label">Nome da Escola:</span> {{ escola.nome_escola }}</p>
+                            <p><span class="field-label">Prefeitura:</span> {{ escola.prefeitura }}</p>
+                            <p><span class="field-label">Data de Criação:</span> {{ escola.created }}</p>
+                            <p><span class="field-label">Autor da Criação:</span> {{ escola.author_created }}</p>
+                            <p><span class="field-label">Data da Última Atualização:</span> {{ escola.atualizado_em }}</p>
+                            <p><span class="field-label">Autor da Atualização:</span> {{ escola.author_atualiza }}</p>
+                        </div>
+                    </div>
+                  </div>
+              </div>
+      
+              <!-- Dados da Escola_admin -->
+              <div class="section">
+                  <h2>Dados Administrativos</h2>
+                  <div class="four-column">
+                      <div class="column">
+                        <p><span class="field-label">Img:</span> <img src=" {{ escola.related_dadosEscola.imagem}} " alt="">gg {{ escola.related_dadosEscola.imagem  }}</p>
+                          <p><span class="field-label">CNPJ:</span> {{ escola.related_dadosEscola.cnpj }}</p>
+                          <p><span class="field-label">Endereço:</span> {{ escola.related_dadosEscola.endereco }}</p>
+                          <p><span class="field-label">Número:</span> {{ escola.related_dadosEscola.numero }}</p>
+                          <p><span class="field-label">Complemento:</span> {{ escola.related_dadosEscola.complemento }}</p>
+                          <p><span class="field-label">Bairro:</span> {{ escola.related_dadosEscola.bairro }}</p>
+                          <p><span class="field-label">Cidade:</span> {{ escola.related_dadosEscola.cidade }}</p>
+                          <p><span class="field-label">Estado:</span> {{ escola.related_dadosEscola.estado }}</p>
+                          <p><span class="field-label">CEP:</span> {{ escola.related_dadosEscola.cep }}</p>
+                      </div>
+                      <div class="column">
+                          <p><span class="field-label">Telefone:</span> {{ escola.related_dadosEscola.telefone }}</p>
+                          <p><span class="field-label">Email:</span> {{ escola.related_dadosEscola.email }}</p>
+                          <p><span class="field-label">Código MEC:</span> {{ escola.related_dadosEscola.codigo_mec }}</p>
+                          <p><span class="field-label">Tipo:</span> {{ escola.related_dadosEscola.tipo }}</p>
+                          <p><span class="field-label">Coordenador Matutino:</span> {{ escola.related_dadosEscola.coordenacao_matutino }}</p>
+                          <p><span class="field-label">Coordenador Vespertino:</span> {{ escola.related_dadosEscola.coordenacao_vespertino }}</p>
+                          <p><span class="field-label">Coordenador Noturno:</span> {{ escola.related_dadosEscola.coordenacao_noturno }}</p>
+                      </div>
+                      <div class="column">
+                          <p><span class="field-label">Data de Fundação:</span> {{ escola.related_dadosEscola.data_fundacao }}</p>
+                          <p><span class="field-label">Turno:</span> {{ escola.related_dadosEscola.turno }}</p>
+                          <p><span class="field-label">Número de Alunos:</span> {{ escola.related_dadosEscola.num_alunos }}</p>
+                          <p><span class="field-label">Número de Funcionários Não Docentes:</span> {{ escola.related_dadosEscola.num_funcionarios_n_docente }}</p>
+                      </div>
+                      <div class="column">
+                          <p><span class="field-label">Número de Funcionários Docentes:</span> {{ escola.related_dadosEscola.num_funcionarios_docente }}</p>
+                          <p><span class="field-label">Número Total de Funcionários:</span> {{ escola.related_dadosEscola.num_funcionarios_total }}</p>
+                          <p><span class="field-label">Número de Turmas:</span> {{ escola.related_dadosEscola.numero_turmas }}</p>
+                      </div>
+                  </div>
+              </div>
+      
+              <!-- Dados de Infraestrutura -->
+              <div class="section">
+                  <h2>Infraestrutura</h2>
+                  <div class="four-column">
+                      <div class="column">
+                          <p><span class="field-label">Quantidade de Salas:</span> {{ escola.related_dadosEscola.qtd_salas }}</p>
+                          <p><span class="field-label">Quantidade de Bibliotecas:</span> {{ escola.related_dadosEscola.qtd_bibliotecas }}</p>
+                      </div>
+                      <div class="column">
+                          <p><span class="field-label">Quantidade de Laboratórios:</span> {{ escola.related_dadosEscola.qtd_laboratorios }}</p>
+                          <p><span class="field-label">Quantidade de Quadras:</span> {{ escola.related_dadosEscola.qtd_quadras }}</p>
+                      </div>
+                      <div class="column">
+                          <p><span class="field-label">Quantidade de Auditórios:</span> {{ escola.related_dadosEscola.qtd_auditórios }}</p>
+                      </div>
+                      <div class="column">
+                          <p><span class="field-label">Quantidade de Refeitórios:</span> {{ escola.related_dadosEscola.qtd_refeitórios }}</p>
+                          <p><span class="field-label">Quantidade de Áreas Verdes:</span> {{ escola.related_dadosEscola.qtd_areas_verdes }}</p>
+                      </div>
+                  </div>
+              </div>
+      
+              <!-- Dados de Curso -->
+              <div class="section">
+                  <h2>Dados de Curso</h2>
+                  <div class="four-column">
+                      <div class="column">
+                          <p><span class="field-label">Educação Infantil:</span> {{ escola.related_dadosEscola.possui_educacao_infantil }}</p>
+                      </div>
+                      <div class="column">
+                          <p><span class="field-label">Ensino Fundamental:</span> {{ escola.related_dadosEscola.possui_ensino_fundamental }}</p>
+                      </div>
+                      <div class="column">
+                          <p><span class="field-label">Ensino Médio:</span> {{ escola.related_dadosEscola.possui_ensino_medio }}</p>
+                      </div>
+                      <div class="column">
+                          <p><span class="field-label">Ensino Técnico:</span> {{ escola.related_dadosEscola.possui_ensino_tecnico }}</p>
+                      </div>
+                  </div>
+              </div>
+      
+              <!-- Dados de Convênios e Parcerias -->
+              <div class="section">
+                  <h2>Convênios e Parcerias</h2>
+                  <p><span class="field-label">Convênios:</span> {{ escola.related_dadosEscola.convenios }}</p>
+              </div>
+      
+              <!-- Dados de Segurança e Acessibilidade -->
+              <div class="section">
+                  <h2>Segurança e Acessibilidade</h2>
+                  <div class="four-column">
+                    <div class="column">
+                      <p><span class="field-label">Acessibilidade:</span> {{ escola.related_dadosEscola.possui_acessibilidade }}</p>
+                      <p><span class="field-label">Sistema de Segurança:</span> {{ escola.related_dadosEscola.possui_sistema_seguranca }}</p>
+                    </div>
+                  </div>
+              </div>
+      
+              <!-- Observações -->               
+              <div class="section">
+                  <h2>Observações</h2>
+                  <p>{{ escola.related_dadosEscola.observacoes }}</p>
+              </div>
+          </div>
