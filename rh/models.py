@@ -209,6 +209,12 @@ class Contrato(models.Model):
     data_fim_contrato = models.DateField(null=True)
     tempo_meses = models.IntegerField( null=True)
 
+    #Segurança
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
+    author_created = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da criação')
+    atualizado_em = models.DateTimeField(auto_now=True, verbose_name='Data da Última Atualização')
+    author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
+
     def calcula_data_fim_contrato(self):
         if self.tempo_meses and self.data_inicio_contrato:
             # Se os campos tempo_mese e data_inicio_contrato for adicionado pelo usuario
@@ -253,6 +259,12 @@ class Decreto(models.Model):
     profissao = models.ForeignKey(Profissao, null=False, verbose_name="Atividade a ser realizada pelo profissional", on_delete=models.CASCADE)
     ano_decreto = models.ForeignKey(Ano, on_delete=models.CASCADE, related_name='Ano_decreto', verbose_name="Ano do")   
 
+    #Segurança
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
+    author_created = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da criação')
+    atualizado_em = models.DateTimeField(auto_now=True, verbose_name='Data da Última Atualização')
+    author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
+
     def __str__(self):
         return self.profissional.nome    
 
@@ -283,8 +295,6 @@ class Escola_admin(models.Model):
     nome_vice_diretor_vespertino = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_Vicediretor_vespertino",verbose_name='Vice Diretor Vespertino', on_delete=models.CASCADE, blank=True, null=True)
     nome_vice_diretor_Noturno = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_Vicediretor_noturno",verbose_name='Vice Diretor Noturno', on_delete=models.CASCADE, blank=True, null=True)
 
-
-
     # Dados de Coordenação por Turno
     coordenacao_matutino = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_coordMat", on_delete=models.CASCADE, blank=True, null=True)
     coordenacao_vespertino = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_coordVesp", on_delete=models.CASCADE, blank=True, null=True)
@@ -298,7 +308,6 @@ class Escola_admin(models.Model):
     num_funcionarios_docente = models.PositiveIntegerField(blank=True, null=True)
     num_funcionarios_total = models.PositiveIntegerField(blank=True, null=True)
     numero_turmas = models.PositiveIntegerField(blank=True, null=True)
-    
     
     # Dados da Infraestrutura
     qtd_salas = models.PositiveIntegerField(blank=True, null=True)
@@ -320,13 +329,16 @@ class Escola_admin(models.Model):
         
     # Dados de Segurança e Acessibilidade
     possui_acessibilidade = models.BooleanField(default=False, blank=True, null=True)
-    possui_sistema_seguranca = models.BooleanField(default=False, blank=True, null=True)
-    
-    # Dados Pedagógicos
-    
+    possui_sistema_seguranca = models.BooleanField(default=False, blank=True, null=True)    
     
     # Outros Campos
     observacoes = models.TextField(blank=True, null=True)
+
+    #Segurança
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
+    author_created = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da criação')
+    atualizado_em = models.DateTimeField(auto_now=True, verbose_name='Data da Última Atualização')
+    author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
     
     def __str__(self):
         return self.nome.nome_escola
@@ -337,6 +349,12 @@ class Encaminhamentos(models.Model):
     encaminhamento = models.ForeignKey(Contrato, related_name='encaminhamento_escolar', verbose_name='Profissional a ser encaminhado', on_delete=models.CASCADE)
     destino = models.ForeignKey(Escola, related_name='local_encaminhamento', null=False, verbose_name='Local onde o profissional será encaminhado', on_delete=models.CASCADE)
     profissao = models.ForeignKey(Profissao, null=False, verbose_name="Atividade a ser realizada pelo profissional", on_delete=models.CASCADE)
+
+    #Segurança
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
+    author_created = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da criação')
+    atualizado_em = models.DateTimeField(auto_now=True, verbose_name='Data da Última Atualização')
+    author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
 
     def __str__(self):
         return self.encaminhamento.contratado.nome  
@@ -366,6 +384,12 @@ class Frequencia_mes(models.Model):
     mes = models.CharField(max_length=30, null=False, verbose_name='Mês')
     local = models.ForeignKey(Escola, related_name='local_frequencia', null=True, verbose_name='Local onde o profissional será encaminhado', on_delete=models.CASCADE)
     profissao = models.ForeignKey(Profissao, null=True,related_name='frequencia_profissional', verbose_name="Frequência do profissional", on_delete=models.CASCADE)
+
+    #Segurança
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
+    author_created = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da criação')
+    atualizado_em = models.DateTimeField(auto_now=True, verbose_name='Data da Última Atualização')
+    author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
 
     def __str__(self):
         return self.mes   
