@@ -29,13 +29,7 @@ class UpdateEscola(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
                 form.instance.author_created = f'{self.request.user.first_name} {self.request.user.last_name} | No Group'      
         
         # Salva o objeto e armazena o ID
-        response = super().form_valid(form)
-        id = self.object.id
-        
-        # Cria um objeto Escola_admin com base no objeto recém-criado
-        Escola_admin.objects.create(
-            nome=Escola.objects.get(pk=id)
-        )        
+        response = super().form_valid(form)      
         return response
 
 
