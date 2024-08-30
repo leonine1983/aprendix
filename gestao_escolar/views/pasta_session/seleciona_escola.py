@@ -16,6 +16,7 @@ def Seleciona_escola(request, pk):
     # Armazena o Id e o nome da escola na sessão
     request.session['escola_id'] = escola.id
     request.session['escola_nome'] = escola.nome_escola
+    request.session['escola_nome_query'] = escola
     request.session['prefeitura'] = prefeitura
     request.session['nomeclatura'] = nomeclatura
     # Redireciona a pagina
