@@ -482,9 +482,9 @@ def post_migrate_setup(sender, **kwargs):
     if not Escola.objects.exists():
         prefeitura = Prefeitura.objects.all().first()
         escolas = [
-            (prefeitura, "Escola Municipal Geralda Maria", "Endereço 01", "(71) 9 86881943"),
-            (prefeitura, "Colégio Municipal de Vera Cruz", "Endereço 02", "(71) 9 86881943")
+            (prefeitura, "Escola Municipal Geralda Maria"),
+            (prefeitura, "Colégio Municipal de Vera Cruz")
         ]
         Escola.objects.bulk_create(
-            [Escola(prefeitura=p, nome_escola=n, endereco_escola=e, telefone_escola=t) for p, n, e, t in escolas]
+            [Escola(prefeitura=p, nome_escola=n) for p, n in escolas]
         )
