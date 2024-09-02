@@ -184,8 +184,6 @@ class Escola(models.Model):
 # Vinculo empregatício --------------------------------------------------------------------------
 choice_vinculo = {
     ("contrato" , "Contrato"),
-    ("decreto" , "Decreto"),
-    ("efetivo" , "efetivo"),
     ("estagio" , "estagio"),
 }
 
@@ -478,6 +476,7 @@ def post_migrate_setup(sender, **kwargs):
             [Sexo(nome=sexo) for sexo in ['Masculino', 'Feminino']]
         )
 
+
     # Cria registros de Escola se não existirem
     if not Escola.objects.exists():
         prefeitura = Prefeitura.objects.all().first()
@@ -485,6 +484,11 @@ def post_migrate_setup(sender, **kwargs):
             (prefeitura, "Escola Municipal Geralda Maria"),
             (prefeitura, "Colégio Municipal de Vera Cruz")
         ]
-        Escola.objects.bulk_create(
-            [Escola(prefeitura=p, nome_escola=n) for p, n in escolas]
+        escolas_criadas = Escola.objects.bulk_create(
+            [Escola(prefeitura=p, nome_escola=n) for p, n in escolas]            
         )
+
+        # Cria os objetos Escola_admin correspondentes
+        escola_admins = [Escola_admin(nome=escola) for escola  in escolas_criadas]
+        Escola_admin.objects.bulk_create(escola_admins)
+       

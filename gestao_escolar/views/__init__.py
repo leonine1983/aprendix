@@ -14,4 +14,6 @@ from .impressos import *
 from .bairro import *
 from .cidade import *
 from .minhaEscola import *
+from .decretos import *
+from .pessoas import *
 #from .ferramentas import *

@@ -124,6 +124,7 @@
     {% if  conteudo_page == 'encaminha_para_escola_deleteORupdate' %}
         {% include 'Escola/partials/partials_professores/encaminhamentos/update_or_delete.html' %}
     {% endif %} 
+
     <!-- Professores -->
     {% if  conteudo_page == 'Criar Disciplina' %}
         {% include 'Escola/partials/seleciona_disciplinas.html' %}
@@ -137,6 +138,17 @@
     {% if  conteudo_page == 'Turmas Escolha' %}
         {% include 'Escola/partials/seleciona_Turma_retorno_aluno.html' %}
     {% endif %} 
+    
+    <!--Pessoas para uso de decreto e outros-->
+    {% if  conteudo_page ==  'Pessoa Create' %}
+        {% include 'Escola/partials/pessoas/pessoa_create.html' %}
+    {% endif %}
+   
+    <!--Decreto-->
+    {% if  conteudo_page ==  'Decreto Create'  %}
+        {% include 'Escola/partials/decreto/decreto_create.html' %}
+    {% endif %}
+   
     <!--Grades-->
     {% if  conteudo_page == 'Todas as turmas-grade' %}
         {% include 'Escola/partials/grades/seleciona_grade_turma.html' %}
@@ -145,6 +157,7 @@
         {% include 'Escola/partials/grades/update_or_delete.html' %}
     {% endif %}
     <!--Grades End-->
+
     {% if  conteudo_page == 'cargos/funcionarios' %}
         {% include 'Escola/partials/selecionar_cargos_funcionarios.html' %}
     {% endif %}    

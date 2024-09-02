@@ -1,0 +1,88 @@
+ {% load static %}
+ {% block script_head %}
+ <style>
+  .grid{
+    display: grid;
+    grid-template-columns: 1fr 20rem;
+    gap:1rem;
+    margin-bottom:1rem
+  }
+  label{
+    color:black
+  }
+  .active{
+    border: 0.1rem solid rgb(243, 221, 206)!important;
+    border-radius: 0.5rem;
+
+  }
+ </style>
+ {% endblock script_head %}
+<!-- Modal -->
+<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    
+    <div class="modal-dialog w-100">
+    <div class="modal-content bg-secondary-subtle win11-window">
+        <div class="modal-header mb-5">
+          <h4 class="modal-title  fs-6"><span class="text-capitalize ml-5 fs-3"><i class="fs-4 fa-solid fa-people-roof"></i> {{titulo_page}}</span></h4>        
+          <button type="button" class="close btn btn-sm btn-primary" data-dismiss="modal"><i class="fa-solid fa-xmark"></i></button>        
+        </div>  
+        
+        <!--Imagem de fundo Brasao-->
+        {% if  request.session.escola_nome_query.related_dadosEscola.imagem %}
+          <img src="{{ request.session.escola_nome_query.related_dadosEscola.imagem.url }}" alt="Imagem atual" style='position:absolute; z-index:-0,1; width:20rem; top:4rem; left:2rem'  class="img-thumbnail" >                              
+        {% else %}
+          <img src="{% static 'schooll.png' %}" style='position:absolute; z-index:-0,1; width:20rem; top:4rem; left:2rem'  alt="">
+        {% endif %}
+
+        <div class="modal-body shadow-sm bg-light-subtle  w-75 ">
+          <div class="modal_windows_title mb-3 p-2 bg-p-4 ">
+            <i class="fa-regular fa-face-grin-squint"></i> <span class="text-capitalize fs-7"> Olá, seja muito bem-vindo {% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}{{request.user}}{% endif %}!!</span>  
+          </div>
+          {% if not update %}
+            <ul class="nav nav-tabs" id="myTab" role="tablist">              
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"><i class="fa-duotone fa-solid fa-school-flag"></i> {{request.session.escola_nome}}</button>
+                </li>             
+            </ul>
+            <div class="tab-content" id="myTabContent">
+              <div class="tab-pane fade show active p-3" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                <h2>Gerenciamento de Decretos Administrativos</h2>
+                <p class="text-secondary p-3">
+                  Este formulário serve para criar e gerenciar decretos administrativos.
+                   Ele permite registrar informações importantes, como quem é o profissional envolvido, 
+                   para onde ele será encaminhado, qual será sua atividade e o ano em que o decreto foi emitido.
+                </p>
+                <div class='p-2 fs-6 border-danger-subtle border-right d-flex text-light bg-p-3' >                  
+                  <form class='m-3 ' action="" method="post">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                      <section class="row row-cols-2">
+                      {% for field in form %}                   
+                        <section >
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            <section class="d-flex">
+                              {{ field }}
+                              <a href="{% url 'Gestao_Escolar:pessoas-create' %}" class="link ml-2 col-3 btn btn-sm btn-success h-75 mt-3">Novo <i class="fa-solid fa-plus"></i></a>
+                              {{ field.errors }}
+                              </section>
+                        </section>
+                    {% endfor %}  
+                    </section>                 
+                    <button type="submit" class="btn btn-sm btn-success w-100 mt-2"> {{button}} {{object}} <i class="fa-solid fa-people-roof"></i></button>     
+                  </form>                    
+                </div> 
+              </div>               
+            </div>              
+        </div>  
+             
+                </div>              
+              </div> 
+            </div>                          
+          {% endif %}          
+        </div>        
+    </div>
+    </div>
+</div>
+{% include "Escola/partials/utils/dragDrop.html" %}
+
+

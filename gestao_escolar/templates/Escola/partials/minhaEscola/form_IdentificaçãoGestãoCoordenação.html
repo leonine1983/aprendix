@@ -8,46 +8,87 @@
                       <div>                        
                         <section>
                           {{escola_dados_form.nome_diretor.label_tag}}
-                          {{escola_dados_form.nome_diretor}}   <br>
-                          {{escola_dados_form.nome_diretor.error}}
+                          <section  class='d-flex'>
+                            <section>
+                              {{escola_dados_form.nome_diretor}}   <br>
+                              {{escola_dados_form.nome_diretor.error}}
+                            </section>
+                            <a href="{% url 'Gestao_Escolar:decreto-create' %} " class="btn btn-success mt-3 ml-2 btn-sm h-75"> Decreto <i class="fa-solid fa-plus"></i></a> 
+                          </section>
                         </section>
                         <section>
                           {{escola_dados_form.nome_vice_diretor_matutino.label_tag}}
-                          {{escola_dados_form.nome_vice_diretor_matutino}}   <br>
-                          {{escola_dados_form.nome_vice_diretor_matutino.error}}
+                          <section  class='d-flex'>
+                            <section>
+                              {{escola_dados_form.nome_vice_diretor_matutino}}   <br>
+                              {{escola_dados_form.nome_vice_diretor_matutino.error}}
+                            </section>
+                            <a href="{% url 'Gestao_Escolar:decreto-create' %} " class="btn btn-success mt-3 ml-2 btn-sm h-75"> Decreto <i class="fa-solid fa-plus"></i></a> 
+                          </section>
                         </section>
-                        <section>
-                          {{escola_dados_form.nome_vice_diretor_vespertino.label_tag}}
-                          {{escola_dados_form.nome_vice_diretor_vespertino}}   <br>
-                          {{escola_dados_form.nome_vice_diretor_vespertino.error}}
+                        <section>                         
+                          {{escola_dados_form.nome_vice_diretor_vespertino.label_tag}}<br>
+                          <section  class='d-flex'>
+                            <section>
+                              {{escola_dados_form.nome_vice_diretor_vespertino}}<br>
+                              {{escola_dados_form.nome_vice_diretor_vespertino.error}}
+                            </section>
+                            <a href="{% url 'Gestao_Escolar:decreto-create' %} " class="btn btn-success mt-3 ml-2 btn-sm h-75"> Decreto <i class="fa-solid fa-plus"></i></a> 
+                          </section>                          
                         </section>
                         <section>
                           {{escola_dados_form.nome_vice_diretor_Noturno.label_tag}}
-                          {{escola_dados_form.nome_vice_diretor_Noturno}}   <br>
-                          {{escola_dados_form.nome_vice_diretor_Noturno.error}}
+                          <section  class='d-flex'>
+                            <section>
+                              {{escola_dados_form.nome_vice_diretor_Noturno}}   <br>
+                              {{escola_dados_form.nome_vice_diretor_Noturno.error}}
+                            </section>
+                            <a href="{% url 'Gestao_Escolar:decreto-create' %} " class="btn btn-success mt-3 ml-2 btn-sm h-75"> Decreto <i class="fa-solid fa-plus"></i></a> 
+                          </section>     
                         </section>
                         <section>
                           {{escola_dados_form.nome_secretario.label_tag}}
-                          {{escola_dados_form.nome_secretario}}   <br>
-                          {{escola_dados_form.nome_secretario.error}}
+                          <section  class='d-flex'>
+                            <section>
+                              {{escola_dados_form.nome_secretario}}   <br>
+                              {{escola_dados_form.nome_secretario.error}}
+                            </section>
+                            <a href="{% url 'Gestao_Escolar:decreto-create' %} " class="btn btn-success mt-3 ml-2 btn-sm h-75"> Decreto <i class="fa-solid fa-plus"></i></a> 
+                          </section> 
                         </section>
                       </div>
                       <h2>Coordenação</h2> Obs.: Se for um único coordenador para todos os turnos. Repita o nome dele em todos os campos.
                       <div>
                         <section>
                           {{escola_dados_form.coordenacao_matutino.label_tag}}
-                          {{escola_dados_form.coordenacao_matutino}}   <br>
-                          {{escola_dados_form.coordenacao_matutino.error}}
+                          <section  class='d-flex'>
+                            <section>
+                              {{escola_dados_form.coordenacao_matutino}}   <br>
+                              {{escola_dados_form.coordenacao_matutino.error}}
+                            </section>
+                            <a href="{% url 'Gestao_Escolar:decreto-create' %} " class="btn btn-success mt-3 ml-2 btn-sm h-75"> Decreto <i class="fa-solid fa-plus"></i></a> 
+                          </section> 
                         </section>
                         <section>
                           {{escola_dados_form.coordenacao_vespertino.label_tag}}
-                          {{escola_dados_form.coordenacao_vespertino}}   <br>
-                          {{escola_dados_form.coordenacao_vespertino.error}}
+                          {{escola_dados_form.coordenacao_matutino.label_tag}}
+                          <section  class='d-flex'>
+                            <section>
+                              {{escola_dados_form.coordenacao_vespertino}}   <br>
+                              {{escola_dados_form.coordenacao_vespertino.error}}
+                            </section>
+                            <a href="{% url 'Gestao_Escolar:decreto-create' %} " class="btn btn-success mt-3 ml-2 btn-sm h-75"> Decreto <i class="fa-solid fa-plus"></i></a> 
+                          </section> 
                         </section>
                         <section>
                           {{escola_dados_form.coordenacao_noturno.label_tag}}
-                          {{escola_dados_form.coordenacao_noturno}}   <br>
-                          {{escola_dados_form.coordenacao_noturno.error}}
+                          <section  class='d-flex'>
+                            <section>
+                              {{escola_dados_form.coordenacao_noturno}}   <br>
+                              {{escola_dados_form.coordenacao_noturno.error}}
+                            </section>
+                            <a href="{% url 'Gestao_Escolar:decreto-create' %} " class="btn btn-success mt-3 ml-2 btn-sm h-75"> Decreto <i class="fa-solid fa-plus"></i></a> 
+                          </section> 
                         </section>
                       </div>
                       <button type="submit" class="btn btn-sm btn-success w-100">Atualizar Identificação | Gestão | Coordenação <i class="fa-solid fa-people-roof"></i></button>     

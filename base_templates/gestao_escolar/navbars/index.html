@@ -52,14 +52,11 @@
   transition: background-color 0.2s ease, transform 0.2s ease;
   margin-left: 1rem;
   margin-top: 0.5rem;
-}
-  
-
+} 
 
 .dropdown-item:last-child {
   border-bottom: none; /* Remove a borda inferior do último item */
 }
-
 .fs-6 {
   font-size: 0.9rem !important;
 }
@@ -104,6 +101,19 @@
             <li><a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Bairros</a></li>
           </ul>
         </li>
+        <!-- Cadastros -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-sharp-duotone fa-solid fa-cash-register"></i><br> Contratos e Decretos
+          </a>
+          <ul class="dropdown-menu " style="margin-top: -1rem;">
+            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:pessoas-create" %}'>Pessoas</a></li>
+            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:decreto-create" %}'>Decretos</a></li>
+            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Contratos </a></li>
+          </ul>
+        </li>
+
+        
         <!-- Apoio/Suporte -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

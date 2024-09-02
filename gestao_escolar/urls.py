@@ -71,7 +71,7 @@ urlpatterns = [
     path('gestao_escolar/Grades/create/<int:pk>', Create_Grades.as_view(), name="Grades_create"),   
     path('gestao_escolar/Grades/update/<int:pk>', Update_Grade.as_view(), name="Grades_update"),     
     path('gestao_escolar/Grades/delete/<int:pk>', Delete_Grade.as_view(), name="Grades_delete"),  
-    path('gestao_escolar/Matricula/remaneja_aluno/Turma/<int:pk>', Update_Matricula_remanejamento.as_view(), name="GE_Escola_Remaneja_update"), 
+    path('gestao_escolar/Matricula/remaneja_aluno/Turma/<int:pk>', Update_Matricula_remanejamento.as_view(), name="GE_Escola_Remaneja_update"),    
 
     # Professores
     path('gestao_escolar/Professores/Pessoas', Create_Pessoa_Professores.as_view(), name="Professores_Pessoa_create"),   
@@ -81,6 +81,20 @@ urlpatterns = [
     path('gestao_escolar/Professores/', Create_Professores.as_view(), name="GE_Professores_create"),    
     path('gestao_escolar/Professores/encaminhamento/<int:pk>', EncaminhaEscola.as_view(), name="encaminha_escola"),   
     path('gestao_escolar/Professores/encaminhamento/apagar/<int:pk>', EncaminhaEscolaDelete.as_view(), name="encaminha_escolaDelete"),   
+
+    # pessoas (para uso de decreto e outros) ----------------------------------------------
+    #path('pessoas/', PessoasListView.as_view(), name='pessoas-list'),
+    #path('pessoas/<int:pk>/', PessoasDetailView.as_view(), name='pessoas-detail'),
+    path('pessoas/criar/', PessoasCreateView.as_view(), name='pessoas-create'),
+    #path('pessoas/<int:pk>/editar/', PessoasUpdateView.as_view(), name='pessoas-update'),
+    #path('pessoas/<int:pk>/excluir/', PessoasDeleteView.as_view(), name='pessoas-delete'),
+
+    # Decretos
+    #path('decretos/', DecretoListView.as_view(), name='decreto-list'),
+    #path('decretos/<int:pk>/', DecretoDetailView.as_view(), name='decreto-detail'),
+    path('decretos/criar/', DecretoCreateView.as_view(), name='decreto-create'),
+    #path('decretos/<int:pk>/editar/', DecretoUpdateView.as_view(), name='decreto-update'),
+    #path('decretos/<int:pk>/excluir/', DecretoDeleteView.as_view(), name='decreto-delete'),
     
 
     # Definir o cargo que o profissional irá exercer na escola
