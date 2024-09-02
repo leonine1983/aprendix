@@ -1,9 +1,11 @@
 from django.db import models
 from datetime import timedelta, date, datetime
+from django.utils import timezone
 from django.dispatch import receiver
 from django.db.models.signals import post_migrate
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
+
 
 
 class Config_plataforma(models.Model):
@@ -56,9 +58,7 @@ class Ano(models.Model):
         if not Ano.objects.exists():
             try:
                 Ano.objects.create(
-                    ano=2024,
-                    data_inicio='2024-01-01',  
-                    data_fim='2024-12-31',    
+                    ano=2024 
                 )
             except Ano.DoesNotExist:
                 print("Ano com ID 1 não encontrado.")
@@ -262,7 +262,7 @@ class Decreto(models.Model):
     #Segurança
     created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
     author_created = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da criação')
-    atualizado_em = models.DateTimeField(auto_now=True, verbose_name='Data da Última Atualização')
+    atualizado_em = models.DateTimeField(auto_now=True,  verbose_name='Data da Última Atualização')
     author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
 
     def __str__(self):
