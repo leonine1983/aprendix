@@ -14,15 +14,13 @@ class PessoasDetailView(LoginRequiredMixin, DetailView):
     model = Pessoas
     template_name = 'Escola/inicio.html'
     context_object_name = 'pessoa'
-    login_url = '/login/'
+    
 
 class PessoasCreateView(LoginRequiredMixin, CreateView):
     model = Pessoas
     template_name = 'Escola/inicio.html'
-    success_url =  'Escola/inicio.html'
     fields = ['nome', 'sobrenome', 'sexo', 'data_nascimento',  'nome_profissao', 'cpf', 'rg', 'rua', 'complemento', 'numero_casa', 'bairro', 'cidade', 'cep']
-    login_url = '/login/'
-
+    
     def form_valid(self, form):
         messages.success(self.request, 'Pessoa criada com sucesso!')
         return super().form_valid(form)
@@ -31,14 +29,16 @@ class PessoasCreateView(LoginRequiredMixin, CreateView):
         messages.error(self.request, 'Erro ao criar a pessoa. Verifique os dados e tente novamente.')
         return super().form_invalid(form)
     
+    def get_success_url(self):
+        messages.success(self.request, 'Pessoa criada com sucesso!')
+        return reverse_lazy('Gestao_Escolar:pessoas-create')
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        context['titulo_page'] = 'Atualização de Dados Básicos da Escola'
-        context['sub_titulo_page'] = "Use os campos abaixo para atualizar as informações básicas da Escola."
         context['btn_bg'] = "btn-success"
         context['button'] = "Atualizar nome da escola"
         context['conteudo_page'] = 'Pessoa Create'
+        context['pessoas'] = Pessoas.objects.all()
         # Preenche o formulário com a instância de Escola_admin
         context['page_ajuda'] = "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional."
         return context 

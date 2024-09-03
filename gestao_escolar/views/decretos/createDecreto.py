@@ -19,11 +19,12 @@ class DecretoDetailView(LoginRequiredMixin, DetailView):
 class DecretoCreateView(LoginRequiredMixin, CreateView):
     model = Decreto
     template_name = 'Escola/inicio.html'
-    fields = ['profissional', 'destino', 'profissao', 'ano_decreto', 'author_created']
-    login_url = '/login/'  # URL para redirecionar se o usuário não estiver autenticado
+    fields = ['profissional', 'destino', 'profissao', 'ano_decreto']
+    success_url = reverse_lazy('Gestao_Escolar:decreto-create')
 
     def form_valid(self, form):
         messages.success(self.request, 'Decreto criado com sucesso!')
+        form.instance.author_created = f'{self.request.user.first_name} {self.request.user.last_name}'
         return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
@@ -38,24 +39,3 @@ class DecretoCreateView(LoginRequiredMixin, CreateView):
         context['page_ajuda'] = "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional."
 
         return context        
-        
-
-class DecretoUpdateView(LoginRequiredMixin, UpdateView):
-    model = Decreto
-    template_name = 'decreto_form.html'
-    fields = ['profissional', 'destino', 'profissao', 'ano_decreto', 'author_atualiza']
-    login_url = '/login/'  # URL para redirecionar se o usuário não estiver autenticado
-
-    def form_valid(self, form):
-        messages.success(self.request, 'Decreto atualizado com sucesso!')
-        return super().form_valid(form)
-
-class DecretoDeleteView(LoginRequiredMixin, DeleteView):
-    model = Decreto
-    template_name = 'decreto_confirm_delete.html'
-    success_url = reverse_lazy('decreto-list')
-    login_url = '/login/'  # URL para redirecionar se o usuário não estiver autenticado
-
-    def delete(self, request, *args, **kwargs):
-        messages.success(self.request, 'Decreto excluído com sucesso!')
-        return super().delete(request, *args, **kwargs)

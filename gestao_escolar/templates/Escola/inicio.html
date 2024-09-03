@@ -8,6 +8,9 @@
     <!-- Importação da família de fontes Nunito -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
     <link href="{% static 'global/css/geral_styler.css' %}" rel="stylesheet">
+    <link href="{% static 'global/css/modals.css' %}" rel="stylesheet">
+    <link href="{% static 'global/css/table_win11.css' %}" rel="stylesheet">
+
     <style>
         .anime-h{height: 5rem !important;}
     </style>
@@ -148,7 +151,10 @@
     {% if  conteudo_page ==  'Decreto Create'  %}
         {% include 'Escola/partials/decreto/decreto_create.html' %}
     {% endif %}
-   
+    {% if  conteudo_page ==  'Decreto Update or Delete' %}
+        {% include 'Escola/partials/decreto/decreto_create.html' %}
+    {% endif %}    
+    
     <!--Grades-->
     {% if  conteudo_page == 'Todas as turmas-grade' %}
         {% include 'Escola/partials/grades/seleciona_grade_turma.html' %}

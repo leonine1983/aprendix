@@ -1,5 +1,19 @@
-<h3 class='p-3 border-bottom'><i class="fa-duotone fa-person-sign"></i> Cadastrar nova pessoa </h3><hr>           
+<div class='m-2'>
+    <h2>Formulário de Cadastro de Pessoas para o Sistema Aprendix</h2>
+    <p>
+        Este formulário é projetado para registrar informações detalhadas sobre indivíduos, 
+        facilitando a contratação de profissionais e o gerenciamento de decretos. Com ele, 
+        o sistema pode manter um banco de dados atualizado e organizado para suportar processos 
+        administrativos e operacionais.
+    </p>
+    <p class='m-2 fs-5 text-info'>
+        <i class="fa-solid fa-circle-exclamation text-danger"></i> Obs.: Cadastrar uma pessoa não implica que ela seja um profissional da instituição. 
+        Para isso, é necessário que a pessoa passe pelos processos de contratação e encaminhamento ou obtenha um decreto correspondente.
+    </p>
+</div>
+    <hr>           
 <form method="post" class='' >  
+    
     {{ form.non_field_errors }}
     {% csrf_token %}
     <div>

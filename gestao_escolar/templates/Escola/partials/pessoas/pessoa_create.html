@@ -13,14 +13,13 @@
   .active{
     border: 0.1rem solid rgb(243, 221, 206)!important;
     border-radius: 0.5rem;
-
   }
  </style>
  {% endblock script_head %}
 <!-- Modal -->
 <div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     
-    <div class="modal-dialog w-100">
+    <div class="modal-dialog"  >
     <div class="modal-content bg-secondary-subtle win11-window">
         <div class="modal-header mb-5">
           <h4 class="modal-title  fs-6"><span class="text-capitalize ml-5 fs-3"><i class="fs-4 fa-solid fa-people-roof"></i> {{titulo_page}}</span></h4>        
@@ -42,58 +41,22 @@
             <ul class="nav nav-tabs" id="myTab" role="tablist">              
                 <li class="nav-item" role="presentation">
                   <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"><i class="fa-light fa-people"></i> Cadastro de Pessoas</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Informações Gerais <i class="fa-solid fa-plus"></i> </button>
-                </li>                
+                </li>                             
             </ul>
               <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active p-3" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-                  <h2>
-                    Formulário de Cadastro de Pessoas para o Sistema Aprendix</h2>
-                  <p>
-                    Formulário de Cadastro de Pessoas para o Sistema Aprendix.
-                     Este formulário é projetado para registrar informações detalhadas sobre indivíduos, 
-                     facilitando a contratação de profissionais e o gerenciamento de decretos. Com ele, 
-                     o sistema pode manter um banco de dados atualizado e organizado para suportar processos 
-                     administrativos e operacionais.
-                  </p>
-                  <div class='p-2 fs-6 border-danger-subtle border-right  text-light bg-p-3' >
-                    <form class='m-3 p-3 ' action="" method="post">
-                      {% csrf_token %}
-                      <div>
-                        {{ form.non_field_errors }}
-                        {% for field in form %}                                                      
-                        <section class="links">
-                          {{field.label_tag}}   
-                          <section class='d-flex'>
-                            {{field}}
-                          </section>
-                        </section>
-                        {% endfor %}
-                      </div>
-                      <button type="submit" class="btn btn-sm btn-success w-100"> <i class="fa-light fa-people"></i> Cadastro de Pessoas</button>     
-                    </form>                    
-                  </div> 
-                </div> 
-                <!--Informações Gerais -->
-                <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                  <video src="{% static 'videos/saturado.mp4.mov' %}" autoplay></video>
-                </div> 
-               
-                <!--Outros-->
-                <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane3" role="tabpanel" aria-labelledby="profile-tab3" tabindex="0">
-                 
-          </div>              
-        </div>  
-             
-                </div>              
-              </div> 
-            </div>                          
-          {% endif %}          
-        </div>        
+                  <div class='m-2'>
+                    {% include 'Escola/partials/pessoas/pessoas_form.html' %}                  
+                  </div>
+                </div>            
+              </div>               
+            </div>              
+          </div> 
+        </div>                          
+        {% endif %}          
+      </div>        
     </div>
-    </div>
+  </div>
 </div>
 {% include "Escola/partials/utils/dragDrop.html" %}
 

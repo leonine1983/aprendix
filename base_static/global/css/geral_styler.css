@@ -99,28 +99,8 @@ input[type=checkbox]{
 .bg-danger-subtle{
     background-color: #F4998d!important;
 }
-.modal-content{        
-    width: 80vw!important;
-    min-height:93vh!important  
-}
-.modal-dialog{ 
-    margin-left:10%    
-}
-.modal-body{
-    min-height: 10rem!important;
-    width: 90%;
-    margin: 2% auto;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
-    border-bottom-left-radius: 1em;
-    border-bottom-right-radius: 1em;
-} 
-.modal_windows_title{
-    margin:-2rem -1rem -1rem -1rem;
-    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px; 
-    background:#009BFF;
-    color:#fff;
-    border-top-left-radius: 1em;
-border-top-right-radius: 1em;}
+
+
 .bg-neutral_light{background-color: rgb(183,200,185);}
 .bg-pale_green{background-color: rgb(212,236,216);}
 tr { vertical-align: middle !important; text-align: center !important;}
@@ -168,52 +148,6 @@ cursor: pointer;
 background-color: #e81123;
 }
 
-/* Estilo geral da tabela */
-.win11-table {
-width: 100%;
-border-collapse: collapse;
-font-size: 18px;
-box-shadow: rgba(0, 0, 0, 0.18) 0px 2px 4px!important;
-border-radius: 8px;
-overflow: hidden;
-}
-.win11-table h1 {
-text-align: center;
-color: #333;
-font-size: 24px;
-margin-bottom: 1px;
-}
-.win11-table thead {
-background-color: #0078d4!important;
-color: #493b3b;
-}
-.win11-table thead th {
-padding: 12px 15px;
-text-align: center;
-}
-.win11-table tbody tr {
-border-bottom: 1px solid #dddddd;
-}
-.win11-table tbody tr:nth-of-type(even) {
-background-color: #f3f3f3;
-}
-.win11-table tbody tr:last-of-type {
-border-bottom: 2px solid #0078d4;
-}
-.win11-table tbody td {
-padding: 1px ;
-text-align: center;
-}
-.win11-table tbody td:first-child {
-text-align: center;
-}
-.win11-table th,
-.win11-table td {
-border: 1px solid #dddddd;
-}
-.win11-table th {
-background-color: #f4f4f4;
-}
 
 
 /* Estilo da paginação Windows 11 */

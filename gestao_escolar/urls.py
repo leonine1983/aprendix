@@ -93,7 +93,7 @@ urlpatterns = [
     #path('decretos/', DecretoListView.as_view(), name='decreto-list'),
     #path('decretos/<int:pk>/', DecretoDetailView.as_view(), name='decreto-detail'),
     path('decretos/criar/', DecretoCreateView.as_view(), name='decreto-create'),
-    #path('decretos/<int:pk>/editar/', DecretoUpdateView.as_view(), name='decreto-update'),
+    path('decretos/<int:pk>/editar/', DecretoUpdateView.as_view(), name='decreto-update'),
     #path('decretos/<int:pk>/excluir/', DecretoDeleteView.as_view(), name='decreto-delete'),
     
 

@@ -60,7 +60,7 @@
 
 </style>
 
-<div>
+  <section>
     {% if escola_dados_form.non_field_errors %}
         <div class="form-errors">
             {% for error in escola_dados_form.non_field_errors %}
@@ -68,7 +68,14 @@
             {% endfor %}
         </div>
     {% endif %}
-  </div>
+    <h2>Atualizar as informações cadastrais da escola</h2>
+    <p>
+      Este formulário é destinado à atualização das informações cadastrais da escola. 
+      Por meio dele, você pode revisar e corrigir dados essenciais, garantindo que as informações sobre a 
+      instituição estejam sempre precisas e atualizadas. Inclua detalhes como endereço, contatos, dados administrativos e 
+      outros aspectos relevantes. Complete todos os campos necessários para assegurar que a atualização seja feita de forma completa e correta.
+    </p>
+  </section>
   <div class='win11-form p-3'>  
     <section>
       {{escola_dados_form.cnpj.label_tag}}

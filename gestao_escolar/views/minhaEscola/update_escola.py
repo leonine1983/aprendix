@@ -1,4 +1,4 @@
-from rh.models import Escola, Escola_admin, Prefeitura
+from rh.models import Escola, Escola_admin, Prefeitura, Decreto
 from django.views.generic import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -51,6 +51,7 @@ class UpdateEscola(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         context['conteudo_page'] = 'Atualiza Escola'
         # Preenche o formulário com a instância de Escola_admin
         context['escola_dados_form'] = EscolaDados_form(instance=escola_admin_instance)
+        context['decreto'] = Decreto.objects.filter(destino = self.request.session['escola_id'])
         context['page_ajuda'] = "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional."
 
         return context        

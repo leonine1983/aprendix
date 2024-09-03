@@ -253,13 +253,14 @@ class Contrato(models.Model):
     
 class Decreto(models.Model):
     profissional = models.ForeignKey(Pessoas, related_name='decreto_profissional', verbose_name='Profissional em que foi emitido o decreto', on_delete=models.CASCADE)
-    destino = models.OneToOneField(Escola, related_name='local_decreto', null=False, verbose_name='Local onde o profissional será encaminhado', on_delete=models.CASCADE)
+    destino = models.ForeignKey(Escola, related_name='local_decreto', null=False, verbose_name='Local onde o profissional será encaminhado', on_delete=models.CASCADE)
     profissao = models.ForeignKey(Profissao, null=False, verbose_name="Atividade a ser realizada pelo profissional", on_delete=models.CASCADE)
     ano_decreto = models.ForeignKey(Ano, on_delete=models.CASCADE, related_name='Ano_decreto', verbose_name="Ano do")   
+    numero_decreto = models.CharField(max_length=50,  null=False, blank=True, verbose_name='0001')
 
     #Segurança
     created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
-    author_created = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da criação')
+    author_created = models.CharField(max_length=50,  null=True, blank=True, verbose_name='Autor da criação')
     atualizado_em = models.DateTimeField(auto_now=True,  verbose_name='Data da Última Atualização')
     author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
 
@@ -312,7 +313,7 @@ class Escola_admin(models.Model):
     qtd_bibliotecas = models.PositiveIntegerField(default=0, blank=True, null=True)
     qtd_laboratorios = models.PositiveIntegerField(default=0, blank=True, null=True)
     qtd_quadras = models.PositiveIntegerField(default=0, blank=True, null=True)
-    qtd_auditórios = models.PositiveIntegerField(default=0, blank=True, null=True)
+    qtd_auditorios = models.PositiveIntegerField(default=0, blank=True, null=True)
     qtd_refeitórios = models.PositiveIntegerField(default=0, blank=True, null=True)
     qtd_areas_verdes = models.PositiveIntegerField(default=0, blank=True, null=True)
 
