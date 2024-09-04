@@ -35,6 +35,7 @@ class DecretoCreateView(LoginRequiredMixin, CreateView):
         context['btn_bg'] = "btn-success"
         context['button'] = "Atualizar nome da escola"
         context['conteudo_page'] = 'Decreto Create'
+        context['decretos'] = Decreto.objects.filter(destino__id=self.request.session['escola_id'])
         # Preenche o formulário com a instância de Escola_admin
         context['page_ajuda'] = "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional."
 

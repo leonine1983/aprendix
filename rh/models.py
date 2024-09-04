@@ -255,7 +255,7 @@ class Decreto(models.Model):
     profissional = models.ForeignKey(Pessoas, related_name='decreto_profissional', verbose_name='Profissional em que foi emitido o decreto', on_delete=models.CASCADE)
     destino = models.ForeignKey(Escola, related_name='local_decreto', null=False, verbose_name='Local onde o profissional será encaminhado', on_delete=models.CASCADE)
     profissao = models.ForeignKey(Profissao, null=False, verbose_name="Atividade a ser realizada pelo profissional", on_delete=models.CASCADE)
-    ano_decreto = models.ForeignKey(Ano, on_delete=models.CASCADE, related_name='Ano_decreto', verbose_name="Ano do")   
+    ano_decreto = models.ForeignKey(Ano, on_delete=models.CASCADE, related_name='Ano_decreto', verbose_name="Ano de Publicação do Decreto")   
     numero_decreto = models.CharField(max_length=50,  null=False, blank=True, verbose_name='0001')
 
     #Segurança
@@ -338,6 +338,8 @@ class Escola_admin(models.Model):
     author_created = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da criação')
     atualizado_em = models.DateTimeField(auto_now=True, verbose_name='Data da Última Atualização')
     author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
+
+    escola_dados_ok = models.BooleanField(default=False)
     
     def __str__(self):
         return self.nome.nome_escola

@@ -14,11 +14,13 @@ from .models import MessageUser, PaletaCores
 # Login
 class CreateLoginView(LoginView):
     template_name = 'admin_acessos/index.html'
-    success_url = reverse_lazy('admin_acessos:painel_acesso')
 
     def form_invalid(self, form):
         messages.error(self.request, 'Credenciais inválidas. Por favor, tente novamente.')
         return super().form_invalid(form)
+    
+    def get_success_url(self) :
+        return reverse_lazy('Gestao_Escolar:GE_inicio')
 
 # Logout
 class LogoutView_logout(LogoutView):

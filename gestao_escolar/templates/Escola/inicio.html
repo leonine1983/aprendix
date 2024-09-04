@@ -31,20 +31,31 @@
             <div class='mt-1 row w-100  ml-1 gap-3'>
                 <div class="card text-left col">
                     <div class="card-header bg-info text-light text-uppercase">
-                    Turmas 
+                    Resumo 
                     </div>
-                    <div class="card-body">
-                        {% if not conteudo_page == 'Criar Turmas update' %}
-                            {% for t  in turmas %}
-                                <ul class='list-group'>
-                                    <li class='list-group-item border'>
-                                        <span class="text-capitalize fw-bold"> {{t.nome}} {{t.descritivo_turma}}</span></span> | {{t.turno}} | {% if t.turma_multiserie  %} Multiseriada {% else %} Normal {% endif %} | {{t.quantidade_vagas}} vagas
-                                    </li>                                                           
-                                </ul>
-                            {% endfor %}
-                        {% endif %}
+                    <div class="card-body">                        
+                        <table class="win11-table">
+                            <thead>
+                                <tr>
+                                    <th>Turmas</th>
+                                    <th>Alunos matriculados</th>
+                                    <th>Limite de Vagas</th>
+                                    <th>Vagas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in request.session.matriculas_all  %}
+                                <tr>
+                                    <td>{{r.nome}}</td>
+                                    <td>{{r.related_matricula_turma.all|length}}</td>
+                                    <td>{{r.quantidade_vagas}}</td>
+                                    <td>{{r.vagas_disponiveis}}</td>
+                                </tr>
+                                {% endfor %}    
+                            </tbody>
+                        </table>                        
                     </div>
-                </div>  
+                </div>      
                 
                 <div class="card text-center col">
                     <div class="card-header bg-danger text-light text-uppercase">

@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
-from django.db.models.signals import post_migrate
+from django.db.models.signals import post_migrate, post_save
 from django.dispatch import receiver
 from rh.models import Ano as AnoLetivo, Uf_Unidade_Federativa, Sexo, Bairro, Cidade
 from ckeditor_uploader.fields import RichTextUploadingField
@@ -320,11 +320,13 @@ class Turmas(models.Model):
     escola = models.ForeignKey('rh.Escola', on_delete=models.CASCADE)
     ano_letivo = models.ForeignKey(AnoLetivo, on_delete=models.CASCADE)
     serie =  models.ForeignKey(Serie_Escolar, on_delete=models.CASCADE)
-    turno = models.CharField(choices=turno, null=False, default=1, max_length=12)    
-    quantidade_vagas = models.CharField(max_length=2, default=36)
+    turno = models.CharField(choices=turno, null=False, default=1, max_length=12)        
     turma_multiserie = models.BooleanField(null=True, default=False)
     turma_concluida = models.BooleanField(null=True, default=False)
+    quantidade_vagas = models.IntegerField(default=36) 
+    vagas_disponiveis = models.IntegerField(null=True)
 
+  
     def __str__(self):
         return f'{self.nome.upper()} {self.descritivo_turma.upper()}'
 
@@ -414,7 +416,18 @@ class Matriculas(models.Model):
     motivo_afastamento = models.TextField(max_length=200, null=True)
     calcula_media = models.BooleanField(default=True, null=True, blank=True)
     profissional_matricula = models.ForeignKey(User, related_name='related_matricula_alunos', null=True, on_delete=models.CASCADE)
-    obervacao = RichTextUploadingField(null=True, blank=True)
+    obervacao = RichTextUploadingField(null=True, blank=True)    
+
+    @receiver(post_save)
+    def verifica_vagas(sender, instance, **kwargs):
+        # Ensure the instance is of type Matriculas
+        if isinstance(instance, Matriculas):
+            turma = instance.turma
+            # Calculate the number of existing matriculas for the turma
+            existing_matriculas_count = turma.related_matricula_turma.count()
+            # Update vagas_disponiveis
+            turma.vagas_disponiveis = turma.quantidade_vagas - existing_matriculas_count
+            turma.save()
 
     class Meta:
         ordering = ['aluno']
@@ -556,9 +569,6 @@ class GestaoTurmas(models.Model):
 
     def __str__(self):
         return self.aluno.aluno.nome_completo
-
-
-
 
 
 # REGISTROS INICIAIS ---------------------

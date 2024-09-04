@@ -13,6 +13,9 @@ def seleciona_anoLetivo_session(request, pk):
     if ano:
         request.session['anoLetivo_id'] = ano.id    
         request.session['anoLetivo_nome'] = str(ano.ano) 
+        matriculas = request.session['matriculas_painel'] 
+        matriculas_painel = matriculas.filter (ano_letivo = ano.id)
+        request.session['matriculas_all'] = matriculas_painel
 
     
     ano = request.session.get('anoLetivo_nome', 'Ano letivo não definido')

@@ -31,8 +31,9 @@
     border-bottom: 2px solid #0078d4;
     }
     .win11-table tbody td {
-    padding: 1px ;
+    padding: 1px 5px ;
     text-align: center;
+    font-size: 0.9rem;
     }
     .win11-table tbody td:first-child {
     text-align: center;

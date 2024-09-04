@@ -89,15 +89,11 @@ class Create_Matriculas(LoginRequiredMixin, SuccessMessageMixin, CreateView, ):
         novo_codigo = f'{ano_atual}-{proximo_numero:07d}'
         form.instance.cod_matricula = novo_codigo
         # / ----------
-
         
-        form_data = self.request.POST    
-        # Imprima os dados do formulário
-        print("Dados do Formulário:")
-        for key, value in form_data.items():
-            print(f"{key}: {value}")
         # Chame o método da superclasse para definir self.object
-        self.object = form.save(commit=False)  # Isso pode variar com base na lógica do seu formulário
+        self.object = form.save(commit=False)  # Isso pode variar com base na lógica do seu 
+        
+        print(f"olha a turmaaaa {self.object.turma}")
 
         if self.object:
             matricula_exist = Matriculas.objects.filter(aluno=self.object.aluno, turma__ano_letivo=self.request.session['anoLetivo_id'])

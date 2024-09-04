@@ -47,12 +47,39 @@
             <div class="tab-content" id="myTabContent">
               <div class="tab-pane fade show active p-3" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                 <h2>Gerenciamento de Decretos Administrativos</h2>
-                <p class="text-secondary p-3">
+                <p class="text-secondary p-2">
                   Este formulário serve para criar e gerenciar decretos administrativos.
                    Ele permite registrar informações importantes, como quem é o profissional envolvido, 
                    para onde ele será encaminhado, qual será sua atividade e o ano em que o decreto foi emitido.
                 </p>
-                <div class='p-2 fs-6 border-danger-subtle border-right d-flex text-light bg-p-3' >                  
+                <table class='win11-table mb-3'>
+                  <thead>
+                    <tr>                      
+                      <th class='bg-danger'>Função</th>
+                      <th>Nome</th>
+                      <th>Escola</th>
+                      <th>Número/ordem</th>
+                      <th>Criado em</th>
+                      <th>Atualizado em</th>                      
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for d in decretos %}
+                    <tr>
+                      
+                      <td class='bg-danger-subtle fw-bolder'> {{d.profissao}} </td>
+                      <td > {{d.profissional}} </td>
+                      <td> {{d.destino}} </td>
+                      <td> {{d.numero_decreto}}/{{d.ano_decreto}} </td>
+                      <td> {{d.created}} | {{d.author_created}} </td>
+                      <td> {{d.atualizado_em }} | {{d.author_atualiza}} </td>
+                      
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>    
+                <div class='p-2 fs-6 border-danger-subtle border-right d-flex text-light bg-p-3' >    
+                                
                   <form class='m-3 ' action="" method="post">
                     {% csrf_token %}
                     {{ form.non_field_errors }}
@@ -62,23 +89,30 @@
                             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                             <section class="d-flex">
                               {{ field }}
-                              <a href="{% url 'Gestao_Escolar:pessoas-create' %}" class="link ml-2 col-3 btn btn-sm btn-success h-75 mt-3">Novo <i class="fa-solid fa-plus"></i></a>
+                             
                               {{ field.errors }}
                               </section>
                         </section>
                     {% endfor %}  
                     </section>                 
                     <button type="submit" class="btn btn-sm btn-success w-100 mt-2"> {{button}} {{object}} <i class="fa-solid fa-people-roof"></i></button>     
-                  </form>                    
-                </div> 
+                  </form>
+                  <div class='border p-3 m-2 col-4'>
+                  <section class='text-secondary'>Se o nome do profissional não constar na lista, clique em "Novo Decreto" para adicioná-lo</section>
+                  <a href="{% url 'Gestao_Escolar:pessoas-create' %}" class="link ml-2 w-50 btn btn-sm btn-success mt-3">Novo Decreto <i class="fa-solid fa-plus"></i></a>                 
+                  
+                  </div>
+                </div>     
               </div>               
             </div>              
         </div>  
              
                 </div>              
               </div> 
-            </div>                          
-          {% endif %}          
+            </div>                    
+          {% endif %}   
+          
+          
         </div>        
     </div>
     </div>
