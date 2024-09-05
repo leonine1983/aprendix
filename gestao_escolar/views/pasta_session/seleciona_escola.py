@@ -23,5 +23,6 @@ def Seleciona_escola(request, pk):
     request.session['prefeitura'] = prefeitura
     request.session['nomeclatura'] = nomeclatura
     request.session['matriculas_painel'] = matriculas_painel
+    
     # Redireciona a pagina
     return redirect(reverse('Gestao_Escolar:GE_anoLetivo'))

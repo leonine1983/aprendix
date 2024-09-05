@@ -17,8 +17,16 @@ class ListView_Escola(LoginRequiredMixin, ListView):
         context['now'] = datetime.now()
         
         context['conteudo_page'] = 'Nome das Escolas'       
+        context['help'] = 'Nome das Escolas'     
         
-        context['page_ajuda'] = "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional."
+        context['page_ajuda'] = "<div class='m-2'>\
+                                    <p>Oi! Precisa de ajuda <i class='fa-duotone fa-solid fa-message-question fs-2'></i></p>\
+                                    <p>Eu sou o Professor Coruja, ou como gosto de ser chamado, ARISTO. Vou ser seu ajudante aqui no Aprendix.</p>\
+                                    <p>Sempre que precisar de uma mãozinha, é só clicar no botão de ajuda e, em um piscar de olhos, estarei aqui para te ajudar! Se eu não conseguir resolver, vou chamar um colega para te dar uma força. <i class='fa-duotone fa-solid fa-hands-holding-heart'></i></p>\
+                                    <p>Ah, e se eu estiver falando muito rápido, não se preocupe! Você pode usar os botões aqui embaixo para rever o que eu disse. Um abraço!</p>\
+                                    <p>Para começar, clique na lista acima e escolha uma das escolas disponíveis para a sua conta. Aqui você verá todas as escolas vinculadas ao seu cadastro. Pode ser uma ou várias escolas.</p>\
+                                    <p>Se houver muitas escolas, pode ser necessário digitar parte do nome da escola para encontrá-la. Se a escola não aparecer, entre em contato com o administrador para verificar o que pode ter dado errado.</p>\
+                                </div>"
         
         return context
             

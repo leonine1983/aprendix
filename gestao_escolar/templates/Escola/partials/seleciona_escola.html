@@ -1,5 +1,6 @@
 
 
+{% load static %}
 <div class="card text-center">
     <div class="card-header bg-danger text-light text-uppercase">
     ATENÇÃO {{request.user.first_name}} {{request.user.last_name}}<i class="fa-solid fa-exclamation"></i><i class="fa-solid fa-exclamation"></i>
@@ -17,7 +18,7 @@
     <div class="modal-dialog w-100">
     <div class="modal-content bg-secondary-subtle">
         <div class="modal-header">
-        <h4 class="modal-title  fs-6"><i class="fa-regular fa-face-grin-squint"></i> Olá, seja muito bem-vindo, <span class="text-capitalize">{{request.user.first_name}} {{request.user.last_name}}!!</span></h4>
+        <h4 class="modal-title  fs-6"><i class="fa-regular fa-face-grin-squint"></i> Olá, seja muito bem-vindo, <span class="text-capitalize">{% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}{{request.user}}{% endif %}!!</span></h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <div class="modal-body shadow-sm bg-light-subtle">
@@ -45,9 +46,135 @@
                     }
                 }
             
-        </script>          
-        </div>
+        </script>           
+        <div class='position-absolute bottom-0 end-0 m-4'>
+            <style>
+                    #balloon {
+            position: relative;
+            background-color: #ffffff;
+            border: 2px solid #0078d4; /* Azul do Windows 11 */
+            border-radius: 12px;
+            padding: 15px;
+            width: auto;
+            min-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-size: 20px;
+            color: #e60bdb;
+        }
+        #balloon::before {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 20px;
+            border-width: 15px;
+            border-style: solid;
+            border-color: #ffffff transparent transparent transparent;
+            border-radius: 5px;
+        }
+        #controls {
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;            
+            font-size: 16px;
+            margin: 0 5px;
+            cursor: pointer;
+            border: 1px solid #0078d4;
+            border-radius: 5px;
+            background-color: #0078d4;
+            color: white;
+        }
+        button:hover {
+            background-color: #005a9e;
+        }
+        video {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+        .position-fixed {
+            padding: 1rem;
+        }
+            </style>
+            
+            <div class="position-absolute bottom-0 end-50  p-3" style="margin-right: 25rem;">
+                <div id="balloon">
+                    <div id="text-container">
+                        <!-- O HTML será injetado aqui -->
+                    </div>
+                </div>
+                               
+                <video src="{% static 'videos/introdut_vovoCoruja.mp4.mov' %}" autoplay muted loop width="300"></video>
+                <div id="controls" class="position-absolute end-0 bottom-50">
+                    <button onclick="prev()" class="btn btn-sm">Anterior</button>
+                    <button onclick="next()" class="btn btn-sm" >Próximo</button>
+                </div> 
+            </div>
         
+            <script>
+                // Conteúdo HTML do contexto
+                const htmlContent = `{{page_ajuda|escapejs}}`;
+        
+                // Extrair os parágrafos do HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+                const paragraphs = Array.from(doc.querySelectorAll('p')).map(p => p.innerHTML);
+        
+                let currentIndex = 0;
+                let autoChangeInterval;
+        
+                function updateText() {
+                    const textContainer = document.getElementById('text-container');
+                    textContainer.innerHTML = paragraphs[currentIndex];
+                }
+        
+                function next() {
+                    if (currentIndex < paragraphs.length - 1) {
+                        currentIndex++;
+                    } else {
+                        currentIndex = 0; // Voltar para o início
+                    }
+                    updateText();
+                }
+        
+                function prev() {
+                    if (currentIndex > 0) {
+                        currentIndex--;
+                    } else {
+                        currentIndex = paragraphs.length - 1; // Ir para o final
+                    }
+                    updateText();
+                }
+        
+                function startAutoChange() {
+                    updateText();
+                    autoChangeInterval = setInterval(() => {
+                        next(); // Avançar automaticamente
+                    }, 10000); // Intervalo de 3 segundos (3000 milissegundos)
+                }
+        
+                function stopAutoChange() {
+                    clearInterval(autoChangeInterval);
+                }
+        
+                // Inicializa a exibição automática e também garante que a exibição manual funcione
+                startAutoChange();
+        
+                // Adiciona eventos para parar a mudança automática quando o usuário interage com os botões
+                document.querySelectorAll('#controls button').forEach(button => {
+                    button.addEventListener('click', stopAutoChange);
+                });
+        
+                // Atualiza o texto inicial
+                updateText();
+                setInterval(() => {
+                        next(); // Avançar automaticamente
+                    }, 20000); // Intervalo de 3 segundos (3000 milissegundos)
+                
+                
+            </script>
+           
+        </div>
     </div>
+</div>
     </div>
 </div>
