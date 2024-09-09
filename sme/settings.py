@@ -19,13 +19,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '94c2-177-200-115-250.ngrok-free.app',
+    'd9c3-177-200-115-250.ngrok-free.app',
     'localhost',
     '127.0.0.1',
     '192.168.15.19'
     # Outros domínios permitidos
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://94c2-177-200-115-250.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['https://94c2-177-200-115-250.ngrok-free.app', 'https://d9c3-177-200-115-250.ngrok-free.app']
 
 
 # Application definition

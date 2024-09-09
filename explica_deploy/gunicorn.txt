@@ -1,0 +1,81 @@
+###############################################################################
+# Substituir
+# upa_gunicorn ao nome do arquivo gunicorn que você deseja
+# rogerleonino ao seu nome de usuário
+# app_repo ao nome da pasta do seu projeto
+# upa ao nome da pasta onde você encontra um arquivo chamado wsgi.py
+#
+###############################################################################
+###############################################################################
+# Replace
+# upa_gunicorn to the name of the gunicorn file you want
+# rogerleonino to your user name
+# app_repo to the folder name of your project
+# upa to the folder name where you find a file called wsgi.py
+#
+###############################################################################
+# Criando o arquivo upa_gunicorn.socket
+sudo nano /etc/systemd/system/upa_gunicorn.socket
+###############################################################################
+# Conteúdo do arquivo
+[Unit]
+Description=gunicorn blog socket
+
+[Socket]
+ListenStream=/run/upa_gunicorn.socket
+
+
+
+###############################################################################
+# Criando o arquivo upa_gunicorn.service
+sudo nano /etc/systemd/system/upa_gunicorn.service
+
+###############################################################################
+# Conteúdo do arquivo
+[Unit]
+Description=Gunicorn daemon (You can change if you want)
+Requires=upa_gunicorn.socket
+After=network.target
+
+[Service]
+User=rogerleonino
+Group=www-data
+Restart=on-failure
+EnvironmentFile=/home/rogerleonino/app_repo/.env
+WorkingDirectory=/home/rogerleonino/app_repo
+# --error-logfile --enable-stdio-inheritance --log-level and --capture-output
+# are all for debugging purposes.
+ExecStart=/home/rogerleonino/app_repo/venv/bin/gunicorn \
+          --error-logfile /home/rogerleonino/app_repo/gunicorn-error-log \
+          --enable-stdio-inheritance \
+          --log-level "debug" \
+          --capture-output \
+          --access-logfile - \
+          --workers 6 \
+          --bind unix:/run/upa_gunicorn.socket \
+          upa.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+
+###############################################################################
+# Ativando
+sudo systemctl start upa_gunicorn.socket
+sudo systemctl enable upa_gunicorn.socket
+
+# Checando
+sudo systemctl status upa_gunicorn.socket
+curl --unix-socket /run/upa_gunicorn.socket localhost
+sudo systemctl status upa_gunicorn
+
+# Restarting
+sudo systemctl restart upa_gunicorn.service
+sudo systemctl restart upa_gunicorn.socket
+sudo systemctl restart upa_gunicorn
+
+# After changing something
+sudo systemctl daemon-reload
+
+# Debugging
+sudo journalctl -u upa_gunicorn.service
+sudo journalctl -u upa_gunicorn.socket

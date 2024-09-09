@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 from gestao_escolar.views.alunos.partials_alunos.alunos_form import Alunos_form
 from django.db.models import Q
 from django.shortcuts import redirect
+from django.contrib import messages
 
 
 class CreateAlunosConfirma(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -15,7 +16,7 @@ class CreateAlunosConfirma(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     form_class = Alunos_form
     #form_class = Turma_form
     template_name = 'Escola/inicio.html'
-    success_message = "Aluno registrado com sucesso!!"
+    success_message = "Aluno registrado com sucesso!!"       
 
     def get_success_url(self):
         # Obtém o ID do registro criado
@@ -31,6 +32,12 @@ class CreateAlunosConfirma(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         else:
             Aluno = Alunos.objects.all()        
         return Aluno
+    
+    def form_valid(self, form):
+        form.nome_completo = self.cleaned_data.get('nome_completo').upper()
+        form.nome_mae = self.cleaned_data.get('nome_mae').upper()
+        return super().form_valid(form)
+    
 
     def get_context_data(self, **kwargs):        
         context = super().get_context_data(**kwargs)        

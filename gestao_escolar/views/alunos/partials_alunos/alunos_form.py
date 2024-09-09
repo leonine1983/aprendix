@@ -5,7 +5,8 @@ import random
 import string
 from rh.models import Uf_Unidade_Federativa, Sexo
 from gestao_escolar.models import (Alunos, Cidade)
-                                     
+import re
+from django.core.exceptions import ValidationError                                     
 
 choices = {
     ('1','A+'),
@@ -20,20 +21,74 @@ choices = {
 }
 
 
-class Alunos_form(forms.ModelForm):
+import re
+from django.core.exceptions import ValidationError
 
+# Validação de formulário
+def validate_caracteres_especiais(value):
+    if re.search(r"[~`´'^]", value):
+        raise ValidationError('Não é permitido usar acentos ou caracteres especiais (~, `, ´, ^).')
+
+
+ 
+from django import forms
+from django.utils.safestring import mark_safe
+from django.core.exceptions import ValidationError                                     
+import re
+from gestao_escolar.models import Alunos
+
+
+
+import re
+from django import forms
+from django.utils.safestring import mark_safe
+from gestao_escolar.models import Alunos
+from django.contrib import messages
+
+class Alunos_form(forms.ModelForm):
     nome_completo = forms.CharField(
-        label='Nome Completo (Igual ao do RG):',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 text-info col m-2 rounded-1'}),
+        label='Nome Completo (Igual ao do RG bem assim):',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control border border-info p-3 pb-3 text-info text-uppercase col m-2 rounded-1',
+            'autocomplete': 'off'}),        
     )
+    
+    def clean_nome_completo(self):
+        nome_completo = self.cleaned_data.get('nome_completo')
+        # Expressão regular para bloquear caracteres especiais e acentuados
+        if re.search(r"[^a-zA-ZÇç\s]", nome_completo):
+            mensagem_erro = "Não é permitido usar acentos, números ou caracteres especiais."         
+            raise forms.ValidationError(mensagem_erro)
+        return nome_completo   
+    
+    
     nome_mae = forms.CharField(      
         label=mark_safe('<i class="fa-solid fa-user-tie-hair"></i> Mãe'),
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 text-info col m-2 rounded-1'}),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control border border-info p-3 pb-3 text-info text-uppercase col m-2 rounded-1',
+            'autocomplete': 'off'}),
     )
+
+    def clean_nome_mae(self):
+        nome_mae = self.cleaned_data.get('nome_mae')
+        if re.search(r"[^a-zA-ZÇç\s]", nome_mae):
+            mensagem_erro = "Não é permitido usar acentos, números ou caracteres especiais."    
+            raise forms.ValidationError(mensagem_erro)
+        return nome_mae
+
+
+    
+    
     class Meta:
         model = Alunos
         fields = ['nome_completo', 'nome_mae']
-        
+
+
+    class Meta:
+        validators=[validate_caracteres_especiais],  
+        model = Alunos
+        fields = ['nome_completo', 'nome_mae']
+
 choice_estado_civil = {
     ('1', 'Solteiro'),
     ('2', 'Casado'),

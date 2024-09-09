@@ -53,6 +53,9 @@ class Create_Alunos(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         if self.request.user.first_name:        
             form.instance.res_cadastro = f'{self.request.user.first_name} {self.request.user.last_name}'
         else:
-            form.instance.res_cadastro = self.request.user        
-        return super().form_valid(form)
+            form.instance.res_cadastro = self.request.user   
+           
+        form.instance.nome_completo = form.cleaned_data['nome_completo'].upper()
+        form.instance.nome_mae =form.cleaned_data['nome_mae'].upper()
+        return super().form_valid(form)     
     
