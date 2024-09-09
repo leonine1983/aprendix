@@ -32,7 +32,7 @@
             <div class='mt-1 row w-100  ml-1 gap-3'>
                 <div class="card text-left col">
                     <div class="card-header bg-info text-light text-uppercase">
-                    Resumo 
+                        <i class="fa-duotone fa-solid fa-file-word"></i> Resumo 
                     </div>
                     <div class="card-body">                        
                         <table class="win11-table">
@@ -50,7 +50,7 @@
                                     <td>{{r.nome}}</td>
                                     <td>{{r.related_matricula_turma.all|length}}</td>
                                     <td>{{r.quantidade_vagas}}</td>
-                                    <td>{{r.vagas_disponiveis}}</td>
+                                    <td>{% if r.vagas_disponiveis %}{{r.vagas_disponiveis}}{% else %}{{r.quantidade_vagas}}{% endif %}</td>
                                 </tr>
                                 {% endfor %}    
                             </tbody>
@@ -59,21 +59,14 @@
                 </div>      
                 
                 <div class="card text-center col">
-                    <div class="card-header bg-danger text-light text-uppercase">
-                    ATENÇÃO {{request.user.first_name}} {{request.user.last_name}}<i class="fa-solid fa-exclamation"></i><i class="fa-solid fa-exclamation"></i>
+                    <div class="card-header bg-danger-subtle text-light text-start text-uppercase">
+                        <i class="fa-duotone fa-solid fa-chart-simple"></i> Gráficos
                     </div>
-                    <div class="card-body">
-                    <h5 class="card-title">Para dar continuidade, vamos precisar que você escolha uma escola que mais lhe agrada. 😊</h5>
-                    <button class="btn btn-primary" onclick="location.reload()">Selecionar Escola</button>        
+                    <div class="card-body"> 
                     </div>
                     <div class="card-footer text-muted">
-                        <div id="chart"></div>
-                        <script>
-                            var graphJson = {{ request.session.matriculas_graficos|safe }};
-                            var fig = JSON.parse(graphJson);
-                            console.log(graphJson);
-                            Plotly.react('chart', fig.data, fig.layout);
-                        </script>
+                        {{graph|safe}}
+                      
                     <p>Data e horário do acesso: {{ now }}</p>
                     </div>
                 </div>
