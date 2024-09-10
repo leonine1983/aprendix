@@ -180,6 +180,14 @@ class Escola(models.Model):
     def __str__(self):
         return self.nome_escola
     
+class EscolaUser(models.Model):
+    escola = models.ForeignKey(Escola, on_delete=models.CASCADE, verbose_name="Escola em que o usuário estará vinculado", related_name="related_escolaUser")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Nome do Usuário", related_name="related_UserEscola" )
+    superuser = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.escola.nome_escola}"
+    
 
 # Vinculo empregatício --------------------------------------------------------------------------
 choice_vinculo = {

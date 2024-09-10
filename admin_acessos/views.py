@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth import authenticate, login, logout
@@ -8,7 +9,6 @@ from django.views.generic import TemplateView, CreateView, ListView, UpdateView,
 from django.views import View
 from django import forms
 from ckeditor.widgets import CKEditorWidget
-
 from .models import MessageUser, PaletaCores
 
 # Login
@@ -131,6 +131,7 @@ class PaletaCoresDeleteView(DeleteView):
 
 # -----------Criar usuarios ---------------------------------
 from django.contrib.auth.models import User
+from rh.models import  EscolaUser, Escola
 
 class UserCreationFormAll(forms.ModelForm):
     password1 = forms.CharField(widget=forms.PasswordInput(), label='Senha')
@@ -161,7 +162,26 @@ class CreateUsers(LoginRequiredMixin, CreateView):
     form_class = UserCreationFormAll
     template_name = 'Escola/inicio.html'
 
+    def get_success_url(self):
+        return reverse_lazy('admin_acessos:CreateUsers')
+    
+    def form_valid(self, form):
+        # Salva o objeto no banco de dados primeiro
+        response = super().form_valid(form)
+        user_pk = form.instance.pk
+        print(f"Id do usuario {user_pk}")
+        usuario = User.objects.get(pk=user_pk)
+        print(f"Usuario econtrado {usuario}")
+        
+        school_pk = self.request.session['escola_id']
+        EscolaUser.objects.create(
+            escola = Escola.objects.get(pk=school_pk),
+            usuario = User.objects.get(pk=user_pk)
+        )
+        return response
+
     def get_context_data(self, **kwargs) :
         context = super().get_context_data(**kwargs)
         context['conteudo_page'] = 'create_users'   
+        context['all_user_school'] = User.objects.all()  
         return context

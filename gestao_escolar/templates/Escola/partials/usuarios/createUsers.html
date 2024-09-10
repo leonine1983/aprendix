@@ -22,19 +22,46 @@
         <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <div class="modal-body shadow-sm bg-light-subtle">
-            <p class="m-0">Estamos felizes em tê-lo aqui!</p>
-            <p class="m-0">Por favor, escolha uma das opções de escolas disponíveis:</p>
+            <h2 class="m-0"><i class="fa-duotone fa-solid fa-users"></i> Criação de Novo Usuário</h2>
+            <p class="m-2 ml-5">Preencha o formulário abaixo para criar um novo usuário. 
+                Todos os campos são obrigatórios, e a senha deve ser confirmada para 
+                garantir a segurança da conta.</p>
        
-        <ul class="list-group list-group-flush shadow shadow-sm rounded-start-3">
-        <form action="" method="post">
-            {% csrf_token %}
-            <div class="m-2 p-2">
-                {{form.as_p}}            
-            </div>
-            <button type="submit">Criar</button>
-        </form>
-        </ul>  
-      
+            <div class="row row-cols-2">
+                <div class="col">
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <div class="m-2 p-2">
+                            {{form.as_p}}            
+                        </div>
+                        <button type="submit">Criar</button>
+                    </form>
+                </div>
+                <div class="col">
+                    <table class='win11-table'>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Usuário</th>
+                                <th>Nome Completo</th>
+                                <th>Email</th>
+                                <th>Escola</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in all_user_school %}
+                            <tr>
+                                <td>{{forloop.counter}}</td>
+                                <td>{{user.username}}</td>
+                                <td>{{user.first_name}} {{user.last_name}}</td>
+                                <td>{{user.email}}</td>
+                                <td>{{user.related_UserEscola.first.escola}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>         
     </div>
 </div>
     </div>
