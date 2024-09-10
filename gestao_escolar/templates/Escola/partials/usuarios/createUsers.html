@@ -1,0 +1,41 @@
+
+
+{% load static %}
+<div class="card text-center">
+    <div class="card-header bg-danger text-light text-uppercase">
+    ATENÇÃO {{request.user.first_name}} {{request.user.last_name}}<i class="fa-solid fa-exclamation"></i><i class="fa-solid fa-exclamation"></i>
+    </div>
+    <div class="card-body">
+    <h5 class="card-title">Para dar continuidade, vamos precisar que você escolha uma escola que mais lhe agrada. 😊</h5>
+    <button class="btn btn-primary" onclick="location.reload()">Selecionar Escola</button>        
+    </div>
+    <div class="card-footer text-muted">
+    <p>Data e horário do acesso: {{ now }}</p>
+    </div>
+</div>    
+<!-- Modal -->
+<div class="modal fade" id="modal_escola" style='background:#000'>
+    <div class="modal-dialog w-100">
+    <div class="modal-content bg-secondary-subtle">
+        <div class="modal-header">
+        <h4 class="modal-title  fs-6"><i class="fa-regular fa-face-grin-squint"></i> Olá, seja muito bem-vindo, <span class="text-capitalize">{% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}{{request.user}}{% endif %}!!</span></h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body shadow-sm bg-light-subtle">
+            <p class="m-0">Estamos felizes em tê-lo aqui!</p>
+            <p class="m-0">Por favor, escolha uma das opções de escolas disponíveis:</p>
+       
+        <ul class="list-group list-group-flush shadow shadow-sm rounded-start-3">
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="m-2 p-2">
+                {{form.as_p}}            
+            </div>
+            <button type="submit">Criar</button>
+        </form>
+        </ul>  
+      
+    </div>
+</div>
+    </div>
+</div>

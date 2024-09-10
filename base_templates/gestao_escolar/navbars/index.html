@@ -117,11 +117,13 @@
         <!-- Apoio/Suporte -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa-sharp-duotone fa-solid fa-face-smiling-hands fs-6"></i><br> Apoio/Suporte
-          </a>
+            <i class="fa-sharp-duotone fa-solid fa-face-smiling-hands fs-6"></i><br> 
+            Apoio/Suporte
+          </a>          
           <ul class="dropdown-menu " style="margin-top: -1rem;">
             <li><a class="dropdown-item" href='{% url "Gestao_Escolar:GE_anoLetivo" %}'><i class="fa-regular fa-arrows-retweet txt-p-nav fs-4"></i><sup class="txt-p-nav ">{{request.session.anoLetivo_nome}}</sup> Alternar entre Anos Letivos | Mudar Exercício</a></li>
             <li><a class="dropdown-item" href='{% url "Gestao_Escolar:CreateEscola" %}'><i class="fa-duotone fa-solid fa-school-flag txt-p-nav me-2 fs-4"></i> Criar nova Escola</a></li>
+            <li><a class="dropdown-item" href='{% url "admin_acessos:CreateUsers" %}'><i class="fa-duotone fa-solid fa-users"></i> Criar novo usuário</a></li>           
           </ul>
         </li>
       </ul>

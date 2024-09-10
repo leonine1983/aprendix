@@ -47,7 +47,7 @@
                             <tbody>
                                 {% for r in request.session.matriculas_all  %}
                                 <tr>
-                                    <td>{{r.nome}}</td>
+                                    <td>{{r.nome}} <span class='text-uppercase'>{{r.descritivo_turma}}</span></td>
                                     <td>{{r.related_matricula_turma.all|length}}</td>
                                     <td>{{r.quantidade_vagas}}</td>
                                     <td>{% if r.vagas_disponiveis %}{{r.vagas_disponiveis}}{% else %}{{r.quantidade_vagas}}{% endif %}</td>
@@ -65,15 +65,17 @@
                     <div class="card-body"> 
                     </div>
                     <div class="card-footer text-muted">
-                        {{graph|safe}}
-                      
+                        {{graph|safe}}                      
                     <p>Data e horário do acesso: {{ now }}</p>
                     </div>
                 </div>
             </div>
         </div>
     
-        
+        'create_users'  
+    {% if  conteudo_page == 'create_users'  %}
+        {% include 'Escola/partials/usuarios/createUsers.html' %}
+    {% endif %}
         <!-- End informações-->    
     {% if  conteudo_page == 'Nome das Escolas' %}
         {% include 'Escola/partials/seleciona_escola.html' %}
@@ -236,7 +238,7 @@
     <!-- Condiciionais-->
     {% if 'escola_id' not in request.session %}
         {% include 'Escola/partials/seleciona_escola.html' %}        
-    {% endif %}Condicionais de verificação de existencia de registros 
+    {% endif %}
     {% if not condicional_aluno.exists %}
         {% include 'Escola/partials/verifica_sem_registros/n_aluno.html' %}
     {% endif %}

@@ -6,6 +6,7 @@ from .views import (
     PaletaCoresCreateView,
     PaletaCoresUpdateView,
     PaletaCoresDeleteView,
+    CreateUsers
 )
 
 app_name = 'admin_acessos'
@@ -19,6 +20,9 @@ urlpatterns = [
     path('accounts/mensagem/lista_enviadas', MensagemListView.as_view(), name='mensagem_lista' ),    
     path('accounts/mensagem/update/<int:pk>', UpdateMessageView.as_view(), name='mensagem_update' ),
     path('accounts/mensagem/detalhe/<int:pk>', DetalheMensagemView.as_view(), name='mensagem_detalhe' ),
+
+    path('newUsers', CreateUsers.as_view(), name='CreateUsers' ),
+
 
 
     path('paletas', PaletaCoresListView.as_view(), name='paletacores_list'),

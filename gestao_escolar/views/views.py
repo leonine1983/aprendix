@@ -31,18 +31,33 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
         sessao_escola = self.request.session['escola_id']
         context['contexto'] = Escola.objects.filter(id=sessao_escola)           
         context['condicional_aluno'] = Alunos.objects.all()
-        context['condicional_professor'] = Encaminhamentos.objects.all()        
-        context['condicional_turma'] = Turmas.objects.filter(escola = self.request.session['escola_id'], ano_letivo = self.request.session['anoLetivo_id'])       
+        context['condicional_professor'] = Encaminhamentos.objects.all()              
         context['page_ajuda'] = "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional."
-        
+
+
+        turmas = Turmas.objects.filter(escola = self.request.session['escola_id'], ano_letivo = self.request.session['anoLetivo_id'])  
+        context['condicional_turma'] = turmas
+        a = []
+        b = []
+        for r in turmas:
+             a.append(f'{r.nome} {r.descritivo_turma.upper()}')
+             b.append(r.related_matricula_turma.count())
+
+        cores = [
+            'orange', 'green', 'red', 'blue', 'purple', 'cyan', 'magenta', 'yellow', 
+            'black', 'pink', 'brown', 'gray', 'lime', 'teal', 'indigo'
+        ]
+
         #Criar o grafico
-        fig = go.Figure(data=go.Bar(x=[1,2,3], y=[4,5,6]))
-        fig.update_layout(title='Gráfico das Turmas')
+        fig = go.Figure(data=go.Bar(x=a, y=b, marker_color= cores))
+        fig.update_layout(
+            title='Gráfico das Turmas',
+            xaxis_title = 'Turmas',
+            yaxis_title= 'Número de Matrículas')      
+
         #converter o gráfico para html
         graph_html = fig.to_html(full_html=False)
         context['graph'] = graph_html
 
-
-        
         return context
 
