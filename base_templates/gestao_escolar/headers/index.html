@@ -24,13 +24,15 @@
       </div>     
       <div class="d-flex  ">
         <a class="col" href="#">          
-            <div class='w-100'>
+            <div class='w-100 mt-2'>
               <img src="{{ request.session.escola_nome_query.related_dadosEscola.imagem.url }}" alt="Imagem atual" style='width:100px' class="img-thumbnail" >                
             </div>           
         </a>
         <div class="col-10" style="margin-left: -1rem;">     
           <h1 class="text-uppercase txt-p fs-5 p-0 m-0">{{request.session.escola_nome}} | </h1>
-          <p class="m-0 p-0 fs-6">Diretor {{  request.session.escola_nome_query.related_dadosEscola.nome_diretor.profissional}} | Decreto nº {{  request.session.escola_nome_query.related_dadosEscola.nome_diretor.numero_decreto}} - {{ request.session.escola_nome_query.related_dadosEscola.nome_diretor.ano_decreto}}</p>
+          <p class="m-0 p-0 fs-6">Diretor {{  request.session.escola_nome_query.local_decreto.all}} 
+        
+            {{  request.session.escola_nome_query.related_dadosEscola.nome_diretor.profissional}} | Decreto nº {{  request.session.escola_nome_query.related_dadosEscola.nome_diretor.numero_decreto}} - {{ request.session.escola_nome_query.related_dadosEscola.nome_diretor.ano_decreto}}</p>
           <p class="m-0 p-0 fs-6">Secretário(a) {{  request.session.escola_nome_query.related_dadosEscola.nome_secretario.profissional}} | Decreto nº {{  request.session.escola_nome_query.related_dadosEscola.nome_secretario.numero_decreto}} - {{ request.session.escola_nome_query.related_dadosEscola.nome_secretario.ano_decreto}}</p>
           <p class="m-0 p-0 fs-6"><i class="fa-solid fa-calendar-days "></i> Ano Letivo: {{request.session.anoLetivo_nome}}</p>
         </div>   
@@ -43,7 +45,7 @@
       </div>     
       <div class="d-flex  ">
         <a class="col" href="#">          
-          <div class='w-100'>           
+          <div class='w-100 mt-2'>           
             <img src="{% static 'schooll.png' %}" class="w-50 mt-1 ml-4">
           </div>        
         </a>

@@ -2,7 +2,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from rh.models import Decreto
+from rh.models import Decreto, Escola, Ano
 
 class DecretoListView(LoginRequiredMixin, ListView):
     model = Decreto
@@ -19,12 +19,14 @@ class DecretoDetailView(LoginRequiredMixin, DetailView):
 class DecretoCreateView(LoginRequiredMixin, CreateView):
     model = Decreto
     template_name = 'Escola/inicio.html'
-    fields = ['profissional', 'destino', 'profissao', 'ano_decreto']
+    fields = ['profissional', 'profissao', 'numero_decreto']
     success_url = reverse_lazy('Gestao_Escolar:decreto-create')
 
     def form_valid(self, form):
         messages.success(self.request, 'Decreto criado com sucesso!')
         form.instance.author_created = f'{self.request.user.first_name} {self.request.user.last_name}'
+        form.instance.destino = Escola.objects.get(id=self.request.session['escola_id'])
+        form.instance.ano_decreto = Ano.objects.get(id=self.request.session['anoLetivo_id'])
         return super().form_valid(form)
     
     def get_context_data(self, **kwargs):

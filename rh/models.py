@@ -264,7 +264,7 @@ class Decreto(models.Model):
     destino = models.ForeignKey(Escola, related_name='local_decreto', null=False, verbose_name='Local onde o profissional será encaminhado', on_delete=models.CASCADE)
     profissao = models.ForeignKey(Profissao, null=False, verbose_name="Atividade a ser realizada pelo profissional", on_delete=models.CASCADE)
     ano_decreto = models.ForeignKey(Ano, on_delete=models.CASCADE, related_name='Ano_decreto', verbose_name="Ano de Publicação do Decreto")   
-    numero_decreto = models.CharField(max_length=50,  null=False, blank=True, verbose_name='0001')
+    numero_decreto = models.CharField(max_length=50,  null=False,  verbose_name='Número de controle do decreto')
 
     #Segurança
     created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
@@ -273,7 +273,7 @@ class Decreto(models.Model):
     author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
 
     def __str__(self):
-        return self.profissional.nome    
+        return f'{self.profissional.nome}, Decreto n° {self.numero_decreto}/{self.ano_decreto}'
 
 
 class Escola_admin(models.Model):
@@ -469,14 +469,17 @@ def post_migrate_setup(sender, **kwargs):
     if not Profissao.objects.exists():
         nome_descreve = [
             ('Diretor Escolar', 'Profissional encarregado da administração e gestão de uma escola.'),
-            ('Professor', 'Profissional dedicado à educação e ao ensino, desempenhando um papel fundamental na transmissão de conhecimentos, habilidades e valores para os alunos.'),
+            ('Vice-Diretor Escolar', 'Profissional que auxilia o diretor escolar na administração e gestão da escola, assumindo suas funções na sua ausência e colaborando nas decisões administrativas e pedagógicas.')
             ('Coordenador Escolar', 'Profissional que supervisiona as operações e as atividades educacionais de uma escola.'),
+            ('Secretária escolar', 'Profissional responsável por tarefas administrativas e organizacionais dentro de uma instituição de ensino.'),
+            ('Professor', 'Profissional dedicado à educação e ao ensino, desempenhando um papel fundamental na transmissão de conhecimentos, habilidades e valores para os alunos.'),            
             ('Merendeira', 'Funcionária responsável pela preparação e distribuição das refeições escolares.'),
             ('Técnica em alimentação escolar', 'Profissional especializada em planejar, preparar e supervisionar refeições nutritivas e balanceadas.'),
-            ('Porteiro escolar', 'Profissional encarregado de monitorar e controlar o acesso à escola.'),
-            ('Secretária escolar', 'Profissional responsável por tarefas administrativas e organizacionais dentro de uma instituição de ensino.'),
+            ('Porteiro escolar', 'Profissional encarregado de monitorar e controlar o acesso à escola.'),            
             ('Auxiliar Administrativo Escolar', 'Profissional que oferece suporte em atividades administrativas dentro de uma instituição educacional.')
+            
         ]
+
         Profissao.objects.bulk_create(
             [Profissao(nome_profissao=nome, descricao=descricao) for nome, descricao in nome_descreve]
         )
