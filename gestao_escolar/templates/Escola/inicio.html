@@ -10,6 +10,7 @@
     <link href="{% static 'global/css/geral_styler.css' %}" rel="stylesheet">
     <link href="{% static 'global/css/modals.css' %}" rel="stylesheet">
     <link href="{% static 'global/css/table_win11.css' %}" rel="stylesheet">
+    <link href="{% static 'global/css/table_win11.css' %}" rel="stylesheet" media="print">
     
 
     <style>
@@ -199,16 +200,23 @@
     {% endif %} 
 
     
-    <!--Impressos-->
+    <!--Impressos **************-->
+
+    {% if  conteudo_page == "imprime_escolas" %}
+        {% include 'Escola/partials/impressos/impresso_escolas.html' %}
+    {% endif %}   
+        
     {% if  conteudo_page == "imprime_turma" %}
         {% include 'Escola/partials/impressos/impresso_turmas.html' %}
-    {% endif %}       
+    {% endif %}   
+        
     {% if  conteudo_page == "imprime_turma_matricula" %}
         {% include 'Escola/partials/impressos/impresso_turmas_matricula.html' %}
     {% endif %}   
     {% if  conteudo_page == "imprime_comprovante_matricula" %}
         {% include 'Escola/partials/impressos/impresso_comprovante_matricula.html' %}
     {% endif %}   
+    <!--END Impressos **************-->
     {% if  conteudo_page == 'delete' %}
         {% include 'Escola/partials/seleciona_DELETE.html' %}
     {% endif %}    

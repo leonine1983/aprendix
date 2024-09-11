@@ -46,6 +46,7 @@
                                 <th>Nome Completo</th>
                                 <th>Email</th>
                                 <th>Escola</th>
+                                <th>Ação</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -56,6 +57,11 @@
                                 <td>{{user.first_name}} {{user.last_name}}</td>
                                 <td>{{user.email}}</td>
                                 <td>{{user.related_UserEscola.first.escola}}</td>
+                                {% if request.user.related_UserEscola.superuser or request.user.is_superuser %}
+                                    <td>Excluir</td>
+                                {% else %}
+                                    <td></td>                                
+                                {% endif %}
                             </tr>
                             {% endfor %}
                         </tbody>

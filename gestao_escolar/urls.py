@@ -125,6 +125,7 @@ urlpatterns = [
     
     # IMPRESSOS
     path('turmas/impressao', Imprime_Turmas.as_view(), name='imprime_list_turmas'),
+    path('escolas/impressao', Imprime_Escolas.as_view(), name='imprime_list_escolas'),
 
 
     # Ferramentas

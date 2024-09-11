@@ -19,7 +19,22 @@ class Imprime_Turmas (LoginRequiredMixin, SuccessMessageMixin, ListView):
         turmas = Turmas.objects.filter(ano_letivo=ano)
         context ['list_turmas'] = turmas
         context ['list_escola'] = escolas
-        context ['conteudo_page'] = "imprime_turma"
+        context ['conteudo_page'] = "imprime_turma"        
         
+        return context
+    
+class Imprime_Escolas (LoginRequiredMixin, SuccessMessageMixin, ListView):
+    model = Turmas
+    template_name = 'Escola/inicio.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ano = self.request.session['anoLetivo_id']
+        escola = self.request.session['escola_id']
+        escolas = Escola.objects.all()
+        turmas = Turmas.objects.filter(ano_letivo=ano)
+        context ['list_turmas'] = turmas
+        context ['list_escola'] = escolas
+        context ['conteudo_page'] = "imprime_escolas"        
         
         return context

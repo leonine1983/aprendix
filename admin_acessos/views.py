@@ -183,5 +183,10 @@ class CreateUsers(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs) :
         context = super().get_context_data(**kwargs)
         context['conteudo_page'] = 'create_users'   
-        context['all_user_school'] = User.objects.all()  
+        pk_school = self.request.session['escola_id']
+        user = self.request.user
+        if user.is_superuser:
+            context['all_user_school'] = User.objects.all()  
+        else:
+            context['all_user_school'] = User.objects.filter(related_UserEscola__escola=pk_school)  
         return context

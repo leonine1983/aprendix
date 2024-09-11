@@ -1,48 +1,57 @@
 /* Estilo geral da tabela */
 .win11-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 18px;
-    box-shadow: rgba(0, 0, 0, 0.18) 0px 2px 4px!important;
-    border-radius: 8px;
-    overflow: hidden;
-    }
-    .win11-table h1 {
-    text-align: center;
-    color: #333;
-    font-size: 24px;
-    margin-bottom: 1px;
-    }
-    .win11-table thead {
-    background-color: #0078d4!important;
-    color: #493b3b;
-    }
-    .win11-table thead th {
-    padding: 12px 15px;
-    text-align: center;
-    }
-    .win11-table tbody tr {
-    border-bottom: 1px solid #dddddd;
-    }
-    .win11-table tbody tr:nth-of-type(even) {
-    background-color: #f3f3f3;
-    }
-    .win11-table tbody tr:last-of-type {
-    border-bottom: 2px solid #0078d4;
-    }
-    .win11-table tbody td {
-    padding: 1px 5px ;
-    text-align: center;
-    font-size: 0.9rem;
-    }
-    .win11-table tbody td:first-child {
-    text-align: center;
-    }
-    .win11-table th,
-    .win11-table td {
-    border: 1px solid #dddddd;
-    }
-    .win11-table th {
-    background-color: #f4f4f4;
-    }
-    
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 14px !important;
+    box-shadow: rgba(0, 0, 0, 0.18) 0px 2px 4px !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+}
+
+.win11-table h1 {
+    text-align: center !important;
+    color: #333 !important;
+    font-size: 24px !important;
+    margin-bottom: 1px !important;
+}
+
+.win11-table thead {
+    background-color: #0078d4 !important;
+    color: #493b3b !important;
+}
+
+.win11-table thead th {
+    padding: 12px 15px !important;
+    text-align: center !important;
+}
+
+.win11-table tbody tr {
+    border-bottom: 1px solid #dddddd !important;
+}
+
+.win11-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3 !important;
+}
+
+.win11-table tbody tr:last-of-type {
+    border-bottom: 2px solid #0078d4 !important;
+}
+
+.win11-table tbody td {
+    padding: 1px 5px !important;
+    text-align: center !important;
+    font-size: 0.9rem !important;
+}
+
+.win11-table tbody td:first-child {
+    text-align: center !important;
+}
+
+.win11-table th,
+.win11-table td {
+    border: 1px solid #dddddd !important;
+}
+
+.win11-table th {
+    background-color: #f4f4f4 !important;
+}

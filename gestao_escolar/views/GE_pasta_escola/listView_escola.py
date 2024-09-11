@@ -1,10 +1,10 @@
 from rh.models import Escola
-from django.views.generic import ListView
+from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import datetime
 
 
-class ListView_Escola(LoginRequiredMixin, ListView):
+class ListView_Escola(LoginRequiredMixin, TemplateView):
     model = Escola
     template_name = 'Escola/inicio.html'
     context_object_name = 'escolas'
@@ -14,11 +14,9 @@ class ListView_Escola(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)        
         context['titulo_page'] = 'Selecione uma escola'          
         context['svg'] = svg 
-        context['now'] = datetime.now()
-        
+        context['now'] = datetime.now()        
         context['conteudo_page'] = 'Nome das Escolas'       
-        context['help'] = 'Nome das Escolas'     
-        
+        context['help'] = 'Nome das Escolas'             
         context['page_ajuda'] = "<div class='m-2'>\
                                     <p>Oi! Precisa de ajuda <i class='fa-duotone fa-solid fa-message-question fs-2'></i></p>\
                                     <p>Eu sou o Professor Coruja, ou como gosto de ser chamado, ARISTO. Vou ser seu ajudante aqui no Aprendix.</p>\
@@ -27,6 +25,11 @@ class ListView_Escola(LoginRequiredMixin, ListView):
                                     <p>Para começar, clique na lista acima e escolha uma das escolas disponíveis para a sua conta. Aqui você verá todas as escolas vinculadas ao seu cadastro. Pode ser uma ou várias escolas.</p>\
                                     <p>Se houver muitas escolas, pode ser necessário digitar parte do nome da escola para encontrá-la. Se a escola não aparecer, entre em contato com o administrador para verificar o que pode ter dado errado.</p>\
                                 </div>"
+        user = self.request.user
+        if user.is_superuser:
+            context['object_list'] = Escola.objects.all()
+        else:
+            context['object_list'] = Escola.objects.filter(related_escolaUser__usuario = user.id)
         
         return context
             

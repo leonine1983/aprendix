@@ -70,20 +70,20 @@
                     </div>
                     <hr>
                     <h2 >Relação de Turmas | <span class='text-capitalize'>{{request.session.escola_nome}}</span> </h2>
-                    <table  style='width:100%'>
+                    <table  style='width:100%' class='win11-table'>
                         <tr style='background:#ccc'>
-                            <th >Turma</th>
-                            <th>Ano Letivo</th>
+                            <th >Escola</th>
+                            <th>Nome do Diretor</th>
                             <th>Turno</th>                            
                             <th>Limite de Vagas</th>
                             <th>Vagas Disponíveis</th>
                             <th>Matriculas</th>
                             <th>Multiseriada</th>
                         </tr>
-                        {% for l  in list_turmas %}
-                        <tr style='text-align:center; border: #ccc 0.1rem solid; text-transform: uppercase;'>
-                            <td>{{l.nome}} - {{l.descritivo_turma}}</td>
-                            <td>{{l.ano_letivo}}</td>
+                        {% for l  in list_escola %}
+                        <tr style='border: #ccc 0.1rem solid; text-transform: capitalize;'>
+                            <td>{{l.nome_escola}}</td>
+                            <td>{% if l.related_dadosEscola.nome_diretor %}{{l.related_dadosEscola.nome_diretor}}{% else %} Não adicionado pela escola{% endif %}</td>
                             <td>{{l.turno}}</td>
                             <td>{{l.quantidade_vagas }}</td>
                             <td>{% if l.vagas_disponiveis %}{{l.vagas_disponiveis}}{% else %}{{l.quantidade_vagas }}{% endif %}</td>
