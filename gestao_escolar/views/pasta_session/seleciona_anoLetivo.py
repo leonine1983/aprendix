@@ -2,6 +2,7 @@ from gestao_escolar.models import *
 from django.shortcuts import redirect
 from django.urls import reverse
 from gestao_escolar.models import AnoLetivo
+from rh.models import Escola, Decreto
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import plotly.express as px
@@ -24,9 +25,17 @@ def seleciona_anoLetivo_session(request, pk):
         graph_json = pio.to_json(fig)
         request.session['matriculas_graficos'] =graph_json
         
+        # Decretos / Gestores
+        local_destino = Escola.objects.get(id = request.session['escola_id'])
+        diretor = Decreto.objects.filter(destino = local_destino, profissao__nome_profissao = "Diretor Escolar").last()
+        vice_diretor = Decreto.objects.filter(destino = local_destino, profissao__nome_profissao = 'Vice-Diretor Escolar').last()
+        coordenador = Decreto.objects.filter(destino = local_destino, profissao__nome_profissao = 'Coordenador Escolar').last()
+        secretario = Decreto.objects.filter(destino = local_destino, profissao__nome_profissao = 'Secretária escolar').last()            
+        request.session['diretor'] = diretor
+        request.session['vice_diretor'] = vice_diretor
+        request.session['coordenador'] = coordenador
+        request.session['secretario'] = secretario   
 
-
-    
     ano = request.session.get('anoLetivo_nome', 'Ano letivo não definido')
     messages.success(request, f"Ano letivo selecionado: {ano}")
 

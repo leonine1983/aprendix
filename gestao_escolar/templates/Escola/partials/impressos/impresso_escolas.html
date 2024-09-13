@@ -31,28 +31,7 @@
                     <a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}" class=" btn btn-sm btn-success" title="Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
                         Criar nova turma <i class="fa-solid fa-plus mx-3"></i></a>
                 </div>
-                <div class=" m-auto  shadow " id="content_imprimir" style="width: 900px;max-height: 800px;min-height:auto;padding:0.5rem" >
-                    <style>
-                      @media print {    
-                        @import url('https://fonts.googleapis.com');         
-                        @import url('https://fonts.gstatic.com');
-                        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&display=swap');
-                        body {
-                            font-family: "M PLUS Rounded 1c", sans-serif !important;
-                            font-weight: 400;
-                            font-style: normal;
-                        }
-                        h2{
-                            font-size:0.9rem!important;
-                            font-family: "M PLUS Rounded 1c", sans-serif !important;
-                        }   
-                        table th, table td{
-                            padding:0.5rem;
-                            font-size:0.8rem!important;
-                        }     
-                            
-                    } 
-                    </style>
+                <div class=" m-auto  shadow " id="content_imprimir" style="max-height: 800px;min-height:auto;padding:0.5rem" >                   
                     <div style="max-height: 7rem; display:flex; justify-content: space-between" class='d-flex'>
                         <div id='prefeitura' style='margin:0.5rem; display:flex; width:auto '>
                             <img style='margin-right:1rem; height:5rem' src='{% static "brasao-veracruz.png " %}' alt="" srcset="">
@@ -73,22 +52,21 @@
                     <table  style='width:100%' class='win11-table'>
                         <tr style='background:#ccc'>
                             <th >Escola</th>
-                            <th>Nome do Diretor</th>
-                            <th>Turno</th>                            
-                            <th>Limite de Vagas</th>
-                            <th>Vagas Disponíveis</th>
-                            <th>Matriculas</th>
-                            <th>Multiseriada</th>
+                            <th>Diretor</th>                              
+                            <th>Vice Diretor</th>                                                        
+                            <th>Secretário</th>  
+                            <th>Coordenador Pedagógico</th>  
                         </tr>
                         {% for l  in list_escola %}
                         <tr style='border: #ccc 0.1rem solid; text-transform: capitalize;'>
                             <td>{{l.nome_escola}}</td>
-                            <td>{% if l.related_dadosEscola.nome_diretor %}{{l.related_dadosEscola.nome_diretor}}{% else %} Não adicionado pela escola{% endif %}</td>
-                            <td>{{l.turno}}</td>
-                            <td>{{l.quantidade_vagas }}</td>
-                            <td>{% if l.vagas_disponiveis %}{{l.vagas_disponiveis}}{% else %}{{l.quantidade_vagas }}{% endif %}</td>
-                            <td>{{l.related_matricula_turma.all|length }}</td>
-                            <td>{% if turma_multiserie %}Sim {% else %}Não{% endif %}</td>
+                            <td>{% for l in l.local_decreto.all  %}
+                                    {% if l.profissao.nome_profissao == 'Diretor Escolar' %}{{l}}{% endif %}                                    
+                                {% endfor %}
+                            </td>                            
+                            <td>{% if request.session.secretario %}{{request.session.secretario}}{% endif %}</td>                            
+                            <td>{% if request.session.coordenador %}{{request.session.coordenador}}{% endif %}</td>
+                            
 
                         </tr>
                         {% endfor %}
