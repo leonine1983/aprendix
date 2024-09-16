@@ -12,6 +12,7 @@ admin.site.register(Sexo)
 admin.site.register(Pessoas)
 admin.site.register(Contrato)
 admin.site.register(Decreto)
+admin.site.register(DecretoAnoLetivoAtivo)
 admin.site.register(Vinculo_empregaticio)
 admin.site.register(Encaminhamentos)
 

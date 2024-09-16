@@ -1,0 +1,33 @@
+<h1 class="text-uppercase txt-p fs-5 p-0 m-0">{{request.session.escola_nome}}  </h1>
+<p class="m-0 p-0 fs-6">Diretor 
+    {{  request.session.diretor}}
+    {% if request.session.diretor %}
+        {% if request.session.diretor.ano_decreto.id != request.session.anoLetivo_id %}
+            | Extendido para
+            {% for n in request.session.diretor.Decreto_decretoAtivo.all %}            
+                {% if n.ano_ativo.id == request.session.anoLetivo_id %}
+                    {{n.ano_ativo}}
+                {% endif %}
+            {% endfor %} 
+        {% endif %}
+        {% else %}
+        <a href="{% url 'Gestao_Escolar:decreto-create' %}"><span title='Vá em decretos e EXTENDA o decreto do último Diretor ou Cadastre um novo de decreto de Diretor'>(Ainda não definido para o Ano Letivo atual)</span></a>        
+    {% endif %}
+</p>
+
+<p class="m-0 p-0 fs-6">Secretário(a) 
+    {% if request.session.secretario %} 
+        {{ request.session.secretario }}
+        {% if request.session.secretario.ano_decreto.id != request.session.anoLetivo_id %}
+            | Extendido para
+            {% for n in request.session.secretario.Decreto_decretoAtivo.all %}            
+                {% if n.ano_ativo.id == request.session.anoLetivo_id %}
+                    {{n.ano_ativo}}
+                {% endif %}
+            {% endfor %} 
+        {% endif %}
+        {% else %}
+        <a href="{% url 'Gestao_Escolar:decreto-create' %}"><span title='Vá em decretos e EXTENDA o decreto do último secretário ou Cadastre um novo de decreto de secretário'>(Ainda não definido para o Ano Letivo atual)</span></a>        
+    {% endif %}
+</p>
+<p class="m-0 p-0 fs-6"><i class="fa-solid fa-calendar-days "></i> Ano Letivo: {{request.session.anoLetivo_nome}}</p>

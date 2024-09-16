@@ -266,8 +266,6 @@ class Decreto(models.Model):
     ano_decreto = models.ForeignKey(Ano, on_delete=models.CASCADE, related_name='Ano_decreto', verbose_name="Ano de Publicação do Decreto")   
     numero_decreto = models.CharField(max_length=50,  null=False,  verbose_name='Número de controle do decreto')
 
-
-
     #Segurança
     created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
     author_created = models.CharField(max_length=50,  null=True, blank=True, verbose_name='Autor da criação')
@@ -280,6 +278,11 @@ class Decreto(models.Model):
 class DecretoAnoLetivoAtivo(models.Model):
     decreto = models.ForeignKey(Decreto, on_delete=models.CASCADE, related_name='Decreto_decretoAtivo', verbose_name="Definir se o decreto está ativo para o ano letivo atual")  
     ano_ativo = models.ForeignKey(Ano, on_delete=models.CASCADE, related_name='Ano_decretoAtivo', verbose_name="Definir se o decreto está ativo para o ano letivo atual")  
+    #Segurança
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
+    author_created = models.CharField(max_length=50,  null=True, blank=True, verbose_name='Autor da criação')
+    atualizado_em = models.DateTimeField(auto_now=True,  verbose_name='Data da Última Atualização')
+    author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
 
     def __str__(self):
         return f'Em atividade para {self.ano_ativo}'

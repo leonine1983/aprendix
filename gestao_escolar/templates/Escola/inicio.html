@@ -168,7 +168,12 @@
     {% endif %}
     {% if  conteudo_page ==  'Decreto Update or Delete' %}
         {% include 'Escola/partials/decreto/decreto_create.html' %}
-    {% endif %}    
+    {% endif %}  
+
+    <!--Decreto ativo-->    
+    {% if  conteudo_page ==  'Decreto Ativo' %}
+        {% include 'Escola/partials/decreto/decreto_createAtivo.html' %}
+    {% endif %}   
     
     <!--Grades-->
     {% if  conteudo_page == 'Todas as turmas-grade' %}

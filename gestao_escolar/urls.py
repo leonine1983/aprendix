@@ -95,6 +95,9 @@ urlpatterns = [
     path('decretos/criar/', DecretoCreateView.as_view(), name='decreto-create'),
     path('decretos/<int:pk>/editar/', DecretoUpdateView.as_view(), name='decreto-update'),
     #path('decretos/<int:pk>/excluir/', DecretoDeleteView.as_view(), name='decreto-delete'),
+
+    # Decreto Ativo    
+    path('decretos/ano_ativo/<int:pk>', DecretoAnoLetivoAtivo_create.as_view(), name='decreto-ativo'),
     
 
     # Definir o cargo que o profissional irá exercer na escola
