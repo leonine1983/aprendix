@@ -165,6 +165,15 @@
         {% include 'Escola/partials/pessoas/update_or_delete.html' %}
     {% endif %}
     
+    <!--PessoasContrato para uso de decreto e outros-->
+    {% if  conteudo_page ==  'Contrato Create' %}
+        {% include 'Escola/partials/pessoasContrato/pessoaContrato_create.html' %}
+    {% endif %}
+    {% if  conteudo_page ==  'Contrato Update_Delete' %}
+        {% include 'Escola/partials/pessoasContrato/update_or_delete.html' %}
+    {% endif %}
+
+    
    
     <!--Decreto-->
     {% if  conteudo_page ==  'Decreto Create'  %}

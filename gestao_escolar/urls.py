@@ -89,6 +89,9 @@ urlpatterns = [
     path('pessoas/<int:pk>/editar/', PessoasUpdateView.as_view(), name='pessoas-update'),
     #path('pessoas/<int:pk>/excluir/', PessoasDeleteView.as_view(), name='pessoas-delete'),
 
+    # pessoasContrato (para uso de decreto e outros) ----------------------------------------------
+    path('pessoas/contrato/<int:pk>', PessoasContratoCreateView.as_view(), name='pessoasContrato-create'),
+
     # Decretos
     #path('decretos/', DecretoListView.as_view(), name='decreto-list'),
     #path('decretos/<int:pk>/', DecretoDetailView.as_view(), name='decreto-detail'),

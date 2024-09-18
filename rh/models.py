@@ -210,13 +210,13 @@ class Vinculo_empregaticio(models.Model):
 class Contrato(models.Model):
     ano_contrato = models.ForeignKey(Ano, related_name='ano_contrato_related',verbose_name='Ano do contrato', on_delete=models.CASCADE)
     contratado = models.ForeignKey(Pessoas, related_name='pessoa_contratada', verbose_name='Pessoa a ser contratada', on_delete=models.CASCADE)
-    text_contrato = models.ForeignKey(Texto_Contrato,related_name='Texto_contrao_related', null=True, verbose_name='Vinculo com o tipo de contrato', on_delete=models.CASCADE)    
+    text_contrato = models.ForeignKey(Texto_Contrato,related_name='Texto_contrao_related', null=True, blank=True, verbose_name='Vinculo com o tipo de contrato', on_delete=models.CASCADE)    
     nome_profissao = models.ForeignKey(Profissao, null=True, verbose_name='Função que irá desempenhar na escola', on_delete=models.CASCADE)     
     nome_escola = models.ForeignKey(Escola, null=True, verbose_name='Escola que o profissional irá desempenhar suas funções', on_delete=models.CASCADE) 
-    salario = models.ForeignKey(Salario, null=True, verbose_name='Valor do salário para o cargo escolhido. Atente-se para o ano em que o valor do salário está vigente', on_delete=models.CASCADE)
+    salario = models.ForeignKey(Salario, null=True, blank=True, verbose_name='Valor do salário para o cargo escolhido. Atente-se para o ano em que o valor do salário está vigente', on_delete=models.CASCADE)
     data_inicio_contrato = models.DateField(auto_now_add=True)
-    data_fim_contrato = models.DateField(null=True)
-    tempo_meses = models.IntegerField( null=True)
+    data_fim_contrato = models.DateField(null=True, blank=True)
+    tempo_meses = models.IntegerField( null=True, blank=True)
 
     #Segurança
     created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    

@@ -16,4 +16,5 @@ from .cidade import *
 from .minhaEscola import *
 from .decretos import *
 from .pessoas import *
+from .pessoas_contrato import *
 #from .ferramentas import *
