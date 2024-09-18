@@ -100,7 +100,7 @@ class Pessoas(models.Model):
     sexo = models.ForeignKey(Sexo, models.CASCADE, null=True)
     data_nascimento = models.DateField(null=True)    
     idade= models.CharField(max_length=9, null=True, blank=True)
-    nome_profissao = models.ManyToManyField(Profissao, blank=True, verbose_name='Profissões')    
+    nome_profissao = models.ForeignKey(Profissao, null=True, blank=True, verbose_name='Profissão', on_delete=models.CASCADE)    
     cpf = models.CharField(max_length=30, null=True, verbose_name='CPF')
     rg= models.CharField(max_length=30, null=True, verbose_name='RG')
     rua= models.CharField(max_length=50, null=True, verbose_name='Nome da rua, avenida etc.')
@@ -108,7 +108,10 @@ class Pessoas(models.Model):
     numero_casa= models.CharField(max_length=10, null=True, verbose_name='Numero da casa ou s/n')
     bairro = models.ForeignKey(Bairro, on_delete=models.CASCADE, related_name='pessoas_bairro_related', null=True, verbose_name='Bairro')     
     cidade = models.ForeignKey(Cidade, on_delete=models.CASCADE, related_name='pessoas_cidade_related', null=True, verbose_name='Cidade')
-    cep= models.CharField(max_length=30, null=True, verbose_name='CEP')       
+    cep= models.CharField(max_length=30, null=True, verbose_name='CEP')      
+
+    login_professor = models.CharField(max_length=10, null=True, blank=True)     
+    senha = models.CharField(max_length=10, null=True, blank=True, default='12345678') 
 
     def calcula_idade (self):
         if self.data_nascimento:
@@ -481,7 +484,7 @@ def post_migrate_setup(sender, **kwargs):
     if not Profissao.objects.exists():
         nome_descreve = [
             ('Diretor Escolar', 'Profissional encarregado da administração e gestão de uma escola.'),
-            ('Vice-Diretor Escolar', 'Profissional que auxilia o diretor escolar na administração e gestão da escola, assumindo suas funções na sua ausência e colaborando nas decisões administrativas e pedagógicas.')
+            ('Vice-Diretor Escolar', 'Profissional que auxilia o diretor escolar na administração e gestão da escola, assumindo suas funções na sua ausência e colaborando nas decisões administrativas e pedagógicas.'),
             ('Coordenador Escolar', 'Profissional que supervisiona as operações e as atividades educacionais de uma escola.'),
             ('Secretária escolar', 'Profissional responsável por tarefas administrativas e organizacionais dentro de uma instituição de ensino.'),
             ('Professor', 'Profissional dedicado à educação e ao ensino, desempenhando um papel fundamental na transmissão de conhecimentos, habilidades e valores para os alunos.'),            

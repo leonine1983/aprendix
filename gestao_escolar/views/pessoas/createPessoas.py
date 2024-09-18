@@ -3,12 +3,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rh.models import Pessoas
+from .professor_form import Pessoa_form, Pessoa_form_update
 
-class PessoasListView(LoginRequiredMixin, ListView):
-    model = Pessoas
-    template_name = 'pessoas_list.html'
-    context_object_name = 'pessoas'
-    login_url = '/login/'
 
 class PessoasDetailView(LoginRequiredMixin, DetailView):
     model = Pessoas
@@ -19,7 +15,7 @@ class PessoasDetailView(LoginRequiredMixin, DetailView):
 class PessoasCreateView(LoginRequiredMixin, CreateView):
     model = Pessoas
     template_name = 'Escola/inicio.html'
-    fields = ['nome', 'sobrenome', 'sexo', 'data_nascimento',  'nome_profissao', 'cpf', 'rg', 'rua', 'complemento', 'numero_casa', 'bairro', 'cidade', 'cep']
+    form_class = Pessoa_form
     
     def form_valid(self, form):
         messages.success(self.request, 'Pessoa criada com sucesso!')
@@ -39,15 +35,20 @@ class PessoasCreateView(LoginRequiredMixin, CreateView):
         context['button'] = "Atualizar nome da escola"
         context['conteudo_page'] = 'Pessoa Create'
         context['pessoas'] = Pessoas.objects.all()
+        context['rh_ativo'] = 'False'
+        
         # Preenche o formulário com a instância de Escola_admin
         context['page_ajuda'] = "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional."
         return context 
 
 class PessoasUpdateView(LoginRequiredMixin, UpdateView):
     model = Pessoas
-    template_name = 'pessoas_form.html'
-    fields = ['nome', 'sobrenome', 'sexo', 'data_nascimento', 'idade', 'nome_profissao', 'cpf', 'rg', 'rua', 'complemento', 'numero_casa', 'bairro', 'cidade', 'cep']
-    login_url = '/login/'
+    template_name = 'Escola/inicio.html'
+    form_class = Pessoa_form_update
+
+    def get_success_url(self):
+        messages.success(self.request, 'Pessoa Atualizada com sucesso!')
+        return reverse_lazy('Gestao_Escolar:pessoas-create')
 
     def form_valid(self, form):
         messages.success(self.request, 'Pessoa atualizada com sucesso!')
@@ -56,10 +57,20 @@ class PessoasUpdateView(LoginRequiredMixin, UpdateView):
     def form_invalid(self, form):
         messages.error(self.request, 'Erro ao atualizar a pessoa. Verifique os dados e tente novamente.')
         return super().form_invalid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['btn_bg'] = "btn-success"
+        context['titulo_page'] = "Atualização de Informações Pessoais"        
+        context['button'] = "Atualizar Informações de"
+        context['conteudo_page'] = 'Update_Delete'        
+        # Preenche o formulário com a instância de Escola_admin
+        context['page_ajuda'] = "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional."
+        return context 
 
 class PessoasDeleteView(LoginRequiredMixin, DeleteView):
     model = Pessoas
-    template_name = 'pessoas_confirm_delete.html'
+    template_name = 'Escola/inicio.html'
     success_url = reverse_lazy('pessoas-list')
     login_url = '/login/'
 
