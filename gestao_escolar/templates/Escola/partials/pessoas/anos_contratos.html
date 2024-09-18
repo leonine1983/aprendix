@@ -1,0 +1,20 @@
+<button id="openDialog" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye"></i></button>
+<dialog id="instructionsDialog">
+    <div class="container mt-4">
+        <div class="alert alert-info" role="alert">
+            <strong>Relação de anos em que {{l.nome}} {{l.sobrenome}} foi contratado</strong>
+        </div>    
+        {% for contrato in l.pessoa_contratada.all %}                            
+            <ol class="list-group list-group-numbered">
+                <li class="list-group-item">                                    
+                    - Contratado em: <strong class="text-success fw-bolder">{{contrato.ano_contrato}}</strong> 
+                </li>
+            </ol>
+                {% if not forloop.last %},             
+                {% endif %}
+            {% empty %}
+            Nenhum contrato
+        {% endfor %}  
+    </div>                    
+    <button id="closeDialog" class="btn btn-secondary btn-close mt-5" title='Fechar'></button>
+</dialog>  
