@@ -2,93 +2,33 @@ from django import forms
 from rh.models import Escola
 from gestao_escolar.models import Turmas, Matriculas
 from rh.models import Pessoas, Vinculo_empregaticio, Ano, Contrato, Profissao, Encaminhamentos, Cidade, Bairro
+from django.db.models import Q
 import random
 import string
 
-# widget personalizado que usa as classes (form-control, border, p-3, pb-3 e ) para ser atribuido ao campo 'tempo_meses' 
 
-# 1º Esse
-class Pessoa_form(forms.ModelForm):   
-    nome = forms.CharField(
-        label="Nome do Professor",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
-    )
-    sobrenome = forms.CharField(
-        label="Sobrenome do Professor",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
-    )
-  
-    data_nascimento = forms.DateField(
-        label='Data de Nascimento:',
-        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3  text-secondary col2  rounded-1', 'type': 'date'}),        
-    )
-    cpf= forms.CharField(
-        label="Nº do CPF",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
-    )
-    rg= forms.CharField(
-        label="Nº do RG",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
-    )
-    rua= forms.CharField(
-        label=" Nome da Rua",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
-    )
-    complemento= forms.CharField(
-        label="Complemento",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
-    )
-    rg= forms.CharField(
-        label="Nº do RG",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
-    )
-    numero_casa= forms.CharField(
-        label="Nº da casa (ou SN)",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
-    )
-    bairro= forms.ModelChoiceField(
-        queryset=Bairro.objects.all(),
-        label="Bairro",
-        widget=forms.Select(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
-    )
-    cidade= forms.ModelChoiceField(
-        queryset=Cidade.objects.all(),        
-        label="Cidade onde mora",
-        widget=forms.Select(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
-    )
-    cep= forms.CharField(
-        label="CEP",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})        
-    )
-
-     # Add login and senha fields
-    login_professor = forms.CharField(
-        label="Login do Professor",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1 text-success col rounded-1 "}),
-        required=False  # Change to True if you want it to be mandatory
-    )
-    senha = forms.CharField(
-        label="Senha do Professor",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1 text-success col rounded-1"}),
-        required=False  # Change to True if you want it to be mandatory
-    )
-
-    class Meta:
-        model = Pessoas
-        fields = ['nome', 'sobrenome', 'data_nascimento', 'cpf', 'rg', 'numero_casa', 'bairro', 'cidade', 'cep', 'login_professor', 'senha']
+class Contrato_form(forms.ModelForm):   
+    nome_profissao = forms.ModelChoiceField(
+        label="Escolha qual a função que o profissional será contratado",
+        queryset=Profissao.objects.none(),      
+        widget=forms.Select(attrs={'class': "border border-info p-2 pb-1 text-secondary col rounded-1"})      
+    )  
 
     def __init__(self, *args, **kwargs):
+        # Remove 'profissao_query' de kwargs
+        profissao_query = kwargs.pop('profissao_query', None)  
+        # Chama o __init__ da classe pai com os kwargs restantes
         super().__init__(*args, **kwargs)
-        self.fields['login_professor'].initial = self.generate_login()
-        self.fields['senha'].initial = '12345678'
+        
+        # Define o queryset se 'profissao_query' for fornecido
+        if profissao_query is not None:
+            self.fields['nome_profissao'].queryset = profissao_query  
 
-    def generate_login(self):
-        while True:
-            letra = random.choice(string.ascii_lowercase)
-            numero = ''.join(random.choices(string.digits, k=5))  # Corrected the digits
-            login = f'{letra}-{numero}'
-            if not Pessoas.objects.filter(login_professor=login).exists():
-                return login
+    class Meta:
+        model = Contrato
+        fields = ['nome_profissao']
+    
+    
 
 
 class Pessoa_form_update(forms.ModelForm):   

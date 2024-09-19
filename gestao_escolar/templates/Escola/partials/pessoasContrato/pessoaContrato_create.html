@@ -36,16 +36,14 @@
       <div class="modal-body shadow-sm bg-light-subtle" style='width:90vw!important'>
         <ul class="nav nav-tabs" id="myTab" role="tablist">
           {% if rh_ativo == 'False' %}
-          <li>
+       
             <li id="all_people" class="nav-item rh-list mt-3" role="presentation">
               <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"><i class="fa-duotone fa-person-sign"></i><i class="fa-duotone fa-address-card" style="--fa-secondary-color: #511f3c;"></i> Todos as pessoas {{turma_ativa}} </button>
             </li>
             <!--<li id="cadastra_people" class="nav-item bg-secondary-subtle rh-list mt-3" role="presentation">
               <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false"><i class="fa-duotone fa-address-card" style="--fa-secondary-color: #511f3c;"></i> Encaminhamentos para a escola <i class="fa-duotone fa-person-sign"></i><i class="fa-sharp fa-solid fa-plus text-info"></i></button>
-            </li>--> 
-            <li id="cadastra_people" class="nav-item bg-secondary-subtle rh-list mt-3" role="presentation">
-              <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane1" type="button" role="tab" aria-controls="profile-tab-pane1" aria-selected="false"><i class="fa-duotone fa-address-card" style="--fa-secondary-color: #511f3c;"></i> Cadastrar nova pessoa <i class="fa-duotone fa-person-sign"></i><i class="fa-sharp fa-solid fa-plus text-info"></i></button>
-            </li>                               
+            </li>-->
+            {% else %}                             
           {% endif %} 
           <!--
           <li class="nav-item" role="presentation">
@@ -55,28 +53,12 @@
         </ul>
         <div class="tab-content" id="myTabContent">
           <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">   
-            <!-- Todos -->
-            {% include "Escola/partials/pessoas/table_Todos.html" %}      
-          </div>
-          
-          <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">  
-            <!-- Encaminhamentos para a escola -->  
-
-
-
-
-
-
-
-            {% include 'Escola/partials/pessoas/pessoas_form.html' %}     
-          </div> 
-          <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane1" role="tabpanel" aria-labelledby="profile-tab" tabindex="0"> 
-            <!--  Cadastrar nova pessoa -->     
-            {% include "Escola/partials/partials_professores/partials_seleciona _pessoas/Cadastrar_nova_pessoa.html" %}
-          </div>                         
-          <div class="tab-pane fade  p-3" id="profile-tab-pane2" role="tabpanel2" aria-labelledby="profile-tab2" tabindex="0">
-            {% include "Escola/partials/partials_professores/partials_seleciona _pessoas/PROFISSIONAIS_na_escola.html" %}
-          </div>              
+            <form action="">
+              {% csrf_token %}
+              {{form.as_p}}ttttttttttttttttttttttttttttttttttttttttttttttttttt
+              <button type="submit">{{button}}</button>
+            </form>  
+          </div>                    
         </div>      
       </div>        
              
