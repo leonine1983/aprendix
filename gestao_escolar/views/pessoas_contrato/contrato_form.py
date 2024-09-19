@@ -10,19 +10,14 @@ import string
 class Contrato_form(forms.ModelForm):   
     nome_profissao = forms.ModelChoiceField(
         label="Escolha qual a função que o profissional será contratado",
-        queryset=Profissao.objects.none(),      
+        queryset=Profissao.objects.all(),
         widget=forms.Select(attrs={'class': "border border-info p-2 pb-1 text-secondary col rounded-1"})      
-    )  
+    )     
 
     def __init__(self, *args, **kwargs):
-        # Remove 'profissao_query' de kwargs
-        profissao_query = kwargs.pop('profissao_query', None)  
-        # Chama o __init__ da classe pai com os kwargs restantes
         super().__init__(*args, **kwargs)
-        
-        # Define o queryset se 'profissao_query' for fornecido
-        if profissao_query is not None:
-            self.fields['nome_profissao'].queryset = profissao_query  
+
+        self.fields['nome_profissao'].queryset = self.query
 
     class Meta:
         model = Contrato

@@ -2,7 +2,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from rh.models import Contrato, Pessoas,Profissao
+from rh.models import Contrato, Pessoas,Profissao, Ano, Escola
 from .contrato_form import Pessoa_form_update, Contrato_form
 from django.db.models import Q
 
@@ -15,20 +15,32 @@ class PessoasContratoDetailView(LoginRequiredMixin, DetailView):
 class PessoasContratoCreateView(LoginRequiredMixin, CreateView):
     model = Contrato
     template_name = 'Escola/inicio.html'
-    form_class = Contrato_form
-       
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['profissao_query'] = Profissao.objects.all(
+    fields = ['nome_profissao']
+    
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Aplicar o filtro diretamente no queryset do campo 'nome_profissao'
+        form.fields['nome_profissao'].queryset = Profissao.objects.exclude(
             Q(nome_profissao='Diretor Escolar') |
             Q(nome_profissao='Vice-Diretor Escolar') |
             Q(nome_profissao='Coordenador Escolar') |
             Q(nome_profissao='Secretária escolar')
         )
-        return kwargs
-  
+        return form
+     
     
     def form_valid(self, form):
+        ano_id = self.request.session['anoLetivo_id']
+        escola_id  = self.request.session['escola_id']
+        pessoa_id = self.kwargs['pk']        
+        um =form.instance.contratado = Pessoas.objects.get(pk=pessoa_id)
+        dois = form.instance.ano_contrato = Ano.objects.get(pk=ano_id)        
+        tres =form.instance.nome_escola = Escola.objects.get(pk=escola_id)
+        print(f'o que temos aqui um = {um}')
+        print(f'o que temos aqui dois = {dois}')
+        print(f'o que temos aqui tres = {tres}')
+        form.save()
         messages.success(self.request, 'Contrato criado com sucesso!')
         return super().form_valid(form)
 
@@ -41,7 +53,7 @@ class PessoasContratoCreateView(LoginRequiredMixin, CreateView):
         return reverse_lazy('Gestao_Escolar:pessoas-create')
     
     def get_context_data(self, **kwargs):
-        pk = self.kwargs['pk']
+        pk = self.kwargs['pk']       
         pessoa = Pessoas.objects.get(pk = pk)
         context = super().get_context_data(**kwargs)
         context['btn_bg'] = "btn-success"
@@ -53,41 +65,6 @@ class PessoasContratoCreateView(LoginRequiredMixin, CreateView):
         context['page_ajuda'] = "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional."
         return context 
     
-    """
-    
-    # widget personalizado que usa as classes (form-control, border, p-3, pb-3 e ) para ser atribuido ao campo 'tempo_meses' 
-
-class Contrato(models.Model):
-    #ano_contrato = models.ForeignKey(Ano, related_name='ano_contrato_related',verbose_name='Ano do contrato', on_delete=models.CASCADE)
-    #contratado = models.ForeignKey(Pessoas, related_name='pessoa_contratada', verbose_name='Pessoa a ser contratada', on_delete=models.CASCADE)
-    #text_contrato = models.ForeignKey(Texto_Contrato,related_name='Texto_contrao_related', null=True, blank=True, verbose_name='Vinculo com o tipo de contrato', on_delete=models.CASCADE)    
-    
-    #nome_escola = models.ForeignKey(Escola, null=True, verbose_name='Escola que o profissional irá desempenhar suas funções', on_delete=models.CASCADE)     
-    
-
-    #Segurança
-    #created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
-    #author_created = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da criação')
-    #atualizado_em = models.DateTimeField(auto_now=True, verbose_name='Data da Última Atualização')
-    #author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
-
-    #def calcula_data_fim_contrato(self):
-        if self.tempo_meses and self.data_inicio_contrato:
-            # Se os campos tempo_mese e data_inicio_contrato for adicionado pelo usuario
-            self.data_fim_contrato = self.data_inicio_contrato + timedelta(days=self.tempo_meses * 30)
-
-    def save(self, *args, **kwargs):
-        self.calcula_data_fim_contrato()
-        super().save(*args, **kwargs)
-
-    class Meta :
-        ordering = ['-ano_contrato']
-
-    def __str__(self):
-        return str(self.contratado)
-    
-    
-    """
 
 class PessoasContratoUpdateView(LoginRequiredMixin, UpdateView):
     model = Pessoas
