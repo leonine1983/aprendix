@@ -1,21 +1,28 @@
 from django import forms
 from rh.models import Escola
 from gestao_escolar.models import Turmas, Matriculas
-from rh.models import Pessoas, Vinculo_empregaticio, Ano, Contrato, Profissao, Encaminhamentos, Cidade, Bairro
+from rh.models import Pessoas, Vinculo_empregaticio, Ano, Contrato, Profissao, Encaminhamentos, Cidade, Bairro, Sexo
 import random
 import string
 
 # widget personalizado que usa as classes (form-control, border, p-3, pb-3 e ) para ser atribuido ao campo 'tempo_meses' 
 
 # 1º Esse
+bootstrap = {'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"}
+
 class Pessoa_form(forms.ModelForm):   
     nome = forms.CharField(
         label="Nome do Professor",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs=bootstrap)
     )
     sobrenome = forms.CharField(
         label="Sobrenome do Professor",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
+    )
+    sexo = forms.ModelChoiceField(
+        label="Gênero sexual da pessoa",
+        queryset=Sexo.objects.all(),
+        widget=forms.Select(attrs= bootstrap )        
     )
   
     data_nascimento = forms.DateField(
@@ -24,41 +31,41 @@ class Pessoa_form(forms.ModelForm):
     )
     cpf= forms.CharField(
         label="Nº do CPF",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
     )
     rg= forms.CharField(
         label="Nº do RG",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
     )
     rua= forms.CharField(
         label=" Nome da Rua",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
     )
     complemento= forms.CharField(
         label="Complemento",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
     )
     rg= forms.CharField(
         label="Nº do RG",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
     )
     numero_casa= forms.CharField(
         label="Nº da casa (ou SN)",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
     )
     bairro= forms.ModelChoiceField(
         queryset=Bairro.objects.all(),
         label="Bairro",
-        widget=forms.Select(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.Select(attrs= bootstrap )
     )
     cidade= forms.ModelChoiceField(
         queryset=Cidade.objects.all(),        
         label="Cidade onde mora",
-        widget=forms.Select(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.Select(attrs= bootstrap )
     )
     cep= forms.CharField(
         label="CEP",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})        
+        widget=forms.TextInput(attrs= bootstrap )        
     )
 
      # Add login and senha fields
@@ -75,7 +82,7 @@ class Pessoa_form(forms.ModelForm):
 
     class Meta:
         model = Pessoas
-        fields = ['nome', 'sobrenome', 'data_nascimento', 'cpf', 'rg', 'numero_casa', 'bairro', 'cidade', 'cep', 'login_professor', 'senha']
+        fields = ['nome', 'sobrenome','sexo', 'data_nascimento', 'cpf', 'rg', 'numero_casa', 'bairro', 'cidade', 'cep', 'login_professor', 'senha']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -94,59 +101,64 @@ class Pessoa_form(forms.ModelForm):
 class Pessoa_form_update(forms.ModelForm):   
     nome = forms.CharField(
         label="Nome do Professor",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
     )
     sobrenome = forms.CharField(
         label="Sobrenome do Professor",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
     )
-  
+    sexo = forms.ModelChoiceField(
+        label="Gênero sexual da pessoa",
+        queryset=Sexo.objects.all(),
+        widget=forms.Select(attrs= bootstrap )        
+    )
+    
     data_nascimento = forms.DateField(
         label='Data de Nascimento:',
         widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3  text-secondary col2  rounded-1', 'type': 'date'}),        
     )
     cpf= forms.CharField(
         label="Nº do CPF",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
     )
     rg= forms.CharField(
         label="Nº do RG",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
     )
     rua= forms.CharField(
         label=" Nome da Rua",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
     )
     complemento= forms.CharField(
         label="Complemento",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
     )
     rg= forms.CharField(
         label="Nº do RG",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
     )
     numero_casa= forms.CharField(
         label="Nº da casa (ou SN)",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
     )
     bairro= forms.ModelChoiceField(
         queryset=Bairro.objects.all(),
         label="Bairro",
-        widget=forms.Select(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.Select(attrs= bootstrap )
     )
     cidade= forms.ModelChoiceField(
         queryset=Cidade.objects.all(),        
         label="Cidade onde mora",
-        widget=forms.Select(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.Select(attrs= bootstrap )
     )
     cep= forms.CharField(
         label="CEP",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"})
+        widget=forms.TextInput(attrs= bootstrap )
     )
 
     class Meta:
         model = Pessoas
-        fields = ['nome', 'sobrenome', "data_nascimento",  'cpf', 'rg', 'numero_casa', 'bairro', 'cidade', 'cep']
+        fields = ['nome', 'sobrenome','sexo', "data_nascimento",  'cpf', 'rg', 'numero_casa', 'bairro', 'cidade', 'cep']
 
 
 

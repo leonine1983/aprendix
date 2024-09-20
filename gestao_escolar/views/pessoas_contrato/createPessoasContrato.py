@@ -2,7 +2,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from rh.models import Contrato, Pessoas,Profissao, Ano, Escola
+from rh.models import Contrato, Pessoas,Profissao, Ano, Escola, Encaminhamentos
 from .contrato_form import Pessoa_form_update, Contrato_form
 from django.db.models import Q
 
@@ -27,22 +27,36 @@ class PessoasContratoCreateView(LoginRequiredMixin, CreateView):
             Q(nome_profissao='Coordenador Escolar') |
             Q(nome_profissao='Secretária escolar')
         )
-        return form
-     
+        return form       
     
     def form_valid(self, form):
+        author = f'{self.request.user.first_name} {self.request.user.last_name}'
         ano_id = self.request.session['anoLetivo_id']
         escola_id  = self.request.session['escola_id']
         pessoa_id = self.kwargs['pk']        
-        um =form.instance.contratado = Pessoas.objects.get(pk=pessoa_id)
-        dois = form.instance.ano_contrato = Ano.objects.get(pk=ano_id)        
-        tres =form.instance.nome_escola = Escola.objects.get(pk=escola_id)
-        print(f'o que temos aqui um = {um}')
-        print(f'o que temos aqui dois = {dois}')
-        print(f'o que temos aqui tres = {tres}')
-        form.save()
+        form.instance.contratado = Pessoas.objects.get(pk=pessoa_id)
+        form.instance.ano_contrato = Ano.objects.get(pk=ano_id)        
+        form.instance.nome_escola = Escola.objects.get(pk=escola_id)
+        form.instance.author_created = author
+        form.save()        
+        # Criar o objeto em encaminhamento
+        profissao = form.instance.nome_profissao
+        pessoa = form.instance.id
+        Encaminhamentos.objects.create(
+            encaminhamento = Contrato.objects.get(pk=pessoa),
+            destino = Escola.objects.get(pk=escola_id),
+            profissao = profissao,
+            author_created = author
+        )
         messages.success(self.request, 'Contrato criado com sucesso!')
         return super().form_valid(form)
+    
+    """
+  
+    #Segurança 
+    author_created = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da criação')
+    author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
+    """
 
     def form_invalid(self, form):
         messages.error(self.request, 'Erro ao criar o Contrato. Verifique os dados e tente novamente.')

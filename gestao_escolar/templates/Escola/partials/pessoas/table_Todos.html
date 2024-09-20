@@ -76,11 +76,14 @@
                         {% endif %}  
                     </div>
                     <div>{% include "Escola/partials/pessoas/anos_contratos.html" %}   </div>
-                    <div>
-                        
-                        {% if l.pessoa_contratada.last.ano_contrato.ano is not None %}
+                    <div>                        
+                        {% if l.pessoa_contratada.last.ano_contrato.ano is not None %}     
                             {% if request.session.anoLetivo_nome == l.pessoa_contratada.last.ano_contrato.ano %} 
-                            Ainda não encaminha para a escola.
+                                {% for e in l.pessoa_contratada.last.encaminhamento_escolar.all  %}
+                                    {% if e.encaminhamento.ano_contrato.ano == request.session.anoLetivo_nome %}
+                                        {{e.destino.nome_escola}}
+                                    {% endif %}
+                                {% endfor %}
                             {% else %}
                             "Profissional ainda não contratado em {{request.session.anoLetivo_nome}}. Antes de encaminhá-lo, é necessário efetuar a contratação."
                             {% endif %}                        

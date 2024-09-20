@@ -51,13 +51,20 @@
           </li>     
           -->                                   
         </ul>
+        {% include "Escola/partials/mensagens.html" %}
         <div class="tab-content" id="myTabContent">
           <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">   
-            <form action="">
+            <form action="" method="post">
               {% csrf_token %}
-              {{form.as_p}}ttttttttttttttttttttttttttttttttttttttttttttttttttt
-              <button type="submit">{{button}}</button>
-            </form>  
+              {% if form.non_field_errors %}
+                  <div class="error">{{ form.non_field_errors }}</div>
+              {% endif %}
+              {% for field in form %}
+                  {{ field.errors }}
+                  {{ field.label_tag }} {{ field }}<br>
+              {% endfor %}
+              <button type="submit">{{ button }}</button>
+          </form>
           </div>                    
         </div>      
       </div>        
