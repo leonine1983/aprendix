@@ -86,7 +86,6 @@ class Salario(models.Model):
 
     def __str__(self):
         return self.valor
-    
 
 class Sexo(models.Model):
     nome = models.CharField(max_length=30)
@@ -96,6 +95,7 @@ class Sexo(models.Model):
     
 class Pessoas(models.Model):
     nome = models.CharField(max_length=30, null=False, verbose_name='Nome')
+    foto = models.ImageField(upload_to='pessoa_fotos/', null=True, blank=True, verbose_name="Adicione uma foto")
     sobrenome = models.CharField(max_length=30, null=False, verbose_name='Sobrenome')    
     sexo = models.ForeignKey(Sexo, models.CASCADE, null=True)
     data_nascimento = models.DateField(null=True)    
@@ -489,7 +489,7 @@ def post_migrate_setup(sender, **kwargs):
             ('Secretária escolar', 'Profissional responsável por tarefas administrativas e organizacionais dentro de uma instituição de ensino.'),
             ('Professor', 'Profissional dedicado à educação e ao ensino, desempenhando um papel fundamental na transmissão de conhecimentos, habilidades e valores para os alunos.'), 
             ('Reserva Técnica', 'Profissional responsável por apoiar a infraestrutura e a logística do ambiente escolar, garantindo que todos os recursos necessários estejam disponíveis para o funcionamento adequado das atividades educacionais.'),
-            ('Auxiliar de Classe', 'Colaborador que assiste o professor no dia a dia da sala de aula, ajudando na gestão de alunos e na preparação de materiais, contribuindo para um ambiente de aprendizado mais eficaz e acolhedor.')
+            ('Auxiliar de Classe', 'Colaborador que assiste o professor no dia a dia da sala de aula, ajudando na gestão de alunos e na preparação de materiais, contribuindo para um ambiente de aprendizado mais eficaz e acolhedor.'),
             ('Merendeira', 'Funcionária responsável pela preparação e distribuição das refeições escolares.'),
             ('Técnica em alimentação escolar', 'Profissional especializada em planejar, preparar e supervisionar refeições nutritivas e balanceadas.'),
             ('Porteiro escolar', 'Profissional encarregado de monitorar e controlar o acesso à escola.'),            

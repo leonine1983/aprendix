@@ -3,6 +3,7 @@ from django.contrib.auth.models import User, Group
 from django.dispatch import receiver
 from django.db.models.signals import post_migrate
 from ckeditor.fields import RichTextField
+from rh.models import Pessoas
 
 class MessageUser(models.Model):
     remetente = models.ForeignKey(User, null=True, on_delete=models.CASCADE, editable=False, verbose_name="Remetente da mensagem", related_name="sent_messages")
@@ -66,3 +67,11 @@ def setup_post_migrate(sender, **kwargs):
     group_names = ['Nutricionista', 'Professor', 'Diretor', 'Aluno']
     for group_name in group_names:
         Group.objects.get_or_create(name=group_name)
+
+
+class UserPessoas(models.Model):
+    user = models.OneToOneField(User, related_name="related_vinculoUserPessoa", on_delete=models.CASCADE)
+    pessoa = models.OneToOneField(Pessoas, related_name="related_vinculoPessoaUser", on_delete=models.PROTECT)
+
+    def __str__(self) :
+        return self.pessoa

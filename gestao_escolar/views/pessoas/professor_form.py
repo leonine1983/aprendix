@@ -12,12 +12,17 @@ bootstrap = {'class': "border border-info p-2 pb-1  text-secondary col  rounded-
 
 class Pessoa_form(forms.ModelForm):   
     nome = forms.CharField(
-        label="Nome do Professor",
+        label="Nome da Pessoa",
         widget=forms.TextInput(attrs=bootstrap)
     )
     sobrenome = forms.CharField(
-        label="Sobrenome do Professor",
+        label="Sobrenome da Pessoa",
         widget=forms.TextInput(attrs= bootstrap )
+    )
+    foto = forms.ImageField(
+        label="Foto da Pessoa",
+        required=False,  # Altere para True se quiser que seja obrigatório
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control-file'})
     )
     sexo = forms.ModelChoiceField(
         label="Gênero sexual da pessoa",
@@ -82,7 +87,7 @@ class Pessoa_form(forms.ModelForm):
 
     class Meta:
         model = Pessoas
-        fields = ['nome', 'sobrenome','sexo', 'data_nascimento', 'cpf', 'rg', 'numero_casa', 'bairro', 'cidade', 'cep', 'login_professor', 'senha']
+        fields = ['nome', 'sobrenome','foto','sexo', 'data_nascimento', 'cpf', 'rg', 'numero_casa', 'bairro', 'cidade', 'cep', 'login_professor', 'senha']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -106,6 +111,11 @@ class Pessoa_form_update(forms.ModelForm):
     sobrenome = forms.CharField(
         label="Sobrenome do Professor",
         widget=forms.TextInput(attrs= bootstrap )
+    )
+    foto = forms.ImageField(
+        label="Foto do Professor",
+        required=False,  # Altere para True se quiser que seja obrigatório
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control-file'})
     )
     sexo = forms.ModelChoiceField(
         label="Gênero sexual da pessoa",
@@ -158,7 +168,7 @@ class Pessoa_form_update(forms.ModelForm):
 
     class Meta:
         model = Pessoas
-        fields = ['nome', 'sobrenome','sexo', "data_nascimento",  'cpf', 'rg', 'numero_casa', 'bairro', 'cidade', 'cep']
+        fields = ['nome', 'sobrenome','foto','sexo', "data_nascimento",  'cpf', 'rg', 'numero_casa', 'bairro', 'cidade', 'cep']
 
 
 
