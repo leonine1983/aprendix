@@ -1,6 +1,6 @@
 from django import forms
 from rh.models import Encaminhamentos
-from gestao_escolar.models import Disciplina, Turmas,  TurmaDisciplina, Profissionais
+from gestao_escolar.models import Disciplina, Turmas,  TurmaDisciplina, Profissionais, Encaminhamentos
 
 # widget personalizado que usa as classes (form-control, border, p-3, pb-3 e bg-transparent) para ser atribuido ao campo 'tempo_meses' 
 
@@ -19,24 +19,24 @@ class Diciplina_Grade_form (forms.ModelForm):
     )   
     professor= forms.ModelChoiceField(
         label='Selecione o professor:',
-        queryset = Profissionais.objects.none(),
+        queryset = Encaminhamentos.objects.none(),
         widget=forms.Select(attrs={'class': ' border border-info p-1 pb-1  text-info m-2 rounded-1 col text-capitalize'}),
     )  
     professor2= forms.ModelChoiceField(
         label='Selicione o professor se houver necessidade de atribuir mais um professor na turma:',
-        queryset = Profissionais.objects.none(),
+        queryset = Encaminhamentos.objects.none(),
         widget=forms.Select(attrs={'class': ' border border-info p-1 pb-1  text-info m-2 rounded-1 col text-capitalize'}),
         required=False
     ) 
     reserva_tecnica = forms.ModelMultipleChoiceField(
         label='Selecione professores de Reserva Técnica, se houver necessidade:',
-        queryset = Profissionais.objects.none(),
+        queryset = Encaminhamentos.objects.none(),
         widget=forms.SelectMultiple(attrs={'class': 'border border-info p-1 pb-1 text-info m-2 rounded-1 w-75'}),
         required=False
     )
     auxiliar_classe = forms.ModelMultipleChoiceField(
         label='Selecione os auxiliares de classe, se houver necessidade:',
-        queryset=Profissionais.objects.all(),
+        queryset=Encaminhamentos.objects.all(),
         widget=forms.SelectMultiple(attrs={'class': 'border border-info p-1 pb-1 text-info m-2 rounded-1 w-75'}),
         required=False
     )
@@ -52,6 +52,8 @@ class Diciplina_Grade_form (forms.ModelForm):
     def __init__(self, *args, **kwargs):
             query_turma = kwargs.pop('turmas_query', None)
             query_professor = kwargs.pop('professor_query', None)
+            query_reserva_tecnica = kwargs.pop('reserva_tecnica', None)
+            query_auxiliar_classe = kwargs.pop('auxiliar_classe', None)
             super().__init__(*args, **kwargs)
             
             if query_turma is not None:
@@ -59,7 +61,8 @@ class Diciplina_Grade_form (forms.ModelForm):
                 self.fields['turma'].initial = query_turma.first()
                 self.fields['professor'].queryset= query_professor
                 self.fields['professor2'].queryset= query_professor
-                self.fields['reserva_tecnica'].queryset= query_professor
+                self.fields['reserva_tecnica'].queryset= query_reserva_tecnica
+                self.fields['auxiliar_classe'].queryset= query_auxiliar_classe
 
     class Meta:
         model = TurmaDisciplina
@@ -73,12 +76,11 @@ class Diciplina_Grade_update_form(forms.ModelForm):
         label='Selecione a Disciplina:',
         queryset=Disciplina.objects.all(),
         widget=forms.Select(attrs={'class': 'border border-info p-1 pb-1 text-info m-2 rounded-1 col'}),
-    )
-   
+    )   
    
     auxiliar_classe = forms.ModelMultipleChoiceField(
         label='Selecione os auxiliares de classe, se houver necessidade:',
-        queryset=Profissionais.objects.all(),
+        queryset=Encaminhamentos.objects.all(),
         widget=forms.SelectMultiple(attrs={'class': 'border border-info p-1 pb-1 text-info m-2 rounded-1 w-75'}),
         required=False
     )

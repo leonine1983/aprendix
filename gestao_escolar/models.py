@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db.models.signals import post_migrate, post_save
 from django.dispatch import receiver
-from rh.models import Ano as AnoLetivo, Uf_Unidade_Federativa, Sexo, Bairro, Cidade
+from rh.models import Ano as AnoLetivo, Uf_Unidade_Federativa, Sexo, Bairro, Cidade, Encaminhamentos
 from ckeditor_uploader.fields import RichTextUploadingField
 
 
@@ -372,10 +372,10 @@ class TurmaDisciplina(models.Model):
     disciplina = models.ForeignKey(Disciplina, on_delete=models.CASCADE, null=True)
     quant_aulas_semana = models.IntegerField(default=5, null=True)
     quant_aulas_dia = models.IntegerField(default=3, null=True)
-    professor = models.ForeignKey(Profissionais, related_name='gradeProfessor1_related', on_delete=models.CASCADE, null=True)
-    professo2 = models.ForeignKey(Profissionais, related_name='gradeProfessor2_related', on_delete=models.CASCADE, null=True, blank=True)
-    reserva_tecnica = models.ManyToManyField(Profissionais, related_name='reservaTecnica_related', null=True, blank=True)
-    auxiliar_classe = models.ManyToManyField(Profissionais, related_name='auxiliarClasse_related', null=True, blank=True)
+    professor = models.ForeignKey(Encaminhamentos, related_name='gradeProfessor1_related', on_delete=models.PROTECT, null=True)
+    professo2 = models.ForeignKey(Encaminhamentos, related_name='gradeProfessor2_related', on_delete=models.PROTECT, null=True, blank=True)
+    reserva_tecnica = models.ForeignKey(Encaminhamentos, related_name='reservaTecnica_related',on_delete=models.PROTECT,  null=True, blank=True)
+    auxiliar_classe = models.ForeignKey(Encaminhamentos, related_name='auxiliarClasse_related',on_delete=models.PROTECT, null=True, blank=True)
 
     carga_horaria_anual = models.IntegerField(null=True)
     limite_faltas = models.IntegerField(null=True)

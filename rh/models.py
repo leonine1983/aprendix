@@ -381,7 +381,7 @@ class Encaminhamentos(models.Model):
     author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
 
     def __str__(self):
-        return self.encaminhamento.contratado.nome  
+        return f'{self.encaminhamento.contratado.nome} {self.encaminhamento.contratado.sobrenome} - RG nº {self.encaminhamento.contratado.rg}'  
 
     def save(self, *args, **kwargs):
         # Verifica se já existe um contrato com as mesmas informações
@@ -487,7 +487,9 @@ def post_migrate_setup(sender, **kwargs):
             ('Vice-Diretor Escolar', 'Profissional que auxilia o diretor escolar na administração e gestão da escola, assumindo suas funções na sua ausência e colaborando nas decisões administrativas e pedagógicas.'),
             ('Coordenador Escolar', 'Profissional que supervisiona as operações e as atividades educacionais de uma escola.'),
             ('Secretária escolar', 'Profissional responsável por tarefas administrativas e organizacionais dentro de uma instituição de ensino.'),
-            ('Professor', 'Profissional dedicado à educação e ao ensino, desempenhando um papel fundamental na transmissão de conhecimentos, habilidades e valores para os alunos.'),            
+            ('Professor', 'Profissional dedicado à educação e ao ensino, desempenhando um papel fundamental na transmissão de conhecimentos, habilidades e valores para os alunos.'), 
+            ('Reserva Técnica', 'Profissional responsável por apoiar a infraestrutura e a logística do ambiente escolar, garantindo que todos os recursos necessários estejam disponíveis para o funcionamento adequado das atividades educacionais.'),
+            ('Auxiliar de Classe', 'Colaborador que assiste o professor no dia a dia da sala de aula, ajudando na gestão de alunos e na preparação de materiais, contribuindo para um ambiente de aprendizado mais eficaz e acolhedor.')
             ('Merendeira', 'Funcionária responsável pela preparação e distribuição das refeições escolares.'),
             ('Técnica em alimentação escolar', 'Profissional especializada em planejar, preparar e supervisionar refeições nutritivas e balanceadas.'),
             ('Porteiro escolar', 'Profissional encarregado de monitorar e controlar o acesso à escola.'),            

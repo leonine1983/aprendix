@@ -1,4 +1,4 @@
-from gestao_escolar.models import Turmas, TurmaDisciplina, Profissionais
+from gestao_escolar.models import Turmas, TurmaDisciplina, Encaminhamentos
 from django.views.generic import CreateView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -33,7 +33,9 @@ class Create_Grades(LoginRequiredMixin, CreateView, SuccessMessageMixin):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['turmas_query'] = Turmas.objects.filter(pk = self.kwargs['pk'])
-        kwargs['professor_query'] = Profissionais.objects.filter(nome__encaminhamento__nome_escola = self.request.session['escola_id'], nome__encaminhamento__ano_contrato = self.request.session['anoLetivo_id'], cargo__nome = "Professor")       
+        kwargs['professor_query'] = Encaminhamentos.objects.filter(encaminhamento__nome_escola = self.request.session['escola_id'], encaminhamento__ano_contrato = self.request.session['anoLetivo_id'], profissao__nome_profissao = 'Professor')    
+        kwargs['reserva_tecnica'] = Encaminhamentos.objects.filter(encaminhamento__nome_escola = self.request.session['escola_id'], encaminhamento__ano_contrato = self.request.session['anoLetivo_id'], profissao__nome_profissao = 'Reserva Técnica')          
+        kwargs['auxiliar_classe'] = Encaminhamentos.objects.filter(encaminhamento__nome_escola = self.request.session['escola_id'], encaminhamento__ano_contrato = self.request.session['anoLetivo_id'], profissao__nome_profissao = 'Auxiliar de Classe')    
         return kwargs
     
     def get_context_data(self, **kwargs):        
