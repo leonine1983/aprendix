@@ -7,7 +7,7 @@ from .disciplina_notasAlunos_form import NotasAlunos_All_form
 from django.db.models import Q
 
 
-class Create_Notas(LoginRequiredMixin, CreateView):
+class GestaoSelecionaTurma(LoginRequiredMixin, CreateView):
     model = GestaoTurmas
     #fields = "__all__"
     form_class = NotasAlunos_All_form

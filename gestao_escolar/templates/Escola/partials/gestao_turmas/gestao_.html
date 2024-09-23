@@ -14,11 +14,30 @@
         <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3 "><i style="font-size: 1.65rem;" class="fs-4 fa-solid fa-users-gear"></i> {{titulo_page}} <i class="fa-solid fa-angles-right"></i> {{matriculas.0.turma}}</span></h4>        
         <button type="button" class="close" data-dismiss="modal">&times;</button>      
       </div>
+      {% if alerta_falta_matricula  %}
+        <div class='alert alert-warning shadow' role='alert'>
+          {{alerta_falta_matricula|safe}}
+          <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="btn btn-sm btn-primary" title="Matrícula" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fs-5 fa-solid fa-screen-users  me-2"></i>
+            Matrícula de alunos nas turmas |  <b class='fs-5'>{{TurmaDisciplina.0.turma.nome}}{{TurmaDisciplina.0.turma.descritivo_turma}}</b>
+          </a>
+        </div>        
+      {% endif %}
+      {% if not matriculas %}
+        <div class="alert alert-info fs-5" role="alert">
+          Bem-vindo à área de gerenciamento de turmas! 📚 Para dar início à gestão, selecione a turma desejada e clique no botão <strong>Coordenar Turma</strong>. 
+        </div>
+      {% else %}
+        <div class="alert alert-info fs-5" role="alert">
+          Nesta área, são lançadas as notas e faltas dos alunos por trimestre, permitindo acompanhar seu desempenho e frequência. Além disso, também se cria a grade de horários escolares, organizada para otimizar o aprendizado e atender às necessidades das turmas. Essa gestão é fundamental para promover um ambiente educacional eficiente e de qualidade.
+        </div>
+      {% endif %}
+      
       <!-- tabs -->
       <div class="pcss3t pcss3t-effect-scale pcss3t-theme-1">
-        {% if not matriculas  %}
+        {% if not matriculas  %}       
           <input type="radio" name="pcss3t" checked  id="tab1"class="tab-content-first">
-          <label for="tab1" class='col-3'><h1>Todas as turmas</h1></label>
+          <label for="tab1" class='col-3'><h1>Todas as turmas</h1></label>          
         {% else %}        
           <input type="radio" name="pcss3t" checked  id="tab1"class="tab-content-first">
           <label for="tab1" class='col-3'><h1>Alunos ({{matriculas|length}})</h1></label>
@@ -32,7 +51,7 @@
         
         <ul>
           {% if not matriculas  %}
-          <li class="tab-content tab-content-first typography">            
+          <li class="tab-content tab-content-first typography">                      
             <table class='win11-table bg-p-3'>
               <thead>
                 <tr>                  
@@ -47,6 +66,7 @@
               <tbody>
                 {% for n in turmas %}
                 <tr >
+                  
                   <td class='p-2 text-center '>{{forloop.counter}}</td>                  
                   <td class='p-2 text-left text-capitalize'>{{n.nome}} {{n.descritivo_turma}}</td>
                   <td class='p-2 text-center'>{{n.turno}}</td>
@@ -90,13 +110,11 @@
                 </tr> 
                 {% endfor %}                                            
               </tbody>
-            </table> 
+            </table>             
           </li>          
           <li class="tab-content tab-content-3 typography">
-            <h1>Albert Einstein</h1>
-            <p>German-born theoretical physicist who developed the general theory of relativity, one of the two pillars of modern physics (alongside quantum mechanics). While best known for his mass–energy equivalence formula E = mc2 (which has been dubbed "the world's most famous equation"), he received the 1921 Nobel Prize in Physics "for his services to theoretical physics, and especially for his discovery of the law of the photoelectric effect". The latter was pivotal in establishing quantum theory.</p>
-            <p>Near the beginning of his career, Einstein thought that Newtonian mechanics was no longer enough to reconcile the laws of classical mechanics with the laws of the electromagnetic field. This led to the development of his special theory of relativity. He realized, however, that the principle of relativity could also be extended to gravitational fields, and with his subsequent theory of gravitation in 1916, he published a paper on the general theory of relativity.</p>
-            <p class="text-right"><em>Find out more about Albert Einstein from <a href="http://en.wikipedia.org/wiki/Albert_Einstein" target="_blank">Wikipedia</a>.</em></p>				
+            <h1>Em construção</h1>
+            
           </li>     
              <!-- O conteúdo que você deseja imprimir -->
              <style>

@@ -1,5 +1,5 @@
-from .create_notas_aluno_1 import *
-from .create_notas_aluno_2 import *
+from .selecionaTurma_1 import *
+from .gerirTurma import *
 
 from .update_dusciplinas import *
 from .delete_disciplina import *

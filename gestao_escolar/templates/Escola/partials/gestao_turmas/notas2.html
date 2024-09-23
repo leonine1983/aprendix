@@ -32,51 +32,39 @@
                         <table class="win11-table" >
                             <thead class="{% if t.final  %}bg-success{% else %}bg-p-3 {% endif %}">
                                 <tr>
-                                    <th rowspan="2">#</th>
-                                    <th rowspan="2">Aluno </th>
+                                    <th>#</th>
+                                    <th>Aluno </th>
                                     {% for disciplina in disciplinas %}
-                                        <th  colspan="3" class="text-center" style="background-color: rgb(146, 161, 161) !important;">
-                                            {{ disciplina.disciplina }}                                           
+                                        <th colspan="2" class="text-center">
+                                            <table class="w-100 table-bordered">
+                                                <tr class="bg-p-3" >
+                                                    <th colspan="8">{{ disciplina.disciplina }}</th>
+                                                </tr>
+                                                {% if not t.final  %}
+                                                <tr>
+                                                    <td style="width: 55px;" class="txt-p">Média</td>
+                                                    <td class="text-center">Faltas</td>
+                                                </tr>
+                                                {% else %}
+                                                <tr>
+                                                    <td style="width: 55px;" class="txt-p">Média Final</td>
+                                                    <td style="width: 55px;"  class=" text-center">Total Faltas</td>
+                                                </tr>
+                                                {% endif %}
+                                            </table>
                                         </th>
                                     {% endfor %}
-                                    
                                     <th class="text-center" >Profissional Resp.</th>     
-                                    <th></th>
-                                    <th class="text-center">Ação</th> 
-                                </tr>
-                                <tr>
-                                    
-                                    {% for disciplina in disciplinas %}
-                                        <th colspan="2" class="text-center" style="background-color: rgb(146, 161, 161) !important;">
-                                          Notas                                        
-                                        </th>
-                                        <th colspan="2" class="text-center" style="background-color: rgb(146, 161, 161) !important;">
-                                            Faltas                                      
-                                        </th>
-                                    {% endfor %}
-                                    <th class="text-center" >Profissional Resp.</th>     
-                                    <th></th>
                                     <th class="text-center">Ação</th> 
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    {% for d in disciplinas %}
-                                        <td style="background-color: rgb(146, 161, 161) !important; color: aliceblue;">Notas</td>
-                                        <td>Faltas</td>
-                                    {% endfor %}
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
                                 {% for aluno in matriculas %}
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
                                         <td>{{ aluno.aluno }}</td>
                                         {% for disciplina in disciplinas %}
-                                            <td class="text-center" style="width: 55px;background-color: rgb(146, 161, 161) !important;color: aliceblue;">
+                                            <td class="text-center" style="width: 55px;">
                                                 {% for gestao_turma in aluno.gestao_turmas_related.all %}
                                                     {% if gestao_turma.grade == disciplina %}
                                                         {% if gestao_turma.trimestre_id == t.id %}
@@ -102,13 +90,30 @@
                                                             {% if gestao_turma.faltas is not None %}
                                                                 {{ gestao_turma.faltas}}
                                                                 {% else %}
-                                                            {% endif %}                                                            
+                                                            {% endif %}
+                                                            
                                                         {% endif %}
                                                     {% endif %}
                                                 {% endfor %}
+                                            </td>  
+                                            <td>
+                                                {% for gestao_turma in aluno.gestao_turmas_related.all %}
+                                                        {% if gestao_turma.grade == disciplina %}
+                                                            {% if gestao_turma.trimestre_id == t.id %}
+                                                                {% if gestao_turma.profissional_resp  is not None %}
+                                                                    <div>
+                                                                        <span title="Profissional que fez o lançamento das notas ou faltas" class="text-capitalize">
+                                                                        {{ gestao_turma.profissional_resp }}</span><br>                                                                    
+                                                                        {{ gestao_turma.data_hora_mod}}
+                                                                    </div>       
+                                                                {% endif %}                                                                
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
                                             </td>
+                                                                          
+
                                         {% endfor %}
-                                            
                                         <td><a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:create_or_update_gestao_turmas' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Lançar ou Editar Notas</a></td>
                                         
 
