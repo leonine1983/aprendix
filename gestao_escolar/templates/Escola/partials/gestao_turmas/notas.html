@@ -1,4 +1,5 @@
 {% load static %}
+{% load meus_filtros %}
 {% block script_head %}<link rel="stylesheet" href="{% static 'global/css/css3_tab.css' %}">{% endblock script_head %} 
 {% block script_footer %}{% endblock script_footer %} 
 
@@ -28,66 +29,58 @@
         
             <ul>
                 {% for t in trimestre %}                
-                    <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography">
-                        <table class="win11-table" >
-                            <thead class="{% if t.final  %}bg-success{% else %}bg-p-3 {% endif %}">
+                    <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography">    
+                        <table class="win11-table mt-5">
+                            <thead>
                                 <tr>
-                                    <th rowspan="2">#</th>
-                                    <th rowspan="2">Aluno </th>
-                                    {% for disciplina in disciplinas %}
-                                        <th  colspan="3" class="text-center" style="background-color: rgb(146, 161, 161) !important;">
-                                            {{ disciplina.disciplina }}                                           
-                                        </th>
+                                    <th rowspan="2">Nº</th>
+                                    <th rowspan="2">nome</th>
+                                    {% for d in disciplinas %}
+                                    <th colspan="2" style="background-color: rgb(146, 161, 161) !important;color: rgb(2, 40, 73);">{{d.disciplina}}</th>
                                     {% endfor %}
+                                    {% if t.final %}
+                                     <th rowspan="2" >Situação do aluno</th>
+                                    {% endif %}
+                                    <th rowspan="2">ação</th>
                                     
-                                    <th class="text-center" >Profissional Resp.</th>     
-                                    <th></th>
-                                    <th class="text-center">Ação</th> 
                                 </tr>
                                 <tr>
-                                    
                                     {% for disciplina in disciplinas %}
-                                        <th colspan="2" class="text-center" style="background-color: rgb(146, 161, 161) !important;">
-                                          Notas                                        
-                                        </th>
-                                        <th colspan="2" class="text-center" style="background-color: rgb(146, 161, 161) !important;">
-                                            Faltas                                      
-                                        </th>
+                                    <th style="background-color: rgb(146, 161, 161) !important;color:black;">notas</th>
+                                    <th style="background-color: rgb(218, 176, 201) !important;color: rgb(4, 45, 82);">faltas</th>
                                     {% endfor %}
-                                    <th class="text-center" >Profissional Resp.</th>     
-                                    <th></th>
-                                    <th class="text-center">Ação</th> 
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    {% for d in disciplinas %}
-                                        <td style="background-color: rgb(146, 161, 161) !important; color: aliceblue;">Notas</td>
-                                        <td>Faltas</td>
-                                    {% endfor %}
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
                                 {% for aluno in matriculas %}
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
                                         <td>{{ aluno.aluno }}</td>
                                         {% for disciplina in disciplinas %}
-                                            <td class="text-center" style="width: 55px;background-color: rgb(146, 161, 161) !important;color: aliceblue;">
+                                            <td class="text-center" style="width: 55px;background-color: rgb(233, 240, 240) !important;color: rgb(4, 45, 82);">
                                                 {% for gestao_turma in aluno.gestao_turmas_related.all %}
                                                     {% if gestao_turma.grade == disciplina %}
                                                         {% if gestao_turma.trimestre_id == t.id %}
                                                             {% if not t.final  %}
                                                                 {% if gestao_turma.notas is not None  %}
-                                                                        {{ gestao_turma.notas }}                                                                 
+                                                                    {% if gestao_turma.notas < 5  %}
+                                                                        <span class="text-danger">
+                                                                            {% else %}
+                                                                                <span class="text-primary">
+                                                                        {% endif %}
+                                                                            {{ gestao_turma.notas }}  
+                                                                        </span>                                                               
                                                                     {% else %}
                                                                 {% endif %} 
                                                                 {% else %} 
-                                                                {% if gestao_turma.media_final is not None  %}
-                                                                        {{gestao_turma.media_final}}                                                                    
+                                                                {% if gestao_turma.media_final is not None  %}                                                                        
+                                                                    {% if gestao_turma.media_final < 5  %}
+                                                                        <span class="text-danger">
+                                                                            {% else %}
+                                                                                <span class="text-primary">
+                                                                        {% endif %}
+                                                                            {{ gestao_turma.media_final }}  
+                                                                        </span>                                                               
                                                                     {% else %}
                                                                 {% endif %} 
                                                             {% endif %}                                                          
@@ -95,7 +88,7 @@
                                                     {% endif %}
                                                 {% endfor %}                                                                                                    
                                             </td>    
-                                            <td class="text-center ">
+                                            <td class="text-center " style="width: 55px;background-color: rgb(235, 223, 230) !important;color: rgb(4, 45, 82);">
                                                 {% for gestao_turma in aluno.gestao_turmas_related.all %}
                                                     {% if gestao_turma.grade == disciplina %}
                                                         {% if gestao_turma.trimestre_id == t.id %}
@@ -106,17 +99,20 @@
                                                         {% endif %}
                                                     {% endif %}
                                                 {% endfor %}
+                                            </td>                                            
+                                        {% endfor %}    
+                                        {% if t.final %}
+                                            <td>
+                                              
                                             </td>
-                                        {% endfor %}
-                                            
-                                        <td><a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:create_or_update_gestao_turmas' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Lançar ou Editar Notas</a></td>
+                                        {% endif %}                                       
                                         
-
-                                      
+                                        <td><a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:create_or_update_gestao_turmas' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Lançar ou Editar Notas</a></td>
                                     </tr>
                                 {% endfor %}
-                            </tbody>
+                            </tbody>                            
                         </table>
+                        
                     </li>
                 {% endfor %}
             </ul>

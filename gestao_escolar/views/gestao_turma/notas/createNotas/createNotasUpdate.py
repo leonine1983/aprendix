@@ -19,9 +19,11 @@ class GestaoTurmasForm(forms.ModelForm):
         fields = ['notas', 'faltas']
 
 
-from django.http import QueryDict
-from django.db.models import Sum
 
+""" A view em função tem como objetivo cadastrar as notas dos alunos e calcular automaticamente a média.
+ Ela permite a entrada de múltiplas notas, valida os dados e assegura o armazenamento eficiente. 
+ A média é calculada conforme as regras definidas, facilitando o controle do desempenho acadêmico e simplificando relatórios para os professores.
+"""
 @login_required
 def create_or_update_gestao_turmas(request, aluno_id, trimestre_id):
     aluno = get_object_or_404(Matriculas, pk=aluno_id)

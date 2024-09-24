@@ -564,8 +564,9 @@ class GestaoTurmas(models.Model):
 
     faltas_total = models.IntegerField(null=True, blank=True)
     recuperacao_final = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    media_final = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    media_final = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)    
     conselho_classe = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    aprovado = models.BooleanField(default=False)
 
     def __str__(self):
         return self.aluno.aluno.nome_completo

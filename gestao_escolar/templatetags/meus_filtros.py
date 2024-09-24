@@ -22,3 +22,8 @@ def get_horario(horarios, dia, periodo):
 
 
 
+# Realiza cálculos de adição no template
+@register.filter()
+def soma(val1, val2, val3):
+    return val1+val2+val3
+

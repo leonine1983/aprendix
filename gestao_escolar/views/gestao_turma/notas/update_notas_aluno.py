@@ -8,6 +8,59 @@ def gestao_turmas_update_view(request, pk):
     trimestres = Trimestre.objects.all()
     disciplinas = TurmaDisciplina.objects.filter(turma=pk)
 
+    resultados = []
+
+    for m in matriculas:
+        aluno_resultado = {
+            'aluno': m.aluno.nome_completo,
+            'disciplinas': []
+        }
+        
+        for d in disciplinas:
+            notas = m.gestao_turmas_related.filter(grade=d).values_list('notas', flat=True)
+
+            # Filtra notas que não são None
+            notas_filtradas = [nota for nota in notas if nota is not None]
+
+            if notas_filtradas and any(nota < 5 for nota in notas_filtradas):
+                status = 'Reprovado'
+            else:
+                status = 'Aprovado'
+
+            aluno_resultado['disciplinas'].append({
+                'disciplina': d.disciplina.nome,
+                'status': status
+            })
+            
+            print(f'status do aluno: {status}')
+
+    """
+       resultados = []
+
+    for m in matriculas:
+        aluno_resultado = {
+            'aluno': m.aluno.nome_completo,
+            'disciplinas': []
+        }
+        
+        for d in disciplinas:
+            notas = m.gestao_turmas_related.filter(grade=d).values_list('notas', flat=True)
+
+            if notas and any(nota < 5 for nota in notas):
+                status = 'Reprovado'
+            else:
+                status = 'Aprovado'
+
+            aluno_resultado['disciplinas'].append({
+                'disciplina': d.disciplina.nome,
+                'status': status
+            })
+    """
+   
+
+       
+    
+
     context = {
         'matriculas': matriculas,
         'trimestre': trimestres,
