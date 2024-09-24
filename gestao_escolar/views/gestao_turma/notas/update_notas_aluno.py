@@ -6,10 +6,9 @@ from gestao_escolar.models import Trimestre, Matriculas, TurmaDisciplina
 def gestao_turmas_update_view(request, pk):
     matriculas = Matriculas.objects.filter(turma=pk)
     trimestres = Trimestre.objects.all()
+    trimestres_finais = Trimestre.objects.filter(final=True) 
     disciplinas = TurmaDisciplina.objects.filter(turma=pk)
-
-    resultados = []
-
+        
     for m in matriculas:
         aluno_resultado = {
             'aluno': m.aluno.nome_completo,
@@ -17,7 +16,9 @@ def gestao_turmas_update_view(request, pk):
         }
         
         for d in disciplinas:
-            notas = m.gestao_turmas_related.filter(grade=d).values_list('notas', flat=True)
+            # Filtra as notas para o trimestre final
+            notas = m.gestao_turmas_related.filter(grade=d, trimestre__in=trimestres_finais).values_list('notas', flat=True)
+            print(f'o trimestre é {notas}')
 
             # Filtra notas que não são None
             notas_filtradas = [nota for nota in notas if nota is not None]
@@ -32,7 +33,6 @@ def gestao_turmas_update_view(request, pk):
                 'status': status
             })
             
-            print(f'status do aluno: {status}')
 
     """
        resultados = []
