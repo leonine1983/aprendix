@@ -29,7 +29,13 @@
         
             <ul>
                 {% for t in trimestre %}                
-                    <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography">    
+                    <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography">   
+                        {% if t.final %}
+                        <div class="alert alert-info" role="alert">
+                            <h2>Área de Resultados Finais</h2>
+                            Nessa área você pode verifica a situação acadêmica do aluno, que indica se ele foi aprovado ou reprovado. Essa seção inclui a <strong>Nota do Conselho de Classe</strong>, que reflete a avaliação geral, e a <strong>Nota de Recuperação</strong>, caso o aluno não tenha atingido a média necessária. Essas informações são essenciais para acompanhar o desempenho e as oportunidades de melhoria.
+                        </div>                        
+                        {% endif %} 
                         <table class="win11-table mt-5">
                             <thead>
                                 <tr>
@@ -40,6 +46,8 @@
                                     {% endfor %}
                                     {% if t.final %}
                                      <th rowspan="2" >Situação do aluno</th>
+                                     <th rowspan="2">Media anterior ao Conselho</th>
+                                     <th rowspan="2" >Conselho de Classe</th>
                                     {% endif %}
                                     <th rowspan="2">ação</th>
                                     
@@ -101,10 +109,21 @@
                                                 {% endfor %}
                                             </td>                                            
                                         {% endfor %}    
-                                        {% if t.final %}
-                                            <td>
-                                              
+                                        {% if t.final %}                                            
+                                            {% if aluno.gestao_turmas_related.last.aprovado  %}
+                                            <td class='bg-primary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado </td>
+                                                {% else %}                                                
+                                                <td class='bg-danger-subtle '><i class="fa-solid fa-face-sad-cry"></i> Reprovado </td>
+                                            {% endif %}                                            
+                                            <td class='text-black'>
+                                                {% for not in aluno.gestao_turmas_related.all %}
+                                                    {% if not.media_anterior_conselho_classe is not Nome %}
+                                                        {{not.grade.disciplina}}
+                                                        {{not.media_anterior_conselho_classe}}
+                                                    {% endif %}                                                    
+                                                {% endfor %} 
                                             </td>
+                                            <td><a href="" ><a class='text-black ' href="{% url 'Gestao_Escolar:aprovaConselho' aluno.pk %}">Aprovar</a></td>
                                         {% endif %}                                       
                                         
                                         <td><a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:create_or_update_gestao_turmas' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Lançar ou Editar Notas</a></td>

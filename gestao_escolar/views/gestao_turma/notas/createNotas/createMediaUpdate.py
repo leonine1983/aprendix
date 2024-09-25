@@ -21,7 +21,6 @@ def create_or_update_Media_turmas(request, aluno_id):
     for disciplina in disciplinas:
         # Obtém ou cria um registro de gestão de turma para o aluno, trimestre e disciplina
         gestao_turma, created = GestaoTurmas.objects.get_or_create(aluno=aluno, trimestre=trimestre, grade=disciplina)
-        print(f'essa é a turma da gestao {gestao_turma}')
         
         # Se o registro foi criado, registra o profissional responsável
         gestao_turma.profissional_resp = request.user.username
@@ -31,7 +30,6 @@ def create_or_update_Media_turmas(request, aluno_id):
 
         # Calcula a soma das notas do aluno para a disciplina
         notas_aluno = GestaoTurmas.objects.filter(aluno=aluno, grade=disciplina).aggregate(Sum('notas'))
-        print(f'notas do aluno {notas_aluno}')
         total_notas = notas_aluno['notas__sum']
 
         # Obtém o ano letivo da turma do aluno

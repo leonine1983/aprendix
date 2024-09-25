@@ -434,8 +434,8 @@ class Matriculas(models.Model):
 
     def __str__(self):
         return self.aluno.nome_completo
-        
-
+    
+  
 class TiposRemanejamentos(models.Model):
     nome = models.CharField(max_length=26, null=True, verbose_name="Tipo de remanejamento")
     description = models.TextField(max_length=500, verbose_name="Descreve o tipo de remanejamento")
@@ -555,21 +555,67 @@ class SequenciaDidatica(models.Model):
 class GestaoTurmas(models.Model):
     aluno = models.ForeignKey(Matriculas, related_name='gestao_turmas_related', null=True, on_delete=models.CASCADE)
     grade = models.ForeignKey(TurmaDisciplina, null=True, on_delete=models.CASCADE)
-    trimestre = models.ForeignKey(Trimestre, null=True, on_delete=models.CASCADE)
+    trimestre = models.ForeignKey(Trimestre, related_name='trimestre_related_turma', null=True, on_delete=models.CASCADE)
     notas = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     faltas = models.IntegerField(null=True, blank=True)
-    media_final = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     profissional_resp = models.CharField(max_length=40, null=True)
     data_hora_mod = models.DateTimeField(null=True)
 
     faltas_total = models.IntegerField(null=True, blank=True)
     recuperacao_final = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    media_final = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)    
-    conselho_classe = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    media_final = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)   
+
+    media_anterior_conselho_classe = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    conselho_classe = models.BooleanField(default=False)
+
     aprovado = models.BooleanField(default=False)
 
     def __str__(self):
         return self.aluno.aluno.nome_completo
+    
+
+# Disponibilização do CAAE -------------------------------------------------------------------------------------------------------------------------
+class AtendimentoEspecializado(models.Model):
+    nome = models.CharField(max_length=30, null=False)
+    descricao = models.TextField(max_length=500)
+
+    def __str__(self):
+        return self.nome
+
+
+class ProfissionaisCaae(models.Model):
+    nome = models.ForeignKey('rh.Pessoas', on_delete=models.PROTECT)
+    especialidade = models.CharField(max_length=100)
+    crm = models.CharField(max_length=20, unique=True, blank=True, null=True)  # Registro profissional
+
+    def __str__(self):
+        return self.nome
+
+
+class MatriculaCaae(models.Model):
+    aluno = models.ForeignKey('Matriculas', related_name="caae_related_aluno", on_delete=models.PROTECT)
+    profissional = models.ForeignKey(ProfissionaisCaae, related_name="profissionais_caae_related", on_delete=models.PROTECT)
+    atendimento_especializado = models.ForeignKey(AtendimentoEspecializado, related_name="atendimentos", on_delete=models.PROTECT)
+    profissional_matricula = models.ForeignKey(User, related_name='related_matricula_alunosCAee', null=True, on_delete=models.CASCADE)   
+    data_matricula = models.DateField(auto_now=True)    
+    data_atendimento = models.DateField(default=timezone.now)  # Data do atendimento
+    observacoes = models.TextField(max_length=500, blank=True, null=True)  # Observações sobre o atendimento
+
+    def __str__(self):
+        return f'Atendimento de {self.aluno} por {self.profissional} em {self.data_atendimento}'
+
+
+class Agendamento(models.Model):
+    aluno = models.ForeignKey(MatriculaCaae, related_name="agendamentos", on_delete=models.PROTECT)
+    profissional = models.ForeignKey(ProfissionaisCaae, related_name="agendamentos_profissional", on_delete=models.PROTECT)
+    atendimento_especializado = models.ForeignKey(AtendimentoEspecializado, related_name="agendamentos", on_delete=models.PROTECT)
+    
+    data_agendamento = models.DateTimeField()  # Data e hora do agendamento
+    status = models.CharField(max_length=20, choices=[('agendado', 'Agendado'), ('realizado', 'Realizado'), ('cancelado', 'Cancelado')], default='agendado')
+
+    def __str__(self):
+        return f'Agendamento de {self.aluno} com {self.profissional} em {self.data_agendamento}'
+
 
 
 # REGISTROS INICIAIS ---------------------

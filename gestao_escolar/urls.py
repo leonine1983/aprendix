@@ -112,6 +112,7 @@ urlpatterns = [
     path('gestao_escolar/Gestao_Turmas/turma/<int:pk>', GerirTurmaSelecionada.as_view(), name="NotasAluno_one_create"),      
     path('gestao_escolar/Gestao_Turmas/turma/notas/<int:pk>', verifica_e_cria_gestao_turmas, name="NotasAluno"),        
     path('gestao_escolar/Gestao_Turmas/aluno/notas/<int:pk>',gestao_turmas_update_view, name='gestao_turmas_update'),  
+    path('gestao_escolar/Gestao_Turmas/aluno/conselhoClasse/<int:pk>',AprovaConselho.as_view(), name='aprovaConselho'),  
 
     # GErar horario
 

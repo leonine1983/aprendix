@@ -8,3 +8,4 @@ from .detail_GRADE_turmas import *
 
 from .notas import *
 from .gerarHorario import *
+from .conselhoClasse import *

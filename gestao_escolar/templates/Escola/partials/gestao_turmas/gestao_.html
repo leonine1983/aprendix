@@ -27,9 +27,15 @@
         <div class="alert alert-info fs-5" role="alert">
           Bem-vindo à área de gerenciamento de turmas! 📚 Para dar início à gestão, selecione a turma desejada e clique no botão <strong>Coordenar Turma</strong>. 
         </div>
+        {% if not turmas %}
+          <div class='alert alert-warning shadow fs-5' role='alert'>
+            <i class="fa-sharp-duotone fa-solid fa-seal-exclamation"></i> Ainda não há turmas criadas para o ano letivo atual, {{request.session.anoLetivo_nome}}. Acesse a seção <a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}">"Turmas"</a> para criá-las e, em seguida, dirija-se à seção <a  href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" >"Matrículas"</a> para matricular os alunos.
+          </div>  
+        {% endif %}   
       {% else %}
         <div class="alert alert-info fs-5" role="alert">
           Nesta área, são lançadas as notas e faltas dos alunos por trimestre, permitindo acompanhar seu desempenho e frequência. Além disso, também se cria a grade de horários escolares, organizada para otimizar o aprendizado e atender às necessidades das turmas. Essa gestão é fundamental para promover um ambiente educacional eficiente e de qualidade.
+       
         </div>
       {% endif %}
       
@@ -82,8 +88,7 @@
           {% else %}  
           <li class="tab-content tab-content-first typography bg-secondary-subtle"> 
             <nav class="nav-win11" style="margin-top:-0.5rem ;">
-              <a href="{% url 'Gestao_Escolar:NotasAluno' matriculas.0.turma.pk %}"><i class="fa-thin fa-hundred-points"></i> Notas </a>
-              <a href="http://"><i class="fa-solid fa-person-to-door"></i> Faltas</a>
+              <a href="{% url 'Gestao_Escolar:NotasAluno' matriculas.0.turma.pk %}"><i class="fa-thin fa-hundred-points"></i> Notas <i class="fa-regular fa-ampersand me-2 mx-2"></i>  Faltas</a>             
               <a href="http://"><i class="fa-solid fa-align-justify"></i> Justficar Faltas</a>
               <a href="http://"><i class="fa-duotone fa-notebook"></i> Relatar Ocorrência</a>
               <a href="http://"><i class="fa-light fa-message-pen"></i> Enviar Mensagem ao aluno</a>
