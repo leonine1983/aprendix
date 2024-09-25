@@ -27,3 +27,25 @@ def get_horario(horarios, dia, periodo):
 def soma(val1, val2, val3):
     return val1+val2+val3
 
+
+
+@register.filter
+def unique_objects(queryset, field_name):
+    """
+    Retorna uma lista de objetos únicos com base em um campo específico de um queryset.
+
+    Args:
+        queryset: Um queryset de objetos que contém o campo a ser verificado.
+        field_name: O nome do campo cujo valor será filtrado para ser único.
+
+    Returns:
+        Uma lista contendo apenas objetos únicos do campo especificado.
+    """
+    seen = set()  # Conjunto para rastrear valores já vistos
+    unique_list = []  # Lista para armazenar objetos únicos
+    for item in queryset:
+        value = getattr(item, field_name)  # Obtém o valor do campo
+        if value not in seen:  # Verifica se o valor já foi visto
+            seen.add(value)  # Adiciona o valor ao conjunto de vistos
+            unique_list.append(item)  # Adiciona o objeto à lista única
+    return unique_list  # Retorna a lista de objetos únicos

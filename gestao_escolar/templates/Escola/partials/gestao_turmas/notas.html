@@ -116,16 +116,25 @@
                                                 <td class='bg-danger-subtle '><i class="fa-solid fa-face-sad-cry"></i> Reprovado </td>
                                             {% endif %}                                            
                                             <td class='text-black'>
-                                                {% for not in aluno.gestao_turmas_related.all %}
-                                                    {% if not.media_anterior_conselho_classe is not Nome %}
-                                                        {{not.grade.disciplina}}
-                                                        {{not.media_anterior_conselho_classe}}
-                                                    {% endif %}                                                    
-                                                {% endfor %} 
+                                                {% comment %}
+                                                    Este trecho de código verifica os registros de turmas do aluno. 
+                                                    Ele garante que cada valor de 'conselho_classe' seja considerado apenas uma vez. 
+                                                    Se o aluno foi aprovado (se 'conselho_classe' for True), ele então olha para todos os registros 
+                                                    novamente e mostra a disciplina e a média anterior, mas só se essa média estiver disponível.
+                                                {% endcomment %}
+                                                {% for cons in aluno.gestao_turmas_related.all|unique_objects:'conselho_classe' %}
+                                                    {% if cons.conselho_classe%}                                                        
+                                                        {% for not in aluno.gestao_turmas_related.all%}
+                                                            {% if not.media_anterior_conselho_classe is not None %}
+                                                                {{not.grade.disciplina}}
+                                                                {{not.media_anterior_conselho_classe}}
+                                                            {% endif %}                                                    
+                                                        {% endfor %} 
+                                                    {% endif %}
+                                                {% endfor %}                                                
                                             </td>
                                             <td><a href="" ><a class='text-black ' href="{% url 'Gestao_Escolar:aprovaConselho' aluno.pk %}">Aprovar</a></td>
-                                        {% endif %}                                       
-                                        
+                                        {% endif %}    
                                         <td><a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:create_or_update_gestao_turmas' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Lançar ou Editar Notas</a></td>
                                     </tr>
                                 {% endfor %}

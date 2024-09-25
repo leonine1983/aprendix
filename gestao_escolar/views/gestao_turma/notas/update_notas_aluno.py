@@ -27,27 +27,30 @@ def gestao_turmas_update_view(request, pk):
                 todas_notas_finais.append([n.id, n.grade.disciplina ,n.trimestre, n.media_final])  
             
             notas_baixas = []
-            for notas in todas_notas_finais:                
-                if notas[3] < 5:
-                    notas_baixas.append(notas[0])                
+            if todas_notas_finais:
+                for notas in todas_notas_finais: 
+                    if notas[3]:               
+                        if notas[3] < 5:
+                            notas_baixas.append(notas[0])                
 
-            for todos in todas_notas_finais:   
-                if todos[3] < 5:  
-                    status = 'Reprovado'
-                    GestaoTurmas.objects.update(
-                        aprovado = False                        
-                    )
-                    break
-                else:
-                    status = 'Aprovado'
-                    GestaoTurmas.objects.update(
-                        aprovado = True
-                    )  
+                for todos in todas_notas_finais:  
+                    if todos[3] :
+                        if todos[3] < 5:  
+                            status = 'Reprovado'
+                            GestaoTurmas.objects.update(
+                                aprovado = False                        
+                            )
+                            break
+                    else:
+                        status = 'Aprovado'
+                        GestaoTurmas.objects.update(
+                            aprovado = True
+                        )  
 
-            aluno_resultado['disciplinas'].append({
-                'disciplina': d.disciplina.nome,
-                'status': status
-            })
+                aluno_resultado['disciplinas'].append({
+                    'disciplina': d.disciplina.nome,
+                    'status': status
+                })
 
     context = {
         'matriculas': matriculas,
