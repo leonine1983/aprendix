@@ -10,6 +10,7 @@ def gestao_turmas_update_view(request, pk):
     
 
     disciplinas = TurmaDisciplina.objects.filter(turma=pk)
+    status =  "Em análise"
         
     for m in matriculas:
         aluno_resultado = {
@@ -41,6 +42,13 @@ def gestao_turmas_update_view(request, pk):
                                 aprovado = False                        
                             )
                             break
+                    if todos[3] is None:
+                        status = 'Reprovado'
+                        GestaoTurmas.objects.update(
+                            aprovado = False                        
+                        )
+                        break
+
                     else:
                         status = 'Aprovado'
                         GestaoTurmas.objects.update(
@@ -51,11 +59,13 @@ def gestao_turmas_update_view(request, pk):
                     'disciplina': d.disciplina.nome,
                     'status': status
                 })
+                
 
     context = {
         'matriculas': matriculas,
         'trimestre': trimestres,
         'disciplinas': disciplinas,
+        'aluno_result': disciplinas,
         'conteudo_page': f"Gestão Turmas - Notas Aluno",
     }
        

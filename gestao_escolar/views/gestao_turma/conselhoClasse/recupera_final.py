@@ -5,6 +5,20 @@ from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 class AprovaConselho(LoginRequiredMixin, View):
+
+    """
+    class GestaoTurmas(models.Model):
+    aluno = models.ForeignKey(Matriculas, related_name='gestao_turmas_related', null=True, on_delete=models.CASCADE)
+    grade = models.ForeignKey(TurmaDisciplina, null=True, on_delete=models.CASCADE)
+    trimestre = models.ForeignKey(Trimestre, related_name='trimestre_related_turma', null=True, on_delete=models.CASCADE)
+    notas = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    faltas = models.IntegerField(null=True, blank=True)
+    profissional_resp = models.CharField(max_length=40, null=True)
+    data_hora_mod = models.DateTimeField(null=True)
+
+    faltas_total = models.IntegerField(null=True, blank=True)
+    recuperacao_final = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    """
     
     def get(self, request, pk):
         gestao_turma = GestaoTurmas.objects.filter(aluno=pk)

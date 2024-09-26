@@ -30,6 +30,7 @@
             <ul>
                 {% for t in trimestre %}                
                     <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography">   
+                        {% include "Escola/partials/mensagens.html" %}
                         {% if t.final %}
                         <div class="alert alert-info" role="alert">
                             <h2>Área de Resultados Finais</h2>
@@ -45,11 +46,14 @@
                                     <th colspan="2" style="background-color: rgb(146, 161, 161) !important;color: rgb(2, 40, 73);">{{d.disciplina}}</th>
                                     {% endfor %}
                                     {% if t.final %}
-                                     <th rowspan="2" >Situação do aluno</th>
-                                     <th rowspan="2">Media anterior ao Conselho</th>
-                                     <th rowspan="2" >Conselho de Classe</th>
+                                        <th rowspan='2'>Recuperação Final</th>
+                                        <th rowspan="2" >Situação do aluno</th>
+                                        <th rowspan="2">Media anterior ao Conselho {{aluno.gestao_turmas_related.last.aprovado}}</th>   
+                                        <th colspan="2">ação</th> 
+                                        {% else %}  
+                                        <th rowspan="2">ação</th>                                                                        
                                     {% endif %}
-                                    <th rowspan="2">ação</th>
+                                    
                                     
                                 </tr>
                                 <tr>
@@ -57,6 +61,10 @@
                                     <th style="background-color: rgb(146, 161, 161) !important;color:black;">notas</th>
                                     <th style="background-color: rgb(218, 176, 201) !important;color: rgb(4, 45, 82);">faltas</th>
                                     {% endfor %}
+                                    {% if t.final %}
+                                    <th rowspan="2" >Recuperação Final</th>   
+                                    <th rowspan="2" >C. Classe</th>   
+                                    {% endif %}                                    
                                 </tr>
                             </thead>
                             <tbody>
@@ -109,12 +117,13 @@
                                                 {% endfor %}
                                             </td>                                            
                                         {% endfor %}    
-                                        {% if t.final %}                                            
+                                        {% if t.final %} 
+                                            <td ><span contenteditable="True" class="w-100 p-2 d-block">2.0</span></td>
                                             {% if aluno.gestao_turmas_related.last.aprovado  %}
-                                            <td class='bg-primary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado </td>
+                                                <td class='bg-primary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado</td>
                                                 {% else %}                                                
-                                                <td class='bg-danger-subtle '><i class="fa-solid fa-face-sad-cry"></i> Reprovado </td>
-                                            {% endif %}                                            
+                                                    <td class='bg-danger-subtle '><i class="fa-solid fa-face-sad-cry"></i> Reprovado </td>                                                   
+                                            {% endif %}  
                                             <td class='text-black'>
                                                 {% comment %}
                                                     Este trecho de código verifica os registros de turmas do aluno. 
@@ -133,9 +142,12 @@
                                                     {% endif %}
                                                 {% endfor %}                                                
                                             </td>
-                                            <td><a href="" ><a class='text-black ' href="{% url 'Gestao_Escolar:aprovaConselho' aluno.pk %}">Aprovar</a></td>
-                                        {% endif %}    
-                                        <td><a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:create_or_update_gestao_turmas' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Lançar ou Editar Notas</a></td>
+                                            <td><a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:recuperaFinal' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Recuperação final</a></td>
+                                            <td><a href="" ><a class='text-black btn btn-sm btn-success ' href="{% url 'Gestao_Escolar:aprovaConselho' aluno.pk %}" title='Aprovar aluno pelo conselho'><i class="fa-sharp fa-thin fa-thumbs-up"></i></a></td>                                            
+                                            {% else %}
+                                                <td><a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:create_or_update_gestao_turmas' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Lançar ou Editar Notas</a></td>
+                                        {% endif %}                                                                                
+                                        
                                     </tr>
                                 {% endfor %}
                             </tbody>                            
