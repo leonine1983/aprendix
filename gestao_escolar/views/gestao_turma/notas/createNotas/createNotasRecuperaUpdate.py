@@ -53,7 +53,7 @@ def create_or_update_gestao_turmas_recupera(request, aluno_id, trimestre_id):
         'forms_dict': forms_dict,
         'aluno': aluno,
         'trimestre': trimestre,
-        'conteudo_page': f"Gestão Turmas - Notas Update",
+        'conteudo_page': f"Gestão Turmas - Notas Recupera Update",
     }
 
     return render(request, 'Escola/inicio.html', context)

@@ -43,10 +43,13 @@
                                     <th rowspan="2">Nº</th>
                                     <th rowspan="2">nome</th>
                                     {% for d in disciplinas %}
-                                    <th colspan="2" style="background-color: rgb(146, 161, 161) !important;color: rgb(2, 40, 73);">{{d.disciplina}}</th>
+                                        {% if t.final %}
+                                            <th colspan="3" style="background-color: rgb(146, 161, 161) !important;color: rgb(2, 40, 73);">{{d.disciplina}}</th>
+                                            {% else %}
+                                                <th colspan="2" style="background-color: rgb(146, 161, 161) !important;color: rgb(2, 40, 73);">{{d.disciplina}}</th>
+                                        {% endif %}
                                     {% endfor %}
                                     {% if t.final %}
-                                        <th rowspan='2'>Recuperação Final</th>
                                         <th rowspan="2" >Situação do aluno</th>
                                         <th rowspan="2">Media anterior ao Conselho {{aluno.gestao_turmas_related.last.aprovado}}</th>   
                                         <th colspan="2">ação</th> 
@@ -60,6 +63,9 @@
                                     {% for disciplina in disciplinas %}
                                     <th style="background-color: rgb(146, 161, 161) !important;color:black;">notas</th>
                                     <th style="background-color: rgb(218, 176, 201) !important;color: rgb(4, 45, 82);">faltas</th>
+                                        {% if t.final %}
+                                            <th style="background-color: rgb(218, 176, 201) !important;color: rgb(4, 45, 82);">recu</th>
+                                        {% endif %}
                                     {% endfor %}
                                     {% if t.final %}
                                     <th rowspan="2" >Recuperação Final</th>   
@@ -71,7 +77,7 @@
                                 {% for aluno in matriculas %}
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
-                                        <td>{{ aluno.aluno }}</td>
+                                        <td class="col-3">{{ aluno.aluno }}</td>
                                         {% for disciplina in disciplinas %}
                                             <td class="text-center" style="width: 55px;background-color: rgb(233, 240, 240) !important;color: rgb(4, 45, 82);">
                                                 {% for gestao_turma in aluno.gestao_turmas_related.all %}
@@ -115,10 +121,23 @@
                                                         {% endif %}
                                                     {% endif %}
                                                 {% endfor %}
-                                            </td>                                            
+                                            </td> 
+                                            {% if t.final %} 
+                                                <td class="text-center " style="width: 55px;background-color: rgb(235, 223, 230) !important;color: rgb(4, 45, 82);">
+                                                    {% for gestao_turma in aluno.gestao_turmas_related.all %}
+                                                        {% if gestao_turma.grade == disciplina %}
+                                                            {% if gestao_turma.trimestre_id == t.id %}
+                                                                {% if gestao_turma.recuperacao_final is not None %}
+                                                                    {{ gestao_turma.recuperacao_final}}
+                                                                    {% else %}
+                                                                {% endif %}                                                            
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </td>   
+                                            {% endif %}                                         
                                         {% endfor %}    
                                         {% if t.final %} 
-                                            <td ><span contenteditable="True" class="w-100 p-2 d-block">2.0</span></td>
                                             {% if aluno.gestao_turmas_related.last.aprovado  %}
                                                 <td class='bg-primary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado</td>
                                                 {% else %}                                                
