@@ -5,6 +5,7 @@ from django import forms
 from django.core.validators import MaxValueValidator
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 class GestaoTurmasForm(forms.ModelForm):
     recuperacao_final = forms.DecimalField(
@@ -29,17 +30,29 @@ def create_or_update_gestao_turmas_recupera(request, aluno_id, trimestre_id):
     aluno = get_object_or_404(Matriculas, pk=aluno_id)
     trimestre = get_object_or_404(Trimestre, pk=trimestre_id)
     disciplinas = TurmaDisciplina.objects.filter(turma=aluno.turma.id)
+    notas_recupera = []
 
     if request.method == 'POST':
         for disciplina in disciplinas:
-            # Verificar se já existe um registro para a combinação de aluno, trimestre e disciplina
             gestao_turma, created = GestaoTurmas.objects.get_or_create(aluno=aluno, trimestre=trimestre, grade=disciplina)
-            form = GestaoTurmasForm(request.POST, instance=gestao_turma, prefix=disciplina.disciplina)  
+            form = GestaoTurmasForm(request.POST, instance=gestao_turma, prefix=disciplina.disciplina)
 
             if form.is_valid():
                 form.instance.profissional_resp = request.user.username
                 form.instance.data_hora_mod = timezone.now()
                 form.save()
+                
+                # Armazenar a nota de recuperação
+                notas_recupera.append(form.instance.recuperacao_final)
+
+        # Verificar se todas as notas são maiores que 5
+        if all(nota >= 5 for nota in notas_recupera):
+            status = "Aprovado na recuperação"
+        else:
+            status = "Reprovado na recuperação"
+
+        success_message = f"Notas de Recuperação do aluno {aluno.aluno} foram atualizadas com sucesso! Status: {status}"
+        messages.info(request, success_message)        
         return redirect(reverse('Gestao_Escolar:create_or_update_media_turmas', kwargs={'aluno_id': aluno.pk}))
 
     else:
@@ -53,7 +66,7 @@ def create_or_update_gestao_turmas_recupera(request, aluno_id, trimestre_id):
         'forms_dict': forms_dict,
         'aluno': aluno,
         'trimestre': trimestre,
-        'conteudo_page': f"Gestão Turmas - Notas Recupera Update",
+        'conteudo_page': "Gestão Turmas - Notas Recupera Update",
     }
 
     return render(request, 'Escola/inicio.html', context)

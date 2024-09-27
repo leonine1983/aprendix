@@ -50,7 +50,8 @@
                                         {% endif %}
                                     {% endfor %}
                                     {% if t.final %}
-                                        <th rowspan="2" >Situação do aluno</th>
+                                        <th rowspan="2" >Situação do aluno na Final</th>
+                                        <th rowspan='2'>Situação Recuperação</th>
                                         <th rowspan="2">Media anterior ao Conselho {{aluno.gestao_turmas_related.last.aprovado}}</th>   
                                         <th colspan="2">ação</th> 
                                         {% else %}  
@@ -140,9 +141,20 @@
                                         {% if t.final %} 
                                             {% if aluno.gestao_turmas_related.last.aprovado  %}
                                                 <td class='bg-primary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado</td>
-                                                {% else %}                                                
-                                                    <td class='bg-danger-subtle '><i class="fa-solid fa-face-sad-cry"></i> Reprovado </td>                                                   
+                                                {% else %}                                                                                              
+                                                    <td class='bg-danger-subtle '><i class="fa-solid fa-face-sad-cry"></i> Reprovado</td>                                                   
                                             {% endif %}  
+                                            <td class='bg-primary-subtle'>
+                                            {% with primeiro_recu=aluno.gestao_turmas_related.all|unique_objects:'recuperacao_final'|first_item %}
+                                                {% if primeiro_recu.recuperacao_final is not None %}
+                                                    {% if primeiro_recu.recuperacao_final > 5 %}
+                                                        Aprovado na recuperação
+                                                    {% else %}
+                                                        Reprovado na recuperação
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endwith %}
+                                            </td>
                                             <td class='text-black'>
                                                 {% comment %}
                                                     Este trecho de código verifica os registros de turmas do aluno. 
@@ -161,7 +173,11 @@
                                                     {% endif %}
                                                 {% endfor %}                                                
                                             </td>
-                                            <td><a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:recuperaFinal' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Recuperação final</a></td>
+                                            <td>
+                                                {% if not aluno.gestao_turmas_related.last.aprovado  %}
+                                                    <a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:recuperaFinal' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Recuperação final</a>
+                                                {% endif %}
+                                            </td>
                                             <td><a href="" ><a class='text-black btn btn-sm btn-success ' href="{% url 'Gestao_Escolar:aprovaConselho' aluno.pk %}" title='Aprovar aluno pelo conselho'><i class="fa-sharp fa-thin fa-thumbs-up"></i></a></td>                                            
                                             {% else %}
                                                 <td><a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:create_or_update_gestao_turmas' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Lançar ou Editar Notas</a></td>

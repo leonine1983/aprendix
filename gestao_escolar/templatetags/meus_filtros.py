@@ -28,7 +28,7 @@ def soma(val1, val2, val3):
     return val1+val2+val3
 
 
-
+""""""
 @register.filter
 def unique_objects(queryset, field_name):
     """
@@ -49,3 +49,10 @@ def unique_objects(queryset, field_name):
             seen.add(value)  # Adiciona o valor ao conjunto de vistos
             unique_list.append(item)  # Adiciona o objeto à lista única
     return unique_list  # Retorna a lista de objetos únicos
+
+
+@register.filter
+def first_item(value):
+    if isinstance(value, (list, tuple)) and value:
+        return value[0]
+    return None

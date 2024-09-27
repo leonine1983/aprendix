@@ -11,6 +11,8 @@ class GestaoTurmasNotas(generic.CreateView):
     template_name = 'Escola/inicio.html'
     success_url = reverse_lazy('nome_da_sua_url_de_sucesso')  # Defina a URL de redirecionamento após o sucesso
 
+    
+
     def get_initial(self):
         initial = super().get_initial()
         aluno_id = self.kwargs['aluno_id']
