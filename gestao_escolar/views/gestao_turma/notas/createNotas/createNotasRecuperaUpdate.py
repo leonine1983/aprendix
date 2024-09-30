@@ -45,11 +45,24 @@ def create_or_update_gestao_turmas_recupera(request, aluno_id, trimestre_id):
                 # Armazenar a nota de recuperação
                 notas_recupera.append(form.instance.recuperacao_final)
 
-        # Verificar se todas as notas são maiores que 5
-        if all(nota >= 5 for nota in notas_recupera):
-            status = "Aprovado na recuperação"
-        else:
-            status = "Reprovado na recuperação"
+                # Verificar se todas as notas são maiores que 5  
+                print(f"olha o texto {notas_recupera}")   
+                try: 
+                    if all(nota >= 5 for nota in notas_recupera):
+                        status = "Aprovado na recuperação"
+                        aluno.aprovado_recupera = True
+                        aluno.naoFoi_a_recupera = False
+                    else:
+                        status = "Reprovado na recuperação"
+                        aluno.aprovado_recupera = False
+                        aluno.naoFoi_a_recupera = False
+                    aluno.save()
+                except Exception as e:
+                    status = "Indefinido"
+                    aluno.naoFoi_a_recupera = True
+                    aluno.aprovado_recupera = False
+                    aluno.save()
+                    print(f"Erro ao verificar notas {e}")
 
         success_message = f"Notas de Recuperação do aluno {aluno.aluno} foram atualizadas com sucesso! Status: {status}"
         messages.info(request, success_message)        

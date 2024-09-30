@@ -40,6 +40,7 @@ def unique_objects(queryset, field_name):
 
     Returns:
         Uma lista contendo apenas objetos únicos do campo especificado.
+
     """
     seen = set()  # Conjunto para rastrear valores já vistos
     unique_list = []  # Lista para armazenar objetos únicos
@@ -56,3 +57,20 @@ def first_item(value):
     if isinstance(value, (list, tuple)) and value:
         return value[0]
     return None
+
+"""
+exemplo de como usar os filtros first_item() e unique_objects()
+ 
+                                            {% with primeiro_recu=aluno.gestao_turmas_related.all|unique_objects:'recuperacao_final'|first_item %}
+                                            {{primeiro_recu.recuperacao_final}}d {{aluno.gestao_turmas_related.first.recuperacao_final}}
+                                            {{primeiro_recu.aprovado_recupera}}
+                                                {% if primeiro_recu.recuperacao_final is not None %}
+                                                    {% if primeiro_recu.recuperacao_final > 5 %}
+                                                        Aprovado na recuperação
+                                                    {% else %}
+                                                        Reprovado na recuperação
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endwith %}
+
+"""

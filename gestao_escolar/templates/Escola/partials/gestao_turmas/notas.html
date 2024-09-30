@@ -12,8 +12,7 @@
 
 <!-- Modal -->
 
-<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    {% include "Escola/partials/mensagens.html" %}
+<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">   
   <div class="modal-dialog w-100">
       <div class="modal-content bg-secondary-subtle">
           <div class="modal-header">
@@ -139,46 +138,91 @@
                                             {% endif %}                                         
                                         {% endfor %}    
                                         {% if t.final %} 
-                                            {% if aluno.gestao_turmas_related.last.aprovado  %}
-                                                <td class='bg-primary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado</td>
-                                                {% else %}                                                                                              
-                                                    <td class='bg-danger-subtle '><i class="fa-solid fa-face-sad-cry"></i> Reprovado</td>                                                   
-                                            {% endif %}  
-                                            <td class='bg-primary-subtle'>
-                                            {% with primeiro_recu=aluno.gestao_turmas_related.all|unique_objects:'recuperacao_final'|first_item %}
-                                                {% if primeiro_recu.recuperacao_final is not None %}
-                                                    {% if primeiro_recu.recuperacao_final > 5 %}
-                                                        Aprovado na recuperação
+                                            {% if not aluno.aprovado_conselho %}
+                                                {% if aluno.gestao_turmas_related.last.aprovado  %}
+                                                    <td class='bg-primary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado</td>
+                                                    {% else %}                                                                                              
+                                                        <td class='bg-danger-subtle '><i class="fa-solid fa-face-sad-cry"></i> Reprovado</td>                                                   
+                                                {% endif %}                                                  
+                                                {% else %}
+                                                <td class='bg-secondary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado conselho</td>
+                                            {% endif %}
+                                            {% if not aluno.naoFoi_a_recupera %}
+                                                {% if aluno.aprovado_recupera %}
+                                                    <td class='bg-primary-subtle'>
+                                                        Aprov. Rec
+                                                    </td>
                                                     {% else %}
-                                                        Reprovado na recuperação
-                                                    {% endif %}
-                                                {% endif %}
-                                            {% endwith %}
-                                            </td>
+                                                        <td class='bg-danger-subtle'>
+                                                            Repr. na Rec                                        
+                                                        </td>   
+                                                {% endif %}                                                
+                                                {% else %}
+                                                <td></td> 
+                                            {% endif %}
                                             <td class='text-black'>
-                                                {% comment %}
-                                                    Este trecho de código verifica os registros de turmas do aluno. 
-                                                    Ele garante que cada valor de 'conselho_classe' seja considerado apenas uma vez. 
-                                                    Se o aluno foi aprovado (se 'conselho_classe' for True), ele então olha para todos os registros 
-                                                    novamente e mostra a disciplina e a média anterior, mas só se essa média estiver disponível.
-                                                {% endcomment %}
-                                                {% for cons in aluno.gestao_turmas_related.all|unique_objects:'conselho_classe' %}
-                                                    {% if cons.conselho_classe%}                                                        
-                                                        {% for not in aluno.gestao_turmas_related.all%}
-                                                            {% if not.media_anterior_conselho_classe is not None %}
-                                                                {{not.grade.disciplina}}
-                                                                {{not.media_anterior_conselho_classe}}
-                                                            {% endif %}                                                    
-                                                        {% endfor %} 
-                                                    {% endif %}
-                                                {% endfor %}                                                
+                                                {% if aluno.aprovado_conselho %}                                                 
+                                                <button id="openDialog_{{aluno.id}}" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye"></i></button>
+                                                <dialog id="instructionsDialog_{{aluno.id}}">
+                                                    <div class="container mt-4">
+                                                        <div class="alert alert-info" role="alert">
+                                                            <strong>Relação da média final do aluno {{aluno}} antes de ser analisada pelo conselho.</strong>
+                                                        </div>    
+                                                        <div>
+                                                            <table class='m-auto mb-5 mt-2'>
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Disciplina</th>
+                                                                        <th>Média Final</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {% for cons in aluno.gestao_turmas_related.all|unique_objects:'conselho_classe' %}
+                                                                        {% if cons.conselho_classe%}                                                        
+                                                                            {% for not in aluno.gestao_turmas_related.all%}
+                                                                                {% if not.media_anterior_conselho_classe is not None %}   
+                                                                                    <tr>
+                                                                                        <td>{{not.grade.disciplina}}</td>
+                                                                                        <td>{{not.media_anterior_conselho_classe}}</td>
+                                                                                    </tr>
+                                                                                {% endif %}                                                    
+                                                                            {% endfor %} 
+                                                                        {% endif %}
+                                                                    {% endfor %} 
+                                                                </tbody>
+                                                            </table>     
+                                                        </div>
+                                                    </div>                    
+                                                    <button id="closeDialog_{{aluno.id}}" class="btn btn-secondary mt-5">Fechar</button>
+                                                </dialog>  
+                                                <script>
+                                                    const dialog = document.getElementById('instructionsDialog_{{aluno.id}}');
+                                                    const openButton = document.getElementById('openDialog_{{aluno.id}}');
+                                                    const closeButton = document.getElementById('closeDialog_{{aluno.id}}');
+                                                
+                                                    openButton.addEventListener('click', () => {
+                                                        dialog.showModal(); // Abre a caixa de diálogo como modal
+                                                        });
+                                                
+                                                    closeButton.addEventListener('click', () => {
+                                                        dialog.close(); // Fecha a caixa de diálogo
+                                                        });
+                                                </script>    
+                                            {% endif %}                                                                                                       
                                             </td>
                                             <td>
                                                 {% if not aluno.gestao_turmas_related.last.aprovado  %}
-                                                    <a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:recuperaFinal' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Recuperação final</a>
+                                                    <a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:recuperaFinal' aluno.id t.id %}">Recuperação</a>
                                                 {% endif %}
                                             </td>
-                                            <td><a href="" ><a class='text-black btn btn-sm btn-success ' href="{% url 'Gestao_Escolar:aprovaConselho' aluno.pk %}" title='Aprovar aluno pelo conselho'><i class="fa-sharp fa-thin fa-thumbs-up"></i></a></td>                                            
+                                            <td>
+                                                {% if not aluno.naoFoi_a_recupera %}
+                                                    {% if not aluno.aprovado_recupera %}                                                   
+                                                        <a href="" ><a class='text-black btn btn-sm btn-success ' href="{% url 'Gestao_Escolar:aprovaConselho' aluno.pk %}" title='Aprovar aluno pelo conselho'><i class="fa-sharp fa-thin fa-thumbs-up"></i></a>                                                        
+                                                    {% endif %}                                                
+                                                    {% else %}
+                                                {% endif %}
+                                            </td>                                            
                                             {% else %}
                                                 <td><a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:create_or_update_gestao_turmas' aluno.id t.id %}"><i class="fa-thin fa-hundred-points text-light"></i> Lançar ou Editar Notas</a></td>
                                         {% endif %}                                                                                
@@ -192,6 +236,8 @@
                 {% endfor %}
             </ul>
         </div>
+        
       </div>
   </div>
 </div>
+
