@@ -566,6 +566,8 @@ class GestaoTurmas(models.Model):
     profissional_resp = models.CharField(max_length=40, null=True)
     data_hora_mod = models.DateTimeField(null=True)
 
+    parecer_descritivo = models.TextField(max_length=500, default="Ainda não há parecer do aluno para esse período")
+
     faltas_total = models.IntegerField(null=True, blank=True)
     recuperacao_final = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     media_final = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)   
@@ -577,6 +579,24 @@ class GestaoTurmas(models.Model):
 
     def __str__(self):
         return self.aluno.aluno.nome_completo
+    
+class ParecerDescritivo(models.Model):
+    matricula = models.ForeignKey(Matriculas, on_delete=models.CASCADE, related_name='pareceres')
+    data_registro = models.DateField(auto_now_add=True)  # Data do registro
+
+    # Aspectos da BNCC para Creche e Anos Iniciais
+    aspectos_cognitivos = models.TextField()              # Descrição do desenvolvimento cognitivo
+    aspectos_socioemocionais = models.TextField()         # Avaliação do comportamento social e emocional
+    aspectos_fisicos_motoras = models.TextField()        # Observações sobre desenvolvimento motor
+    habilidades = models.TextField()                       # Habilidades desenvolvidas
+    conteudos_abordados = models.TextField()              # Conteúdos trabalhados
+    interacao_social = models.TextField()                 # Avaliação da interação social e convivência
+    comunicacao = models.TextField()                       # Desenvolvimento da comunicação (verbal e não verbal)
+    consideracoes_finais = models.TextField()             # Reflexões e sugestões
+    observacao_coordenador = models.TextField(blank=True, null=True)  # Observações do coordenador pedagógico (não obrigatórias)
+
+    def __str__(self):
+        return f'Parecer de {self.matricula.aluno} - {self.data_registro}'
     
 
 # Disponibilização do CAAE -------------------------------------------------------------------------------------------------------------------------

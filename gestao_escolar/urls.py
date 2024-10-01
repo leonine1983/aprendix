@@ -129,7 +129,8 @@ urlpatterns = [
     path('gestao_turmas/recuperaFinal/<int:aluno_id>/<int:trimestre_id>/', create_or_update_gestao_turmas_recupera, name='recuperaFinal'),
     path('gestao_turmas/media/<int:aluno_id>/', create_or_update_Media_turmas, name='create_or_update_media_turmas'),
     
-
+    # Notas Trimestre
+    path('criar-gestao-turma/parecer/trimestre/<int:aluno_id>/', GestaoTurmasParecer.as_view(), name='criaParecer'), 
     
     # IMPRESSOS
     path('turmas/impressao', Imprime_Turmas.as_view(), name='imprime_list_turmas'),
