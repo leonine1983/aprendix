@@ -89,7 +89,7 @@
           <li class="tab-content tab-content-first typography bg-secondary-subtle"> 
             <nav class="nav-win11" style="margin-top:-0.5rem ;">
               <a href="{% url 'Gestao_Escolar:NotasAluno' matriculas.0.turma.pk %}"><i class="fa-thin fa-hundred-points"></i> Notas <i class="fa-regular fa-ampersand me-2 mx-2"></i>  Faltas</a>             
-              <a href="http://"><i class="fa-solid fa-align-justify"></i> Justficar Faltas</a>
+              <a href="{% url 'Gestao_Escolar:criaParecer' matriculas.0.turma.pk %}"> <img src="{% static 'svg/parecerDescritivo.svg' %}" alt=""><span class='mt-1'> Parecer Descritivo</span></a>
               <a href="http://"><i class="fa-duotone fa-notebook"></i> Relatar Ocorrência</a>
               <a href="http://"><i class="fa-light fa-message-pen"></i> Enviar Mensagem ao aluno</a>
             </nav>                        

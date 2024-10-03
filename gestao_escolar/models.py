@@ -582,18 +582,21 @@ class GestaoTurmas(models.Model):
     
 class ParecerDescritivo(models.Model):
     matricula = models.ForeignKey(Matriculas, on_delete=models.CASCADE, related_name='pareceres')
-    data_registro = models.DateField(auto_now_add=True)  # Data do registro
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
+    author_created = models.CharField(max_length=50,  null=True, blank=True, verbose_name='Autor da criação')
+    atualizado_em = models.DateTimeField(auto_now=True,  verbose_name='Data da Última Atualização')
+    author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
 
     # Aspectos da BNCC para Creche e Anos Iniciais
-    aspectos_cognitivos = models.TextField()              # Descrição do desenvolvimento cognitivo
-    aspectos_socioemocionais = models.TextField()         # Avaliação do comportamento social e emocional
-    aspectos_fisicos_motoras = models.TextField()        # Observações sobre desenvolvimento motor
-    habilidades = models.TextField()                       # Habilidades desenvolvidas
-    conteudos_abordados = models.TextField()              # Conteúdos trabalhados
-    interacao_social = models.TextField()                 # Avaliação da interação social e convivência
-    comunicacao = models.TextField()                       # Desenvolvimento da comunicação (verbal e não verbal)
-    consideracoes_finais = models.TextField()             # Reflexões e sugestões
-    observacao_coordenador = models.TextField(blank=True, null=True)  # Observações do coordenador pedagógico (não obrigatórias)
+    aspectos_cognitivos =  RichTextUploadingField(null=True, blank=True)       
+    aspectos_socioemocionais =  RichTextUploadingField(null=True, blank=True)  
+    aspectos_fisicos_motoras =  RichTextUploadingField(null=True, blank=True)  
+    habilidades =  RichTextUploadingField(null=True, blank=True)               
+    conteudos_abordados =  RichTextUploadingField(null=True, blank=True)       
+    interacao_social =  RichTextUploadingField(null=True, blank=True)          
+    comunicacao =  RichTextUploadingField(null=True, blank=True)               
+    consideracoes_finais =  RichTextUploadingField(null=True, blank=True)      
+    observacao_coordenador =  RichTextUploadingField(null=True, blank=True)    
 
     def __str__(self):
         return f'Parecer de {self.matricula.aluno} - {self.data_registro}'

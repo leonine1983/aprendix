@@ -1,6 +1,8 @@
 {% load static %}
 {% load meus_filtros %}
-{% block script_head %}<link rel="stylesheet" href="{% static 'global/css/css3_tab.css' %}">{% endblock script_head %} 
+{% block script_head %}<link rel="stylesheet" href="{% static 'global/css/css3_tab.css' %}">
+
+{% endblock script_head %} 
 {% block script_footer %}{% endblock script_footer %} 
 
 
@@ -166,7 +168,7 @@
                                             <td class='text-black'>
                                                 {% if aluno.aprovado_conselho %}                                                 
                                                 <button id="openDialog_{{aluno.id}}" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye"></i></button>
-                                                <dialog id="instructionsDialog_{{aluno.id}}">
+                                                <dialog id="instructionsDialog_{{aluno.id}}" class="w-100">
                                                     <div class="container mt-4">
                                                         <div class="alert alert-info" role="alert">
                                                             <strong>Relação da média final do aluno {{aluno}} antes de ser analisada pelo conselho.</strong>

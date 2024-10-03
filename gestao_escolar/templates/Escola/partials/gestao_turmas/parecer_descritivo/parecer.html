@@ -1,0 +1,157 @@
+{% load static %}
+{% load meus_filtros %}
+{% block script_head %}<link rel="stylesheet" href="{% static 'global/css/css3_tab.css' %}">{% endblock script_head %} 
+{% block script_footer %}{% endblock script_footer %} 
+
+<!-- Modal -->
+<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">   
+  <div class="modal-dialog w-100">
+      <div class="modal-content bg-secondary-subtle">
+          <div class="modal-header border-bottom border-primary bg-primary-subtle ">
+              <h4 class="modal-title fs-6 text-secondary"><span class="text-uppercase ml-5 fs-3 "><i style="font-size: 1.65rem;" class="fs-4 fa-solid fa-users-gear"></i> {{ titulo_page }} {{ turma.0.turma}}<i class="fa-solid fa-angles-right me-1 mx-1"></i> {{ turma.all|length }} alunos </span></h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div>
+            <a href="" rel="noopener noreferrer" class="btn btn-primary btn-sm">Voltar a secção anterior  </a>
+          </div>
+
+          <div class="pcss3t pcss3t-effect-scale pcss3t-theme-1">           
+            {% for t in trimestes %}
+                <input type="radio" name="pcss3t" {% if t.id == 1 %} checked {% endif %} id="tab{{ t.id }}" class="{% if t.id == 1 %}tab-content-first{% else %}tab-content-{{ t.id }}{% endif %}">
+                <label for="tab{{ t.id }}" class="col-2"><h1>{{ t.numero_nome }}</h1></label>
+                
+            {% endfor %}
+        
+            <ul>
+                {% for t in trimestes %}         
+                    <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography">   
+                        {% include "Escola/partials/mensagens.html" %}
+                        {% if t.final %}
+                        <div class="alert alert-info" role="alert">
+                            <h2>Área de Resultados Finais</h2>
+                            Nessa área você pode verifica a situação acadêmica do aluno, que indica se ele foi aprovado ou reprovado. Essa seção inclui a <strong>Nota do Conselho de Classe</strong>, que reflete a avaliação geral, e a <strong>Nota de Recuperação</strong>, caso o aluno não tenha atingido a média necessária. Essas informações são essenciais para acompanhar o desempenho e as oportunidades de melhoria.
+                        </div> 
+                        {% else %} 
+                        <h2 class="text-center">Lançamento e Acompanhamento do Parecer Descritivo do Aluno</h2>
+                        <div class="alert alert-info mt-4">
+                            <p>Bem-vindo ao espaço destinado ao lançamento e acompanhamento do parecer descritivo do aluno por trimestres. Aqui, você poderá registrar e visualizar as avaliações de desempenho, comportamentos e progressos do estudante ao longo do ano letivo.</p>
+                            <p>Por favor, preencha as informações necessárias para cada trimestre, garantindo que o parecer reflita de forma precisa o desenvolvimento do aluno. Este formulário é uma ferramenta essencial para que pais, professores e alunos possam acompanhar juntos o aprendizado e as conquistas ao longo do tempo.</p>
+                            <p>Agradecemos pela colaboração!</p>
+                        </div>                      
+                        {% endif %} 
+                        
+                        <table class="win11-table">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" >Alunos</th>                                    
+                                    <th colspan="9" class="text-uppercase bg-info">Parecer Descritivo</th>
+                                </tr>
+                                <tr>
+                                    <th>Aspec. Cognitivos</th>
+                                    <th>Aspec. Socioemocionais</th>
+                                    <th>Aspec. Físicos e Motores</th>
+                                    <th>Habilidades</th>
+                                    <th>Cont. Abordados</th>
+                                    <th>Interação Social</th>
+                                    <th>Comunicação</th>
+                                    <th>Consid. Finais</th>
+                                    <th>Obs. do Coordenador</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tu in turma %}
+                                <tr>
+                                    <td>{{tu.aluno}}</td>
+                                    <td>
+                                        {% if not tu.aspectos_cognitivos %}
+                                            <button id="openDialog_{{tu.aluno.id}}_cogn" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+                                            <dialog id="instructionsDialog_{{tu.aluno.id}}_cogn" class="w-75">
+                                                <div class="container mt-4">
+                                                    <div class="alert alert-info" role="alert">
+                                                        <strong>Aspectos Cognitivos do Aluno</strong>
+                                                    </div>    
+                                                    <div class="row row-cols-2">
+                                                        <section class='col p-2'>
+                                                            <h2 class="alert-info p-2">Aspectos Cognitivos do Aluno - {{t.numero_nome}}</h2>
+                                                            <section class='p-2'>
+                                                                <p class='border-bottom border-primary p-1'>Avaliado por: {{t.author_atualiza}} em {{atualizado_em}}</p>   
+                                                                <p>{{t.aspectos_cognitivos|safe}}</p>
+                                                            </section>
+                                                        </section>
+                                                        <section class="col">
+                                                            <form action="" id="cognitivo">
+                                                                {{form.media}}
+                                                                {{form.aspectos_cognitivos}}
+                                                                <button id="b-cognitivo">Salvar</button>
+                                                            </form>
+                                                        </section>
+
+                                                        {{tu.aspectos_cognitivos|safe}}
+                                                    </div>
+                                                </div>                    
+                                                <button id="closeDialog_{{tu.aluno.id}}_cogn" class="btn btn-secondary mt-5">Fechar</button>
+                                            </dialog>  
+                                            <script>
+                                                const dialog = document.getElementById('instructionsDialog_{{tu.aluno.id}}_cogn');
+                                                const openButton = document.getElementById('openDialog_{{tu.aluno.id}}_cogn');
+                                                const closeButton = document.getElementById('closeDialog_{{tu.aluno.id}}_cogn');
+                                            
+                                                openButton.addEventListener('click', () => {
+                                                    dialog.showModal(); // Abre a caixa de diálogo como modal
+                                                    });
+                                            
+                                                closeButton.addEventListener('click', () => {
+                                                    dialog.close(); // Fecha a caixa de diálogo
+                                                    });
+                                            </script>    
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if not t.aspectos_socioemocionais %}
+                                            <button id="openDialog_{{t.aluno.id}}_socio" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+                                            <dialog id="instructionsDialog_{{t.aluno.id}}_socio" class="w-75">
+                                                <div class="container mt-4">
+                                                    <div class="alert alert-info" role="alert">
+                                                        <strong>Aspectos Socioemocionais do aluno</strong>
+                                                    </div>    
+                                                    <div>
+                                                        {{t.aspectos_socioemocionais |safe}}
+                                                    </div>
+                                                </div>                    
+                                                <button id="closeDialog_{{t.aluno.id}}_socio" class="btn btn-secondary mt-5">Fechar</button>
+                                            </dialog>  
+                                            <script>
+                                                const dialog_socio = document.getElementById('instructionsDialog_{{t.aluno.id}}_socio');
+                                                const openButton_socio = document.getElementById("openDialog_{{t.aluno.id}}_socio");
+                                                const closeButton_socio = document.getElementById('closeDialog_{{t.aluno.id}}_socio');
+                                            
+                                                openButton_socio.addEventListener('click', () => {
+                                                    dialog_socio.showModal(); // Abre a caixa de diálogo como modal
+                                                    });
+                                            
+                                                closeButton_socio.addEventListener('click', () => {
+                                                    dialog_socio.close(); // Fecha a caixa de diálogo
+                                                    });
+                                            </script>    
+                                        {% endif %}
+                                    </td>
+                                    <td>{% if t.aspectos_fisicos_motoras %}<i class="fa-sharp fa-solid fa-eye text-primary" title="Ver"></i>{% endif %}</td>
+                                    <td>{% if t.habilidades %}<i class="fa-sharp fa-solid fa-eye text-primary" title="Ver"></i>{% endif %}</td>
+                                    <td>{% if t.conteudos_abordados %}<i class="fa-sharp fa-solid fa-eye text-primary" title="Ver"></i>{% endif %}</td>
+                                    <td>{% if t.interacao_social %}<i class="fa-sharp fa-solid fa-eye text-primary" title="Ver"></i>{% endif %}</td>
+                                    <td>{% if t.comunicacao %}<i class="fa-sharp fa-solid fa-eye text-primary" title="Ver"></i>{% endif %}</td>
+                                    <td>{% if t.consideracoes_finais %}<i class="fa-sharp fa-solid fa-eye text-primary" title="Ver"></i>{% endif %}</td>
+                                    <td>{% if t.observacao_coordenador %}<i class="fa-sharp fa-solid fa-eye text-primary" title="Ver"></i>{% endif %}</td>                                    
+                                </tr>
+                                
+                                {% endfor %}
+                            </tbody>
+                        </table>                        
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>        
+    </div>
+  </div>
+</div>
+
