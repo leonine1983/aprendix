@@ -2,7 +2,7 @@
 .win11-table {
     width: 100% !important;
     border-collapse: collapse !important;
-    font-size: 14px !important;
+    font-size: 12px !important;
     box-shadow: rgba(0, 0, 0, 0.18) 0px 2px 4px !important;
     border-radius: 8px !important;
     overflow: hidden !important;
@@ -11,7 +11,7 @@
 .win11-table h1 {
     text-align: center !important;
     color: #333 !important;
-    font-size: 24px !important;
+    font-size: 20px !important;
     margin-bottom: 1px !important;
 }
 
@@ -40,7 +40,7 @@
 .win11-table tbody td {
     padding: 1px 5px !important;
     text-align: center !important;
-    font-size: 0.9rem !important;
+    font-size: 0.75rem !important;
 }
 
 .win11-table tbody td:first-child {

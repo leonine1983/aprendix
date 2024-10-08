@@ -33,6 +33,18 @@
     color: #0078d4; /* Cor azul do Windows 11 */
 }
 </style>
+<div class="container m-0 w-100">
+    <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading">Instruções para Criação de Contrato no Aprendix</h4>
+        <p>Após cadastrar uma pessoa no sistema Aprendix, é fundamental que você crie o contrato correspondente para o ano letivo. Para isso, siga os passos abaixo:</p>
+        <ol>
+            <li><strong>Localize o cadastro na tabela abaixo:</strong> Encontre a pessoa que você acabou de cadastrar.</li>
+            <li><strong>Criar Contrato:</strong> Clique na opção “Criar + [ano letivo]” para iniciar a elaboração do contrato.</li>
+        </ol>
+        <p>Certifique-se de preencher todas as informações necessárias e revisar os dados antes de finalizar o processo. Isso garantirá que o contrato esteja correto e completo, evitando possíveis problemas futuros.</p>
+    </div>
+</div>
+
 <table class="win11-table">
     <thead>
         <tr>
@@ -67,12 +79,18 @@
                 <div class="option_form_cliente">                    
                     <div>
                         {% if l.pessoa_contratada.last.ano_contrato.ano is not None %}
+                            {% comment "Verifica se existe algum contrato para o profissional" %}{% endcomment %}
                             {% if request.session.anoLetivo_nome == l.pessoa_contratada.last.ano_contrato.ano %} 
+                            {% comment "Verifica se o profissional foi contratado para o ano letivo atual" %}{% endcomment %}
                                 <i class="fa-duotone fa-solid fa-check fa-beat text-success fs-4" title="Contratado para ano letivo de {{request.session.anoLetivo_nome}}?"></i> 
-                                {{l.pessoa_contratada.last.ano_contrato.ano}}                                
+                                {{l.pessoa_contratada.last.ano_contrato.ano}}                           
                                 {% else %}
                                     {{l.pessoa_contratada.last.ano_contrato.ano}} <a class='btn btn-primary p-1 fs-8' title='{% include "Escola/partials/pessoas/texto.html" %}' href="{% url 'Gestao_Escolar:pessoasContrato-create' l.id %}">Criar <i class="fa-solid fa-plus"></i> {{request.session.anoLetivo_nome}}</a>
-                            {% endif %}   
+                            {% endif %} 
+                            {% else %}
+                            {% comment "Caso não haja contrato é exibido a opção para contratar" %}{% endcomment %}
+                            Não há nenhum contrato  
+                            {{l.pessoa_contratada.last.ano_contrato.ano}} <a class='btn btn-primary p-1 fs-8' title='{% include "Escola/partials/pessoas/texto.html" %}' href="{% url 'Gestao_Escolar:pessoasContrato-create' l.id %}">Criar <i class="fa-solid fa-plus"></i> {{request.session.anoLetivo_nome}}</a>
                         {% endif %}  
                     </div>
                     <div>{% include "Escola/partials/pessoas/anos_contratos.html" %}   </div>
@@ -88,18 +106,15 @@
                             "Profissional ainda não contratado em {{request.session.anoLetivo_nome}}. Antes de encaminhá-lo, é necessário efetuar a contratação."
                             {% endif %}                        
                         {% endif %}
-
-
-
-
-
                     {% if l.pessoa_contratada.last.ano_contrato.ano %}
                         {% if not request.session.anoLetivo_nome == l.pessoa_contratada.last.ano_contrato.ano %} 
                             <a class='btn btn-primary p-1 fs-8' title='Disponibiliza o profissional para a escola' href="{% url 'Gestao_Escolar:encaminha_escola' l.id %}">Todos
                         {% endif %}                        
                     {% endif %}</a>
                     </div>
-                    <div>d</div>
+                    <div>
+                        {{l.pessoa_contratada.last.encaminhamento_escolar.last.profissao}}
+                    </div>
                 </div>                  
             </td>
             <td><a href="{% url "Gestao_Escolar:pessoas-update" l.pk %}" title='Editar informações pessoais'><i class="fa-duotone fa-solid fa-user-pen"></i></a></td>
@@ -108,16 +123,3 @@
         {% endfor %}
     </tbody>
 </table>
-<script>
-    const dialog = document.getElementById('instructionsDialog');
-    const openButton = document.getElementById('openDialog');
-    const closeButton = document.getElementById('closeDialog');
-
-    openButton.addEventListener('click', () => {
-        dialog.showModal(); // Abre a caixa de diálogo como modal
-        });
-
-    closeButton.addEventListener('click', () => {
-        dialog.close(); // Fecha a caixa de diálogo
-        });
-</script>

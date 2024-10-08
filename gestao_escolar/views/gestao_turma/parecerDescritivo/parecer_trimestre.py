@@ -16,7 +16,7 @@ class GestaoTurmasParecer(generic.CreateView):
     def get_initial(self):
         initial = super().get_initial()
         turma_id = self.kwargs['turma_id']
-        initial['aluno'] = get_object_or_404(Matriculas, id=aluno_id)
+        initial['aluno'] = get_object_or_404(Matriculas, id=aluno_id) 
         return initial
     """
     def get_context_data(self, **kwargs):

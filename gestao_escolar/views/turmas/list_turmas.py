@@ -12,6 +12,15 @@ class List_turmas(LoginRequiredMixin, ListView):
     template_name = 'Escola/inicio.html'
     context_object_name = 'Turmas'
 
+    def get_queryset(self):
+        escola_id = self.request.session.get('escola_id')
+        ano_letivo_id = self.request.session.get('anoLetivo_id')
+        
+        # Filtra as turmas com base na escola e ano letivo da sessão
+        queryset = Turmas.objects.filter(escola_id=escola_id, ano_letivo_id=ano_letivo_id)
+        
+        return queryset
+
     
 
     def get_context_data(self, **kwargs):

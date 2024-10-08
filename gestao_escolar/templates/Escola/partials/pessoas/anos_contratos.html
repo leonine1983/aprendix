@@ -1,20 +1,33 @@
-<button id="openDialog" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye"></i></button>
-<dialog id="instructionsDialog">
+<button id="openDialog_{{l.id}}" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye"></i></button>
+<dialog id="instructionsDialog_{{l.id}}" class='w-75'>
     <div class="container mt-4">
         <div class="alert alert-info" role="alert">
-            <strong>Relação de anos em que {{l.nome}} {{l.sobrenome}} foi contratado</strong>
-        </div>    
-        {% for contrato in l.pessoa_contratada.all %}                            
-            <ol class="list-group list-group-numbered">
+            <strong>Relação de anos em que <b class='fs-3'>{{l.nome}} {{l.sobrenome}}</b> foi contratado</strong>
+        </div>                   
+            <ol class="list-group list-group-numbered fs-4">
+                {% for contrato in l.pessoa_contratada.all %}   
                 <li class="list-group-item">                                    
                     - Contratado em: <strong class="text-success fw-bolder">{{contrato.ano_contrato}}</strong> 
                 </li>
+                    {% if not forloop.last %},{% endif %}
+                    {% empty %}
+                    Nenhum contrato
+                {% endfor %}  
             </ol>
-                {% if not forloop.last %},             
-                {% endif %}
-            {% empty %}
-            Nenhum contrato
-        {% endfor %}  
+               
     </div>                    
-    <button id="closeDialog" class="btn btn-secondary btn-close mt-5" title='Fechar'></button>
-</dialog>  
+    <button id="closeDialog_{{l.id}}" class="btn btn-secondary btn-close mt-5" title='Fechar'></button>
+</dialog> 
+<script>
+    const dialog_{{l.id}} = document.getElementById('instructionsDialog_{{l.id}}');
+    const openButton_{{l.id}} = document.getElementById('openDialog_{{l.id}}');
+    const closeButton_{{l.id}} = document.getElementById('closeDialog_{{l.id}}');
+
+    openButton_{{l.id}}.addEventListener('click', () => {
+        dialog_{{l.id}}.showModal(); // Abre a caixa de diálogo como modal
+        });
+
+    closeButton_{{l.id}}.addEventListener('click', () => {
+        dialog_{{l.id}}.close(); // Fecha a caixa de diálogo
+        });
+</script> 
