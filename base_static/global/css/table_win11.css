@@ -3,7 +3,6 @@
     width: 100% !important;
     border-collapse: collapse !important;
     font-size: 12px !important;
-    box-shadow: rgba(0, 0, 0, 0.18) 0px 2px 4px !important;
     border-radius: 8px !important;
     overflow: hidden !important;
 }
@@ -21,7 +20,7 @@
 }
 
 .win11-table thead th {
-    padding: 12px 15px !important;
+    padding: 10px 10px !important;
     text-align: center !important;
 }
 
@@ -54,4 +53,63 @@
 
 .win11-table th {
     background-color: #f4f4f4 !important;
+}
+
+@media print {
+    .win11-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 12px !important;
+        box-shadow: rgba(0, 0, 0, 0.18) 0px 2px 4px !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+    }
+    
+    .win11-table h1 {
+        text-align: center !important;
+        color: #333 !important;
+        font-size: 20px !important;
+        margin-bottom: 1px !important;
+    }
+    
+    .win11-table thead {
+        background-color: #0078d4 !important;
+        color: #493b3b !important;
+    }
+    
+    .win11-table thead th {
+        padding: 12px 15px !important;
+        text-align: center !important;
+    }
+    
+    .win11-table tbody tr {
+        border-bottom: 1px solid #dddddd !important;
+    }
+    
+    .win11-table tbody tr:nth-of-type(even) {
+        background-color: #f3f3f3 !important;
+    }
+    
+    .win11-table tbody tr:last-of-type {
+        border-bottom: 2px solid #0078d4 !important;
+    }
+    
+    .win11-table tbody td {
+        padding: 1px 5px !important;
+        text-align: center !important;
+        font-size: 0.74rem !important;
+    }
+    
+    .win11-table tbody td:first-child {
+        text-align: center !important;
+    }
+    
+    .win11-table th,
+    .win11-table td {
+        border: 1px solid #474646 !important;
+    }
+    
+    .win11-table th {
+        background-color: #f4f4f4 !important;
+    }
 }

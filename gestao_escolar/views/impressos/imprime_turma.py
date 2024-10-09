@@ -16,7 +16,7 @@ class Imprime_Turmas (LoginRequiredMixin, SuccessMessageMixin, ListView):
         ano = self.request.session['anoLetivo_id']
         escola = self.request.session['escola_id']
         escolas = Escola.objects.get(pk=escola)
-        turmas = Turmas.objects.filter(ano_letivo=ano)
+        turmas = Turmas.objects.filter(ano_letivo=ano, escola = escola)
         context ['list_turmas'] = turmas
         context ['list_escola'] = escolas
         context ['conteudo_page'] = "imprime_turma"        
@@ -32,7 +32,7 @@ class Imprime_Escolas (LoginRequiredMixin, SuccessMessageMixin, ListView):
         ano = self.request.session['anoLetivo_id']
         escola = self.request.session['escola_id']
         escolas = Escola.objects.all()
-        turmas = Turmas.objects.filter(ano_letivo=ano)
+        turmas = Turmas.objects.filter(ano_letivo=ano, escola = escola)
         context ['list_turmas'] = turmas
         context ['list_escola'] = escolas
         context ['conteudo_page'] = "imprime_escolas"        

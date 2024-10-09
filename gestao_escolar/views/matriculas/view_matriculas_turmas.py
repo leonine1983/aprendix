@@ -19,7 +19,7 @@ class View_turmas_Matriculas(LoginRequiredMixin, ListView):
             raise Http404("Ano Letivo não definido na sessão")
         
         # Filtrar as turmas pelo ano letivo da sessão
-        queryset = Turmas.objects.filter(ano_letivo_id=ano_letivo_id)
+        queryset = Turmas.objects.filter(ano_letivo_id=ano_letivo_id, escola = Escola.objects.get(id = self.request.session['escola_id']))
         # Filtrar as matrículas pelas turmas obtidas
         print(f'ano livr {queryset}')
         

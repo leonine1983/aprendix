@@ -240,6 +240,10 @@
     {% if  conteudo_page == "imprime_turma" %}
         {% include 'Escola/partials/impressos/impresso_turmas.html' %}
     {% endif %}   
+    {% if  conteudo_page == "imprime_turma_filtros"     %}
+        {% include 'Escola/partials/impressos/impressoTurmasFiltros.html' %}
+    {% endif %}   
+    
         
     {% if  conteudo_page == "imprime_turma_matricula" %}
         {% include 'Escola/partials/impressos/impresso_turmas_matricula.html' %}
