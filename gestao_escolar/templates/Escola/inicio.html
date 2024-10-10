@@ -276,8 +276,13 @@
     {% if  conteudo_page == 'imagem-docx' %}
         {% include 'Escola/partials/bairros/seleciona_bairros.html' %}
     {% endif %} 
+    
+    <!--Ferramentas-->
+    {% if  conteudo_page == "freqenciaImpressa"  %}
+        {% include 'Escola/partials/feriados_frequencia/calendario_mes.html' %}
+    {% endif %} 
 
-
+    
     <!-- Condiciionais-->
     {% if 'escola_id' not in request.session %}
         {% include 'Escola/partials/seleciona_escola.html' %}        

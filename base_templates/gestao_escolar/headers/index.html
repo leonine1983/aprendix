@@ -107,6 +107,7 @@
               {% endif %}       
             </a>
           </div>
+          {% comment "ocultar" %}
           <div class="button">  
             <a href="{% url 'admin_acessos:painel_acesso' %}">
               <img src="{% static 'svg/grade_horario.svg' %}" alt="mdo" width="32" class="rounded-circle">     
@@ -115,16 +116,20 @@
             </span>  
             </a>                    
           </div>
+          {% endcomment %}
           <div class="button">
-            <a href="">
+            <a href="" >
               <img src="{% static 'svg/grade_horario.svg' %}" alt="mdo" width="50" class="rounded-circle">     
-              <span>Horários</span>
+              <span >Horários</span>
             </a>
           </div>
           <div class="button">
-            <a href="">
-              <span style="background-position: 0 -897px"></span>
-              <span>Play</span>
+            <a href="{% url 'Gestao_Escolar:calendario_mes_atual' %}" title='Impressão de frequência impressa'>               
+              <div class="m-1 shadow shadow-sm mb-3" style="background-image: url({% static 'svg/calendar.svg' %}); width:70px; height:auto"> 
+                <div class="p-1 fs-8 link-light " style='margin-top:0.5rem'>{{request.session.mes}}</div>
+                <div class="fs-5 p-2 text-danger">{{request.session.dia}}</div>
+              </div> 
+              <span>Frequência </span>
             </a>
           </div>
           <div class="button">

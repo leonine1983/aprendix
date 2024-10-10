@@ -153,6 +153,10 @@ urlpatterns = [
     path('cidade/novo/', CidadeCreateView.as_view(), name='cidade-create'),
     path('cidade/<int:pk>/editar/', CidadeUpdateView.as_view(), name='cidade-update'),
     path('cidade/<int:pk>/deletar/', CidadeDeleteView.as_view(), name='cidade-delete'),
+
+    # Feriados
+    path('calendario/<int:ano>/<int:mes>/', calendario_mes, name='calendario_mes'),
+    path('calendario/', calendario_mes, {'ano': datetime.now().year, 'mes': datetime.now().month}, name='calendario_mes_atual'),
 ] 
 
 

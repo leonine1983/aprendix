@@ -17,4 +17,5 @@ from .minhaEscola import *
 from .decretos import *
 from .pessoas import *
 from .pessoas_contrato import *
+from .frequencia_e_feriados import *
 #from .ferramentas import *

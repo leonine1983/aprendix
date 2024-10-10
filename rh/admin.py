@@ -15,4 +15,5 @@ admin.site.register(Decreto)
 admin.site.register(DecretoAnoLetivoAtivo)
 admin.site.register(Vinculo_empregaticio)
 admin.site.register(Encaminhamentos)
+admin.site.register(Feriado)
 

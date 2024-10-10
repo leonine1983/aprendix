@@ -1,0 +1,81 @@
+ {% load static %}
+ {% block script_head %}
+ <style>
+  .grid{
+    display: grid;
+    grid-template-columns: 1fr 20rem;
+    gap:1rem;
+    margin-bottom:1rem
+  }
+ </style>
+ {% endblock script_head %}
+<!-- Modal -->
+<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    
+  <div class="modal-dialog w-100">
+    <div class="modal-content bg-secondary-subtle win11-window">
+        <div class="modal-header mb-5">
+          <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3">
+            <div class="m-1 mb-3" style="background: url({% static 'svg/calendar.svg' %}) no-repeat; background-size:contain; position:absolute; z-index:-0,1; width:23rem; height:25rem; top:3rem; left:2rem"> 
+              <div style='margin:3.5rem;' class="text-center fs-1 text-light">{{request.session.mes}}</div>
+              <div style='padding:3.5rem;font-size: 8rem;' class=" p-2 text-danger text-center">{{request.session.dia}}</div>
+            </div> 
+          </h4>        
+          <button type="button" class="close btn btn-sm btn-primary" data-dismiss="modal"><i class="fa-solid fa-xmark"></i></button>        
+        </div>        
+        
+        <div class="modal-body shadow-sm bg-light-subtle  w-75 ">
+          <div class="modal_windows_title mb-3 p-2 bg-p-4 ">
+            <i class="fa-regular fa-face-grin-squint"></i> <span class="text-capitalize fs-7"> Olá, seja muito bem-vindo {% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}{{request.user}}{% endif %}!!</span>  
+          </div> 
+        <style>       
+            .feriado-nacional { background-color: yellow; }
+            .feriado-local { background-color: lightgreen; }
+            .final-de-semana { background-color: lightgray; }
+        </style>        
+        <h2 class='alert-info p-2' >Calendário do mês de {{request.session.mes}}</h2>
+        <table class='win11-table'>
+            <tr>
+                <th>Dia</th>
+                <th>Dia da Semana</th>
+                <th>Tipo</th>
+                <th>Horário Entrada</th>
+                <th>Assinatura Entrada</th>
+                <th>Horário Saída</th>
+                <th>Assinatura Saída</th>
+            </tr>
+            {% for dia in dias %}
+            <tr class="{% if dia.feriado_nacional %}feriado-nacional{% elif dia.feriado_local %}feriado-local{% elif dia.final_de_semana %}final-de-semana{% endif %}">
+                <td>{{ dia.data.day }}</td>
+                <td>{{ dia.dia_da_semana }}</td>
+                <td>
+                    {% if dia.feriado_nacional %}
+                        Feriado Nacional: <b>{{ dia.feriado_nacional_nome }}</b>
+                    {% endif %}
+                    {% if dia.feriado_local %}
+                        Feriado Local: <b class='fs-6'>{{ dia.feriado_local_nome.last }}</b>
+                    {% endif %}
+                    {% if not dia.feriado_nacional and not dia.feriado_local and dia.final_de_semana %}
+                        Final de Semana
+                    {% endif %}
+                    {% if not dia.feriado_nacional and not dia.feriado_local and not dia.final_de_semana %}
+                        Dia Útil
+                    {% endif %}
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            {% endfor %}
+        </table>
+
+                
+
+
+
+        </div>        
+    </div>
+    </div>
+</div>
+{% include "Escola/partials/utils/dragDrop.html" %}

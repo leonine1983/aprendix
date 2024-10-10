@@ -403,6 +403,16 @@ class Encaminhamentos(models.Model):
         super().save(*args, **kwargs)
 
 
+class Feriado(models.Model):
+    data = models.DateField(unique=True)
+    nome = models.CharField(max_length=100)
+    local = models.BooleanField(default=False)  # Para indicar se é um feriado local
+
+    def __str__(self):
+        return self.nome
+
+
+
 class Frequencia_mes(models.Model):
     ano = models.ForeignKey(Ano, null=False, related_name='frequencia_ano', on_delete=models.CASCADE)
     mes = models.CharField(max_length=30, null=False, verbose_name='Mês')
