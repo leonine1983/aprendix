@@ -1,3 +1,5 @@
+import smtplib
+from email.message import EmailMessage
 from django.shortcuts import render
 from gestao_escolar.models import Trimestre, Matriculas, TurmaDisciplina, GestaoTurmas
 
