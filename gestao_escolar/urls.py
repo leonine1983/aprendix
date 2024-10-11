@@ -136,6 +136,8 @@ urlpatterns = [
     path('turmas/impressao', Imprime_Turmas.as_view(), name='imprime_list_turmas'),
     path('turmas/impressao/filtros', ImprimeTurmasFiltros.as_view(), name='imprime_turmas_filtros'),
     path('escolas/impressao', Imprime_Escolas.as_view(), name='imprime_list_escolas'),
+    path('horarios/all/impressao', ImprimeAllHorarios .as_view(), name='imprime_all_horarios'),
+    
 
 
     # Ferramentas

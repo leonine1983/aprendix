@@ -243,6 +243,10 @@
     {% if  conteudo_page == "imprime_turma_filtros"     %}
         {% include 'Escola/partials/impressos/impressoTurmasFiltros.html' %}
     {% endif %}   
+    {% if  conteudo_page == "imprime_all_horario"     %}
+        {% include 'Escola/partials/impressos/horarios/geral.html' %}
+    {% endif %}   
+    
     
         
     {% if  conteudo_page == "imprime_turma_matricula" %}

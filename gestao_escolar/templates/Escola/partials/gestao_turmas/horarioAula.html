@@ -1,9 +1,6 @@
 {% load static %}
 {% load meus_filtros %}
 {% block script_head %}<link rel="stylesheet" href="{% static 'global/css/css3_tab.css' %}">
-
-
-
 {% endblock script_head %} 
 {% block script_footer %}{% endblock script_footer %} 
 
@@ -23,7 +20,9 @@
             </div>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>                
             </div>
-            <hr class="mb-0">           
+            <hr class="mb-0"> 
+            <button onclick="imprimirConteudo()">Imprimir</button>
+            <div id="content_imprimir">          
             <table class="win11-table ">
               <thead class='bg-p-3'>
                 <tr>
@@ -41,17 +40,18 @@
                 {% for horario in horarios %}                  
                   <tr>
                     <td class='text-center'>{{ horario.periodo }}</td>
-                    <td class='text-center'>{{ horario.segunda}}</td>
-                    <td class='text-center'>{{ horario.terca}}</td>
-                    <td class='text-center'>{{ horario.quarta}}</td>
-                    <td class='text-center'>{{ horario.quinta}}</td>
-                    <td class='text-center'>{{ horario.sexta}}</td>
+                    <td class='text-center'>{% if horario.quarta is not None %}{{ horario.segunda}}{% endif %}</td>
+                    <td class='text-center'>{% if horario.quarta is not None %}{{ horario.terca}}{% endif %}</td>
+                    <td class='text-center'>{% if horario.quarta is not None %}{{ horario.quarta}}{% endif %}</td>
+                    <td class='text-center'>{% if horario.quarta is not None %}{{ horario.quinta}}{% endif %}</td>
+                    <td class='text-center'>{% if horario.quarta is not None %}{{ horario.sexta}}{% endif %}</td>
                     <td class='text-center'><a href="{% url 'Gestao_Escolar:horario_update' pk=horario.id turma_id=horario.turma.id %}">Editar <i class="fa-regular fa-pen-to-square"></i></a>
                     </td>
                   </tr>
                 {% endfor %}
               </tbody>
             </table>
+          </div>
             {% if form %}
             <form action="" method="post" class="win11-form" >
               <div class='p-1 mt-3'> 
@@ -66,7 +66,25 @@
               </div>
               <button type="submit" class="btn btn-success m-auto w-75">Atualizar Horário</button>
             </form>
-            {% endif %}         
+            {% endif %}   
+            
+            <script>
+              function imprimirConteudo() {
+                      // Obtém o conteúdo da div
+                      var conteudo = document.getElementById('content_imprimir').innerHTML;
+                      
+                      // Abre uma nova janela para impressão
+                      var janela = window.open('', '', 'height=600,width=800');
+                      janela.document.write('<html><head><link rel="stylesheet" href="{% static 'global/css/table_win11.css' %}"><title>Conteúdo</title></head>');
+                      janela.document.write('<body>');
+                      janela.document.write(conteudo); // Escreve o conteúdo na nova janela
+                      janela.document.write('</body></html>');
+                      
+                      // Fecha a nova janela após a impressão
+                      janela.document.close();
+                      janela.print();
+                  }
+            </script> 
     </div>
 </div>
 

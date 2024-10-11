@@ -381,7 +381,7 @@ class TurmaDisciplina(models.Model):
     limite_faltas = models.IntegerField(null=True)
 
     def __str__(self):
-        return f'{self.disciplina.nome} - {self.professor}'
+        return f'{self.disciplina.nome} - {self.professor.encaminhamento}'
 
 
 escola_fora = {

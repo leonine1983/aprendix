@@ -97,7 +97,7 @@
     .win11-table tbody td {
         padding: 1px 5px !important;
         text-align: center !important;
-        font-size: 0.74rem !important;
+        font-size: 0.65rem !important;
     }
     
     .win11-table tbody td:first-child {
@@ -115,4 +115,27 @@
     .break {
         page-break-before: always; /* Ou page-break-after: always; */
     }
+    .none{
+        display: none;
+    }
+
+
+    /* Alertas */
+    .alert-primary {
+        background-color: #cce5ff; /* Azul claro */
+        color: #004085; /* Texto azul escuro */
+        border-color: #b8daff; /* Borda azul claro */
+        padding: 1rem; /* Espaçamento interno */
+        border-radius: .25rem; /* Bordas arredondadas */
+    }
+    
+    .alert-primary h4 {
+        margin-top: 0; /* Remove margem superior do título */
+        margin-bottom: .5rem; /* Margem inferior do título */
+    }
+    
+    .alert-primary .alert-link {
+        color: #003c71; /* Cor do link */
+    }
+    
 }
