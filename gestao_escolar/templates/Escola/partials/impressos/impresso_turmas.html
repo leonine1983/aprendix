@@ -107,24 +107,7 @@
             
             </div>
             
-            <script>
-                    function imprimirConteudo() {
-                        // Obtém o conteúdo da div
-                        var conteudo = document.getElementById('content_imprimir').innerHTML;
-                        
-                        // Abre uma nova janela para impressão
-                        var janela = window.open('', '', 'height=600,width=800');
-                        janela.document.write('<html><head><title>Conteúdo</title></head>');
-                        janela.document.write('<body>');
-                        janela.document.write(conteudo); // Escreve o conteúdo na nova janela
-                        janela.document.write('</body></html>');
-                        
-                        // Fecha a nova janela após a impressão
-                        janela.document.close();
-                        janela.print();
-                    }
-                </script>
-            
+          
             
             <script>
                 // Small using Bootstrap 5 classes

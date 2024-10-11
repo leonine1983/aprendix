@@ -106,10 +106,13 @@
     
     .win11-table th,
     .win11-table td {
-        border: 1px solid #474646 !important;
+        border: 1px solid #868585 !important;
     }
     
     .win11-table th {
         background-color: #f4f4f4 !important;
+    }
+    .break {
+        page-break-before: always; /* Ou page-break-after: always; */
     }
 }

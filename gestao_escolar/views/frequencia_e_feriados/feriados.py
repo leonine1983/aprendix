@@ -1,11 +1,18 @@
 from django.shortcuts import render
 from datetime import datetime, timedelta
 import holidays
-from rh.models import Feriado
+from rh.models import Feriado, Encaminhamentos, Escola, Ano
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def calendario_mes(request, ano=datetime.now().year, mes=datetime.now().month):
     hoje = datetime(ano, mes, 1)
     dias_no_mes = (hoje.replace(day=28) + timedelta(days=4)).replace(day=1) - timedelta(days=1)
+
+    # Profissionais que terão o frequencia impressa
+    escola = Escola.objects.get(id = request.session['escola_id'])
+    ano_l = Ano.objects.get(id = request.session['anoLetivo_id'])
+    profissionais = Encaminhamentos.objects.filter(destino = escola, encaminhamento__ano_contrato = ano_l)
 
     # Obtendo feriados nacionais
     feriados_nacionais = holidays.Brazil(years=ano)
@@ -43,6 +50,7 @@ def calendario_mes(request, ano=datetime.now().year, mes=datetime.now().month):
             'feriado_local_nome': feriado_local_nome,
             'final_de_semana': data_atual.weekday() >= 5,  # Sábado ou Domingo
             'dia_da_semana': dia_da_semana,
+            
         })
 
-    return render(request, 'Escola/inicio.html', {'dias': dias, 'ano': ano, 'mes': mes, 'conteudo_page': "freqenciaImpressa"})
+    return render(request, 'Escola/inicio.html', {'dias': dias, 'ano': ano, 'mes': mes, 'conteudo_page': "freqenciaImpressa", 'profissionais': profissionais,})

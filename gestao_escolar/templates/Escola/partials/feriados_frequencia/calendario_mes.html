@@ -7,8 +7,13 @@
     gap:1rem;
     margin-bottom:1rem
   }
+  .break {
+        page-break-before: always; /* Ou page-break-after: always; */
+    }
  </style>
+ <link rel="stylesheet" href="{% static 'global/css/table_win11.css' %}">
  {% endblock script_head %}
+
 <!-- Modal -->
 <div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     
@@ -32,48 +37,73 @@
             .feriado-nacional { background-color: yellow; }
             .feriado-local { background-color: lightgreen; }
             .final-de-semana { background-color: lightgray; }
-        </style>        
-        <h2 class='alert-info p-2' >Calendário do mês de {{request.session.mes}}</h2>
-        <table class='win11-table'>
-            <tr>
-                <th>Dia</th>
-                <th>Dia da Semana</th>
-                <th>Tipo</th>
-                <th>Horário Entrada</th>
-                <th>Assinatura Entrada</th>
-                <th>Horário Saída</th>
-                <th>Assinatura Saída</th>
-            </tr>
-            {% for dia in dias %}
-            <tr class="{% if dia.feriado_nacional %}feriado-nacional{% elif dia.feriado_local %}feriado-local{% elif dia.final_de_semana %}final-de-semana{% endif %}">
-                <td>{{ dia.data.day }}</td>
-                <td>{{ dia.dia_da_semana }}</td>
-                <td>
-                    {% if dia.feriado_nacional %}
-                        Feriado Nacional: <b>{{ dia.feriado_nacional_nome }}</b>
-                    {% endif %}
-                    {% if dia.feriado_local %}
-                        Feriado Local: <b class='fs-6'>{{ dia.feriado_local_nome.last }}</b>
-                    {% endif %}
-                    {% if not dia.feriado_nacional and not dia.feriado_local and dia.final_de_semana %}
-                        Final de Semana
-                    {% endif %}
-                    {% if not dia.feriado_nacional and not dia.feriado_local and not dia.final_de_semana %}
-                        Dia Útil
-                    {% endif %}
-                </td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
+        </style> 
+        <button onclick="imprimirConteudo()">Imprimir</button>
+        <div id="content_imprimir">
+          {% for p in profissionais %}
+
+            {% include "Escola/impressos/timbre_veraCruz.html" %}
+            <h2 class='alert-info p-2' >Calendário do mês de {{request.session.mes}} - Ano Letivo {{request.session.anoLetivo_nome}}</h2>
+              <div style="display: flex; border: 0.1rem solid gray; padding: 0.5rem; justify-content:space-between;">
+                <section>Nome: <span style="border-bottom: 0.1rem solid gray;margin: 0 1rem; padding: 0 2rem;">{{p.encaminhamento}} </span></section>
+                <section>Escola: <span style="border-bottom: 0.1rem solid gray;margin: 0 1rem; padding: 0 2rem;">{{p.destino}} </span></section>
+                <section>Profissão = <span style="border-bottom: 0.1rem solid gray; padding: 0 2rem;">{{p.profissao}}  </span></section>
+              </div>                           
+            <table class='win11-table'>
+                <tr>
+                    <th>Dia</th>
+                    <th>Dia da Semana</th>
+                    <th>Tipo</th>
+                    <th>Horário Entrada</th>
+                    <th>Assinatura Entrada</th>
+                    <th>Horário Saída</th>
+                    <th>Assinatura Saída</th>
+                </tr>
+                {% for dia in dias %}
+                <tr class="{% if dia.feriado_nacional %}feriado-nacional{% elif dia.feriado_local %}feriado-local{% elif dia.final_de_semana %}final-de-semana{% endif %}">
+                    <td>{{ dia.data.day }}</td>
+                    <td>{{ dia.dia_da_semana }}</td>
+                    <td>
+                        {% if dia.feriado_nacional %}
+                            Feriado Nacional: <b>{{ dia.feriado_nacional_nome }}</b>
+                        {% endif %}
+                        {% if dia.feriado_local %}
+                            Feriado Local: <b class='fs-6'>{{ dia.feriado_local_nome.last }}</b>
+                        {% endif %}
+                        {% if not dia.feriado_nacional and not dia.feriado_local and dia.final_de_semana %}
+                            Final de Semana
+                        {% endif %}
+                        {% if not dia.feriado_nacional and not dia.feriado_local and not dia.final_de_semana %}
+                            Dia Útil
+                        {% endif %}
+                    </td>
+                    <td>____ : ____</td>
+                    <td></td>
+                    <td>____ : ____</td>
+                    <td></td>
+                </tr>
+              {% endfor %}
+            </table>
+            <div class="break"></div>
             {% endfor %}
-        </table>
-
-                
-
-
-
+        </div>
+          <script>
+            function imprimirConteudo() {
+                    // Obtém o conteúdo da div
+                    var conteudo = document.getElementById('content_imprimir').innerHTML;
+                    
+                    // Abre uma nova janela para impressão
+                    var janela = window.open('', '', 'height=600,width=800');
+                    janela.document.write('<html><head><link rel="stylesheet" href="{% static 'global/css/table_win11.css' %}"><title>Conteúdo</title></head>');
+                    janela.document.write('<body>');
+                    janela.document.write(conteudo); // Escreve o conteúdo na nova janela
+                    janela.document.write('</body></html>');
+                    
+                    // Fecha a nova janela após a impressão
+                    janela.document.close();
+                    janela.print();
+                }
+          </script> 
         </div>        
     </div>
     </div>
