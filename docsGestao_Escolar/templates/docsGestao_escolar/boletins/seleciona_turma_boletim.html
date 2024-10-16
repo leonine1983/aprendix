@@ -1,0 +1,78 @@
+
+<!-- Bootstrap Datepicker CSS -->
+<!-- Modal -->
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static "global/css/search.css" %}">
+{% endblock css %}
+<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">    
+  <div class="modal-dialog w-100">
+    <div class="modal-content bg-secondary-subtle ">
+      <div class="modal-header">
+        <div class="container mt-5 alerta-info">
+          <h1 class='border-bottom border-1 border-dark' >Boletins Trimestrais</h1>          
+          <h2 class="text-center">Escolha de Turma para Boletins Trimestrais</h2>
+          <p class="text-center">
+              Nesta seção, você deve selecionar a turma em que o aluno está matriculado. Essa informação é importante para que possamos emitir corretamente os boletins trimestrais. Escolha a turma correspondente e, em seguida, clique no botão para prosseguir. Se você tiver alguma dúvida, não hesite em perguntar!
+          </p>
+      </div>
+      
+        <h4 class="modal-title  fs-6">
+          <span class="text-uppercase ml-5 fs-3 ">
+            <i class="fa-sharp fa-solid fa-people fs-5"></i>
+            {{titulo_page}}
+            {% if messages %}                
+              {% include 'Escola/partials/mensagens.html' %}          
+            {% endif %}
+          </span>
+        </h4>        
+        <button type="button" class="close" data-dismiss="modal">&times;</button>        
+      </div>
+      <div class="modal-body shadow-sm bg-light-subtle">            
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">
+              <i class="fa-duotone fa-solid fa-location-dot"></i>
+              <span>Todos as Turma</span>
+            </button>
+          </li>
+        </ul>         
+        <div class="tab-content" id="myTabContent">          
+          <div class="tab-pane fade show active bg-light" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">  
+            <div  class='p-2 fs-6 border-danger-subtle border-right d-flex text-light' style= 'box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgb(209, 213, 219) 0px 0px 0px 1px inset; background-color:rgb(116, 145, 140)'>
+              <div  class="  mr-4  fs-5 d-flex  w-100">             
+                <div class="mt-0 mb-0" style='margin:auto;  width:90%; '>
+                  <form action="?" method="GET" class="form-inline">
+                    {% csrf_token %}            
+                    <div class="search-wrapper" style='margin:1rem auto 1rem auto;  width:110%; '>
+                      <input type="text" class="search-input rounded-3 m-0 mr-2 ml-2" placeholder="Buscar turma" name="busca-turma" style='margin:1rem auto 1rem auto;  width:90%; ' >
+                      <button class="search-button" type="submit"  style='height: 10rem importamt;border-radius: 1rem;'><i class="fa-regular fa-user-magnifying-glass"></i></button>
+                    </div>
+                  </form> 
+                </div>                            
+              </div>              
+              </div>   
+              <table class="win11-table">
+                    <thead>
+                  <tr>
+                    <th scope="col" style='width:5rem'>Ordem</th> 
+                    <th scope="col" style='width:20rem'>Nome</th>                    
+                    <th scope="col" style='width:20rem'></th>     
+                  </tr>
+                </thead>
+                <tbody>
+                {% for n in turma %}
+                  <tr>
+                    <th scope="row">{{forloop.counter}}</th>
+                    <td>{{n.nome}} {{n.descritivo_turma}}</td>     
+                    <td><a href="{% url 'docsGestao_escolar:boletim_turma' n.pk %}" class='btn btn-sm btn-success'>Seguir para a turma >> </a> </td>                
+                  </tr>    
+                {% endfor %}                
+                </tbody>                  
+              </table>
+            </div> 
+        </div>                 
+        </div>
+      </div>        
+    </div>
+  </div>

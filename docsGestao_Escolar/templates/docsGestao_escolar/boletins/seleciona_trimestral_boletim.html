@@ -1,0 +1,45 @@
+
+<!-- Bootstrap Datepicker CSS -->
+<!-- Modal -->
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static "global/css/search.css" %}">
+{% endblock css %}
+<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">    
+  <div class="modal-dialog w-100">
+    <div class="modal-content bg-secondary-subtle ">
+      <div class="modal-header">
+        <h4 class="modal-title  fs-6">
+          <span class="text-uppercase ml-5 fs-3 ">
+            <i class="fa-sharp fa-solid fa-people fs-5"></i>
+            {{titulo_page}}
+            {% if messages %}                
+              {% include 'Escola/partials/mensagens.html' %}          
+            {% endif %}
+          </span>
+        </h4>        
+        <button type="button" class="close" data-dismiss="modal">&times;</button>        
+      </div>
+      <div class="modal-body shadow-sm bg-light-subtle">            
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          {% for t in trimestres %}
+          <li class="nav-item" role="presentation">
+            <button class="nav-link " id="home-tab_{{t.id}}" data-bs-toggle="tab" data-bs-target="#home-tab-pane_{{t.id}}" type="button" role="tab" aria-controls="home-tab-pane_{{t.id}}" aria-selected="true">
+              <i class="fa-duotone fa-solid fa-location-dot"></i>
+              <span>{{t.numero_nome}}</span>
+            </button>
+          </li>
+          {% endfor %}
+          
+        </ul>         
+        <div class="tab-content" id="myTabContent"> 
+          {% for t in trimestres %}         
+            <div class="tab-pane fade show bg-light" id="home-tab-pane_{{t.id}}" role="tabpanel" aria-labelledby="home-tab_{{t.id}}" tabindex="0">                            
+              {{t.id}}
+            </div>
+          {% endfor %}
+                   
+        </div>
+      </div>        
+    </div>
+  </div>

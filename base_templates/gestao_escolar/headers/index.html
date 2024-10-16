@@ -131,7 +131,13 @@
               </div> 
               <span>Frequência </span>
             </a>
-          </div>                 
+          </div> 
+          <div class="button">
+            <a href="{% url 'docsGestao_escolar:boletim' %}" title='Impressão de frequência impressa'>   
+              <div style='margin-bottom:0.9rem'><img src="{% static 'svg/boletim_aluno.svg' %}" alt="mdo"  class="pt-1 pb-1" ></div>   
+              <span>Boletins </span>
+            </a>
+          </div>                  
         </div>
       </div>
         <img src="{% if user.foto is not None %}{% static user.foto %}{% else %}{% static 'man.png' %}{% endif %}" alt="mdo" width="32" height="32" class="rounded-circle">           

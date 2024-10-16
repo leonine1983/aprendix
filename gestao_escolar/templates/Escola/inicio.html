@@ -286,6 +286,18 @@
         {% include 'Escola/partials/feriados_frequencia/calendario_mes.html' %}
     {% endif %} 
 
+    <!--Documentos-->
+    {% if  conteudo_page == "boletim"  %}
+        {% include 'docsGestao_escolar/boletins/seleciona_turma_boletim.html' %}
+    {% endif %} 
+    {% if  conteudo_page == "boletim_aluno" %}
+        {% include 'docsGestao_escolar/boletins/seleciona_aluno_boletim.html' %}
+    {% endif %} 
+    {% if  conteudo_page == "boletim_trimestral"%}
+        {% include 'docsGestao_escolar/boletins/seleciona_trimestral_boletim.html' %}
+    {% endif %} 
+    
+
     
     <!-- Condiciionais-->
     {% if 'escola_id' not in request.session %}
