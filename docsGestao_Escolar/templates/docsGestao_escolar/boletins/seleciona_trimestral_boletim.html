@@ -23,23 +23,127 @@
       <div class="modal-body shadow-sm bg-light-subtle">            
         <ul class="nav nav-tabs" id="myTab" role="tablist">
           {% for t in trimestres %}
-          <li class="nav-item" role="presentation">
-            <button class="nav-link " id="home-tab_{{t.id}}" data-bs-toggle="tab" data-bs-target="#home-tab-pane_{{t.id}}" type="button" role="tab" aria-controls="home-tab-pane_{{t.id}}" aria-selected="true">
-              <i class="fa-duotone fa-solid fa-location-dot"></i>
-              <span>{{t.numero_nome}}</span>
-            </button>
-          </li>
+            {% if not t.final  %}
+              <li class="nav-item" role="presentation">
+                <button class="nav-link " id="home-tab_{{t.id}}" data-bs-toggle="tab" data-bs-target="#home-tab-pane_{{t.id}}" type="button" role="tab" aria-controls="home-tab-pane_{{t.id}}" aria-selected="true">
+                  <i class="fa-duotone fa-solid fa-location-dot"></i>
+                  <span>{{t.numero_nome}}</span>
+                </button>
+              </li>
+            {% endif %}
           {% endfor %}
           
         </ul>         
         <div class="tab-content" id="myTabContent"> 
-          {% for t in trimestres %}         
-            <div class="tab-pane fade show bg-light" id="home-tab-pane_{{t.id}}" role="tabpanel" aria-labelledby="home-tab_{{t.id}}" tabindex="0">                            
-              {{t.id}}
-            </div>
+          {% for t in trimestres %}     
+            {% if not t.final  %}
+              <div class="tab-pane fade show bg-light" id="home-tab-pane_{{t.id}}" role="tabpanel" aria-labelledby="home-tab_{{t.id}}" tabindex="0">     
+                {% for trimestre in notas %}
+                  {% if trimestre.trimestre_id == t.id  %}  
+                    {% if not trimestre.final  %}
+                    <div id="content_imprimir">
+                      {% include "Escola/impressos/timbre_veraCruz.html" %}
+
+                      <div class="alert alert-success " style='display: flex' role="alert">
+                        <h4 class="alert-heading p-0">{{request.session.escola_nome}} - Ano letivo de {{request.session.anoLetivo_nome}} </h4>                 
+                        <p style='margin-top:0.7rem; margin-left:3rem'>  <i class="fa-regular fa-pen-line"></i> BOLETIM ESCOLAR</p>
+                      </div>
+                      
+                      
+                      <div>
+                        <h2 style='background: rgb(224, 224, 224); padding: 0.2rem;'>{{ trimestre.trimestre_nome }}</h2>
+                        <h3 style="padding-left: 5rem;">{{aluno.0.aluno}}</h3>
+                      </div>
+                      
+                      <table class='win11-table'>
+                          <thead>
+                              <tr>
+                                  <th>Disciplina</th>
+                                  <th>Notas</th>
+                                  <th>Faltas</th>
+                                  <th>Parecer Descritivo</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for disciplina in trimestre.disciplinas %}
+                                  <tr>
+                                      <td>{{ disciplina.disciplina_nome }}</td>
+                                      <td>{% if disciplina.notas is not None %}{{ disciplina.notas }}{% endif %}</td>
+                                      <td>{% if disciplina.faltas is not None %}{{ disciplina.faltas }}{% endif %}</td>
+                                      <td>{% if disciplina.parecer_descritivo is not None %}{{ disciplina.parecer_descritivo }}{% endif %}</td>
+                                  </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table>
+                    </div>
+                    {% else %}
+                      <div>
+                        <div>
+                          <h2 style='background: rgb(224, 224, 224); padding: 0.2rem;'>{{ trimestre.trimestre_nome }}</h2>
+                          <h3 style="padding-left: 5rem;">{{aluno.0.aluno}}</h3>
+                        </div>
+                        
+                        <table class='win11-table'>
+                            <thead>
+                                <tr>
+                                    <th>Disciplina</th>
+                                    <th>Notas</th>
+                                    <th>Faltas</th>
+                                    <th>Parecer Descritivo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for disciplina in trimestre.disciplinas %}
+                                    <tr>
+                                        <td>{{ disciplina.disciplina_nome }}</td>
+                                        <td>{% if disciplina.media_final is not None %}{{ disciplina.media_final }}{% endif %}</td>
+                                        <td>{% if disciplina.faltas is not None %}{{ disciplina.faltas }}{% endif %}</td>
+                                        <td>{% if disciplina.parecer_descritivo is not None %}{{ disciplina.parecer_descritivo }}{% endif %}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                      </div>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% endif %}   
           {% endfor %}
                    
         </div>
       </div>        
     </div>
   </div>
+  <script>
+    function imprimirConteudo(){
+      //Obter o conteudo a ser impresso
+      var conteudo = document.getElementById('content_imprimir').innerHTML;
+      //Abrir a janela de impressão
+      var janela = window.open('', '', 'height=600, width=800');
+      janela.document.write('<html><head><title></title><</head>')
+    }
+  </script>
+
+
+
+  <!--
+  
+  <script>
+   function imprimirConteudo() {
+            // Obtém o conteúdo da div
+            var conteudo = document.getElementById('content_imprimir').innerHTML;
+            
+            // Abre uma nova janela para impressão
+            var janela = window.open('', '', 'height=600,width=800');
+            janela.document.write('<html><head><title>Conteúdo</title></head>');
+            janela.document.write('<body>');
+            janela.document.write(conteudo); // Escreve o conteúdo na nova janela
+            janela.document.write('</body></html>');
+            
+            // Fecha a nova janela após a impressão
+            janela.document.close();
+            janela.print();
+        }
+</script>
+  -->

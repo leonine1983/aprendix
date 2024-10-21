@@ -19,6 +19,11 @@ class Pessoa_form(forms.ModelForm):
         label="Sobrenome da Pessoa",
         widget=forms.TextInput(attrs= bootstrap )
     )
+    email = forms.EmailField(
+        label='Email',
+        widget=forms.EmailInput(attrs=bootstrap),
+        required=False
+    )
     foto = forms.ImageField(
         label="Foto da Pessoa",
         required=False,  # Altere para True se quiser que seja obrigatório
@@ -81,13 +86,13 @@ class Pessoa_form(forms.ModelForm):
     )
     senha = forms.CharField(
         label="Senha do Professor",
-        widget=forms.TextInput(attrs={'class': "border border-info p-2 pb-1 text-success col rounded-1"}),
+        widget=forms.PasswordInput(attrs={'class': "border border-info p-2 pb-1 text-success col rounded-1"}),
         required=False  # Change to True if you want it to be mandatory
     )
 
     class Meta:
         model = Pessoas
-        fields = ['nome', 'sobrenome','foto','sexo', 'data_nascimento', 'cpf', 'rg', 'numero_casa', 'bairro', 'cidade', 'cep', 'login_professor', 'senha']
+        fields = ['nome', 'sobrenome','foto','sexo','email', 'data_nascimento', 'cpf', 'rg', 'numero_casa', 'bairro', 'cidade', 'cep', 'login_professor', 'senha']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -96,7 +96,8 @@ class Sexo(models.Model):
 class Pessoas(models.Model):
     nome = models.CharField(max_length=30, null=False, verbose_name='Nome')
     foto = models.ImageField(upload_to='pessoa_fotos/', null=True, blank=True, verbose_name="Adicione uma foto")
-    sobrenome = models.CharField(max_length=30, null=False, verbose_name='Sobrenome')    
+    sobrenome = models.CharField(max_length=30, null=False, verbose_name='Sobrenome')   
+    email = models.EmailField(max_length=100, null=True) 
     sexo = models.ForeignKey(Sexo, models.CASCADE, null=True)
     data_nascimento = models.DateField(null=True)    
     idade= models.CharField(max_length=9, null=True, blank=True)

@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rh.models import Pessoas
 from .professor_form import Pessoa_form, Pessoa_form_update
+from django.contrib.auth.models import User, Group
 
 
 class PessoasDetailView(LoginRequiredMixin, DetailView):
@@ -19,6 +20,23 @@ class PessoasCreateView(LoginRequiredMixin, CreateView):
     
     def form_valid(self, form):
         messages.success(self.request, 'Pessoa criada com sucesso!')
+        nome = form.instance.nome
+        ultimoNome = form.instance.sobrenome
+        email = form.instance.email
+        usuario = form.instance.login_professor
+        senha = form.instance.senha
+        user = User.objects.create_user(
+            first_name = nome,
+            last_name = ultimoNome,
+            username = usuario,
+            password= senha,
+            email = email
+        )
+        user.save()
+        professor = Group.objects.get(name = 'Professor')
+        print(f'todos os grupos {Group.objects.all()}')
+        user.groups.add(professor)
+        messages.success(self.request, f'Acesso ao sistema, liberado para {user.first_name} {user.last_name}')
         return super().form_valid(form)
 
     def form_invalid(self, form):
