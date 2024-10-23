@@ -2,7 +2,13 @@
 {% load meus_filtros %}
 {% block script_head %}<link rel="stylesheet" href="{% static 'global/css/css3_tab.css' %}">{% endblock script_head %} 
 {% block script_footer %}{% endblock script_footer %} 
-
+<style>
+    .ckeditor div{
+        box-shadow: none !important;
+        padding: 0rem !important;
+        border: none!important;
+    }
+</style>
 <!-- Modal -->
 <div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">   
   <div class="modal-dialog w-100">
@@ -24,7 +30,7 @@
         
             <ul>
                 {% for t in trimestes %}         
-                    <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography">   
+                    <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography">                           
                         {% include "Escola/partials/mensagens.html" %}
                         {% if t.final %}
                         <div class="alert alert-info" role="alert">
@@ -61,32 +67,24 @@
                             <tbody>
                                 {% for tu in turma %}
                                 <tr>
-                                    <td>{{tu.aluno}}</td>
+                                    <td>{{tu.aluno}} </td>
                                     <td>
                                         {% if not tu.aspectos_cognitivos %}
                                             <button id="openDialog_{{tu.aluno.id}}_cogn" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
                                             <dialog id="instructionsDialog_{{tu.aluno.id}}_cogn" class="w-75">
                                                 <div class="container mt-4">
                                                     <div class="alert alert-info" role="alert">
-                                                        <strong>Aspectos Cognitivos do Aluno</strong>
+                                                        <strong><h2> Cognitivos do Aluno</h2></strong>
                                                     </div>    
-                                                    <div class="row row-cols-2">
-                                                        <section class='col p-2'>
-                                                            <h2 class="alert-info p-2">Aspectos Cognitivos do Aluno - {{t.numero_nome}}</h2>
-                                                            <section class='p-2'>
-                                                                <p class='border-bottom border-primary p-1'>Avaliado por: {{t.author_atualiza}} em {{atualizado_em}}</p>   
-                                                                <p>{{t.aspectos_cognitivos|safe}}</p>
-                                                            </section>
-                                                        </section>
-                                                        <section class="col">
-                                                            <form action="" id="cognitivo">
-                                                                {{form.media}}
-                                                                {{form.aspectos_cognitivos}}
-                                                                <button id="b-cognitivo">Salvar</button>
-                                                            </form>
-                                                        </section>
-
-                                                        {{tu.aspectos_cognitivos|safe}}
+                                                    <div class="">  
+                                                        <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id %}" id="cognitivo" method="post">
+                                                            {% csrf_token %}
+                                                            {{form.media}}
+                                                            <section class="border">
+                                                            {{form.aspectos_cognitivos}}
+                                                            </section>                                                         
+                                                            <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
+                                                        </form>                                                       
                                                     </div>
                                                 </div>                    
                                                 <button id="closeDialog_{{tu.aluno.id}}_cogn" class="btn btn-secondary mt-5">Fechar</button>
@@ -112,10 +110,17 @@
                                             <dialog id="instructionsDialog_{{t.aluno.id}}_socio" class="w-75">
                                                 <div class="container mt-4">
                                                     <div class="alert alert-info" role="alert">
-                                                        <strong>Aspectos Socioemocionais do aluno</strong>
-                                                    </div>    
-                                                    <div>
-                                                        {{t.aspectos_socioemocionais |safe}}
+                                                        <strong><h2> Socioemocionais do aluno </h2></strong>
+                                                    </div>
+                                                    <div class="">  
+                                                        <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id %}" id="cognitivo" method="post">
+                                                            {% csrf_token %}
+                                                            {{form.media}}
+                                                            <section class="border">
+                                                            {{form.aspectos_socioemocionais}}
+                                                            </section>                                                         
+                                                            <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
+                                                        </form>                                                       
                                                     </div>
                                                 </div>                    
                                                 <button id="closeDialog_{{t.aluno.id}}_socio" class="btn btn-secondary mt-5">Fechar</button>

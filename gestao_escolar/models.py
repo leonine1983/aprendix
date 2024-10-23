@@ -434,6 +434,11 @@ class Matriculas(models.Model):
             turma.vagas_disponiveis = turma.quantidade_vagas - existing_matriculas_count
             turma.save()
 
+            ParecerDescritivo.objects.create(
+                matricula = Matriculas.objects.get(id=instance.id)
+            )
+
+
     class Meta:
         ordering = ['aluno']
 
@@ -581,7 +586,7 @@ class GestaoTurmas(models.Model):
         return self.aluno.aluno.nome_completo
     
 class ParecerDescritivo(models.Model):
-    matricula = models.ForeignKey(Matriculas, on_delete=models.CASCADE, related_name='pareceres')
+    matricula = models.ForeignKey(Matriculas, blank=True, on_delete=models.CASCADE, related_name='pareceres_aluno')
     created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
     author_created = models.CharField(max_length=50,  null=True, blank=True, verbose_name='Autor da criação')
     atualizado_em = models.DateTimeField(auto_now=True,  verbose_name='Data da Última Atualização')
@@ -599,7 +604,7 @@ class ParecerDescritivo(models.Model):
     observacao_coordenador =  RichTextUploadingField(null=True, blank=True)    
 
     def __str__(self):
-        return f'Parecer de {self.matricula.aluno} - {self.data_registro}'
+        return f'Parecer de {self.matricula.aluno} - Matriculado em {self.matricula.data_matricula}'
     
 
 # Disponibilização do CAAE -------------------------------------------------------------------------------------------------------------------------
