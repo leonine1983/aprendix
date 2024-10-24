@@ -3,16 +3,8 @@ from gestao_escolar.models import Matriculas, Trimestre, ParecerDescritivo
 from .formsAlunoParecer import AlunoParecerForm
 
 def gestao_turmas_parecer(request, turma_id):
-    # Obtém todos os pareceres relacionados à turma
-    #parecer = Matriculas.objects.filter(turma=turma_id)
     parecer = ParecerDescritivo.objects.filter(matricula__turma=turma_id)
     #parecer = ParecerDescritivo.objects.filter(matricula__turma=turma_id).select_related('trimestre')
-
-
-    
-    
-    # Se você deseja mostrar pareceres individuais, precisará iterar sobre eles.
-    # Aqui, por exemplo, assumimos que você quer mostrar todos os pareceres em um formulário.
     
     forms = []
     for item in parecer:
@@ -27,7 +19,7 @@ def gestao_turmas_parecer(request, turma_id):
 
     context = {
         'form': forms,  
-        'turma': turma,
+        'turma': turma,       
         'trimestres': trimestres,
         'conteudo_page': "Gestão Turmas - Parecer",
     }
