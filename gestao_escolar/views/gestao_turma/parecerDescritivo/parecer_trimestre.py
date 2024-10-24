@@ -1,23 +1,35 @@
-# views.py
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse_lazy
-from django.views import generic
-from gestao_escolar.models import GestaoTurmas, Matriculas, Trimestre, TurmaDisciplina, ParecerDescritivo
+from gestao_escolar.models import Matriculas, Trimestre, ParecerDescritivo
 from .formsAlunoParecer import AlunoParecerForm
 
-class GestaoTurmasParecer(generic.TemplateView):
-    model = ParecerDescritivo
-    fields = ['aspectos_cognitivos', 'aspectos_socioemocionais', 'aspectos_fisicos_motoras', 'habilidades', 'conteudos_abordados', 'interacao_social', 'comunicacao', 'consideracoes_finais', 'observacao_coordenador' ]
-    template_name = 'Escola/inicio.html'
+def gestao_turmas_parecer(request, turma_id):
+    # Obtém todos os pareceres relacionados à turma
+    #parecer = Matriculas.objects.filter(turma=turma_id)
+    parecer = ParecerDescritivo.objects.filter(matricula__turma=turma_id)
+    #parecer = ParecerDescritivo.objects.filter(matricula__turma=turma_id).select_related('trimestre')
 
-    def get_context_data(self, **kwargs):
-        turma_id = self.kwargs['turma_id']
-        context = super().get_context_data(**kwargs)
-        parecer = get_object_or_404(ParecerDescritivo, matricula__turma = turma_id)
-        form = AlunoParecerForm(instance = parecer)
-        context['form'] = form
 
-        context['turma'] = Matriculas.objects.filter(turma = turma_id)  
-        context['trimestes'] = Trimestre.objects.all()
-        context['conteudo_page'] = "Gestão Turmas - Parecer"
-        return context
+    
+    
+    # Se você deseja mostrar pareceres individuais, precisará iterar sobre eles.
+    # Aqui, por exemplo, assumimos que você quer mostrar todos os pareceres em um formulário.
+    
+    forms = []
+    for item in parecer:
+        form = AlunoParecerForm(instance=item)
+        forms.append(form)
+
+    print(f'olha os forms {forms}')
+   
+    # Obtém as matrículas da turma
+    turma = Matriculas.objects.filter(turma=turma_id)
+    trimestres = Trimestre.objects.all()
+
+    context = {
+        'form': forms,  
+        'turma': turma,
+        'trimestres': trimestres,
+        'conteudo_page': "Gestão Turmas - Parecer",
+    }
+
+    return render(request, 'Escola/inicio.html', context)

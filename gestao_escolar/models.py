@@ -434,9 +434,12 @@ class Matriculas(models.Model):
             turma.vagas_disponiveis = turma.quantidade_vagas - existing_matriculas_count
             turma.save()
 
-            ParecerDescritivo.objects.create(
-                matricula = Matriculas.objects.get(id=instance.id)
-            )
+            trimestre = Trimestre.objects.all()
+            for tri in trimestre:
+                ParecerDescritivo.objects.create(
+                    matricula = Matriculas.objects.get(id=instance.id),
+                    trimestre = Trimestre.objects.get(id = tri.id)
+                )
 
 
     class Meta:
@@ -587,6 +590,7 @@ class GestaoTurmas(models.Model):
     
 class ParecerDescritivo(models.Model):
     matricula = models.ForeignKey(Matriculas, blank=True, on_delete=models.CASCADE, related_name='pareceres_aluno')
+    trimestre = models.ForeignKey(Trimestre, related_name='trimestre_related_turma_parecer', null=True, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
     author_created = models.CharField(max_length=50,  null=True, blank=True, verbose_name='Autor da criação')
     atualizado_em = models.DateTimeField(auto_now=True,  verbose_name='Data da Última Atualização')
@@ -601,7 +605,8 @@ class ParecerDescritivo(models.Model):
     interacao_social =  RichTextUploadingField(null=True, blank=True)          
     comunicacao =  RichTextUploadingField(null=True, blank=True)               
     consideracoes_finais =  RichTextUploadingField(null=True, blank=True)      
-    observacao_coordenador =  RichTextUploadingField(null=True, blank=True)    
+    observacao_coordenador =  RichTextUploadingField(null=True, blank=True)  
+    resumo = RichTextUploadingField(null=True, blank=True) 
 
     def __str__(self):
         return f'Parecer de {self.matricula.aluno} - Matriculado em {self.matricula.data_matricula}'

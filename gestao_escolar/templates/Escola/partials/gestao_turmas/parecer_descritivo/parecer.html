@@ -22,14 +22,14 @@
           </div>
 
           <div class="pcss3t pcss3t-effect-scale pcss3t-theme-1">           
-            {% for t in trimestes %}
+            {% for t in trimestres %}
                 <input type="radio" name="pcss3t" {% if t.id == 1 %} checked {% endif %} id="tab{{ t.id }}" class="{% if t.id == 1 %}tab-content-first{% else %}tab-content-{{ t.id }}{% endif %}">
                 <label for="tab{{ t.id }}" class="col-2"><h1>{{ t.numero_nome }}</h1></label>
                 
             {% endfor %}
         
             <ul>
-                {% for t in trimestes %}         
+                {% for t in trimestres %}         
                     <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography">                           
                         {% include "Escola/partials/mensagens.html" %}
                         {% if t.final %}
@@ -74,17 +74,26 @@
                                             <dialog id="instructionsDialog_{{tu.aluno.id}}_cogn" class="w-75">
                                                 <div class="container mt-4">
                                                     <div class="alert alert-info" role="alert">
-                                                        <strong><h2> Cognitivos do Aluno</h2></strong>
+                                                        <strong><h2> Cognitivos do Aluno</h2></strong> 
                                                     </div>    
                                                     <div class="">  
-                                                        <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id %}" id="cognitivo" method="post">
+                                                        <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="cognitivo" method="post">
                                                             {% csrf_token %}
                                                             {{form.media}}
-                                                            <section class="border">
-                                                            {{form.aspectos_cognitivos}}
+                                                            <section class="border">                                                                
+                                                            {% for form in form %}
+                                                                {% for tri in tu.pareceres_aluno.all %}
+                                                                    {% if t.id == tri.trimestre.id %}
+                                                                        {{form.media}}
+                                                                        {{form.id}}
+                                                                        {{ form.aspectos_cognitivos }}
+                                                                    {% endif %}                                                        
+                                                                {% endfor %}                                                               
+                                                            {% endfor %}  
                                                             </section>                                                         
                                                             <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
-                                                        </form>                                                       
+                                                        </form>  
+                                                      
                                                     </div>
                                                 </div>                    
                                                 <button id="closeDialog_{{tu.aluno.id}}_cogn" class="btn btn-secondary mt-5">Fechar</button>
@@ -105,15 +114,15 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if not t.aspectos_socioemocionais %}
+                                        {% if not t.pareceres_aluno.aspectos_socioemocionais %}
                                             <button id="openDialog_{{t.aluno.id}}_socio" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
                                             <dialog id="instructionsDialog_{{t.aluno.id}}_socio" class="w-75">
                                                 <div class="container mt-4">
                                                     <div class="alert alert-info" role="alert">
-                                                        <strong><h2> Socioemocionais do aluno </h2></strong>
+                                                        <strong><h2> Socioemocionais do aluno </h2> {{tu.pareceres_aluno.all}}</strong>
                                                     </div>
                                                     <div class="">  
-                                                        <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id %}" id="cognitivo" method="post">
+                                                        <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="cognitivo" method="post">
                                                             {% csrf_token %}
                                                             {{form.media}}
                                                             <section class="border">
