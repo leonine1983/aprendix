@@ -50,18 +50,42 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
         client = Client()
         message_resumo = [
             "Por favor, do conteudo abaixo, crie um parecer descritivo para o aluno em português:",
-            f'Nome do Aluno: {pAtrib.get('aluno')}',
-            f'Trimestre atual: {pAtrib.get('trimestre')}',
-            f'Aspectos Cognitivos: {parecer_atualizado.aspectos_cognitivos}',
-            f'Aspectos Socioemocionais: {parecer_atualizado.aspectos_socioemocionais}',
-            f'Aspectos Físicos/Motoras: {parecer_atualizado.aspectos_fisicos_motoras}',
-            f'Habilidades: {parecer_atualizado.habilidades}',
-            f'Conteúdos Abordados: {parecer_atualizado.conteudos_abordados}',
-            f'Interação Social: {parecer_atualizado.interacao_social}',
-            f'Comunicação: {parecer_atualizado.comunicacao}',
-            f'Considerações Finais: {parecer_atualizado.consideracoes_finais}',
-            f'Observação do Coordenador: {parecer_atualizado.observacao_coordenador}'
-        ]
+            ]
+
+        # Adiciona as informações apenas se não estiverem vazias
+        if pAtrib.get('aluno'):
+            message_resumo.append(f'Nome do Aluno: {pAtrib.get("aluno")}')
+
+        if pAtrib.get('trimestre'):
+            message_resumo.append(f'Trimestre atual: {pAtrib.get("trimestre")}')
+
+        if parecer_atualizado.aspectos_cognitivos:
+            message_resumo.append(f'Aspectos Cognitivos: {parecer_atualizado.aspectos_cognitivos}')
+
+        if parecer_atualizado.aspectos_socioemocionais:
+            message_resumo.append(f'Aspectos Socioemocionais: {parecer_atualizado.aspectos_socioemocionais}')
+
+        if parecer_atualizado.aspectos_fisicos_motoras:
+            message_resumo.append(f'Aspectos Físicos/Motoras: {parecer_atualizado.aspectos_fisicos_motoras}')
+
+        if parecer_atualizado.habilidades:
+            message_resumo.append(f'Habilidades: {parecer_atualizado.habilidades}')
+
+        if parecer_atualizado.conteudos_abordados:
+            message_resumo.append(f'Conteúdos Abordados: {parecer_atualizado.conteudos_abordados}')
+
+        if parecer_atualizado.interacao_social:
+            message_resumo.append(f'Interação Social: {parecer_atualizado.interacao_social}')
+
+        if parecer_atualizado.comunicacao:
+            message_resumo.append(f'Comunicação: {parecer_atualizado.comunicacao}')
+
+        if parecer_atualizado.consideracoes_finais:
+            message_resumo.append(f'Considerações Finais: {parecer_atualizado.consideracoes_finais}')
+
+        if parecer_atualizado.observacao_coordenador:
+            message_resumo.append(f'Observação do Coordenador: {parecer_atualizado.observacao_coordenador}')
+
 
         # Gera o resumo usando o G4f
         response = client.chat.completions.create(
