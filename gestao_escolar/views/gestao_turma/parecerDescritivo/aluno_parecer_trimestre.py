@@ -18,14 +18,13 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
         form = request.POST
         cgn = form.get('aspectos_cognitivos') or pAtrib.get('aspectos_cognitivos')
         socio = form.get('aspectos_socioemocionais') or pAtrib.get('aspectos_socioemocionais')
-
-        fis = form.get('aspectos_fisicos_motoras')
-        hab = form.get('habilidades')
-        contAbordado = form.get('conteudos_abordados')
-        intSocial = form.get('interacao_social')
-        comunica = form.get('comunicacao')
-        consFinais = form.get('consideracoes_finais')
-        obsCoord = form.get('observacao_coordenador')
+        fis = form.get('aspectos_fisicos_motoras') or pAtrib.get('aspectos_fisicos_motoras')
+        hab = form.get('habilidades') or pAtrib.get('habilidades')
+        contAbordado = form.get('conteudos_abordados') or pAtrib.get('conteudos_abordados')
+        intSocial = form.get('interacao_social') or pAtrib.get('interacao_social')
+        comunica = form.get('comunicacao') or pAtrib.get('comunicacao')
+        consFinais = form.get('consideracoes_finais') or pAtrib.get('consideracoes_finais')
+        obsCoord = form.get('observacao_coordenador') or pAtrib.get('observacao_coordenador')
 
         # Atualiza ou cria o ParecerDescritivo
         ParecerDescritivo.objects.update_or_create(
