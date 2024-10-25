@@ -1,4 +1,3 @@
-
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from gestao_escolar.models import ParecerDescritivo, Trimestre
@@ -7,13 +6,19 @@ from g4f.client import Client
 
 def alunoGestaoTurmasParecer(request, pk, trimestre):
     parecer = ParecerDescritivo.objects.filter(matricula=pk, trimestre=trimestre)
-    print(f'olha o parecer {parecer}')
-    #parecer = get_object_or_404(ParecerDescritivo, matricula=pk, trimestre__id=trimestre)    
+    pAtrib = {}
+
+    for p in parecer:
+        pAtrib['aluno'] = p.matricula       
+        pAtrib['trimestre'] = p.trimestre   
+        pAtrib['aspectos_cognitivos'] = p.aspectos_cognitivos
+        pAtrib['aspectos_socioemocionais'] = p.aspectos_socioemocionais
 
     if request.method == 'POST':
         form = request.POST
-        cgn = form.get('aspectos_cognitivos')
-        socio = form.get('aspectos_socioemocionais')
+        cgn = form.get('aspectos_cognitivos') or pAtrib.get('aspectos_cognitivos')
+        socio = form.get('aspectos_socioemocionais') or pAtrib.get('aspectos_socioemocionais')
+
         fis = form.get('aspectos_fisicos_motoras')
         hab = form.get('habilidades')
         contAbordado = form.get('conteudos_abordados')
@@ -27,7 +32,7 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
             matricula=pk,
             trimestre__id=trimestre,
             defaults={
-                'trimestre' : Trimestre.objects.get(pk=trimestre),
+                'trimestre': Trimestre.objects.get(pk=trimestre),
                 'aspectos_cognitivos': cgn,
                 'aspectos_socioemocionais': socio,
                 'aspectos_fisicos_motoras': fis,
@@ -42,28 +47,22 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
 
         parecer_atualizado = get_object_or_404(ParecerDescritivo, matricula=pk, trimestre__id=trimestre)
 
-        client = Client()
-        message_resumo = []
 
-        # Coleta as informações para gerar o resumo
-        
-        message_resumo.append(f'Aspectos Cognitivos: {parecer_atualizado.aspectos_cognitivos}')
-    
-        message_resumo.append(f'Aspectos Socioemocionais: {parecer_atualizado.aspectos_socioemocionais}')
-    
-        message_resumo.append(f'Aspectos Físicos/Motoras: {parecer_atualizado.aspectos_fisicos_motoras}')
-    
-        message_resumo.append(f'Habilidades: {parecer_atualizado.habilidades}')
-    
-        message_resumo.append(f'Conteúdos Abordados: {parecer_atualizado.conteudos_abordados}')
-    
-        message_resumo.append(f'Interação Social: {parecer_atualizado.interacao_social}')
-    
-        message_resumo.append(f'Comunicação: {parecer_atualizado.comunicacao}')
-    
-        message_resumo.append(f'Considerações Finais: {parecer_atualizado.consideracoes_finais}')
-    
-        message_resumo.append(f'Observação do Coordenador: {parecer_atualizado.observacao_coordenador}')
+        client = Client()
+        message_resumo = [
+            "Por favor, do conteudo abaixo, crie um parecer descritivo para o aluno em português:",
+            f'Nome do Aluno: {pAtrib.get('aluno')}',
+            f'Trimestre atual: {pAtrib.get('trimestre')}',
+            f'Aspectos Cognitivos: {parecer_atualizado.aspectos_cognitivos}',
+            f'Aspectos Socioemocionais: {parecer_atualizado.aspectos_socioemocionais}',
+            f'Aspectos Físicos/Motoras: {parecer_atualizado.aspectos_fisicos_motoras}',
+            f'Habilidades: {parecer_atualizado.habilidades}',
+            f'Conteúdos Abordados: {parecer_atualizado.conteudos_abordados}',
+            f'Interação Social: {parecer_atualizado.interacao_social}',
+            f'Comunicação: {parecer_atualizado.comunicacao}',
+            f'Considerações Finais: {parecer_atualizado.consideracoes_finais}',
+            f'Observação do Coordenador: {parecer_atualizado.observacao_coordenador}'
+        ]
 
         # Gera o resumo usando o G4f
         response = client.chat.completions.create(
@@ -71,7 +70,7 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
             messages=[{"role": "user", "content": "\n".join(message_resumo)}]
         )
 
-        resumo = response.choices[0].message.content  # Acessa o conteúdo corretamente
+        resumo = response.choices[0].message.content
 
         # Atualiza o campo 'resumo'
         ParecerDescritivo.objects.update_or_create(
@@ -80,8 +79,6 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
             defaults={'resumo': resumo}
         )
 
-
         messages.success(request, "Parecer do aluno salvo com sucesso")
-    
-    return redirect(reverse_lazy('Gestao_Escolar:criaParecer', kwargs={'turma_id': parecer_atualizado.matricula.turma.id}))
 
+    return redirect(reverse_lazy('Gestao_Escolar:criaParecer', kwargs={'turma_id': parecer_atualizado.matricula.turma.id}))

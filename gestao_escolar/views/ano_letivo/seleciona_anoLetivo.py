@@ -23,6 +23,13 @@ class Seleciona_anoLetivo(LoginRequiredMixin, ListView):
         context['now'] = datetime.now()        
         context['conteudo_page'] = 'Ano Letivo'          
         
-        context['page_ajuda'] = "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional."
+        context['page_ajuda'] = "<div class='m-2'>\
+                                    <p>Oi! Precisa de ajuda <i class='fa-duotone fa-solid fa-message-question fs-2'></i></p>\
+                                    <p>Oi! Vamos escolher um ano letivo.</p>\
+                                    <p>Sempre que inicia o APRENDIX, é necessário além de escolher uma escola, deve selecionar o ano letivo<i class='fa-duotone fa-solid fa-hands-holding-heart'></i></p>\
+                                    <p>Aqui nessa janela, lá no topo tem uma lista contendo todos os anos letivos disponíveis.</p>\
+                                    <p>Basta você clicar lista, clicar no ano letivo e depois no botão SELECIONAR. Daí a mágica acontece</p>\
+                                    <p>Vai lá e experimente. Qualquer coisa, estarei por aqui. Abraços...</p>\
+                                </div>"
         
         return context

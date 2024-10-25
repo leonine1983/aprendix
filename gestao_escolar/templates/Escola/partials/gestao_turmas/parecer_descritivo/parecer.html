@@ -80,20 +80,16 @@
                                                         <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="cognitivo" method="post">
                                                             {% csrf_token %}
                                                             {{form.media}}
-                                                            <section class="border">                                                                
-                                                            {% for form in form %}
-                                                                {% for tri in tu.pareceres_aluno.all %}
-                                                                    {% if t.id == tri.trimestre.id %}
-                                                                        {{form.media}}
-                                                                        {{form.id}}
-                                                                        {{ form.aspectos_cognitivos }}
-                                                                    {% endif %}                                                        
-                                                                {% endfor %}                                                               
+                                                            <section class="border"> 
+                                                            {% for form in form %}                                                               
+                                                                {% if form.trimestre.label == t.numero_nome%}
+                                                                    {{form.media}}
+                                                                    {{ form.aspectos_cognitivos }}
+                                                                {% endif %}                                             
                                                             {% endfor %}  
                                                             </section>                                                         
                                                             <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
-                                                        </form>  
-                                                      
+                                                        </form>                                                        
                                                     </div>
                                                 </div>                    
                                                 <button id="closeDialog_{{tu.aluno.id}}_cogn" class="btn btn-secondary mt-5">Fechar</button>
@@ -125,11 +121,18 @@
                                                         <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="cognitivo" method="post">
                                                             {% csrf_token %}
                                                             {{form.media}}
-                                                            <section class="border">
-                                                            {{form.aspectos_socioemocionais}}
+                                                            <section class="border"> 
+                                                            {% for form in form %}                                                               
+                                                                {% if form.trimestre.label == t.numero_nome%}
+                                                                    {{form.media}}
+                                                                    {{ form.aspectos_socioemocionais }}
+                                                                {% endif %}                                             
+                                                            {% endfor %}  
                                                             </section>                                                         
                                                             <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
-                                                        </form>                                                       
+                                                        </form>  
+
+                                                     
                                                     </div>
                                                 </div>                    
                                                 <button id="closeDialog_{{t.aluno.id}}_socio" class="btn btn-secondary mt-5">Fechar</button>
