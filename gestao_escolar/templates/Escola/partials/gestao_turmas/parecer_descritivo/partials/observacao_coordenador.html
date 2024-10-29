@@ -1,0 +1,95 @@
+<button id="openDialog_{{t.aluno.id}}_observacao_coordenador" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{t.aluno.id}}_observacao_coordenador" class="w-75">
+    <div class="container mt-4">
+        
+        <div class="container mt-5">
+            <div class='alert-primary p-2 m-2'>
+                <h2 class="text-center text-uppercase ">Observação do Coordenador da Turma</h2>
+                <p class='fs-5'>Esta seção é destinada ao coordenador registrar observações relevantes sobre o aluno, visando complementar a avaliação realizada pelos professores. Considere os seguintes aspectos ao preencher:</p>
+            </div>
+        
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm bg-secondary-subtle">
+                <div class="card-body">
+                    <h5 class="card-title">Desempenho Geral</h5>
+                    <p class="card-text">Como o aluno tem se saído em relação às expectativas do nível em que se encontra?</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm bg-secondary-subtle">
+                <div class="card-body">
+                    <h5 class="card-title">Interação com os Colegas</h5>
+                    <p class="card-text">Como o aluno se relaciona com os demais alunos? Ele participa ativamente das atividades em grupo?</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm bg-secondary-subtle">
+                <div class="card-body">
+                    <h5 class="card-title">Comportamento em Sala de Aula</h5>
+                    <p class="card-text">Observações sobre a postura do aluno durante as aulas e em atividades. Ele demonstra interesse e respeito?</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm bg-secondary-subtle">
+                <div class="card-body">
+                    <h5 class="card-title">Desafios Enfrentados</h5>
+                    <p class="card-text">Quais dificuldades o aluno tem apresentado? Existem áreas que precisam de mais atenção?</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm bg-secondary-subtle">
+                <div class="card-body">
+                    <h5 class="card-title">Recomendações</h5>
+                    <p class="card-text">Sugestões para o acompanhamento do aluno e como os professores podem apoiá-lo.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h5>Observações Adicionais:</h5>
+    
+            
+        <div class="">  
+            <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="observacao_coordenador" method="post">
+                {% csrf_token %}
+                {{form.media}}
+                <section class="border"> 
+                {% for form in form %}                                                               
+                    {% if form.trimestre.label == t.numero_nome%}
+                        {{form.media}}
+                        {{ form.observacao_coordenador}}
+                    {% endif %}                                             
+                {% endfor %}  
+                </section>                                                         
+                <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
+            </form>                                                          
+        </div>
+    </div>
+    </div>                    
+    <button id="closeDialog_{{t.aluno.id}}_observacao_coordenador" class="btn btn-secondary mt-5">Fechar</button>
+</dialog>  
+<script>
+const dialog_observacao_coordenador = document.getElementById('instructionsDialog_{{t.aluno.id}}_observacao_coordenador');
+const openButton_observacao_coordenador = document.getElementById("openDialog_{{t.aluno.id}}_observacao_coordenador");
+const closeButton_observacao_coordenador = document.getElementById("closeDialog_{{t.aluno.id}}_observacao_coordenador");
+
+openButton_observacao_coordenador.addEventListener('click', () => {
+    dialog_observacao_coordenador.showModal(); // Abre a caixa de diálogo como modal
+    });
+
+closeButton_observacao_coordenador.addEventListener('click', () => {
+    dialog_observacao_coordenador.close(); // Fecha a caixa de diálogo
+    });
+</script> 

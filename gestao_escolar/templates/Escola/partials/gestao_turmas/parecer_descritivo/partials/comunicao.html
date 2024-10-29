@@ -1,0 +1,100 @@
+<button id="openDialog_{{t.aluno.id}}_comunicao" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{t.aluno.id}}_comunicao" class="w-75">
+    <div class="container mt-4">
+        
+        <div class="container mt-5">
+            <div class='alert-primary p-2 m-2'>
+                <h2 class="text-center text-uppercase ">Comunicação do Aluno</h2>
+                <p class='fs-5'>Ao preencher o campo "Comunicação" do parecer descritivo, os professores devem observar e avaliar os seguintes aspectos:</p>
+            </div>
+        
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Expressão Verbal</h5>
+                    <p class="card-text">Avaliar a clareza e a coerência da fala do aluno, além da riqueza de vocabulário utilizado.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Escuta Ativa</h5>
+                    <p class="card-text">Observar a capacidade do aluno de ouvir atentamente os colegas e professores, demonstrando compreensão.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Comunicação Não Verbal</h5>
+                    <p class="card-text">Avaliar a expressão facial, gestos e posturas que acompanham a comunicação do aluno.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Interação em Grupo</h5>
+                    <p class="card-text">Verificar como o aluno se comunica e colabora com os colegas durante atividades em grupo.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Argumentação</h5>
+                    <p class="card-text">Observar a habilidade do aluno em apresentar e defender suas ideias de forma lógica.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Feedback</h5>
+                    <p class="card-text">Avaliar a capacidade do aluno de dar e receber feedback de maneira construtiva.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+        
+            
+        <div class="">  
+            <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="comunicacao" method="post">
+                {% csrf_token %}
+                {{form.media}}
+                <section class="border"> 
+                {% for form in form %}                                                               
+                    {% if form.trimestre.label == t.numero_nome%}
+                        {{form.media}}
+                        {{ form.comunicacao}}
+                    {% endif %}                                             
+                {% endfor %}  
+                </section>                                                         
+                <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
+            </form>                                                          
+        </div>
+    </div>                    
+    <button id="closeDialog_{{t.aluno.id}}_comunicao" class="btn btn-secondary mt-5">Fechar</button>
+</dialog>  
+<script>
+const dialog_comunicao = document.getElementById('instructionsDialog_{{t.aluno.id}}_comunicao');
+const openButton_comunicao = document.getElementById("openDialog_{{t.aluno.id}}_comunicao");
+const closeButton_comunicao = document.getElementById("closeDialog_{{t.aluno.id}}_comunicao");
+
+openButton_comunicao.addEventListener('click', () => {
+    dialog_comunicao.showModal(); // Abre a caixa de diálogo como modal
+    });
+
+closeButton_comunicao.addEventListener('click', () => {
+    dialog_comunicao.close(); // Fecha a caixa de diálogo
+    });
+</script> 

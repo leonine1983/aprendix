@@ -62,6 +62,7 @@
                                     <th>Comunicação</th>
                                     <th>Consid. Finais</th>
                                     <th>Obs. do Coordenador</th>
+                                    <th>Análise feita pela IA</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -69,132 +70,36 @@
                                 <tr>
                                     <td>{{tu.aluno}} </td>
                                     <td>                                        
-                                        <button id="openDialog_{{tu.aluno.id}}_cogn" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
-                                        <dialog id="instructionsDialog_{{tu.aluno.id}}_cogn" class="w-75">
-                                            <div class="container mt-4">
-                                                <div class="alert alert-info" role="alert">
-                                                    <strong><h2> Cognitivos do Aluno</h2></strong> 
-                                                </div>    
-                                                <div class="">  
-                                                    <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="cognitivo" method="post">
-                                                        {% csrf_token %}
-                                                        {{form.media}}
-                                                        <section class="border"> 
-                                                        {% for form in form %}                                                               
-                                                            {% if form.trimestre.label == t.numero_nome%}
-                                                                {{form.media}}
-                                                                {{ form.aspectos_cognitivos }}
-                                                            {% endif %}                                             
-                                                        {% endfor %}  
-                                                        </section>                                                         
-                                                        <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
-                                                    </form>                                                        
-                                                </div>
-                                            </div>                    
-                                            <button id="closeDialog_{{tu.aluno.id}}_cogn" class="btn btn-secondary mt-5">Fechar</button>
-                                        </dialog>  
-                                        <script>
-                                            const dialog = document.getElementById('instructionsDialog_{{tu.aluno.id}}_cogn');
-                                            const openButton = document.getElementById('openDialog_{{tu.aluno.id}}_cogn');
-                                            const closeButton = document.getElementById('closeDialog_{{tu.aluno.id}}_cogn');
-                                        
-                                            openButton.addEventListener('click', () => {
-                                                dialog.showModal(); // Abre a caixa de diálogo como modal
-                                                });
-                                        
-                                            closeButton.addEventListener('click', () => {
-                                                dialog.close(); // Fecha a caixa de diálogo
-                                                });
-                                        </script>    
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/CognitivosAluno.html" %}
                                     </td>
                                     <td>
-                                        <button id="openDialog_{{t.aluno.id}}_socio" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
-                                            <dialog id="instructionsDialog_{{t.aluno.id}}_socio" class="w-75">
-                                                <div class="container mt-4">
-                                                    <div class="alert alert-info" role="alert">
-                                                        <strong><h2> Socioemocionais do aluno </h2> {{tu.pareceres_aluno.all}}</strong>
-                                                    </div>
-                                                    <div class="">  
-                                                        <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="cognitivo" method="post">
-                                                            {% csrf_token %}
-                                                            {{form.media}}
-                                                            <section class="border"> 
-                                                            {% for form in form %}                                                               
-                                                                {% if form.trimestre.label == t.numero_nome%}
-                                                                    {{form.media}}
-                                                                    {{ form.aspectos_socioemocionais }}
-                                                                {% endif %}                                             
-                                                            {% endfor %}  
-                                                            </section>                                                         
-                                                            <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
-                                                        </form>                                                          
-                                                    </div>
-                                                </div>                    
-                                                <button id="closeDialog_{{t.aluno.id}}_socio" class="btn btn-secondary mt-5">Fechar</button>
-                                            </dialog>  
-                                        <script>
-                                            const dialog_socio = document.getElementById('instructionsDialog_{{t.aluno.id}}_socio');
-                                            const openButton_socio = document.getElementById("openDialog_{{t.aluno.id}}_socio");
-                                            const closeButton_socio = document.getElementById('closeDialog_{{t.aluno.id}}_socio');
-                                        
-                                            openButton_socio.addEventListener('click', () => {
-                                                dialog_socio.showModal(); // Abre a caixa de diálogo como modal
-                                                });
-                                        
-                                            closeButton_socio.addEventListener('click', () => {
-                                                dialog_socio.close(); // Fecha a caixa de diálogo
-                                                });
-                                        </script>    
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/Socioemocionais.html" %}   
                                     </td>
                                     <td>
-                                        <button id="openDialog_{{t.aluno.id}}_fisico" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
-                                        <dialog id="instructionsDialog_{{t.aluno.id}}_fisico" class="w-75">
-                                            <div class="container mt-4">
-                                                <div class="alert alert-info" role="alert">
-                                                    <strong><h2> Aspectos Físcos e Motores </h2></strong>
-                                                    <div class="alert alert-light" role="alert">
-                                                         Avalie as habilidades motoras, tanto grossas (como correr e pular) quanto finas (como escrever e manipular objetos). Não se esqueça de observar a coordenação e o equilíbrio do aluno em atividades físicas, bem como seu nível de participação e interesse nas aulas. Identifique também quaisquer áreas que possam necessitar de suporte adicional. Essas informações são essenciais para entender o desenvolvimento global do aluno.
-                                                    </div>
-                                                    
-                                                </div>
-                                                <div class="">  
-                                                    <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="cognitivo" method="post">
-                                                        {% csrf_token %}
-                                                        {{form.media}}
-                                                        <section class="border"> 
-                                                        {% for form in form %}                                                               
-                                                            {% if form.trimestre.label == t.numero_nome%}
-                                                                {{form.media}}
-                                                                {{ form.aspectos_fisicos_motoras }}
-                                                            {% endif %}                                             
-                                                        {% endfor %}  
-                                                        </section>                                                         
-                                                        <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
-                                                    </form>                                                          
-                                                </div>
-                                            </div>                    
-                                            <button id="closeDialog_{{t.aluno.id}}_fisico" class="btn btn-secondary mt-5">Fechar</button>
-                                        </dialog>  
-                                        <script>
-                                            const dialog_fisico = document.getElementById('instructionsDialog_{{t.aluno.id}}_fisico');
-                                            const openButton_fisico = document.getElementById("openDialog_{{t.aluno.id}}_fisico");
-                                            const closeButton_fisico = document.getElementById('closeDialog_{{t.aluno.id}}_fisico');
-                                        
-                                            openButton_fisico.addEventListener('click', () => {
-                                                dialog_fisico.showModal(); // Abre a caixa de diálogo como modal
-                                                });
-                                        
-                                            closeButton_fisico.addEventListener('click', () => {
-                                                dialog_fisico.close(); // Fecha a caixa de diálogo
-                                                });
-                                        </script> 
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/Aspectos_Fiscos_Motores.html" %}
                                     </td>
-                                    <td>{% if t.habilidades %}<i class="fa-sharp fa-solid fa-eye text-primary" title="Ver"></i>{% endif %}</td>
-                                    <td>{% if t.conteudos_abordados %}<i class="fa-sharp fa-solid fa-eye text-primary" title="Ver"></i>{% endif %}</td>
-                                    <td>{% if t.interacao_social %}<i class="fa-sharp fa-solid fa-eye text-primary" title="Ver"></i>{% endif %}</td>
-                                    <td>{% if t.comunicacao %}<i class="fa-sharp fa-solid fa-eye text-primary" title="Ver"></i>{% endif %}</td>
-                                    <td>{% if t.consideracoes_finais %}<i class="fa-sharp fa-solid fa-eye text-primary" title="Ver"></i>{% endif %}</td>
-                                    <td>{% if t.observacao_coordenador %}<i class="fa-sharp fa-solid fa-eye text-primary" title="Ver"></i>{% endif %}</td>                                    
+                                    <td>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/HabilidadesAcademicas.html" %}                                    
+                                    </td>
+                                    <td>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ConteudosAbordados.html" %}                                    
+                                    </td>
+                                    <td>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/interacao_social.html" %}
+                                    </td>
+                                    <td>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/comunicao.html" %}
+                                    </td>
+                                    <td>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/consideracoes_finais.html" %}
+                                    </td>
+                                    <td>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/observacao_coordenador.html" %}
+                                    </td>     
+                                    <td>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ResumoParecerfinal.html" %}
+                                    </td>     
+                                                                   
                                 </tr>
                                 
                                 {% endfor %}

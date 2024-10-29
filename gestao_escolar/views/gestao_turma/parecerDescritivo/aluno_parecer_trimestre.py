@@ -5,26 +5,38 @@ from django.contrib import messages
 from g4f.client import Client
 
 def alunoGestaoTurmasParecer(request, pk, trimestre):
-    parecer = ParecerDescritivo.objects.filter(matricula=pk, trimestre=trimestre)
-    pAtrib = {}
-
-    for p in parecer:
-        pAtrib['aluno'] = p.matricula       
-        pAtrib['trimestre'] = p.trimestre   
-        pAtrib['aspectos_cognitivos'] = p.aspectos_cognitivos
-        pAtrib['aspectos_socioemocionais'] = p.aspectos_socioemocionais
+    parecer = ParecerDescritivo.objects.filter(matricula=pk, trimestre=trimestre).first()
+    """
+    if not parecer:
+        # Tratar caso em que não existe parecer
+        return HttpResponse("Parecer não encontrado.", status=404)
+    """
+    pAtrib = {
+        'aluno': parecer.matricula,
+        'idade': parecer.matricula.aluno.idade,
+        'trimestre': parecer.trimestre,
+        'aspectos_cognitivos': parecer.aspectos_cognitivos,
+        'aspectos_socioemocionais': parecer.aspectos_socioemocionais,
+        'aspectos_fisicos_motoras': parecer.aspectos_fisicos_motoras,
+        'habilidades': parecer.habilidades,
+        'conteudos_abordados': parecer.conteudos_abordados,
+        'interacao_social': parecer.interacao_social,
+        'comunicacao': parecer.comunicacao,
+        'consideracoes_finais': parecer.consideracoes_finais,
+        'observacao_coordenador': parecer.observacao_coordenador,
+    }
 
     if request.method == 'POST':
         form = request.POST
-        cgn = form.get('aspectos_cognitivos') or pAtrib.get('aspectos_cognitivos')
-        socio = form.get('aspectos_socioemocionais') or pAtrib.get('aspectos_socioemocionais')
-        fis = form.get('aspectos_fisicos_motoras') or pAtrib.get('aspectos_fisicos_motoras')
-        hab = form.get('habilidades') or pAtrib.get('habilidades')
-        contAbordado = form.get('conteudos_abordados') or pAtrib.get('conteudos_abordados')
-        intSocial = form.get('interacao_social') or pAtrib.get('interacao_social')
-        comunica = form.get('comunicacao') or pAtrib.get('comunicacao')
-        consFinais = form.get('consideracoes_finais') or pAtrib.get('consideracoes_finais')
-        obsCoord = form.get('observacao_coordenador') or pAtrib.get('observacao_coordenador')
+        cgn = form.get('aspectos_cognitivos', pAtrib['aspectos_cognitivos'])
+        socio = form.get('aspectos_socioemocionais', pAtrib['aspectos_socioemocionais'])
+        fis = form.get('aspectos_fisicos_motoras', pAtrib['aspectos_fisicos_motoras'])
+        hab = form.get('habilidades', pAtrib['habilidades'])
+        contAbordado = form.get('conteudos_abordados', pAtrib['conteudos_abordados'])
+        intSocial = form.get('interacao_social', pAtrib['interacao_social'])
+        comunica = form.get('comunicacao', pAtrib['comunicacao'])
+        consFinais = form.get('consideracoes_finais', pAtrib['consideracoes_finais'])
+        obsCoord = form.get('observacao_coordenador', pAtrib['observacao_coordenador'])
 
         # Atualiza ou cria o ParecerDescritivo
         ParecerDescritivo.objects.update_or_create(
@@ -49,42 +61,51 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
 
         client = Client()
         message_resumo = [
-            "Por favor, do conteudo abaixo, crie um parecer descritivo para o aluno em português:",
+            "Por favor, Com base nas informações\
+                  a seguir sobre o aluno, elabore um\
+                      parecer descritivo em português, com\
+                          no mínimo 500 caracteres que aborde suas\
+                              habilidades acadêmicas, comportamento, participação\
+                                  em sala de aula e áreas de melhoria. Considere os\
+                                      seguintes dados:.",
             ]
 
         # Adiciona as informações apenas se não estiverem vazias
         if pAtrib.get('aluno'):
-            message_resumo.append(f'Nome do Aluno: {pAtrib.get("aluno")}')
+            message_resumo.append(f'Nome do Aluno: {pAtrib.get("aluno")}</br>')
+
+        if pAtrib.get('idade'):
+            message_resumo.append(f'idade: {pAtrib.get('idade')} anos </br>')
 
         if pAtrib.get('trimestre'):
-            message_resumo.append(f'Trimestre atual: {pAtrib.get("trimestre")}')
+            message_resumo.append(f'Trimestre atual: {pAtrib.get("trimestre")} </br>')
 
         if parecer_atualizado.aspectos_cognitivos:
-            message_resumo.append(f'Aspectos Cognitivos: {parecer_atualizado.aspectos_cognitivos}')
+            message_resumo.append(f'Quanto aos aspectos cognitivos: {parecer_atualizado.aspectos_cognitivos} <br>')
 
         if parecer_atualizado.aspectos_socioemocionais:
-            message_resumo.append(f'Aspectos Socioemocionais: {parecer_atualizado.aspectos_socioemocionais}')
+            message_resumo.append(f'Quanto aos aspectos socioemocionais: {parecer_atualizado.aspectos_socioemocionais} <br>')
 
         if parecer_atualizado.aspectos_fisicos_motoras:
-            message_resumo.append(f'Aspectos Físicos/Motoras: {parecer_atualizado.aspectos_fisicos_motoras}')
+            message_resumo.append(f'Quanto aos aspectos físicos/motoras: {parecer_atualizado.aspectos_fisicos_motoras} <br>')
 
         if parecer_atualizado.habilidades:
-            message_resumo.append(f'Habilidades: {parecer_atualizado.habilidades}')
+            message_resumo.append(f'Quanto as  habilidades do aluno: {parecer_atualizado.habilidades}<br>')
 
         if parecer_atualizado.conteudos_abordados:
-            message_resumo.append(f'Conteúdos Abordados: {parecer_atualizado.conteudos_abordados}')
+            message_resumo.append(f'Os conteúdos abordados: {parecer_atualizado.conteudos_abordados} <br>')
 
         if parecer_atualizado.interacao_social:
-            message_resumo.append(f'Interação Social: {parecer_atualizado.interacao_social}')
+            message_resumo.append(f'Quanto a interação social: {parecer_atualizado.interacao_social} <br>')
 
         if parecer_atualizado.comunicacao:
-            message_resumo.append(f'Comunicação: {parecer_atualizado.comunicacao}')
+            message_resumo.append(f'Quanto a comunicação: {parecer_atualizado.comunicacao} <br>')
 
         if parecer_atualizado.consideracoes_finais:
-            message_resumo.append(f'Considerações Finais: {parecer_atualizado.consideracoes_finais}')
+            message_resumo.append(f'Considerações Finais: {parecer_atualizado.consideracoes_finais} <br>')
 
         if parecer_atualizado.observacao_coordenador:
-            message_resumo.append(f'Observação do Coordenador: {parecer_atualizado.observacao_coordenador}')
+            message_resumo.append(f'Observação do Coordenador: {parecer_atualizado.observacao_coordenador} <br>')
 
 
         # Gera o resumo usando o G4f

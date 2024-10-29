@@ -1,0 +1,89 @@
+<button id="openDialog_{{tu.aluno.id}}_resumo" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{tu.aluno.id}}_resumo" class="w-75">
+    <div class="container mt-4">    
+
+
+        <div class="container mt-5">
+            <div class='m-2'>
+                <h2 class="text-left text-primary">Geração do Parecer Descritivo Final com IA </h2>            
+                <p class="lead text-left text-dark ">
+                    O parecer descritivo final é uma ferramenta essencial para o acompanhamento do desenvolvimento dos alunos. Utilizando uma abordagem baseada em Inteligência Artificial (IA), o parecer é gerado a partir de informações registradas em vários campos relevantes, garantindo um relatório abrangente e informativo.
+                </p>
+            </div>
+        
+            <div class="alert alert-info" role="alert">
+                <h4 class="mt-2 text-left">Dados Considerados pela IA</h4>
+                <p class="text-left fs-6">
+                    A IA analisou os registros feitos nosseguintes campos:<br>
+                    <strong>Aspectos Cognitivos:</strong> Informações sobre o desenvolvimento intelectual e as habilidades de raciocínio.<br>
+                    <strong>Aspectos Socioemocionais:</strong> Avaliações sobre a interação social e as emoções do aluno.<br>
+                    <strong>Aspectos Físicos e Motoras:</strong> Observações sobre o desenvolvimento físico e motor do aluno.<br>
+                    <strong>Habilidades:</strong> Registro das habilidades adquiridas ao longo do período letivo.<br>
+                    <strong>Conteúdos Abordados:</strong> Descrição dos conteúdos estudados durante o trimestre.<br>
+                    <strong>Interação Social:</strong> Avaliação da capacidade do aluno de se relacionar com os colegas.<br>
+                    <strong>Comunicação:</strong> Informações sobre a habilidade de expressar-se verbalmente e não verbalmente.<br>
+                    <strong>Considerações Finais:</strong> Observações gerais sobre o desempenho do aluno.<br>
+                    <strong>Observação do Coordenador:</strong> Notas adicionais do coordenador, que podem enriquecer o parecer.
+                </p>
+            </div>
+        
+            <div class="alert alert-warning mt-4" role="alert">
+                <h4 class="text-left">Análise Feita pela IA</h4>
+                <p class="text-left fs-6">
+                    O texto a seguir corresponde à análise realizada pela IA com base nos dados coletados. Essa análise oferece uma visão abrangente e precisa do desempenho do aluno, refletindo as informações registradas nos campos mencionados.
+                </p>
+            </div>
+        
+            <div class="alert alert-success mt-4" role="alert">
+                <h4 class="text-left">Possibilidade de Alteração e Personalização</h4>
+                <p class="text-left fs-6">
+                    Após a geração inicial do parecer, os professores e coordenadores têm a opção de revisar e modificar o conteúdo. Essa flexibilidade é essencial para que as observações pessoais e a experiência dos educadores possam ser integradas ao relatório final. Com isso, o parecer não apenas reflete as análises da IA, mas também as nuances que somente um educador pode perceber.
+                </p>
+            </div>
+        </div>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <div class="">  
+            <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="cognitivo" method="post">
+                {% csrf_token %}
+                {{form.media}}
+                <section class="border"> 
+                {% for form in form %}                                                               
+                    {% if form.trimestre.label == t.numero_nome%}
+                        {{form.media}}
+                        {{ form.resumo }}
+                    {% endif %}                                             
+                {% endfor %}  
+                </section>                                                         
+                <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
+            </form>                                                        
+        </div>
+    </div>                    
+    <button id="closeDialog_{{tu.aluno.id}}_resumo" class="btn btn-secondary mt-5">Fechar</button>
+</dialog>  
+<script>
+    const dialog_resumo = document.getElementById('instructionsDialog_{{tu.aluno.id}}_resumo');
+    const openButton_resumo = document.getElementById('openDialog_{{tu.aluno.id}}_resumo');
+    const closeButton_resumo = document.getElementById('closeDialog_{{tu.aluno.id}}_resumo');
+
+    openButton_resumo.addEventListener('click', () => {
+        dialog_resumo.showModal(); // Abre a caixa de diálogo como modal
+        });
+
+    closeButton_resumo.addEventListener('click', () => {
+        dialog_resumo.close(); // Fecha a caixa de diálogo
+        });
+</script>    

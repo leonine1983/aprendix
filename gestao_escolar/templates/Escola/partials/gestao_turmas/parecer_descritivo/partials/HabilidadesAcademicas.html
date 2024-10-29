@@ -1,0 +1,75 @@
+<button id="openDialog_{{t.aluno.id}}_habil" title='Ver todas as habilidades do aluno' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{t.aluno.id}}_habil" class="w-75">
+    <div class="container mt-4">
+        <div class="container mt-5 p-5">
+            <div class="alert alert-success">
+                <h2 class="text-center text-uppercase">Avaliação de Habilidades do Aluno</h2>
+                <p  class="fs-4">Ao preencher o campo "habilidades" do parecer descritivo, os professores devem observar as seguintes competências:</p>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Habilidades Acadêmicas</h5>
+                            <p class="card-text">Observe como a criança resolve problemas simples e demonstra interesse em aprender novas ideias.</p>
+                        </div>
+                    </div>
+                </div>                                                  
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Habilidades Emocionais</h5>
+                            <p class="card-text">Preste atenção em como a criança expressa suas emoções e lida com frustrações.</p>
+                        </div>
+                    </div>
+                </div>      
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Criatividade</h5>
+                            <p class="card-text">Identifique se a criança gosta de inventar e imaginar novas ideias.</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Persistência</h5>
+                            <p class="card-text">Observe como a criança lida com desafios e se continua tentando mesmo quando é difícil.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="">  
+            <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="habilidades" method="post">
+                {% csrf_token %}
+                {{form.media}}
+                <section class="border"> 
+                {% for form in form %}                                                               
+                    {% if form.trimestre.label == t.numero_nome%}
+                        {{form.media}}
+                        {{ form.habilidades }}
+                    {% endif %}                                             
+                {% endfor %}  
+                </section>                                                         
+                <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
+            </form>                                                          
+        </div>
+    </div>                    
+    <button id="closeDialog_{{t.aluno.id}}_habil" class="btn btn-secondary mt-5">Fechar</button>
+</dialog>  
+<script>
+    const dialog_habil = document.getElementById('instructionsDialog_{{t.aluno.id}}_habil');
+    const openButton_habil = document.getElementById("openDialog_{{t.aluno.id}}_habil");
+    const closeButton_habil = document.getElementById('closeDialog_{{t.aluno.id}}_habil');
+
+    openButton_habil.addEventListener('click', () => {
+        dialog_habil.showModal(); // Abre a caixa de diálogo como modal
+        });
+
+    closeButton_habil.addEventListener('click', () => {
+        dialog_habil.close(); // Fecha a caixa de diálogo
+        });
+</script>                                     

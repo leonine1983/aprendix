@@ -1,0 +1,91 @@
+<button id="openDialog_{{t.aluno.id}}_fisico" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{t.aluno.id}}_fisico" class="w-75">
+    <div class="container mt-4">
+        <div class="alert alert-info" role="alert">
+            <strong><h2> Desenvolvimento Motor </h2></strong>
+            <div class="alert alert-light fs-5" role="alert">
+                Avaliar a coordenação motora grossa e fina do aluno, como correr, pular, escrever e manipular objetos.
+            </div>
+
+            <div class="row">               
+        
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Postura</h5>
+                            <p class="card-text">Observar a postura do aluno durante as atividades, tanto em pé quanto sentado, e se ele demonstra conforto.</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Nível de Energia</h5>
+                            <p class="card-text">Avaliar o nível de energia do aluno ao longo do dia, incluindo disposição para participar de atividades físicas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Equilíbrio</h5>
+                            <p class="card-text">Observar a habilidade do aluno em manter o equilíbrio durante atividades físicas, como correr ou brincar.</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Flexibilidade</h5>
+                            <p class="card-text">Avaliar a flexibilidade do aluno em atividades que exigem alongamento e movimentação.</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Habilidades Esportivas</h5>
+                            <p class="card-text">Observar a participação do aluno em atividades esportivas e sua habilidade em jogos e brincadeiras.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="">  
+            <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="aspectos_fisicos_motoras" method="post">
+                {% csrf_token %}
+                {{form.media}}
+                <section class="border"> 
+                {% for form in form %}                                                               
+                    {% if form.trimestre.label == t.numero_nome%}
+                        {{form.media}}
+                        {{ form.aspectos_fisicos_motoras }}
+                    {% endif %}                                             
+                {% endfor %}  
+                </section>                                                         
+                <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
+            </form>                                                          
+        </div>
+    </div>                    
+    <button id="closeDialog_{{t.aluno.id}}_fisico" class="btn btn-secondary mt-5">Fechar</button>    
+</dialog>  
+<script>
+    const dialog_fisico = document.getElementById('instructionsDialog_{{t.aluno.id}}_fisico');
+    const openButton_fisico = document.getElementById("openDialog_{{t.aluno.id}}_fisico");
+    const closeButton_fisico = document.getElementById('closeDialog_{{t.aluno.id}}_fisico');
+
+    openButton_fisico.addEventListener('click', () => {
+        dialog_fisico.showModal(); // Abre a caixa de diálogo como modal
+        });
+
+    closeButton_fisico.addEventListener('click', () => {
+        dialog_fisico.close(); // Fecha a caixa de diálogo
+        });
+</script> 

@@ -1,0 +1,99 @@
+<button id="openDialog_{{tu.aluno.id}}_cogn" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{tu.aluno.id}}_cogn" class="w-75">
+    <div class="container mt-4">
+        
+
+
+        <div class="container mt-5">
+            <h2 class="text-left text-primary">Dados a Inserir: Aspectos Cognitivos</h2>
+        
+            <p class="lead text-left text-dark">
+                Ao preencher o campo "Aspectos Cognitivos" no parecer descritivo, o professor deve considerar os seguintes dados essenciais:
+            </p>
+        
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="p-3 bg-light border rounded">
+                        <h5 class="text-left text-secondary">Compreensão</h5>
+                        <p>Avalie se o aluno entendeu os conteúdos abordados nas aulas.</p>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="p-3 bg-info  border rounded">
+                        <h5 class="text-left text-white">Aplicação do Conhecimento</h5>
+                        <p class='text-white'>Descreva como o aluno utiliza o que aprendeu em situações práticas.</p>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="p-3 bg-warning text-dark border rounded">
+                        <h5 class="text-left">Pensamento Crítico</h5>
+                        <p>Observe a capacidade do aluno de analisar e questionar informações.</p>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <div class="p-3 bg-success text-white border rounded">
+                        <h5 class="text-left text-white">Criatividade</h5>
+                        <p>Registre exemplos de soluções criativas ou originais apresentadas pelo aluno.</p>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="p-3 bg-danger text-white border rounded">
+                        <h5 class="text-left text-white">Desempenho em Atividades</h5>
+                        <p >Inclua observações sobre o desempenho do aluno em tarefas e projetos.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="p-3 bg-white text-secondary border rounded">
+                        <h5 class="text-left text-dark ">Dicas para o Registro</h5>
+                        <p class="text-left text-dark">
+                            - Utilize exemplos específicos para ilustrar cada ponto. <br>
+                            - Seja objetivo, focando nas observações mais relevantes. <br>
+                            - Considere o progresso do aluno ao longo do tempo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        
+            
+        </div>
+        
+        
+
+        <div class="">  
+            <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="cognitivo" method="post">
+                {% csrf_token %}
+                {{form.media}}
+                <section class="border"> 
+                {% for form in form %}                                                               
+                    {% if form.trimestre.label == t.numero_nome%}
+                        {{form.media}}
+                        {{ form.aspectos_cognitivos }}
+                    {% endif %}                                             
+                {% endfor %}  
+                </section>                                                         
+                <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
+            </form>                                                        
+        </div>
+    </div>                    
+    <button id="closeDialog_{{tu.aluno.id}}_cogn" class="btn btn-secondary mt-5">Fechar</button>
+</dialog>  
+<script>
+    const dialog = document.getElementById('instructionsDialog_{{tu.aluno.id}}_cogn');
+    const openButton = document.getElementById('openDialog_{{tu.aluno.id}}_cogn');
+    const closeButton = document.getElementById('closeDialog_{{tu.aluno.id}}_cogn');
+
+    openButton.addEventListener('click', () => {
+        dialog.showModal(); // Abre a caixa de diálogo como modal
+        });
+
+    closeButton.addEventListener('click', () => {
+        dialog.close(); // Fecha a caixa de diálogo
+        });
+</script>    

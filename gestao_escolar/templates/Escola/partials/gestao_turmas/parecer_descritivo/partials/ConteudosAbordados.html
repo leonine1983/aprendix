@@ -1,0 +1,136 @@
+<button id="openDialog_{{t.aluno.id}}_conteudo" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{t.aluno.id}}_conteudo" class="w-75">
+    <div class="container mt-4">
+        
+
+        <div class="container mt-5">
+            <div class="alert alert-info" role="alert">
+                <strong><h2> Conteudos abordados </h2></strong>
+            </div>        
+            <!-- Informativo para a Etapa Creche -->
+            <h3 class="mt-4">Etapa Creche</h3>
+            <p>Ao preencher o campo "Conteúdos Abordados" do parecer descritivo para a creche, os professores devem considerar os seguintes tópicos:</p>
+        
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Desenvolvimento da Linguagem</h5>
+                            <p class="card-text">Estimular a comunicação através de histórias, músicas e conversas simples.</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Brincadeiras e Jogos</h5>
+                            <p class="card-text">Atividades que promovem a interação social e o desenvolvimento motor.</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Exploração Sensorial</h5>
+                            <p class="card-text">Atividades que estimulam os sentidos, como tocar, cheirar e ouvir.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <hr>
+        
+            <!-- Informativo para as Séries Iniciais (Fundamental 1) -->
+            <h3 class="mt-4">Séries Iniciais (Fundamental 1)</h3>
+            <p>Ao preencher o campo "Conteúdos Abordados" do parecer descritivo para as séries iniciais, os professores devem considerar os seguintes tópicos:</p>
+        
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Linguagem Oral e Escrita</h5>
+                            <p class="card-text">Desenvolvimento da comunicação, leitura de histórias e escrita de palavras simples.</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Matemática</h5>
+                            <p class="card-text">Atividades com números, formas, sequências e resolução de problemas simples.</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Ciências</h5>
+                            <p class="card-text">Exploração do meio ambiente e curiosidade sobre a natureza.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">História e Geografia</h5>
+                            <p class="card-text">Reconhecimento da identidade, família, comunidade e noções de espaço.</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Artes</h5>
+                            <p class="card-text">Atividades de desenho, pintura e expressão artística.</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Educação Física</h5>
+                            <p class="card-text">Desenvolvimento de habilidades motoras e atividades que promovem a saúde.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <div class="">  
+            <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="coteudo_abordado" method="post">
+                {% csrf_token %}
+                {{form.media}}
+                <section class="border"> 
+                {% for form in form %}                                                               
+                    {% if form.trimestre.label == t.numero_nome%}
+                        {{form.media}}
+                        {{ form.conteudos_abordados }}
+                    {% endif %}                                             
+                {% endfor %}  
+                </section>                                                         
+                <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
+            </form>                                                          
+        </div>
+    </div>                    
+    <button id="closeDialog_{{t.aluno.id}}_conteudo" class="btn btn-secondary mt-5">Fechar</button>
+</dialog>  
+<script>
+const dialog_conteudo = document.getElementById('instructionsDialog_{{t.aluno.id}}_conteudo');
+const openButton_conteudo = document.getElementById("openDialog_{{t.aluno.id}}_conteudo");
+const closeButton_conteudo = document.getElementById("closeDialog_{{t.aluno.id}}_conteudo");
+
+openButton_conteudo.addEventListener('click', () => {
+    dialog_conteudo.showModal(); // Abre a caixa de diálogo como modal
+    });
+
+closeButton_conteudo.addEventListener('click', () => {
+    dialog_conteudo.close(); // Fecha a caixa de diálogo
+    });
+</script> 

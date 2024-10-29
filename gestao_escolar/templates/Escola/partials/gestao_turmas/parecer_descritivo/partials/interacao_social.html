@@ -1,0 +1,91 @@
+<button id="openDialog_{{t.aluno.id}}_interacao_social" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{t.aluno.id}}_interacao_social" class="w-75">
+    <div class="container mt-4">
+        
+        <div class="container mt-5">
+            <div class='alert-primary p-2 m-2'>
+                <h2 class="text-center text-uppercase ">Interação Social do Aluno</h2>
+                <p class='fs-5'>Ao preencher o campo "Interação Social" do parecer descritivo, os professores devem observar e avaliar os seguintes aspectos:</p>
+            </div>
+        
+            <div class="row">
+                <div class="col-md-4 ">
+                    <div class="card mb-4 shadow-sm bg-secondary-subtle shadow-sm bg-secondary-subtle">
+                        <div class="card-body">
+                            <h5 class="card-title">Colaboração</h5>
+                            <p class="card-text">Avaliar como o aluno trabalha em grupo, se ele contribui e respeita as ideias dos colegas.</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm bg-secondary-subtle">
+                        <div class="card-body">
+                            <h5 class="card-title">Resolução de Conflitos</h5>
+                            <p class="card-text">Observar a habilidade do aluno em lidar com desentendimentos e encontrar soluções pacíficas.</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm bg-secondary-subtle">
+                        <div class="card-body">
+                            <h5 class="card-title">Empatia</h5>
+                            <p class="card-text">Avaliar a capacidade do aluno de se colocar no lugar do outro e compreender os sentimentos alheios.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm bg-secondary-subtle">
+                        <div class="card-body">
+                            <h5 class="card-title">Participação</h5>
+                            <p class="card-text">Verificar a disposição do aluno para participar de atividades coletivas e eventos escolares.</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm bg-secondary-subtle">
+                        <div class="card-body">
+                            <h5 class="card-title">Inclusão</h5>
+                            <p class="card-text">Avaliar se o aluno é acolhedor com novos colegas e se participa ativamente da inclusão social.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            
+        <div class="">  
+            <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="interacao_social" method="post">
+                {% csrf_token %}
+                {{form.media}}
+                <section class="border"> 
+                {% for form in form %}                                                               
+                    {% if form.trimestre.label == t.numero_nome%}
+                        {{form.media}}
+                        {{ form.interacao_social}}
+                    {% endif %}                                             
+                {% endfor %}  
+                </section>                                                         
+                <button id="b-cognitivo" class='mt-5'>Salvar informações</button>
+            </form>                                                          
+        </div>
+    </div>                    
+    <button id="closeDialog_{{t.aluno.id}}_interacao_social" class="btn btn-secondary mt-5">Fechar</button>
+</dialog>  
+<script>
+const dialog_interacao_social = document.getElementById('instructionsDialog_{{t.aluno.id}}_interacao_social');
+const openButton_interacao_social = document.getElementById("openDialog_{{t.aluno.id}}_interacao_social");
+const closeButton_interacao_social = document.getElementById("closeDialog_{{t.aluno.id}}_interacao_social");
+
+openButton_interacao_social.addEventListener('click', () => {
+    dialog_interacao_social.showModal(); // Abre a caixa de diálogo como modal
+    });
+
+closeButton_interacao_social.addEventListener('click', () => {
+    dialog_interacao_social.close(); // Fecha a caixa de diálogo
+    });
+</script> 
