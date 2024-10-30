@@ -1,13 +1,11 @@
-<button id="openDialog_{{t.aluno.id}}_consideracoes_finais" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
-<dialog id="instructionsDialog_{{t.aluno.id}}_consideracoes_finais" class="w-75">
-    <div class="container mt-4">
-        
+<button id="openDialog_{{t.aluno.id}}_consideracoes_finais_{{t.id}}" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{t.aluno.id}}_consideracoes_finais_{{t.id}}" class="w-75">
+    <div class="container mt-4">        
         <div class="container mt-5">
             <div class='alert-primary p-2 m-2'>
                 <h2 class="text-center text-uppercase ">Considerações Finais</h2>
                 <p class='fs-5'>A avaliação da comunicação do aluno é essencial para entender suas habilidades sociais e seu desenvolvimento pessoal. Os professores devem considerar:</p>
-            </div>
-        
+            </div>        
             <div class="row">
                 <div class="col-md-4">
                     <div class="card mb-4 shadow-sm bg-secondary-subtle">
@@ -16,8 +14,7 @@
                             <p class="card-text">Cada aluno possui seu próprio estilo de comunicação, e é importante respeitar isso ao realizar a avaliação.</p>
                         </div>
                     </div>
-                </div>
-        
+                </div>        
                 <div class="col-md-4">
                     <div class="card mb-4 shadow-sm bg-secondary-subtle">
                         <div class="card-body">
@@ -25,8 +22,7 @@
                             <p class="card-text">Avalie a comunicação em diferentes contextos, como em atividades individuais e em grupo, para uma visão mais completa.</p>
                         </div>
                     </div>
-                </div>
-        
+                </div>        
                 <div class="col-md-4">
                     <div class="card mb-4 shadow-sm bg-secondary-subtle">
                         <div class="card-body">
@@ -35,8 +31,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        
+            </div>        
             <div class="row">
                 <div class="col-md-4">
                     <div class="card mb-4 shadow-sm bg-secondary-subtle">
@@ -45,8 +40,7 @@
                             <p class="card-text">Oferecer feedback construtivo ajuda os alunos a melhorarem suas habilidades de comunicação ao longo do tempo.</p>
                         </div>
                     </div>
-                </div>
-        
+                </div>        
                 <div class="col-md-4">
                     <div class="card mb-4 shadow-sm bg-secondary-subtle">
                         <div class="card-body">
@@ -55,20 +49,15 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        
-            <p class="mt-4">Com base nessas considerações, o papel do professor é fundamental para guiar e apoiar o aluno em seu processo de comunicação. Através da observação atenta e do incentivo, é possível ajudar cada aluno a se expressar de maneira eficaz e a construir relacionamentos saudáveis.</p>
-        
-          
-        
-            
+            </div>        
+            <p class="mt-4">Com base nessas considerações, o papel do professor é fundamental para guiar e apoiar o aluno em seu processo de comunicação. Através da observação atenta e do incentivo, é possível ajudar cada aluno a se expressar de maneira eficaz e a construir relacionamentos saudáveis.</p>            
         <div class="">  
             <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="consideracoes_finais" method="post">
                 {% csrf_token %}
                 {{form.media}}
                 <section class="border"> 
                 {% for form in form %}                                                               
-                    {% if form.trimestre.label == t.numero_nome%}
+                    {% if form.trimestre.label == t.id %}
                         {{form.media}}
                         {{ form.consideracoes_finais}}
                     {% endif %}                                             
@@ -78,18 +67,18 @@
             </form>                                                          
         </div>
     </div>                    
-    <button id="closeDialog_{{t.aluno.id}}_consideracoes_finais" class="btn btn-secondary mt-5">Fechar</button>
+    <button id="closeDialog_{{t.aluno.id}}_consideracoes_finais_{{t.id}}" class="btn btn-secondary mt-5">Fechar</button>
 </dialog>  
 <script>
-const dialog_consideracoes_finais = document.getElementById('instructionsDialog_{{t.aluno.id}}_consideracoes_finais');
-const openButton_consideracoes_finais = document.getElementById("openDialog_{{t.aluno.id}}_consideracoes_finais");
-const closeButton_consideracoes_finais = document.getElementById("closeDialog_{{t.aluno.id}}_consideracoes_finais");
+const dialog_consideracoes_finais_{{t.id}}_{{t.aluno.id}} = document.getElementById('instructionsDialog_{{t.aluno.id}}_consideracoes_finais_{{t.id}}');
+const openButton_consideracoes_finais_{{t.id}}_{{t.aluno.id}} = document.getElementById("openDialog_{{t.aluno.id}}_consideracoes_finais_{{t.id}}");
+const closeButton_consideracoes_finais_{{t.id}}_{{t.aluno.id}} = document.getElementById("closeDialog_{{t.aluno.id}}_consideracoes_finais_{{t.id}}");
 
-openButton_consideracoes_finais.addEventListener('click', () => {
-    dialog_consideracoes_finais.showModal(); // Abre a caixa de diálogo como modal
+openButton_consideracoes_finais_{{t.id}}_{{t.aluno.id}}.addEventListener('click', () => {
+    dialog_consideracoes_finais_{{t.id}}_{{t.aluno.id}}.showModal(); // Abre a caixa de diálogo como modal
     });
 
-closeButton_consideracoes_finais.addEventListener('click', () => {
-    dialog_consideracoes_finais.close(); // Fecha a caixa de diálogo
+closeButton_consideracoes_finais_{{t.id}}_{{t.aluno.id}}.addEventListener('click', () => {
+    dialog_consideracoes_finais_{{t.id}}_{{t.aluno.id}}.close(); // Fecha a caixa de diálogo
     });
 </script> 

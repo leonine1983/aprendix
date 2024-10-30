@@ -9,7 +9,6 @@ def gestao_turmas_parecer(request, turma_id):
     forms = []
     for item in parecer:
         form = AlunoParecerForm(instance=item)
-        print(f'Item trimestre: {item.trimestre}') 
         forms.append(form)
    
     # Obtém as matrículas da turma

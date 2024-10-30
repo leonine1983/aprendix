@@ -1,5 +1,5 @@
-<button id="openDialog_{{tu.aluno.id}}_resumo" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
-<dialog id="instructionsDialog_{{tu.aluno.id}}_resumo" class="w-75">
+<button id="openDialog_{{tu.aluno.id}}_resumo_{{t.id}}" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{tu.aluno.id}}_resumo_{{t.id}}" class="w-75">
     <div class="container mt-4">    
 
 
@@ -62,7 +62,7 @@
                 {{form.media}}
                 <section class="border"> 
                 {% for form in form %}                                                               
-                    {% if form.trimestre.label == t.numero_nome%}
+                    {% if form.trimestre.label == t.id%}
                         {{form.media}}
                         {{ form.resumo }}
                     {% endif %}                                             
@@ -72,18 +72,18 @@
             </form>                                                        
         </div>
     </div>                    
-    <button id="closeDialog_{{tu.aluno.id}}_resumo" class="btn btn-secondary mt-5">Fechar</button>
+    <button id="closeDialog_{{tu.aluno.id}}_resumo_{{t.id}}" class="btn btn-secondary mt-5">Fechar</button>
 </dialog>  
 <script>
-    const dialog_resumo = document.getElementById('instructionsDialog_{{tu.aluno.id}}_resumo');
-    const openButton_resumo = document.getElementById('openDialog_{{tu.aluno.id}}_resumo');
-    const closeButton_resumo = document.getElementById('closeDialog_{{tu.aluno.id}}_resumo');
+    const dialog_resumo_{{t.aluno.id}}_{{t.id}} = document.getElementById('instructionsDialog_{{tu.aluno.id}}_resumo_{{t.id}}');
+    const openButton_resumo_{{t.aluno.id}}_{{t.id}} = document.getElementById('openDialog_{{tu.aluno.id}}_resumo_{{t.id}}');
+    const closeButton_resumo_{{t.aluno.id}}_{{t.id}} = document.getElementById('closeDialog_{{tu.aluno.id}}_resumo_{{t.id}}');
 
-    openButton_resumo.addEventListener('click', () => {
-        dialog_resumo.showModal(); // Abre a caixa de diálogo como modal
+    openButton_resumo_{{t.aluno.id}}_{{t.id}}.addEventListener('click', () => {
+        dialog_resumo_{{t.aluno.id}}_{{t.id}}.showModal(); // Abre a caixa de diálogo como modal
         });
 
-    closeButton_resumo.addEventListener('click', () => {
-        dialog_resumo.close(); // Fecha a caixa de diálogo
+    closeButton_resumo_{{t.aluno.id}}_{{t.id}}.addEventListener('click', () => {
+        dialog_resumo_{{t.aluno.id}}_{{t.id}}.close(); // Fecha a caixa de diálogo
         });
 </script>    

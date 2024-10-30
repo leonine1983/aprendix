@@ -13,4 +13,4 @@ class AlunoParecerForm(forms.ModelForm):
         
         if self.instance and self.instance.trimestre:
             # Ajuste conforme o seu modelo
-            self.fields['trimestre'].label = str(self.instance.trimestre.numero_nome)  # Supondo que 'nome' seja o atributo correto
+            self.fields['trimestre'].label = self.instance.trimestre.id # Supondo que 'nome' seja o atributo correto

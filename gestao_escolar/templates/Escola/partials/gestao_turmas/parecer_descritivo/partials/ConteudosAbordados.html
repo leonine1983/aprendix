@@ -1,5 +1,5 @@
-<button id="openDialog_{{t.aluno.id}}_conteudo" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
-<dialog id="instructionsDialog_{{t.aluno.id}}_conteudo" class="w-75">
+<button id="openDialog_{{t.aluno.id}}_conteudo_{{t.id}}" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{t.aluno.id}}_conteudo_{{t.id}}" class="w-75">
     <div class="container mt-4">
         
 
@@ -109,7 +109,7 @@
                 {{form.media}}
                 <section class="border"> 
                 {% for form in form %}                                                               
-                    {% if form.trimestre.label == t.numero_nome%}
+                    {% if form.trimestre.label == t.id %}
                         {{form.media}}
                         {{ form.conteudos_abordados }}
                     {% endif %}                                             
@@ -119,18 +119,18 @@
             </form>                                                          
         </div>
     </div>                    
-    <button id="closeDialog_{{t.aluno.id}}_conteudo" class="btn btn-secondary mt-5">Fechar</button>
+    <button id="closeDialog_{{t.aluno.id}}_conteudo_{{t.id}}" class="btn btn-secondary mt-5">Fechar</button>
 </dialog>  
 <script>
-const dialog_conteudo = document.getElementById('instructionsDialog_{{t.aluno.id}}_conteudo');
-const openButton_conteudo = document.getElementById("openDialog_{{t.aluno.id}}_conteudo");
-const closeButton_conteudo = document.getElementById("closeDialog_{{t.aluno.id}}_conteudo");
+const dialog_conteudo_{{t.id}}_{{t.aluno.id}} = document.getElementById('instructionsDialog_{{t.aluno.id}}_conteudo_{{t.id}}');
+const openButton_conteudo_{{t.id}}_{{t.aluno.id}} = document.getElementById("openDialog_{{t.aluno.id}}_conteudo_{{t.id}}");
+const closeButton_conteudo_{{t.id}}_{{t.aluno.id}} = document.getElementById("closeDialog_{{t.aluno.id}}_conteudo_{{t.id}}");
 
-openButton_conteudo.addEventListener('click', () => {
-    dialog_conteudo.showModal(); // Abre a caixa de diálogo como modal
+openButton_conteudo_{{t.id}}_{{t.aluno.id}}.addEventListener('click', () => {
+    dialog_conteudo_{{t.id}}_{{t.aluno.id}}.showModal(); // Abre a caixa de diálogo como modal
     });
 
-closeButton_conteudo.addEventListener('click', () => {
-    dialog_conteudo.close(); // Fecha a caixa de diálogo
+closeButton_conteudo_{{t.id}}_{{t.aluno.id}}.addEventListener('click', () => {
+    dialog_conteudo_{{t.id}}_{{t.aluno.id}}.close(); // Fecha a caixa de diálogo
     });
 </script> 

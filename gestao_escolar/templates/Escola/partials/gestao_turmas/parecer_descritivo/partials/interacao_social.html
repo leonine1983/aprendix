@@ -1,5 +1,5 @@
-<button id="openDialog_{{t.aluno.id}}_interacao_social" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
-<dialog id="instructionsDialog_{{t.aluno.id}}_interacao_social" class="w-75">
+<button id="openDialog_{{t.aluno.id}}_interacao_social_{{t.id}}" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{t.aluno.id}}_interacao_social_{{t.id}}" class="w-75">
     <div class="container mt-4">
         
         <div class="container mt-5">
@@ -64,7 +64,7 @@
                 {{form.media}}
                 <section class="border"> 
                 {% for form in form %}                                                               
-                    {% if form.trimestre.label == t.numero_nome%}
+                    {% if form.trimestre.label == t.id %}
                         {{form.media}}
                         {{ form.interacao_social}}
                     {% endif %}                                             
@@ -74,18 +74,18 @@
             </form>                                                          
         </div>
     </div>                    
-    <button id="closeDialog_{{t.aluno.id}}_interacao_social" class="btn btn-secondary mt-5">Fechar</button>
+    <button id="closeDialog_{{t.aluno.id}}_interacao_social_{{t.id}}" class="btn btn-secondary mt-5">Fechar</button>
 </dialog>  
 <script>
-const dialog_interacao_social = document.getElementById('instructionsDialog_{{t.aluno.id}}_interacao_social');
-const openButton_interacao_social = document.getElementById("openDialog_{{t.aluno.id}}_interacao_social");
-const closeButton_interacao_social = document.getElementById("closeDialog_{{t.aluno.id}}_interacao_social");
+const dialog_interacao_social_{{t.id}}_{{t.aluno.id}} = document.getElementById('instructionsDialog_{{t.aluno.id}}_interacao_social_{{t.id}}');
+const openButton_interacao_social_{{t.id}}_{{t.aluno.id}} = document.getElementById("openDialog_{{t.aluno.id}}_interacao_social_{{t.id}}");
+const closeButton_interacao_social_{{t.id}}_{{t.aluno.id}} = document.getElementById("closeDialog_{{t.aluno.id}}_interacao_social_{{t.id}}");
 
-openButton_interacao_social.addEventListener('click', () => {
-    dialog_interacao_social.showModal(); // Abre a caixa de diálogo como modal
+openButton_interacao_social_{{t.id}}_{{t.aluno.id}}.addEventListener('click', () => {
+    dialog_interacao_social_{{t.id}}_{{t.aluno.id}}.showModal(); // Abre a caixa de diálogo como modal
     });
 
-closeButton_interacao_social.addEventListener('click', () => {
-    dialog_interacao_social.close(); // Fecha a caixa de diálogo
+closeButton_interacao_social_{{t.id}}_{{t.aluno.id}}.addEventListener('click', () => {
+    dialog_interacao_social_{{t.id}}_{{t.aluno.id}}.close(); // Fecha a caixa de diálogo
     });
 </script> 

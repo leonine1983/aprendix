@@ -1,5 +1,5 @@
-<button id="openDialog_{{t.aluno.id}}_observacao_coordenador" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
-<dialog id="instructionsDialog_{{t.aluno.id}}_observacao_coordenador" class="w-75">
+<button id="openDialog_{{t.aluno.id}}_observacao_coordenador_{{t.id}}" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{t.aluno.id}}_observacao_coordenador_{{t.id}}" class="w-75">
     <div class="container mt-4">
         
         <div class="container mt-5">
@@ -67,7 +67,7 @@
                 {{form.media}}
                 <section class="border"> 
                 {% for form in form %}                                                               
-                    {% if form.trimestre.label == t.numero_nome%}
+                    {% if form.trimestre.label == t.id %}
                         {{form.media}}
                         {{ form.observacao_coordenador}}
                     {% endif %}                                             
@@ -78,18 +78,18 @@
         </div>
     </div>
     </div>                    
-    <button id="closeDialog_{{t.aluno.id}}_observacao_coordenador" class="btn btn-secondary mt-5">Fechar</button>
+    <button id="closeDialog_{{t.aluno.id}}_observacao_coordenador_{{t.id}}" class="btn btn-secondary mt-5">Fechar</button>
 </dialog>  
 <script>
-const dialog_observacao_coordenador = document.getElementById('instructionsDialog_{{t.aluno.id}}_observacao_coordenador');
-const openButton_observacao_coordenador = document.getElementById("openDialog_{{t.aluno.id}}_observacao_coordenador");
-const closeButton_observacao_coordenador = document.getElementById("closeDialog_{{t.aluno.id}}_observacao_coordenador");
+const dialog_observacao_coordenador_{{t.id}}_{{t.aluno.id}} = document.getElementById('instructionsDialog_{{t.aluno.id}}_observacao_coordenador_{{t.id}}');
+const openButton_observacao_coordenador_{{t.id}}_{{t.aluno.id}} = document.getElementById("openDialog_{{t.aluno.id}}_observacao_coordenador_{{t.id}}");
+const closeButton_observacao_coordenador_{{t.id}}_{{t.aluno.id}} = document.getElementById("closeDialog_{{t.aluno.id}}_observacao_coordenador_{{t.id}}");
 
-openButton_observacao_coordenador.addEventListener('click', () => {
-    dialog_observacao_coordenador.showModal(); // Abre a caixa de diálogo como modal
+openButton_observacao_coordenador_{{t.id}}_{{t.aluno.id}}.addEventListener('click', () => {
+    dialog_observacao_coordenador_{{t.id}}_{{t.aluno.id}}.showModal(); // Abre a caixa de diálogo como modal
     });
 
-closeButton_observacao_coordenador.addEventListener('click', () => {
-    dialog_observacao_coordenador.close(); // Fecha a caixa de diálogo
+closeButton_observacao_coordenador_{{t.id}}_{{t.aluno.id}}.addEventListener('click', () => {
+    dialog_observacao_coordenador_{{t.id}}_{{t.aluno.id}}.close(); // Fecha a caixa de diálogo
     });
 </script> 

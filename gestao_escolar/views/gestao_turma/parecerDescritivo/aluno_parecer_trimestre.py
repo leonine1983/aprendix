@@ -58,6 +58,43 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
 
         parecer_atualizado = get_object_or_404(ParecerDescritivo, matricula=pk, trimestre__id=trimestre)
 
+        # Crie resumos para cada campo do model Parecer descritivo no trimestre final
+        parecer_all = ParecerDescritivo.objects.filter(matricula=pk)
+        todos_obs = []
+        for p_all in parecer_all:
+            if not p_all.trimestre.final:
+                todos_obs.append(
+                    {
+                    'trimestre': p_all.trimestre,
+                    'aspectos_cognitivos': p_all.aspectos_cognitivos,
+                    'aspectos_socioemocionais': p_all.aspectos_socioemocionais,
+                    'aspectos_fisicos_motoras': p_all.aspectos_fisicos_motoras,
+                    'habilidades': p_all.habilidades,
+                    'conteudos_abordados': p_all.conteudos_abordados,
+                    'interacao_social': p_all.interacao_social,
+                    'comunicacao': p_all.comunicacao,
+                    'consideracoes_finais': p_all.consideracoes_finais,
+                    'observacao_coordenador': p_all.observacao_coordenador,
+                }
+                )  
+            if p_all.trimestre.final:                 
+                ParecerDescritivo.objects.update_or_create( 
+                    trimestre = Trimestre.objects.get(final=True),
+                    aspectos_cognitivos = todos_obs['aspectos_cognitivos'],
+                    aspectos_socioemocionais = todos_obs['aspectos_socioemocionais'],
+                    aspectos_fisicos_motoras = todos_obs['aspectos_fisicos_motoras'],
+                    habilidades = todos_obs['habilidades'],
+                    conteudos_abordados = todos_obs['conteudos_abordados'],
+                    interacao_social = todos_obs['interacao_social'],
+                    comunicacao = todos_obs['comunicacao'],
+                    consideracoes_finais = todos_obs['consideracoes_finais'],
+                    observacao_coordenador = todos_obs['observacao_coordenador'],
+                )
+                messages.success(request, "Resumo por parâmetro criado com sucesso!")
+
+
+
+
 
         client = Client()
         message_resumo = [

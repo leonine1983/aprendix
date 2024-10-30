@@ -1,5 +1,5 @@
-<button id="openDialog_{{t.aluno.id}}_comunicao" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
-<dialog id="instructionsDialog_{{t.aluno.id}}_comunicao" class="w-75">
+<button id="openDialog_{{t.aluno.id}}_comunicao_{{t.id}}" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{t.aluno.id}}_comunicao_{{t.id}}" class="w-75">
     <div class="container mt-4">
         
         <div class="container mt-5">
@@ -73,7 +73,7 @@
                 {{form.media}}
                 <section class="border"> 
                 {% for form in form %}                                                               
-                    {% if form.trimestre.label == t.numero_nome%}
+                    {% if form.trimestre.label == t.id %}
                         {{form.media}}
                         {{ form.comunicacao}}
                     {% endif %}                                             
@@ -83,18 +83,18 @@
             </form>                                                          
         </div>
     </div>                    
-    <button id="closeDialog_{{t.aluno.id}}_comunicao" class="btn btn-secondary mt-5">Fechar</button>
+    <button id="closeDialog_{{t.aluno.id}}_comunicao_{{t.id}}" class="btn btn-secondary mt-5">Fechar</button>
 </dialog>  
 <script>
-const dialog_comunicao = document.getElementById('instructionsDialog_{{t.aluno.id}}_comunicao');
-const openButton_comunicao = document.getElementById("openDialog_{{t.aluno.id}}_comunicao");
-const closeButton_comunicao = document.getElementById("closeDialog_{{t.aluno.id}}_comunicao");
+const dialog_comunicao_{{t.id}}_{{t.aluno.id}} = document.getElementById('instructionsDialog_{{t.aluno.id}}_comunicao_{{t.id}}');
+const openButton_comunicao_{{t.id}}_{{t.aluno.id}} = document.getElementById("openDialog_{{t.aluno.id}}_comunicao_{{t.id}}");
+const closeButton_comunicao_{{t.id}}_{{t.aluno.id}} = document.getElementById("closeDialog_{{t.aluno.id}}_comunicao_{{t.id}}");
 
-openButton_comunicao.addEventListener('click', () => {
-    dialog_comunicao.showModal(); // Abre a caixa de diálogo como modal
+openButton_comunicao_{{t.id}}_{{t.aluno.id}}.addEventListener('click', () => {
+    dialog_comunicao_{{t.id}}_{{t.aluno.id}}.showModal(); // Abre a caixa de diálogo como modal
     });
 
-closeButton_comunicao.addEventListener('click', () => {
-    dialog_comunicao.close(); // Fecha a caixa de diálogo
+closeButton_comunicao_{{t.id}}_{{t.aluno.id}}.addEventListener('click', () => {
+    dialog_comunicao_{{t.id}}.close(); // Fecha a caixa de diálogo
     });
 </script> 

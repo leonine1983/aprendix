@@ -51,6 +51,7 @@
                                 <tr>
                                     <th rowspan="2" >Alunos</th>                                    
                                     <th colspan="9" class="text-uppercase bg-info">Parecer Descritivo</th>
+                                    <th rowspan='2' style='background:rgb(247, 189, 134) !important'><i class="fa-thin fa-robot fs-4 "></i><br>  Análise feita pela IA</th>
                                 </tr>
                                 <tr>
                                     <th>Aspec. Cognitivos</th>
@@ -62,9 +63,10 @@
                                     <th>Comunicação</th>
                                     <th>Consid. Finais</th>
                                     <th>Obs. do Coordenador</th>
-                                    <th>Análise feita pela IA</th>
+                                    
                                 </tr>
                             </thead>
+                            {% if not t.final %}
                             <tbody>
                                 {% for tu in turma %}
                                 <tr>
@@ -96,7 +98,7 @@
                                     <td>
                                         {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/observacao_coordenador.html" %}
                                     </td>     
-                                    <td>
+                                    <td style='background:rgb(241, 212, 185) !important'>
                                         {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ResumoParecerfinal.html" %}
                                     </td>     
                                                                    
@@ -104,6 +106,9 @@
                                 
                                 {% endfor %}
                             </tbody>
+                            {% else %}
+                            ddddd
+                            {% endif %}
                         </table>                        
                     </li>
                 {% endfor %}

@@ -1,5 +1,5 @@
-<button id="openDialog_{{t.aluno.id}}_habil" title='Ver todas as habilidades do aluno' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
-<dialog id="instructionsDialog_{{t.aluno.id}}_habil" class="w-75">
+<button id="openDialog_{{t.aluno.id}}_habil_{{t.id}}" title='Ver todas as habilidades do aluno' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{t.aluno.id}}_habil_{{t.id}}" class="w-75">
     <div class="container mt-4">
         <div class="container mt-5 p-5">
             <div class="alert alert-success">
@@ -48,7 +48,7 @@
                 {{form.media}}
                 <section class="border"> 
                 {% for form in form %}                                                               
-                    {% if form.trimestre.label == t.numero_nome%}
+                    {% if form.trimestre.label == t.id %}
                         {{form.media}}
                         {{ form.habilidades }}
                     {% endif %}                                             
@@ -58,18 +58,18 @@
             </form>                                                          
         </div>
     </div>                    
-    <button id="closeDialog_{{t.aluno.id}}_habil" class="btn btn-secondary mt-5">Fechar</button>
+    <button id="closeDialog_{{t.aluno.id}}_habil_{{t.id}}" class="btn btn-secondary mt-5">Fechar</button>
 </dialog>  
 <script>
-    const dialog_habil = document.getElementById('instructionsDialog_{{t.aluno.id}}_habil');
-    const openButton_habil = document.getElementById("openDialog_{{t.aluno.id}}_habil");
-    const closeButton_habil = document.getElementById('closeDialog_{{t.aluno.id}}_habil');
+    const dialog_habil_{{t.id}}_{{t.aluno.id}} = document.getElementById('instructionsDialog_{{t.aluno.id}}_habil_{{t.id}}');
+    const openButton_habil_{{t.id}}_{{t.aluno.id}} = document.getElementById("openDialog_{{t.aluno.id}}_habil_{{t.id}}");
+    const closeButton_habil_{{t.id}}_{{t.aluno.id}} = document.getElementById('closeDialog_{{t.aluno.id}}_habil_{{t.id}}');
 
-    openButton_habil.addEventListener('click', () => {
-        dialog_habil.showModal(); // Abre a caixa de diálogo como modal
+    openButton_habil_{{t.id}}_{{t.aluno.id}}.addEventListener('click', () => {
+        dialog_habil_{{t.id}}_{{t.aluno.id}}.showModal(); // Abre a caixa de diálogo como modal
         });
 
-    closeButton_habil.addEventListener('click', () => {
-        dialog_habil.close(); // Fecha a caixa de diálogo
+    closeButton_habil_{{t.id}}_{{t.aluno.id}}.addEventListener('click', () => {
+        dialog_habil_{{t.id}}_{{t.aluno.id}}.close(); // Fecha a caixa de diálogo
         });
 </script>                                     
