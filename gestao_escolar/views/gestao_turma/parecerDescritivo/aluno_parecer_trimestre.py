@@ -61,6 +61,18 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
         # Crie resumos para cada campo do model Parecer descritivo no trimestre final
         parecer_all = ParecerDescritivo.objects.filter(matricula=pk)
         todos_obs = []
+        dados_resumo = {
+                    'aspectos_cognitivos': [],
+                    'aspectos_socioemocionais': [],
+                    'aspectos_fisicos_motoras': [],
+                    'habilidades': [],
+                    'conteudos_abordados': [],
+                    'interacao_social': [],
+                    'comunicacao': [],
+                    'consideracoes_finais': [],
+                    'observacao_coordenador': [],
+                }
+        
         for p_all in parecer_all:
             if not p_all.trimestre.final:
                 todos_obs.append(
@@ -77,25 +89,39 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
                     'observacao_coordenador': p_all.observacao_coordenador,
                 }
                 )  
-            if p_all.trimestre.final:                 
-                ParecerDescritivo.objects.update_or_create( 
-                    trimestre = Trimestre.objects.get(final=True),
-                    aspectos_cognitivos = todos_obs['aspectos_cognitivos'],
-                    aspectos_socioemocionais = todos_obs['aspectos_socioemocionais'],
-                    aspectos_fisicos_motoras = todos_obs['aspectos_fisicos_motoras'],
-                    habilidades = todos_obs['habilidades'],
-                    conteudos_abordados = todos_obs['conteudos_abordados'],
-                    interacao_social = todos_obs['interacao_social'],
-                    comunicacao = todos_obs['comunicacao'],
-                    consideracoes_finais = todos_obs['consideracoes_finais'],
-                    observacao_coordenador = todos_obs['observacao_coordenador'],
+                # Coletando dados de todos_obs              
+                
+
+                for obs in todos_obs:
+                    dados_resumo['aspectos_cognitivos'].append(obs['aspectos_cognitivos'])
+                    dados_resumo['aspectos_socioemocionais'].append(obs['aspectos_socioemocionais'])
+                    dados_resumo['aspectos_fisicos_motoras'].append(obs['aspectos_fisicos_motoras'])
+                    dados_resumo['habilidades'].append(obs['habilidades'])
+                    dados_resumo['conteudos_abordados'].append(obs['conteudos_abordados'])
+                    dados_resumo['interacao_social'].append(obs['interacao_social'])
+                    dados_resumo['comunicacao'].append(obs['comunicacao'])
+                    dados_resumo['consideracoes_finais'].append(obs['consideracoes_finais'])
+                    dados_resumo['observacao_coordenador'].append(obs['observacao_coordenador'])
+                
+            
+            # Agora, você pode atualizar ou criar o ParecerDescritivo
+            if p_all.trimestre.final:
+                ParecerDescritivo.objects.update_or_create(
+                    trimestre=Trimestre.objects.get(final=True),
+                    matricula=pk,  # Certifique-se de incluir isso se necessário
+                    defaults={
+                        'aspectos_cognitivos': dados_resumo['aspectos_cognitivos'],
+                        'aspectos_socioemocionais': dados_resumo['aspectos_socioemocionais'],
+                        'aspectos_fisicos_motoras': dados_resumo['aspectos_fisicos_motoras'],
+                        'habilidades': dados_resumo['habilidades'],
+                        'conteudos_abordados': dados_resumo['conteudos_abordados'],
+                        'interacao_social': dados_resumo['interacao_social'],
+                        'comunicacao': dados_resumo['comunicacao'],
+                        'consideracoes_finais': dados_resumo['consideracoes_finais'],
+                        'observacao_coordenador': dados_resumo['observacao_coordenador'],
+                    }
                 )
                 messages.success(request, "Resumo por parâmetro criado com sucesso!")
-
-
-
-
-
         client = Client()
         message_resumo = [
             "Por favor, Com base nas informações\
