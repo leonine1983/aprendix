@@ -58,70 +58,7 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
 
         parecer_atualizado = get_object_or_404(ParecerDescritivo, matricula=pk, trimestre__id=trimestre)
 
-        # Crie resumos para cada campo do model Parecer descritivo no trimestre final
-        parecer_all = ParecerDescritivo.objects.filter(matricula=pk)
-        todos_obs = []
-        dados_resumo = {
-                    'aspectos_cognitivos': [],
-                    'aspectos_socioemocionais': [],
-                    'aspectos_fisicos_motoras': [],
-                    'habilidades': [],
-                    'conteudos_abordados': [],
-                    'interacao_social': [],
-                    'comunicacao': [],
-                    'consideracoes_finais': [],
-                    'observacao_coordenador': [],
-                }
-        
-        for p_all in parecer_all:
-            if not p_all.trimestre.final:
-                todos_obs.append(
-                    {
-                    'trimestre': p_all.trimestre,
-                    'aspectos_cognitivos': p_all.aspectos_cognitivos,
-                    'aspectos_socioemocionais': p_all.aspectos_socioemocionais,
-                    'aspectos_fisicos_motoras': p_all.aspectos_fisicos_motoras,
-                    'habilidades': p_all.habilidades,
-                    'conteudos_abordados': p_all.conteudos_abordados,
-                    'interacao_social': p_all.interacao_social,
-                    'comunicacao': p_all.comunicacao,
-                    'consideracoes_finais': p_all.consideracoes_finais,
-                    'observacao_coordenador': p_all.observacao_coordenador,
-                }
-                )  
-                # Coletando dados de todos_obs              
-                
-
-                for obs in todos_obs:
-                    dados_resumo['aspectos_cognitivos'].append(obs['aspectos_cognitivos'])
-                    dados_resumo['aspectos_socioemocionais'].append(obs['aspectos_socioemocionais'])
-                    dados_resumo['aspectos_fisicos_motoras'].append(obs['aspectos_fisicos_motoras'])
-                    dados_resumo['habilidades'].append(obs['habilidades'])
-                    dados_resumo['conteudos_abordados'].append(obs['conteudos_abordados'])
-                    dados_resumo['interacao_social'].append(obs['interacao_social'])
-                    dados_resumo['comunicacao'].append(obs['comunicacao'])
-                    dados_resumo['consideracoes_finais'].append(obs['consideracoes_finais'])
-                    dados_resumo['observacao_coordenador'].append(obs['observacao_coordenador'])
-                
-            
-            # Agora, você pode atualizar ou criar o ParecerDescritivo
-            if p_all.trimestre.final:
-                ParecerDescritivo.objects.update_or_create(
-                    trimestre=Trimestre.objects.get(final=True),
-                    matricula=pk,  # Certifique-se de incluir isso se necessário
-                    defaults={
-                        'aspectos_cognitivos': dados_resumo['aspectos_cognitivos'],
-                        'aspectos_socioemocionais': dados_resumo['aspectos_socioemocionais'],
-                        'aspectos_fisicos_motoras': dados_resumo['aspectos_fisicos_motoras'],
-                        'habilidades': dados_resumo['habilidades'],
-                        'conteudos_abordados': dados_resumo['conteudos_abordados'],
-                        'interacao_social': dados_resumo['interacao_social'],
-                        'comunicacao': dados_resumo['comunicacao'],
-                        'consideracoes_finais': dados_resumo['consideracoes_finais'],
-                        'observacao_coordenador': dados_resumo['observacao_coordenador'],
-                    }
-                )
-                messages.success(request, "Resumo por parâmetro criado com sucesso!")
+      
         client = Client()
         message_resumo = [
             "Por favor, Com base nas informações\
@@ -186,6 +123,73 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
             defaults={'resumo': resumo}
         )
 
-        messages.success(request, "Parecer do aluno salvo com sucesso")
+        nomeTrimestre = Trimestre.objects.get(id=trimestre).numero_nome
+
+        messages.success(request, f"<span class='fs-1'>🤖</span> Parecer do aluno para o {nomeTrimestre} salvo com sucesso! Você já pode conferir a análise realizada pela IA, caso deseje")
 
     return redirect(reverse_lazy('Gestao_Escolar:criaParecer', kwargs={'turma_id': parecer_atualizado.matricula.turma.id}))
+
+
+
+from g4f.client import Client
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.utils.safestring import mark_safe
+
+def atualizarResumoFinal(request, pk):
+    trimestres = Trimestre.objects.filter(final=False)
+    infoAll = {
+        'aspectos_cognitivos': [''],
+        'aspectos_socioemocionais': [],
+        'aspectos_fisicos_motoras': [],
+        'habilidades': [],
+        'conteudos_abordados': [],
+        'interacao_social': [],
+        'comunicacao': [],
+        'consideracoes_finais': [],
+        'observacao_coordenador': []
+    }
+
+    for trimestre in trimestres:
+        pareceres = ParecerDescritivo.objects.filter(matricula=pk, trimestre=trimestre)
+        for p in pareceres:
+            infoAll['aspectos_cognitivos'].append(f'No {p.trimestre}, {p.aspectos_cognitivos}')
+            infoAll['aspectos_socioemocionais'].append(f'No {p.trimestre}, {p.aspectos_socioemocionais}')
+            infoAll['aspectos_fisicos_motoras'].append(f'No {p.trimestre}, {p.aspectos_fisicos_motoras}')
+            infoAll['habilidades'].append(f'No {p.trimestre}, {p.habilidades}')
+            infoAll['conteudos_abordados'].append(f'No {p.trimestre}, {p.conteudos_abordados}')
+            infoAll['interacao_social'].append(f'No {p.trimestre}, {p.interacao_social}')
+            infoAll['comunicacao'].append(f'No {p.trimestre}, {p.comunicacao}')
+            infoAll['consideracoes_finais'].append(f'No {p.trimestre}, {p.consideracoes_finais}')
+            infoAll['observacao_coordenador'].append(f'No {p.trimestre}, {p.observacao_coordenador}')
+
+    parecer_final = ParecerDescritivo.objects.get(matricula=pk, trimestre__final=True)
+    texto_orientado = f"Analise o texto sobre o comportamento do aluno {parecer_final.matricula} faça um resumo e em seguida, forneça orientações práticas para o professor em 2º pessoa. Crie uma história fictícia que possa fazer o professor entender como ajudar o aluno. Máximo 500 caracteres"
+
+    aspectos_cognitivos = f"{texto_orientado}: {infoAll.get('aspectos_cognitivos')}"
+
+    client = Client()
+
+    response_cogn = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[{
+            "role": "user",
+            "content": f"{aspectos_cognitivos}\n\nPor favor, forneça as orientações em português."
+        }]
+    )
+
+    resumo_cogn = response_cogn.choices[0].message.content
+
+    ParecerDescritivo.objects.update_or_create(
+        matricula=pk, 
+        trimestre__final=True,
+        defaults={
+            'aspectos_cognitivos': resumo_cogn  # Corrigido
+        }
+    )
+
+    # Retorna o resultado como JSON
+    return JsonResponse({
+        'resumo_cognitivo': mark_safe(resumo_cogn),
+        # Adicione outros dados que você deseja retornar
+    })

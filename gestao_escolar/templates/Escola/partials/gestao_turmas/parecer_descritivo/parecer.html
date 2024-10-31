@@ -51,7 +51,7 @@
                                 <tr>
                                     <th rowspan="2" >Alunos</th>                                    
                                     <th colspan="9" class="text-uppercase bg-info">Parecer Descritivo</th>
-                                    <th rowspan='2' style='background:rgb(247, 189, 134) !important'><i class="fa-thin fa-robot fs-4 "></i><br>  Análise feita pela IA</th>
+                                    <th rowspan='2' style='background:rgb(247, 189, 134) !important'><span class='fs-1'>🤖</span><br>  Análise feita pela IA</th>
                                 </tr>
                                 <tr>
                                     <th>Aspec. Cognitivos</th>
@@ -70,7 +70,7 @@
                             <tbody>
                                 {% for tu in turma %}
                                 <tr>
-                                    <td>{{tu.aluno}} </td>
+                                    <td>{{tu.aluno}} <a href="{% url 'Gestao_Escolar:resumo' tu.id %}">resumo</a></td>
                                     <td>                                        
                                         {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/CognitivosAluno.html" %}
                                     </td>

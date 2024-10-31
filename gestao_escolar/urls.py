@@ -157,6 +157,9 @@ urlpatterns = [
     path('cidade/<int:pk>/editar/', CidadeUpdateView.as_view(), name='cidade-update'),
     path('cidade/<int:pk>/deletar/', CidadeDeleteView.as_view(), name='cidade-delete'),
 
+    path('resumo/<int:pk>/', atualizarResumoFinal, name='resumo'),
+    
+
     # Feriados
     path('calendario/<int:ano>/<int:mes>/', calendario_mes, name='calendario_mes'),
     path('calendario/', calendario_mes, {'ano': datetime.now().year, 'mes': datetime.now().month}, name='calendario_mes_atual'),
