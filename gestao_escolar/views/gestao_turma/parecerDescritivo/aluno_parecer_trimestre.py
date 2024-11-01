@@ -9,6 +9,7 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
     pAtrib = {
         'aluno': parecer.matricula,
         'idade': parecer.matricula.aluno.idade,
+        'genero': parecer.matricula.aluno.sexo,
         'trimestre': parecer.trimestre,
         'aspectos_cognitivos': parecer.aspectos_cognitivos,
         'aspectos_socioemocionais': parecer.aspectos_socioemocionais,
@@ -69,6 +70,9 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
 
         if pAtrib.get('idade'):
             message_resumo.append(f'idade: {pAtrib.get('idade')} anos </br>')
+        
+        if pAtrib.get('genero'):
+            message_resumo.append(f'gênero sexual: {pAtrib.get('geenro')} </br>')
 
         if pAtrib.get('trimestre'):
             message_resumo.append(f'Trimestre atual: {pAtrib.get("trimestre")} </br>')
