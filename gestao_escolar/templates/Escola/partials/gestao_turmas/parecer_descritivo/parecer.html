@@ -24,7 +24,7 @@
           <div class="pcss3t pcss3t-effect-scale pcss3t-theme-1">           
             {% for t in trimestres %}
                 <input type="radio" name="pcss3t" {% if t.id == 1 %} checked {% endif %} id="tab{{ t.id }}" class="{% if t.id == 1 %}tab-content-first{% else %}tab-content-{{ t.id }}{% endif %}">
-                <label for="tab{{ t.id }}" class="col-2"><h1>{{ t.numero_nome }}</h1></label>
+                <label for="tab{{ t.id }}" class="col-2 text-center"><h1>{% if t.final %}Análise feita pela IA <span class='fs-1'>🤖</span>{% else %}{{ t.numero_nome }}{% endif %}</h1></label>
                 
             {% endfor %}
         
@@ -104,11 +104,23 @@
                                                                    
                                 </tr>
                                 
-                                {% endfor %}
-                            </tbody>
+                                {% endfor %}                            
                             {% else %}
-                            ddddd
+                                {% for tu in turma %}
+
+                                    {% for tp in tu.pareceres_aluno.all %}
+                                        {% if tp.trimestre.final %}
+                                        <tr>
+                                            <td>{{tp.matricula}} </td>
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/Cognitivos_IA.html" %}
+                                            </td>                                                       
+                                        </tr>  
+                                        {% endif %}
+                                    {% endfor %}  
+                                {% endfor %}                              
                             {% endif %}
+                            </tbody>
                         </table>                        
                     </li>
                 {% endfor %}
