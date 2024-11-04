@@ -106,7 +106,6 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
         if parecer_atualizado.observacao_coordenador:
             message_resumo.append(f'Observação do Coordenador: {parecer_atualizado.observacao_coordenador} <br>')
 
-
         # Gera o resumo usando o G4f
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
@@ -114,18 +113,14 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
         )
 
         resumo = response.choices[0].message.content
-
         # Atualiza o campo 'resumo'
         ParecerDescritivo.objects.update_or_create(
             matricula=pk,
             trimestre__id=trimestre,
             defaults={'resumo': resumo}
         )
-        print(f"sera que é aqui o erro ANTES : {trimestre} ----- {parecer}")  
 
-        
-        # ATUALIZA TODOS OS CAMPOS DO TRIMESTRE FINAL COM ORIENTAÇÃO DA IA
-        
+        # ATUALIZA TODOS OS CAMPOS DO TRIMESTRE FINAL COM ORIENTAÇÃO DA IA        
         trimestres = Trimestre.objects.filter(final=False)
         infoAll = {
             'aspectos_cognitivos': [],
@@ -139,11 +134,7 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
             'observacao_coordenador': [],
             'resumo': []
         }
-
-        trimestre_id = trimestre
-        print(f"sera que é aqui o erro DEPOIS: {trimestre} ----- {parecer}")  
-       
-
+        trimestre_id = trimestre    
         for trimestre in trimestres:
             pareceres = ParecerDescritivo.objects.filter(matricula=pk, trimestre=trimestre)
             for p in pareceres:
@@ -163,8 +154,8 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
         print(f"sera que é aqui o erro  BEM DEPOIS:{trimestre_id} ------- {trimestre} ----- {parecer}")  
         parecer_final = ParecerDescritivo.objects.get(matricula=pk, trimestre__final=True)
         texto_orientado = f"Analise o texto sobre o comportamento do aluno {parecer_final.matricula} faça um resumo e em seguida, forneça orientações práticas para o professor em 2º pessoa. Crie uma história fictícia que possa fazer o professor entender como ajudar o aluno. Máximo 500 caracteres"
-        texto_resumo = f"Analise o texto e faça um resumo. Dependendo do que foi escrito dê orientações ao profissional. Máximo 500 caracteres"
-
+ 
+        texto_resumo = f"Com base no seu treinamento, analise o texto e faça um resumo. Dependendo do que foi escrito dê orientações ao profissional. Máximo 500 caracteres"
         # Cria as mensagens para cada campo
         aspectos_cognitivos = f"{texto_orientado}: {infoAll.get('aspectos_cognitivos')}"
         aspectos_socio = f"{texto_orientado}: {infoAll.get('aspectos_socioemocionais')}"
@@ -226,63 +217,6 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
     return redirect(reverse_lazy('Gestao_Escolar:criaParecer', kwargs={'turma_id': parecer_atualizado.matricula.turma.id}))
 
 
-# Atualizar o Resumo Final
-@login_required
-def alunoGestaoTurmasParecerResumo(request, pk, trimestre):
-    parecer = ParecerDescritivo.objects.filter(matricula=pk, trimestre=trimestre).first()  
-    pAtrib = {
-        'aluno': parecer.matricula,
-        'idade': parecer.matricula.aluno.idade,
-        'genero': parecer.matricula.aluno.sexo,
-        'trimestre': parecer.trimestre,
-        'aspectos_cognitivos': parecer.aspectos_cognitivos,
-        'aspectos_socioemocionais': parecer.aspectos_socioemocionais,
-        'aspectos_fisicos_motoras': parecer.aspectos_fisicos_motoras,
-        'habilidades': parecer.habilidades,
-        'conteudos_abordados': parecer.conteudos_abordados,
-        'interacao_social': parecer.interacao_social,
-        'comunicacao': parecer.comunicacao,
-        'consideracoes_finais': parecer.consideracoes_finais,
-        'observacao_coordenador': parecer.observacao_coordenador,
-    }
-
-    if request.method == 'POST':
-        form = request.POST
-        cgn = form.get('aspectos_cognitivos', pAtrib['aspectos_cognitivos'])
-        socio = form.get('aspectos_socioemocionais', pAtrib['aspectos_socioemocionais'])
-        fis = form.get('aspectos_fisicos_motoras', pAtrib['aspectos_fisicos_motoras'])
-        hab = form.get('habilidades', pAtrib['habilidades'])
-        contAbordado = form.get('conteudos_abordados', pAtrib['conteudos_abordados'])
-        intSocial = form.get('interacao_social', pAtrib['interacao_social'])
-        comunica = form.get('comunicacao', pAtrib['comunicacao'])
-        consFinais = form.get('consideracoes_finais', pAtrib['consideracoes_finais'])
-        obsCoord = form.get('observacao_coordenador', pAtrib['observacao_coordenador'])
-        obsResum = form.get('resumo', pAtrib['resumo'])
-
-        # Atualiza ou cria o ParecerDescritivo
-        ParecerDescritivo.objects.update_or_create(
-            matricula=pk,
-            trimestre__id=trimestre,
-            defaults={
-                'trimestre': Trimestre.objects.get(pk=trimestre),
-                'aspectos_cognitivos': cgn,
-                'aspectos_socioemocionais': socio,
-                'aspectos_fisicos_motoras': fis,
-                'habilidades': hab,
-                'conteudos_abordados': contAbordado,
-                'interacao_social': intSocial,
-                'comunicacao': comunica,
-                'consideracoes_finais': consFinais,
-                'observacao_coordenador': obsCoord,
-                'resumo': obsResum,
-            }
-        )
-       
-
-        nomeTrimestre = Trimestre.objects.get(id=trimestre).numero_nome
-        messages.success(request, f"<span class='fs-1'>🤖</span> Parecer do aluno para o {nomeTrimestre} salvo com sucesso! Você já pode conferir a análise realizada pela IA, caso deseje")
-
-    return redirect(reverse_lazy('Gestao_Escolar:criaParecer', kwargs={'turma_id': nomeTrimestre.matricula.turma.id}))
 
 
 from g4f.client import Client

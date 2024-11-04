@@ -57,9 +57,8 @@
 
 
         <div class="">  
-            <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="cognitivo" method="post">
-                {% csrf_token %}
-                {{form.media}}
+            <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAlunoFinal' tu.id t.id %}" id="cognitivo" method="post">
+                {% csrf_token %}               
                 <section class="border"> 
                 {% for form in form %}                                                               
                     {% if form.trimestre.label == t.id%}

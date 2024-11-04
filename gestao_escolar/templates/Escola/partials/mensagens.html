@@ -8,9 +8,21 @@
               </div>
               {% endif %}
               <div class="messages">
-                  <div class='text-center fs-4 border-3 m-auto rounded-3 border-light'>{{ message|safe }}</div>
+                  <div class='text-center fs-4 border-3 m-auto rounded-3 border-light'>{{ message|safe }} </div>
               </div>
           </div>
+        
+        
+            {% if message.tags == 'alert-success' %}
+            <audio id="success-sound" src="{% static 'audio/plin_plin.wav' %}"></audio>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var audio = document.getElementById('success-sound');
+                    audio.play();
+                });
+            </script>
+                
+            {% endif %}
           {% endfor %}
 <script>
   $(document).ready(function() {
@@ -33,7 +45,8 @@
           }
       });
   });
-  </script>
+</script>
+  
   
 
 

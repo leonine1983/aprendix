@@ -24,7 +24,7 @@
           <div class="pcss3t pcss3t-effect-scale pcss3t-theme-1">           
             {% for t in trimestres %}
                 <input type="radio" name="pcss3t" {% if t.id == 1 %} checked {% endif %} id="tab{{ t.id }}" class="{% if t.id == 1 %}tab-content-first{% else %}tab-content-{{ t.id }}{% endif %}">
-                <label for="tab{{ t.id }}" class="col-2 text-center {% if t.final %} bg-success-subtle {% endif %}"><h1>{% if t.final %}Análise feita pela IA <span class='fs-1'>🤖</span>{% else %}{{ t.numero_nome }}{% endif %}</h1></label>
+                <label for="tab{{ t.id }}" class="col-2 text-center {% if t.final %} col-5 bg-success-subtle {% endif %}"><h1>{% if t.final %}Análise feita pela IA e PARERECER DESCRITIVO FINAL<span class='fs-1'>🤖</span>{% else %}{{ t.numero_nome }}{% endif %}</h1></label>
                 
             {% endfor %}
         
@@ -88,7 +88,11 @@
                                 <tr>
                                     <th rowspan="2" >Alunos</th>                                    
                                     <th colspan="9" class="text-uppercase bg-info">Parecer Descritivo</th>
-                                    <th rowspan='2' style='background:rgb(247, 189, 134) !important'><span class='fs-1'>🤖</span><br>  Análise feita pela IA</th>
+                                    {% if t.final %}
+                                        <th rowspan='2' style='background:rgb(247, 189, 134) !important'><i class="fa-duotone fa-solid fa-book-user fs-2"></i><br>  Parecer Descritivo Final </th>
+                                    {% else %}
+                                    <th rowspan='2' style='background:rgb(247, 189, 134) !important'><i class="fa-light fa-book-sparkles fs-3"></i><br>  Parecer Descritivo (Análise IA) </th>
+                                    {% endif %}
                                 </tr>
                                 <tr>
                                     <th>Aspec. Cognitivos</th>
@@ -99,8 +103,7 @@
                                     <th>Interação Social</th>
                                     <th>Comunicação</th>
                                     <th>Consid. Finais</th>
-                                    <th>Obs. do Coordenador</th>
-                                    
+                                    <th>Obs. do Coordenador</th>                                    
                                 </tr>
                             </thead>
                             {% if not t.final %}
