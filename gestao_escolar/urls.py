@@ -132,6 +132,7 @@ urlpatterns = [
     # Notas Trimestre
     path('criar-gestao-turma/parecer/<int:turma_id>/', gestao_turmas_parecer, name='criaParecer'), 
     path('criar-gestao-turma/parecer/aluno/<int:pk>/<int:trimestre>/', alunoGestaoTurmasParecer, name='criaParecerAluno'), 
+    path('criar-gestao-turma/parecer/aluno/Final<int:pk>/<int:trimestre>/', alunoGestaoTurmasParecerResumo, name='criaParecerAlunoFinal'), 
     
     # IMPRESSOS
     path('turmas/impressao', Imprime_Turmas.as_view(), name='imprime_list_turmas'),

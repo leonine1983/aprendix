@@ -1,5 +1,5 @@
-<button id="openDialog_{{t.aluno.id}}_fisico" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
-<dialog id="instructionsDialog_{{t.aluno.id}}_fisico" class="w-75">
+<button id="openDialog_{{t.aluno.id}}_fisico_{{t.id}}" title='Ver todos os contratos' class='border-0 bg-transparent'> <i class="fa-duotone fa-solid fa-eye text-primary"></i></button>
+<dialog id="instructionsDialog_{{t.aluno.id}}_fisico_{{t.id}}" class="w-75">
     <div class="container mt-4">
         <div class="alert alert-info" role="alert">
             <strong><h2> Desenvolvimento Motor </h2></strong>
@@ -61,12 +61,12 @@
         <div class="">  
             <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="aspectos_fisicos_motoras" method="post">
                 {% csrf_token %}
-                {{form.media}}
-                <section class="border"> 
+                <section class="border">    
+                    {{form.media}}            
                 {% for form in form %}                                                               
-                    {% if form.trimestre.label == t.numero_nome%}
-                        {{form.media}}
-                        {{ form.aspectos_fisicos_motoras }}
+                    {% if form.trimestre.label == t.id %}
+                        
+                        {{form.aspectos_fisicos_motoras|safe }}
                     {% endif %}                                             
                 {% endfor %}  
                 </section>                                                         
@@ -74,18 +74,18 @@
             </form>                                                          
         </div>
     </div>                    
-    <button id="closeDialog_{{t.aluno.id}}_fisico" class="btn btn-secondary mt-5">Fechar</button>    
+    <button id="closeDialog_{{t.aluno.id}}_fisico_{{t.id}}" class="btn btn-secondary mt-5">Fechar</button>    
 </dialog>  
 <script>
-    const dialog_fisico = document.getElementById('instructionsDialog_{{t.aluno.id}}_fisico');
-    const openButton_fisico = document.getElementById("openDialog_{{t.aluno.id}}_fisico");
-    const closeButton_fisico = document.getElementById('closeDialog_{{t.aluno.id}}_fisico');
+    const dialog_fisico_{{tu.aluno.id}}_{{t.id}} = document.getElementById('instructionsDialog_{{t.aluno.id}}_fisico_{{t.id}}');
+    const openButton_fisico_{{tu.aluno.id}}_{{t.id}} = document.getElementById("openDialog_{{t.aluno.id}}_fisico_{{t.id}}");
+    const closeButton_fisico_{{tu.aluno.id}}_{{t.id}} = document.getElementById('closeDialog_{{t.aluno.id}}_fisico_{{t.id}}');
 
-    openButton_fisico.addEventListener('click', () => {
-        dialog_fisico.showModal(); // Abre a caixa de diálogo como modal
+    openButton_fisico_{{tu.aluno.id}}_{{t.id}}.addEventListener('click', () => {
+        dialog_fisico_{{tu.aluno.id}}_{{t.id}}.showModal(); // Abre a caixa de diálogo como modal
         });
 
-    closeButton_fisico.addEventListener('click', () => {
-        dialog_fisico.close(); // Fecha a caixa de diálogo
+    closeButton_fisico_{{tu.aluno.id}}_{{t.id}}.addEventListener('click', () => {
+        dialog_fisico_{{tu.aluno.id}}_{{t.id}}.close(); // Fecha a caixa de diálogo
         });
 </script> 

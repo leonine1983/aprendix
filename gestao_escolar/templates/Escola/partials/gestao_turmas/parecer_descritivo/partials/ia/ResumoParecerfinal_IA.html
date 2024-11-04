@@ -28,7 +28,7 @@
             </div>
         
             <div class="alert alert-warning mt-4" role="alert">
-                <h4 class="text-left">Análise Feita pela IA</h4>
+                <h4 class="text-left">Parecer Final feito pela IA</h4>
                 <p class="text-left fs-6">
                     O texto a seguir corresponde à análise realizada pela IA com base nos dados coletados. Essa análise oferece uma visão abrangente e precisa do desempenho do aluno, refletindo as informações registradas nos campos mencionados.
                 </p>
@@ -57,13 +57,14 @@
 
 
         <div class="">  
-            <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAlunoFinal' tu.id t.id %}" id="cognitivo" method="post">
+            <form class='ckeditor' action="{% url 'Gestao_Escolar:criaParecerAluno' tu.id t.id %}" id="cognitivo" method="post">
                 {% csrf_token %}
+                {{form.media}}
                 <section class="border"> 
                 {% for form in form %}                                                               
                     {% if form.trimestre.label == t.id%}
                         {{form.media}}
-                        {{form.resumo}}
+                        {{ form.resumo }}
                     {% endif %}                                             
                 {% endfor %}  
                 </section>                                                         

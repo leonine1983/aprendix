@@ -24,19 +24,56 @@
           <div class="pcss3t pcss3t-effect-scale pcss3t-theme-1">           
             {% for t in trimestres %}
                 <input type="radio" name="pcss3t" {% if t.id == 1 %} checked {% endif %} id="tab{{ t.id }}" class="{% if t.id == 1 %}tab-content-first{% else %}tab-content-{{ t.id }}{% endif %}">
-                <label for="tab{{ t.id }}" class="col-2 text-center"><h1>{% if t.final %}Análise feita pela IA <span class='fs-1'>🤖</span>{% else %}{{ t.numero_nome }}{% endif %}</h1></label>
+                <label for="tab{{ t.id }}" class="col-2 text-center {% if t.final %} bg-success-subtle {% endif %}"><h1>{% if t.final %}Análise feita pela IA <span class='fs-1'>🤖</span>{% else %}{{ t.numero_nome }}{% endif %}</h1></label>
                 
             {% endfor %}
         
             <ul>
                 {% for t in trimestres %}         
-                    <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography">                           
+                    <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography  {% if t.final %} bg-success-subtle {% endif %}">                           
                         {% include "Escola/partials/mensagens.html" %}
                         {% if t.final %}
-                        <div class="alert alert-info" role="alert">
-                            <h2>Área de Resultados Finais</h2>
-                            Nessa área você pode verifica a situação acadêmica do aluno, que indica se ele foi aprovado ou reprovado. Essa seção inclui a <strong>Nota do Conselho de Classe</strong>, que reflete a avaliação geral, e a <strong>Nota de Recuperação</strong>, caso o aluno não tenha atingido a média necessária. Essas informações são essenciais para acompanhar o desempenho e as oportunidades de melhoria.
-                        </div> 
+                        <div class=" row row-cols-2" role="alert">
+                            <div class="col-2">
+                                <img src="{% static 'professorCoruja/img/professorCoruja.png' %}" class='w-100' alt="">
+                            </div>
+                            <style>
+                                .speech-bubble {
+                                    position: relative;
+                                    display: inline-block;
+                                    background: #f0f8ff;
+                                    border: 2px solid #007bff;
+                                    border-radius: 10px;
+                                    padding: 15px;
+                                    margin: 10px;
+                                    font-family: Arial, sans-serif;
+                                    align-self: flex-start; /* Alinha à esquerda */
+                                }                            
+                               
+                                .speech-bubble:after {
+                                    content: '';
+                                    position: absolute;
+                                    top: 40%; /* Centraliza verticalmente */
+                                    left: -35px; /* Posiciona o "triângulo" à esquerda do balão */
+                                    margin-top: -10px; /* Ajusta a posição vertical do triângulo */
+                                    border-width: 5px 35px 35px 0; /* Define a largura das bordas */
+                                    border-style: solid;
+                                    border-color: transparent #007bff transparent transparent; /* Define a cor azul na borda direita */
+                                }
+
+                            
+                                .speech-bubble h2 {
+                                    margin: 0 0 10px 0;
+                                }
+                            </style>
+                            
+                            <div class="speech-bubble col-8 ">
+                                <h2>Área de Análise Comportamental</h2>
+                                Nesta área, eu, Professor Coruja, apresento uma análise detalhada do comportamento do aluno, gerada por inteligência artificial. Com exceção do <strong>Parecer Geral</strong>, os demais campos fornecem dicas práticas para ajudá-lo a interagir melhor com o aluno, com base nos pareceres descritivos que você disponibiliza. Essas informações são fundamentais para que eu possa auxiliar você a promover um acompanhamento mais efetivo do desempenho e das oportunidades de desenvolvimento.
+                            </div>
+                            
+                        </div>
+                        
                         {% else %} 
                         <h2 class="text-center">Lançamento e Acompanhamento do Parecer Descritivo do Aluno</h2>
                         <div class="alert alert-info mt-4">
@@ -46,7 +83,7 @@
                         </div>                      
                         {% endif %} 
                         
-                        <table class="win11-table">
+                        <table class="win11-table bg-light">
                             <thead>
                                 <tr>
                                     <th rowspan="2" >Alunos</th>                                    
@@ -67,7 +104,7 @@
                                 </tr>
                             </thead>
                             {% if not t.final %}
-                            <tbody>
+                            <tbody >
                                 {% for tu in turma %}
                                 <tr>
                                     <td>{{tu.aluno}} <a href="{% url 'Gestao_Escolar:resumo' tu.id %}">resumo</a></td>
@@ -110,14 +147,54 @@
 
                                     {% for tp in tu.pareceres_aluno.all %}
                                         {% if tp.trimestre.final %}
-                                        <tr>
+                                        <tr class="t-final">
                                             <td>{{tp.matricula}} </td>
                                             <td>                                        
                                                 {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/Cognitivos_IA.html" %}
-                                            </td>                                                       
+                                            </td>                                       
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/Socioemocionais_IA.html" %}
+                                            </td>    
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/aspectos_fisicos_motoras.html" %}
+                                            </td>  
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/habilidades_IA.html" %}
+                                            </td>     
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/conteudos_abordados.html" %}
+                                            </td>   
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/interacao_social.html" %}
+                                            </td>    
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/comunicacao.html" %}
+                                            </td>    
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/consideracoes_finais.html" %}
+                                            </td>   
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/observacao_coordenador_IA.html" %}
+                                            </td> 
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/ResumoParecerfinal_IA.html" %}
+                                            </td>      
                                         </tr>  
                                         {% endif %}
                                     {% endfor %}  
+                                    <script>
+                                         // Script para modificar "História fictícia:"
+            document.addEventListener('DOMContentLoaded', () => {
+                const paragraphs = document.querySelectorAll('.fs-5');
+                paragraphs.forEach(paragraph => {
+                    paragraph.innerHTML = paragraph.innerHTML.replace(
+                        /História fictícia:/,
+                        '<br><br><strong style="color: blue;">História fictícia:</strong>'
+                    );
+                });
+            });
+                                    </script>
+                                    
                                 {% endfor %}                              
                             {% endif %}
                             </tbody>
@@ -126,6 +203,7 @@
                 {% endfor %}
             </ul>
         </div>        
+
     </div>
   </div>
 </div>
