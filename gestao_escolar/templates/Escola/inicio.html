@@ -67,7 +67,11 @@
                     </div>
                     <div class="card-footer text-muted">
                         {{graph|safe}}                      
-                    <p>Data e horário do acesso: {{ now }}</p>
+                    <p>Data e horário do acesso: {{ now }}
+
+
+                        gggggggggggggggggggggggg
+                    </p>
                     </div>
                 </div>
             </div>
@@ -296,8 +300,14 @@
     {% if  conteudo_page == "boletim_trimestral"%}
         {% include 'docsGestao_escolar/boletins/seleciona_trimestral_boletim.html' %}
     {% endif %} 
-    
 
+    <!--Errors 400, 403, 404, 500-->
+
+    {% if  conteudo_page == "500" %}    
+        {% include 'docsGestao_escolar/boletins/seleciona_trimestral_boletim.html' %}
+    {% endif %} 
+    
+    
     
     <!-- Condiciionais-->
     {% if 'escola_id' not in request.session %}
