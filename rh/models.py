@@ -51,17 +51,7 @@ class Prefeitura(models.Model):
 class Ano(models.Model):
     ano = models.CharField(max_length=4, null=False, verbose_name='Ano', default='2023')
     data_inicio = models.DateField(blank=True, null=True)
-    data_fim = models.DateField(blank=True, null=True)   
-
-    @receiver(post_migrate)
-    def create_AnoLetivo(sender, **kwargs):
-        if not Ano.objects.exists():
-            try:
-                Ano.objects.create(
-                    ano=2024 
-                )
-            except Ano.DoesNotExist:
-                print("Ano com ID 1 não encontrado.")
+    data_fim = models.DateField(blank=True, null=True)       
     
     class Meta:
         ordering = ['-ano']
@@ -434,6 +424,15 @@ class Frequencia_mes(models.Model):
 def post_migrate_setup(sender, **kwargs):
     if sender.name != 'rh':  # Substitua 'rh' pelo nome do seu app
         return
+    
+    
+    if not Ano.objects.exists():
+        try:
+            Ano.objects.create(
+                ano=2024 
+            )
+        except Ano.DoesNotExist:
+            print("Ano com ID 1 não encontrado.")
 
     # Cria o registro Config_Plataforma se não existir
     if not Config_plataforma.objects.exists():
