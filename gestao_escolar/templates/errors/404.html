@@ -1,0 +1,44 @@
+{% extends 'gestao_escolar/template.html' %}
+{% load static %}
+{% block script_head %}
+ {% include 'gestao_escolar/links_modal.html' %}
+<script src="{% static 'select2/js/select2.full.min.js' %}"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Importação da família de fontes Nunito -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link href="{% static 'global/css/geral_styler.css' %}" rel="stylesheet">
+    <link href="{% static 'global/css/modals.css' %}" rel="stylesheet">
+    <link href="{% static 'global/css/table_win11.css' %}" rel="stylesheet">
+    <link href="{% static 'global/css/table_win11.css' %}" rel="stylesheet" media="print">
+    
+
+    <style>
+        .anime-h{height: 5rem !important;}
+    </style>
+{% endblock script_head %} 
+
+{% block main %}
+<div class="shadow-sm p-3 mb-3  w-100 mt-5" >
+    {% if messages %}                
+    {% include 'Escola/partials/mensagens.html' %}          
+  {% endif %}
+
+    <div class=' p-4 h5 bg-p-3' style='margin:-1rem -1rem 0 -1rem'></div>    
+        <!-- informações-->
+        <div class=" rounded-top-2  bg-body-tertiary " style='margin:-1.2rem 0rem 1rem 0rem !important'>
+            <div class='mb-2'>
+                {% include 'gestao_escolar/navbars/index.html' %}    
+            </div>
+            <div class='mt-1 row w-100  ml-1 gap-3'>
+                
+                
+               
+            </div>
+        </div>    
+ 
+    
+</div>
+
+{% block script_footer %}{% endblock script_footer %} 
+{% endblock main %}
