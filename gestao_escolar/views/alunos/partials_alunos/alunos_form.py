@@ -134,7 +134,7 @@ class Aluno_documento_form(forms.ModelForm):
     )
     RG_emissao = forms.DateField(
         label = "Data de emissão do RG",
-        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col2 m-2 rounded-1', 'type': 'date'}), 
+        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col2 m-2 rounded-1'}), 
         required=False 
     )
     RG_UF = forms.ModelChoiceField(
@@ -228,7 +228,7 @@ class Aluno_documento_form(forms.ModelForm):
     )
     emissao = forms.DateField(
         label = "Data de emissão do RG",
-        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col2 m-2 rounded-1', 'type': 'date'}), 
+        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col2 m-2 rounded-1'}), 
         required=False 
     )
     distrito_certidao = forms.CharField(
@@ -270,7 +270,7 @@ class Aluno_documento_form(forms.ModelForm):
     )
     data_obito = forms.DateField(
         label = "Data óbito / Data de Falecimento",
-        widget= forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3  text-info col m-2 rounded-1', 'type': 'date'}),
+        widget= forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3  text-info col m-2 rounded-1'}),
         required=False  
     )
 

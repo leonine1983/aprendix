@@ -22,8 +22,19 @@
                         </script>
                     </div>
                 {% endif %}
+                {% if message.tags == 'alert-info' %}
+                    <div style='margin:-1rem -1rem 0 !important' class="p-2 fs-3">                        
+                        <audio id="error-sound" src="{% static 'audio/error/error_2.wav' %}"></audio>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                var audio = document.getElementById('error-sound');
+                                audio.play();
+                            });
+                        </script>
+                    </div>
+                {% endif %}
                 <div class="messages">
-                    <div class='text-center fs-4 border-3 m-auto rounded-3 border-light'>{{ message|safe }}    </div>
+                    <div class='text-center fs-4 border-3 m-auto rounded-3 border-light'>{{ message|safe }} </div>
                 </div>
             </div>
         {% endfor %}

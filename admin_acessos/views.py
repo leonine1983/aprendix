@@ -1,7 +1,6 @@
-from django.http import HttpResponse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import  redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import logout
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -10,8 +9,11 @@ from django.views import View
 from django import forms
 from ckeditor.widgets import CKEditorWidget
 from .models import MessageUser, PaletaCores
+from django.contrib.auth.models import User
 
 # Login
+import random
+
 class CreateLoginView(LoginView):
     template_name = 'admin_acessos/index.html'
 
@@ -19,8 +21,42 @@ class CreateLoginView(LoginView):
         messages.error(self.request, 'Credenciais inválidas. Por favor, tente novamente.')
         return super().form_invalid(form)
     
-    def get_success_url(self) :
+    def get_success_url(self):
+        # Lista de mensagens aleatórias de boas-vindas
+        name = self.request.user.username.capitalize()
+     
+
+        # Lista expandida de mensagens aleatórias de boas-vindas
+        mensagens_boas_vindas = [
+            f"Bem-vindo(a) ao AprendiX! <br> 🎉 Você está pronto(a) para começar!  Vamos fazer deste momento uma jornada incrível!",
+            f"Bem-vindo(a) ao AprendiX! <br> Estamos super empolgados em ter você conosco.",
+            f"Olá, {name}! Seja bem-vindo(a) ao AprendiX!<br> Vamos juntos construir uma experiência de aprendizado incrível!",
+            f"Que ótimo ter você de volta, {name}!<br> Está pronto(a) para começar mais uma jornada de aprendizado no AprendiX? Vamos nessa!",
+            f"Oi, {name}! Bem-vindo(a) ao AprendiX!<br> Estamos muito felizes por ter você conosco e vamos juntos alcançar novos aprendizados!",
+            f"Seja bem-vindo(a) ao AprendiX, {name}!<br> Estamos aqui para garantir que sua experiência de aprendizado seja a melhor possível!",
+            f"Fala, {name}! Que bom ver você por aqui!<br> Preparado(a) para começar mais uma etapa no AprendiX? Vamos juntos!",
+            f"Olá, {name}!<br> O AprendiX está ainda mais incrível e pronto para te ajudar a aprender de maneira única. Vamos começar!",
+            f"Bem-vindo(a) ao AprendiX, {name}!<br> Vamos fazer dessa jornada de aprendizado algo memorável. Contamos com você!",
+            f"Que alegria ter você conosco, {name}!<br> O AprendiX está pronto para te proporcionar uma experiência de aprendizado fantástica!",
+            f"Oi, {name}!<br> Você chegou ao lugar certo para crescer e aprender. O AprendiX te espera para essa jornada incrível!",
+            f"Bem-vindo(a) ao AprendiX, {name}!<br> Vamos transformar o aprendizado em uma experiência única e empolgante!",
+            f"É um prazer ter você aqui, {name}!<br> Estamos ansiosos para compartilhar com você o melhor do AprendiX. Vamos nessa!",
+            f"Oi, {name}! Estamos muito felizes que você se juntou ao AprendiX. Vamos trilhar juntos um caminho de aprendizado de sucesso!",
+            f"Seja muito bem-vindo(a), {name}!<br> O AprendiX é o lugar perfeito para crescer e aprender. Estamos prontos para te apoiar!",
+            f"Olá, {name}!<br> O AprendiX foi feito para pessoas como você. Vamos aprender, crescer e alcançar novos horizontes juntos!"
+        ]
+        
+        # Escolher uma mensagem aleatória da lista
+        mensagem = random.choice(mensagens_boas_vindas)
+
+        # Personalizar a mensagem com o nome do usuário
+        mensagem = mensagem.format(self.request.user.first_name)
+
+        # Exibir a mensagem de boas-vindas
+        messages.info(self.request, f'<i class="fa-duotone fa-solid fa-hand-wave fa-shake fs-1"></i> {mensagem}')
+        
         return reverse_lazy('Gestao_Escolar:GE_inicio')
+    
 
 # Logout
 class LogoutView_logout(LogoutView):

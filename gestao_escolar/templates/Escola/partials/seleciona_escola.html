@@ -15,11 +15,15 @@
 </div>    
 <!-- Modal -->
 <div class="modal fade" id="modal_escola" style='background:#000'>
+    {% include 'Escola/partials/mensagens.html' %}
     <div class="modal-dialog w-100">
     <div class="modal-content bg-secondary-subtle">
         <div class="modal-header">
-        <h4 class="modal-title  fs-6"><i class="fa-regular fa-face-grin-squint"></i> Olá, seja muito bem-vindo, <span class="text-capitalize">{% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}{{request.user}}{% endif %}!!</span></h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title  fs-6"><i class="fa-regular fa-face-grin-squint"></i> Olá, seja muito bem-vindo, <span class="text-capitalize">{% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}{{request.user}}{% endif %}!!</span></h4>        
+        <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}">
+            {% csrf_token %}
+            <button type="submit" style="background-color: transparent !important; border: cadetblue 0.1rem solid !important;color: cadetblue !important;" class="mx-2"><i class="fa-thin fa-door-closed txt-p"></i> Sair</button>
+          </form>
         </div>
         <div class="modal-body shadow-sm bg-light-subtle">
             <p class="m-0">Estamos felizes em tê-lo aqui!</p>
