@@ -5,13 +5,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import datetime
 from django.urls import reverse_lazy
 from .turmas_form import Turma_form
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
 
 
-class Create_turmas(LoginRequiredMixin, CreateView):
+class Create_turmas(LoginRequiredMixin, CreateView, SuccessMessageMixin):
     model = Turmas
     # fields = ['nome']
     form_class = Turma_form
+    success_message = "Turma criado com sucesso"
     template_name = 'Escola/inicio.html'
+    
     success_url = reverse_lazy('Gestao_Escolar:GE_Escola_turmas')
 
     def form_valid(self, form):

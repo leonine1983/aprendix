@@ -68,16 +68,11 @@
                     <div class="card-footer text-muted">
                         {{graph|safe}}                      
                     <p>Data e horário do acesso: {{ now }}
-
-
-                        gggggggggggggggggggggggg
                     </p>
                     </div>
                 </div>
             </div>
         </div>
-    
-        'create_users'  
     {% if  conteudo_page == 'create_users'  %}
         {% include 'Escola/partials/usuarios/createUsers.html' %}
     {% endif %}
@@ -313,6 +308,7 @@
     {% if 'escola_id' not in request.session %}
         {% include 'Escola/partials/seleciona_escola.html' %}        
     {% endif %}
+    
     {% if not condicional_aluno.exists %}
         {% include 'Escola/partials/verifica_sem_registros/n_aluno.html' %}
     {% endif %}

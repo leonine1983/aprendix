@@ -28,7 +28,7 @@ class Alunos_form_etapa2(forms.ModelForm):
     )   
     data_nascimento = forms.DateField(
         label='Data de Nascimento:',
-        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3  text-info col2 m-2 rounded-1', 'type': 'date'}),        
+        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3  text-info col2 m-2 rounded-1' }),        
     )
     
     sexo = forms.ModelChoiceField(

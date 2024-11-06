@@ -6,6 +6,7 @@ from rh.models import Escola, Prefeitura
 from admin_acessos.models import NomeclaturaJanelas
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
+from django.contrib import messages
 
 # Essa view lida com a seleção da escola e armazena os dados na sessão
 @login_required
@@ -34,4 +35,5 @@ def Seleciona_escola(request, pk):
     request.session['mes'] = meses[mes_atual - 1]
     
     # Redireciona a pagina
+    messages.success(request, "Escola selecionada com sucesso!")
     return redirect(reverse('Gestao_Escolar:GE_anoLetivo'))
