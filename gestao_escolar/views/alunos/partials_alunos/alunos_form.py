@@ -57,7 +57,7 @@ class Alunos_form(forms.ModelForm):
         nome_completo = self.cleaned_data.get('nome_completo')
         # Expressão regular para bloquear caracteres especiais e acentuados
         if re.search(r"[^a-zA-ZÇç\s]", nome_completo):
-            mensagem_erro = "Não é permitido usar acentos, números ou caracteres especiais."         
+            mensagem_erro = "Não é permitido o uso de acentos, números ou caracteres especiais ao cadastrar o aluno. Por favor, acesse 'NOVO ALUNO' e tente novamente."        
             raise forms.ValidationError(mensagem_erro)
         return nome_completo   
     

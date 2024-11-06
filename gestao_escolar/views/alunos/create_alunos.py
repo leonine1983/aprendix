@@ -59,3 +59,10 @@ class Create_Alunos(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         form.instance.nome_mae =form.cleaned_data['nome_mae'].upper()
         return super().form_valid(form)     
     
+    def form_invalid(self, form):
+        # Adiciona mensagens de erro para os campos específicos
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(self.request, error)
+        return super().form_invalid(form)
+    

@@ -20,14 +20,10 @@ class AlunosEcontred(LoginRequiredMixin,TemplateView):
         context = super().get_context_data(**kwargs)
         nome_completo = self.kwargs.get('nome_completo')
         nome_mae = self.kwargs.get('nome_mae')
-        print(f'Nome da mae : {nome_mae}')
-        # Agora você pode usar 'nome_completo' no contexto conforme necessário
         # Preenche o formulário com os valores
         formulario = MeuFormulario(initial={'nome_completo': nome_completo, 'nome_mae': nome_mae})
-
         # Adiciona o formulário ao contexto
         context['form'] = formulario
-
         nome_completo_query = Alunos.objects.filter(nome_completo__icontains = nome_completo) 
         context['titulo_page'] = 'Alunos'        
         context['conteudo_page'] = 'Registrar Alunos'            
