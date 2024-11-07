@@ -85,9 +85,10 @@ class Pessoa_form(forms.ModelForm):
         required=False  # Change to True if you want it to be mandatory
     )
     senha = forms.CharField(
-        label="Senha do Professor",
+        label="Senha do Professor (senha padrão é 12345678): ",
         widget=forms.PasswordInput(attrs={'class': "border border-info p-2 pb-1 text-success col rounded-1"}),
-        required=False  # Change to True if you want it to be mandatory
+        required=False,  
+        disabled=True     
     )
 
     class Meta:

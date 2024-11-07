@@ -1,3 +1,4 @@
+{% load static %}
 <div class='m-2'>
     <h2>Formulário de Cadastro de Pessoas para o Sistema Aprendix</h2>
     <p>
@@ -11,9 +12,10 @@
         Para isso, é necessário que a pessoa passe pelos processos de contratação e encaminhamento ou obtenha um decreto correspondente.
     </p>
 </div>
-    <hr>           
+    <hr>         
+</script>      
 <form method="post" class='' >  
-    
+    <script src="{% static 'global/js/jquery.mask.min.js' %}"></script>    
     {{ form.non_field_errors }}
     {% csrf_token %}
     <div>
@@ -29,12 +31,12 @@
             {{ field }} <a class='m-2 p-2' href='{% url "Gestao_Escolar:cidade-create" %}'><i class="fa-solid fa-plus text-primary"></i> Cidade</a>
         </section>                      
         {% else %}
-            {{ field }}
+            {{ field }}              
+            </script>
         {% endif %}
-
         {{ field.errors }}
         </section>
     {% endfor %}  
     </div>
     <button class="btn btn-sm btn-primary" type="submit">Salvar registro do professor</button>
-</form> 
+</form>

@@ -24,7 +24,9 @@ class DecretoCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('Gestao_Escolar:decreto-create')
 
     def form_valid(self, form):
-        messages.success(self.request, 'Decreto criado com sucesso!')
+        name = form.instance.profissional
+        cargo = form.instance.profissao
+        messages.success(self.request, f'Decreto de {name} como {cargo} foi criado com sucesso!')
         form.instance.author_created = f'{self.request.user.first_name} {self.request.user.last_name}'
         form.instance.destino = Escola.objects.get(id=self.request.session['escola_id'])
         form.instance.ano_decreto = Ano.objects.get(id=self.request.session['anoLetivo_id'])

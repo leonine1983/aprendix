@@ -22,6 +22,7 @@
     
   <div class="modal-dialog w-100">
     <div class="modal-content bg-secondary-subtle win11-window" >
+        {% include "Escola/partials/mensagens.html" %}
         <div class="modal-header mb-5">
           <h4 class="modal-title  fs-6"><span class="text-capitalize ml-5 fs-3"><i class="fs-4 fa-solid fa-people-roof"></i> {{titulo_page}}</span></h4>        
           <button type="button" class="close btn btn-sm btn-primary" data-dismiss="modal"><i class="fa-solid fa-xmark"></i></button>        
@@ -104,8 +105,8 @@
                     <button type="submit" class="btn btn-sm btn-success w-100 mt-2"> {{button}} {{object}} <i class="fa-solid fa-people-roof"></i></button>     
                   </form>
                   <div class='border p-3 m-2 col-4'>
-                  <section class='text-secondary'>Se o nome do profissional não constar na lista, clique em "Novo Decreto" para adicioná-lo</section>
-                  <a href="{% url 'Gestao_Escolar:pessoas-create' %}" class="link ml-2 w-50 btn btn-sm btn-success mt-3">Novo Decreto <i class="fa-solid fa-plus"></i></a>                 
+                  <section class='text-secondary'>Se o nome do profissional não constar na lista, clique em "Nova Pessoa" para adicioná-lo</section>
+                  <a href="{% url 'Gestao_Escolar:pessoas-create' %}" class="link ml-2 w-50 btn btn-sm btn-success mt-3">Nova Pessoa <i class="fa-solid fa-plus"></i></a>                 
                   
                   </div>
                 </div>     
