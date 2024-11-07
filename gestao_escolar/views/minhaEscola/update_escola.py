@@ -51,7 +51,7 @@ class UpdateEscola(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         context['conteudo_page'] = 'Atualiza Escola'
         # Preenche o formulário com a instância de Escola_admin
         context['escola_dados_form'] = EscolaDados_form(instance=escola_admin_instance)
-        context['decreto'] = Decreto.objects.filter(destino = self.request.session['escola_id'])
+        context['decreto'] = Decreto.objects.filter(destino = self.request.session['escola_id'], Decreto_decretoAtivo__ano_ativo__id = self.request.session['anoLetivo_id'])
         context['page_ajuda'] = "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional."
 
         return context        

@@ -272,6 +272,7 @@ class Decreto(models.Model):
 class DecretoAnoLetivoAtivo(models.Model):
     decreto = models.ForeignKey(Decreto, on_delete=models.CASCADE, related_name='Decreto_decretoAtivo', verbose_name="Definir se o decreto está ativo para o ano letivo atual")  
     ano_ativo = models.ForeignKey(Ano, on_delete=models.CASCADE, related_name='Ano_decretoAtivo', verbose_name="Definir se o decreto está ativo para o ano letivo atual")  
+   
     #Segurança
     created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    
     author_created = models.CharField(max_length=50,  null=True, blank=True, verbose_name='Autor da criação')
@@ -301,6 +302,8 @@ class Escola_admin(models.Model):
     codigo_mec = models.CharField(max_length=10, blank=True, null=True, unique=True)  # Código do MEC
     tipo = models.CharField(max_length=50, blank=True, null=True)  # Ex.: 'Pública', 'Privada', 'Filantrópica'
     
+    """
+    O acesso a diretores e secretarios e outros decretos e feito pelo model Decretos
     # Dados de Direção
     nome_diretor = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_diretor", on_delete=models.CASCADE, blank=True, null=True)
     nome_secretario = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_secretaria", on_delete=models.CASCADE, blank=True, null=True)
@@ -312,6 +315,7 @@ class Escola_admin(models.Model):
     coordenacao_matutino = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_coordMat", on_delete=models.CASCADE, blank=True, null=True)
     coordenacao_vespertino = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_coordVesp", on_delete=models.CASCADE, blank=True, null=True)
     coordenacao_noturno = models.ForeignKey(Decreto, related_name="related_dadosEscola_decreto_coordNot", on_delete=models.CASCADE, blank=True, null=True)
+    """
 
     # Dados de Funcionamento
     data_fundacao = models.DateField(blank=True, null=True)

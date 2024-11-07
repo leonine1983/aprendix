@@ -145,18 +145,17 @@
                         {% endif %}  
                     </div>
                     <div style='display:flex'>  
-                        <div class='col-10'>
-                            <p style='padding:0; margin:0'><span class="field-label">Nome da Escola:</span> {{ escola.nome_escola }}</p>
-                            <p style='padding:0; margin:0'><span class="field-label">Prefeitura:</span> {{ escola.prefeitura }}</p>
-                            <p style='padding:0; margin:0'><span class="field-label">Diretor:</span> {{ escola.related_dadosEscola.nome_diretor.profissional}} | Decreto nº {{ escola.related_dadosEscola.nome_diretor.numero_decreto}} - {{ escola.related_dadosEscola.nome_diretor.ano_decreto}} </p>  
-                            <p style='padding:0; margin:0'><span class="field-label">Secretário:</span> {{ escola.related_dadosEscola.nome_secretario.profissional }} | Decreto nº {{ escola.related_dadosEscola.nome_secretario.numero_decreto }} - {{ escola.related_dadosEscola.nome_secretario.ano_decreto }}</p>  
-                        </div>
-                        <div class='col-5'>
-                            <p style='padding:0; margin:0'>&nbsp;</p>
-                            <p style='padding:0; margin:0'>&nbsp;</p>
+                        <div class='col-6'>
+                            <p style='padding:0; margin:0'><span class="field-label">Instituição:</span> {{ escola.prefeitura }}</p>
+                            <p style='padding:0; margin:0'><span class="field-label">Escola:</span> {{ escola.nome_escola }}</p>                            
                             <p style='padding:0; margin:0'><span class="field-label">Telefone:</span> {{ escola.related_dadosEscola.telefone }}</p>
                             <p style='padding:0; margin:0'><span class="field-label">Email:</span> {{ escola.related_dadosEscola.email }}</p>
-                            <p style='padding:0; margin:0'><span class="field-label">Código MEC:</span> {{ escola.related_dadosEscola.codigo_mec }}</p>                                
+                            <p style='padding:0; margin:0'><span class="field-label">Código MEC:</span> {{ escola.related_dadosEscola.codigo_mec }}</p>    
+                        </div>
+                        <div class='col-7'>
+                            {% for dec in decreto %}
+                                <p style='padding:0; margin:0'><span class="field-label">{{dec.profissao}}:</span> {{dec}} </p>  
+                            {% endfor %}                                                       
                         </div>
                     </div>
                 </div>
