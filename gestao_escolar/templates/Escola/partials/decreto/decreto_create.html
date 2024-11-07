@@ -77,7 +77,9 @@
                       <td> {{d.atualizado_em }} | {{d.author_atualiza}} </td>
                       <td>
                         {% if not d.Decreto_decretoAtivo.last.ano_ativo.ano == request.session.anoLetivo_nome %}
-                          <a href="{% url "Gestao_Escolar:decreto-ativo" d.pk %}">Extender <i class="fa-sharp fa-thin fa-square-up-right"></i></a>                          
+                          <a href="{% url "Gestao_Escolar:decreto-ativo" d.pk %}">Extender <i class="fa-sharp fa-thin fa-square-up-right"></i></a>     
+                          {% else %}
+                          Já está em atividade em {{request.session.anoLetivo_nome}}             
                         {% endif %}
                       </td>
                       
