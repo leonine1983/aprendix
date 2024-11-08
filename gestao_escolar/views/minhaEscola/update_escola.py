@@ -2,6 +2,7 @@ from rh.models import Escola, Escola_admin, Prefeitura, Decreto
 from django.views.generic import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
 from datetime import datetime, date
 from django.urls import reverse_lazy
 from .escola_form import Escola_form, EscolaDados_form
@@ -13,8 +14,16 @@ class UpdateEscola(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     form_class = Escola_form
     #fields = ['nome']
     template_name = 'Escola/inicio.html'
-    success_message = "Turma atualizada com sucesso!!"
-    success_url = reverse_lazy('Gestao_Escolar:GE_Escola_inicio')
+
+    def get_success_url(self):
+        destino = self.request.session['escola_id']
+        escola = self.get_object()
+        mensagem = f"{escola} atualizada com sucesso!!"
+        messages.success(self.request, mensagem )
+        print(f'olha o objeto {escola.nome_escola}')
+        
+        return reverse_lazy('Gestao_Escolar:DadosEscola', kwargs = {'pk':destino})   
+
 
     def form_valid(self, form):
         # Recupera a prefeitura da sessão e atribui ao objeto
@@ -47,7 +56,7 @@ class UpdateEscola(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         context['titulo_page'] = 'Atualização de Dados Básicos da Escola'
         context['sub_titulo_page'] = "Use os campos abaixo para atualizar as informações básicas da Escola."
         context['btn_bg'] = "btn-success"
-        context['button'] = "Atualizar nome da escola"
+        context['button'] = "Clique para atualizar"
         context['conteudo_page'] = 'Atualiza Escola'
         # Preenche o formulário com a instância de Escola_admin
         context['escola_dados_form'] = EscolaDados_form(instance=escola_admin_instance)

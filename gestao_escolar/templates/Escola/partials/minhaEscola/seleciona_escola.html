@@ -19,6 +19,7 @@
  {% endblock script_head %}
 <!-- Modal -->
 <div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  {% include "Escola/partials/mensagens.html" %}
     
   <div class="modal-dialog" >
     <div class="modal-content bg-secondary-subtle win11-window"  >
@@ -53,19 +54,17 @@
             </li>
           </ul>
           <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active bg-p-3 " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-              <div class='p-2 fs-6  text-light col-5 ' >
-                <div class="border p-2 bg-light shadow-sm">
-                  <form class=' p-1' action="" method="post">
-                    {% csrf_token %}
-                    <div class="border ">
-                      {{form.as_p}}   
-                    </div>
-                    <button type="submit" class="btn btn-sm btn-success w-100"> {{button}} {{object}} <i class="fa-solid fa-people-roof"></i></button>     
-                  </form>                    
+            <div class="tab-pane fade show active bg-p-3 " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">              
+              <form class='p-1 d-flex' action="" method="post">
+                {% csrf_token %}
+                <div class="border d-flex align-items-center justify-content-center">
+                  <section>{{form.as_p}}</section>
+                  <section class="fs-1 rounded-2 p-4 text-primary shadow">{{object}}</section>
                 </div>
-              </div> 
+                <button type="submit" class="btn col-3 btn-sm btn-success w-100"> {{button}} <i class="fa-solid fa-people-roof"></i></button>     
+              </form>  
               {% include "Escola/partials/minhaEscola/dados_impressao.html" %}
+              
             </div> 
               <!--Informações Gerais -->
             <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
