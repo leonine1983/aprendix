@@ -3,27 +3,20 @@ from django.views.generic import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
-from datetime import datetime, date
 from django.urls import reverse_lazy
 from .escola_form import Escola_form, EscolaDados_form
 
-
 class UpdateEscola(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Escola
-    #form_class = Alunos_form
     form_class = Escola_form
-    #fields = ['nome']
     template_name = 'Escola/inicio.html'
 
     def get_success_url(self):
         destino = self.request.session['escola_id']
         escola = self.get_object()
         mensagem = f"{escola} atualizada com sucesso!!"
-        messages.success(self.request, mensagem )
-        print(f'olha o objeto {escola.nome_escola}')
-        
+        messages.success(self.request, mensagem )        
         return reverse_lazy('Gestao_Escolar:DadosEscola', kwargs = {'pk':destino})   
-
 
     def form_valid(self, form):
         # Recupera a prefeitura da sessão e atribui ao objeto
@@ -35,13 +28,10 @@ class UpdateEscola(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
                 last_group = user_groups.last()     
                 form.instance.author_created = f'{self.request.user.first_name} {self.request.user.last_name} | {last_group.name}'
             else:
-                form.instance.author_created = f'{self.request.user.first_name} {self.request.user.last_name} | No Group'      
-        
-        # Salva o objeto e armazena o ID
+                form.instance.author_created = f'{self.request.user.first_name} {self.request.user.last_name} | No Group'  
+       
         response = super().form_valid(form)      
         return response
-
-
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -62,6 +52,5 @@ class UpdateEscola(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         context['escola_dados_form'] = EscolaDados_form(instance=escola_admin_instance)
         context['decreto'] = Decreto.objects.filter(destino = self.request.session['escola_id'], Decreto_decretoAtivo__ano_ativo__id = self.request.session['anoLetivo_id'])
         context['page_ajuda'] = "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional."
-
         return context        
         
