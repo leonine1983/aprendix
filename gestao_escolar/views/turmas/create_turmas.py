@@ -12,8 +12,7 @@ from django.contrib import messages
 class Create_turmas(LoginRequiredMixin, CreateView, SuccessMessageMixin):
     model = Turmas
     # fields = ['nome']
-    form_class = Turma_form
-    success_message = "Turma criado com sucesso"
+    form_class = Turma_form    
     template_name = 'Escola/inicio.html'
     
     success_url = reverse_lazy('Gestao_Escolar:GE_Escola_turmas')
@@ -21,6 +20,9 @@ class Create_turmas(LoginRequiredMixin, CreateView, SuccessMessageMixin):
     def form_valid(self, form):
         form.instance.escola = Escola.objects.get(id=self.request.session['escola_id'])
         form.instance.ano_letivo = AnoLetivo.objects.get(id=self.request.session['anoLetivo_id'])
+        turma = form.instance
+        message = f"Turma do {turma} criado com sucesso"        
+        messages.success(self.request, message)
         return super().form_valid(form)
 
 

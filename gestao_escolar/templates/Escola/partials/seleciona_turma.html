@@ -11,8 +11,7 @@
  {% endblock script_head %}
 <!-- Modal -->
 <div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    {% include "Escola/partials/mensagens.html" %}
-    
+    {% include "Escola/partials/mensagens.html" %}    
     <div class="modal-dialog w-100">
     <div class="modal-content bg-secondary-subtle win11-window">
         <div class="modal-header mb-5">
@@ -38,6 +37,7 @@
                 </li>
             </ul>
               <div class="tab-content" id="myTabContent">
+                {% include "Escola/partials/mensagens.html" %}
                 {% if not update %}
                 <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                   <div class='p-2 fs-6 border-danger-subtle border-right d-flex text-light bg-p-3' >

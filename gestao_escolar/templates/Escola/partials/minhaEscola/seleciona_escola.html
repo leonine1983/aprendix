@@ -15,6 +15,25 @@
     border-radius: 0.5rem;
 
   }
+  #visualizaNome {
+    position: relative; /* Necessário para posicionar o pseudo-elemento */
+    border: 2px solid #007bff; /* Adiciona a borda */
+    padding: 20px; /* Ajuste o padding conforme necessário */
+    border-radius: 8px; /* Bordas arredondadas */
+  }
+  
+  #visualizaNome::before {
+    content: "Nome da escola, salvo até o momento"; 
+    position: absolute;
+    top: -20px; /* Ajuste a posição do texto para cima */
+    left: 50%;
+    transform: translateX(-50%); /* Para centralizar o texto */
+    background-color: #007bff; /* Cor de fundo da descrição */
+    color: white;
+    padding: 5px 10px;
+    font-size: 1rem;
+    border-radius: 4px;
+  }
  </style>
  {% endblock script_head %}
 <!-- Modal -->
@@ -59,7 +78,7 @@
                 {% csrf_token %}
                 <div class="border d-flex align-items-center justify-content-center">
                   <section>{{form.as_p}}</section>
-                  <section class="fs-1 rounded-2 p-4 text-primary shadow">{{object}}</section>
+                  <section id="visualizaNome" class="fs-1 rounded-2 p-4 text-primary shadow">{{object}}</section>
                 </div>
                 <button type="submit" class="btn col-3 btn-sm btn-success w-100"> {{button}} <i class="fa-solid fa-people-roof"></i></button>     
               </form>  

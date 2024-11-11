@@ -326,6 +326,9 @@ class Turmas(models.Model):
     quantidade_vagas = models.IntegerField(default=36) 
     vagas_disponiveis = models.IntegerField(null=True)
 
+    class Meta:
+        ordering = ['nome']
+
   
     def __str__(self):
         return f'{self.nome.upper()} {self.descritivo_turma.upper()}'
