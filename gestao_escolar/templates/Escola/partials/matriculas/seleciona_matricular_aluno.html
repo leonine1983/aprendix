@@ -56,6 +56,11 @@ input[type=checkbox]{
             <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="btn btn-primary m-1 "> <i class="fa-thin fa-ballot-check text-light "></i> Escolher outra TURMA</a>
           </li>
           <li>
+            <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_create' %}" class="btn btn-orange m-1 "> <i class="fa-sharp fa-solid fa-people fs-6 txt-p-nav me-2"></i>
+              Cadastrar novo aluno</a>
+          </li>
+                
+          <li>
             <a href="{% url 'Gestao_Escolar:Matricula_turma' turma_ativa.pk %}" class="btn btn-primary m-1 "> <i class="fa-sharp fa-thin fa-print text-light "></i> Imprimir Turma</a>
           </li>
         </ul>             

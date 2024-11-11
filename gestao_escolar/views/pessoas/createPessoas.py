@@ -34,7 +34,6 @@ class PessoasCreateView(LoginRequiredMixin, CreateView):
         )
         user.save()
         professor = Group.objects.get(name = 'Professor')
-        print(f'todos os grupos {Group.objects.all()}')
         user.groups.add(professor)
         messages.success(self.request, f'Acesso ao sistema, liberado para {user.first_name} {user.last_name}')
         return super().form_valid(form)

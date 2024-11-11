@@ -3,7 +3,7 @@ from django import forms
 from django.utils.safestring import mark_safe
 from rh.models import Sexo
 from gestao_escolar.models import (Alunos, Etnia, Nacionalidade,
-                                     Pais_origem, Deficiencia_aluno)
+                                     Pais_origem, Deficiencia_aluno, Cidade)
 
 
 choices = {
@@ -69,8 +69,9 @@ class Alunos_form_etapa2(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1', 'type': 'tel'}),
         required=False
     )
-    naturalidade = forms.CharField(        
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
+    naturalidade = forms.ModelChoiceField(        
+        queryset=Cidade.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
     )
     nacionalidade = forms.ModelChoiceField(
         queryset=Nacionalidade.objects.all(),

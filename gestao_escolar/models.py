@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from datetime import timedelta, date, datetime
 from django.contrib.auth.models import User
 from django.db.models.signals import post_migrate, post_save
 from django.dispatch import receiver
@@ -131,8 +132,8 @@ class Alunos(models.Model):
     nome_mae = models.CharField(max_length=120, null=False, default='Nome completo da Mãe', verbose_name='Nome da Mãe*')
     tel_celular_mae = models.CharField(max_length=30, null=True, verbose_name='Nº do celular do mãe*')
     nome_pai = models.CharField(max_length=120, null=True, default='Nome completo da Pai')
-    tel_celular_pai = models.CharField(max_length=30, null=True)    
-    naturalidade = models.CharField(max_length=30, null=False, default='Cidade onde nasceu')
+    tel_celular_pai = models.CharField(max_length=30, null=True)      
+    naturalidade = models.ForeignKey(Cidade, null=True, on_delete=models.CASCADE, related_name="related_naturalidade", verbose_name='Cidade onde nasceu')
     nacionalidade = models.ForeignKey(Nacionalidade, on_delete=models.CASCADE, default=1, verbose_name='Nacionalidade*')
     aluno_exterior = models.BooleanField(default=False, verbose_name="Marque se o aluno veio do Exterior")
     pais_origem = models.ForeignKey(Pais_origem, blank=True, null=True, on_delete=models.CASCADE)
@@ -181,6 +182,13 @@ class Alunos(models.Model):
     local_diferenciado = models.CharField(max_length=2, choices=choice_justifica_falta_document, null=True, blank=True, verbose_name='Local Diferenciado')
     obito = models.BooleanField(null=True, blank=True,default=False)
     data_obito = models.DateField(null=True, blank=True)
+
+
+    def e_aniversario_hoje(self):
+        hoje = datetime.now().date()
+        return (self.data_nascimento and 
+                self.data_nascimento.month == hoje.month and 
+                self.data_nascimento.day == hoje.day)
 
     def __str__(self):
         return self.nome_completo 

@@ -13,7 +13,6 @@ class Update_Alunos(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     form_class = Alunos_atualiza
     #form_class = Turma_form
     template_name = 'Escola/inicio.html'
-    success_message = "foi atualizado com sucesso"
     
     def get_success_url(self):
         aluno_id = self.object.id 
@@ -23,8 +22,9 @@ class Update_Alunos(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         data_nascimento = form.cleaned_data['data_nascimento']
         ano_atual = date.today().year
         idade = ano_atual - data_nascimento.year - ((ano_atual, data_nascimento.month, data_nascimento.day) < (ano_atual, date.today().month, date.today().day))
-        form.instance.idade = idade
-        print(f'Essa é a idade do aluno: {idade}')        
+        form.instance.idade = idade    
+        aluno = form.instance.nome_completo
+        messages.success(self.request, f"Parabéns! As informações do aluno {aluno} foram atualizadas com sucesso!") 
         return super().form_valid(form)
 
 

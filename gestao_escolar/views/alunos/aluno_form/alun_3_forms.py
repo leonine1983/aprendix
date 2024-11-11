@@ -30,7 +30,7 @@ class Alunos_form_etapa3(forms.ModelForm):
         disabled = True
     )
     data_entrada_no_pais = forms.DateField(
-        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col2 m-2 rounded-1', 'type': 'date'}),      
+        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col2 m-2 rounded-1'}),      
         required=False,
         disabled = True
     )
