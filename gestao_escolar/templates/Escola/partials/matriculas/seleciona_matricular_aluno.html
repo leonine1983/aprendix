@@ -154,8 +154,9 @@ input[type=checkbox]{
                 {{form.media}}
                 <div>
                   {% for field in form %}
-                    <section>
+                    <section>{{form.media}}
                         {{ field.label_tag }}
+
                         {{ field }}
                         {{ field.errors }}        
                     </section>                 

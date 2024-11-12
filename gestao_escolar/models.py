@@ -129,9 +129,9 @@ class Alunos(models.Model):
     cidade = models.ForeignKey(Cidade, null=True, on_delete=models.CASCADE)    
     cidade_nascimento = models.ForeignKey(Cidade, related_name="cidade_nascimento",verbose_name='Cidade onde nasceu', null=True, on_delete=models.CASCADE)
     estado = models.ForeignKey(Uf_Unidade_Federativa, related_name="estado_nascimento",verbose_name='Estado onde nasceu', null=True, on_delete=models.CASCADE)
-    nome_mae = models.CharField(max_length=120, null=False, default='Nome completo da Mãe', verbose_name='Nome da Mãe*')
+    nome_mae = models.CharField(max_length=120, null=False, default='', verbose_name='Nome da Mãe*')
     tel_celular_mae = models.CharField(max_length=30, null=True, verbose_name='Nº do celular do mãe*')
-    nome_pai = models.CharField(max_length=120, null=True, default='Nome completo da Pai')
+    nome_pai = models.CharField(max_length=120, null=True, default='')
     tel_celular_pai = models.CharField(max_length=30, null=True)      
     naturalidade = models.ForeignKey(Cidade, null=True, on_delete=models.CASCADE, related_name="related_naturalidade", verbose_name='Cidade onde nasceu')
     nacionalidade = models.ForeignKey(Nacionalidade, on_delete=models.CASCADE, default=1, verbose_name='Nacionalidade*')
@@ -139,7 +139,7 @@ class Alunos(models.Model):
     pais_origem = models.ForeignKey(Pais_origem, blank=True, null=True, on_delete=models.CASCADE)
     data_entrada_no_pais= models.DateField(null=True, blank=True)  
     documento_estrangeiro = models.CharField(max_length=30, null=True, blank=True)
-    deficiencia_aluno = models.ForeignKey(Deficiencia_aluno, on_delete=models.CASCADE, null=True, verbose_name='Informe se o aluno possui deficiência*')    
+    deficiencia_aluno = models.ForeignKey(Deficiencia_aluno, on_delete=models.CASCADE, null=True, verbose_name='Informe se o aluno possui deficiência*')        
     tipo_sanguineo = models.CharField(max_length=3, choices=choices, null=True, )
     beneficiario_aux_Brasil = models.BooleanField(default=False,null=True, verbose_name='Selecione se o aluno é beneficiário do Bolsa Família/Aux. Brasil')
     necessita_edu_especial = models.BooleanField(default=False,null=True, verbose_name='Selecione se o aluno precisa de algum atendimento especial')
@@ -149,7 +149,11 @@ class Alunos(models.Model):
     vacina_covid_19 = models.BooleanField(default=False, null=True,verbose_name='Selecione se o aluno tomou vacina contra a covid 19' )
     dose_vacina_covid_19 = models.IntegerField(null=True, blank=True, verbose_name='Preencha se o aluno tomou alguma dose da covid 19' )
     res_cadastro = models.CharField(max_length=120, null=True, default='Quem criou o cadastro')    
-    res_atualiza_cadastro = models.CharField(max_length=120, null=True, default='Quem atualizou')    
+    res_atualiza_cadastro = models.CharField(max_length=120, null=True, default='Quem atualizou')   
+
+    espectro_autista = models.BooleanField(default=False, null=True,verbose_name='Por favor, informe se o aluno possui Transtorno do Espectro Autista (TEA), para que possamos oferecer o apoio necessário') 
+    documento_espectro_autista = models.FileField(upload_to='documentos_aluno_TEA/', null=True, blank=True, verbose_name="Caso o aluno seja autista ou possua qualquer deficiência que requeira comprovação, faça o upload do laudo médico ou documentos pertinentes.")
+    foto_aluno = models.ImageField(upload_to='imagem_aluno/', null=True, blank=True, verbose_name="Selecione uma imagem de perfil para o aluno.")
 
     # Documentação
     RG = models.CharField(max_length=14, null=True, blank=True, default='000.000.00-00')    

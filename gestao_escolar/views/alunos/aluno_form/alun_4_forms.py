@@ -30,7 +30,16 @@ class Alunos_form_etapa4(forms.ModelForm):
     choices=choices,
     widget=forms.Select(attrs={'class': ' border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1'}),
     required=False
+    ) 
+
+    espectro_autista = forms.BooleanField(   
+    widget = forms.CheckboxInput(attrs={'class': 'border border-info p-1 pb-1 bg-transparent text-info col m-2 rounded-1'}),           
+    )
+
+    documento_espectro_autista = forms.FileField(
+        widget=forms.FileInput(attrs={'class': 'border border-info p-1 pb-1 bg-transparent text-info col m-2 rounded-1'})
     )   
+    
     necessita_edu_especial = forms.BooleanField(   
     label='Selecione se o aluno necessita de educação especial',
     widget = forms.CheckboxInput(attrs={'class': 'border border-info p-1 pb-1 bg-transparent text-info col m-2 rounded-1'}),
@@ -71,5 +80,5 @@ class Alunos_form_etapa4(forms.ModelForm):
    
     class Meta:
         model = Alunos
-        fields = ['deficiencia_aluno', 'tipo_sanguineo', 'necessita_edu_especial', 'sindrome_de_Down', 'vacina_covid_19', 'dose_vacina_covid_19']
+        fields = ['deficiencia_aluno', 'tipo_sanguineo', 'necessita_edu_especial', 'sindrome_de_Down', 'vacina_covid_19', 'dose_vacina_covid_19', 'espectro_autista', 'documento_espectro_autista']
         

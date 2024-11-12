@@ -30,7 +30,8 @@ class Delete_Matriculas(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
         ]
         msg = random.choice(mensagens_cancelamento)
         messages.warning(self.request, msg)
-        messages.success(self.request, f'Matrícula do aluno {self.get_object.aluno} foi cancelada com sucesso')
+        aluno = self.object.aluno
+        messages.success(self.request, f'Matrícula do aluno {aluno} foi cancelada com sucesso')
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -41,7 +42,8 @@ class Delete_Matriculas(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
         context['titulo_page'] = 'Excluir Matrícula'
         context['sub_Info_page'] = f"Você tem certerza que deseja excluir a matrícula de <b class='text-capitalize '>{aluno}</b> do {aluno_turma}"
         context['table'] = True   
-        context['bottom'] = "Excluí matricula de"   
+        context['bottom'] = "Confirmar cancelamento de matrícula"  
+        context['buttom_color'] = "btn-danger"   
         context['btn_bg'] = " btn-danger " 
         context['conteudo_page'] = "matricula_update_or_delete"               
         context['page_ajuda'] = "<div class='border bg-secondary p-2'><h2>Pessoar a ser contratada</h2><div>"        

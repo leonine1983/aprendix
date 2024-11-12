@@ -68,14 +68,19 @@ class Alunos_atualiza(forms.ModelForm):
     )
     naturalidade = forms.ModelChoiceField(        
         queryset=Cidade.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
+        widget=forms.Select(attrs={'class': ' border border-info p-1 pb-1 bg-transparent text-info col m-2 rounded-1'}),
     )
     nacionalidade = forms.ModelChoiceField(
         queryset=Nacionalidade.objects.all(),
         widget=forms.Select(attrs={'class': ' border border-info p-1 pb-1 bg-transparent text-info col m-2 rounded-1'}),
     )
+
+    foto_aluno = forms.ImageField(
+        widget=forms.FileInput(attrs={'class': ' border border-info p-1 pb-1 bg-transparent text-info col m-2 rounded-1'})
+    )
+    
     
     class Meta:
         model = Alunos
         fields = ['nome_social', 'data_nascimento', 'sexo', 'etnia', 'tel_celular_aluno', 'email', 'tel_celular_mae', 'nome_pai', 'tel_celular_pai',
-                  'naturalidade', 'nacionalidade']
+                  'naturalidade', 'nacionalidade', 'foto_aluno']

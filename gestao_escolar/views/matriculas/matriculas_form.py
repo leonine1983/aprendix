@@ -3,6 +3,7 @@ from django import forms
 from rh.models import Escola
 from gestao_escolar.models import Turmas,Alunos, Remanejamento, Serie_Escolar, Matriculas, TamanhoRoupa
 
+
 # widget personalizado que usa as classes (form-control, border, p-3, pb-3 e bg-transparent) para ser atribuido ao campo 'tempo_meses' 
 
 escola_fora = {
@@ -166,6 +167,7 @@ class Matricula_form_retorno_aluno(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1'}),
         required=False  
     )
+    
     obervacao = forms.CharField(
         widget=forms.Textarea(attrs={'class': 'border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1'}),
         required=False  
