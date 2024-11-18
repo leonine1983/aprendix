@@ -43,19 +43,33 @@
                                     <th>Alunos matriculados</th>
                                     <th>Limite de Vagas</th>
                                     <th>Vagas disponíveis</th>
+                                    <th>Autistas</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for r in request.session.matriculas_all  %}
+                                {% for turma in request.session.matriculas_all %}
                                 <tr>
-                                    <td>{{r.nome}} <span class='text-uppercase'>{{r.descritivo_turma}}</span></td>
-                                    <td>{{r.related_matricula_turma.all|length}}</td>
-                                    <td>{{r.quantidade_vagas}}</td>
-                                    <td>{% if r.vagas_disponiveis %}{{r.vagas_disponiveis}}{% else %}{{r.quantidade_vagas}}{% endif %}</td>
+                                    <td>{{ turma.nome }} <span class='text-uppercase'>{{ turma.descritivo_turma }}</span></td>
+                                    <td>{{ turma.matriculas }}</td>
+                                    <td>{{ turma.quantidade_vagas }}</td>
+                                    <td>{{ turma.vagas_disponiveis }}</td>
+                                    <td>{{ turma.autistas }}</td>
                                 </tr>
-                                {% endfor %}    
+                                {% endfor %}
+                                
+                                <!-- Linha de Totais -->
+                                <tr class='bg-success-subtle text-black fs-2'>
+                                    <td><strong>Total</strong></td>
+                                    <td>{{ request.session.totais.total_matriculas }}</td>
+                                    <td>{{ request.session.totais.total_vagas }}</td>
+                                    <td>{{ request.session.totais.vagas_disponiveis_total }}</td> <!-- Vagas disponíveis calculadas -->
+                                    <td>{{ request.session.totais.total_autistas }}</td>
+                                </tr>
                             </tbody>
-                        </table>                        
+                        </table>
+                        
+                        
+                                            
                     </div>
                 </div>      
                 

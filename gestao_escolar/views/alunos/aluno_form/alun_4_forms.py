@@ -33,11 +33,13 @@ class Alunos_form_etapa4(forms.ModelForm):
     ) 
 
     espectro_autista = forms.BooleanField(   
-    widget = forms.CheckboxInput(attrs={'class': 'border border-info p-1 pb-1 bg-transparent text-info col m-2 rounded-1'}),           
+    widget = forms.CheckboxInput(attrs={'class': 'border border-info p-1 pb-1 bg-transparent text-info col m-2 rounded-1'}),    
+    required=False
     )
 
     documento_espectro_autista = forms.FileField(
-        widget=forms.FileInput(attrs={'class': 'border border-info p-1 pb-1 bg-transparent text-info col m-2 rounded-1'})
+        widget=forms.FileInput(attrs={'class': 'border border-info p-1 pb-1 bg-transparent text-info col m-2 rounded-1'}),
+        required=False
     )   
     
     necessita_edu_especial = forms.BooleanField(   

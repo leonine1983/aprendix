@@ -78,9 +78,16 @@ class Alunos_atualiza(forms.ModelForm):
     foto_aluno = forms.ImageField(
         widget=forms.FileInput(attrs={'class': ' border border-info p-1 pb-1 bg-transparent text-info col m-2 rounded-1'})
     )
+
+    # Novos adicionados
+    espectro_autista = forms.BooleanField(   
+    widget = forms.CheckboxInput(attrs={'class': 'border border-info p-1 pb-1 bg-transparent text-info col m-2 rounded-1'}),    
+    required=False
+    )
+
     
     
     class Meta:
         model = Alunos
         fields = ['nome_social', 'data_nascimento', 'sexo', 'etnia', 'tel_celular_aluno', 'email', 'tel_celular_mae', 'nome_pai', 'tel_celular_pai',
-                  'naturalidade', 'nacionalidade', 'foto_aluno']
+                  'naturalidade', 'nacionalidade', 'foto_aluno', 'espectro_autista']
