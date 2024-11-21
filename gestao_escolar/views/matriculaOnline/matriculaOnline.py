@@ -16,4 +16,4 @@ def matricular_aluno(request, aluno_id):
         matricula.save()
         return render(request, 'matricula_online/matricula_confirmada.html', {'aluno': aluno})
 
-    return render(request, 'matricula_online/matricular_aluno.html', {'aluno': aluno})
+    return render(request, 'Escola/matriculaOnline/matricular_aluno.html', {'aluno': aluno})

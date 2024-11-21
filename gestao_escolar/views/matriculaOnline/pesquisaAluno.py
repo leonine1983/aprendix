@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from gestao_escolar.models import Alunos, MatriculasOnline
 from django.db.models import Q
 
@@ -15,8 +16,8 @@ def pesquisar_aluno(request):
         )
 
         if alunos.exists():
-            return render(request, 'matricula_online/resultados_aluno.html', {'alunos': alunos})
+            return render(request, 'Escola/matriculaOnline/resultados_aluno.html', {'alunos': alunos})
         else:
-            return redirect('cadastro_aluno_etapa1')
+            return redirect(reverse_lazy('Gestao_Escolar:cadastro_aluno_etapa1', Kwargs={'nome': nome, 'mae':nome_mae}))
 
     return render(request, 'Escola/matriculaOnline/pesquisar_aluno.html')
