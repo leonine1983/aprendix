@@ -418,8 +418,20 @@ class TamanhoRoupa(models.Model):
         return self.nome
     
 
+class MatriculasOnline(models.Model):    
+    cod_matriculaOline = models.TextField(max_length=200, null=True, default='2025-001')
+    aluno = models.ForeignKey(Alunos, related_name='related_matriculaOnline_alunos', on_delete=models.CASCADE)
+    serie =  models.ForeignKey(Serie_Escolar, related_name="related_serie_matricula", on_delete=models.CASCADE)
+    ano_letivo = models.ForeignKey(AnoLetivo, related_name="related_anoLetivoOnline", on_delete=models.CASCADE)
+    matriculaConfirmada = models.BooleanField(default=False)
+    escola = models.ForeignKey('rh.Escola', related_name='OnlineMatriculaEscola', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.aluno.nome_completo
+
+
 class Matriculas(models.Model):
-    cod_matricula = models.TextField(max_length=200, null=True, default='2023-001')
+    cod_matricula = models.TextField(max_length=200, null=True, default='2025-001')
     aluno = models.ForeignKey(Alunos, related_name='related_matricula_alunos', on_delete=models.CASCADE)
     turma = models.ForeignKey(Turmas, related_name='related_matricula_turma', on_delete=models.CASCADE)
     camisa_tamanho = models.ForeignKey(TamanhoRoupa, related_name='related_camisa', null=True, on_delete=models.CASCADE)

@@ -1,0 +1,10 @@
+<h2>Resultados da Pesquisa</h2>
+{% if alunos %}
+    <ul>
+        {% for aluno in alunos %}
+            <li><a href="{% url 'matricular_aluno' aluno.id %}">{{ aluno.nome_completo }}</a></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Aluno não encontrado. <a href="{% url 'cadastro_aluno_etapa1' %}">Clique aqui para cadastrar o aluno.</a></p>
+{% endif %}
