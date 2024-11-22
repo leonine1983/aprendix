@@ -1,6 +1,15 @@
 {% extends "Admin_Acessos/base_template.html" %}
 
 {% block main %}
+<style>
+    label{
+        color:#343a40;                
+    }
+    .alert{
+        color: #343a40;
+    }
+</style>
+{% include "Escola/partials/mensagens.html" %}
     <div class="container p-4  " style="background-color: #343a40; color: #fff; border-radius: 8px; width: 30rem !important;">
         <h2 class="text-center mb-4">Pesquisar Aluno para Matrícula Online</h2>
 
@@ -11,24 +20,10 @@
         <div class="alert alert-info" role="alert">
             <strong>Importante:</strong> Verifique se os dados estão corretos antes de enviar. Se o aluno já estiver registrado, você será redirecionado para a página de matrícula.
         </div>
-
-        <form method="post">
+        
+        <form method="post" class="text-start text-dark">
             {% csrf_token %}
-            <div class="mb-3">
-                <label for="nome" class="form-label">Nome Completo do Aluno:</label>
-                <input type="text" class="form-control" name="nome" required placeholder="Ex: João Silva">
-            </div>
-
-            <div class="mb-3">
-                <label for="data_nascimento" class="form-label">Data de Nascimento:</label>
-                <input type="date" class="form-control" name="data_nascimento" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="nome_mae" class="form-label">Nome da Mãe:</label>
-                <input type="text" class="form-control" name="nome_mae" required placeholder="Ex: Maria Silva">
-            </div>
-
+            {{form.as_p}} 
             <div class="text-center">
                 <button type="submit" class="btn btn-primary btn-lg">Pesquisar</button>
             </div>

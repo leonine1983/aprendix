@@ -6,7 +6,8 @@ import string
 from rh.models import Uf_Unidade_Federativa, Sexo
 from gestao_escolar.models import (Alunos, Cidade)
 import re
-from django.core.exceptions import ValidationError                                     
+from django.core.exceptions import ValidationError   
+from django.contrib import messages                             
 
 choices = {
     ('1','A+'),
@@ -20,30 +21,11 @@ choices = {
     ('0','Não informado')
 }
 
-
-import re
-from django.core.exceptions import ValidationError
-
 # Validação de formulário
 def validate_caracteres_especiais(value):
     if re.search(r"[~`´'^]", value):
         raise ValidationError('Não é permitido usar acentos ou caracteres especiais (~, `, ´, ^).')
 
-
- 
-from django import forms
-from django.utils.safestring import mark_safe
-from django.core.exceptions import ValidationError                                     
-import re
-from gestao_escolar.models import Alunos
-
-
-
-import re
-from django import forms
-from django.utils.safestring import mark_safe
-from gestao_escolar.models import Alunos
-from django.contrib import messages
 
 class Alunos_form(forms.ModelForm):
     nome_completo = forms.CharField(
@@ -57,7 +39,7 @@ class Alunos_form(forms.ModelForm):
         nome_completo = self.cleaned_data.get('nome_completo')
         # Expressão regular para bloquear caracteres especiais e acentuados
         if re.search(r"[^a-zA-ZÇç\s]", nome_completo):
-            mensagem_erro = "Não é permitido o uso de acentos, números ou caracteres especiais ao cadastrar o aluno. Por favor, acesse 'NOVO ALUNO' e tente novamente."        
+            mensagem_erro = "⚠️ Percebemos que você usou acento no 'Nome completo' do aluno. Evite acentos, números e caracteres especiais ❌ e tente novamente."        
             raise forms.ValidationError(mensagem_erro)
         return nome_completo   
     
@@ -72,22 +54,19 @@ class Alunos_form(forms.ModelForm):
     def clean_nome_mae(self):
         nome_mae = self.cleaned_data.get('nome_mae')
         if re.search(r"[^a-zA-ZÇç\s]", nome_mae):
-            mensagem_erro = "Não é permitido usar acentos, números ou caracteres especiais."    
+            mensagem_erro = "⚠️ Percebemos que você usou acento no 'Nome da mãe' do aluno. Evite acentos, números e caracteres especiais ❌ e tente novamente. Obrigado pela colaboração! 😄"    
             raise forms.ValidationError(mensagem_erro)
-        return nome_mae
-
-
-    
-    
+        return nome_mae    
+    """
     class Meta:
         model = Alunos
-        fields = ['nome_completo', 'nome_mae']
-
+        fields = ['nome_completo', 'nome_mae']"""    
 
     class Meta:
         validators=[validate_caracteres_especiais],  
         model = Alunos
         fields = ['nome_completo', 'nome_mae']
+
 
 choice_estado_civil = {
     ('1', 'Solteiro'),

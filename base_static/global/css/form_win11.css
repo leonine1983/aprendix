@@ -1,0 +1,129 @@
+
+
+/* Forms windwosForm*/
+.win11-form {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f3f3f3;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 75%;
+    margin:1% auto;
+  }
+  .win11-form label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  .win11-form input[type="text"],
+  .win11-form input[type="time"],
+  .win11-form input[type="date"],
+  .win11-form select,
+  .win11-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif;
+    box-sizing: border-box;
+  }
+  .win11-form input[type="text"]:focus,
+  .win11-form input[type="time"]:focus,
+  .win11-form input[type="date"]:focus,
+  .win11-form select:focus,
+  .win11-form textarea:focus {
+    border-color: #0078d4;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 120, 212, 0.5);
+  }
+  .win11-form button {
+    background-color: #0078d4;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+  }
+  .win11-form button:hover {
+    background-color: #005a9e;
+  }
+  
+  /* Estilo dos elementos de formulário */
+  .win11-input,
+  .win11-select,
+  .win11-button, .win11-table {
+  width: calc(100% - 20px);
+  padding: 8px 10px;
+  margin: 4px 0;
+  font-family: "Segoe UI", Tahoma, Geneva, sans-serif;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  .win11-input:focus,
+  .win11-select:focus,
+  .win11-button:focus {
+  border-color: #0078d4;
+  outline: none;
+  }
+  .win11-button {
+  background-color: #0078d4;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  }
+  .win11-button:hover {
+  background-color: #005a9e;
+  }
+  /* Estilo do campo de busca Windows 11 */
+  .win11-search-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem auto;
+  }
+  .win11-search-wrapper-inner {
+  display: flex;
+  align-items: center;
+  border: 1px solid #0078d4;
+  border-radius: 4px;
+  background-color: white;
+  padding: 4px;
+  }
+  .win11-search-input {
+  border: none;
+  outline: none;
+  padding: 6px;
+  font-size: 14px;
+  width: 200px;
+  }
+  .win11-search-button {
+  background-color: #0078d4;
+  color: white;
+  border: none;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  }
+  .win11-search-button:hover {
+  background-color: #005a9e;
+  }
+  
+  /* Extras */
+  .e_aniversario{
+    background-color: #ffeb3b; /* Amarelo brilhante para destaque */
+  color: #d32f2f;            /* Vermelho para o texto */
+  text-align: center;        /* Centralizar o texto */
+  border: 1px solid #c49494; /* Borda vermelha */
+  border-radius: 5px;       /* Bordas arredondadas */
+  padding: 2px;          /* Espaçamento interno */
+  }
