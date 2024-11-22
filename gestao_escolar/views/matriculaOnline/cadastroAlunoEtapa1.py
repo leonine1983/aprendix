@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from gestao_escolar.models import Alunos
-from gestao_escolar.views.alunos.partials_alunos.alunos_form import Aluno_documento_form
+from .matricualOnline_form import Aluno_documento_form
 
 
 def cadastro_aluno_etapa1(request, nome, mae):
@@ -20,5 +20,5 @@ def cadastro_aluno_etapa1(request, nome, mae):
         aluno.save()
         return redirect('cadastro_aluno_etapa2', aluno_id=aluno.id)
     
-    return render(request, 'Escola/matriculaOnline/etapa1.html', {'form':form})
+    return render(request, 'Escola/matriculaOnline/etapa1.html', {'form':form, 'nomeAluno': nome, 'nomeMae':mae})
 

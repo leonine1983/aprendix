@@ -461,7 +461,46 @@ def post_migrate_setup(sender, **kwargs):
     if not Cidade.objects.exists():
         try:
             uf_unidade_federativa = Uf_Unidade_Federativa.objects.get(id=5)
-            Cidade.objects.create(nome_estado=uf_unidade_federativa, nome_cidade="Vera Cruz")
+
+            cidades_bahia = [
+                'Abaíra', 'Acajutiba', 'Adustina', 'Água Fria', 'Aiquara', 'Alagoinhas', 'Alcobaça', 'Almadina', 'Amargosa', 
+                'Amélia Rodrigues', 'Anagé', 'Andaraí', 'Angical', 'Anguera', 'Antas', 'Antônio Cardoso', 'Antônio Gonçalves', 
+                'Aporá', 'Aracatu', 'Araçás', 'Arataca', 'Aratuípe', 'Aurelino Leal', 'Baianópolis', 'Baixa Grande', 'Banzaê', 
+                'Barra', 'Barra da Estiva', 'Barra do Choça', 'Barra do Mendes', 'Barro Alto', 'Barrocas', 'Belmonte', 'Belo Campo', 
+                'Biritinga', 'Boa Nova', 'Boa Vista do Tupim', 'Bom Jesus da Lapa', 'Bom Jesus da Serra', 'Boninal', 'Bonito', 
+                'Boquira', 'Botuporã', 'Brejões', 'Brejolândia', 'Camaçari', 'Camacan', 'Candeias', 'Candido Motta', 'Cansanção', 
+                'Capela do Alto Alegre', 'Caraíbas', 'Caravelas', 'Cardeal da Silva', 'Carinhanha', 'Casa Nova', 'Castro Alves', 
+                'Catolândia', 'Catu', 'Cícero Dantas', 'Cipó', 'Coaraci', 'Coco', 'Conceição da Feira', 'Conceição do Almeida', 
+                'Conde', 'Condeúba', 'Contendas do Sincorá', 'Coração de Maria', 'Crisópolis', 'Cristópolis', 'Cururupe', 'Dário Meira', 
+                'Dias d\'Ávila', 'Dom Basílio', 'Dom Macedo Costa', 'Elísio Medrado', 'Encruzilhada', 'Entre Rios', 'Esplanada', 'Euclides da Cunha', 
+                'Eunápolis', 'Fátima', 'Feira de Santana', 'Filadélfia', 'Formosa do Rio Preto', 'Gandu', 'Gavião', 'Gentio do Ouro', 'Glória', 
+                'Gongogi', 'Governador Mangabeira', 'Guaratinga', 'Heliópolis', 'Ibotirama', 'Icaraí', 'Ichu', 'Igaporã', 'Igrapiúna', 'Iguaí', 
+                'Ilhéus', 'Inhambupe', 'Ipecaetá', 'Ipiaú', 'Ipirá', 'Iraquara', 'Irará', 'Irecê', 'Itabela', 'Itaberaba', 'Itabuna', 'Itacaré', 
+                'Itaeté', 'Itagi', 'Itagibá', 'Itajuípe', 'Itamaraju', 'Itanagra', 'Itaparica', 'Itapé', 'Itapetinga', 'Itapicuru', 'Itiruçu', 
+                'Itororó', 'Ituaçu', 'Ituberá', 'Jacobina', 'Jaguaçu', 'Jaguarari', 'Jandaíra', 'Jequié', 'Jeremoabo', 'Jiquiriçá', 'João Dourado', 
+                'Juazeiro', 'Jussara', 'Jussiape', 'Lafaiete Coutinho', 'Lagoa Real', 'Laje', 'Laje do Muriaé', 'Lencóis', 'Licínio de Almeida', 
+                'Livramento de Nossa Senhora', 'Luís Eduardo Magalhães', 'Macajuba', 'Macarani', 'Macaúbas', 'Madre de Deus', 'Maetinga', 'Mairi', 
+                'Malhada', 'Malhada de Pedras', 'Manoel Vitorino', 'Maracás', 'Maragogipe', 'Maraú', 'Marcionílio Souza', 'Mascote', 'Mata de São João', 
+                'Matina', 'Medeiros Neto', 'Miguel Calmon', 'Milagres', 'Mirangaba', 'Morro do Chapéu', 'Mortugaba', 'Mucugê', 'Mucuri', 'Mundo Novo', 
+                'Muniz Ferreira', 'Muquém de São Francisco', 'Muritiba', 'Mundo Novo', 'Nazaré', 'Nilo Peçanha', 'Nordestina', 'Nova Canaã', 
+                'Nova Fátima', 'Nova Ibiá', 'Nova Itarana', 'Nova Redenção', 'Nova Soure', 'Novo Horizonte', 'Olindina', 'Oliveira dos Brejinhos', 
+                'Ourolândia', 'Palmeiras', 'Paramirim', 'Paratinga', 'Paripiranga', 'Pau Brasil', 'Paulo Afonso', 'Pedrão', 'Pedro Alexandre', 'Piatan', 
+                'Pilão Arcado', 'Pindaí', 'Pintadas', 'Pojuca', 'Ponto Novo', 'Porto Seguro', 'Potiraguá', 'Prado', 'Presidente Jânio Quadros', 
+                'Presidente Tancredo Neves', 'Queimadas', 'Rafael Jambeiro', 'Remanso', 'Retirolândia', 'Riachão das Neves', 'Riachão do Jacuípe', 
+                'Ribeira do Pombal', 'Ribeirão do Largo', 'Rio de Contas', 'Rio Real', 'Salinas', 'Salvador', 'Santa Bárbara', 'Santa Brígida', 
+                'Santa Cruz Cabrália', 'Santa Cruz da Vitória', 'Santa Inês', 'Santa Luzia', 'Santa Maria da Vitória', 'Santana', 'Santanópolis', 
+                'Santo Amaro', 'Santo Estêvão', 'São Desidério', 'São Domingos', 'São Félix', 'São Felipe', 'São Francisco do Conde', 'São Gonçalo do Amarante',
+                'São João do Paraíso', 'São José da Vitória', 'São Miguel das Matas', 'São Sebastião do Passé', 'Sapeaçu', 'Santo Antônio de Jesus', 
+                'São Sebastião', 'Sítio do Mato', 'Sítio do Quinto', 'Sobradinho', 'Tanhaçu', 'Tanhaípe', 'Teixeira de Freitas', 'Teodoro Sampaio', 
+                'Tremedal', 'Tucano', 'Ubaíra', 'Ubatã', 'Uibaí', 'Utinga', 'Valença', 'Valente', 'Várzea da Roça', 'Várzea do Poço', 'Vera Cruz', 
+                'Vitória da Conquista'
+            ]
+
+            for cidade in cidades_bahia:
+                Cidade.objects.create(nome_estado=uf_unidade_federativa, nome_cidade=cidade)         
+
+
+
         except Uf_Unidade_Federativa.DoesNotExist:
             print("UF Unidade Federativa com ID 5 não encontrada.")
 
