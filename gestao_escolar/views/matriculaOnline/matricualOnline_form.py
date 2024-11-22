@@ -30,7 +30,7 @@ class Alunos_form(forms.ModelForm):
     nome_completo = forms.CharField(
         label='Nome Completo (Igual ao do RG bem assim):',
         widget=forms.TextInput(attrs={
-            'class': 'form-control border border-info p-3 pb-3  text-uppercase col m-2 rounded-1',
+            'class': ' border border-info p-3 pb-3  text-uppercase col m-2 rounded-1',
             'autocomplete': 'off'}),        
     )
     
@@ -46,7 +46,7 @@ class Alunos_form(forms.ModelForm):
     nome_mae = forms.CharField(      
         label=mark_safe('<i class="fa-solid fa-user-tie-hair"></i> Mãe'),
         widget=forms.TextInput(attrs={
-            'class': 'form-control border border-info p-3 pb-3  text-uppercase col m-2 rounded-1',
+            'class': ' border border-info p-3 pb-3  text-uppercase col m-2 rounded-1',
             'autocomplete': 'off'}),
     )
 
@@ -106,12 +106,12 @@ class Aluno_documento_form(forms.ModelForm):
     )
     RG = forms.CharField(
         label='Número do RG',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3   col m-2 rounded-1'}),
+        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
         required=False
     )
     RG_emissao = forms.DateField(
         label = "Data de emissão do RG",
-        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3   col2 m-2 rounded-1', 'type': 'date'}), 
+        widget=forms.DateInput(attrs={'class': ' border border-info p-3 pb-3   col2 m-2 rounded-1', 'type': 'date'}), 
         required=False 
     )
     RG_UF = forms.ModelChoiceField(
@@ -122,12 +122,12 @@ class Aluno_documento_form(forms.ModelForm):
     )
     orgao_emissor = forms.CharField(
         label="Órgão Emissor",
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3   col m-2 rounded-1'}),
+        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
         required=False
     )
     rua = forms.CharField(
         label="Rua, Av., Travessa",
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3   col m-2 rounded-1'})        
+        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'})        
     )
     estado = forms.ModelChoiceField(
         queryset = Uf_Unidade_Federativa.objects.all(),
@@ -141,18 +141,18 @@ class Aluno_documento_form(forms.ModelForm):
     )
     renda_familiar = forms.CharField(
         label='Renda Familiar',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3   col m-2 rounded-1'}),
+        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
         required=False
     )
   
     cartao_nacional_saude_cns = forms.CharField(
         label='Cartão Nacional de Saúde / CNS',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3   col m-2 rounded-1'}),
+        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
         required=False
     )
     nis = forms.CharField(
         label='NIS',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3   col m-2 rounded-1'}),
+        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
         required=False
     )
  
@@ -170,42 +170,42 @@ class Aluno_documento_form(forms.ModelForm):
     )
     numero_certidao = forms.CharField(
         label='Número da Certidão',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3   col m-2 rounded-1'}),
+        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
         required=False
     )
     livro = forms.CharField(
         label='Livro',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3   col m-2 rounded-1'}),
+        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
         required=False
     )
     folha = forms.CharField(
         label='Folha',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3   col m-2 rounded-1'}),
+        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
         required=False
     )
     termo = forms.CharField(
         label='Termo',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3   col m-2 rounded-1'}),
+        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
         required=False
     )
     emissao = forms.DateField(
         label = "Data de emissão do RG",
-        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3  col2 m-2 rounded-1'}), 
+        widget=forms.DateInput(attrs={'class': ' border border-info p-3 pb-3  col2 m-2 rounded-1'}), 
         required=False 
     )
     distrito_certidao = forms.CharField(
         label='Distrito',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3   col m-2 rounded-1', }),
+        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1', }),
         required=False
     )
     cartorio = forms.CharField(
         label='Cartório',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3   col m-2 rounded-1'}),
+        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
         required=False
     )
     comarca = forms.CharField(
         label='Comarca',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3   col m-2 rounded-1'}),
+        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
         required=False
     )
     cartorio_uf = forms.ModelChoiceField(
