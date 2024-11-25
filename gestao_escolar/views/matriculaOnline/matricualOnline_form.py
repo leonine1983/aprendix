@@ -91,140 +91,83 @@ class Aluno_documento_form(forms.ModelForm):
     
     class Meta:
         model = Alunos
-        fields = ['aluno', 'CPF', 'RG', 'RG_emissao', 'RG_UF', 'orgao_emissor','cidade_nascimento','estado','renda_familiar','cidade',  'bairro', 'cartao_nacional_saude_cns', 'nis',
+        fields = ['login_aluno', 'senha','email', 'rua', 'bairro', 'cidade' ]    
+        
+        """
+        fields = ['login_aluno', 'senha','email',  'CPF', 'RG', 'RG_emissao', 'RG_UF', 'orgao_emissor','cidade_nascimento','estado','cidade',  'bairro', 'cartao_nacional_saude_cns', 'nis',
                 'estado_civil', 'tipo_certidao', 'numero_certidao', 'livro', 'folha', 'termo', 'emissao', 'distrito_certidao', 'cartorio', 'comarca', 'cartorio_uf']    
+        """
     
-    aluno = forms.ModelChoiceField(
-        queryset=Alunos.objects.none(),
-        widget=forms.Select(attrs={'class': 'border border-info p-2 pb-1   col m-2 rounded-1',  'readonly': 'readonly'}),
-        required=False
+    
+    login_aluno = forms.CharField(
+        label='Login do aluno (idendificação de acesso do aluno ao Aprendix)',
+        widget=forms.TextInput(attrs={'class': 'form-control  '}),
+        required=False,
+        disabled=True
+    )   
+    senha = forms.CharField(
+        label='Senha do aluno (Senha Padrão 12345678)',
+        widget=forms.PasswordInput(attrs={'class': 'form-control '}),
+        required=False,
+        disabled=True
     )
+    email = forms.EmailField(
+        label='Digite o email do aluno',
+        widget=forms.EmailInput(attrs={'class': 'form-control'}),
+        #required=False
+    )
+
+    rua = forms.CharField(
+        label="Rua, Av., Travessa",
+        widget=forms.TextInput(attrs={'class': 'form-control '})        
+    )
+
+    estado = forms.ModelChoiceField(
+        queryset = Uf_Unidade_Federativa.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=False   
+    )
+    cidade_nascimento = forms.ModelChoiceField(
+        queryset = Cidade.objects.all(),
+        widget=forms.Select(attrs={'class': ' form-control'}),
+        required=False   
+    )
+   
+   
     CPF = forms.CharField(
         label='Número do CPF',
-        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
+        widget=forms.TextInput(attrs={'class': 'form-control '}),
         required=False
     )
     RG = forms.CharField(
         label='Número do RG',
-        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
+        widget=forms.TextInput(attrs={'class': 'form-control '}),
         required=False
     )
     RG_emissao = forms.DateField(
         label = "Data de emissão do RG",
-        widget=forms.DateInput(attrs={'class': ' border border-info p-3 pb-3   col2 m-2 rounded-1', 'type': 'date'}), 
+        widget=forms.DateInput(attrs={'class': 'form-control ', 'type': 'date'}), 
         required=False 
     )
     RG_UF = forms.ModelChoiceField(
         label="UF do RG",
         queryset=Uf_Unidade_Federativa.objects.all(),
-        widget=forms.Select(attrs={'class': ' border border-info p-2 pb-1   col m-2 rounded-1'}),  
+        widget=forms.Select(attrs={'class': ' form-control'}),  
         required=False   
     )
     orgao_emissor = forms.CharField(
         label="Órgão Emissor",
-        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
+        widget=forms.TextInput(attrs={'class': 'form-control '}),
         required=False
     )
-    rua = forms.CharField(
-        label="Rua, Av., Travessa",
-        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'})        
-    )
-    estado = forms.ModelChoiceField(
-        queryset = Uf_Unidade_Federativa.objects.all(),
-        widget=forms.Select(attrs={'class': ' border border-info p-2 pb-1   col m-2 rounded-1'}),
-        required=False   
-    )
-    cidade_nascimento = forms.ModelChoiceField(
-        queryset = Cidade.objects.all(),
-        widget=forms.Select(attrs={'class': ' border border-info p-2 pb-1   col m-2 rounded-1'}),
-        required=False   
-    )
-    renda_familiar = forms.CharField(
-        label='Renda Familiar',
-        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
-        required=False
-    )
-  
-    cartao_nacional_saude_cns = forms.CharField(
-        label='Cartão Nacional de Saúde / CNS',
-        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
-        required=False
-    )
-    nis = forms.CharField(
-        label='NIS',
-        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
-        required=False
-    )
- 
-    estado_civil = forms.ChoiceField(
-        label='Estado Civil',
-        choices=choice_estado_civil,
-        widget=forms.Select(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
-        required=False
-    )
-    tipo_certidao = forms.ChoiceField(
-        label='Tipo de Certidão',
-        choices=choice_modelo_certidao,
-        widget=forms.Select(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
-        required=False
-    )
-    numero_certidao = forms.CharField(
-        label='Número da Certidão',
-        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
-        required=False
-    )
-    livro = forms.CharField(
-        label='Livro',
-        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
-        required=False
-    )
-    folha = forms.CharField(
-        label='Folha',
-        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
-        required=False
-    )
-    termo = forms.CharField(
-        label='Termo',
-        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
-        required=False
-    )
-    emissao = forms.DateField(
-        label = "Data de emissão do RG",
-        widget=forms.DateInput(attrs={'class': ' border border-info p-3 pb-3  col2 m-2 rounded-1'}), 
-        required=False 
-    )
-    distrito_certidao = forms.CharField(
-        label='Distrito',
-        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1', }),
-        required=False
-    )
-    cartorio = forms.CharField(
-        label='Cartório',
-        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
-        required=False
-    )
-    comarca = forms.CharField(
-        label='Comarca',
-        widget=forms.TextInput(attrs={'class': ' border border-info p-3 pb-3   col m-2 rounded-1'}),
-        required=False
-    )
-    cartorio_uf = forms.ModelChoiceField(
-        label="UF do Cartório",
-        queryset = Uf_Unidade_Federativa.objects.all(),
-        widget=forms.Select(attrs={'class': ' border border-info p-2 pb-1   col m-2 rounded-1'}),
-        required=False        
-    )    
-  
+    
+    
+    
   
     def __init__(self, *args, **kwargs):
-        aluno_create = kwargs.pop('aluno_create', None)
-        super().__init__(*args, **kwargs)
-
-        if aluno_create is not None:
-            self.fields['aluno'].queryset = aluno_create
-            self.fields['aluno'].initial = aluno_create.first()    
-            self.fields['login_aluno'].initial = self.generate_login()           
-            self.fields['senha'].initial = "12345678"
+        super().__init__(*args, **kwargs)        
+        self.fields['login_aluno'].initial = self.generate_login()           
+        self.fields['senha'].initial = "12345678"
                     
     
     def generate_login(self):
@@ -235,3 +178,89 @@ class Aluno_documento_form(forms.ModelForm):
             if not Alunos.objects.filter(login_aluno=login).exists():
                 return login
 
+
+
+
+
+
+
+
+"""
+
+renda_familiar = forms.CharField(
+        label='Renda Familiar',
+        widget=forms.TextInput(attrs={'class': ' form-control'}),
+        required=False
+    )
+  
+    cartao_nacional_saude_cns = forms.CharField(
+        label='Cartão Nacional de Saúde / CNS',
+        widget=forms.TextInput(attrs={'class': 'form-control '}),
+        required=False
+    )
+    nis = forms.CharField(
+        label='NIS',
+        widget=forms.TextInput(attrs={'class': ' form-control'}),
+        required=False
+    )
+ 
+    estado_civil = forms.ChoiceField(
+        label='Estado Civil',
+        choices=choice_estado_civil,
+        widget=forms.Select(attrs={'class': ' form-control'}),
+        required=False
+    )
+    tipo_certidao = forms.ChoiceField(
+        label='Tipo de Certidão',
+        choices=choice_modelo_certidao,
+        widget=forms.Select(attrs={'class': 'form-control '}),
+        required=False
+    )
+    numero_certidao = forms.CharField(
+        label='Número da Certidão',
+        widget=forms.TextInput(attrs={'class': 'form-control '}),
+        required=False
+    )
+    livro = forms.CharField(
+        label='Livro',
+        widget=forms.TextInput(attrs={'class': 'form-control '}),
+        required=False
+    )
+    folha = forms.CharField(
+        label='Folha',
+        widget=forms.TextInput(attrs={'class': 'form-control '}),
+        required=False
+    )
+    termo = forms.CharField(
+        label='Termo',
+        widget=forms.TextInput(attrs={'class': 'form-control '}),
+        required=False
+    )
+    emissao = forms.DateField(
+        label = "Data de emissão do RG",
+        widget=forms.DateInput(attrs={'class': ' form-control'}), 
+        required=False 
+    )
+    distrito_certidao = forms.CharField(
+        label='Distrito',
+        widget=forms.TextInput(attrs={'class': ' form-control', }),
+        required=False
+    )
+    cartorio = forms.CharField(
+        label='Cartório',
+        widget=forms.TextInput(attrs={'class': 'form-control '}),
+        required=False
+    )
+    comarca = forms.CharField(
+        label='Comarca',
+        widget=forms.TextInput(attrs={'class': 'form-control '}),
+        required=False
+    )
+    cartorio_uf = forms.ModelChoiceField(
+        label="UF do Cartório",
+        queryset = Uf_Unidade_Federativa.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control border border-info p-2 pb-1   col m-2 rounded-1'}),
+        required=False        
+    )    
+  
+"""

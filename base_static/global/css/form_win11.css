@@ -64,3 +64,264 @@
 .win11-button:hover {
   background-color: #005a9e;
 }
+
+
+
+
+
+/* Geral */
+.win11-header {
+  background-color: #0078d4;
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.win11-container {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.win11-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: #0078d4;
+}
+
+.win11-text {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.alert-info {
+  background-color: #e1f4fe;
+  border-color: #9be1fe;
+  color: #333;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 20px;
+}
+
+/* Botões */
+.btn-win11-light {
+  background-color: #ffffff;
+  color: #0078d4;
+  border: 1px solid #0078d4;
+  border-radius: 30px;
+  font-weight: 500;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-win11-light:hover {
+  background-color: #0078d4;
+  color: #ffffff;
+}
+
+.btn-login {
+  background-color: #4CAF50;
+  color: #ffffff;
+  border-radius: 30px;
+  font-weight: 500;
+  padding: 12px 30px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-login:hover {
+  background-color: #45a049;
+}
+
+.btn-win11-primary {
+  background-color: #0078d4;
+  color: #ffffff;
+  border-radius: 30px;
+  padding: 12px 30px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.btn-win11-primary:hover {
+  background-color: #005a9e;
+}
+
+.win11-form {
+  margin-top: 30px;
+}
+
+/* Inputs do Formulário */
+input, select, textarea {
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid #dcdcdc;
+  width: 100%;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #0078d4;
+  box-shadow: 0 0 8px rgba(0, 120, 212, 0.2);
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .win11-container {
+      padding: 30px;
+  }
+
+  .win11-title {
+      font-size: 28px;
+  }
+
+  .btn-win11-primary, .btn-login {
+      padding: 12px 24px;
+  }
+
+  .btn-win11-light {
+      padding: 10px 20px;
+  }
+
+  .alert-info {
+      padding: 10px 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .win11-container {
+      padding: 20px;
+      width: 90%;
+  }
+
+  .win11-title {
+      font-size: 24px;
+  }
+
+  .win11-text {
+      font-size: 14px;
+  }
+
+  .btn-win11-primary, .btn-login {
+      padding: 10px 20px;
+      font-size: 14px;
+  }
+
+  .btn-win11-light {
+      padding: 10px 15px;
+      font-size: 14px;
+  }
+
+  .alert-info {
+      font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .win11-container {
+      padding: 15px;
+      width: 95%;
+  }
+
+  .win11-title {
+      font-size: 22px;
+      text-align: center;
+  }
+
+  .win11-text {
+      font-size: 13px;
+  }
+
+  .btn-win11-primary, .btn-login {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+  }
+
+  .btn-win11-light {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+  }
+
+  .alert-info {
+      font-size: 13px;
+      padding: 8px 12px;
+  }
+}
+
+
+
+.win11-form {
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 12px !important;
+  padding: 30px !important;
+}
+
+.form-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr 1fr !important; /* 3 colunas para desktop */
+  gap: 20px !important;
+}
+
+.form-group {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+label {
+  font-size: 14px !important;
+  color: #555 !important;
+  margin-bottom: 8px !important;
+}
+
+.form-control {
+  padding: 12px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 8px !important;
+  background-color: #f9f9f9 !important;
+  font-size: 14px !important;
+  color: #333 !important;
+}
+
+.form-control:focus {
+  border-color: #0078d4 !important;
+  outline: none !important;
+  background-color: #fff !important;
+}
+
+select.form-control {
+  padding: 10px !important;
+}
+
+button.btn-submit {
+  background-color: #0078d4 !important;
+  color: white !important;
+  padding: 12px 25px !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  margin-top: 20px !important;
+}
+
+button.btn-submit:hover {
+  background-color: #005a8f !important;
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .form-grid {
+      grid-template-columns: 1fr 1fr !important; /* 2 colunas para tablets */
+  }
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+      grid-template-columns: 1fr !important; /* 1 coluna para celulares */
+  }
+}

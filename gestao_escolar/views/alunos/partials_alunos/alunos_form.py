@@ -31,7 +31,7 @@ class Alunos_form(forms.ModelForm):
     nome_completo = forms.CharField(
         label='Nome Completo (Igual ao do RG bem assim):',
         widget=forms.TextInput(attrs={
-            'class': 'form-control border border-info p-3 pb-3 text-info text-uppercase col m-2 rounded-1',
+            'class': 'form-control border border-info bg-light p-3 pb-3 text-info text-uppercase col m-2 rounded-1',
             'autocomplete': 'off'}),        
     )
     
@@ -45,7 +45,7 @@ class Alunos_form(forms.ModelForm):
     
     
     nome_mae = forms.CharField(      
-        label=mark_safe('<i class="fa-solid fa-user-tie-hair"></i> Mãe'),
+        label=mark_safe('<i class="fa-solid fa-user-tie-hair"></i>Nome completo da Mãe'),
         widget=forms.TextInput(attrs={
             'class': 'form-control border border-info p-3 pb-3 text-info text-uppercase col m-2 rounded-1',
             'autocomplete': 'off'}),
@@ -154,7 +154,7 @@ class Aluno_documento_form(forms.ModelForm):
     )   
     senha = forms.CharField(
         label='Senha do aluno',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
+        widget=forms.PasswordInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
         required=False,
         disabled=True
     )

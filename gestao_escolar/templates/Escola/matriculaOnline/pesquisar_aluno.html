@@ -1,6 +1,7 @@
 {% extends "Admin_Acessos/base_template.html" %}
-
+{% load static %}
 {% block main %}
+<link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
 <style>
     label{
         color:#343a40;                
@@ -8,27 +9,114 @@
     .alert{
         color: #343a40;
     }
+
+
+    /* Definições básicas do estilo */
+
+.win11-form {
+    background-color: #ffffff !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    border-radius: 12px !important;
+    padding: 30px !important;
+}
+
+.form-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important; /* 3 colunas para desktop */
+    gap: 20px !important;
+}
+
+.form-group {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+label {
+    font-size: 14px !important;
+    color: #555 !important;
+    margin-bottom: 8px !important;
+}
+
+.form-control {
+    padding: 12px !important;
+    border: 1px solid #ccc !important;
+    border-radius: 8px !important;
+    background-color: #f9f9f9 !important;
+    font-size: 14px !important;
+    color: #333 !important;
+}
+
+.form-control:focus {
+    border-color: #0078d4 !important;
+    outline: none !important;
+    background-color: #fff !important;
+}
+
+select.form-control {
+    padding: 10px !important;
+}
+
+button.btn-submit {
+    background-color: #0078d4 !important;
+    color: white !important;
+    padding: 12px 25px !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 16px !important;
+    cursor: pointer !important;
+    margin-top: 20px !important;
+}
+
+button.btn-submit:hover {
+    background-color: #005a8f !important;
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+    .form-grid {
+        grid-template-columns: 1fr 1fr !important; /* 2 colunas para tablets */
+    }
+}
+
+@media (max-width: 600px) {
+    .form-grid {
+        grid-template-columns: 1fr !important; /* 1 coluna para celulares */
+    }
+}
+
 </style>
 {% include "Escola/partials/mensagens.html" %}
-    <div class="container p-4  " style="background-color: #343a40; color: #fff; border-radius: 8px; width: 30rem !important;">
-        <h2 class="text-center mb-4">Pesquisar Aluno para Matrícula Online</h2>
+<div class="d-flex justify-content-between w-100 win11-header mt-2 mb-2">   
+    <a href="{% url 'admin_acessos:login_create' %}" class="btn btn-win11-light m-2">
+        <i class="fa-solid fa-house"></i> Home
+    </a>
+    <button class="btn btn-win11-primary m-2 btn-login">
+        <i class="fa-regular fa-address-card"></i> Login Matrícula
+    </button>
+</div>
 
-        <p class="lead text-center mb-4">
-            Olá! Para verificar se o aluno já está registrado em nosso sistema e facilitar a sua matrícula online, por favor, preencha as informações abaixo.
-        </p>
-        
-        <div class="alert alert-info" role="alert">
-            <strong>Importante:</strong> Verifique se os dados estão corretos antes de enviar. Se o aluno já estiver registrado, você será redirecionado para a página de matrícula.
-        </div>
-        
-        <form method="post" class="text-start text-dark">
-            {% csrf_token %}
-            {{form.as_p}} 
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary btn-lg">Pesquisar</button>
-            </div>
-        </form>
-        
+<div class="container p-4 win11-container">
+    <img src="{% static 'SME - 2 PNG.png' %}" alt="" width='120' class='m-3'>
+    <h2 class="text-center mb-4 win11-title">Bem-vindo! Vamos te ajudar a realizar a matrícula do aluno no AprendiX</h2>
+
+
+    <p class="lead text-center mb-4 win11-text">
+        <i class="fas fa-user-check"></i> Olá! Caso o aluno já possua um login e senha em nosso sistema, basta clicar em <strong>"Login Matrícula"</strong> <i class="fas fa-sign-in-alt"></i> para acompanhar a matrícula no ano letivo atual ou realizar a matrícula de forma online. <br>
+        Caso contrário, por favor, preencha as informações abaixo <i class="fas fa-pencil-alt"></i> para realizar o cadastro do aluno.
+    </p>
+    
+    <div class="alert alert-info" role="alert">
+        <strong>Importante:</strong> Verifique se os dados estão corretos antes de enviar. Se o aluno já estiver registrado, você será redirecionado para a página de matrícula.
     </div>
+
+    <form method="post" class="win11-form">
+        {% csrf_token %}
+        {{ form.as_div }}
+        <div class="text-center">
+            <button type="submit" class="btn btn-win11-primary btn-lg">Pesquisar</button>
+        </div>
+    </form>        
+</div>
+
 {% endblock main %}
 
