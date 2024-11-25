@@ -91,7 +91,7 @@ class Aluno_documento_form(forms.ModelForm):
     
     class Meta:
         model = Alunos
-        fields = ['login_aluno', 'senha','email', 'rua', 'bairro', 'cidade' ]    
+        fields = ['login_aluno', 'senha','email','nome_social', 'data_nascimento', 'sexo', 'tel_celular_aluno', 'etnia', 'rua', 'bairro', 'cidade' ]    
         
         """
         fields = ['login_aluno', 'senha','email',  'CPF', 'RG', 'RG_emissao', 'RG_UF', 'orgao_emissor','cidade_nascimento','estado','cidade',  'bairro', 'cartao_nacional_saude_cns', 'nis',
@@ -111,6 +111,11 @@ class Aluno_documento_form(forms.ModelForm):
         required=False,
         disabled=True
     )
+    nome_social = forms.CharField(
+        label='Nome Social (Como a pessoa se identifica)',
+        widget=forms.TextInput(attrs={'class': 'form-control  '}),
+        required=False,
+    )  
     email = forms.EmailField(
         label='Digite o email do aluno',
         widget=forms.EmailInput(attrs={'class': 'form-control'}),
