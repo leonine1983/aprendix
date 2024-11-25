@@ -169,8 +169,8 @@ urlpatterns = [
     path('matricula_online/', pesquisar_aluno, name='pesquisar_aluno'),
     path('matricula_online/<int:aluno_id>/', matricular_aluno, name='matricular_aluno'),
     path('cadastro_aluno/<str:nome>/<str:mae>', cadastro_aluno_etapa1, name='cadastro_aluno_etapa1'),
-    path('cadastro_aluno/etapa2/', cadastro_aluno_etapa2, name='cadastro_aluno_etapa2'),
-    path('cadastro_aluno/etapa3/', cadastro_aluno_etapa3, name='cadastro_aluno_etapa3'),
+    path('cadastro_aluno/etapa2/<int:aluno_id>', cadastro_aluno_etapa2, name='cadastro_aluno_etapa2'),
+    path('cadastro_aluno/etapa3/<int:aluno_id>', cadastro_aluno_etapa3, name='cadastro_aluno_etapa3'),
 ] 
 
 

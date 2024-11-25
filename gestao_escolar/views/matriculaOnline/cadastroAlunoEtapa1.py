@@ -20,6 +20,7 @@ def cadastro_aluno_etapa1(request, nome, mae):
             sexo_id=sexo
         )
         aluno.save()
+        aluno_id = aluno.id
         login = form.cleaned_data.get('login_aluno')
         senha = form.cleaned_data.get('senha')
         email = form.cleaned_data.get('email')
@@ -45,7 +46,7 @@ def cadastro_aluno_etapa1(request, nome, mae):
         
         print(f"login: {login} e senha {senha}")        
         return redirect('Gestao_Escolar:pesquisar_aluno')"""
-        return redirect('cadastro_aluno_etapa2', aluno_id=aluno.id)
+        return redirect('Gestao_Escolar:cadastro_aluno_etapa2',  aluno_id=aluno_id)
     
     return render(request, 'Escola/matriculaOnline/etapa1.html', {'form':form, 'nomeAluno': nome, 'nomeMae':mae})
 
