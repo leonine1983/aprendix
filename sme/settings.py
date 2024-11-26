@@ -40,16 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # meus apps
     'rh',   
-    'admin_acessos',
-     
+    'admin_acessos',     
     'gestao_escolar',  
     'controle_estoque', 
     'docsGestao_Escolar',  
+    'modulo_aluno',
     'ckeditor',
-    'ckeditor_uploader'
-   
-
-
+    'ckeditor_uploader' 
 ]
 
 MIDDLEWARE = [

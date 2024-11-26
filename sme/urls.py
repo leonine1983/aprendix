@@ -31,6 +31,7 @@ urlpatterns = [
     path('', include('gestao_escolar.urls')),
     path('nutricao/', include('controle_estoque.urls')),
     path('administrativo/', include('docsGestao_Escolar.urls')),
+    path('acesso_aluno', include('modulo_aluno.urls')),
     #path('central_admin/', include('admin_acessos.urls')),
     # extras
     path('ckeditor/', include("ckeditor_uploader.urls"))

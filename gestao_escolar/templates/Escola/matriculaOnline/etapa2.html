@@ -1,0 +1,102 @@
+{% extends "Admin_Acessos/base_template.html" %}
+{% load static %}
+{% block main %}
+<style>
+    #id_login_aluno, #id_senha{
+        background-color: rgb(248, 124, 200)!important;
+    }
+    .form-section-title {
+    font-size: 1.2rem;
+    color: #333;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+</style>
+<link rel="stylesheet" href="{% static 'global/css/form_win11.css' %}">
+<div class="container p-4 bg-light text-muted " style=" color: #fff; border-radius: 8px; width:95vw">
+    <img src="{% static 'SME - 2 PNG.png' %}" width="150" alt="">
+    <h2 class="text-center mb-4 border-bottom border-1 border-dark mt-3">Criar cadastro do aluno</h2>
+
+    <p class="text-center mb-4">**"Por favor, forneça as informações correspondentes aos documentos do aluno."**.</p>  
+
+    
+    <form method="post" class='win11-form'>
+        {% csrf_token %}             
+        <h2 class="form-section-title">CPF, NIS e o CNS</h2>
+        <div class="form-grid border p-2 m-2">            
+            <div>
+                {{form.CPF.error}}
+                {{form.CPF.label}}
+                {{form.CPF}}
+            </div>   
+            <div>
+                {{form.nis.error}}
+                {{form.nis.label}}
+                {{form.nis}}
+            </div>  
+            <div>
+                {{form.cartao_nacional_saude_cns.error}}
+                {{form.cartao_nacional_saude_cns.label}}
+                {{form.cartao_nacional_saude_cns}}
+            </div>      
+        </div>
+        <h2 class="form-section-title">Carteira de Identidade do Aluno</h2>
+        <div class="form-grid border p-2 m-2">            
+            <div>
+                {{form.RG.error}}
+                {{form.RG.label}}
+                {{form.RG}}
+            </div>   
+            <div>
+                {{form.RG_emissao.error}}
+                {{form.RG_emissao.label}}
+                {{form.RG_emissao}}
+            </div>  
+            <div>
+                {{form.RG_UF.error}}
+                {{form.RG_UF.label}}
+                {{form.RG_UF}}
+            </div>    
+            <div>
+                {{form.cidade_nascimento.error}}
+                {{form.cidade_nascimento.label}}
+                {{form.cidade_nascimento}}
+            </div>  
+            <div>
+                {{form.orgao_emissor.error}}
+                {{form.orgao_emissor.label}}
+                {{form.orgao_emissor}}
+            </div>  
+            <div>
+                {{form.estado.error}}
+                {{form.estado.label}}
+                {{form.estado}}
+            </div>  
+               
+        </div>
+       
+
+       
+
+        
+        <button type="submit" class="btn btn-win11-primary btn-lg">Próxima Etapa</button>
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.6-beta.16/inputmask.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function(){
+    var im = new Inputmask('999.999.999-99');
+    im.mask($('#id_CPF'));
+  });
+</script>
+
+{% endblock main %}
+
+
+
