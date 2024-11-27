@@ -17,6 +17,8 @@ SECRET_KEY = 'django-insecure-u7afypyeioy$6!z7+0_n9nhoj^zd4l=1$i5tewe7%v4llfr#9^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+ALLOWED_HOSTS = ['*']
+"""
 ALLOWED_HOSTS = [*
     #'89af-177-200-115-250.ngrok-free.app' ,
     #'localhost',
@@ -27,7 +29,7 @@ ALLOWED_HOSTS = [*
     #'177.131.142.27',
     #'kiweln.conteige.cloud',
     #'https://kiweln.conteige.cloud'
-]
+]"""
 
 CSRF_TRUSTED_ORIGINS = ['https://89af-177-200-115-250.ngrok-free.app', 'https://kiweln.conteige.cloud']
 
