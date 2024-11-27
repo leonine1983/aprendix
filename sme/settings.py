@@ -25,7 +25,7 @@ ALLOWED_HOSTS = [
     '192.168.15.53',    
     # Outros domínios permitidos
     '177.131.142.27',
-    'kiweln.conteige.cloud'
+    'kiweln.conteige.cloud',
     'https://kiweln.conteige.cloud'
 ]
 
