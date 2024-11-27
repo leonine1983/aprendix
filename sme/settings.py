@@ -26,9 +26,10 @@ ALLOWED_HOSTS = [
     # Outros domínios permitidos
     '177.131.142.27',
     'kiweln.conteige.cloud'
+    'https://kiweln.conteige.cloud'
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://89af-177-200-115-250.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['https://89af-177-200-115-250.ngrok-free.app', 'https://kiweln.conteige.cloud']
 
 
 # Application definition
