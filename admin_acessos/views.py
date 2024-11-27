@@ -15,7 +15,7 @@ from django.contrib.auth.models import User, Group
 import random
 
 class CreateLoginView(LoginView):
-    template_name = 'admin_acessos/index.html'
+    template_name = 'Admin_acessos/index.html'
 
     def form_invalid(self, form):
         messages.error(self.request, 'Credenciais inválidas. Por favor, tente novamente.')
