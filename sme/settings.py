@@ -24,7 +24,8 @@ ALLOWED_HOSTS = [
     '192.168.15.19',
     '192.168.15.53',    
     # Outros domínios permitidos
-    '177.131.142.27'
+    '177.131.142.27',
+    'kiweln.conteige.cloud'
 ]
 
 CSRF_TRUSTED_ORIGINS = ['https://89af-177-200-115-250.ngrok-free.app']
