@@ -243,3 +243,21 @@ LOGGING = {
         },
     },
 }
+
+
+# CONFIRGURAÇAÕ PARA O CONTEIGER.CLOUD
+# Porta do servidor HTTP
+PORT = int(os.environ.get('PORT', 8000))
+
+# Endereço/Host do servidor HTTP
+HOST = os.environ.get('HOST', '0.0.0.0')
+
+"""
+Variáveis de Ambiente necessárias:
+
+Nome da Variável: PORT
+Valor da Variável: 8000 (ou qualquer outra porta desejada para o servidor HTTP)
+HOST:
+Nome da Variável: HOST
+Valor da Variável: 0.0.0.0 (ou o endereço IP específico que o conteiger.cloud recomenda para o host do servidor HTTP)
+"""
