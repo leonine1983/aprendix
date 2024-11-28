@@ -15,7 +15,9 @@
 .form-group {
     margin-bottom: 15px;
 }
-
+#id_senha{
+    display: none;
+}
 </style>
 <link rel="stylesheet" href="{% static 'global/css/form_win11.css' %}">
 <div class="container p-4 bg-light text-muted " style=" color: #fff; border-radius: 8px; width:95vw">
@@ -35,16 +37,11 @@
         {% csrf_token %}     
         
         <h2 class="form-section-title">Dados de acesso ao Aprendix Módulo do Aluno</h2>
-        <div class="form-grid border p-2 m-2">            
+        <div class="form-grid border p-2 m-2">  
             <div>
-                {{form.login_aluno.error}}
-                {{form.login_aluno.label}}
-                {{form.login_aluno}}
-            </div>
-            <div>
-                {{form.senha.error}}
-                {{form.senha.label}}
-                {{form.senha}}
+                {{form.nome_social.error}}
+                {{form.nome_social.label}}
+                {{form.nome_social}}
             </div>
             <div>
                 {{form.email.error}}

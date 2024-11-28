@@ -130,6 +130,7 @@ class Alunos(models.Model):
     cidade_nascimento = models.ForeignKey(Cidade, related_name="cidade_nascimento",verbose_name='Cidade onde nasceu', null=True, on_delete=models.CASCADE)
     estado = models.ForeignKey(Uf_Unidade_Federativa, related_name="estado_nascimento",verbose_name='Estado onde nasceu', null=True, on_delete=models.CASCADE)
     nome_mae = models.CharField(max_length=120, null=False, default='', verbose_name='Nome da Mãe*')
+    CPF_mae = models.CharField(max_length=14, null=True, blank=True, default='000.000.000-00')   
     tel_celular_mae = models.CharField(max_length=30, null=True, verbose_name='Nº do celular do mãe*')
     nome_pai = models.CharField(max_length=120, null=True, default='')
     tel_celular_pai = models.CharField(max_length=30, null=True)      
@@ -196,6 +197,17 @@ class Alunos(models.Model):
 
     def __str__(self):
         return self.nome_completo 
+    
+class AlunoUser(models.Model):
+    aluno = models.ForeignKey(Alunos, null=True, on_delete=models.CASCADE, related_name='alunoUser_related',  verbose_name='Aluno Usuario*:')
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE,related_name='userAluno_related', verbose_name='usuario aluno*:')
+
+    class Meta:
+        ordering = ['aluno']
+
+    def __str__(self):
+        return f'{self.aluno.nome_completo} - Login: {self.aluno.login_aluno} - Senha: {self.aluno.senha}'
+
 
 
 class Disciplina(models.Model):

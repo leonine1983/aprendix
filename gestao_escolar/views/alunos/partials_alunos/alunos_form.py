@@ -29,7 +29,7 @@ def validate_caracteres_especiais(value):
 
 class Alunos_form(forms.ModelForm):
     nome_completo = forms.CharField(
-        label='Nome Completo (Igual ao do RG bem assim):',
+        label='Nome Completo do Aluno (Igual ao do RG bem assim):',
         widget=forms.TextInput(attrs={
             'class': 'form-control border border-info bg-light p-3 pb-3 text-info text-uppercase col m-2 rounded-1',
             'autocomplete': 'off'}),        
@@ -50,6 +50,12 @@ class Alunos_form(forms.ModelForm):
             'class': 'form-control border border-info p-3 pb-3 text-info text-uppercase col m-2 rounded-1',
             'autocomplete': 'off'}),
     )
+    CPF_mae = forms.CharField(      
+        label=mark_safe('<i class="fa-solid fa-user-tie-hair"></i>Digite o CPF da mãe'),
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control border border-info p-3 pb-3 text-info text-uppercase col m-2 rounded-1',
+            'autocomplete': 'off'}),
+    )
 
     def clean_nome_mae(self):
         nome_mae = self.cleaned_data.get('nome_mae')
@@ -57,15 +63,12 @@ class Alunos_form(forms.ModelForm):
             mensagem_erro = "⚠️ Percebemos que você usou acento no 'Nome da mãe' do aluno. Evite acentos, números e caracteres especiais ❌ e tente novamente. Obrigado pela colaboração! 😄"    
             raise forms.ValidationError(mensagem_erro)
         return nome_mae    
-    """
-    class Meta:
-        model = Alunos
-        fields = ['nome_completo', 'nome_mae']"""    
+    
 
     class Meta:
         validators=[validate_caracteres_especiais],  
         model = Alunos
-        fields = ['nome_completo', 'nome_mae']
+        fields = ['nome_completo', 'nome_mae', 'CPF_mae']
 
 
 choice_estado_civil = {
