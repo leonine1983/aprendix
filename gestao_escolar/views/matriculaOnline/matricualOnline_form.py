@@ -2,7 +2,7 @@ from django import forms
 from django.utils.safestring import mark_safe
 import random
 import string
-from rh.models import Uf_Unidade_Federativa, Sexo, Cidade
+from rh.models import Uf_Unidade_Federativa, Sexo, Cidade, Bairro
 from gestao_escolar.models import (Alunos)
 import re
 from django.core.exceptions import ValidationError   
@@ -143,31 +143,14 @@ import phonenumbers
 class MatriculaOnline_etapa2(forms.ModelForm):   
     class Meta:
         model = Alunos
-        fields = ['nome_social', 'data_nascimento', 'sexo', 'tel_celular_aluno', 'etnia', 'rua', 'bairro', 'cidade','CPF', 'RG', 'RG_emissao', 'orgao_emissor', 'RG_UF', 'cidade_nascimento', 'estado', 'cartao_nacional_saude_cns', 'nis']
+        fields = ['nome_social', 'data_nascimento', 'sexo', 'tel_celular_aluno', 'etnia', 'rua', 'bairro', 'cidade', 'cartao_nacional_saude_cns', 'nis']
 
-    data_nascimento = forms.CharField(
-        label="Data de nascimento do aluno",
-        widget=forms.TextInput(attrs={'class': 'form-control ', 'type':'date'})        
-    )
+        """
+        ,'CPF', 'RG', 'RG_emissao', 'orgao_emissor', 'RG_UF', 'cidade_nascimento', 'estado',
 
-    rua = forms.CharField(
-        label="Rua, Av., Travessa",
-        widget=forms.TextInput(attrs={'class': 'form-control '})        
-    )
 
-    estado = forms.ModelChoiceField(
-        queryset = Uf_Unidade_Federativa.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        required=False   
-    )
-    cidade_nascimento = forms.ModelChoiceField(
-        label='Cidade onde o aluno mora',
-        queryset = Cidade.objects.all(),
-        widget=forms.Select(attrs={'class': ' form-control'}),
-        required=False   
-    )      
-  
 
+        
     CPF = forms.CharField(
         label='Nº do CPF (aluno)',
         widget=forms.TextInput(attrs={'class': 'form-control', 'maxlength': '14'}),
@@ -192,32 +175,53 @@ class MatriculaOnline_etapa2(forms.ModelForm):
         required=False,
     ) 
 
-    RG_UF = forms.CharField(
-        label='Unidade Federativa',
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
-        required=False,
-    ) 
 
-    cidade_nascimento = forms.CharField(
-        label='Cidade onde nasceu o aluno',
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
-        required=False,
-    ) 
+        """
+        
+    data_nascimento = forms.CharField(
+        label="Data de nascimento do aluno",
+        widget=forms.TextInput(attrs={'class': 'form-control ', 'type':'date'})        
+    )
+    tel_celular_aluno = forms.CharField(
+        label="Telefone celular do aluno",
+        widget=forms.TextInput(attrs={'class': 'form-control '})        
+    )
+    sexo = forms.ModelChoiceField(
+        label="Gênero sexual do aluno",
+        queryset = Sexo.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control '})        
+    )   
 
-    estado = forms.CharField(
-        label='Estado onde nasceu o aluno',
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
-        required=False,
-    ) 
+    rua = forms.CharField(
+        label="Rua, Av., Travessa",
+        widget=forms.TextInput(attrs={'class': 'form-control '})        
+    )
+    bairro = forms.ModelChoiceField(
+        label='Bairro',
+        queryset = Bairro.objects.all(),
+        widget=forms.Select(attrs={'class': ' form-control'}),
+        required=False   
+    )     
+    cidade = forms.ModelChoiceField(
+        label='Cidade onde o aluno mora',
+        queryset = Cidade.objects.all(),
+        widget=forms.Select(attrs={'class': ' form-control'}),
+        required=False   
+    )  
+    estado = forms.ModelChoiceField(
+        queryset = Uf_Unidade_Federativa.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=False   
+    )   
 
     cartao_nacional_saude_cns = forms.CharField(
-        label='CNS (Cartão do Sus)',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'maxlength': '16'}),
+        label='CNS (Cartão Nacional de Saúde)',
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
         required=False,
     ) 
 
     nis = forms.CharField(
-        label='NIS',
+        label='NIS (Número de Identificação Social)',
         widget=forms.TextInput(attrs={'class': 'form-control', 'maxlength': '16'}),
         required=False,
     )

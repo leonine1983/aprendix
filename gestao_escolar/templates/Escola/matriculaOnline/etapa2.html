@@ -1,4 +1,4 @@
-{% extends "Admin_Acessos/base_template.html" %}
+{% extends "modulo_aluno/base.html" %}
 {% load static %}
 {% block main %}
 <style>
@@ -18,22 +18,68 @@
 
 </style>
 <link rel="stylesheet" href="{% static 'global/css/form_win11.css' %}">
-<div class="container p-4 bg-light text-muted " style=" color: #fff; border-radius: 8px; width:95vw">
-    <img src="{% static 'SME - 2 PNG.png' %}" width="150" alt="">
-    <h2 class="text-center mb-4 border-bottom border-1 border-dark mt-3">Criar cadastro do aluno</h2>
+<div class="container p-4 bg-light text-muted " style=" color: #fff; border-radius: 8px; width:95vw; margin-top:5rem!important">
+    <div class="container border-bottom" >
+        <!-- Container para centralizar o conteúdo e garantir responsividade -->
+        <div class="row align-items-center">
+            <!-- Linha para organizar os elementos em colunas -->
+            <div class="col-2 text-center mb-3">
+                <img src="{% static 'SME - 2 PNG.png' %}" class="img-fluid" alt="Logo">
+            </div>
+            <div class="col">
+                <!-- Coluna que ocupa 12 espaços na tela pequena -->
+                <a class="nav-link btn border w-100 text-center" title="Atualizar Data de Nascimento | NIS | CNS" href="{% url 'Gestao_Escolar:cadastro_aluno_etapa2' request.user.userAluno_related.aluno.id %}">
+                    <span class="fs-6">Data de Nascimento | NIS | CNS</span>
+                </a>
+                <!-- Usar w-100 para o link ocupar toda a largura da coluna e text-center para centralizar o texto -->
+            </div>
+            <div class="col">
+                <!-- Coluna que ocupa 12 espaços na tela pequena -->
+                <a class="nav-link btn border w-100 text-center" title="Atualizar Data de Nascimento | NIS | CNS" href="{% url 'Gestao_Escolar:cadastro_aluno_etapa2' request.user.userAluno_related.aluno.id %}">
+                    <span class="fs-6">Data de Nascimento | NIS | CNS</span>
+                </a>
+                <!-- Usar w-100 para o link ocupar toda a largura da coluna e text-center para centralizar o texto -->
+            </div>
+        </div>
+    </div>
+    <h2 class="h2 fs-5 mt-3">Aviso de Atualização de Cadastro</h2>
 
-    <p class="text-center mb-4">**"Por favor, forneça as informações correspondentes aos documentos do aluno."**.</p>  
-
+    <div class="container mt-1">
+        <!-- Mensagem de aviso -->
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Atenção!</strong> Antes de realizar a matrícula do aluno, é necessário realizar a <strong>atualização do cadastro</strong>. 
+            Isso é importante para garantir que todos os documentos estejam em ordem e para verificar se há alguma pendência.
+        </div>
+    </div>
+    
     
     <form method="post" class='win11-form'>
-        {% csrf_token %}             
-        <h2 class="form-section-title">CPF, NIS e o CNS</h2>
-        <div class="form-grid border p-2 m-2">            
+        {% csrf_token %}        
+        {% for error in form.data_nascimento.errors %}
+            <div class="error-message">{{ error }}</div>
+        {% endfor %}     
+        <h2 class="form-section-title">Data de Nascimento | NIS | CNS</h2>
+        <div class="form-grid border p-2 m-2">
             <div>
-                {{form.CPF.error}}
-                {{form.CPF.label}}
-                {{form.CPF}}
+                {{form.data_nascimento.error}}
+                {{form.data_nascimento.label}}
+                {{form.data_nascimento}}
             </div>   
+            <div>
+                {{form.tel_celular_aluno.error}}
+                {{form.tel_celular_aluno.label}}
+                {{form.tel_celular_aluno}}
+            </div>  
+            <div>
+                {{form.sexo.error}}
+                {{form.sexo.label}}
+                {{form.sexo}}
+            </div>  
+            <div>
+                {{form.etnia.error}}
+                {{form.etnia.label}}
+                {{form.etnia}}
+            </div> 
             <div>
                 {{form.nis.error}}
                 {{form.nis.label}}
@@ -45,41 +91,45 @@
                 {{form.cartao_nacional_saude_cns}}
             </div>      
         </div>
-        <h2 class="form-section-title">Carteira de Identidade do Aluno</h2>
+
+     
+        <h2 class="form-section-title">Endereço do aluno</h2>
         <div class="form-grid border p-2 m-2">            
+            
             <div>
-                {{form.RG.error}}
-                {{form.RG.label}}
-                {{form.RG}}
-            </div>   
+                {{form.rua.error}}
+                {{form.rua.label}}
+                {{form.rua}}
+            </div>
             <div>
-                {{form.RG_emissao.error}}
-                {{form.RG_emissao.label}}
-                {{form.RG_emissao}}
-            </div>  
-            <div>
-                {{form.RG_UF.error}}
-                {{form.RG_UF.label}}
-                {{form.RG_UF}}
+                {{form.bairro.error}}
+                {{form.bairro.label}}
+                {{form.bairro}}
             </div>    
-            <div>
-                {{form.cidade_nascimento.error}}
-                {{form.cidade_nascimento.label}}
-                {{form.cidade_nascimento}}
-            </div>  
-            <div>
-                {{form.orgao_emissor.error}}
-                {{form.orgao_emissor.label}}
-                {{form.orgao_emissor}}
-            </div>  
             <div>
                 {{form.estado.error}}
                 {{form.estado.label}}
                 {{form.estado}}
             </div>  
+            
                
         </div>
+        
        
+        <!--
+
+    cidade_nascimento = forms.ModelChoiceField(
+        label='Cidade onde o aluno mora',
+        queryset = Cidade.objects.all(),
+        widget=forms.Select(attrs={'class': ' form-control'}),
+        required=False   
+    )     
+
+ 
+
+    
+
+        -->
 
        
 
@@ -87,13 +137,20 @@
         <button type="submit" class="btn btn-win11-primary btn-lg">Próxima Etapa</button>
     </form>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.9/jquery.inputmask.min.js" integrity="sha512-F5Ul1uuyFlGnIT1dk2c4kB4DBdi5wnBJjVhL7gQlGh46Xn0VhvD8kgxLtjdZ5YN83gybk/aASUAlpdoWUjRR3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.6-beta.16/inputmask.min.js"></script>
-<script type="text/javascript">
-  $(document).ready(function(){
-    var im = new Inputmask('999.999.999-99');
-    im.mask($('#id_CPF'));
-  });
+<script>
+    $(document).ready(function() {
+        // Aplicando a máscara de CPF (xxx.xxx.xxx-xx)
+        $('#id_tel_celular_aluno').inputmask('(99) 9 9999 9999');        
+        
+        // Aplicando a máscara de NIS (xxxxxxxxxxxxxxx)
+        $('#id_nis').inputmask('999.99999.999');
+
+        // Aplicando mascara no NIS
+        $('#id_cartao_nacional_saude_cns').inputmask('999.9999.9999.9999');
+    });
 </script>
 
 {% endblock main %}

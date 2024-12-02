@@ -126,8 +126,7 @@ class Alunos(models.Model):
     email = models.EmailField(max_length=200, null=False, verbose_name='Email*')
     rua = models.CharField(max_length=30, null=False, default='Av., Rua, Travessa')
     bairro = models.ForeignKey(Bairro, null=True, on_delete=models.CASCADE)
-    cidade = models.ForeignKey(Cidade, null=True, on_delete=models.CASCADE)    
-    cidade_nascimento = models.ForeignKey(Cidade, related_name="cidade_nascimento",verbose_name='Cidade onde nasceu', null=True, on_delete=models.CASCADE)
+    cidade = models.ForeignKey(Cidade, null=True, on_delete=models.CASCADE)   
     estado = models.ForeignKey(Uf_Unidade_Federativa, related_name="estado_nascimento",verbose_name='Estado onde nasceu', null=True, on_delete=models.CASCADE)
     nome_mae = models.CharField(max_length=120, null=False, default='', verbose_name='Nome da Mãe*')
     CPF_mae = models.CharField(max_length=14, null=True, blank=True, default='000.000.000-00')   
@@ -199,8 +198,8 @@ class Alunos(models.Model):
         return self.nome_completo 
     
 class AlunoUser(models.Model):
-    aluno = models.ForeignKey(Alunos, null=True, on_delete=models.CASCADE, related_name='alunoUser_related',  verbose_name='Aluno Usuario*:')
-    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE,related_name='userAluno_related', verbose_name='usuario aluno*:')
+    aluno = models.OneToOneField(Alunos, null=True, on_delete=models.CASCADE, related_name='alunoUser_related',  verbose_name='Aluno Usuario*:')
+    user = models.OneToOneField(User, null=True, on_delete=models.CASCADE,related_name='userAluno_related', verbose_name='usuario aluno*:')
 
     class Meta:
         ordering = ['aluno']
