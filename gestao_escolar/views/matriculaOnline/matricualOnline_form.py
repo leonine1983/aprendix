@@ -191,7 +191,8 @@ class MatriculaOnline_etapa2(forms.ModelForm):
 class MatriculaOnline_etapa3(forms.ModelForm):   
     class Meta:
         model = Alunos
-        fields = ['CPF', 'RG', 'RG_emissao', 'orgao_emissor', 'RG_UF', 'naturalidade', 'estado_naturalidade']      
+        fields = ['CPF', 'RG', 'RG_emissao', 'orgao_emissor', 'RG_UF', 'naturalidade', 'estado_naturalidade', 'nacionalidade', 'aluno_exterior', 'pais_origem', 'data_entrada_no_pais', 'documento_estrangeiro']      
+
         
     CPF = forms.CharField(
         label="CPF do aluno",
@@ -208,7 +209,7 @@ class MatriculaOnline_etapa3(forms.ModelForm):
 
     orgao_emissor = forms.CharField(
         label="Órgão que emitiu o RG",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder':"ssp"})        
+        widget=forms.TextInput(attrs={'class': 'form-control'})        
     )
     RG_UF = forms.ModelChoiceField(
         label='Estado que emitiu o RG',
@@ -226,7 +227,14 @@ class MatriculaOnline_etapa3(forms.ModelForm):
         queryset = Uf_Unidade_Federativa.objects.all(),
         widget=forms.Select(attrs={'class': 'form-control'}),
         required=False   
-    )   
+    ) 
+    data_entrada_no_pais =  forms.CharField(
+        label="Data de entrada no Brasil",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'type':'date'}),
+        required=False   
+    )
+
+   
 
 class MatriculaOnline_etapa4(forms.ModelForm):   
     class Meta:

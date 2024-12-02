@@ -139,10 +139,12 @@ class Alunos(models.Model):
     naturalidade = models.ForeignKey(Cidade, null=True, on_delete=models.CASCADE, related_name="related_naturalidade", verbose_name='Cidade onde nasceu')
     estado_naturalidade = models.ForeignKey(Uf_Unidade_Federativa, related_name="estado_nascimento",verbose_name='Estado onde nasceu', null=True, on_delete=models.CASCADE)
     nacionalidade = models.ForeignKey(Nacionalidade, on_delete=models.CASCADE, default=1, verbose_name='Nacionalidade*')
+    # Se exterior
     aluno_exterior = models.BooleanField(default=False, verbose_name="Marque se o aluno veio do Exterior")
     pais_origem = models.ForeignKey(Pais_origem, blank=True, null=True, on_delete=models.CASCADE)
     data_entrada_no_pais= models.DateField(null=True, blank=True)  
     documento_estrangeiro = models.CharField(max_length=30, null=True, blank=True)
+    # condicoes fisicas
     deficiencia_aluno = models.ForeignKey(Deficiencia_aluno, on_delete=models.CASCADE, null=True, verbose_name='Informe se o aluno possui deficiência*')        
     tipo_sanguineo = models.CharField(max_length=3, choices=choices, null=True, )
     beneficiario_aux_Brasil = models.BooleanField(default=False,null=True, verbose_name='Selecione se o aluno é beneficiário do Bolsa Família/Aux. Brasil')

@@ -99,33 +99,30 @@
                 {{form.estado_naturalidade}}
             </div>      
         </div>
-
-     
-        
-        
-       
-        <!--
-
-   
-class MatriculaOnline_etapa3(forms.ModelForm):   
-    class Meta:
-        model = Alunos
-        fields = ['CPF', 'RG', 'RG_emissao', 'orgao_emissor', 'RG_UF', 'naturalidade', 'estado_naturalidade']      
-        
-    CPF = forms.CharField(
-        label="CPF do aluno",
-        widget=forms.TextInput(attrs={'class': 'form-control ', 'type':'date'})        
-    )
-  
-
-
-    
-
-        -->
-
-       
-
-        
+        <h2 class="form-section-title">Se extrangeiro</h2>
+        <div class="form-grid border p-2 m-2 bg-danger-subtle p-3 rounded-2">
+            <div>
+                {{form.aluno_exterior.error}}
+                {{form.aluno_exterior.label}}
+                {{form.aluno_exterior}}
+            </div>   
+            <div>
+                {{form.pais_origem.error}}
+                {{form.pais_origem.label}}
+                {{form.pais_origem}}
+            </div>  
+            <div>
+                {{form.data_entrada_no_pais.error}}
+                {{form.data_entrada_no_pais.label}}
+                {{form.data_entrada_no_pais }}
+            </div>  
+            <div>
+                {{form.documento_estrangeiro.error}}
+                {{form.documento_estrangeiro.label}}
+                {{form.documento_estrangeiro }}
+            </div>               
+        </div>
+            
         <button type="submit" class="btn btn-win11-primary btn-lg">Próxima Etapa</button>
     </form>
 </div>
@@ -144,6 +141,7 @@ class MatriculaOnline_etapa3(forms.ModelForm):
         $('#id_cartao_nacional_saude_cns').inputmask('999.9999.9999.9999');
     });
 </script>
+ 
 
 {% endblock main %}
 

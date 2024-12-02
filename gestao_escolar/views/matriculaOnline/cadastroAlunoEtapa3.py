@@ -12,14 +12,17 @@ def cadastro_aluno_etapa3(request, aluno_id):
     if request.method == 'POST':
         if form.is_valid():  # Check if form is valid before accessing cleaned_data
             # Aqui você pode adicionar mais dados, como telefone, endereço, etc.
-            aluno.data_nascimento = form.cleaned_data['data_nascimento']
-            aluno.tel_celular_aluno = form.cleaned_data['tel_celular_aluno']
-            aluno.sexo = form.cleaned_data['sexo']
-            aluno.rua = form.cleaned_data['rua']
-            aluno.bairro = form.cleaned_data['bairro']
-            aluno.cidade = form.cleaned_data['cidade']
-            aluno.cartao_nacional_saude_cns = form.cleaned_data['cartao_nacional_saude_cns']
-            aluno.nis = form.cleaned_data['nis']
+            aluno.CPF = form.cleaned_data['CPF']
+            aluno.RG = form.cleaned_data['RG']
+            aluno.RG_emissao = form.cleaned_data['orgao_emissor']
+            aluno.RG_UF = form.cleaned_data['RG_UF']
+            aluno.naturalidade = form.cleaned_data['naturalidade']
+            aluno.estado_naturalidade = form.cleaned_data['estado_naturalidade']
+            aluno.nacionalidade = form.cleaned_data['nacionalidade']
+            aluno.aluno_exterior = form.cleaned_data['aluno_exterior']
+            aluno.pais_origem = form.cleaned_data['pais_origem']
+            aluno.data_entrada_no_pais = form.cleaned_data['data_entrada_no_pais']
+            aluno.documento_estrangeiro = form.cleaned_data['documento_estrangeiro']
 
             aluno.save()
             messages.success(request, f"As informações foram atualizadas com sucesso: RG e CPF. A partir de agora, você atualizarar os dados da Certidão de Nascimento do aluno.")
