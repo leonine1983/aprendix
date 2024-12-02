@@ -6,7 +6,10 @@ from rh.models import Uf_Unidade_Federativa, Sexo, Cidade, Bairro
 from gestao_escolar.models import (Alunos)
 import re
 from django.core.exceptions import ValidationError   
-from django.contrib import messages                             
+from django.contrib import messages     
+from django import forms
+from maskpass import askpass
+
 
 choices = {
     ('1','A+'),
@@ -91,13 +94,7 @@ class MatriculaOnline_etapa1(forms.ModelForm):
     
     class Meta:
         model = Alunos
-        fields = ['login_aluno', 'senha','nome_social','email']    
-        
-        """
-        fields = ['login_aluno', 'senha','email',  'CPF', 'RG', 'RG_emissao', 'RG_UF', 'orgao_emissor','cidade_nascimento','estado','cidade',  'bairro', 'cartao_nacional_saude_cns', 'nis',
-                'estado_civil', 'tipo_certidao', 'numero_certidao', 'livro', 'folha', 'termo', 'emissao', 'distrito_certidao', 'cartorio', 'comarca', 'cartorio_uf']    
-        """
-    
+        fields = ['login_aluno', 'senha','nome_social','email']          
     
     login_aluno = forms.CharField(
         label='Login do aluno (idendificação de acesso do aluno ao Aprendix)',
@@ -135,48 +132,12 @@ class MatriculaOnline_etapa1(forms.ModelForm):
             login = f'{letra}/{numero}'
             if not Alunos.objects.filter(login_aluno=login).exists():
                 return login
-            
-from django import forms
-from maskpass import askpass
-import phonenumbers
+                       
 
 class MatriculaOnline_etapa2(forms.ModelForm):   
     class Meta:
         model = Alunos
-        fields = ['nome_social', 'data_nascimento', 'sexo', 'tel_celular_aluno', 'etnia', 'rua', 'bairro', 'cidade', 'cartao_nacional_saude_cns', 'nis']
-
-        """
-        ,'CPF', 'RG', 'RG_emissao', 'orgao_emissor', 'RG_UF', 'cidade_nascimento', 'estado',
-
-
-
-        
-    CPF = forms.CharField(
-        label='Nº do CPF (aluno)',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'maxlength': '14'}),
-        required=False,
-    )  
-
-    RG = forms.CharField(
-        label='Nº do RG (aluno)',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'maxlength': '12'}),
-        required=False,
-    )  
-
-    RG_emissao = forms.CharField(
-        label='Data de emissão do RG',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'date'}),
-        required=False,
-    )  
-
-    orgao_emissor = forms.CharField(
-        label='Orgão emissor do RG',
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
-        required=False,
-    ) 
-
-
-        """
+        fields = ['nome_social', 'data_nascimento', 'sexo', 'tel_celular_aluno', 'etnia', 'rua', 'bairro', 'cidade', 'cartao_nacional_saude_cns', 'nis']      
         
     data_nascimento = forms.CharField(
         label="Data de nascimento do aluno",
@@ -226,15 +187,67 @@ class MatriculaOnline_etapa2(forms.ModelForm):
         required=False,
     )
 
+
+class MatriculaOnline_etapa3(forms.ModelForm):   
+    class Meta:
+        model = Alunos
+        fields = ['CPF', 'RG', 'RG_emissao', 'orgao_emissor', 'RG_UF', 'naturalidade', 'estado_naturalidade']      
+        
+    CPF = forms.CharField(
+        label="CPF do aluno",
+        widget=forms.TextInput(attrs={'class': 'form-control '})        
+    )
+    RG = forms.CharField(
+        label="RG do aluno",
+        widget=forms.TextInput(attrs={'class': 'form-control '})        
+    )
+    RG_emissao = forms.CharField(
+        label="data de emissão do RG",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'type': "date"})            
+    )   
+
+    orgao_emissor = forms.CharField(
+        label="Órgão que emitiu o RG",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder':"ssp"})        
+    )
+    RG_UF = forms.ModelChoiceField(
+        label='Estado que emitiu o RG',
+        queryset = Uf_Unidade_Federativa.objects.all(),
+        widget=forms.Select(attrs={'class': ' form-control'}),
+        required=False   
+    )     
+    naturalidade  = forms.ModelChoiceField(
+        label='Cidade onde o aluno nasceu',
+        queryset = Cidade.objects.all(),
+        widget=forms.Select(attrs={'class': ' form-control'}),
+        required=False   
+    )  
+    estado_naturalidade = forms.ModelChoiceField(
+        queryset = Uf_Unidade_Federativa.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=False   
+    )   
+
+class MatriculaOnline_etapa4(forms.ModelForm):   
+    class Meta:
+        model = Alunos
+        fields = ['estado_civil', 'tipo_certidao', 'numero_certidao', 'livro', 'folha', 'termo', 'emissao', 'distrito_certidao', 'cartorio', 'comarca', 'cartorio_uf']      
+        
+  
+
+
+
     
 
 
 """
-        fields = [ 
-                'estado_civil', 'tipo_certidao', 'numero_certidao', 'livro', 'folha', 'termo', 'emissao', 'distrito_certidao', 'cartorio', 'comarca', 'cartorio_uf']    
-        """
-    
+      
+        fields = []    
+      
 
+
+
+        """
 
 """
   

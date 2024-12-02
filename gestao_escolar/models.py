@@ -124,16 +124,20 @@ class Alunos(models.Model):
     #aluno_inativo = models.BooleanField(default=False, null=True)
     tel_celular_aluno = models.CharField(max_length=30, null=False,  verbose_name='Nº de telefone do aluno*')    
     email = models.EmailField(max_length=200, null=False, verbose_name='Email*')
+    # Endereço do aluno
     rua = models.CharField(max_length=30, null=False, default='Av., Rua, Travessa')
     bairro = models.ForeignKey(Bairro, null=True, on_delete=models.CASCADE)
     cidade = models.ForeignKey(Cidade, null=True, on_delete=models.CASCADE)   
-    estado = models.ForeignKey(Uf_Unidade_Federativa, related_name="estado_nascimento",verbose_name='Estado onde nasceu', null=True, on_delete=models.CASCADE)
+    estado = models.ForeignKey(Uf_Unidade_Federativa, related_name="estado_relatec",verbose_name='Estado onde vive', null=True, on_delete=models.CASCADE)
+    # Informações Paternas e Maternas
     nome_mae = models.CharField(max_length=120, null=False, default='', verbose_name='Nome da Mãe*')
     CPF_mae = models.CharField(max_length=14, null=True, blank=True, default='000.000.000-00')   
     tel_celular_mae = models.CharField(max_length=30, null=True, verbose_name='Nº do celular do mãe*')
     nome_pai = models.CharField(max_length=120, null=True, default='')
     tel_celular_pai = models.CharField(max_length=30, null=True)      
+    # Dados de Nacimento
     naturalidade = models.ForeignKey(Cidade, null=True, on_delete=models.CASCADE, related_name="related_naturalidade", verbose_name='Cidade onde nasceu')
+    estado_naturalidade = models.ForeignKey(Uf_Unidade_Federativa, related_name="estado_nascimento",verbose_name='Estado onde nasceu', null=True, on_delete=models.CASCADE)
     nacionalidade = models.ForeignKey(Nacionalidade, on_delete=models.CASCADE, default=1, verbose_name='Nacionalidade*')
     aluno_exterior = models.BooleanField(default=False, verbose_name="Marque se o aluno veio do Exterior")
     pais_origem = models.ForeignKey(Pais_origem, blank=True, null=True, on_delete=models.CASCADE)

@@ -7,7 +7,7 @@ from django.contrib import messages
 @login_required
 def cadastro_aluno_etapa2(request, aluno_id):
     aluno = Alunos.objects.get(id=aluno_id)
-    form = MatriculaOnline_etapa2(request.POST or None)
+    form = MatriculaOnline_etapa2(request.POST or None, instance=aluno)
 
     if request.method == 'POST':
         if form.is_valid():  # Check if form is valid before accessing cleaned_data
@@ -23,7 +23,7 @@ def cadastro_aluno_etapa2(request, aluno_id):
 
             aluno.save()
             messages.success(request, f"As informações foram atualizadas com sucesso: Endereço, Data de Nascimento, CNS (Cartão Nacional de Saúde), NIS (Número de Identificação Social). A partir de agora, você atualizarar os dados do RG e CPF do aluno.")
-            return redirect('cadastro_aluno_etapa3', aluno_id=aluno.id)
+            return redirect('Gestao_Escolar:cadastro_aluno_etapa3', aluno_id=aluno.id)
         else:
             messages.error(request, "Por favor, corrija os erros no formulário.")
 
