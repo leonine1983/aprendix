@@ -187,13 +187,11 @@ class MatriculaOnline_etapa2(forms.ModelForm):
         required=False,
     )
 
-
 class MatriculaOnline_etapa3(forms.ModelForm):   
     class Meta:
         model = Alunos
         fields = ['CPF', 'RG', 'RG_emissao', 'orgao_emissor', 'RG_UF', 'naturalidade', 'estado_naturalidade', 'nacionalidade', 'aluno_exterior', 'pais_origem', 'data_entrada_no_pais', 'documento_estrangeiro']      
 
-        
     CPF = forms.CharField(
         label="CPF do aluno",
         widget=forms.TextInput(attrs={'class': 'form-control '})        
@@ -239,13 +237,12 @@ class MatriculaOnline_etapa3(forms.ModelForm):
         required=False,
         disabled=True 
     )
-    data_entrada_no_pais =  forms.CharField(
+    data_entrada_no_pais = forms.DateField(  # Alterado de CharField para DateField
         label="Data de entrada no Brasil",
-        widget=forms.DateInput(attrs={'class': 'form-control', 'type':'date'}),
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         required=False,
         disabled=True 
     )
-   
 
 class MatriculaOnline_etapa4(forms.ModelForm):   
     class Meta:
