@@ -17,5 +17,6 @@ def cadastro_aluno_etapa4(request, aluno_id):
         aluno.save()
         messages.success(request, f"As informações foram atualizadas com sucesso: RG e CPF. A partir de agora, você atualizarar os dados da Certidão de Nascimento do aluno.")
         return redirect('matricula_online', aluno_id=aluno.id)
+   
     
     return render(request, 'Escola/matriculaOnline/etapa4.html', {'aluno': aluno, 'form':form})

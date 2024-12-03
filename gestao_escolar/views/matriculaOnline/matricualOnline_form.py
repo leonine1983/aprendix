@@ -247,7 +247,7 @@ class MatriculaOnline_etapa3(forms.ModelForm):
 class MatriculaOnline_etapa4(forms.ModelForm):   
     class Meta:
         model = Alunos
-        fields = ['estado_civil', 'tipo_certidao', 'numero_certidao', 'livro', 'folha', 'termo', 'emissao', 'distrito_certidao', 'cartorio', 'comarca', 'cartorio_uf']      
+        fields = ['nome_mae', 'tel_celular_mae', 'nome_pai', 'tel_celular_pai', 'estado_civil', 'tipo_certidao', 'numero_certidao', 'livro', 'folha', 'termo', 'emissao', 'distrito_certidao', 'cartorio', 'comarca', 'cartorio_uf']      
         
   
 
