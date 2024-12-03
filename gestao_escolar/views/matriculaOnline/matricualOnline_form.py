@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 import random
 import string
 from rh.models import Uf_Unidade_Federativa, Sexo, Cidade, Bairro
-from gestao_escolar.models import (Alunos)
+from gestao_escolar.models import (Alunos, Pais_origem)
 import re
 from django.core.exceptions import ValidationError   
 from django.contrib import messages     
@@ -204,7 +204,7 @@ class MatriculaOnline_etapa3(forms.ModelForm):
     )
     RG_emissao = forms.CharField(
         label="data de emissão do RG",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'type': "date"})            
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': "date"})            
     )   
 
     orgao_emissor = forms.CharField(
@@ -228,8 +228,9 @@ class MatriculaOnline_etapa3(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'}),
         required=False,
     ) 
-    pais_origem=  forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
+    pais_origem =  forms.ModelChoiceField(
+        queryset=Pais_origem.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
         required=False,
         disabled=True 
     )
@@ -240,7 +241,7 @@ class MatriculaOnline_etapa3(forms.ModelForm):
     )
     data_entrada_no_pais =  forms.CharField(
         label="Data de entrada no Brasil",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'type':'date'}),
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type':'date'}),
         required=False,
         disabled=True 
     )

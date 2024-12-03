@@ -66,77 +66,106 @@
     
     
     <form method="post" class='win11-form'>
-        {% csrf_token %}        
-        {% for error in form.data_nascimento.errors %}
-            <div class="error-message">{{ error }}</div>
-        {% endfor %} 
+        {% csrf_token %}
         <h2 class="form-section-title">Informações sobre o CPF</h2>
-        <div class="form-grid border p-2 m-2">  
+        <div class="form-grid border p-2 m-2">
             <div>
-                {{form.CPF.error}}
-                {{form.CPF.label}}
-                {{form.CPF}}
-            </div>  
-        </div>    
+                {% for error in form.CPF.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+                {{ form.CPF.label }}
+                {{ form.CPF }}
+            </div>
+        </div>
+    
         <h2 class="form-section-title">Informações sobre Documento de Identidade (RG)</h2>
         <div class="form-grid border p-2 m-2">
             <div>
-                {{form.RG.error}}
-                {{form.RG.label}}
-                {{form.RG}}
-            </div>   
+                {% for error in form.RG.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+                {{ form.RG.label }}
+                {{ form.RG }}
+            </div>
             <div>
-                {{form.RG_emissao.error}}
-                {{form.RG_emissao.label}}
-                {{form.RG_emissao}}
-            </div>  
+                {% for error in form.RG_emissao.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+                {{ form.RG_emissao.label }}
+                {{ form.RG_emissao }}
+            </div>
             <div>
-                {{form.orgao_emissor.error}}
-                {{form.orgao_emissor.label}}
-                {{form.orgao_emissor }}
-            </div>  
+                {% for error in form.orgao_emissor.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+                {{ form.orgao_emissor.label }}
+                {{ form.orgao_emissor }}
+            </div>
             <div>
-                {{form.RG_UF.error}}
-                {{form.RG_UF.label}}
-                {{form.RG_UF}}
-            </div> 
+                {% for error in form.RG_UF.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+                {{ form.RG_UF.label }}
+                {{ form.RG_UF }}
+            </div>
             <div>
-                {{form.naturalidade.error}}
-                {{form.naturalidade.label}}
-                {{form.naturalidade}}
-            </div>  
+                {% for error in form.naturalidade.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+                {{ form.naturalidade.label }}
+                {{ form.naturalidade }}
+            </div>
             <div>
-                {{form.estado_naturalidade.error}}
-                {{form.estado_naturalidade.label}}
-                {{form.estado_naturalidade}}
-            </div>      
+                {% for error in form.estado_naturalidade.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+                {{ form.estado_naturalidade.label }}
+                {{ form.estado_naturalidade }}
+            </div>
+            <div>
+                {% for error in form.nacionalidade.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+                {{ form.nacionalidade.label }}
+                {{ form.nacionalidade }}
+            </div>
         </div>
+    
         <h2 class="form-section-title">Se extrangeiro</h2>
         <div class="form-grid border p-2 m-2 bg-danger-subtle p-3 rounded-2">
             <div class="d-flex">
-                {{form.aluno_exterior.error}}
-                {{form.aluno_exterior.label}}
-                {{form.aluno_exterior}}
-            </div>   
+                {% for error in form.aluno_exterior.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+                {{ form.aluno_exterior.label }}
+                {{ form.aluno_exterior }}
+            </div>
             <div>
-                {{form.pais_origem.error}}
-                {{form.pais_origem.label}}
-                {{form.pais_origem}}
-            </div>  
+                {% for error in form.pais_origem.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+                {{ form.pais_origem.label }}
+                {{ form.pais_origem }}
+            </div>
             <div>
-                {{form.data_entrada_no_pais.error}}
-                {{form.data_entrada_no_pais.label}}
-                {{form.data_entrada_no_pais }}
-            </div>  
+                {% for error in form.data_entrada_no_pais.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+                {{ form.data_entrada_no_pais.label }}
+                {{ form.data_entrada_no_pais }}
+            </div>
             <div>
-                {{form.documento_estrangeiro.error}}
-                {{form.documento_estrangeiro.label}}
-                {{form.documento_estrangeiro }}
-            </div>               
+                {% for error in form.documento_estrangeiro.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+                {{ form.documento_estrangeiro.label }}
+                {{ form.documento_estrangeiro }}
+            </div>
         </div>
-            
+    
         <button type="submit" class="btn btn-win11-primary btn-lg">Próxima Etapa</button>
     </form>
+    
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.9/jquery.inputmask.min.js" integrity="sha512-F5Ul1uuyFlGnIT1dk2c4kB4DBdi5wnBJjVhL7gQlGh46Xn0VhvD8kgxLtjdZ5YN83gybk/aASUAlpdoWUjRR3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
