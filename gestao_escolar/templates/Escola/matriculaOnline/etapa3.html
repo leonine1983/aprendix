@@ -15,7 +15,19 @@
 .form-group {
     margin-bottom: 15px;
 }
+#id_aluno_exterior{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: center !important;
+    gap: 2;
+    border: #333;
+}
+#id_pais_origem, #id_data_entrada_no_pais, #id_documento_estrangeiro{
+    background-color: cadetblue !important ;
+}
 
+
+ 
 </style>
 <link rel="stylesheet" href="{% static 'global/css/form_win11.css' %}">
 <div class="container p-4 bg-light text-muted " style=" color: #fff; border-radius: 8px; width:95vw; margin-top:5rem!important">
@@ -101,7 +113,7 @@
         </div>
         <h2 class="form-section-title">Se extrangeiro</h2>
         <div class="form-grid border p-2 m-2 bg-danger-subtle p-3 rounded-2">
-            <div>
+            <div class="d-flex">
                 {{form.aluno_exterior.error}}
                 {{form.aluno_exterior.label}}
                 {{form.aluno_exterior}}
@@ -140,8 +152,39 @@
         // Aplicando mascara no NIS
         $('#id_cartao_nacional_saude_cns').inputmask('999.9999.9999.9999');
     });
+
+   
 </script>
  
+
+
+
+<script>
+    // Função que ativa ou desativa os campos
+    function toggleFields() {
+        const isChecked = document.getElementById('id_aluno_exterior').checked;
+        
+        // Ativar ou desativar campos dependendo do estado do checkbox
+        document.getElementById('id_pais_origem').disabled = !isChecked;        
+        document.getElementById('id_data_entrada_no_pais').disabled = !isChecked;
+        document.getElementById('id_documento_estrangeiro').disabled = !isChecked;
+
+         // Alterar o fundo para branco ou voltar para cadetblue
+             // Forçar a mudança do fundo para branco ou cadetblue, ignorando o !important no CSS
+        if (isChecked) {
+            document.getElementById('id_pais_origem').style.setProperty('background-color', 'white', 'important');
+            document.getElementById('id_data_entrada_no_pais').style.setProperty('background-color', 'white', 'important');
+            document.getElementById('id_documento_estrangeiro').style.setProperty('background-color', 'white', 'important');
+        } else {
+            document.getElementById('id_pais_origem').style.setProperty('background-color', 'cadetblue', 'important');
+            document.getElementById('id_data_entrada_no_pais').style.setProperty('background-color', 'cadetblue', 'important');
+            document.getElementById('id_documento_estrangeiro').style.setProperty('background-color', 'cadetblue', 'important');
+        }
+    }
+
+    // Adicionar evento para alternar os campos quando o checkbox for clicado
+    document.getElementById('id_aluno_exterior').addEventListener('change', toggleFields);
+</script>
 
 {% endblock main %}
 

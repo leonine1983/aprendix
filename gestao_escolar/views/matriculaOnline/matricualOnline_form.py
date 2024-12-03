@@ -221,19 +221,29 @@ class MatriculaOnline_etapa3(forms.ModelForm):
         label='Cidade onde o aluno nasceu',
         queryset = Cidade.objects.all(),
         widget=forms.Select(attrs={'class': ' form-control'}),
-        required=False   
+        required=False,
     )  
     estado_naturalidade = forms.ModelChoiceField(
         queryset = Uf_Unidade_Federativa.objects.all(),
         widget=forms.Select(attrs={'class': 'form-control'}),
-        required=False   
+        required=False,
     ) 
+    pais_origem=  forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        required=False,
+        disabled=True 
+    )
+    documento_estrangeiro =  forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        required=False,
+        disabled=True 
+    )
     data_entrada_no_pais =  forms.CharField(
         label="Data de entrada no Brasil",
         widget=forms.TextInput(attrs={'class': 'form-control', 'type':'date'}),
-        required=False   
+        required=False,
+        disabled=True 
     )
-
    
 
 class MatriculaOnline_etapa4(forms.ModelForm):   
@@ -249,13 +259,11 @@ class MatriculaOnline_etapa4(forms.ModelForm):
 
 
 """
-      
-        fields = []    
-      
 
+     
+             
 
-
-        """
+  """
 
 """
   
