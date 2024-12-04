@@ -248,6 +248,12 @@ class MatriculaOnline_etapa4(forms.ModelForm):
     class Meta:
         model = Alunos
         fields = ['nome_mae', 'tel_celular_mae', 'nome_pai', 'tel_celular_pai', 'estado_civil', 'tipo_certidao', 'numero_certidao', 'livro', 'folha', 'termo', 'emissao', 'distrito_certidao', 'cartorio', 'comarca', 'cartorio_uf']      
+
+    emissao = forms.DateField(  # Alterado de CharField para DateField
+        label="Data de emissão da certidão",
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        required=False
+    )
         
   
 

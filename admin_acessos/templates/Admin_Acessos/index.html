@@ -194,11 +194,11 @@ body{
 
 
 .faixa {
-    background-color: rgba(245, 245, 245, 0.1); /* Cor similar ao Windows 11 com transparência */
+    background-color: rgba(255, 255, 255, 0.514); /* Cor similar ao Windows 11 com transparência */
   
     padding: 10px 20px;
     display: flex;
-    justify-content: flex-end;
+    justify-content:space-around;
     align-items: center;
    
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), inset 0 0 10px rgba(0, 0, 0, 0.1); /* Efeito interno (para dar a sensação de borda para dentro) */
@@ -251,6 +251,7 @@ body{
 <main class="form-signin w-100 m-auto " >
   <div class="container-fluid">
     <div class="faixa">
+        <img src="{% static 'SME - 2 PNG.png' %}" width='120' alt="">
         <a class="botao-matricula btn btn-light" href="{% url 'Gestao_Escolar:pesquisar_aluno' %}">Matrícula Online</a>
     </div>
   </div>
