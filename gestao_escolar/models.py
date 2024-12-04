@@ -343,6 +343,27 @@ turno = {
     ('Noturno', 'Noturno')
 }
 
+class EscolaMatriculaOnline(models.Model):
+    escola = models.ForeignKey('rh.Escola', on_delete=models.CASCADE)
+    ano_letivo = models.ForeignKey(AnoLetivo, on_delete=models.CASCADE)
+    data_inicio = models.DateField(null=True)
+    data_fim = models.DateField(null=True)   
+    ativo =models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.escola} - {self.ano_letivo.ano}'
+
+
+class SerieOnline(models.Model):
+    escola = models.ForeignKey(EscolaMatriculaOnline, on_delete=models.CASCADE)    
+    serie =  models.ForeignKey(Serie_Escolar, on_delete=models.CASCADE)
+    turno = models.CharField(choices=turno, null=False, default=1, max_length=12)                
+    quantidade_vagas = models.IntegerField(default=36) 
+    vagas_disponiveis = models.IntegerField(null=True)    
+    
+    def __str__(self):
+        return f'{self.serie.nome} - {self.escola.ano_letivo.ano}'
+
 
 class Turmas(models.Model):
     nome = models.CharField(max_length=10)

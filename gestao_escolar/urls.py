@@ -174,6 +174,20 @@ urlpatterns = [
     path('cadastro_aluno/etapa3/<int:aluno_id>', cadastro_aluno_etapa3, name='cadastro_aluno_etapa3'),
     path('cadastro_aluno/certidao/<int:aluno_id>', cadastro_aluno_etapa4, name='cadastro_aluno_etapa4'),
     path('cadastro_aluno/fisicoEsaude/<int:aluno_id>', cadastro_aluno_etapa5, name='cadastro_aluno_etapa5'),
+
+
+    # Escola Matricula Online
+    # URLs para EscolaMatriculaOnline
+    path('escolas/', lista_escolas, name='lista_escolas'),
+    path('escolas/adicionar/', adicionar_escola, name='adicionar_escola'),
+    path('escolas/editar/<int:pk>/', editar_escola, name='editar_escola'),
+    path('escolas/deletar/<int:pk>/', deletar_escola, name='deletar_escola'),
+
+    # URLs para SerieOnline
+    path('series/', lista_series, name='lista_series'),
+    path('series/adicionar/', adicionar_serie, name='adicionar_serie'),
+    path('series/editar/<int:pk>/', editar_serie, name='editar_serie'),
+    path('series/deletar/<int:pk>/', deletar_serie, name='deletar_serie'),
     
 ] 
 

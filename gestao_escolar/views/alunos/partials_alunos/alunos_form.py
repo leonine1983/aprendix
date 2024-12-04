@@ -45,16 +45,16 @@ class Alunos_form(forms.ModelForm):
     
     
     nome_mae = forms.CharField(      
-        label=mark_safe('<i class="fa-solid fa-user-tie-hair"></i>Nome completo da Mãe'),
+        label=mark_safe('<i class="fa-solid fa-user-tie-hair"></i>Nome completo da Mãe ou Responsável'),
         widget=forms.TextInput(attrs={
             'class': 'form-control border border-info p-3 pb-3 text-info text-uppercase col m-2 rounded-1',
             'autocomplete': 'off'}),
     )
     CPF_mae = forms.CharField(      
-        label=mark_safe('<i class="fa-solid fa-user-tie-hair"></i>Digite o CPF da mãe'),
-        widget=forms.NumberInput(attrs={
+        label=mark_safe('<i class="fa-solid fa-user-tie-hair"></i>Digite o CPF da mãe ou responsável'),
+        widget=forms.TextInput(attrs={
             'class': 'form-control border border-info p-3 pb-3 text-info text-uppercase col m-2 rounded-1',
-            'autocomplete': 'off'}),
+            'autocomplete': 'off'}),    
     )
 
     def clean_nome_mae(self):

@@ -55,6 +55,15 @@
       </li>
     </ul>
     <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+      <li class="nav-item">
+        <a href="{% url 'controle_estoque:index' %}" class="nav-link {% if active == 'index' %}active{% endif %}" aria-current="page">
+          <svg class="bi pe-none  me-2" width="24" height="24" role="img" aria-label="Home"><use xlink:href="#home"/></svg>
+          Informações Gerais
+        </a>
+      </li>      
+    </ul>
+    <hr>
     <div class="dropdown">
       <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
         <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">

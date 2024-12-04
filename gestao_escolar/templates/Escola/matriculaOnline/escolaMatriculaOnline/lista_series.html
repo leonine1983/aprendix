@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Séries</title>
+</head>
+<body>
+    <h1>Lista de Séries</h1>
+    <a href="{% url 'adicionar_serie' %}">Adicionar Nova Série</a>
+    <ul>
+        {% for serie in series %}
+            <li>
+                {{ serie }} - 
+                <a href="{% url 'editar_serie' pk=serie.pk %}">Editar</a> | 
+                <a href="{% url 'deletar_serie' pk=serie.pk %}">Deletar</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
