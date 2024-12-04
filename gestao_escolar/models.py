@@ -144,20 +144,21 @@ class Alunos(models.Model):
     pais_origem = models.ForeignKey(Pais_origem, blank=True, null=True, on_delete=models.CASCADE)
     data_entrada_no_pais= models.DateField(null=True, blank=True)  
     documento_estrangeiro = models.CharField(max_length=30, null=True, blank=True)
-    # condicoes fisicas
+    # condicoes fisicas e saude
     deficiencia_aluno = models.ForeignKey(Deficiencia_aluno, on_delete=models.CASCADE, null=True, verbose_name='Informe se o aluno possui deficiência*')        
-    tipo_sanguineo = models.CharField(max_length=3, choices=choices, null=True, )
-    beneficiario_aux_Brasil = models.BooleanField(default=False,null=True, verbose_name='Selecione se o aluno é beneficiário do Bolsa Família/Aux. Brasil')
+    tipo_sanguineo = models.CharField(max_length=3, choices=choices, null=True, )    
     necessita_edu_especial = models.BooleanField(default=False,null=True, verbose_name='Selecione se o aluno precisa de algum atendimento especial')
-    sindrome_de_Down = models.BooleanField(default=False,null=True, verbose_name='Selecione se o aluno for portador de Síndrome de Down')
-    quilombola = models.BooleanField(default=False,null=True, verbose_name='Selecione se o aluno possui deficiência')
-    irmao_gemeo = models.BooleanField(default=False, null=True, verbose_name='Selecione se o aluno possui irmão(s) gêmeos')
     vacina_covid_19 = models.BooleanField(default=False, null=True,verbose_name='Selecione se o aluno tomou vacina contra a covid 19' )
     dose_vacina_covid_19 = models.IntegerField(null=True, blank=True, verbose_name='Preencha se o aluno tomou alguma dose da covid 19' )
-    res_cadastro = models.CharField(max_length=120, null=True, default='Quem criou o cadastro')    
-    res_atualiza_cadastro = models.CharField(max_length=120, null=True, default='Quem atualizou')   
-
+    sindrome_de_Down = models.BooleanField(default=False,null=True, verbose_name='Selecione se o aluno for portador de Síndrome de Down')
     espectro_autista = models.BooleanField(default=False, null=True,verbose_name='Por favor, informe se o aluno possui Transtorno do Espectro Autista (TEA), para que possamos oferecer o apoio necessário') 
+    
+    beneficiario_aux_Brasil = models.BooleanField(default=False,null=True, verbose_name='Selecione se o aluno é beneficiário do Bolsa Família/Aux. Brasil')
+    quilombola = models.BooleanField(default=False,null=True, verbose_name='Selecione se o aluno possui deficiência')
+    irmao_gemeo = models.BooleanField(default=False, null=True, verbose_name='Selecione se o aluno possui irmão(s) gêmeos')   
+    res_cadastro = models.CharField(max_length=120, null=True, default='Quem criou o cadastro')    
+    res_atualiza_cadastro = models.CharField(max_length=120, null=True, default='Quem atualizou')       
+    
     documento_espectro_autista = models.FileField(upload_to='documentos_aluno_TEA/', null=True, blank=True, verbose_name="Caso o aluno seja autista ou possua qualquer deficiência que requeira comprovação, faça o upload do laudo médico ou documentos pertinentes.")
     foto_aluno = models.ImageField(upload_to='imagem_aluno/', null=True, blank=True, verbose_name="Selecione uma imagem de perfil para o aluno.")
 

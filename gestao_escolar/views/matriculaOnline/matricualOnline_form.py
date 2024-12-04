@@ -247,87 +247,23 @@ class MatriculaOnline_etapa3(forms.ModelForm):
 class MatriculaOnline_etapa4(forms.ModelForm):   
     class Meta:
         model = Alunos
-        fields = ['nome_mae', 'tel_celular_mae', 'nome_pai', 'tel_celular_pai', 'estado_civil', 'tipo_certidao', 'numero_certidao', 'livro', 'folha', 'termo', 'emissao', 'distrito_certidao', 'cartorio', 'comarca', 'cartorio_uf']      
-
-    emissao = forms.DateField(  # Alterado de CharField para DateField
-        label="Data de emissão da certidão",
-        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-        required=False
-    )
-        
-  
-
-
-
+        #fields = ['nome_mae', 'tel_celular_mae', 'nome_pai', 'tel_celular_pai', 'estado_civil', 'tipo_certidao', 'numero_certidao', 'livro', 'folha', 'termo', 'emissao', 'distrito_certidao', 'cartorio', 'comarca', 'cartorio_uf']      
     
+    
+        fields = [
+            'nome_mae', 'tel_celular_mae', 'nome_pai', 'tel_celular_pai', 
+            'estado_civil', 'tipo_certidao', 'numero_certidao', 'livro', 
+            'folha', 'termo', 'emissao', 'distrito_certidao', 
+            'cartorio', 'comarca', 'cartorio_uf', 'estado_naturalidade'
+        ]
+    estado_naturalidade = forms.ModelChoiceField(
+    queryset=Uf_Unidade_Federativa.objects.all(),  # Ajuste a queryset conforme necessário
+    widget=forms.Select(attrs={'class': 'form-control'}),
+    required=False    
+)
 
 
-"""
-
-     
-             
-
-  """
-
-"""
-  
-    estado_civil = forms.ChoiceField(
-        label='Estado Civil',
-        choices=choice_estado_civil,
-        widget=forms.Select(attrs={'class': ' form-control'}),
-        required=False
-    )
-    tipo_certidao = forms.ChoiceField(
-        label='Tipo de Certidão',
-        choices=choice_modelo_certidao,
-        widget=forms.Select(attrs={'class': 'form-control '}),
-        required=False
-    )
-    numero_certidao = forms.CharField(
-        label='Número da Certidão',
-        widget=forms.TextInput(attrs={'class': 'form-control '}),
-        required=False
-    )
-    livro = forms.CharField(
-        label='Livro',
-        widget=forms.TextInput(attrs={'class': 'form-control '}),
-        required=False
-    )
-    folha = forms.CharField(
-        label='Folha',
-        widget=forms.TextInput(attrs={'class': 'form-control '}),
-        required=False
-    )
-    termo = forms.CharField(
-        label='Termo',
-        widget=forms.TextInput(attrs={'class': 'form-control '}),
-        required=False
-    )
-    emissao = forms.DateField(
-        label = "Data de emissão do RG",
-        widget=forms.DateInput(attrs={'class': ' form-control'}), 
-        required=False 
-    )
-    distrito_certidao = forms.CharField(
-        label='Distrito',
-        widget=forms.TextInput(attrs={'class': ' form-control', }),
-        required=False
-    )
-    cartorio = forms.CharField(
-        label='Cartório',
-        widget=forms.TextInput(attrs={'class': 'form-control '}),
-        required=False
-    )
-    comarca = forms.CharField(
-        label='Comarca',
-        widget=forms.TextInput(attrs={'class': 'form-control '}),
-        required=False
-    )
-    cartorio_uf = forms.ModelChoiceField(
-        label="UF do Cartório",
-        queryset = Uf_Unidade_Federativa.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control border border-info p-2 pb-1   col m-2 rounded-1'}),
-        required=False        
-    )    
-  
-"""
+class MatriculaOnline_etapa5(forms.ModelForm):   
+    class Meta:
+        model = Alunos
+        fields = ['espectro_autista','deficiencia_aluno', 'tipo_sanguineo', 'necessita_edu_especial', 'vacina_covid_19', 'dose_vacina_covid_19', 'sindrome_de_Down']               

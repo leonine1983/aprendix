@@ -173,6 +173,7 @@ urlpatterns = [
     path('cadastro_aluno/etapa2/documentos/endereco/<int:aluno_id>', cadastro_aluno_etapa2, name='cadastro_aluno_etapa2'),
     path('cadastro_aluno/etapa3/<int:aluno_id>', cadastro_aluno_etapa3, name='cadastro_aluno_etapa3'),
     path('cadastro_aluno/certidao/<int:aluno_id>', cadastro_aluno_etapa4, name='cadastro_aluno_etapa4'),
+    path('cadastro_aluno/fisicoEsaude/<int:aluno_id>', cadastro_aluno_etapa5, name='cadastro_aluno_etapa5'),
     
 ] 
 

@@ -16,6 +16,35 @@
     margin-bottom: 15px;
 }
 
+/* Estilo geral para o select */
+    #id_espectro_autista{
+      padding: 10px;
+      font-size: 16px;
+      font-family: Arial, sans-serif;
+      border-radius: 8px;
+      border: 2px solid #4CAF50; /* Cor suave mas chamativa */
+      background-color: #f9f9f9; /* Fundo suave */
+      transition: all 0.3s ease; /* Transição suave para interações */
+      outline: none;
+    }
+
+    /* Efeito de foco - quando o usuário clica no campo */
+    #id_espectro_autista:focus {
+      border-color: #2196F3; /* Azul vibrante para indicar foco */
+      box-shadow: 0 0 8px rgba(33, 150, 243, 0.5); /* Sombra sutil */
+    }
+
+    /* Estilo das opções no select */
+    #id_espectro_autista option {
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    /* Hover para melhorar a interação */
+    #id_espectro_autista:hover {
+      border-color: #388E3C; /* Verde mais forte quando o usuário passa o mouse */
+    }
+
 </style>
 <link rel="stylesheet" href="{% static 'global/css/form_win11.css' %}">
 <div class="container p-4 bg-light text-muted " style=" color: #fff; border-radius: 8px; width:95vw; margin-top:5rem!important">
@@ -44,7 +73,7 @@
     </div>
     <h2 class="h2 fs-5 mt-3">Aviso de Atualização de Cadastro</h2>
 
-    <div class="container mt-1">
+    <div class="container mt-1 ">
         <!-- Mensagem de aviso -->
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <strong>Atenção!</strong> Antes de realizar a matrícula do aluno, é necessário realizar a <strong>atualização do cadastro</strong>. 
@@ -58,88 +87,42 @@
         {% for error in form.data_nascimento.errors %}
             <div class="error-message">{{ error }}</div>
         {% endfor %} 
-        <h2 class="form-section-title">Filiação</h2>
+        <h2 class="form-section-title">Autismo</h2>
         <div class="form-grid border p-2 m-2">  
             <div>
-                {{form.nome_mae.error}}
-                {{form.nome_mae.label}}
-                {{form.nome_mae}}
-            </div> 
-            <div>
-                {{form.tel_celular_mae.error}}
-                {{form.tel_celular_mae.label}}
-                {{form.tel_celular_mae}}
-            </div>   
-            <div>
-                {{form.nome_pai.error}}
-                {{form.nome_pai.label}}
-                {{form.nome_pai}}
-            </div>  
-            <div>
-                {{form.tel_celular_pai.error}}
-                {{form.tel_celular_pai.label}}
-                {{form.tel_celular_pai}}
-            </div>
-        </div>    
-        <h2 class="form-section-title">Informações da Certidão</h2>
-        <div class="form-grid border p-2 m-2">
-            <div>
-                {{form.estado_civil.error}}
-                {{form.estado_civil.label}}
-                {{form.estado_civil}}
-            </div>   
-            <div>
-                {{form.tipo_certidao.error}}
-                {{form.tipo_certidao.label}}
-                {{form.tipo_certidao}}
-            </div>  
-            <div>
-                {{form.numero_certidao.error}}
-                {{form.numero_certidao.label}}
-                {{form.numero_certidao }}
-            </div>  
-            <div>
-                {{form.livro.error}}
-                {{form.livro.label}}
-                {{form.livro}}
-            </div> 
-            <div>
-                {{form.folha.error}}
-                {{form.folha.label}}
-                {{form.folha}}
-            </div>  
-            <div>
-                {{form.estado_naturalidade.error}}
-                {{form.estado_naturalidade.label}}
-                {{form.estado_naturalidade}}
-            </div>      
-            <div>
-                {{form.emissao.error}}
-                {{form.emissao.label}}
-                {{form.emissao}}
-            </div> 
-            <div>
-                {{form.distrito_certidao.error}}
-                {{form.distrito_certidao.label}}
-                {{form.distrito_certidao}}
-            </div> 
-            <div>
-                {{form.distrito_certidao.error}}
-                {{form.distrito_certidao.label}}
-                {{form.distrito_certidao}}
-            </div> 
-            <div>
-                {{form.distrito_certidao.error}}
-                {{form.comarca.label}}
-                {{form.comarca}}
-            </div> 
-            <div>
-                {{form.cartorio_uf.error}}
-                {{form.cartorio_uf.label}}
-                {{form.cartorio_uf}}
-            </div> 
+                {{form.espectro_autista.error}}
+                {{form.espectro_autista.label}}
+                {{form.espectro_autista}}
+            </div>                  
         </div>
-       
+        <h2 class="form-section-title">Informações Físicas e Biológicas do Aluno</h2>
+        <div class="form-grid border p-2 m-2">  
+            <div>
+                {{form.deficiencia_aluno.error}}
+                {{form.deficiencia_aluno.label}}
+                {{form.deficiencia_aluno}}
+            </div>  
+            <div>
+                {{form.tipo_sanguineo.error}}
+                {{form.tipo_sanguineo.label}}
+                {{form.tipo_sanguineo}}
+            </div>             
+            <div>
+                {{form.vacina_covid_19.error}}
+                {{form.vacina_covid_19.label}}
+                {{form.vacina_covid_19}}
+            </div>
+            <div>
+                {{form.dose_vacina_covid_19.error}}
+                {{form.dose_vacina_covid_19.label}}
+                {{form.dose_vacina_covid_19}}
+            </div>
+            <div>
+                {{form.sindrome_de_Down.error}}
+                {{form.sindrome_de_Down.label}}
+                {{form.sindrome_de_Down}}
+            </div>      
+        </div>
         
         <button type="submit" class="btn btn-win11-primary btn-lg">Próxima Etapa</button>
     </form>
