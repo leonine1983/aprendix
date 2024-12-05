@@ -48,16 +48,44 @@ class Prefeitura(models.Model):
         return self.instituto   
 
 
+from django.db import models
+from datetime import date, timedelta
+
 class Ano(models.Model):
-    ano = models.CharField(max_length=4, null=False, verbose_name='Ano', default='2023')
+    ano = models.CharField(max_length=4, null=False, verbose_name='Ano', default='2025')
     data_inicio = models.DateField(blank=True, null=True)
     data_fim = models.DateField(blank=True, null=True)       
-    
+
     class Meta:
         ordering = ['-ano']
 
     def __str__(self):
-        return self.ano   
+        return self.ano
+
+    def save(self, *args, **kwargs):
+        # Lógica para criar o próximo ano após 31 de outubro
+        if not self.pk:  # Verifica se é um novo objeto (não salvo ainda)
+            # Se for o primeiro objeto, defina a data de início como 01/01/2023 e fim como 31/12/2023
+            if not self.ano:
+                self.ano = str(date.today().year)
+
+            if not self.data_inicio and not self.data_fim:
+                # Define a data de início como 01/01 e a data de fim como 31/12
+                self.data_inicio = date(int(self.ano), 1, 1)
+                self.data_fim = date(int(self.ano), 12, 31)
+        
+        super(Ano, self).save(*args, **kwargs)  # Salva normalmente após a validação
+
+        # Lógica para criar o próximo ano se for após 31 de outubro
+        if self.data_fim and self.data_fim.month == 10 and self.data_fim.day == 31:
+            proximo_ano = str(int(self.ano) + 1)
+            if not Ano.objects.filter(ano=proximo_ano).exists():  # Verifica se o próximo ano já existe
+                Ano.objects.create(
+                    ano=proximo_ano,
+                    data_inicio=date(int(proximo_ano), 1, 1),
+                    data_fim=date(int(proximo_ano), 12, 31)
+                )
+
 
 
 class Profissao(models.Model):

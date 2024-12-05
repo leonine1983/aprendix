@@ -1,14 +1,71 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-from gestao_escolar.models import EscolaMatriculaOnline
-from gestao_escolar.models import SerieOnline
+from gestao_escolar.models import EscolaMatriculaOnline, AnoLetivo, SerieOnline
+from rh.models import Escola
 from django import forms
 
+
+from django import forms
 
 class EscolaMatriculaOnlineForm(forms.ModelForm):
     class Meta:
         model = EscolaMatriculaOnline
-        fields = ['escola', 'ano_letivo', 'data_inicio', 'data_fim', 'ativo']
+        fields = ['ano_letivo', 'data_inicio', 'data_fim', 'ativo']
+
+    # Campo 'ano_letivo' - supondo que seja um campo relacionado a um modelo 'Ano'
+    ano_letivo = forms.ModelChoiceField(
+        queryset=AnoLetivo.objects.all(),  # Seleciona todos os objetos do modelo Ano
+        widget=forms.Select(attrs={'class': 'form-class'}),
+        required=True,  # Campo obrigatório (se necessário)
+        label='Ano Letivo'
+    )
+
+    # Campo 'data_inicio' - Data de início
+    data_inicio = forms.DateField(
+        widget=forms.DateInput(
+            attrs={
+                'class': 'form-class',
+                'type': 'date',
+                'placeholder': 'DD/MM/YYYY'
+            }
+        ),
+        input_formats=['%Y-%m-%d'],  # Formato de entrada da data
+        required=True  # Campo obrigatório
+    )
+
+    # Campo 'data_fim' - Data de fim
+    data_fim = forms.DateField(
+        widget=forms.DateInput(
+            attrs={
+                'class': 'form-class',
+                'type': 'date',
+                'placeholder': 'DD/MM/YYYY'
+            }
+        ),
+        input_formats=['%Y-%m-%d'],  # Formato de entrada da data
+        required=True  # Campo obrigatório
+    )
+
+    # Campo 'ativo' - Campo Booleano (Ativo/Desativo)
+    ativo = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={'class': 'form-class'}),
+        required=False,  # Não obrigatório (se necessário)
+        initial=True,  # Definindo como True por padrão (se necessário)
+        label='Ativo'
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        data_inicio = cleaned_data.get('data_inicio')
+        data_fim = cleaned_data.get('data_fim')
+
+        # Verificar se a data_fim é posterior à data_inicio
+        if data_inicio and data_fim:
+            if data_fim < data_inicio:
+                raise forms.ValidationError('A data de término não pode ser anterior à data de início.')
+
+        return cleaned_data
+
 
 from django import forms
 class SerieOnlineForm(forms.ModelForm):
@@ -19,21 +76,30 @@ class SerieOnlineForm(forms.ModelForm):
 
 
 
-# Listar as escolas de matrícula online
-def lista_escolas(request):
-    escolas = EscolaMatriculaOnline.objects.all()
-    return render(request, 'escolas/lista_escolas.html', {'escolas': escolas})
 
 # Adicionar nova escola de matrícula online
 def adicionar_escola(request):
     if request.method == 'POST':
         form = EscolaMatriculaOnlineForm(request.POST)
         if form.is_valid():
-            form.save()
+            escola = Escola.objects.get(id=request.session['escola_id'])
+            print(f'escola {escola}')
+            
+            # Antes de salvar o formulário, atribuímos a escola
+            nova_matricula = form.save(commit=False)  # Não salva imediatamente
+            nova_matricula.escola = escola  # Atribui a escola
+            nova_matricula.save()  # Agora sim, salva a instância no banco
+
             return redirect('lista_escolas')
     else:
         form = EscolaMatriculaOnlineForm()
-    return render(request, 'Escola/matriculaOnline/escolaMatriculaOnline/adicionar_escola.html', {'form': form})
+
+    return render(request, 'Escola/inicio.html', {
+        'form': form,
+        'conteudo_page': "Add Matricula Online",
+        'titulo_page': "Definição de Período de Matrícula Online"
+    })
+
 
 # Editar escola de matrícula online
 def editar_escola(request, pk):

@@ -178,7 +178,6 @@ urlpatterns = [
 
     # Escola Matricula Online
     # URLs para EscolaMatriculaOnline
-    path('escolas/', lista_escolas, name='lista_escolas'),
     path('escolas/adicionar/', adicionar_escola, name='adicionar_escola'),
     path('escolas/editar/<int:pk>/', editar_escola, name='editar_escola'),
     path('escolas/deletar/<int:pk>/', deletar_escola, name='deletar_escola'),

@@ -1,11 +1,12 @@
 
 
 .modal-content{        
-  width: 95vw!important;
-  min-height:93vh!important  
+  width: 80vw!important;
+  min-height:80vh!important  
 }
+
 .modal-dialog{ 
-  margin-left:2%    
+  margin: 2% 10% !important;    
 }
 .modal-body{
   min-height: 10rem!important;
