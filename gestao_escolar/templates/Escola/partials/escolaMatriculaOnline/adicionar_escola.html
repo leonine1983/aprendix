@@ -76,8 +76,14 @@
                   <td>{{e.data_inicio}}</td>               
                   <td>{{e.data_fim}}</td>
                   <td>Edit</td>
-                  <td></td>
-                  <td><a href="{% url 'Gestao_Escolar:adicionar_serie' %}">Add</a></td>
+                  <td >
+                  {% for s in e.seriesOnlineRelated.all  %}
+                    <div class='text-start alert-info p-2 m-2'>
+                      {{s.serie}} - {{s.turno }} | vagas: {{s.vagas_disponiveis }} <br>
+                    </div>
+                  {% endfor %}
+                  </td>
+                  <td><a href="{% url 'Gestao_Escolar:adicionar_serie' e.id %}">Add</a></td>
                 </tr>
                 {% endfor %}
               </tbody>

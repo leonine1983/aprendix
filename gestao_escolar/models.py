@@ -355,11 +355,14 @@ class EscolaMatriculaOnline(models.Model):
 
 
 class SerieOnline(models.Model):
-    escola = models.ForeignKey(EscolaMatriculaOnline, on_delete=models.CASCADE)    
+    escola = models.ForeignKey(EscolaMatriculaOnline, related_name='seriesOnlineRelated', on_delete=models.CASCADE)    
     serie =  models.ForeignKey(Serie_Escolar, on_delete=models.CASCADE)
     turno = models.CharField(choices=turno, null=False, default=1, max_length=12)                
     quantidade_vagas = models.IntegerField(default=36) 
     vagas_disponiveis = models.IntegerField(null=True)    
+
+    class Meta:
+        ordering = ['serie']
     
     def __str__(self):
         return f'{self.serie.nome} - {self.escola.ano_letivo.ano}'
@@ -456,17 +459,29 @@ class TamanhoRoupa(models.Model):
     def __str__(self):
         return self.nome
     
-
+from django.db.models.signals import post_save, post_delete
 class MatriculasOnline(models.Model):    
     cod_matriculaOline = models.TextField(max_length=200, null=True, default='2025-001')
     aluno = models.ForeignKey(Alunos, related_name='related_matriculaOnline_alunos', on_delete=models.CASCADE)
-    serie =  models.ForeignKey(Serie_Escolar, related_name="related_serie_matricula", on_delete=models.CASCADE)
-    ano_letivo = models.ForeignKey(AnoLetivo, related_name="related_anoLetivoOnline", on_delete=models.CASCADE)
-    matriculaConfirmada = models.BooleanField(default=False)
-    escola = models.ForeignKey('rh.Escola', related_name='OnlineMatriculaEscola', on_delete=models.CASCADE)
+    serie = models.ForeignKey(SerieOnline, related_name="related_serie_matricula", on_delete=models.CASCADE)
+    matriculaConfirmada = models.BooleanField(default=False)  
 
     def __str__(self):
         return self.aluno.nome_completo
+    
+# Defina os sinais fora da classe
+@receiver(post_save, sender=MatriculasOnline)
+@receiver(post_delete, sender=MatriculasOnline)
+def atualizar_vagas_disponiveis(sender, instance, **kwargs):
+    # Obtenha a série associada
+    serie_online = instance.serie
+
+    # Conte o número de matrículas para esta série
+    total_matriculas = MatriculasOnline.objects.filter(serie=serie_online).count()
+
+    # Atualize o campo vagas_disponiveis
+    serie_online.vagas_disponiveis = serie_online.quantidade_vagas - total_matriculas
+    serie_online.save()
 
 
 class Matriculas(models.Model):

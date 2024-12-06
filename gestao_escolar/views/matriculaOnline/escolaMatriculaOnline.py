@@ -72,7 +72,7 @@ from django import forms
 class SerieOnlineForm(forms.ModelForm):
     class Meta:
         model = SerieOnline
-        fields = [ 'serie', 'turno', 'quantidade_vagas', 'vagas_disponiveis']
+        fields = [ 'serie', 'turno', 'quantidade_vagas']
 
 
 
@@ -90,7 +90,7 @@ def adicionar_escola(request):
             nova_matricula.escola = escola  # Atribui a escola
             nova_matricula.save()  # Agora sim, salva a instância no banco
 
-            return redirect('lista_escolas')
+            return redirect('Gestao_Escolar:adicionar_escola')
     else:
         form = EscolaMatriculaOnlineForm()
 
@@ -127,16 +127,16 @@ def deletar_escola(request, pk):
 
 # Adicionar nova série online
 @login_required
-def adicionar_serie(request):
+def adicionar_serie(request, pk):
     #'escola',
     if request.method == 'POST':
         form = SerieOnlineForm(request.POST)
-        escola = Escola.objects.get(id=request.session['escola_id'])
+        escola = EscolaMatriculaOnline.objects.get(id=pk)
         if form.is_valid():
             novaSerie = form.save(commit=False)
             novaSerie.escola = escola
             form.save()
-            return redirect('lista_series')
+            return redirect('Gestao_Escolar:adicionar_escola')
     else:
         form = SerieOnlineForm()
     return render(request, 'Escola/inicio.html', {
@@ -153,7 +153,7 @@ def editar_serie(request, pk):
         form = SerieOnlineForm(request.POST, instance=serie)
         if form.is_valid():
             form.save()
-            return redirect('lista_series')
+            return redirect('Gestao_Escolar:adicionar_escola')
     else:
         form = SerieOnlineForm(instance=serie)
     return render(request, 'series/editar_serie.html', {'form': form})

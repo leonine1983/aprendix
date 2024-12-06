@@ -20,6 +20,11 @@ admin.site.register(Validade_horario)
 admin.site.register(Periodo)
 admin.site.register(Horario)
 admin.site.register(DiaSemana)
+# Matricula Online
+admin.site.register(EscolaMatriculaOnline)
+admin.site.register(SerieOnline)
+admin.site.register(MatriculasOnline)
+
 #admin.site.register(PerguntasAbertas)
 #admin.site.register(PerguntasMultiplaEscolha)
 #admin.site.register(OpcaoMultiplaEscolha)
