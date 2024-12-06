@@ -183,7 +183,6 @@ urlpatterns = [
     path('escolas/deletar/<int:pk>/', deletar_escola, name='deletar_escola'),
 
     # URLs para SerieOnline
-    path('series/', lista_series, name='lista_series'),
     path('series/adicionar/', adicionar_serie, name='adicionar_serie'),
     path('series/editar/<int:pk>/', editar_serie, name='editar_serie'),
     path('series/deletar/<int:pk>/', deletar_serie, name='deletar_serie'),

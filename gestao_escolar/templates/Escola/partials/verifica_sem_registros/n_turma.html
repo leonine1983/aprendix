@@ -46,8 +46,14 @@ input[type=checkbox]{
     <div class="modal-dialog w-100">
     <div class="modal-content bg-secondary-subtle ">
         <div class="modal-header">
-        <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3 "><i class="fa-solid fa-people-roof" style="--fa-primary-color: #c11f1f; --fa-secondary-color: #c11f1f;"></i> Nenhuma turma registrada</span></h4>        
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title  fs-6"><span class=" ml-5 fs-3 "><i class="fa-solid fa-people-roof" style="--fa-primary-color: #c11f1f; --fa-secondary-color: #c11f1f;"></i> Nenhuma turma registrada - Ano Letivo <strong>{{request.session.anoLetivo_nome}}</strong></span></h4>        
+        
+        <button type="button" class="close p-3 bg-success" data-dismiss="modal">&times;</button>
+        <a class="btn mx-5 border border-success " href='{% url "Gestao_Escolar:GE_anoLetivo" %}'><i class="fa-regular fa-arrows-retweet txt-p-nav fs-4"></i><sup class="txt-p-nav ">{{request.session.anoLetivo_nome}}</sup> Alternar entre Anos Letivos | Mudar Exercício</a>
+        <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}" class='mx-1'>
+          {% csrf_token %}
+          <button type="submit" style="background-color: transparent !important; border: cadetblue 0.1rem solid !important;color: cadetblue !important;" class="mx-2"><i class="fa-thin fa-door-closed txt-p"></i> Sair</button>
+        </form>
         
         </div>
         <div class="modal-body shadow-sm bg-light-subtle">            

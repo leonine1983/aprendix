@@ -35,10 +35,7 @@
                     <li>Data de Início: Escolha o dia em que as matrículas começam. Esse será o primeiro dia em que os responsáveis poderão fazer a matrícula dos alunos.</li>
                     <li>Data de Fim: Defina o último dia em que as matrículas poderão ser feitas. Após essa data, o sistema não permitirá novas inscrições.</li>
                     <li>Ativo: Ao marcar este campo como "Ativo", você está permitindo que as matrículas online fiquem abertas para os responsáveis. Se estiver desmarcado, as matrículas ficam fechadas até que você decida reabrir.</div>       </li>
-                </ul>
-                
-                
-                
+                </ul>               
                 
                 
                 
@@ -59,7 +56,33 @@
                   <a class="col-5 btn btn-sm btn-danger"  href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}"  type="submit">Cancelar</a>
                   <button class=" col-5 btn btn-sm btn-primary" type="submit">Liberar escola para matricula Online</button>
                 </section>
-            </form>   
+            </form>
+            
+            <table class='win11-table'>
+              <thead>
+                <tr>
+                  <th>Escola</th>
+                  <th>Ano letivo p/Mat Online </th>
+                  <th colspan="3">Periodo aberto para matricula</th>
+                  <th colspan="2">Séries</th>
+                  
+                </tr>
+              </thead>
+              <tbody>
+                {% for e in EscolaMatriculaOnline  %}
+                <tr>                  
+                  <td>{{e.escola}}</td>
+                  <td>{{e.ano_letivo}}</td>
+                  <td>{{e.data_inicio}}</td>               
+                  <td>{{e.data_fim}}</td>
+                  <td>Edit</td>
+                  <td></td>
+                  <td><a href="{% url 'Gestao_Escolar:adicionar_serie' %}">Add</a></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+              <tbody></tbody>
+            </table>
           </div>             
         </div>
       </div>        

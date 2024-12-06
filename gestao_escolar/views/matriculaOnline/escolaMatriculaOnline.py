@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from gestao_escolar.models import EscolaMatriculaOnline, AnoLetivo, SerieOnline
+from django.contrib.auth.decorators import login_required
 from rh.models import Escola
 from django import forms
 
@@ -71,20 +72,19 @@ from django import forms
 class SerieOnlineForm(forms.ModelForm):
     class Meta:
         model = SerieOnline
-        fields = ['escola', 'serie', 'turno', 'quantidade_vagas', 'vagas_disponiveis']
+        fields = [ 'serie', 'turno', 'quantidade_vagas', 'vagas_disponiveis']
 
 
 
 
 
 # Adicionar nova escola de matrícula online
+@login_required
 def adicionar_escola(request):
     if request.method == 'POST':
         form = EscolaMatriculaOnlineForm(request.POST)
         if form.is_valid():
             escola = Escola.objects.get(id=request.session['escola_id'])
-            print(f'escola {escola}')
-            
             # Antes de salvar o formulário, atribuímos a escola
             nova_matricula = form.save(commit=False)  # Não salva imediatamente
             nova_matricula.escola = escola  # Atribui a escola
@@ -97,7 +97,8 @@ def adicionar_escola(request):
     return render(request, 'Escola/inicio.html', {
         'form': form,
         'conteudo_page': "Add Matricula Online",
-        'titulo_page': "Definição de Período de Matrícula Online"
+        'titulo_page': "Definição de Período de Matrícula Online",
+        'EscolaMatriculaOnline': EscolaMatriculaOnline.objects.filter(escola = request.session['escola_id'])
     })
 
 
@@ -123,20 +124,27 @@ def deletar_escola(request, pk):
 
 
 # Listar as séries online
-def lista_series(request):
-    series = SerieOnline.objects.all()
-    return render(request, 'series/lista_series.html', {'series': series})
 
 # Adicionar nova série online
+@login_required
 def adicionar_serie(request):
+    #'escola',
     if request.method == 'POST':
         form = SerieOnlineForm(request.POST)
+        escola = Escola.objects.get(id=request.session['escola_id'])
         if form.is_valid():
+            novaSerie = form.save(commit=False)
+            novaSerie.escola = escola
             form.save()
             return redirect('lista_series')
     else:
         form = SerieOnlineForm()
-    return render(request, 'series/adicionar_serie.html', {'form': form})
+    return render(request, 'Escola/inicio.html', {
+        'form': form,
+        'conteudo_page': "Add Series Online",
+        'titulo_page': "Seleciona séries para matrícula online",
+    })
+
 
 # Editar série online
 def editar_serie(request, pk):
