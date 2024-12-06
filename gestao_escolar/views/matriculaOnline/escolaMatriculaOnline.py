@@ -4,6 +4,7 @@ from gestao_escolar.models import EscolaMatriculaOnline, AnoLetivo, SerieOnline
 from django.contrib.auth.decorators import login_required
 from rh.models import Escola
 from django import forms
+from django.contrib import messages
 
 
 from django import forms
@@ -90,6 +91,11 @@ def adicionar_escola(request):
             nova_matricula.escola = escola  # Atribui a escola
             nova_matricula.save()  # Agora sim, salva a instância no banco
 
+            messages.success(
+                request, 
+                "🎉 Período de matrícula online definido com sucesso! 🚀 A escola está pronta para receber novas matrícula via internet."
+            )
+
             return redirect('Gestao_Escolar:adicionar_escola')
     else:
         form = EscolaMatriculaOnlineForm()
@@ -136,6 +142,11 @@ def adicionar_serie(request, pk):
             novaSerie = form.save(commit=False)
             novaSerie.escola = escola
             form.save()
+            # Adiciona uma mensagem de sucesso
+            messages.success(
+                request, 
+                f"✅ Série adicionada com sucesso! 📚 As inscrições online para esta série {novaSerie.serie} {novaSerie.turno} - {novaSerie.quantidade_vagas} vagas, agora estão disponíveis."
+            )
             return redirect('Gestao_Escolar:adicionar_escola')
     else:
         form = SerieOnlineForm()
@@ -144,6 +155,21 @@ def adicionar_serie(request, pk):
         'conteudo_page': "Add Series Online",
         'titulo_page': "Seleciona séries para matrícula online",
     })
+
+# Deletar série online
+@login_required
+def deletar_serie(request, pk):
+    serie = get_object_or_404(SerieOnline, pk=pk)
+    serie.delete()
+
+    # Adiciona uma mensagem de sucesso
+    messages.success(
+        request, 
+        "❌ Série excluída com sucesso! 📝 A série não estará mais disponível para matrícula online."
+    )
+
+    return redirect('Gestao_Escolar:adicionar_escola')
+
 
 
 # Editar série online
@@ -158,9 +184,4 @@ def editar_serie(request, pk):
         form = SerieOnlineForm(instance=serie)
     return render(request, 'series/editar_serie.html', {'form': form})
 
-# Deletar série online
-def deletar_serie(request, pk):
-    serie = get_object_or_404(SerieOnline, pk=pk)
-    serie.delete()
-    return redirect('lista_series')
 
