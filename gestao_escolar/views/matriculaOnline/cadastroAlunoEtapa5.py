@@ -21,6 +21,6 @@ def cadastro_aluno_etapa5(request, aluno_id):
             aluno.sindrome_de_Down = form.cleaned_data['sindrome_de_Down']
             aluno.save()
             messages.success(request, f"As informações foram atualizadas com sucesso: Fisicos e Biológicos. A partir de agora, você já pode realizar a matrícula do aluno em uma das turmas disponíveis")
-            return redirect('matricula_online', aluno_id=aluno.id)      
+            return redirect('Gestao_Escolar:matricular_aluno', aluno_id=aluno.id)      
     
     return render(request, 'Escola/matriculaOnline/etapa5.html', {'aluno': aluno, 'form':form})

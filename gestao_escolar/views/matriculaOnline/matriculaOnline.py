@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
 from gestao_escolar.models import Alunos, MatriculasOnline
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 
 
+@login_required
 def matricular_aluno(request, aluno_id):
     aluno = Alunos.objects.get(id=aluno_id)
     if request.method == 'POST':
