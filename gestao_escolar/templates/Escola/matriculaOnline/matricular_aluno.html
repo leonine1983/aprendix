@@ -71,27 +71,46 @@
             </div>
         </div>
     </div>
-    <h2 class="h2 fs-5 mt-3">Aviso de Atualização de Cadastro</h2>
-
     <div class="container mt-1 ">
         <!-- Mensagem de aviso -->
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <strong>Atenção!</strong> Antes de realizar a matrícula do aluno, é necessário realizar a <strong>atualização do cadastro</strong>. 
-            Isso é importante para garantir que todos os documentos estejam em ordem e para verificar se há alguma pendência.
-        </div>
+            <h2 class="text-center">🎉 Bem-vindo à Área de Matrícula Online do Aluno! 🎓</h2>
+            <p class="mt-3">
+                É um prazer ter você aqui! Estamos comprometidos em ajudar a dar início a uma nova etapa educacional para o seu filho. 🌟<br>
+                Para começar, basta selecionar a escola que melhor atende à sua localização e às necessidades da sua família. 🏫✨<br>
+                Nosso objetivo é tornar esse processo simples, rápido e acolhedor, garantindo que o futuro educacional do seu filho comece com o pé direito. 🚀
+            </p>
+        </div>        
     </div>
+
+    <div class="container mt-4">
+        <div class="alert alert-info" role="alert">
+            <strong>Seleção da Escola</strong>
+            <p>Com base no bairro onde o aluno reside, as escolas disponíveis para a sua localidade estão listadas abaixo. Por favor, selecione a escola conforme a série escolar em que o aluno se encontra. Isso garantirá que o aluno seja matriculado na instituição mais adequada à sua série e localização, facilitando o acesso e o acompanhamento educacional.</p>
+        </div>
     
-    
-    <form method="post" class='win11-form'>
-        {% csrf_token %}        
-        {% for error in form.data_nascimento.errors %}
-            <div class="error-message">{{ error }}</div>
-        {% endfor %} 
-        <h2 class="form-section-title">Autismo</h2>
-        
-        
-        <button type="submit" class="btn btn-win11-primary btn-lg">Próxima Etapa</button>
-    </form>
+        <div class="card">
+            <div class="card-header">
+                Escolas Disponíveis
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">Escolas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in escola %}
+                        <tr>
+                            <td>{{e}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>  
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.9/jquery.inputmask.min.js" integrity="sha512-F5Ul1uuyFlGnIT1dk2c4kB4DBdi5wnBJjVhL7gQlGh46Xn0VhvD8kgxLtjdZ5YN83gybk/aASUAlpdoWUjRR3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>

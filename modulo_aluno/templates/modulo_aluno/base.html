@@ -532,12 +532,12 @@
     </nav>  
     <!--Contudo dinamico -->
     <div class="container-xl mb-4">
-      
-      {% block main %}
+      {% include 'Escola/partials/mensagens.html' %}   
+      {% block main %}         
       <div class="text-center"><h2>Em construção...</Em></h2></div>
       {% endblock main %}
       <div style="position: relative;z-index: 10;">
-        {% include 'Escola/partials/mensagens.html' %}      
+        
       </div>
           
     </div> 
@@ -634,6 +634,7 @@
         }
       });
   </script>
+  
   
 </body>    
 </html>

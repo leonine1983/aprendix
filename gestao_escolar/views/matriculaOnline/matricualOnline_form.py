@@ -244,23 +244,40 @@ class MatriculaOnline_etapa3(forms.ModelForm):
         disabled=True 
     )
 
+
 class MatriculaOnline_etapa4(forms.ModelForm):   
     class Meta:
-        model = Alunos
-        #fields = ['nome_mae', 'tel_celular_mae', 'nome_pai', 'tel_celular_pai', 'estado_civil', 'tipo_certidao', 'numero_certidao', 'livro', 'folha', 'termo', 'emissao', 'distrito_certidao', 'cartorio', 'comarca', 'cartorio_uf']      
-    
-    
+        model = Alunos    
         fields = [
             'nome_mae', 'tel_celular_mae', 'nome_pai', 'tel_celular_pai', 
             'estado_civil', 'tipo_certidao', 'numero_certidao', 'livro', 
             'folha', 'termo', 'emissao', 'distrito_certidao', 
             'cartorio', 'comarca', 'cartorio_uf', 'estado_naturalidade'
         ]
+    
+    # Definir valor padrão para o campo 'nome_pai'
+    nome_pai = forms.CharField(
+        max_length=120, 
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        required=False,  # Se desejar que o campo seja opcional
+        initial="Não consta na certidão"  # Valor padrão
+    )
+    tel_celular_pai = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        required=False,  # Se desejar que o campo seja opcional
+    )
+
+    # Campo 'estado_naturalidade'
+    cartorio_uf = forms.ModelChoiceField(
+        queryset=Uf_Unidade_Federativa.objects.all(),  # Ajuste a queryset conforme necessário
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=False    
+    )
     estado_naturalidade = forms.ModelChoiceField(
-    queryset=Uf_Unidade_Federativa.objects.all(),  # Ajuste a queryset conforme necessário
-    widget=forms.Select(attrs={'class': 'form-control'}),
-    required=False    
-)
+        queryset=Uf_Unidade_Federativa.objects.all(),  # Ajuste a queryset conforme necessário
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=False    
+    )
 
 
 class MatriculaOnline_etapa5(forms.ModelForm):   

@@ -133,7 +133,7 @@ class Alunos(models.Model):
     nome_mae = models.CharField(max_length=120, null=False, default='', verbose_name='Nome da Mãe*')
     CPF_mae = models.CharField(max_length=14, null=True, blank=True, default='000.000.000-00')   
     tel_celular_mae = models.CharField(max_length=30, null=True, verbose_name='Nº do celular do mãe*')
-    nome_pai = models.CharField(max_length=120, null=True, default='')
+    nome_pai = models.CharField(max_length=120, null=True, default='Não consta')
     tel_celular_pai = models.CharField(max_length=30, null=True)      
     # Dados de Nacimento
     naturalidade = models.ForeignKey(Cidade, null=True, on_delete=models.CASCADE, related_name="related_naturalidade", verbose_name='Cidade onde nasceu')
@@ -344,7 +344,7 @@ turno = {
 }
 
 class EscolaMatriculaOnline(models.Model):
-    escola = models.ForeignKey('rh.Escola', on_delete=models.CASCADE)
+    escola = models.ForeignKey('rh.Escola', related_name="escolaOnline",  on_delete=models.CASCADE)
     ano_letivo = models.ForeignKey(AnoLetivo, on_delete=models.CASCADE)
     data_inicio = models.DateField(null=True)
     data_fim = models.DateField(null=True)   

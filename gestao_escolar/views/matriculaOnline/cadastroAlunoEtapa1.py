@@ -6,6 +6,7 @@ from django.contrib import messages
 
 
 def cadastro_aluno_etapa1(request, nome, mae, cpf):
+    
     form = MatriculaOnline_etapa1(request.POST or None)
    
 

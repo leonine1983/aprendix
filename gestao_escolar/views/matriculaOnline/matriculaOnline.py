@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from gestao_escolar.models import Alunos, MatriculasOnline
+from gestao_escolar.models import Alunos, MatriculasOnline, EscolaMatriculaOnline
+from rh.models import Escola
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 
@@ -7,6 +8,9 @@ from django.contrib.auth.decorators import login_required
 @login_required
 def matricular_aluno(request, aluno_id):
     aluno = Alunos.objects.get(id=aluno_id)
+    aluno_bairro = aluno.bairro.id
+    escola_bairro = EscolaMatriculaOnline.objects.filter(escola__related_dadosEscola__bairro__id = aluno_bairro)
+
     if request.method == 'POST':
         # Aqui você pode criar o objeto de matrícula
         matricula = MatriculasOnline.objects.create(
@@ -17,8 +21,7 @@ def matricular_aluno(request, aluno_id):
         )
         matricula.save()
         return render(request, 'matricula_online/matricula_confirmada.html', {'aluno': aluno})
-
-    return render(request, 'Escola/matriculaOnline/matricular_aluno.html', {'aluno': aluno})
+    return render(request, 'Escola/matriculaOnline/matricular_aluno.html', {'aluno': aluno, "escola":escola_bairro})
 """
 
 class MatriculasOnline(models.Model):    

@@ -1,73 +1,97 @@
 {% load static %}
-<!-- Inclua o CSS do Bootstrap 5 -->
-
 
 <!-- Inclua o JS do Bootstrap 5 (com bundle, que já inclui o Popper.js) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-{% for message in messages %}
-    <div class="alert {% if message.tags %} {{ message.tags }}{% endif %} shadow alert-dismissible fade show" role="alert">
-        {% if message.tags == 'alert-success' %}
-            <audio id="success-sound" src="{% static 'audio/success_low.wav' %}"></audio>
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    var audio = document.getElementById('success-sound');
-                    audio.play();
-                });
-            </script>                
-        {% endif %}
-        {% if message.tags == 'alert-danger' %}
-            <div style='margin:-1rem -1rem 0 !important' class="p-2 fs-3">
-                <i class="fa-thin fa-bomb"></i> Error!!
-                <audio id="error-sound" src="{% static 'audio/error/error_1.wav' %}"></audio>
+<style>
+    .message-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Fundo escuro semi-transparente */
+        z-index: 1050; /* Valor alto para garantir que esteja no topo */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .message {
+        z-index: 1060;
+        position: relative;
+        max-width: 95%!important;
+    }
+    </style>
+    
+    {% for message in messages %}
+    <div class="message-overlay" onclick="closeOverlay()">
+        <div class="message alert {% if message.tags %}{{ message.tags }}{% endif %} shadow alert-dismissible fade show" role="alert">
+            {% if message.tags == 'alert-success' %}
+                <audio id="success-sound" src="{% static 'audio/success_low.wav' %}"></audio>
                 <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        var audio = document.getElementById('error-sound');
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var audio = document.getElementById('success-sound');
                         audio.play();
                     });
                 </script>
-            </div>
-        {% endif %}
-        {% if message.tags == 'alert-info' %}
-            <div style='margin:-1rem -1rem 0 !important' class="p-2 fs-3">                        
-                <audio id="info-sound" src="{% static 'audio/error/error_2.wav' %}"></audio>
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        var audio = document.getElementById('info-sound');
-                        audio.play();
-                    });
-                </script>
-            </div>
-        {% endif %}
-        <div class="messages">
-            <div class="d-flex justify-content-between">
-                <div class='text-center fs-4 border-3 m-auto rounded-3 border-light'>{{ message|safe }}</div>
-                <!-- Botão de fechar -->
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            {% endif %}
+            {% if message.tags == 'alert-danger' %}
+                <div style='margin:-1rem -1rem 0 !important' class="p-2 fs-3">
+                    <i class="fa-thin fa-bomb"></i> Error!!
+                    <audio id="error-sound" src="{% static 'audio/error/error_1.wav' %}"></audio>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            var audio = document.getElementById('error-sound');
+                            audio.play();
+                        });
+                    </script>
+                </div>
+            {% endif %}
+            {% if message.tags == 'alert-info' %}
+                <div style='margin:-1rem -1rem 0 !important' class="p-2 fs-3">
+                    <audio id="info-sound" src="{% static 'audio/error/error_2.wav' %}"></audio>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            var audio = document.getElementById('info-sound');
+                            audio.play();
+                        });
+                    </script>
+                </div>
+            {% endif %}
+            <div class="messages">
+                <div class="d-flex justify-content-between">
+                    <div class='text-center fs-4 border-3 m-auto rounded-3 border-light'>
+                        {{ message|safe }}
+                    </div>
+                    <!-- Botão de fechar -->
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             </div>
         </div>
     </div>
+    
 {% endfor %}
 
 <script>
-  $(document).ready(function() {
-      // Quando um modal é aberto
-      $(document).on('show.bs.modal', '.modal', function() {
-          var zIndex = 1050 + (10 * $('.modal:visible').length);
-          $(this).css('z-index', zIndex);
-          setTimeout(function() {
-              $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
-          }, 0);
-      });
-  
-      // Quando um modal é fechado
-      $(document).on('hidden.bs.modal', '.modal', function() {
-          if ($('.modal:visible').length) {
-              // Restaura o foco para o modal anterior
-              setTimeout(function() {
-                  $(document.body).addClass('modal-open');
-              }, 0);
-          }
-      });
-  });
+    document.addEventListener('DOMContentLoaded', function () {
+        // Seleciona todos os botões de fechar
+        document.querySelectorAll('.btn-close').forEach(button => {
+            button.addEventListener('click', function (event) {
+                // Evita que o clique no botão propague para o `message-overlay`
+                event.stopPropagation();
+
+                // Fecha o overlay removendo-o do DOM
+                const overlay = button.closest('.message-overlay');
+                if (overlay) {
+                    overlay.remove();
+                }
+            });
+        });
+    });
+
+    // Função para fechar ao clicar no fundo do overlay
+    function closeOverlay() {
+        document.querySelectorAll('.message-overlay').forEach(overlay => overlay.remove());
+    }
 </script>
+

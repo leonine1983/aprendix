@@ -167,7 +167,7 @@ urlpatterns = [
 
     # Matricula Online - Area Publica
     path('matricula_online/', pesquisar_aluno, name='pesquisar_aluno'),
-    path('cadastro_aluno/<str:nome>/<str:mae>/<int:cpf>', cadastro_aluno_etapa1, name='cadastro_aluno_etapa1'),
+    path('cadastro_aluno/<str:nome>/<str:mae>/<str:cpf>', cadastro_aluno_etapa1, name='cadastro_aluno_etapa1'),
     path('cadastro_aluno/exibe/dados/acesso/<int:aluno_id>', cadastro_aluno_etapa1_exibeSenha, name='cadastro_aluno_etapa1_exibeSenha'),    
     path('cadastro_aluno/etapa2/documentos/endereco/<int:aluno_id>', cadastro_aluno_etapa2, name='cadastro_aluno_etapa2'),
     path('cadastro_aluno/etapa3/<int:aluno_id>', cadastro_aluno_etapa3, name='cadastro_aluno_etapa3'),

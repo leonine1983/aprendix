@@ -320,6 +320,7 @@ class Escola_admin(models.Model):
     numero = models.CharField(max_length=10, blank=True, null=True)
     complemento = models.CharField(max_length=100, blank=True, null=True)
     bairro = models.ForeignKey(Bairro, related_name="related_dadosEscola_bairro", on_delete=models.CASCADE, blank=True, null=True)
+    bairro_atendEscola= models.ManyToManyField(Bairro, related_name="related_bairroAtend1", verbose_name="Outros bairros que são atendidos pela escola", blank=True, null=True)
     cidade = models.ForeignKey(Cidade, related_name="related_dadosEscola_cidade", on_delete=models.CASCADE, blank=True, null=True)
     estado = models.ForeignKey(Uf_Unidade_Federativa, related_name="related_UF_escola", on_delete=models.CASCADE, blank=True, null=True)
     cep = models.CharField(max_length=8, blank=True, null=True)  # CEP no formato XXXXX-XXX
@@ -535,7 +536,16 @@ def post_migrate_setup(sender, **kwargs):
     if not Bairro.objects.exists():
         try:
             cidade = Cidade.objects.get(id=1)
-            Bairro.objects.create(nome_cidade=cidade, nome_bairro="Coroa")
+            bairros = [
+                "Aratuba", "Baiacu", "Barra do Gil", "Barra do Pote", "Berlinque",
+                "Cacha Pregos", "Campinas", "Cine", "Conceição", "Coroa", 
+                "Gamboa", "Ilhota", "Juerana", "Mar Grande", "Matarandiba", 
+                "Ponta Grossa", "Porrãozinho"
+            ]
+
+            for nome_bairro in sorted(bairros):  # Garantindo ordem alfabética
+                Bairro.objects.create(nome_cidade=cidade, nome_bairro=nome_bairro)
+
         except Cidade.DoesNotExist:
             print("Cidade com ID 1 não encontrada.")
 

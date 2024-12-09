@@ -21,7 +21,7 @@ def pesquisar_aluno(request):
 
         if alunos.exists():
             return render(request, 'Escola/matriculaOnline/resultados_aluno.html', {'alunos': alunos})
-        else:
+        else:            
             return redirect(reverse_lazy('Gestao_Escolar:cadastro_aluno_etapa1', kwargs={'nome': nome, 'mae':nome_mae, 'cpf':CPF_mae}))
         
     else:
