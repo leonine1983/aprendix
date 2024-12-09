@@ -535,7 +535,7 @@ def post_migrate_setup(sender, **kwargs):
 
     if not Bairro.objects.exists():
         try:
-            cidade = Cidade.objects.get(id=1)
+            cidade = Cidade.objects.get(nome_cidade='Vera Cruz')
             bairros = [
                 "Aratuba", "Baiacu", "Barra do Gil", "Barra do Pote", "Berlinque",
                 "Cacha Pregos", "Campinas", "Cine", "Conceição", "Coroa", 
@@ -600,17 +600,30 @@ def post_migrate_setup(sender, **kwargs):
 
 
     # Cria registros de Escola se não existirem
+    # Cria registros de Escola se não existirem
     if not Escola.objects.exists():
         prefeitura = Prefeitura.objects.all().first()
-        escolas = [
-            (prefeitura, "Escola Municipal Geralda Maria"),
-            (prefeitura, "Colégio Municipal de Vera Cruz")
-        ]
-        escolas_criadas = Escola.objects.bulk_create(
-            [Escola(prefeitura=p, nome_escola=n) for p, n in escolas]            
-        )
+        
+        if prefeitura is None:
+            print("Nenhuma prefeitura encontrada.")
+        else:
+            # Definindo as escolas a serem criadas
+            escolas = [
+                (prefeitura, "Escola Municipal Geralda Maria"),
+                (prefeitura, "Colégio Municipal de Vera Cruz")
+            ]
+            
+            # Criar as escolas
+            escolas_criadas = Escola.objects.bulk_create(
+                [Escola(prefeitura=p, nome_escola=n) for p, n in escolas]
+            )
+            print(f"Escolas criadas: {[escola.nome_escola for escola in escolas_criadas]}")
 
-        # Cria os objetos Escola_admin correspondentes
-        escola_admins = [Escola_admin(nome=escola) for escola  in escolas_criadas]
-        Escola_admin.objects.bulk_create(escola_admins)
-       
+            # Criar um único registro de Escola_admin para cada Escola, garantindo um relacionamento um-para-um
+            for escola in escolas_criadas:
+                if not Escola_admin.objects.filter(escola=escola).exists():
+                    # Criar o registro de Escola_admin para a escola
+                    Escola_admin.objects.create(escola=escola)
+                    print(f"Escola_admin criado para: {escola.nome_escola}")
+                else:
+                    print(f"Já existe um Escola_admin para: {escola.nome_escola}")

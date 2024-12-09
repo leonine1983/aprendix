@@ -160,8 +160,7 @@ class MatriculaOnline_etapa2(forms.ModelForm):
     bairro = forms.ModelChoiceField(
         label='Bairro',
         queryset = Bairro.objects.all(),
-        widget=forms.Select(attrs={'class': ' form-control'}),
-        required=False   
+        widget=forms.Select(attrs={'class': ' form-control'})  
     )     
     cidade = forms.ModelChoiceField(
         label='Cidade onde o aluno mora',
