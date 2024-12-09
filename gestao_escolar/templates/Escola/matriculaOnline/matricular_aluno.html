@@ -99,13 +99,17 @@
                         <tr>
                             <th scope="col">Escolas</th>
                             <th>Ano Letivo</th>
+                            <th>Series Disponíveis</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for e in escola %}
                         <tr>
                             <td>{{e}}</td>
-                            <td></td>
+                            <td>{{e.ano_letivo}}</td>
+                            {% for s in e.seriesOnlineRelated.all  %}
+                                <td>{{s}}</td>
+                            {% endfor %}
                         </tr>
                         {% endfor %}
                     </tbody>
