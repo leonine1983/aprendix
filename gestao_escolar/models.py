@@ -461,10 +461,8 @@ class TamanhoRoupa(models.Model):
     
 from django.db.models.signals import post_save, post_delete
 class MatriculasOnline(models.Model):    
-    cod_matriculaOline = models.TextField(max_length=200, null=True, default='2025-001')
     aluno = models.ForeignKey(Alunos, related_name='related_matriculaOnline_alunos', on_delete=models.CASCADE)
     serie = models.ForeignKey(SerieOnline, related_name="related_serie_matricula", on_delete=models.CASCADE)
-    matriculaConfirmada = models.BooleanField(default=False)  
 
     def __str__(self):
         return self.aluno.nome_completo

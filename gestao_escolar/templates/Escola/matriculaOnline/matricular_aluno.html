@@ -94,7 +94,9 @@
                 Escolas Disponíveis
             </div>
             <div class="card-body">
-                <table class="table table-bordered">
+                <h2 class='h2 fs-5'>Aluno: <span class='text-capitalize'>{{aluno}}</span> | Bairro: <span class='text-capitalize'>{{aluno.bairro}}</span></h2>
+                <link rel="stylesheet" href="{% static 'global/css/table_win11.css' %}">
+                <table class="table table-bordered win11-table">
                     <thead>
                         <tr>
                             <th scope="col">Escolas</th>
@@ -107,9 +109,11 @@
                         <tr>
                             <td>{{e}}</td>
                             <td>{{e.ano_letivo}}</td>
+                            <td>
                             {% for s in e.seriesOnlineRelated.all  %}
-                                <td>{{s}}</td>
+                                <div><a href="{% url 'Gestao_Escolar:matricular_alunoSerie' aluno_id=aluno.id serie_id=s.id %}">{{s}}</a></div>                                
                             {% endfor %}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

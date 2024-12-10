@@ -188,6 +188,10 @@ urlpatterns = [
 
     # Faze de matricula online do aluno
     path('matricula_online/<int:aluno_id>/', matricular_aluno, name='matricular_aluno'),
+    path('matricula_online/<int:aluno_id>/<int:serie_id>/', finaliza_matricular_aluno, name='matricular_alunoSerie'),
+
+
+    
     
 ] 
 
