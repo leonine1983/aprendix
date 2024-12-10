@@ -23,8 +23,8 @@
     this.$container = $('<div/>', { 'class': "ms-container" });
     this.$selectableContainer = $('<div/>', { 'class': 'ms-selectable' });
     this.$selectionContainer = $('<div/>', { 'class': 'ms-selection' });
-    this.$selectableUl = $('<ul/>', { 'class': "ms-list", 'tabindex' : '-1' });
-    this.$selectionUl = $('<ul/>', { 'class': "ms-list", 'tabindex' : '-1' });
+    this.$selectableUl = $('<ol/>', { 'class': "ms-list", 'tabindex' : '-1' });
+    this.$selectionUl = $('<ol/>', { 'class': "ms-list", 'tabindex' : '-1' });
     this.scrollTo = 0;
     this.elemsSelector = 'li:visible:not(.ms-optgroup-label,.ms-optgroup-container,.'+options.disabledClass+')';
   };
@@ -139,7 +139,7 @@
 
         if ($selectableOptgroup.length === 0){
           var optgroupContainerTpl = '<li class="ms-optgroup-container"></li>',
-              optgroupTpl = '<ul class="ms-optgroup"><li class="ms-optgroup-label"><span>'+optgroupLabel+'</span></li></ul>';
+              optgroupTpl = '<ol class="ms-optgroup"><li class="ms-optgroup-label"><span>'+optgroupLabel+'</span></li></ul>';
 
           $selectableOptgroup = $(optgroupContainerTpl);
           $selectionOptgroup = $(optgroupContainerTpl);

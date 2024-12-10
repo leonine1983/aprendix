@@ -324,20 +324,21 @@
     {% if 'escola_id' not in request.session %}
         {% include 'Escola/partials/seleciona_escola.html' %}        
     {% endif %}
-    
+    {% comment "se existir professor" %}
     {% if not condicional_aluno.exists %}
         {% include 'Escola/partials/verifica_sem_registros/n_aluno.html' %}
     {% endif %}
 
-    {% comment "se existir professor" %}
+    
     {% if not condicional_professor.exists %}
         {% include 'Escola/partials/verifica_sem_registros/n_professor.html' %}
     {% endif %}
-    {% endcomment %}
+    
 
     {% if not condicional_turma.exists %}    
         {% include 'Escola/partials/verifica_sem_registros/n_turma.html' %}
-    {% endif %}     
+    {% endif %} 
+    {% endcomment %}   
 </div>
 
 {% block script_footer %}

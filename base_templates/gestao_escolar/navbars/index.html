@@ -32,8 +32,9 @@
 }
 
 .dropdown-menu {
-  background-color:transparent;
-  backdrop-filter: blur(10px);
+  /*background-color:transparent;*/
+  /*backdrop-filter: blur(10px);*/
+  background-color:rgb(170, 209, 209);
   border: none;
   box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px; 
   border-radius: 0.5rem; 
@@ -124,9 +125,14 @@
             Apoio/Suporte
           </a>          
           <ul class="dropdown-menu " style="margin-top: -1rem;">
-            <li> </li>
-            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:CreateEscola" %}'><i class="fa-duotone fa-solid fa-school-flag txt-p-nav me-2 fs-4"></i> Criar nova Escola</a></li>
-            <li><a class="dropdown-item" href='{% url "admin_acessos:CreateUsers" %}'><i class="fa-duotone fa-solid fa-users"></i> Criar novo usuário</a></li>           
+            <li> 
+              <a class="dropdown-item" href='{% url "Gestao_Escolar:GE_anoLetivo" %}'><i class="fa-regular fa-arrows-retweet txt-p-nav fs-4"></i><sup class="txt-p-nav ">{{request.session.anoLetivo_nome}}</sup> Alternar entre Anos Letivos | Mudar Exercício</a>
+              
+            </li>
+            {% if user.is_superuser %}
+              <li><a class="dropdown-item" href='{% url "Gestao_Escolar:CreateEscola" %}'><i class="fa-duotone fa-solid fa-school-flag txt-p-nav me-2 fs-4"></i> Criar nova Escola (Super User)</a></li>
+            {% endif %}
+            <li><a class="dropdown-item" href='{% url "admin_acessos:CreateUsers" %}'><i class="fa-duotone fa-solid fa-users"></i> Criar novo usuário </a></li>           
           </ul>
         </li>
       </ul>
