@@ -15,6 +15,7 @@
     <link href="{% static 'global/css/bootstrap.min.css' %}" rel="stylesheet">
     
     <link rel="stylesheet" href="{% static 'fontawesome/css/all.css' %}">
+    <link rel="stylesheet" href="{% static 'global/css/table_win11.css' %}">
   <style>  
     body{
       width:100vw!important;
@@ -387,15 +388,10 @@
       width: 10px;
     }
 
-/* inspired by https://dribbble.com/shots/6396442-Micro-Interaction-Search-Bar-Menu */
-  </style>  
-</head>
 
-<body class=" bg-p-1">  
- 
-  <main class="w-100 m-auto" >      
-    <style>
-      .bd-placeholder-img {
+
+
+    .bd-placeholder-img {
         font-size: 1.125rem;
         text-anchor: middle;
         -webkit-user-select: none;
@@ -473,8 +469,12 @@
       .btn:hover{
         scale: 1.05!important;
       }
-    </style>  
-    <!-- Conteúdo principal -->
+  </style>  
+</head>
+
+<body class=" bg-p-1">  
+ 
+  <main class="w-100 m-auto" >      
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top  p-0" aria-label="Eighth navbar example">
       <div class="container">
@@ -534,7 +534,42 @@
     <div class="container-xl mb-4">
       {% include 'Escola/partials/mensagens.html' %}   
       {% block main %}         
-      <div class="text-center"><h2>Em construção...</Em></h2></div>
+      <div class="text-center"><h2>        
+
+        <div class="container mt-5">
+          <div class="card text-center">
+            <div class="card-header">
+              Status da Pré Matrícula de
+              <span class='text-uppercase'>{{request.session.alunoUser.aluno}}</span>
+            </div>
+            <div class="card-body">
+              <table class="win11-table m-3">
+                <thead>
+                  <tr> 
+                    <th>Escola</th>
+                    <th>Ano Letivo</th>
+                    <th>Pré-matricula (Série)</th>
+                    <th>Situação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for a in aluno %}
+                  <tr>
+                    <td>{{a.serie.escola}}</td>
+                    <td>{{a.serie.escola.ano_letivo}}</td>
+                    <td>{{a.serie}}</td>
+                    <td ><b class='fs-5'>Em análise...</b></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="card-footer text-muted fs-5">
+              Se tiver dúvidas, entre em contato com a secretaria da Escola.
+            </div>           
+          </div>
+        </div>        
+       </div>
       {% endblock main %}
       <div style="position: relative;z-index: 10;">
         
@@ -638,5 +673,7 @@
   
 </body>    
 </html>
+
+
 
 

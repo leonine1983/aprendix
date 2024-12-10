@@ -26,15 +26,15 @@ def finaliza_matricular_aluno(request, aluno_id, serie_id):
         serie = SerieOnline.objects.get(id=serie_id)
     except Alunos.DoesNotExist:
         messages.error(request, "Aluno não encontrado.")
-        return redirect('alguma_rota')  # Substitua com a URL de erro desejada
+        return redirect('Gestao_Escolar:matricular_aluno', {'aluno_id':aluno_id})  # Substitua com a URL de erro desejada
     except SerieOnline.DoesNotExist:
         messages.error(request, "Série não encontrada.")
-        return redirect('alguma_rota')  # Substitua com a URL de erro desejada
+        return redirect('Gestao_Escolar:matricular_aluno', {'aluno_id':aluno_id})  # Substitua com a URL de erro desejada
 
     # Verifica se o aluno já está matriculado na série
     if MatriculasOnline.objects.filter(aluno=aluno, serie=serie).exists():
         messages.warning(request, "Este aluno já está matriculado nesta série.")
-        return redirect('alguma_rota')  # Substitua com a URL de erro desejada
+        return redirect('Gestao_Escolar:matricular_aluno', {'aluno_id':aluno_id})  # Substitua com a URL de erro desejada
 
     try:
         # Criação do registro de matrícula
@@ -51,7 +51,7 @@ def finaliza_matricular_aluno(request, aluno_id, serie_id):
         )
     except Exception as e:
         messages.error(request, f"Ocorreu um erro ao realizar a matrícula: {e}")
-        return redirect('alguma_rota')  # Substitua com a URL de erro desejada
+        return redirect('Gestao_Escolar:matricular_aluno', {'aluno_id':aluno_id})  # Substitua com a URL de erro desejada
 
     # Redirecionamento para a página de confirmação
     return render(
@@ -68,7 +68,7 @@ def matricula_confirmada(request, aluno_id, serie_id):
         matricula = MatriculasOnline.objects.get(aluno__id=aluno_id, serie__id=serie_id)
     except MatriculasOnline.DoesNotExist:
         messages.error(request, "Matrícula não encontrada.")
-        return redirect('alguma_rota')  # Substitua com a URL de erro desejada
+        return redirect('Gestao_Escolar:matricular_aluno', {'aluno_id':aluno_id})  # Substitua com a URL de erro desejada
 
     return render(
         request,

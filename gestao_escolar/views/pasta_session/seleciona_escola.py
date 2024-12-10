@@ -14,7 +14,7 @@ def Seleciona_escola(request, pk):
     # Recupera a escola com base no id fornecido
     escola = Escola.objects.get(pk = pk)
     nomeclatura = NomeclaturaJanelas.objects.latest('id')
-    prefeitura = Prefeitura.objects.get(pk = 1)
+    prefeitura = Prefeitura.objects.get(pk = 1)    
     
     # outros
     matriculas_painel = Turmas.objects.filter(escola = escola)
