@@ -70,6 +70,7 @@
             <table class='win11-table'>
               <thead>
                 <tr>
+                  <th>Situação</th>
                   <th>Escola</th>
                   <th>Ano letivo p/Mat Online </th>
                   <th colspan="3">Periodo aberto para matricula</th>
@@ -77,9 +78,31 @@
                 </tr>
               </thead>
               <tbody>
+                <style>
+                    .ativo {
+                      position: relative;  /* Permite que o conteúdo 'before' seja posicionado relativo ao tr */
+                    }
+
+                    .ativo:before {
+                      content: 'Matricula Online Ativa';
+                      position: absolute;
+                      top: -35px;  /* Ajusta a distância da borda superior */
+                      left: 0;
+                      right: 0;
+                      background-color: rgba(0, 128, 0, 0.4);  /* Cor de fundo semitransparente para destacar */
+                      color: white;  /* Cor do texto */
+                      text-align: center;  /* Centraliza o texto */
+                      padding: 1px;  /* Adiciona um pouco de espaçamento */
+                      font-weight: bold;
+                      border-radius: 2px;  /* Bordas arredondadas */
+                      width: 100%;
+                    }
+                                  </style>
                 {% for e in EscolaMatriculaOnline %}
-                  <tr>
-                    <td>{{e.escola}}</td>
+
+                  <tr {% if e.ativo %} class='bg-success-subtle'{% endif %}>
+                    <td>{% if e.ativo %}Ativa {% else %}Finalizada{% endif %}</td>
+                    <td>{{e.escola}} </td>
                     <td>{{e.ano_letivo}}</td>
                     <td>{{e.data_inicio}}</td>
                     <td>{{e.data_fim}}</td>

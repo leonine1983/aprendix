@@ -11,6 +11,7 @@ def matricular_aluno(request, aluno_id):
     aluno = Alunos.objects.get(id=aluno_id)
     aluno_bairro = aluno.bairro.id
     escola_bairro = EscolaMatriculaOnline.objects.filter(
+    Q(ativo = True) &
     Q(escola__related_dadosEscola__bairro__id=aluno_bairro) |
     Q(escola__related_dadosEscola__bairro_atendEscola__id=aluno_bairro)
     )    

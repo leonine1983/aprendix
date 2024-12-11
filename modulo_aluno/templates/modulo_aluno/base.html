@@ -540,7 +540,7 @@
           <div class="card text-center">
             <div class="card-header">
               Status da Pré Matrícula de
-              <span class='text-uppercase'>{{request.session.alunoUser.aluno}}</span>
+              <span class='text-uppercase'>{{request.session.alunoUser.aluno.related_matriculaOnline_alunos.first}} para o {{request.session.alunoUser.aluno.related_matriculaOnline_alunos.first.serie}}</span>
             </div>
             <div class="card-body">
               <table class="win11-table m-3">

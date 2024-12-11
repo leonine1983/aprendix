@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from datetime import timedelta, date, datetime
 from django.contrib.auth.models import User
-from django.db.models.signals import post_migrate, post_save
+from django.db.models.signals import post_migrate, post_save, post_delete
 from django.dispatch import receiver
 from rh.models import Ano as AnoLetivo, Uf_Unidade_Federativa, Sexo, Bairro, Cidade, Encaminhamentos
 from ckeditor_uploader.fields import RichTextUploadingField
@@ -343,12 +343,17 @@ turno = {
     ('Noturno', 'Noturno')
 }
 
+# Modelos para a MATRÍCULA PÚBLICA ----------------------------------------------------------------
+
 class EscolaMatriculaOnline(models.Model):
     escola = models.ForeignKey('rh.Escola', related_name="escolaOnline",  on_delete=models.CASCADE)
     ano_letivo = models.ForeignKey(AnoLetivo, on_delete=models.CASCADE)
     data_inicio = models.DateField(null=True)
     data_fim = models.DateField(null=True)   
     ativo =models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-data_inicio']
 
     def __str__(self):
         return f'{self.escola} - {self.ano_letivo.ano}'
@@ -366,6 +371,30 @@ class SerieOnline(models.Model):
     
     def __str__(self):
         return f'{self.serie.nome} - {self.escola.ano_letivo.ano}'
+    
+
+class MatriculasOnline(models.Model):    
+    aluno = models.ForeignKey(Alunos, related_name='related_matriculaOnline_alunos', on_delete=models.CASCADE)
+    serie = models.ForeignKey(SerieOnline, related_name="related_serie_matricula", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.aluno.nome_completo
+    
+# Defina os sinais fora da classe
+@receiver(post_save, sender=MatriculasOnline)
+@receiver(post_delete, sender=MatriculasOnline)
+def atualizar_vagas_disponiveis(sender, instance, **kwargs):
+    # Obtenha a série associada
+    serie_online = instance.serie
+
+    # Conte o número de matrículas para esta série
+    total_matriculas = MatriculasOnline.objects.filter(serie=serie_online).count()
+
+    # Atualize o campo vagas_disponiveis
+    serie_online.vagas_disponiveis = serie_online.quantidade_vagas - total_matriculas
+    serie_online.save()
+
+# FIM Modelos para a MATRÍCULA PÚBLICA ----------------------------------------------------------------
 
 
 class Turmas(models.Model):
@@ -457,29 +486,7 @@ class TamanhoRoupa(models.Model):
     peso = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
-        return self.nome
-    
-from django.db.models.signals import post_save, post_delete
-class MatriculasOnline(models.Model):    
-    aluno = models.ForeignKey(Alunos, related_name='related_matriculaOnline_alunos', on_delete=models.CASCADE)
-    serie = models.ForeignKey(SerieOnline, related_name="related_serie_matricula", on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.aluno.nome_completo
-    
-# Defina os sinais fora da classe
-@receiver(post_save, sender=MatriculasOnline)
-@receiver(post_delete, sender=MatriculasOnline)
-def atualizar_vagas_disponiveis(sender, instance, **kwargs):
-    # Obtenha a série associada
-    serie_online = instance.serie
-
-    # Conte o número de matrículas para esta série
-    total_matriculas = MatriculasOnline.objects.filter(serie=serie_online).count()
-
-    # Atualize o campo vagas_disponiveis
-    serie_online.vagas_disponiveis = serie_online.quantidade_vagas - total_matriculas
-    serie_online.save()
+        return self.nome   
 
 
 class Matriculas(models.Model):
