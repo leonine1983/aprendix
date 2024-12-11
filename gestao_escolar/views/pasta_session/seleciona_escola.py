@@ -12,7 +12,7 @@ from django.contrib import messages
 @login_required
 def Seleciona_escola(request, pk):
     # Recupera a escola com base no id fornecido
-    escola = Escola.objects.get(pk = pk)
+    escola = Escola.objects.get(pk = pk)    
     nomeclatura = NomeclaturaJanelas.objects.latest('id')
     prefeitura = Prefeitura.objects.get(pk = 1)    
     

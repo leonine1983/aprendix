@@ -25,7 +25,155 @@
   {% endif %}
 
     <div class=' p-4 h5 bg-p-3' style='margin:-1rem -1rem 0 -1rem'></div>    
-        <!-- informações-->
+      
+
+
+<style>
+
+    #openDialog_matriculaOnline {
+        position: fixed; /* Fixa o elemento na tela */
+        top: 25%; /* 30% do topo da tela */
+        right: 1%; /* Alinha o elemento à direita */
+        z-index: 9999; /* Garante que o elemento fique sobre todos os outros */
+        background-color: rgba(148, 190, 127, 0.9); /* Fundo alaranjado semi-transparente */
+        padding: 10px; /* Espaçamento interno */
+        color: rgb(36, 1, 1); /* Cor do texto */
+        border-radius: 5px; /* Bordas arredondadas */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombras para profundidade */
+        
+        /* Animação de pulsação */
+        animation: pulse 2s infinite; /* Aplique a animação de pulsação */
+    }
+    
+    /* Efeito de pulsação (aumentar de tamanho) */
+    @keyframes pulse {
+        0% {
+            transform: scale(1); /* Tamanho normal */
+        }
+        50% {
+            transform: scale(1.1); /* Aumenta 10% do tamanho */
+        }
+        100% {
+            transform: scale(1); /* Volta ao tamanho original */
+        }
+    }
+    
+    /* Efeito de piscar (opacidade) */
+    @keyframes blink {
+        0% {
+            opacity: 1; /* Visível */
+        }
+        50% {
+            opacity: 0; /* Invisível */
+        }
+        100% {
+            opacity: 1; /* Visível novamente */
+        }
+    }
+    
+    /* Aplicar animação de piscar */
+    #openDialog_matriculaOnline.blink {
+        animation: blink 1s infinite; /* Animação de piscar */
+    }
+    
+.imgMatricula {
+    position: absolute; /* Posiciona a imagem acima do botão */
+    top: -90px; /* Ajusta a distância entre a imagem e o botão, pode ser ajustado */
+    width: 100px; /* Tamanho da imagem (ajuste conforme necessário) */
+    height: auto; /* Mantém a proporção da imagem */
+    left:1%;
+}
+    
+
+</style>
+
+
+
+
+
+
+{% if escolaMatriculaOnline %}
+    <button id="openDialog_matriculaOnline" title='Resumos' class='border-0  btn btn-sm  btn-light' style='margin:0 -1rem -1rem'>
+        <img class='imgMatricula' src="{% static 'matONline.png' %}" alt="">
+        ATENÇÃO! Matriculas Públicas <br>
+    </button>
+
+    <dialog id="instructions_resumos_matriculaOnline" class="w-75 mt-5">
+        <div class="alert  alert-dismissible fade show" role="alert">
+            {{request.session.escola_MatriculaPublica}}sssssss
+        </div>
+        <div class="container mt-4">        
+            <!-- genero--> 
+            <h4 class="alert alert-info"><i class="fa-regular fa-venus-mars"></i> Quantidade de alunos por gênero - Ano letivo {{request.session.anoLetivo_nome}}</h4>
+            <table class="win11-table">
+                <thead>
+                    <tr>
+                        <th >Série</th>
+                        <th >Aluno</th>
+                        <th >Data da matrícula</th>
+                    </tr>                    
+                </thead>
+                <tbody>
+                    {% for e in escolaMatriculaOnline %}
+                    <tr>  
+                        <td>{{ e.serie}}</td>
+                        <td class='text-uppercase'>{{ e.aluno}}</td>
+                        <td class='text-uppercase'>{{ e.data_matricula}}</td>
+                    </tr>
+                    {% endfor %}                                  
+                </tbody>
+            </table>    
+           
+            
+        </div>                    
+        <button id="closeDialog_resumos" class="btn btn-secondary mt-5">Fechar</button>
+    </dialog>  
+    <script>
+        const dialog_resumos = document.getElementById('instructions_resumos_matriculaOnline');
+        const openButton_resumos = document.getElementById('openDialog_matriculaOnline');
+        const closeButton_resumos = document.getElementById('closeDialog_resumos');
+    
+        openButton_resumos.addEventListener('click', () => {
+            dialog_resumos.showModal(); // Abre a caixa de diálogo como modal
+            });
+    
+        closeButton_resumos.addEventListener('click', () => {
+            dialog_resumos.close(); // Fecha a caixa de diálogo
+            });
+    </script>    
+{% endif %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+   
+
+
+
+
+
+
+
+
         <div class=" rounded-top-2  bg-body-tertiary " style='margin:-1.2rem 0rem 1rem 0rem !important'>
             <div class='mb-2'>
                 {% include 'gestao_escolar/navbars/index.html' %}    
@@ -340,7 +488,6 @@
     {% endif %} 
     {% endcomment %}   
 </div>
-
 {% block script_footer %}
 <script>
     $(document).ready(function(){
