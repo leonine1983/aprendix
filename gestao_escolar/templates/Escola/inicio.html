@@ -93,54 +93,68 @@
 
 
 {% if escolaMatriculaOnline %}
-    <button id="openDialog_matriculaOnline" title='Resumos' class='border-0  btn btn-sm  btn-light' style='margin:0 -1rem -1rem'>
-        <img class='imgMatricula' src="{% static 'matONline.png' %}" alt="">
-        ATENÇÃO! Matriculas Públicas <br>
-    </button>
+    {% if escolaMatriculaOnline|length >= 1 %}
+        <button id="openDialog_matriculaOnline" title='Matrícula Pública' class='border-0  btn btn-sm  btn-light' style='margin:0 -1rem -1rem'>
+            <img class='imgMatricula' src="{% static 'matONline.png' %}" alt="">
+            ATENÇÃO! Matriculas Públicas   <br>
+        </button>
 
-    <dialog id="instructions_resumos_matriculaOnline" class="w-75 mt-5">
-        <div class="alert  alert-dismissible fade show" role="alert">
-            {{request.session.escola_MatriculaPublica}}sssssss
-        </div>
-        <div class="container mt-4">        
-            <!-- genero--> 
-            <h4 class="alert alert-info"><i class="fa-regular fa-venus-mars"></i> Quantidade de alunos por gênero - Ano letivo {{request.session.anoLetivo_nome}}</h4>
-            <table class="win11-table">
-                <thead>
-                    <tr>
-                        <th >Série</th>
-                        <th >Aluno</th>
-                        <th >Data da matrícula</th>
-                    </tr>                    
-                </thead>
-                <tbody>
-                    {% for e in escolaMatriculaOnline %}
-                    <tr>  
-                        <td>{{ e.serie}}</td>
-                        <td class='text-uppercase'>{{ e.aluno}}</td>
-                        <td class='text-uppercase'>{{ e.data_matricula}}</td>
-                    </tr>
-                    {% endfor %}                                  
-                </tbody>
-            </table>    
-           
-            
-        </div>                    
-        <button id="closeDialog_resumos" class="btn btn-secondary mt-5">Fechar</button>
-    </dialog>  
-    <script>
-        const dialog_resumos = document.getElementById('instructions_resumos_matriculaOnline');
-        const openButton_resumos = document.getElementById('openDialog_matriculaOnline');
-        const closeButton_resumos = document.getElementById('closeDialog_resumos');
-    
-        openButton_resumos.addEventListener('click', () => {
-            dialog_resumos.showModal(); // Abre a caixa de diálogo como modal
-            });
-    
-        closeButton_resumos.addEventListener('click', () => {
-            dialog_resumos.close(); // Fecha a caixa de diálogo
-            });
-    </script>    
+        <dialog id="instructions_resumos_matriculaOnline" class="w-75 mt-5">
+            <div class="alert  alert-dismissible fade show" role="alert">
+                {{request.session.escola_MatriculaPublica}}
+            </div>
+            <div class="container mt-4">        
+                <!-- genero--> 
+                <div class="container mt-4">
+                    <div class="alert alert-info" role="alert">
+                        <h4 class="alert-heading">Atenção às Matrículas Realizadas</h4>
+                        <p>A tabela abaixo contém todas as matrículas públicas feitas para a escola. 
+                            É importante que as matrículas sejam analisadas com atenção, pois cada aluno foi alocado com base na série escolhida no momento da matrícula online. 
+                            Após a verificação, é necessário remanejar os alunos para uma das turmas disponíveis na escola, conforme a série indicada.</p>
+                        <hr>
+                        <p class="mb-0">Por favor, verifique e atualize as informações para um melhor gerenciamento das turmas.</p>
+                    </div>
+                    
+                    <table class="table table-bordered table-striped mt-3">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Série</th>
+                                <th scope="col">Aluno</th>
+                                <th scope="col">Data da Matrícula</th>
+                                <th scope="col">Remanejamento</th>
+                            </tr>                    
+                        </thead>
+                        <tbody>
+                            {% for e in escolaMatriculaOnline %}
+                                <tr>  
+                                    <td>{{ e.serie }}</td>
+                                    <td class="text-uppercase">{{ e.aluno }}</td>
+                                    <td class="text-uppercase">{{ e.data_matricula }}</td>
+                                    <td class="text-uppercase">Seguir</td>
+                                </tr>
+                            {% endfor %}                                  
+                        </tbody>
+                    </table>
+                </div>
+                
+                
+            </div>                    
+            <button id="closeDialog_resumos" class="btn btn-secondary mt-5">Fechar</button>
+        </dialog>  
+        <script>
+            const dialog_resumos = document.getElementById('instructions_resumos_matriculaOnline');
+            const openButton_resumos = document.getElementById('openDialog_matriculaOnline');
+            const closeButton_resumos = document.getElementById('closeDialog_resumos');
+        
+            openButton_resumos.addEventListener('click', () => {
+                dialog_resumos.showModal(); // Abre a caixa de diálogo como modal
+                });
+        
+            closeButton_resumos.addEventListener('click', () => {
+                dialog_resumos.close(); // Fecha a caixa de diálogo
+                });
+        </script> 
+    {% endif %}   
 {% endif %}
 
 
