@@ -376,6 +376,8 @@ class SerieOnline(models.Model):
 class MatriculasOnline(models.Model):    
     aluno = models.ForeignKey(Alunos, related_name='related_matriculaOnline_alunos', on_delete=models.CASCADE)
     serie = models.ForeignKey(SerieOnline, related_name="related_serie_matricula", on_delete=models.CASCADE)
+    pendecia = RichTextUploadingField(null=True, blank=True)  
+    impugnar = models.BooleanField(default=False)
     data_matricula = models.DateField( auto_now=True) 
 
     def __str__(self):

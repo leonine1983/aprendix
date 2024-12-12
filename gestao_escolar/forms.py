@@ -41,3 +41,4 @@ class OpenEndedForm(forms.Form):
         if question and answer:
             # Aqui você pode aplicar validações adicionais à resposta aberta
             pass
+
