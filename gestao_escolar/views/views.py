@@ -14,7 +14,7 @@ from django.contrib import messages
 class MatriculasOnlineForm(forms.ModelForm):
     class Meta:
         model = MatriculasOnline
-        fields = ['impugnar', 'pendecia']
+        fields = ['id','impugnar', 'pendecia']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -25,6 +25,7 @@ class MatriculasOnlineForm(forms.ModelForm):
             'item que precise ser entregue ou regularizado.'
         )
         self.fields['pendecia'].widget.attrs['style'] = 'display: none;'
+        self.fields['pendecia'].widget.attrs['class'] = '{{e.id}};'
         self.fields['impugnar'].label = ("Clique no botão 'Impugnar' para informar que a matrícula não pode"
                                          " ser confirmada e, em seguida, descreva o motivo no campo abaixo. ")
 
@@ -51,12 +52,14 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
         if matricula_id:
             try:
                 matricula = MatriculasOnline.objects.get(id=matricula_id)
+                print(f'olhaaaaa a {matricula}')
                 form = MatriculasOnlineForm(instance=matricula)  # Carrega os dados da matrícula existente
                 context['form'] = form
             except MatriculasOnline.DoesNotExist:
                 messages.error(self.request, 'Matrícula não encontrada.')
                 context['form'] = MatriculasOnlineForm()  # Caso não exista matrícula, exibe um formulário vazio
         else:
+            matricula = MatriculasOnline.objects.filter(serie__escola__ativo = True)
             context['form'] = MatriculasOnlineForm()  # Formulário vazio para nova matrícula
 
         # Carregar os alunos e encaminhamentos
