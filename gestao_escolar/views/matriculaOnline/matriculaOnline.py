@@ -106,23 +106,17 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def matricula_confirmada(request, mat_id):
-    # Obtém a matrícula pelo ID
+    # Obtém a matrícula pelo ID (com `get_object_or_404`, se preferir, para simplificar)
     matricula = get_object_or_404(MatriculasOnline, id=mat_id)
     
     # Verifica se o formulário foi enviado via POST
     if request.method == 'POST':
-        # Instancia o formulário com os dados POST
-        form = MatriculasOnlineFormConfirmada(request.POST)
+        # Instancia o formulário com os dados POST, passando a instância de MatriculasOnline
+        form = MatriculasOnlineFormConfirmada(request.POST, instance=matricula)
         
         # Verifica se o formulário é válido
         if form.is_valid():
-            # Recupera o aluno associado à matrícula
-            aluno = matricula.aluno
-            
-            # Atribui o aluno ao campo 'aluno' da matrícula no formulário
-            form.instance.aluno = aluno  # Isso associa o aluno à matrícula
-            
-            # Salva a matrícula
+            # Salva a matrícula após associar o aluno e os dados da matrícula
             form.save()
 
             # Após salvar, redireciona para uma página de sucesso ou de confirmação
@@ -131,7 +125,7 @@ def matricula_confirmada(request, mat_id):
             # Se o formulário não for válido, renderiza o template novamente com o formulário
             return render(request, 'matriculas/confirmacao.html', {'form': form, 'matricula': matricula})
     else:
-        # Instancia o formulário com a matrícula existente para GET
+        # Instancia o formulário com a matrícula existente para GET (preenchido com os dados)
         form = MatriculasOnlineFormConfirmada(instance=matricula)
 
     # Renderiza o template com o formulário para o usuário
@@ -139,4 +133,6 @@ def matricula_confirmada(request, mat_id):
         'form': form,
         'matricula': matricula,
         'conteudo_page': "Add Series Online",
-        'titulo_page': "Seleciona séries para matrícula online",})
+        'titulo_page': "Seleciona séries para matrícula online",
+    })
+

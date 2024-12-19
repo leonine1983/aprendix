@@ -122,156 +122,19 @@ label{
                                     <td class="text-uppercase">{{ e.aluno }}</td>
                                     <td class="text-uppercase">{{ e.data_matricula }}</td>
                                     <td class="text-uppercase">
-                                    <!--TD dialog-->
-                                    <button id="openDialog_matriculaOnline_{{e.id}}" value='{{e.id}}' title='Matrícula Pública' class='border-0 btn btn-sm btn-secondary'>
-                                        <i class="fa-regular fa-address-book"></i> Vê documentação do aluno
-                                    </button>
-                                    
-                                    {% if e.id == e.id  %} 
-                                        <dialog id="instructions_matriculaOnline_{{e.id}}" name='{{e.id}}' class="w-75 mt-5">
-                                            
-                                            <div class="alert  alert-dismissible fade show" role="alert">
-                                                {{request.session.escola_MatriculaPublica}}
-                                            </div>
-                                            <div class="container mt-4">        
-                                                <!-- genero--> 
-                                                <div class="container mt-4">
-                                                    <div class="alert alert-info" role="alert">
-                                                        <h4 class="alert-heading">Atenção às Documentação do Aluno</h4>
-                                                        <p >A <span class='text-lowercase'> tabela abaixo exibe as informações documentais fornecidas pelo aluno ou responsável durante a matrícula pública. 
-                                                            Caso sejam encontradas inconsistências nas informações, você poderá solicitar ao responsável a correção das informações por meio do preenchimento do espaço reservado para correção. 
-                                                            A matrícula poderá ser impugnada ou confirmada, condicionada à resolução das inconsistências na primeira semana de aula.</span></p>
-                                                        <hr>
-                                                        <p class="mb-0">Por favor, verifique e atualize as informações para garantir a conformidade e o bom andamento das matrículas.</p>
-                                                    </div>   
-                                                     
-                                                        <!-- Botão de Impressão -->
-                                                        <div class="text-end mt-4">
-                                                            <button class="btn btn-success" onclick="imprimirConteudo_{{e.id}}()">Imprimir</button>
-                                                        </div>
-                                                    
-                                                        <!-- Impressão de informação do aluno -->
-                                                        <div class="container mt-4 border p-5 shadow" id="conteudo-imprimir_{{e.id}}">
-                                                            {% include "Escola/matriculaOnline/partial_alunosEmPre_matricula_Impressão.html" %}
-                                                        </div>
-
-                                                        <a href="{% url "Gestao_Escolar:matricular_confirma_impugna" e.id %}" >Confirmar Matrícula</a>
-
-                                                        
-
-
-
-<script>
-                                            // Seleciona os elementos do formulário
-                                            const checkbox = document.getElementById('id_impugnar');
-                                            //const ckeditorDiv = document.querySelector('.django-ckeditor-widget');
-                                            const ckeditorDiv = document.querySelector('.django-ckeditor-widget');
-                                            const button = document.getElementById('impugnar_button');
-                                            const confirMatricula = document.getElementById('confirMatricula_button');
-
-                                            // Inicializa a classe django-ckeditor-widget com style display: none !important
-                                            ckeditorDiv.style.display = 'none';
-                                            ckeditorDiv.style.setProperty('display', 'none', 'important'); // Força o !important
-
-                                            // Adiciona um evento para verificar alterações no checkbox
-                                            checkbox.addEventListener('change', function () {
-                                            if (this.checked) {
-                                                // Exibe a CKEditor div como inline-block e o botão
-                                                ckeditorDiv.style.setProperty('display', 'inline-block', 'important');
-                                                button.style.display = 'block';
-                                                confirMatricula.style.display = 'none'
-                                            } else {
-                                                // Oculta a CKEditor div e o botão
-                                                ckeditorDiv.style.setProperty('display', 'none', 'important');
-                                                button.style.display = 'none';
-                                                confirMatricula.style.display = 'block'
-
-                                            }
-                                            });
-                                        </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                        
-                                                        
-                                                </div>    
-                                            </div>                    
-                                            <button id="closeDialog_matriculaOnline_{{e.id}}" class="btn btn-secondary mt-5"><i class="fa-solid fa-angles-left"></i> Voltar</button>
-                                           
-                                        </dialog>  
-                                        <script>
-                                            const dialog_matriculaOnline_{{e.id}}= document.getElementById('instructions_matriculaOnline_{{e.id}}');
-                                            const openButton_matriculaOnline_{{e.id}} = document.getElementById('openDialog_matriculaOnline_{{e.id}}');
-                                            const closeButton_matriculaOnline_{{e.id}} = document.getElementById('closeDialog_matriculaOnline_{{e.id}}');
-                                        
-                                            openButton_matriculaOnline_{{e.id}}.addEventListener('click', () => {
-                                                dialog_matriculaOnline_{{e.id}}.showModal(); // Abre a caixa de diálogo como modal
-                                                });
-                                        
-                                            closeButton_matriculaOnline_{{e.id}}.addEventListener('click', () => {
-                                                dialog_matriculaOnline_{{e.id}}.close(); // Fecha a caixa de diálogo
-                                                });
-                                        </script> 
-
-                                        <!-- Ativa e desativa form para IMPUGNAR MATRICULA -->
-                                        <script>
-                                            // Seleciona os elementos do formulário
-                                            const checkbox = document.getElementById('id_impugnar');
-                                            //const ckeditorDiv = document.querySelector('.django-ckeditor-widget');
-                                            const ckeditorDiv = document.querySelector('.django-ckeditor-widget');
-                                            const button = document.getElementById('impugnar_button');
-                                            const confirMatricula = document.getElementById('confirMatricula_button');
-
-                                            // Inicializa a classe django-ckeditor-widget com style display: none !important
-                                            ckeditorDiv.style.display = 'none';
-                                            ckeditorDiv.style.setProperty('display', 'none', 'important'); // Força o !important
-
-                                            // Adiciona um evento para verificar alterações no checkbox
-                                            checkbox.addEventListener('change', function () {
-                                            if (this.checked) {
-                                                // Exibe a CKEditor div como inline-block e o botão
-                                                ckeditorDiv.style.setProperty('display', 'inline-block', 'important');
-                                                button.style.display = 'block';
-                                                confirMatricula.style.display = 'none'
-                                            } else {
-                                                // Oculta a CKEditor div e o botão
-                                                ckeditorDiv.style.setProperty('display', 'none', 'important');
-                                                button.style.display = 'none';
-                                                confirMatricula.style.display = 'block'
-
-                                            }
-                                            });
-                                        </script>
+                                        <!--TD dialog-->
+                                        <a href="{% url 'Gestao_Escolar:matricular_confirma_impugna' e.id %}"class='border-0 btn btn-sm btn-secondary'><i class="fa-regular fa-address-book"></i> Vê documentação do aluno</a>
                                         <!--end Ativa e desativa form para IMPUGNAR MATRICULA -->
                                         <!--fim TD dialog-->
-                                        </td>
-                                        <td>
-                                            
-                                            {% if e.impugnar %}
-                                                <span class='fw-bold text-secondary'>Matricula com Incosistências:</span></br>
-                                                {{e.pendecia|safe}}
-                                                {% else %}
-                                                Aguardando..
-                                            {% endif %}
-                                        </td>
-                                    {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if e.impugnar %}
+                                            <span class='fw-bold text-secondary'>Matricula com Incosistências:</span></br>
+                                            {{e.pendecia|safe}}
+                                            {% else %}
+                                            Aguardando..
+                                        {% endif %}
+                                    </td>
                                 </tr>                                    
                             {% endfor %}                                  
                         </tbody>

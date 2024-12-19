@@ -1,14 +1,15 @@
 {% load static %}
 <!-- Dados do aluno -->
 {% include 'Escola/impressos/timbre_veraCruz.html' %}
+
                                                 
 <div class="card mb-4 p-3" style="display: flexbox;">
-    <div class="card-header bg-primary text-white p-2">
+    <div class="card-header bg-secondary-subtle p-1">
         <div class="row w-100">
             <!-- Foto do aluno -->
-            <div class="col-2 text-center border p-2 mx-2" style="min-width: 30px;">
-                {% if e.aluno.foto_aluno %}
-                    <img src="{{ e.aluno.foto_aluno.url }}" alt="Foto do Aluno" class="img-fluid rounded-circle" style="max-width: 200px;">
+            <div class="col-2 text-center border p-1 mx-2" style="min-width: 30px;">
+                {% if matricula.aluno.foto_aluno %}
+                    <img src="{{ matricula.aluno.foto_aluno.url }}" alt="Foto do Aluno" class="img-fluid rounded-circle" style="max-width: 200px;">
                 {% else %}
                     <p>Foto do aluno não disponível</p>
                 {% endif %}
@@ -16,7 +17,7 @@
             
             <!-- Título "Informações do Aluno" -->
             <div class="col text-left">
-                <h4 style="text-transform: none;">Informações do Aluno</h4>
+                <h4 style="text-transform: none;">Informações Básicas do Aluno</h4>
             </div>
         </div>
     </div>
@@ -25,24 +26,24 @@
     <div class="card-body text-left" style="text-transform: none; padding: 0.75rem;">
         <div class="row">
             <div class="col-md-6">
-                <p class="mb-1 text-capitalize"><strong>Nome Completo:</strong> {{ e.aluno.nome_completo }}</p>
-                <p class="mb-1"><strong>Nome Social:</strong> {{ e.aluno.nome_social }}</p>
-                <p class="mb-1"><strong>Gênero Sexual:</strong> {{ e.aluno.sexo }}</p>
-                <p class="mb-1"><strong>Data de Nascimento:</strong> {{ e.aluno.data_nascimento }}</p>
-                <p class="mb-1"><strong>Idade:</strong> {{ e.aluno.idade }} anos</p>
-                <p class="mb-1"><strong>Etnia:</strong> {{ e.aluno.etnia }}</p>
-                <p class="mb-1"><strong>Telefone:</strong> {{ e.aluno.tel_celular_aluno }}</p>
-                <p class="mb-1"><strong>Email:</strong> {{ e.aluno.email }}</p>
+                <p class="mb-1 text-capitalize"><strong>Nome Completo:</strong> {{ matricula.aluno.nome_completo }}</p>
+                <p class="mb-1"><strong>Nome Social:</strong> {{ matricula.aluno.nome_social }}</p>
+                <p class="mb-1"><strong>Gênero Sexual:</strong> {{ matricula.aluno.sexo }}</p>
+                <p class="mb-1"><strong>Data de Nascimento:</strong> {{ matricula.aluno.data_nascimento }}</p>
+                <p class="mb-1"><strong>Idade:</strong> {{ matricula.aluno.idade }} anos</p>
+                <p class="mb-1"><strong>Etnia:</strong> {{ matricula.aluno.etnia }}</p>
+                <p class="mb-1"><strong>Telefone:</strong> {{ matricula.aluno.tel_celular_aluno }}</p>
+                <p class="mb-1"><strong>Email:</strong> {{ matricula.aluno.email }}</p>
             </div>
             <div class="col-md-6">
-                <p class="mb-1"><strong>Endereço:</strong> {{ e.aluno.rua }}, {{ e.aluno.bairro }}, {{ e.aluno.cidade }}, {{ e.aluno.estado }}</p>
-                <p class="mb-1 text-capitalize"><strong>Nome da Mãe:</strong> {{ e.aluno.nome_mae }}</p>
-                <p class="mb-1"><strong>Telefone Mãe:</strong> {{ e.aluno.tel_celular_mae }}</p>
-                <p class="mb-1"><strong>Nome do Pai:</strong> {{ e.aluno.nome_pai }}</p>
-                <p class="mb-1"><strong>Telefone Pai:</strong> {{ e.aluno.tel_celular_pai }}</p>
-                <p class="mb-1"><strong>Cidade de Nascimento:</strong> {{ e.aluno.naturalidade }}</p>
-                <p class="mb-1"><strong>Estado de Nascimento:</strong> {{ e.aluno.estado_naturalidade }}</p>
-                <p class="mb-1"><strong>Nacionalidade:</strong> {{ e.aluno.nacionalidade }}</p>
+                <p class="mb-1"><strong>Endereço:</strong> {{ matricula.aluno.rua }}, {{ matricula.aluno.bairro }}, {{ matricula.aluno.cidade }}, {{ matricula.aluno.estado }}</p>
+                <p class="mb-1 text-capitalize"><strong>Nome da Mãe:</strong> {{ matricula.aluno.nome_mae }}</p>
+                <p class="mb-1"><strong>Telefone Mãe:</strong> {{ matricula.aluno.tel_celular_mae }}</p>
+                <p class="mb-1"><strong>Nome do Pai:</strong> {{ matricula.aluno.nome_pai }}</p>
+                <p class="mb-1"><strong>Telefone Pai:</strong> {{ matricula.aluno.tel_celular_pai }}</p>
+                <p class="mb-1"><strong>Cidade de Nascimento:</strong> {{ matricula.aluno.naturalidade }}</p>
+                <p class="mb-1"><strong>Estado de Nascimento:</strong> {{ matricula.aluno.estado_naturalidade }}</p>
+                <p class="mb-1"><strong>Nacionalidade:</strong> {{ matricula.aluno.nacionalidade }}</p>
             </div>
         </div>
     </div>
@@ -50,52 +51,61 @@
 
 <!-- Condições Físicas e Saúde -->
 <div class="card mb-4 p-3">
-    <div class="card-header bg-info text-white p-2">
-        <h4 class="text-left" style="text-transform: none;">Condições Físicas e Saúde</h4>
+    <div class="card-header bg-secondary-subtle text-white p-1">
+        <h4 class="text-left " style="text-transform: none;">Condições Físicas e Saúde</h4>
     </div>
     <div class="card-body text-left" style="text-transform: none; padding: 0.75rem;">
-        <p class="mb-1"><strong>Deficiência:</strong> {{ e.aluno.deficiencia_aluno }}</p>
-        <p class="mb-1"><strong>Tipo Sanguíneo:</strong> {{ e.aluno.get_tipo_sanguineo_display }}</p>
-        <p class="mb-1"><strong>Educação Especial Necessária:</strong> {% if e.aluno.necessita_edu_especial %} Sim {% else %} Não {% endif %}</p>
-        <p class="mb-1"><strong>Vacina Covid-19:</strong> {% if e.aluno.vacina_covid_19 %} Sim {% else %} Não {% endif %}</p>
-        <p class="mb-1"><strong>Doses da Vacina:</strong> {{ e.aluno.dose_vacina_covid_19 }}</p>
-        <p class="mb-1"><strong>Portador de Síndrome de Down:</strong> {% if e.aluno.sindrome_de_Down %} Sim {% else %} Não {% endif %}</p>
-        <p class="mb-1"><strong>Transtorno do Espectro Autista (TEA):</strong> {% if e.aluno.espectro_autista %} Sim {% else %} Não {% endif %}</p>
+        <p class="mb-1"><strong>Deficiência:</strong> {{ matricula.aluno.deficiencia_aluno }}</p>
+        <p class="mb-1"><strong>Tipo Sanguíneo:</strong> {{ matricula.aluno.get_tipo_sanguineo_display }}</p>
+        <p class="mb-1"><strong>Educação Especial Necessária:</strong> {% if matricula.aluno.necessita_edu_especial %} Sim {% else %} Não {% endif %}</p>
+        <p class="mb-1"><strong>Vacina Covid-19:</strong> {% if matricula.aluno.vacina_covid_19 %} Sim {% else %} Não {% endif %}</p>
+        <p class="mb-1"><strong>Doses da Vacina:</strong> {{ matricula.aluno.dose_vacina_covid_19 }}</p>
+        <p class="mb-1"><strong>Portador de Síndrome de Down:</strong> {% if matricula.aluno.sindrome_de_Down %} Sim {% else %} Não {% endif %}</p>
+        <p class="mb-1"><strong>Transtorno do Espectro Autista (TEA):</strong> {% if matricula.aluno.espectro_autista %} Sim {% else %} Não {% endif %}</p>
     </div>
 </div>
 
 <!-- Documentação -->
 <div class="card mb-4 p-3">
-    <div class="card-header bg-secondary text-white p-2">
-        <h4 class="text-left" style="text-transform: none;">Documentação</h4>
+    <div class="card-header bg-secondary-subtle text-white p-1">
+        <h4 class="text-left " style="text-transform: none;">Documentação</h4>
     </div>
     <div class="card-body text-left" style="text-transform: none; padding: 0.75rem;">
-        <p class="mb-1"><strong>RG:</strong> {{ e.aluno.RG }}</p>
-        <p class="mb-1"><strong>Emissão do RG:</strong> {{ e.aluno.RG_emissao }}</p>
-        <p class="mb-1"><strong>Estado de Emissão do RG:</strong> {{ e.aluno.RG_UF }}</p>
-        <p class="mb-1"><strong>Orgão Emissor:</strong> {{ e.aluno.orgao_emissor }}</p>
-        <p class="mb-1"><strong>Certidão de Nascimento:</strong> {{ e.aluno.numero_certidao }}</p>
-        <p class="mb-1"><strong>Data de Emissão da Certidão:</strong> {{ e.aluno.emissao }}</p>
-        <p class="mb-1"><strong>Cartório:</strong> {{ e.aluno.cartorio }}</p>
-        <p class="mb-1"><strong>Comarca:</strong> {{ e.aluno.comarca }}</p>
+        <p class="mb-1"><strong>RG:</strong> {{ matricula.aluno.RG }}</p>
+        <p class="mb-1"><strong>Emissão do RG:</strong> {{ matricula.aluno.RG_emissao }}</p>
+        <p class="mb-1"><strong>Estado de Emissão do RG:</strong> {{ matricula.aluno.RG_UF }}</p>
+        <p class="mb-1"><strong>Orgão Emissor:</strong> {{ matricula.aluno.orgao_emissor }}</p>
+        <p class="mb-1"><strong>Certidão de Nascimento:</strong> {{ matricula.aluno.numero_certidao }}</p>
+        <p class="mb-1"><strong>Data de Emissão da Certidão:</strong> {{ matricula.aluno.emissao }}</p>
+        <p class="mb-1"><strong>Cartório:</strong> {{ matricula.aluno.cartorio }}</p>
+        <p class="mb-1"><strong>Comarca:</strong> {{ matricula.aluno.comarca }}</p>
     </div>
 </div>
 
 <!-- Informações Adicionais -->
 <div class="card mb-4 p-3">
-    <div class="card-header bg-warning text-white p-2">
-        <h4 class="text-left" style="text-transform: none;">Informações Adicionais</h4>
+    <div class="card-header bg-secondary-subtle text-white p-1">
+        <h4 class="text-left " style="text-transform: none;">Informações Adicionais</h4>
     </div>
     <div class="card-body text-left" style="text-transform: none; padding: 0.75rem;">
-        <p class="mb-1"><strong>Renda Familiar:</strong> {{ e.aluno.renda_familiar }}</p>
-        <p class="mb-1"><strong>Beneficiário Auxílio Brasil:</strong> {% if e.aluno.beneficiario_aux_Brasil %} Sim {% else %} Não {% endif %}</p>
-        <p class="mb-1"><strong>Possui Irmãos Gêmeos:</strong> {% if e.aluno.irmao_gemeo %} Sim {% else %} Não {% endif %}</p>
-        <p class="mb-1"><strong>Cadastro Criado por:</strong> {{ e.aluno.res_cadastro }}</p>
-        <p class="mb-1"><strong>Cadastro Atualizado por:</strong> {{ e.aluno.res_atualiza_cadastro }}</p>
+        <p class="mb-1"><strong>Renda Familiar:</strong> {{ matricula.aluno.renda_familiar }}</p>
+        <p class="mb-1"><strong>Beneficiário Auxílio Brasil:</strong> {% if matricula.aluno.beneficiario_aux_Brasil %} Sim {% else %} Não {% endif %}</p>
+        <p class="mb-1"><strong>Possui Irmãos Gêmeos:</strong> {% if matricula.aluno.irmao_gemeo %} Sim {% else %} Não {% endif %}</p>
+        <p class="mb-1"><strong>Cadastro Criado por:</strong> {{ matricula.aluno.res_cadastro }}</p>
+        <p class="mb-1"><strong>Cadastro Atualizado por:</strong> {{ matricula.aluno.res_atualiza_cadastro }}</p>
     </div>                                                            
 </div>
  <!-- CSS para impressão -->
  <style>
+    .card-body{
+        color: rgb(96, 5, 110);
+    }
+    strong{
+            font-weight: 800!important;
+            color: rgb(41, 36, 36);
+
+        }
+   
     @media print {
         body {
             font-family: Arial, sans-serif;
@@ -129,21 +139,10 @@
             max-width: 200px;
             border-radius: 50%;
         }
+        strong{
+            font-weight: 800!important;
+        }
     }
-</style>
+  </style>
 
 <!-- JavaScript para impressão -->
-<script>
-    function imprimirConteudo_{{e.id}}() {
-        var conteudo = document.getElementById("conteudo-imprimir_{{e.id}}").innerHTML;
-        var janelaImpressao = window.open('', '', 'height=800,width=600');
-        janelaImpressao.document.write('<html><head><title>Impressão</title>');
-        janelaImpressao.document.write('<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">');
-        janelaImpressao.document.write('<style>@media print {.container { padding: 10px; font-size: 14px;} }</style>');
-        janelaImpressao.document.write('</head><body>');
-        janelaImpressao.document.write(conteudo);
-        janelaImpressao.document.write('</body></html>');
-        janelaImpressao.document.close();
-        janelaImpressao.print();
-    }
-</script>
