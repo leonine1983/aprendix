@@ -96,7 +96,7 @@ def matricula_confirma_impugna(request, mat_id):
 # View para mostrar a confirmação da matrícula
 class MatriculasOnlineFormConfirmada(ModelForm):  # Usando ModelForm diretamente
     class Meta:
-        model = MatriculasOnline
+        model = Matriculas
         fields = ['turma','aluno']
 
 
@@ -135,86 +135,8 @@ def matricula_confirmada(request, mat_id):
         form = MatriculasOnlineFormConfirmada(instance=matricula)
 
     # Renderiza o template com o formulário para o usuário
-    return render(request, 'matriculas/confirmacao.html', {'form': form, 'matricula': matricula})
-
-
-
-"""
-
-
-
-
-
-
-class MatriculasOnlineForm(ModelForm):  # Usando ModelForm diretamente
-    class Meta:
-        model = MatriculasOnline
-        fields = ['id','impugnar', 'pendecia']
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['pendecia'].label = (
-            'Por favor, descreva as pendências que precisam ser resolvidas para a finalização '
-            'da matrícula ou que precisam ser entregues durante a primeira semana de aula. '
-            'Isso pode incluir documentos pendentes, requisitos administrativos ou qualquer outro '
-            'item que precise ser entregue ou regularizado.'
-        )
-        self.fields['impugnar'].label = ("Clique no botão 'Impugnar' para informar que a matrícula não pode"
-                                         " ser confirmada e, em seguida, descreva o motivo no campo abaixo. ")
-        
-        self.fields['impugnar'].initial =  False
-        self.fields['impugnar'].required = True
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-from django.forms import BaseModelForm
-from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.messages.views import SuccessMessageMixin
-from rh.models import Bairro
-
-
-class BairroCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
-    model = Bairro
-    template_name = 'Escola/inicio.html'
-    fields = ['nome_cidade', 'nome_bairro']
-    success_url = reverse_lazy('Gestao_Escolar:bairro-create')
-    success_message = "Bairro criado com sucesso!!!"
-     
-
-    def get_context_data(self, **kwargs):
-        busca = self.request.GET.get('busca-bairro')
-        if busca:
-            lista_all = Bairro.objects.filter(nome_bairro__icontains = busca)
-        else:
-            lista_all = Bairro.objects.all()
-
-        lista_all = lista_all.order_by('nome_bairro')
-
-
-        context = super().get_context_data(**kwargs)        
-        context['titulo_page'] = 'Bairros'         
-        #context['now'] = datetime.now()     
-        context['conteudo_page'] = "Criar Bairros" 
-        context['lista_all'] = lista_all
-        context['page_ajuda'] = "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional."
-        return context
-
-
-"""
+    return render(request, 'matriculas/confirmacao.html', {
+        'form': form,
+        'matricula': matricula,
+        'conteudo_page': "Add Series Online",
+        'titulo_page': "Seleciona séries para matrícula online",})
