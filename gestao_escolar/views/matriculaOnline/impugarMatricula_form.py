@@ -1,4 +1,4 @@
-from gestao_escolar.models import MatriculasOnline
+from gestao_escolar.models import MatriculasOnline, Matriculas
 from .impugarMatricula_form import *
 from django.forms import ModelForm  # Já importado diretamente
 
@@ -20,4 +20,10 @@ class MatriculasOnlineForm(ModelForm):  # Usando ModelForm diretamente
         
         self.fields['impugnar'].initial =  False
         self.fields['impugnar'].required = True
+
+
+
+
+
+
 

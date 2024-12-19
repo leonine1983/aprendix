@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from gestao_escolar.models import Alunos, MatriculasOnline, EscolaMatriculaOnline, SerieOnline
+from gestao_escolar.models import Alunos, MatriculasOnline, EscolaMatriculaOnline, SerieOnline, Matriculas
 from rh.models import Escola
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
@@ -94,22 +94,93 @@ def matricula_confirma_impugna(request, mat_id):
 
 
 # View para mostrar a confirmação da matrícula
+class MatriculasOnlineFormConfirmada(ModelForm):  # Usando ModelForm diretamente
+    class Meta:
+        model = MatriculasOnline
+        fields = ['turma','aluno']
+
+
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
+
 @login_required
 def matricula_confirmada(request, mat_id):
-    try:
-        matricula = MatriculasOnline.objects.get(id=mat_id)
-        print(f"matricula atual ok {matricula}")
-    except MatriculasOnline.DoesNotExist:
-        messages.error(request, "Matrícula não encontrada.")
-        return redirect('Gestao_Escolar:matricular_aluno', {'aluno_id':matricula.aluno.id})  # Substitua com a URL de erro desejada
+    # Obtém a matrícula pelo ID
+    matricula = get_object_or_404(MatriculasOnline, id=mat_id)
+    
+    # Verifica se o formulário foi enviado via POST
+    if request.method == 'POST':
+        # Instancia o formulário com os dados POST
+        form = MatriculasOnlineFormConfirmada(request.POST)
+        
+        # Verifica se o formulário é válido
+        if form.is_valid():
+            # Recupera o aluno associado à matrícula
+            aluno = matricula.aluno
+            
+            # Atribui o aluno ao campo 'aluno' da matrícula no formulário
+            form.instance.aluno = aluno  # Isso associa o aluno à matrícula
+            
+            # Salva a matrícula
+            form.save()
 
-    return render(
-        request,
-        'Escola/matriculaOnline/matricula_confirmada.html',
-        {'matricula': matricula}
-    )
+            # Após salvar, redireciona para uma página de sucesso ou de confirmação
+            return HttpResponseRedirect('/matricula/confirmada/sucesso/')
+        else:
+            # Se o formulário não for válido, renderiza o template novamente com o formulário
+            return render(request, 'matriculas/confirmacao.html', {'form': form, 'matricula': matricula})
+    else:
+        # Instancia o formulário com a matrícula existente para GET
+        form = MatriculasOnlineFormConfirmada(instance=matricula)
+
+    # Renderiza o template com o formulário para o usuário
+    return render(request, 'matriculas/confirmacao.html', {'form': form, 'matricula': matricula})
+
+
 
 """
+
+
+
+
+
+
+class MatriculasOnlineForm(ModelForm):  # Usando ModelForm diretamente
+    class Meta:
+        model = MatriculasOnline
+        fields = ['id','impugnar', 'pendecia']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['pendecia'].label = (
+            'Por favor, descreva as pendências que precisam ser resolvidas para a finalização '
+            'da matrícula ou que precisam ser entregues durante a primeira semana de aula. '
+            'Isso pode incluir documentos pendentes, requisitos administrativos ou qualquer outro '
+            'item que precise ser entregue ou regularizado.'
+        )
+        self.fields['impugnar'].label = ("Clique no botão 'Impugnar' para informar que a matrícula não pode"
+                                         " ser confirmada e, em seguida, descreva o motivo no campo abaixo. ")
+        
+        self.fields['impugnar'].initial =  False
+        self.fields['impugnar'].required = True
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 from django.forms import BaseModelForm
 from django.urls import reverse_lazy
