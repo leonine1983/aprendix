@@ -154,38 +154,63 @@ label{
                                                         <div class="container mt-4 border p-5 shadow" id="conteudo-imprimir_{{e.id}}">
                                                             {% include "Escola/matriculaOnline/partial_alunosEmPre_matricula_Impressão.html" %}
                                                         </div>
-                                                
-                                                        <!-- Formulário de Atualização -->                                                     
-                                                        <form method="post" class="border m-3 text-start p-4 bg-secondary-subtle" id="form_pendencia_{{e.id}}">
-                                                            {% csrf_token %}
-                                                            <input type="hidden" name="matricula_id" value="{{e.id}}">     
-                                                            {{form.media}}
-                                                            <p id="impuganar_{{e.id}}">
-                                                                {{form.impugnar.label}}
-                                                                {{form.impugnar}}
-                                                            </p>
-                                                            <p id="pendecia_{{e.id}}">
-                                                                {{form.pendecia.label}}
-                                                                {{form.pendecia}}                                                                
-                                                            </p>    
-                                                                                                    
-                                                            <button type="submit" id="impugnar_button_{{e.id}}" style="display: none;"><i class="fa-regular fa-circle-xmark"></i>  Impugnar Matrícula</button>
-                                                                                                                  
-                                                        </form>  
-                                                        <style>
-                                                                #pendecia_{{e.id}}{
-                                                                    display: none!important;
-                                                                }
-                                                            </style>  
-                                                        <a href="http://" id="confirMatricula_button">Confirmar Matricula <i class="fa-solid fa-check-double"></i></a>                                                                                                                                                     
-                                                   
-                                                                                                      
-                                                    <script>
-                                                        function enabledPedencia_{{e.id}}(){
-                                                            var impuganar_{{e.id}} = document.addEventListener(getElementById('id_impugnar'))
 
-                                                        }
-                                                    </script> 
+                                                        <a href="{% url "Gestao_Escolar:matricular_confirma_impugna" e.id %}" >Confirmar Matrícula</a>
+
+                                                        
+
+
+
+<script>
+                                            // Seleciona os elementos do formulário
+                                            const checkbox = document.getElementById('id_impugnar');
+                                            //const ckeditorDiv = document.querySelector('.django-ckeditor-widget');
+                                            const ckeditorDiv = document.querySelector('.django-ckeditor-widget');
+                                            const button = document.getElementById('impugnar_button');
+                                            const confirMatricula = document.getElementById('confirMatricula_button');
+
+                                            // Inicializa a classe django-ckeditor-widget com style display: none !important
+                                            ckeditorDiv.style.display = 'none';
+                                            ckeditorDiv.style.setProperty('display', 'none', 'important'); // Força o !important
+
+                                            // Adiciona um evento para verificar alterações no checkbox
+                                            checkbox.addEventListener('change', function () {
+                                            if (this.checked) {
+                                                // Exibe a CKEditor div como inline-block e o botão
+                                                ckeditorDiv.style.setProperty('display', 'inline-block', 'important');
+                                                button.style.display = 'block';
+                                                confirMatricula.style.display = 'none'
+                                            } else {
+                                                // Oculta a CKEditor div e o botão
+                                                ckeditorDiv.style.setProperty('display', 'none', 'important');
+                                                button.style.display = 'none';
+                                                confirMatricula.style.display = 'block'
+
+                                            }
+                                            });
+                                        </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                        
+                                                        
                                                 </div>    
                                             </div>                    
                                             <button id="closeDialog_matriculaOnline_{{e.id}}" class="btn btn-secondary mt-5"><i class="fa-solid fa-angles-left"></i> Voltar</button>

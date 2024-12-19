@@ -4,6 +4,7 @@ from rh.models import Escola
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from .impugarMatricula_form import *
 
 
 @login_required
@@ -62,14 +63,45 @@ def finaliza_matricular_aluno(request, aluno_id, serie_id):
     )
 
 
-# View para mostrar a confirmação da matrícula
+
 @login_required
-def matricula_confirmada(request, aluno_id, serie_id):
+def matricula_confirma_impugna(request, mat_id):
     try:
-        matricula = MatriculasOnline.objects.get(aluno__id=aluno_id, serie__id=serie_id)
+        # Retrieve the MatriculasOnline instance using the mat_id
+        matricula = MatriculasOnline.objects.get(id=mat_id)
     except MatriculasOnline.DoesNotExist:
         messages.error(request, "Matrícula não encontrada.")
-        return redirect('Gestao_Escolar:matricular_aluno', {'aluno_id':aluno_id})  # Substitua com a URL de erro desejada
+        return redirect('some_error_page')  # Or another page where you handle errors
+
+    # Pass the instance of MatriculasOnline to the form
+    form = MatriculasOnlineForm(instance=matricula)
+
+    # You might not need aluno_id if it's just a reference to the same MatriculasOnline object
+    aluno_id = matricula.id
+
+    return render(request, 'Escola/inicio.html', {
+        'aluno_id': aluno_id,
+        'matricula': matricula,
+        'form': form,
+
+        'titulo_page': "Análise de Solicitação de Matrícula por Meio da Matrícula Pública (Matrícula Online)",
+        'sub_titulo_page': "Utilize os botões abaixo para aprovar a solicitação de matrícula do aluno ou para impugná-la devido à falta de documentos.",
+        'btn_bg' : "btn-success",
+        'conteudo_page' : 'impugnarConfirmar'
+    })
+
+
+
+
+# View para mostrar a confirmação da matrícula
+@login_required
+def matricula_confirmada(request, mat_id):
+    try:
+        matricula = MatriculasOnline.objects.get(id=mat_id)
+        print(f"matricula atual ok {matricula}")
+    except MatriculasOnline.DoesNotExist:
+        messages.error(request, "Matrícula não encontrada.")
+        return redirect('Gestao_Escolar:matricular_aluno', {'aluno_id':matricula.aluno.id})  # Substitua com a URL de erro desejada
 
     return render(
         request,

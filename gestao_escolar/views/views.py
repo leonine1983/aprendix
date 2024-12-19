@@ -24,8 +24,6 @@ class MatriculasOnlineForm(forms.ModelForm):
             'Isso pode incluir documentos pendentes, requisitos administrativos ou qualquer outro '
             'item que precise ser entregue ou regularizado.'
         )
-        self.fields['pendecia'].widget.attrs['style'] = 'display: none;'
-        self.fields['pendecia'].widget.attrs['class'] = '{{e.id}};'
         self.fields['impugnar'].label = ("Clique no botão 'Impugnar' para informar que a matrícula não pode"
                                          " ser confirmada e, em seguida, descreva o motivo no campo abaixo. ")
 
