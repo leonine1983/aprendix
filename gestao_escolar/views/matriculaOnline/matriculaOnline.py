@@ -120,16 +120,16 @@ def matricula_confirmada(request, mat_id):
             form.save()
 
             # Após salvar, redireciona para uma página de sucesso ou de confirmação
-            return HttpResponseRedirect('/matricula/confirmada/sucesso/')
+            return HttpResponseRedirect('Escola/matriculaOnline/matricula_sucesso/recusada.html')
         else:
             # Se o formulário não for válido, renderiza o template novamente com o formulário
-            return render(request, 'matriculas/confirmacao.html', {'form': form, 'matricula': matricula})
+            return render(request, 'Escola/matriculaOnline/matricula_sucesso/sucesso.html', {'form': form, 'matricula': matricula})
     else:
         # Instancia o formulário com a matrícula existente para GET (preenchido com os dados)
         form = MatriculasOnlineFormConfirmada(instance=matricula)
 
     # Renderiza o template com o formulário para o usuário
-    return render(request, 'matriculas/confirmacao.html', {
+    return render(request, 'Escola/matriculaOnline/matricula_sucesso/confirma.html', {
         'form': form,
         'matricula': matricula,
         'conteudo_page': "Add Series Online",
