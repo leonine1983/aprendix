@@ -75,3 +75,11 @@ class UserPessoas(models.Model):
 
     def __str__(self) :
         return self.pessoa
+    
+"""
+from rh.models import Escola, Ano
+class ConfigAvisos(models.Model):
+    escola = models.ForeignKey(Escola, related_name="AvisoEscola_related", on_delete=models.CASCADE)
+    anoLetivo = models.ForeignKey(Ano, related_name='AvisoAnoLetivo_related', on_delete=models.CASCADE)
+    decreto_diretor = models.ForeignKey()
+"""
