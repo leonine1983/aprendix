@@ -39,6 +39,8 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
         context['svg'] = '<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="..."/></svg>'
         context['now'] = datetime.now()
         context['conteudo_page'] = 'info_escola'
+        # Carrega as informações do diretor para a pagina inicial para ativar o modal
+       
 
         # Obter a escola do banco de dados
         sessao_escola = self.request.session['escola_id']
