@@ -623,7 +623,7 @@ def post_migrate_setup(sender, **kwargs):
             for escola in escolas_criadas:
                 if not Escola_admin.objects.filter(nome=escola).exists():
                     # Criar o registro de Escola_admin para a escola
-                    Escola_admin.objects.create(escola=escola)
+                    Escola_admin.objects.create(nome=escola)
                     print(f"Escola_admin criado para: {escola.nome_escola}")
                 else:
                     print(f"Já existe um Escola_admin para: {escola.nome_escola}")
