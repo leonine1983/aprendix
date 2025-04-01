@@ -621,7 +621,7 @@ def post_migrate_setup(sender, **kwargs):
 
             # Criar um único registro de Escola_admin para cada Escola, garantindo um relacionamento um-para-um
             for escola in escolas_criadas:
-                if not Escola_admin.objects.filter(escola=escola).exists():
+                if not Escola_admin.objects.filter(nome=escola).exists():
                     # Criar o registro de Escola_admin para a escola
                     Escola_admin.objects.create(escola=escola)
                     print(f"Escola_admin criado para: {escola.nome_escola}")
