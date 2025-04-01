@@ -20,3 +20,33 @@
     $(".modal-body").draggable();
   })
 </script>
+<script>
+  $(document).ready(function() {
+
+    $(".modal-body").resizable({
+      handles: "n, e, s, w", // permite redimensionamento apenas pelo lado leste (direito)
+      minWidth: 700, // largura mínima permitida
+      
+    });
+  });
+</script>
+
+<!--DRAG AND DROP-->
+<script>
+  $(document).ready(function(){
+    $(".modal-content").draggable();
+  })
+</script>
+
+<script>
+  $(document).ready(function() {
+
+    $(".modal-content").resizable({
+      handles: "n, e, s, w", // permite redimensionamento apenas pelo lado leste (direito)
+      minWidth: 700, // largura mínima permitida
+      
+    });
+  });
+</script>
+
+ 

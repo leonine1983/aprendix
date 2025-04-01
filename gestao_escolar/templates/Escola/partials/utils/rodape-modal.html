@@ -1,0 +1,5 @@
+<!-- Rodapé do Modal -->
+<div class="modal-footer mx-5">
+    <code >Usuário ativo:</code>
+    <code class='text-uppercase'>{% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}{{request.user}}{% endif %} | {% now "l, d F d Y, H:i:s " %}</code>
+  </div>
