@@ -1,5 +1,27 @@
 <!-- Rodapé do Modal -->
-<div class="modal-footer mx-5">
-    <code >Usuário ativo:</code>
-    <code class='text-uppercase'>{% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}{{request.user}}{% endif %} | {% now "l, d F d Y, H:i:s " %}</code>
-  </div>
+<div class="modal-footer custom-footer">
+  <div>Usuário ativo:</div>
+  <small class="text-uppercase">
+      {% if request.user.first_name %}
+          {{ request.user.first_name }} {{ request.user.last_name }}
+      {% else %}
+          {{ request.user }}
+      {% endif %}
+      | {% now "l, d F Y, H:i:s" %}
+  </small>
+</div>
+
+<style>
+.custom-footer {
+  background-color:rgb(107, 139, 167); /* Cinza escuro, estilo terminal */
+  color: #00ff00; /* Verde, estilo monitores antigos */
+  font-family: 'Courier New', Courier, monospace;
+  padding: 10px;
+  text-align: center;
+  border-top: 2px solid #00aa00; /* Linha separadora verde */
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+</style>

@@ -44,7 +44,7 @@ class DecretoCreateView(LoginRequiredMixin, CreateView):
         context['titulo_page'] = 'Atualização de Dados Básicos da Escola'
         context['sub_titulo_page'] = "Use os campos abaixo para atualizar as informações básicas da Escola."
         context['btn_bg'] = "btn-success"
-        context['button'] = "Atualizar nome da escola"
+        context['button'] = "Criar decreto no Aprendix"
         context['conteudo_page'] = 'Decreto Create'
         context['decretos'] = Decreto.objects.filter(destino__id=self.request.session['escola_id'])
         context['decreto_ativo'] = DecretoAnoLetivoAtivo.objects.filter(ano_ativo = self.request.session['anoLetivo_id'], decreto__destino = self.request.session['escola_id'])
