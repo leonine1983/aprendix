@@ -48,7 +48,8 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
         """
         if 'escola_id' not in request.session:
             return redirect('Gestao_Escolar:GE_inicio')
-        return redirect('Gestao_Escolar:GE_inicio')
+        return super().dispatch(request, *args, **kwargs)
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

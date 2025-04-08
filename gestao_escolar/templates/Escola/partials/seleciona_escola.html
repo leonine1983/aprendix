@@ -2,7 +2,7 @@
 <div class="modal fade" id="modal_escola" style='background:#000'>
     {% include 'Escola/partials/mensagens.html' %}
     <div class="modal-dialog">
-        <div class="modal-content bg-secondary-subtle">
+        <div class="modal-content bg-secondary-subtle"style='height:100%!important' >
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div class="fs-3">Escola</div>
@@ -36,8 +36,9 @@
                                 }
                             }            
                     </script> 
-                </div>
-            </div>          
+                </div>                
+            </div>
+            {% include "Escola/partials/utils/rodape-modal.html" %}          
         </div>
     </div>
 </div>
