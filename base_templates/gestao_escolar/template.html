@@ -363,33 +363,60 @@
   .bg-trimestre-3 {background-color: #b68d7a;}  
   .bg-trimestre-4 {background-color: #85685a;}
 
+
+
+
+  #landscape-warning {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.9);
+    color: white;
+    font-size: 1.5rem;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    padding: 20px;
+  }
+
 </style>
     {% block css %}{% endblock css %}
     {% block script_head %}{% endblock script_head %}   
     <title>{% block title_page %}{% endblock title_page %}</title> 
 </head>
-<body>   
-  <main class='shadow  mb-2 bg-white rounded mt-2'> 
-    <!--Botão muda tema-->
-      {% include 'gestao_escolar/botom_cores/cores.html' %}
-    <!-- Fim Botão muda tema-->
 
-    {% comment "Head" %} Cabeçalho ----------------------------------------------- {% endcomment %}
-        {% include 'gestao_escolar/headers/index.html' %}      
-    
-    <div class="d-flex">
-      {% comment "Sidebar" %} Menu lateral esquerdo  ------------------------------- {% endcomment %}
-        {% include 'gestao_escolar/sidebars/index.html' %}
-      {% comment "Main" %} Conteudo Principal{% endcomment %}
-        {% block main %}{% endblock main %}
-    </div>
+<body >   
+  <div id="landscape-warning" class="bg-black" style="background-color: #191b22;">
+    <img width='150px' src="{% static 'Vire.gif' %}" alt="">
+  </div>  
+  <div id="site-content">    
+    <main id="content-main" class='shadow  mb-2 bg-white rounded mt-2'> 
+      <!--Botão muda tema-->
+        {% include 'gestao_escolar/botom_cores/cores.html' %}
+      <!-- Fim Botão muda tema-->
 
-    {% comment "Footer" %} Rodape do site ----------------------------------------- {% endcomment %}
-        {% block footer %}rodape{% endblock footer %}
-    {% comment "Scripts" %} Área pra scripts fim da pagina {% endcomment %}
-        {% block script_footer %}{% endblock script_footer %}   
-        
-  </main> 
+      {% comment "Head" %} Cabeçalho ----------------------------------------------- {% endcomment %}
+          {% include 'gestao_escolar/headers/index.html' %}      
+      
+      <div class="d-flex">
+        {% comment "Sidebar" %} Menu lateral esquerdo  ------------------------------- {% endcomment %}
+          {% include 'gestao_escolar/sidebars/index.html' %}  
+        {% comment "Main" %} Conteudo Principal{% endcomment %}      
+          {% block main %}{% endblock main %}
+      </div>      
+      {% comment "Footer" %} Rodape do site ----------------------------------------- {% endcomment %}
+          {% block footer %}
+          
+          {% endblock footer %}
+      {% comment "Scripts" %} Área pra scripts fim da pagina {% endcomment %}
+          {% block script_footer %}{% endblock script_footer %}   
+          
+    </main> 
+  </div>
   <script>
     function exibirDiv() {
         var divOculta = document.getElementById('oculto');        
@@ -400,6 +427,29 @@
         divOculta.style.display = 'none';
     }
 </script>
+
+<!-- Aviso de orientação -->
+<script>
+  function verificarOrientacao() {
+    const aviso = document.getElementById('landscape-warning');
+    const conteudo = document.getElementById('site-content');
+
+    if (window.innerHeight > window.innerWidth) {
+      // Modo retrato
+      aviso.style.display = 'flex';
+      conteudo.style.display = 'none';
+    } else {
+      // Modo paisagem
+      aviso.style.display = 'none';
+      conteudo.style.display = 'block';
+    }
+  }
+
+  window.addEventListener('load', verificarOrientacao);
+  window.addEventListener('resize', verificarOrientacao);
+  window.addEventListener('orientationchange', verificarOrientacao);
+</script>
+
 
 </body>
 </html>

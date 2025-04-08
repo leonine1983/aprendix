@@ -1,4 +1,8 @@
 {% load static %}
+<style>
+ .fs-vw{font-size: 0.1vw; }
+</style>
+
 <header class=" mb-3 border-bottom shadow-bottom w-100 m-0">  
   <link
   href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
@@ -14,136 +18,138 @@
 
 
 </style>
-  <nav class='nav_google p-5  bg-p-1'
-  style='height: 7rem !important; box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(170, 157, 157, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;margin-top:-0.5rem; '>
-  {% load static %}          
-  {% if request.session.escola_nome_query.related_dadosEscola.imagem %}
-    <div class="logo col-8 " > 
-      <div style="box-shadow: rgba(192, 197, 194, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset; margin-left: -4rem!important; margin-bottom: -0.35;padding: 0.2rem; width: 20rem;text-align: center;" >
-        <img style="width: 7rem; margin-top: 0.3rem; " width="3000" src="{% static 'logo.png' %}" />       
-      </div>     
-      <div class="d-flex  ">
-        <a class="col" href="#">          
-            <div class='w-100 mt-2'>
-              <img src="{{ request.session.escola_nome_query.related_dadosEscola.imagem.url }}" alt="Imagem atual" style='width:100px' class="img-thumbnail" >                
-            </div>           
-        </a>
-        <div class="col-10" style="margin-left: -1rem;">     
-          {% include "gestao_escolar/headers/dados_gestao.html" %}
-        </div>   
-      </div>
-    </div>
-    {% else %}
-    <div class="logo col-8 " > 
-      <div style="box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset; margin-left: -4rem!important; margin-bottom: -0.35;padding: 0.2rem; width: 42rem;text-align: center;" >
-        <img style="width: 6rem; margin-top: 0.3rem; " width="3000" src="{% static 'logo.png' %}" />       
-      </div>     
-      <div class="d-flex  ">
-        <a class="col" href="#">          
-          <div class='w-100 mt-2'>           
-            <img src="{% static 'schooll.png' %}" class="w-50 mt-1 ml-4">
-          </div>        
-        </a>
-        <div class="col-10" style="margin-left: -1rem;">     
-          {% include "gestao_escolar/headers/dados_gestao.html" %}          
-        </div>   
-      </div>
-    </div> 
-    {% endif %}
-    
-    <div class="nav-right" >
-      <a href="#" class="d-block  text-decoration-none txt-p " data-bs-toggle="dropdown" aria-expanded="false">
-           
-        {% if not aberto %}         
-          <i class="fa-solid fa-comment fa-flip-horizontal"></i>
-        {% else %}  
-          <i class="fa-solid fa-comments fa-beat text-info h5 "> <b style="font-size:0.5rem; color:black">MSG</b><sup style="font-size:0.4rem; color:black; margin-right: -0.1rem;"></sup></i>                    
-        {% endif %}
 
-      </a>
-      <!--
-      {% for n in usuario %}                  
-              {% if n.aberta %}   
-              <a class="dropdown-item m-0 p-0 text-secondary " href=" {% url 'admin_acessos:mensagem_detalhe' n.pk %} " >
-                <div class=' p-1 m-0 d-flex'>
-                  <span class="w-100" ><img src="{% static n.remetente.foto %}" alt="mdo" width="32" height="32" class="rounded-circle"> {{n.assunto}} </span>
-                  <span class="w-25 " style="padding-left: 1rem;">
-                    <i class="fa-regular fa-eye"></i>
-                  </span>
-                </div>
-              </a>               
-              {% else %}   
-              <a class=" dropdown-item m-0 p-0  txt-p" href="{% url 'admin_acessos:mensagem_update' n.pk %} ">                 
-                <div class='p-1 m-0 d-flex'>
-                  <div class="w-100" ><img src="{% static n.remetente.foto %}" alt="mdo" width="32" height="32" class="rounded-circle"><i class="w-25 fa-solid fa-volume-high"></i> {{n.assunto}}  </div>
-                  <div class="w-25 " style="padding-left: 1rem;">
-                    <i class="fa-solid fa-envelope fa-beat text-info  "></i>
-                  </div>
-                </div>
-                </a>
-              {% endif %} 
-            {% endfor %}
-           
-      <a class="dropdown-item txt-p bg-transparent" href="{% url 'admin_acessos:mensagem'%}">
-        <i class="fa-regular fa-envelope"></i>
-        <span>Enviar mensagem dddd</span>        
-      </a> -->
-      <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}">
-        {% csrf_token %}
-        <button type="submit" style="background-color: transparent !important; border: cadetblue 0.1rem solid !important;color: cadetblue !important;" class="mx-2"><i class="fa-thin fa-door-closed txt-p"></i> Sair</button>
-      </form>
-      
-      <span class="material-symbols-outlined txt-p"> <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M476-280q21 0 35.5-14.5T526-330q0-21-14.5-35.5T476-380q-21 0-35.5 14.5T426-330q0 21 14.5 35.5T476-280Zm-36-154h74q0-17 1.5-29t6.5-23q5-11 12.5-20.5T556-530q35-35 49.5-58.5T620-642q0-53-36-85.5T487-760q-55 0-93.5 27T340-658l66 26q7-27 28-43.5t49-16.5q27 0 45 14.5t18 38.5q0 17-11 36t-37 42q-17 14-27.5 27.5T453-505q-7 15-10 31.5t-3 39.5Zm40 394L360-160H200q-33 0-56.5-23.5T120-240v-560q0-33 23.5-56.5T200-880h560q33 0 56.5 23.5T840-800v560q0 33-23.5 56.5T760-160H600L480-40ZM200-240h192l88 88 88-88h192v-560H200v560Zm280-280Z"/></svg></span>     
-      <div class="dropdown txt-p">
-        <div class="button material-symbols-outlined"><a href="">apps</a></div>
-
-
-
-        <div class="menu_google shadow bg-p-5 ">
-          <div class="button">
-            <a href="#" class="d-block  text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="{% if user.foto is not None %}{% static user.foto %}{% else %}{% static 'man.png' %}{% endif %}" alt="mdo" width="32" height="32" class="rounded-circle">     
-              {% if user.is_authenticated %}
-              <span> <b class='text-capitalize'>{{ user.username }}</b></span>              
-              {% else %}
-              <span>Você ainda não está logado.</span>
-              {% endif %}       
-            </a>
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid justify-content-middle">
+    <div>
+      {% if request.session.escola_nome_query.related_dadosEscola.imagem %}         
+        <div class="logo" > 
+          <div style="width:12rem ;box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset; margin-left: -3rem!important; margin-bottom: -0.35;padding: 0.2rem; text-align: center;" >
+            <img class="w-50" src="{{ request.session.escola_nome_query.related_dadosEscola.imagem.url }}" />       
           </div>
-          {% comment "ocultar" %}
-          <div class="button">  
-            <a href="{% url 'admin_acessos:painel_acesso' %}">
-              <img src="{% static 'svg/grade_horario.svg' %}" alt="mdo" width="32" class="rounded-circle">     
-            <span>
-               Área de Acessos
-            </span>  
-            </a>                    
-          </div>
-          {% endcomment %}
-          <div class="button">
-            <a href="{% url 'Gestao_Escolar:imprime_all_horarios' %}" >
-              <div style='margin-bottom:0.9rem'><img src="{% static 'svg/relogio.svg' %}" alt="mdo"  class="pt-1 pb-1" ></div>
-              <span >Grade</span>
-            </a>
-          </div>
-          <div class="button">
-            <a href="{% url 'Gestao_Escolar:calendario_mes_atual' %}" title='Impressão de frequência impressa'>               
-              <div class="m-1  mb-3" style="background-image: url({% static 'svg/calendar.svg' %}); width:70px; height:auto"> 
-                <div class="p-1 fs-8 link-light " style='margin-top:0.5rem'>{{request.session.mes}}</div>
-                <div class="fs-5 p-2 text-danger">{{request.session.dia}}</div>
-              </div> 
-              <span>Frequência </span>
-            </a>
+          <div class="mx-2">     
+              {% include "gestao_escolar/headers/dados_gestao.html" %}          
           </div> 
-          <div class="button">
-            <a href="{% url 'docsGestao_escolar:boletim' %}" title='Impressão de frequência impressa'>   
-              <div style='margin-bottom:0.9rem'><img src="{% static 'svg/boletim_aluno.svg' %}" alt="mdo"  class="pt-1 pb-1" ></div>   
-              <span>Boletins </span>
-            </a>
-          </div>                  
+        </div>     
+      {% else %}
+      <div class="logo " > 
+        <div style="width:12rem ;box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset; margin-left: -3rem!important; margin-bottom: -0.35;padding: 0.2rem; text-align: center;" >
+          <img class="w-50" src="{% static 'logo.png' %}" />       
         </div>
-      </div>
-        <img src="{% if user.foto is not None %}{% static user.foto %}{% else %}{% static 'man.png' %}{% endif %}" alt="mdo" width="32" height="32" class="rounded-circle">           
+        <div class="mx-2">     
+            {% include "gestao_escolar/headers/dados_gestao.html" %}          
+        </div> 
+      </div> 
+      {% endif %}
     </div>
-  </nav>
+    <div>    
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="nav-right" >
+          <a href="#" class="d-block  text-decoration-none txt-p " data-bs-toggle="dropdown" aria-expanded="false">
+              
+            {% if not aberto %}         
+              <i class="fa-solid fa-comment fa-flip-horizontal"></i>
+            {% else %}  
+              <i class="fa-solid fa-comments fa-beat text-info h5 "> <b style="font-size:0.5rem; color:black">MSG</b><sup style="font-size:0.4rem; color:black; margin-right: -0.1rem;"></sup></i>                    
+            {% endif %}
+      
+          </a>
+          <!--
+          {% for n in usuario %}                  
+                  {% if n.aberta %}   
+                  <a class="dropdown-item m-0 p-0 text-secondary " href=" {% url 'admin_acessos:mensagem_detalhe' n.pk %} " >
+                    <div class=' p-1 m-0 d-flex'>
+                      <span class="w-100" ><img src="{% static n.remetente.foto %}" alt="mdo" width="32" height="32" class="rounded-circle"> {{n.assunto}} </span>
+                      <span class="w-25 " style="padding-left: 1rem;">
+                        <i class="fa-regular fa-eye"></i>
+                      </span>
+                    </div>
+                  </a>               
+                  {% else %}   
+                  <a class=" dropdown-item m-0 p-0  txt-p" href="{% url 'admin_acessos:mensagem_update' n.pk %} ">                 
+                    <div class='p-1 m-0 d-flex'>
+                      <div class="w-100" ><img src="{% static n.remetente.foto %}" alt="mdo" width="32" height="32" class="rounded-circle"><i class="w-25 fa-solid fa-volume-high"></i> {{n.assunto}}  </div>
+                      <div class="w-25 " style="padding-left: 1rem;">
+                        <i class="fa-solid fa-envelope fa-beat text-info  "></i>
+                      </div>
+                    </div>
+                    </a>
+                  {% endif %} 
+                {% endfor %}
+              
+          <a class="dropdown-item txt-p bg-transparent" href="{% url 'admin_acessos:mensagem'%}">
+            <i class="fa-regular fa-envelope"></i>
+            <span>Enviar mensagem dddd</span>        
+          </a> -->
+          <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}">
+            {% csrf_token %}
+            <button type="submit" style="background-color: transparent !important; border: cadetblue 0.1rem solid !important;color: cadetblue !important;" class="mx-2"><i class="fa-thin fa-door-closed txt-p"></i> Sair</button>
+          </form>
+          
+          <span class="material-symbols-outlined txt-p"> <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M476-280q21 0 35.5-14.5T526-330q0-21-14.5-35.5T476-380q-21 0-35.5 14.5T426-330q0 21 14.5 35.5T476-280Zm-36-154h74q0-17 1.5-29t6.5-23q5-11 12.5-20.5T556-530q35-35 49.5-58.5T620-642q0-53-36-85.5T487-760q-55 0-93.5 27T340-658l66 26q7-27 28-43.5t49-16.5q27 0 45 14.5t18 38.5q0 17-11 36t-37 42q-17 14-27.5 27.5T453-505q-7 15-10 31.5t-3 39.5Zm40 394L360-160H200q-33 0-56.5-23.5T120-240v-560q0-33 23.5-56.5T200-880h560q33 0 56.5 23.5T840-800v560q0 33-23.5 56.5T760-160H600L480-40ZM200-240h192l88 88 88-88h192v-560H200v560Zm280-280Z"/></svg></span>     
+          <div class="dropdown txt-p">
+            <div class="button material-symbols-outlined"><a href="">apps</a></div>
+      
+      
+      
+            <div class="menu_google shadow bg-p-5 ">
+              <div class="button">
+                <a href="#" class="d-block  text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">
+                  <img src="{% if user.foto is not None %}{% static user.foto %}{% else %}{% static 'man.png' %}{% endif %}" alt="mdo" width="32" height="32" class="rounded-circle">     
+                  {% if user.is_authenticated %}
+                  <span> <b class='text-capitalize'>{{ user.username }}</b></span>              
+                  {% else %}
+                  <span>Você ainda não está logado.</span>
+                  {% endif %}       
+                </a>
+              </div>
+              {% comment "ocultar" %}
+              <div class="button">  
+                <a href="{% url 'admin_acessos:painel_acesso' %}">
+                  <img src="{% static 'svg/grade_horario.svg' %}" alt="mdo" width="32" class="rounded-circle">     
+                <span>
+                  Área de Acessos
+                </span>  
+                </a>                    
+              </div>
+              {% endcomment %}
+              <div class="button">
+                <a href="{% url 'Gestao_Escolar:imprime_all_horarios' %}" >
+                  <div style='margin-bottom:0.9rem'><img src="{% static 'svg/relogio.svg' %}" alt="mdo"  class="pt-1 pb-1" ></div>
+                  <span >Grade</span>
+                </a>
+              </div>
+              <div class="button">
+                <a href="{% url 'Gestao_Escolar:calendario_mes_atual' %}" title='Impressão de frequência impressa'>               
+                  <div class="m-1  mb-3" style="background-image: url({% static 'svg/calendar.svg' %}); width:70px; height:auto"> 
+                    <div class="p-1 fs-8 link-light " style='margin-top:0.5rem'>{{request.session.mes}}</div>
+                    <div class="fs-5 p-2 text-danger">{{request.session.dia}}</div>
+                  </div> 
+                  <span>Frequência </span>
+                </a>
+              </div> 
+              <div class="button">
+                <a href="{% url 'docsGestao_escolar:boletim' %}" title='Impressão de frequência impressa'>   
+                  <div style='margin-bottom:0.9rem'><img src="{% static 'svg/boletim_aluno.svg' %}" alt="mdo"  class="pt-1 pb-1" ></div>   
+                  <span>Boletins </span>
+                </a>
+              </div>                  
+            </div>
+          </div>
+            <img src="{% if user.foto is not None %}{% static user.foto %}{% else %}{% static 'man.png' %}{% endif %}" alt="mdo" width="32" height="32" class="rounded-circle">           
+        </div>        
+      </div>
+    </div>
+  </div>
+</nav>
+ 
 </header>
+
+
+
+
+
