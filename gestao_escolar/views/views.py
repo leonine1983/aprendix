@@ -1,4 +1,5 @@
 from django.shortcuts import redirect
+from django.urls import reverse_lazy
 from gestao_escolar.models import *
 from django.views.generic import TemplateView
 from rh.models import Escola, Encaminhamentos
@@ -33,14 +34,29 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
     model = Escola
     template_name = 'Escola/inicio.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        """       
+        Verifica se a chave 'escola_id' está presente na sessão do usuário.
+
+        Caso a chave 'escola_id' não esteja presente, o usuário é redirecionado para a 
+        página inicial da gestão escolar ('Gestao_Escolar:GE_inicio'). Este controle 
+        garante que o acesso à página inicial da escola só ocorra se uma escola estiver
+        previamente selecionada na sessão.
+
+        Retorna:
+            HttpResponseRedirect: redirecionamento para a URL 'Gestao_Escolar:GE_inicio'
+        """
+        if 'escola_id' not in request.session:
+            return redirect('Gestao_Escolar:GE_inicio')
+        return redirect('Gestao_Escolar:GE_inicio')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo_page'] = 'Selecione o ano letivo'
         context['svg'] = '<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="..."/></svg>'
         context['now'] = datetime.now()
         context['conteudo_page'] = 'info_escola'
-        # Carrega as informações do diretor para a pagina inicial para ativar o modal
-       
+        # Carrega as informações do diretor para a pagina inicial para ativar o modal       
 
         # Obter a escola do banco de dados
         sessao_escola = self.request.session['escola_id']
