@@ -14,6 +14,42 @@
 
     <style>
         .anime-h{height: 5rem !important;}
+
+
+
+
+        /* Define o estilo geral para os cards */
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;  /* Espaçamento entre os cards */
+            justify-content: center;
+            width: 100%; /* Garantir que a largura da container seja total */
+        }
+
+        /* Estilo para cada card */
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Ocupa 100% da largura por padrão */
+            max-width: 800px; /* Limita a largura máxima dos cards */
+            padding: 10px;
+        }
+
+        /* Responsividade: quando a tela for maior que 576px, exibe 2 colunas */
+        @media (min-width: 1000px) {
+            .card {
+                width: 48%; /* Ocupa 48% da largura, permitindo que dois cards fiquem lado a lado */
+            }
+        }
+
+
+
+
+
+
+
     </style>
 {% endblock script_head %} 
 {% block main %}
@@ -31,10 +67,10 @@
                 {% include 'gestao_escolar/navbars/index.html' %}    
             </div>
 
-            <div class='mt-1 row w-100 ml-1 gap-3 justify-content-center'>
+            <div class="cards-container">
                 <!-- Primeiro Card -->
-                <div class="card text-left col-12 col-md-6">
-                    <div class="card-header bg-info text-light text-uppercase" style='margin:0 -1rem'>
+                <div class="card">
+                    <div class="card-header bg-info text-light text-uppercase">
                         {% include "Escola/partials/resumos/resumos.html" %}
                     </div>
                     <div class="card-body">
@@ -71,10 +107,10 @@
                         </table>
                     </div>
                 </div>
-            
+                
                 <!-- Segundo Card -->
-                <div class="card text-center col-12 col-md-5">
-                    <div class="card-header bg-danger-subtle text-light text-start text-uppercase" style='margin:0 -1rem'>
+                <div class="card">
+                    <div class="card-header bg-danger-subtle text-light text-start text-uppercase">
                         <i class="fa-duotone fa-solid fa-chart-simple"></i> Gráficos
                     </div>
                     <div class="card-body">
@@ -84,8 +120,8 @@
                         <p>Data e horário do acesso: {{ now }}</p>
                     </div>
                 </div>
-            </div>            
-
+            </div>
+            
         </div>
     {% if  conteudo_page == 'create_users'  %}
         {% include 'Escola/partials/usuarios/createUsers.html' %}
