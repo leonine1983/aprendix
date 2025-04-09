@@ -11,6 +11,7 @@
     <link href="{% static 'global/css/modals.css' %}" rel="stylesheet">
     <link href="{% static 'global/css/table_win11.css' %}" rel="stylesheet">
     <link href="{% static 'global/css/table_win11.css' %}" rel="stylesheet" media="print">   
+
     <style>
         .anime-h{height: 5rem !important;}
     </style>
@@ -29,12 +30,14 @@
             <div class='mb-2'>
                 {% include 'gestao_escolar/navbars/index.html' %}    
             </div>
-            <div class='mt-1 row w-100  ml-1 gap-3'>
-                <div class="card text-left col">
-                    <div class="card-header bg-info text-light text-uppercase" style='margin:0 -1rem'>                        
+
+            <div class='mt-1 row w-100 ml-1 gap-3 justify-content-center'>
+                <!-- Primeiro Card -->
+                <div class="card text-left col-12 col-md-6">
+                    <div class="card-header bg-info text-light text-uppercase" style='margin:0 -1rem'>
                         {% include "Escola/partials/resumos/resumos.html" %}
                     </div>
-                    <div class="card-body">                        
+                    <div class="card-body">
                         <table class="win11-table">
                             <thead>
                                 <tr>
@@ -61,76 +64,28 @@
                                     <td><strong>Total</strong></td>
                                     <td>{{ request.session.totais.total_matriculas }}</td>
                                     <td>{{ request.session.totais.total_vagas }}</td>
-                                    <td>{{ request.session.totais.vagas_disponiveis_total }}</td> <!-- Vagas disponíveis calculadas -->
+                                    <td>{{ request.session.totais.vagas_disponiveis_total }}</td>
                                     <td>{{ request.session.totais.total_autistas }}</td>
                                 </tr>
                             </tbody>
-                        </table>                          
+                        </table>
                     </div>
-                </div>      
-                
-                <div class="card text-center col">
+                </div>
+            
+                <!-- Segundo Card -->
+                <div class="card text-center col-12 col-md-5">
                     <div class="card-header bg-danger-subtle text-light text-start text-uppercase" style='margin:0 -1rem'>
                         <i class="fa-duotone fa-solid fa-chart-simple"></i> Gráficos
                     </div>
-                    <div class="card-body"> 
+                    <div class="card-body">
                     </div>
                     <div class="card-footer text-muted">
-                        {{graph|safe}}                      
-                    <p>Data e horário do acesso: {{ now }}
-                    </p>
+                        {{ graph|safe }}
+                        <p>Data e horário do acesso: {{ now }}</p>
                     </div>
-                </div> 
-                
-                
-                <div class="card-body">                        
-                    <table class="win11-table">
-                        <thead>
-                            <tr>
-                                <th>Turmas</th>
-                                <th>Alunos matriculados</th>
-                                <th>Limite de Vagas</th>
-                                <th>Vagas disponíveis</th>
-                                <th>Autistas</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for turma in request.session.matriculas_all %}
-                            <tr>
-                                <td>{{ turma.nome }} <span class='text-uppercase'>{{ turma.descritivo_turma }}</span></td>
-                                <td>{{ turma.matriculas }}</td>
-                                <td>{{ turma.quantidade_vagas }}</td>
-                                <td>{{ turma.vagas_disponiveis }}</td>
-                                <td>{{ turma.autistas }}</td>
-                            </tr>
-                            {% endfor %}
-                            
-                            <!-- Linha de Totais -->
-                            <tr class='bg-success-subtle text-black fs-2'>
-                                <td><strong>Total</strong></td>
-                                <td>{{ request.session.totais.total_matriculas }}</td>
-                                <td>{{ request.session.totais.total_vagas }}</td>
-                                <td>{{ request.session.totais.vagas_disponiveis_total }}</td> <!-- Vagas disponíveis calculadas -->
-                                <td>{{ request.session.totais.total_autistas }}</td>
-                            </tr>
-                        </tbody>
-                    </table>                          
                 </div>
-            </div>      
-            
-            <div class="card text-center col">
-                <div class="card-header bg-danger-subtle text-light text-start text-uppercase" style='margin:0 -1rem'>
-                    <i class="fa-duotone fa-solid fa-chart-simple"></i> Gráficos
-                </div>
-                <div class="card-body"> 
-                </div>
-                <div class="card-footer text-muted">
-                    {{graph|safe}}                      
-                <p>Data e horário do acesso: {{ now }}
-                </p>
-                </div>
-            </div> 
-            </div>           
+            </div>            
+
         </div>
     {% if  conteudo_page == 'create_users'  %}
         {% include 'Escola/partials/usuarios/createUsers.html' %}
