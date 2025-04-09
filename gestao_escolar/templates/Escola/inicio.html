@@ -10,61 +10,18 @@
     <link href="{% static 'global/css/geral_styler.css' %}" rel="stylesheet">
     <link href="{% static 'global/css/modals.css' %}" rel="stylesheet">
     <link href="{% static 'global/css/table_win11.css' %}" rel="stylesheet">
-    <link href="{% static 'global/css/table_win11.css' %}" rel="stylesheet" media="print">
-    
-
+    <link href="{% static 'global/css/table_win11.css' %}" rel="stylesheet" media="print">   
     <style>
         .anime-h{height: 5rem !important;}
     </style>
 {% endblock script_head %} 
-
 {% block main %}
-
-{% comment "valida diretor" %}
-{% if not request.session.diretor %}
-<!-- Modal -->
-<div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog d-flex align-items-center justify-content-center " style="min-height: 100vh;min-width: 77vw!important;">
-        <div class="card w-75 m-auto" style="min-height: 100%; border-radius: 0;">
-            <h5 class="card-header fs-2">Gestor Escolar.</h5>
-            <div class="card-body">
-                <h5 class="card-title ">⚠️ Responsável pela escola não encontrado</h5>
-                <p class="card-text">
-                    <div class="d-flex flex-column flex-sm-row">
-                        <div class="col-2">
-                            <img src="{% static 'svg/diretor.svg' %}" alt="" class="w-100">
-                        </div>
-                        <div class="col alert alert-info fs-4">
-                            <p>No sistema, não foi possível localizar o nome do atual gestor da escola. Pedimos que verifique os dados fornecidos ou atualize as informações para garantir a correta identificação do responsável pela instituição.</p>
-                            <a href="{% url 'Gestao_Escolar:decreto-create' %}" class="btn btn-primary btn-sm" title="Vá em decretos e EXTENDA o decreto do último Diretor ou Cadastre um novo de decreto de Diretor">Clique para adicionar o Diretor</a>
-                        </div>               
-                    </div>
-                </p>
-            </div>
-        </div>
-    </div>
-</div>  
-  <!-- Incluindo Bootstrap JS (necessário para funcionalidade do modal) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  
-  <!-- Script para abrir o modal automaticamente -->
-  <script>
-      window.onload = function() {
-          var myModal = new bootstrap.Modal(document.getElementById('exampleModal'));
-          myModal.show(); // Abre o modal automaticamente ao carregar a página
-      };
-  </script>
-{% endif %}
-{% endcomment %}
-
-
-
-<div class="shadow-sm p-3 mb-3  w-100 mt-5" >
+<div class="shadow-sm p-3 mb-3  w-100 " >
     {% if messages %}                
         {% include 'Escola/partials/mensagens.html' %}          
     {% endif %}
 
-    <div class=' p-4 h5 bg-p-3' style='margin:-1rem -1rem 0 -1rem'></div>   
+    <div class='p-4 h5 bg-p-3' style='margin:-1rem -1rem 0 -1rem'></div>   
         {% if escolaMatriculaOnline %}
             {% include "Escola/matriculaOnline/partial_alunosEmPre_matricula.html" %}
         {% endif %}
@@ -123,8 +80,8 @@
                     <p>Data e horário do acesso: {{ now }}
                     </p>
                     </div>
-                </div>
-            </div>
+                </div>                
+            </div>           
         </div>
     {% if  conteudo_page == 'create_users'  %}
         {% include 'Escola/partials/usuarios/createUsers.html' %}
@@ -136,10 +93,7 @@
     {% if  conteudo_page == 'Ano Letivo' %}
         {% include 'Escola/partials/seleciona_anoLetivo.html' %}
     {% endif %}
-    <!--Ao Inicio o Sistema-->
-    {% if  conteudo_page == 'info_escola' %}
-        {{contexto}}
-    {% endif %}
+    
     <!--Dados Escola-->
     {% if  conteudo_page == 'Atualiza Escola'  %}
         {% include 'Escola/partials/minhaEscola/seleciona_escola.html' %}
@@ -361,8 +315,7 @@
         {% include 'Escola/matriculaOnline/confirmarOUimpuganar.html' %}
     {% endif %} 
     
-    -->
-    
+    -->  
     
     
     
@@ -430,9 +383,5 @@ var datepickersList = datepickers.map(function (el) {
         }
     }
 </script>  
-
-
-
-
 {% endblock script_footer %} 
 {% endblock main %}

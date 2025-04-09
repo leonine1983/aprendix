@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    
     <meta name="description" content="">
     <meta name="author" content="Rogério Cerqueria da Silva">
    
@@ -54,6 +55,11 @@
            font-weight:200!important;
          
        }
+       body, html {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
        .bd-placeholder-img {
         font-size: 1.125rem;
         text-anchor: middle;
@@ -67,7 +73,7 @@
             font-size: 3.5rem;
         }
         }
-
+        /*
         .b-example-divider {
         width: 100%;
         height: 3rem;
@@ -76,7 +82,7 @@
         border-width: 1px 0;
         box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
         }
-
+        
         .b-example-vr {
         flex-shrink: 0;
         width: 1.5rem;
@@ -105,6 +111,7 @@
         white-space: nowrap;
         -webkit-overflow-scrolling: touch;
         }
+        */
 
         .btn-bd-primary {
         --bd-violet-bg: #712cf9;
@@ -383,6 +390,7 @@
     padding: 20px;
   }
 
+
 </style>
     {% block css %}{% endblock css %}
     {% block script_head %}{% endblock script_head %}   
@@ -394,7 +402,7 @@
     <img width='150px' src="{% static 'Vire.gif' %}" alt="">
   </div>  
   <div id="site-content">    
-    <main id="content-main" class='shadow  mb-2 bg-white rounded mt-2'> 
+    <main id="content-main" class='shadow  mb-2 bg-white rounded'> 
       <!--Botão muda tema-->
         {% include 'gestao_escolar/botom_cores/cores.html' %}
       <!-- Fim Botão muda tema-->
@@ -402,7 +410,8 @@
       {% comment "Head" %} Cabeçalho ----------------------------------------------- {% endcomment %}
           {% include 'gestao_escolar/headers/index.html' %}      
       
-      <div class="d-flex">
+          <div class="d-flex" style="overflow-y: auto;">
+
         {% comment "Sidebar" %} Menu lateral esquerdo  ------------------------------- {% endcomment %}
           {% include 'gestao_escolar/sidebars/index.html' %}  
         {% comment "Main" %} Conteudo Principal{% endcomment %}      
