@@ -1,9 +1,91 @@
 {% load static %}
 <style>
  .fs-vw{font-size: 0.1vw; }
-</style>
 
-<header class=" mb-3 border-bottom shadow-bottom w-100 m-0">  
+ .green-header {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 0;
+  background-color:rgba(0, 26, 0, 0.75);
+  background-image: url("https://www.transparenttextures.com/patterns/sandpaper.png");
+  /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
+  background-blend-mode: overlay, overlay;
+  background-size: cover;
+  border-bottom: 2px solid #95D5B2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  color: #E9F5EC;
+  font-family: 'Segoe UI', sans-serif;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+}
+
+
+
+.green-header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at bottom center,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 35%,
+    rgba(0, 0, 0, 0) 80%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+
+/* Estilo base para links no header */
+.green-header a {
+  color: #E9F5EC; /* tom claro suave que combina com o fundo */
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+/* Ao passar o mouse */
+.green-header a:hover,
+.green-header a:focus {
+  color: #D8F3DC; /* tom mais claro para hover */
+  text-decoration: underline;
+}
+
+/* Links em botões ou dropdowns */
+.green-header .dropdown-item,
+.green-header .btn,
+.green-header button {
+  color: #E9F5EC;
+}
+
+.green-header .dropdown-item:hover,
+.green-header .btn:hover,
+.green-header button:hover {
+  color: #D8F3DC;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Ícones com links */
+.green-header i,
+.green-header svg {
+  fill: #E9F5EC;
+  color: #E9F5EC;
+  transition: color 0.3s ease, fill 0.3s ease;
+}
+
+.green-header a:hover i,
+.green-header a:hover svg {
+  fill: #D8F3DC;
+  color: #D8F3DC;
+}
+
+
+</style>
+<header class="border-bottom shadow-bottom w-100 m-0 green-header">
+
   <link
   href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
   rel="stylesheet"
@@ -19,21 +101,21 @@
 
 </style>
 
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-  <div class="container-fluid justify-content-middle">
+<nav class="navbar navbar-expand-lg rounded-0 padding-0">
+  <div class="container-fluid justify-content-middle"  style="margin: -0.7rem 1rem;">
     <div>
       {% if request.session.escola_nome_query.related_dadosEscola.imagem %}         
-        <div class="logo" > 
-          <div style="width:12rem ;box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset; margin-left: -3rem!important; margin-bottom: -0.35;padding: 0.2rem; text-align: center;" >
-            <img class="w-50" src="{{ request.session.escola_nome_query.related_dadosEscola.imagem.url }}" />       
+        <div class="logo p-2" style="gap: 1rem;">
+          <div class='d-flex align-items-center' style="width:12rem; height:5rem; box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset; margin-left: -3rem; padding: 0.2rem; display: flex; justify-content: center; align-items: center;">
+            <img class="h-75 w-auto" src="{{ request.session.escola_nome_query.related_dadosEscola.imagem.url }}" />
           </div>
-          <div class="mx-2">     
-              {% include "gestao_escolar/headers/dados_gestao.html" %}          
-          </div> 
-        </div>     
+          <div class="mx-2r">
+            {% include "gestao_escolar/headers/dados_gestao.html" %}
+          </div>
+        </div>         
       {% else %}
-      <div class="logo " > 
-        <div style="width:12rem ;box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset; margin-left: -3rem!important; margin-bottom: -0.35;padding: 0.2rem; text-align: center;" >
+      <div class="logo  p-2" > 
+        <div class='d-flex align-items-center' style="width:12rem ;box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset; margin-left: -3rem!important; margin-bottom: -0.35;padding: 0.2rem; text-align: center;" >
           <img class="w-50" src="{% static 'logo.png' %}" />       
         </div>
         <div class="mx-2">     
@@ -44,10 +126,10 @@
     </div>
     <div>    
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+        <img src="{% static 'menu_resp.svg' %}" class='w-50' alt="">
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <div class="collapse navbar-collapse " id="navbarSupportedContent">
         <div class="nav-right" >
           <a href="#" class="d-block  text-decoration-none txt-p " data-bs-toggle="dropdown" aria-expanded="false">
               

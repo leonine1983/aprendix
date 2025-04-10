@@ -19,7 +19,8 @@ body {
   width: 100%;
   height: 72px;
   box-shadow: 0 0 20px rgb(0 0 0 / 6%);
-  z-index: 20;
+  z-index: 1000;
+  
 }
 
 .logo {
@@ -122,6 +123,7 @@ span.material-symbols-outlined {
   visibility: hidden;
   transition: 0.3s;
   appearance: none;
+  z-index: 3000!important;
 }
 
 .menu_google::-webkit-scrollbar {

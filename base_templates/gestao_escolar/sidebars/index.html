@@ -37,6 +37,18 @@
     #sidebar-desktop {
       display: none !important;
     }
+   
+    #navbarSupportedContent {
+      border: 1px solid #d1d5db; /* cinza suave para visual clean */
+      border-radius: 0.5rem; /* cantos levemente arredondados */
+      padding: 1rem; /* mais espaço interno para usabilidade */
+      margin: 1rem auto; /* centralizado horizontalmente */
+      min-width: 90vw; /* limite de largura para legibilidade */
+      background-color: #ffffff; /* fundo branco para contraste com o conteúdo */
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* sombra suave para destaque */
+      transition: all 0.3s ease-in-out; /* suavidade em interações */
+    }
+
 
     #sidebar-mobile {
       display: flex !important;
@@ -50,7 +62,7 @@
 <link rel="stylesheet" href="{% static 'fontawesome/css/PRO/sharp_light.css' %}">
 
   {% endblock css %}
-  <div id="sidebar-desktop" class="d-flex flex-column flex-shrink-0 p-3 bg-light shadow-sm rounded-3 bg-p-3">
+  <div id="sidebar-desktop" class="d-flex flex-column flex-shrink-0 p-3 bg-light shadow-sm rounded-3 bg-p-3 mt-1">
     <ul class="nav nav-pills flex-column mb-auto">
       {% if request.session.escola_id   %}
       <li>

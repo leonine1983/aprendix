@@ -62,80 +62,217 @@
   font-size: 0.9rem !important;
 }
 
+/*menu vertical*/
+  
+    .custom-nav {
+      margin-top: -2.2rem;
+      background-color: #a68500be;
+      background-image: url("https://www.transparenttextures.com/patterns/groovepaper.png");
+      box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+      position: relative;
+      border-bottom-left-radius: 0.5rem;
+      border-bottom-right-radius: 0.5rem;
 
-</style>
-<nav class="navbar navbar-expand-lg rounded-top-3  shadow-sm bg-p-4" style="height: 3.5rem;">
-  <div class="container-fluid m-0 p-0">    
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavDropdown">
-      <ul class="navbar-nav">
-        <!-- Parâmetros -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa-solid fa-screwdriver-wrench fs-6"></i><br> Parâmetros
-          </a>
-          <ul class="dropdown-menu" style="margin-top: -1rem;">
-            <li><a class="dropdown-item" href="#">Série</a></li>
-            <li><a class="dropdown-item" href="#">Grau/Nível Escolar</a></li>
-            <li><a class="dropdown-item" href="#">Tipo de Remanejamentos</a></li>
-            <li><a class="dropdown-item" href="{% url 'Gestao_Escolar:GE_Disciplina_create' %}">Disciplinas</a></li>
-          </ul>
-        </li>
-        <!-- Relatórios -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa-solid fa-print fs-6"></i><br> Relatórios
-          </a>
-          <ul class="dropdown-menu " style="margin-top: -1rem;">
-            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:imprime_list_turmas" %}'>Relação de Turmas</a></li>
-            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:imprime_turmas_filtros" %}'>Relação de Turmas detalhado</a></li>
-            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:imprime_list_escolas" %}'>Relação de Escolas</a></li>
-            
-          </ul>
-        </li>
-        <!-- Localização -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa-duotone fa-solid fa-location-dot fs-6"></i><br> Localização
-          </a>
-          <ul class="dropdown-menu " style="margin-top: -1rem;">
-            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Cidade</a></li>
-            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Bairros</a></li>
-          </ul>
-        </li>
-        <!-- Cadastros -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa-sharp-duotone fa-solid fa-cash-register"></i><br> Contratos e Decretos
-          </a>
-          <ul class="dropdown-menu " style="margin-top: -1rem;">
-            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:pessoas-create" %}'>Pessoas</a></li>
-            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:decreto-create" %}'>Decretos</a></li>
-            <li><a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Contratos </a></li>
-          </ul>
-        </li>
+    }
 
+    .custom-nav-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content:center;
+    }
+
+    .custom-nav-list li {
+      position: relative;      
+    }
+
+    .custom-nav-list li a {
+      display: block;
+      padding: 1rem 2rem;
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.95);
+      transition: background 0.3s ease-in-out;
+    }
+
+    .custom-nav-list li a:hover {
+      background: rgba(0, 0, 0, .15);
+    }
+
+    .custom-nav-list li a:not(:only-child)::after {
+      content: ' ▾';
+      padding-left: 5px;
+    }
+
+    .custom-dropdown {
+      display: none;
+      position: absolute;
+      background: white;
+      top: 100%;
+      left: 0;
+      box-shadow: 0 4px 10px rgba(10, 20, 30, .4);
+      min-width: 190px;
+      z-index: 1000;
+      width: 20vw;
+      text-align: start;
+      border: 0.1rem solid #a68500be;;
+      
+    }
+
+    .custom-dropdown li a {
+      padding: 0.8rem 1rem;
+      color: #555;
+      border-bottom: 1px solid #eee;
+    }
+
+    .custom-dropdown li a:hover {
+      background: #f0f0f0;
+      color: #111;
+    }
+
+    /* MOBILE MENU */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      padding: 1rem;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+
+      .custom-nav-list {
+        display: none;
+        flex-direction: column;
+      }
+
+      .custom-nav-list.active {
+        display: flex;
+      }
+
+      .custom-nav-list li {
+        width: 100%;
+      }
+
+      .custom-dropdown {
+        position: static;
+        box-shadow: none;
+      }
+
+      .custom-dropdown li a {
+        padding-left: 2rem;
+      }
+    }
+  </style>
+
+
+  <nav class="custom-nav">
+    <button class="menu-toggle">☰ Menu</button>
+    <ul class="custom-nav-list">
+      <!-- Parâmetros -->
+      <li class="custom-drop text-center">
+        <a href="#"><i class="fa-solid fa-screwdriver-wrench fs-6"></i><br> Parâmetros</a>
+        <ul class="custom-dropdown">
+          <li><a href="#">Série</a></li>
+          <li><a href="#">Grau/Nível Escolar</a></li>
+          <li><a href="#">Tipo de Remanejamentos</a></li>
+          <li><a href="{% url 'Gestao_Escolar:GE_Disciplina_create' %}">Disciplinas</a></li>
+        </ul>
+      </li>
+
+      <!-- Relatórios -->
+      <li class="custom-drop text-center border">
+        <a href="#"><i class="fa-solid fa-print fs-6"></i><br> Relatórios</a>
+        <ul class="custom-dropdown">
+          <li><a href='{% url "Gestao_Escolar:imprime_list_turmas" %}'>Relação de Turmas</a></li>
+          <li><a href='{% url "Gestao_Escolar:imprime_turmas_filtros" %}'>Relação de Turmas detalhado</a></li>
+          <li><a href='{% url "Gestao_Escolar:imprime_list_escolas" %}'>Relação de Escolas</a></li>
+        </ul>
+      </li>
+
+      <!-- Relatórios -->
+      <li class="custom-drop text-center border">
+        <a href="#"><i class="fa-duotone fa-solid fa-location-dot fs-6"></i><br> Localização</a>
+        <ul class="custom-dropdown">
+          <li><a href='{% url "Gestao_Escolar:bairro-create" %}'>Cidade</a></li>
+          <li><a href='{% url "Gestao_Escolar:bairro-create" %}'>Bairros</a></li>
+        </ul>
+      </li>
+
+      <!-- Contratos e Decretos -->
+      <li class="custom-drop text-center border">
+        <a href="#"><i class="fa-sharp-duotone fa-solid fa-cash-register"></i><br> Contratos e Decretos</a>
+        <ul class="custom-dropdown">
+          <li><a href='{% url "Gestao_Escolar:pessoas-create" %}'>Pessoas</a></li>
+          <li><a href='{% url "Gestao_Escolar:decreto-create" %}'>Decretos</a></li>
+          <li><a href='{% url "Gestao_Escolar:bairro-create" %}'>Contratos </a></li>
+        </ul>
+      </li>
+
+      <!-- Relatórios -->
+      <li class="custom-drop text-center  border">
+        <a href="#"><i class="fa-sharp-duotone fa-solid fa-face-smiling-hands fs-6"></i><br>Apoio/Suporte</a>   
+        <ul class="custom-dropdown">
+          <li><a href='{% url "Gestao_Escolar:GE_anoLetivo" %}'><i class="fa-regular fa-arrows-retweet txt-p-nav fs-4"></i><sup class="txt-p-nav ">{{request.session.anoLetivo_nome}}</sup> Alternar entre Anos Letivos | Mudar Exercício</a>
+          {% if user.is_superuser %}
+            <li><a href='{% url "Gestao_Escolar:CreateEscola" %}'><i class="fa-duotone fa-solid fa-school-flag txt-p-nav me-2 fs-4"></i> Criar nova Escola (Super User)</a></li>
+          {% endif %}
+          <li><a href='{% url "admin_acessos:CreateUsers" %}'><i class="fa-duotone fa-solid fa-users"></i> Criar novo usuário </a></li>       
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <script>
+    // Toggle mobile menu
+    $(".menu-toggle").click(function () {
+      $(".custom-nav-list").toggleClass("active");
+    });
+
+    // Dropdown on hover (desktop) and click (mobile)
+    $(".custom-drop").hover(
+      function () {
+        if (window.innerWidth > 768) {
+          $(this).find(".custom-dropdown").stop(true, true).slideDown(300);
+        }
+      },
+      function () {
+        if (window.innerWidth > 768) {
+          $(this).find(".custom-dropdown").stop(true, true).slideUp(300);
+        }
+      }
+    );
+
+    $(".custom-drop > a").click(function (e) {
+      if (window.innerWidth <= 768) {
+        e.preventDefault();
+        $(this).next(".custom-dropdown").slideToggle(300);
+      }
+    });
+  </script>
+
+
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+<script type="text/javascript">
+    $(document).ready(function(){
         
-        <!-- Apoio/Suporte -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa-sharp-duotone fa-solid fa-face-smiling-hands fs-6"></i><br> 
-            Apoio/Suporte
-          </a>          
-          <ul class="dropdown-menu " style="margin-top: -1rem;">
-            <li> 
-              <a class="dropdown-item" href='{% url "Gestao_Escolar:GE_anoLetivo" %}'><i class="fa-regular fa-arrows-retweet txt-p-nav fs-4"></i><sup class="txt-p-nav ">{{request.session.anoLetivo_nome}}</sup> Alternar entre Anos Letivos | Mudar Exercício</a>
-              
-            </li>
-            {% if user.is_superuser %}
-              <li><a class="dropdown-item" href='{% url "Gestao_Escolar:CreateEscola" %}'><i class="fa-duotone fa-solid fa-school-flag txt-p-nav me-2 fs-4"></i> Criar nova Escola (Super User)</a></li>
-            {% endif %}
-            <li><a class="dropdown-item" href='{% url "admin_acessos:CreateUsers" %}'><i class="fa-duotone fa-solid fa-users"></i> Criar novo usuário </a></li>           
-          </ul>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
+        $('#drop').click(function () {
+        
+            if (!$(this).hasClass('ativo')) {
+                $(this).addClass('ativo');
+                $('.dropdown').slideDown(300);
+            } else {
+                $(this).removeClass('ativo');
+                $('.dropdown').slideUp(300);
+            }
+        
+        });
+    });
+</script>

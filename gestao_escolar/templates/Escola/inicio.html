@@ -57,14 +57,13 @@
     {% if messages %}                
         {% include 'Escola/partials/mensagens.html' %}          
     {% endif %}
-
-    <div class='p-4 h5 bg-p-3' style='margin:-1rem -1rem 0 -1rem'></div>   
+    <div class='p-4 h5 ' style='margin:-2.5rem -1rem 0 -1rem'></div>   
         {% if escolaMatriculaOnline %}
             {% include "Escola/matriculaOnline/partial_alunosEmPre_matricula.html" %}
         {% endif %}
         <div class=" rounded-top-2  bg-body-tertiary " style='margin:-1.2rem 0rem 1rem 0rem !important'>
             <div class='mb-2'>
-                {% include 'gestao_escolar/navbars/index.html' %}    
+                {% include 'gestao_escolar/navbars/index.html' %} 
             </div>
 
             <div class="cards-container">
