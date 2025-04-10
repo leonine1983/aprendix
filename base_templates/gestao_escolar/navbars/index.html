@@ -167,6 +167,8 @@
 
       .custom-dropdown li a {
         padding-left: 2rem;
+        width: 75vw;
+        background-color: aliceblue;
       }
     }
   </style>
@@ -177,7 +179,7 @@
     <ul class="custom-nav-list">
       <!-- Parâmetros -->
       <li class="custom-drop text-center">
-        <a href="#"><i class="fa-solid fa-screwdriver-wrench fs-6"></i><br> Parâmetros</a>
+        <a href="#"><i class="fa-solid fa-screwdriver-wrench fs-5"></i><br> Parâmetros</a>
         <ul class="custom-dropdown">
           <li><a href="#">Série</a></li>
           <li><a href="#">Grau/Nível Escolar</a></li>
@@ -188,7 +190,7 @@
 
       <!-- Relatórios -->
       <li class="custom-drop text-center border">
-        <a href="#"><i class="fa-solid fa-print fs-6"></i><br> Relatórios</a>
+        <a href="#"><i class="fa-solid fa-print fs-5"></i><br> Relatórios</a>
         <ul class="custom-dropdown">
           <li><a href='{% url "Gestao_Escolar:imprime_list_turmas" %}'>Relação de Turmas</a></li>
           <li><a href='{% url "Gestao_Escolar:imprime_turmas_filtros" %}'>Relação de Turmas detalhado</a></li>
@@ -198,7 +200,7 @@
 
       <!-- Relatórios -->
       <li class="custom-drop text-center border">
-        <a href="#"><i class="fa-duotone fa-solid fa-location-dot fs-6"></i><br> Localização</a>
+        <a href="#"><i class="fa-duotone fa-solid fa-location-dot fs-5"></i><br> Localização</a>
         <ul class="custom-dropdown">
           <li><a href='{% url "Gestao_Escolar:bairro-create" %}'>Cidade</a></li>
           <li><a href='{% url "Gestao_Escolar:bairro-create" %}'>Bairros</a></li>
@@ -207,7 +209,7 @@
 
       <!-- Contratos e Decretos -->
       <li class="custom-drop text-center border">
-        <a href="#"><i class="fa-sharp-duotone fa-solid fa-cash-register"></i><br> Contratos e Decretos</a>
+        <a href="#"><i class="fa-sharp-duotone fa-solid fa-cash-register fs-5"></i><br> Contratos e Decretos</a>
         <ul class="custom-dropdown">
           <li><a href='{% url "Gestao_Escolar:pessoas-create" %}'>Pessoas</a></li>
           <li><a href='{% url "Gestao_Escolar:decreto-create" %}'>Decretos</a></li>
@@ -217,7 +219,7 @@
 
       <!-- Relatórios -->
       <li class="custom-drop text-center  border">
-        <a href="#"><i class="fa-sharp-duotone fa-solid fa-face-smiling-hands fs-6"></i><br>Apoio/Suporte</a>   
+        <a href="#"><i class="fa-sharp-duotone fa-solid fa-face-smiling-hands fs-5"></i><br>Apoio/Suporte</a>   
         <ul class="custom-dropdown">
           <li><a href='{% url "Gestao_Escolar:GE_anoLetivo" %}'><i class="fa-regular fa-arrows-retweet txt-p-nav fs-4"></i><sup class="txt-p-nav ">{{request.session.anoLetivo_nome}}</sup> Alternar entre Anos Letivos | Mudar Exercício</a>
           {% if user.is_superuser %}
