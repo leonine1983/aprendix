@@ -343,14 +343,206 @@
     <title>{% block title_page %}{% endblock title_page %}</title> 
 </head>
 
-<body>   
+<body>     
   <div id="landscape-warning" class="bg-black" style="background-color: #191b22;">
     <img width='150px' src="{% static 'Vire.gif' %}" alt="">
-  </div>  
+  </div> 
+  <style>
+    .phone-frame {
+      }
+      .phone-screen {
+  align-items: center;
+  height: 100%;
+  overflow: hidden;
+  perspective: 460px;
+  position: relative;
+}
+
+.menu {
+  position: fixed; /* fixado no canto inferior */
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 180px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  background: linear-gradient(180deg, #1f1f1f 0%, #2b2b2b 100%);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(180px);
+  transition: transform 300ms ease-in-out;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  z-index: 1000;
+}
+
+.active .menu {
+  transform: translateY(0);
+}
+
+.option {
+  width: 70px;
+  height: 70px;
+  margin: 10px;
+  background-color: #2e2e2e;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.2s;
+}
+
+.option:active {
+  background-color: #444;
+}
+
+.option svg,
+.food {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 6px;
+}
+
+.button-menu1 {
+  bottom: 100px;
+  right: 50%;
+  position: fixed;
+  z-index: 2000;
+  cursor: pointer;
+  height: 56px;
+  width: 56px;
+  border-radius: 50%;
+  background-color: #0e3024;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.button-menu1:active {
+  background-color: #132e25;
+}
+
+.bg {
+  fill: none;
+}
+
+.line {
+  stroke: white;
+  stroke-width: 2;
+  transition: transform 300ms ease, stroke 300ms ease;
+  transform-origin: 50%;
+}
+
+.active .line1 {
+  stroke: #fff;
+  transform: translateY(6px) rotate(45deg);
+}
+.active .line2 {
+  stroke: #fff;
+  transform: scale(0);
+}
+.active .line3 {
+  stroke: #fff;
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+      .modal-backdrop {
+  all: unset;
+}
+
+
+
+
+/* Esconde por padrão */
+.button-menu1,
+.menu {
+  display: none;
+}
+
+/* Exibe apenas em telas menores que 768px (mobile) */
+@media (max-width: 768px) {
+  .button-menu1 {
+    display: flex;
+    bottom: 0;
+    right: 42%;
+    position: absolute;
+    z-index: 1100;
+    cursor: pointer;
+    height: 30px;
+    width: 60px;
+    border-radius: 5%;
+    background-color: #0d2b20;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+  }
+
+  .button-menu1:active {
+    background-color: #3baf8a;
+  }
+
+  .menu {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 180px;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    background: linear-gradient(180deg, #1f1f1f 0%, #2b2b2b 100%);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(180px);
+    transition: transform 300ms ease-in-out;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    z-index: 1000;
+  }
+
+  .active .menu {
+    transform: translateY(0);
+  }
+}
+
+/* Linhas do ícone (hambúrguer) */
+.line {
+  stroke: white;
+  stroke-width: 2;
+  transition: transform 300ms ease, stroke 300ms ease;
+  transform-origin: 50%;
+}
+
+.active .line1 {
+  stroke: #fff;
+  transform: translateY(6px) rotate(45deg);
+}
+.active .line2 {
+  stroke: #fff;
+  transform: scale(0);
+}
+.active .line3 {
+  stroke: #fff;
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+
+</style>
+
+<div class="phone-frame">
+    <div class="phone-screen">
+      <div class="imageContainer"> 
+
   <div id="site-content">    
     <main id="content-main" class='shadow  mb-2 bg-white rounded'> 
       <!--Botão muda tema-->
-        {% include 'gestao_escolar/botom_cores/cores.html' %}
       <!-- Fim Botão muda tema-->
 
       {% comment "Head" %} Cabeçalho ----------------------------------------------- {% endcomment %}
@@ -368,10 +560,138 @@
           
           {% endblock footer %}
       {% comment "Scripts" %} Área pra scripts fim da pagina {% endcomment %}
-          {% block script_footer %}{% endblock script_footer %}   
-          
+          {% block script_footer %}{% endblock script_footer %}             
     </main> 
   </div>
+ 
+       
+      </div>
+      <!-- <div class="button-menu button-menu1"></div> -->
+      <svg class="button-menu button-menu1" height="24" width="24" onclick="document.querySelector('.phone-screen').classList.toggle('active')">
+        <circle class="bg" r="12" cx="12" cy="12" />
+        <path class="line line1" d="M 6,8 H 18" />
+        <path class="line line2" d="M 6,12 H 18" />
+        <path class="line line3" d="M 6,16 H 18" />
+        
+      </svg>
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <!--Versão Mobile 
+     
+        <li>
+          <a href="{% url 'Gestao_Escolar:GE_Create_Professores' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Professores" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fs-5 fa-duotone fa-person-chalkboard txt-p-nav me-2"></i>
+            Cadastro de Profissionais
+          </a>
+        </li>
+        
+        <li>
+          <a href="{% url 'Gestao_Escolar:pessoas-create' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Professores" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fs-5 fa-duotone fa-person-chalkboard txt-p-nav me-2"></i>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Matrícula" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fs-4 fa-solid fa-screen-users txt-p-nav me-2"></i>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'Gestao_Escolar:Grades_turmas' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Grade de Disciplinas" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fs-4 fa-duotone fa-chart-network txt-p-nav me-2" style="font-size: 1.65rem;"></i>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Gestão das Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fs-4 fa-solid fa-users-gear txt-p-nav me-2" style="font-size: 1.65rem;"></i>
+          </a>
+        </li>
+        <li class='mt-5'>
+          <a href="{% url 'Gestao_Escolar:adicionar_escola' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Espaço reservado para a matricula online" data-bs-toggle="tooltip" data-bs-placement="right">          
+            <img src="{% static 'svg/matriOn.svg' %}" alt="">
+          </a>
+        </li>  
+    </ul>
+    <div class="dropdown border-top">
+      <a href="#" class="d-flex align-items-center justify-content-center p-3 link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="https://github.com/mdo.png" alt="mdo" width="24" height="24" class="rounded-circle">
+      </a>
+      <ul class="dropdown-menu text-small shadow">
+
+        <li><a class="dropdown-item" href="#">New project...</a></li>
+        <li><a class="dropdown-item" href="#">Settings</a></li>
+        <li><a class="dropdown-item" href="#">Profile</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="#">Sign out</a></li>
+      </ul>
+    </div>
+  </div>
+
+
+
+
+-->
+
+
+
+
+
+      <div class="menu" >        
+        <div class="option">
+          {% if request.session.escola_id   %}
+          <a href="{% url 'Gestao_Escolar:DadosEscola' request.session.escola_id %}" class="nav-link link-light rounded-3 txt-p-nav" title="Cadstro de Escola" alt="Cadstro de Escola"  data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fa-duotone fa-solid fa-school-flag txt-p-nav text-light  fs-4"></i>            
+          </a>
+        {% endif %}
+        </div>
+        <div class="option">
+          <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_create' %}" class="nav-link link-light  rounded-3 txt-p-nav" title="Cadastro de Alunos" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fa-sharp fa-solid fa-people fs-5 txt-p-nav text-light"></i>
+          </a>
+        </div>
+        <div class="option">
+          <a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}" class="nav-link  rounded-3 txt-p-nav" title="Cadastro de Turmas data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fa-solid fa-people-roof fs-4 txt-p-nav  text-light"></i>            
+          </a>
+        </div>
+        <div class="option">
+          <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="nav-link  rounded-3 txt-p-nav" title="Matrícula de alunos nas turmas" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fs-4 fa-solid fa-screen-users txt-p-nav text-light"></i>            
+          </a>
+        </div>
+        <div class="option">
+          <a href="{% url 'Gestao_Escolar:Grades_turmas' %}" class="nav-link  rounded-3 txt-p-nav" title="Grade de disciplinas" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fs-4 fa-duotone fa-chart-network txt-p-nav text-light" style="font-size: 1.65rem;"></i>           
+          </a>
+        </div>
+        <div class="option">
+          <a href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}" class="nav-link  rounded-3 txt-p-nav" title="Gestão das Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fs-4 fa-solid fa-users-gear txt-p-nav text-light" style="font-size: 1.65rem;"></i>            
+          </a>
+        </div>
+        <div class="option">
+          <a href="{% url 'Gestao_Escolar:adicionar_escola' %}" class="nav-link  rounded-3 txt-p-nav" title="Espaço reservado para a matricula online" data-bs-toggle="tooltip" data-bs-placement="right">          
+            <img src="{% static 'svg/matriOn.svg' %}" alt="">            
+          </a>
+        </div>
+
+        
+      </div>
+    </div>
+  </div>
+
   <script>
     function exibirDiv() {
         var divOculta = document.getElementById('oculto');        
@@ -383,7 +703,7 @@
     }
 </script>
 
-<!-- Aviso de orientação -->
+<!-- Aviso de orientação 
 <script>
   function verificarOrientacao() {
     const aviso = document.getElementById('landscape-warning');
@@ -404,7 +724,7 @@
   window.addEventListener('resize', verificarOrientacao);
   window.addEventListener('orientationchange', verificarOrientacao);
 </script>
-
+-->
 
 </body>
 </html>
