@@ -69,7 +69,6 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
         if matricula_id:
             try:
                 matricula = MatriculasOnline.objects.get(id=matricula_id)
-                print(f'olhaaaaa a {matricula}')
                 form = MatriculasOnlineForm(instance=matricula)  # Carrega os dados da matrícula existente
                 context['form'] = form
             except MatriculasOnline.DoesNotExist:

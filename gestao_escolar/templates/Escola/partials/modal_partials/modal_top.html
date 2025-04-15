@@ -1,0 +1,41 @@
+<style>
+
+
+.fullscreen-card {
+  width: 100vw;
+  min-height: 100vh!important;
+  margin: 0;
+  padding: 2rem;
+  box-sizing: border-box;
+  background-color: #e2dfdf;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* centraliza verticalmente o conteúdo interno */
+  align-items: center;     /* centraliza horizontalmente o conteúdo interno */
+  border-radius: 0; /* remove bordas arredondadas */
+  box-shadow: none; /* opcional, se quiser sem sombra */
+}
+.fullscreen-card .card-header {
+    width: 100%;
+    padding: 0.5rem 1rem;       
+    margin: -2rem 0 0 0;           
+    background-color: rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125); 
+}
+</style>
+{% load static %}
+<div class="modal fade show" id="modal_escola" style="display: block; background: #0000003f; height: 100vh; width: 100vw; padding: 0; margin: 0;">
+    {% include 'Escola/partials/mensagens.html' %}
+    <div class="modal-dialog m-0 p-0" style="height: 100%; width: 100%; max-width: 100%;">
+        <div class="modal-content bg-transparent d-flex justify-content-center align-items-center p-0" >
+            <div class="{% if titulo_page == 'Selecione o ano letivo' %} card {% elif  titulo_page == 'Selecione uma escola' %} card {% else %}fullscreen-card{% endif %}  w-100 h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="fs-3">{{ title_page }} {{titulo_page}}</div>
+                    <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" style="background-color: transparent !important; border: cadetblue 0.1rem solid !important; color: cadetblue !important;" class="mx-2">
+                            <i class="fa-thin fa-door-closed txt-p"></i> Sair do Sistema | Deslogar
+                        </button>
+                    </form>
+                </div>
+                <div class="card-body">

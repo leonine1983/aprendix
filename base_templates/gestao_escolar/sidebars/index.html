@@ -13,9 +13,6 @@
 <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/sharp-light.css">
 
 <style>
-  .txt-p-nav {
-    color: #0078d4; /* Cor dos ícones e texto */
-  }
 
   .nav-pills li {
     box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
@@ -31,11 +28,17 @@
   #sidebar-desktop {
     display: block;
   }
+  #navMobile{
+      display: none;
+    }
 
   /* Quando a tela for 830px ou menor */
   @media (max-width: 1000px) {
     #sidebar-desktop {
       display: none !important;
+    }
+    #navMobile{
+      display: block;
     }
    
     #navbarSupportedContent {
@@ -47,10 +50,12 @@
       background-color: #ffffff; /* fundo branco para contraste com o conteúdo */
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* sombra suave para destaque */
       transition: all 0.3s ease-in-out; /* suavidade em interações */
+    }   
+  }
+  @media(max-width:450px){
+    #navMobile{
+      display: none;
     }
-
-
-   
   }
 </style>
 
@@ -141,3 +146,73 @@
       <hr>      
     </div>
   </div>  
+
+<!--Navbar para Tablets-->
+  <nav id="navMobile" class="navbar fixed-bottom navbar-expand-sm  bg-secondary-subtle rounded-0">
+    <div class="container-fluid">
+      <a class="navbar-brand px-1 pe-1 border-right me-2" href="#">
+        <img src="{% static 'logo.png' %}" width='50' alt="">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav border-bottom border-primary">          
+          <!--Escola-->
+          {% if request.session.escola_id   %}
+          <li class="nav-item">
+            <a href="{% url 'Gestao_Escolar:DadosEscola' request.session.escola_id %}" class="nav-link  rounded-3 " title="Alunos" data-bs-toggle="tooltip" data-bs-placement="right">
+              <i class="fa-duotone fa-solid fa-school-flag text-green fs-3 "></i>
+            </a>
+          </li>
+          {% endif 
+          <!--Alunos-->
+          <li class="nav-item">
+            <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_create' %}" class="nav-link rounded-3 " title="Alunos" data-bs-toggle="tooltip" data-bs-placement="right">
+              <i class="fa-sharp fa-solid fa-people fs-3 text-green "></i>
+            </a>
+          </li>
+          <!--Turmas-->
+          <li class="nav-item">
+            <a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}" class="nav-link rounded-3 " title="Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
+              <i class="fa-solid fa-people-roof fs-3 text-green"></i>
+            </a>
+          </li>
+          <!--Cadastra Professores e Profissionais de apoio-->
+          <li class="nav-item">
+            <a href="{% url 'Gestao_Escolar:pessoas-create' %}" class="nav-link rounded-3" title="Professores" data-bs-toggle="tooltip" data-bs-placement="right">
+              <i class="fs-3 text-green fa-duotone fa-person-chalkboard "></i>
+            </a>
+          </li>
+          <!--Matricular Alunos-->
+          <li class="nav-item">
+            <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="nav-link rounded-3" title="Matrícula" data-bs-toggle="tooltip" data-bs-placement="right">
+              <i class="fs-3 text-green fa-solid fa-screen-users "></i>
+            </a>
+          </li>
+          <!--Cadastra Professores e Profissionais de apoio-->
+          <li class="nav-item">
+            <a href="{% url 'Gestao_Escolar:pessoas-create' %}" class="nav-link rounded-3" title="Professores" data-bs-toggle="tooltip" data-bs-placement="right">
+              <i class="fs-3 text-green fa-duotone fa-person-chalkboard  "></i>
+            </a>
+          </li>
+          <!--Grade de Disciplinas-->
+          <li class="nav-item">
+            <a href="{% url 'Gestao_Escolar:Grades_turmas' %}" class="nav-link rounded-3 " title="Grade de Disciplinas" data-bs-toggle="tooltip" data-bs-placement="right">
+              <i class="fs-2 text-green fa-duotone fa-chart-network "></i>
+            </a>
+          </li>
+          <!--Gestão de Turmas-->
+          <li class="nav-item">
+            <a href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}" class="nav-link rounded-3 border" title="Gestão das Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
+              <i class="fs-2 fa-solid fa-users-gear text-green " ></i>
+            </a>
+          </li>    
+        </ul>
+        <!--Matricula Onlinde-->
+          <a class="navbar-brand px-1 pe-1 border-right mx-2" href="{% url 'Gestao_Escolar:adicionar_escola' %}" class="nav-link rounded-3 " title="Espaço reservado para a matricula online" data-bs-toggle="tooltip" data-bs-placement="right">          
+            <img src="{% static 'svg/matriOn.svg' %}" alt="">
+          </a>        
+      </div>
+    </div>
+  </nav>

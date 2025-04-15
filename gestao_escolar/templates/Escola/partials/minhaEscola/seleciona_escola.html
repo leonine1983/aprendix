@@ -46,172 +46,146 @@
     padding: 0px ;
     margin-bottom: 3rem!important;
   }
- </style>
- {% endblock script_head %}
-<!-- Modal -->
-<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-  {% include "Escola/partials/mensagens.html" %}
+
+  .modal-dialog {
+    width:100vw!important;
+  }
+  .modal-content{
+    margin-left: 0px!important;
     
-  <div class="modal-dialog" >
-    <div class="modal-content bg-secondary-subtle win11-window"  >
-      <div class="modal-header mb-5">
-        <h4 class="modal-title  fs-6"><span class="text-capitalize ml-5 fs-3"><i class="fs-4 fa-solid fa-people-roof"></i> {{titulo_page}}</span></h4>        
-        <button type="button" class="close btn btn-sm btn-primary" data-dismiss="modal"><i class="fa-solid fa-xmark"></i></button>        
-      </div>         
-      <!--Imagem de fundo Brasao-->
-      {% if  request.session.escola_nome_query.related_dadosEscola.imagem %}
-        <img src="{{ request.session.escola_nome_query.related_dadosEscola.imagem.url }}" alt="Imagem atual" style='position:absolute; z-index:-0,1; width:20rem; top:4rem; left:2rem'  class="img-thumbnail" >                              
-      {% else %}
-        <img src="{% static 'schooll.png' %}" style='position:absolute; z-index:-0,1; width:20rem; top:4rem; left:2rem'  alt="">
-      {% endif %}
+  }
+ </style>
 
-      <div class="modal-body shadow-sm bg-light-subtle " style="width: 85% !important;">
-        <div class="modal_windows_title mb-3 p-2 bg-p-4 ">
-          <i class="fa-regular fa-face-grin-squint"></i> <span class="text-capitalize fs-7"> Olá, seja muito bem-vindo {% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}{{request.user}}{% endif %}!!</span>  
-        </div>
-        {% if not update %}
-          <ul class="nav nav-tabs" id="myTab" role="tablist">              
-            <li class="nav-item" role="presentation">
-              <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"><i class="fa-duotone fa-solid fa-school-flag"></i> {{request.session.escola_nome}}</button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Informações Gerais <i class="fa-solid fa-plus"></i> </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="profile-tab2" data-bs-toggle="tab" data-bs-target="#profile-tab-pane2" type="button" role="tab" aria-controls="profile-tab-pane2" aria-selected="false"> Gestão | Coordenação<i class="fa-solid fa-plus"></i> </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="profile-tab3" data-bs-toggle="tab" data-bs-target="#profile-tab-pane3" type="button" role="tab" aria-controls="profile-tab-pane3" aria-selected="false">Outros<i class="fa-solid fa-plus"></i> </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane5" type="button" role="tab" aria-controls="profile-tab-pane5" aria-selected="false">Bairros atendidos pela escola <i class="fa-solid fa-plus"></i> </button>
-            </li>
-          </ul>
-          <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active bg-p-3 " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">              
-              <form class='d-flex ' action="" id="atualizaEscola" method="post">
-                {% csrf_token %}
-                <div id='visualizaNome' class="d-flex align-items-center justify-content-center fs-4 rounded-2 p-1 m-3 text-primary ">
-                  {{form.nome_escola}}
-                </div>
-                <button type="submit" class="btn col-3 btn-sm btn-success w-100"> {{button}} <i class="fa-solid fa-people-roof"></i></button>     
-              </form>  
-              {% include "Escola/partials/minhaEscola/dados_impressao.html" %}
-              
-            </div> 
-              <!--Informações Gerais -->
-            <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-              <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post" enctype="multipart/form-data">                        
-                  {% csrf_token %}
-                  {% include "Escola/partials/minhaEscola/form_Informações_Gerais.html" %}                      
-              </form>
-            </div> 
-            <!--Identificação | Gestão | Coordenação-->
-            <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane2" role="tabpanel" aria-labelledby="profile-tab2" tabindex="0">
-              <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post">                        
-                  {% csrf_token %}   
-                  {% include "Escola/partials/minhaEscola/form_IdentificaçãoGestãoCoordenação.html" %}                   
-              </form>
-            </div> 
-            <!--Outros-->
-            <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane3" role="tabpanel" aria-labelledby="profile-tab3" tabindex="0">
-              <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post">                        
-                  {% csrf_token %}     
-                  {% include "Escola/partials/minhaEscola/form_Outros.html" %}                 
-              </form>                 
-            </div> 
-             <!--Bairros atendidos pela escola -->
-             <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane5" role="tabpanel" aria-labelledby="profile-tab5" tabindex="0">
-              <h2 class="h2 alert alert-info">"Selecione as localidades e bairros aplicáveis para a matrícula online. As opções selecionadas permitirão que alunos residentes nessas localidades realizem sua matrícula na escola de forma prática e eficiente."</h2>
-              <form class='m-3 p-3 win11-form' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post" enctype="multipart/form-data">                        
-                  {% csrf_token %}
+{% endblock script_head %} 
+{% include "Escola/partials/modal_partials/modal_top.html" %}    
+{% if not update %}
+<ul class="nav nav-tabs bg-light" id="myTab" role="tablist">              
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"><i class="fa-duotone fa-solid fa-school-flag"></i> {{request.session.escola_nome}}</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Informações Gerais <i class="fa-solid fa-plus"></i> </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="profile-tab2" data-bs-toggle="tab" data-bs-target="#profile-tab-pane2" type="button" role="tab" aria-controls="profile-tab-pane2" aria-selected="false"> Gestão | Coordenação<i class="fa-solid fa-plus"></i> </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="profile-tab3" data-bs-toggle="tab" data-bs-target="#profile-tab-pane3" type="button" role="tab" aria-controls="profile-tab-pane3" aria-selected="false">Outros<i class="fa-solid fa-plus"></i> </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane5" type="button" role="tab" aria-controls="profile-tab-pane5" aria-selected="false">Bairros atendidos pela escola <i class="fa-solid fa-plus"></i> </button>
+  </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active bg-p-3 " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">              
+    <form class='d-flex ' action="" id="atualizaEscola" method="post">
+      {% csrf_token %}
+      <div id='visualizaNome' class="d-flex align-items-center justify-content-center fs-4 rounded-2 p-1 m-3 text-primary ">
+        {{form.nome_escola}}
+      </div>
+      <button type="submit" class="btn col-3 btn-sm btn-success w-100"> {{button}} <i class="fa-solid fa-people-roof"></i></button>     
+    </form>  
+    {% include "Escola/partials/minhaEscola/dados_impressao.html" %}              
+  </div> 
+    <!--Informações Gerais -->
+  <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+    <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post" enctype="multipart/form-data">                        
+        {% csrf_token %}
+        {% include "Escola/partials/minhaEscola/form_Informações_Gerais.html" %}                      
+    </form>
+  </div> 
+  <!--Identificação | Gestão | Coordenação-->
+  <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane2" role="tabpanel" aria-labelledby="profile-tab2" tabindex="0">
+    <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post">                        
+        {% csrf_token %}   
+        {% include "Escola/partials/minhaEscola/form_IdentificaçãoGestãoCoordenação.html" %}                   
+    </form>
+  </div> 
+  <!--Outros-->
+  <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane3" role="tabpanel" aria-labelledby="profile-tab3" tabindex="0">
+    <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post">                        
+        {% csrf_token %}     
+        {% include "Escola/partials/minhaEscola/form_Outros.html" %}              
+    </form>                 
+  </div> 
+    <!--Bairros atendidos pela escola -->
+  <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane5" role="tabpanel" aria-labelledby="profile-tab5" tabindex="0">
+    <h2 class="h2 alert alert-info">"Selecione as localidades e bairros aplicáveis para a matrícula online. As opções selecionadas permitirão que alunos residentes nessas localidades realizem sua matrícula na escola de forma prática e eficiente."</h2>
+    <form class='m-3 p-3 win11-form' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post" enctype="multipart/form-data">                        
+        {% csrf_token %}
+        <style>
+          .ms-selectable {
+          position: relative; /* Necessário para posicionar o pseudo-elemento */
+          border: 2px solid #007bff!important; /* Adiciona a borda */
+          padding: 20px !important; /* Ajuste o padding conforme necessário */
+          border-radius: 8px; /* Bordas arredondadas */
+        }                    
+        
+          .ms-selectable:before{
+            content: "Todas as localidades disponíveis" !important; 
+            position: absolute !important;
+            top: -20px; /* Ajuste a posição do texto para cima */
+            left: 30%;
+            transform: translateX(-50%); /* Para centralizar o texto */
+            background-color: white; /* Cor de fundo da descrição */
+            color: #007bff;
+            padding: 5px 10px;
+            font-size: 1rem;
+            border: #007bff solid 0.1rem;
+            border-radius: 4px;
 
-                  <style>
-                   .ms-selectable {
-                    position: relative; /* Necessário para posicionar o pseudo-elemento */
-                    border: 2px solid #007bff!important; /* Adiciona a borda */
-                    padding: 20px !important; /* Ajuste o padding conforme necessário */
-                    border-radius: 8px; /* Bordas arredondadas */
-                  }                    
-                  
-                    .ms-selectable:before{
-                      content: "Todas as localidades disponíveis" !important; 
-                      position: absolute !important;
-                      top: -20px; /* Ajuste a posição do texto para cima */
-                      left: 30%;
-                      transform: translateX(-50%); /* Para centralizar o texto */
-                      background-color: white; /* Cor de fundo da descrição */
-                      color: #007bff;
-                      padding: 5px 10px;
-                      font-size: 1rem;
-                      border: #007bff solid 0.1rem;
-                      border-radius: 4px;
+          }
+          .ms-selection {
+          position: relative; /* Necessário para posicionar o pseudo-elemento */
+          border: 2px solid #1af306!important; /* Adiciona a borda */
+          padding: 20px !important; /* Ajuste o padding conforme necessário */
+          border-radius: 8px; /* Bordas arredondadas */
+        }   
+          .ms-selection:before{
+            content: "Localidades atendidas pela escola" !important; 
+            position: absolute !important;
+            top: -20px; /* Ajuste a posição do texto para cima */
+            left: 30%;
+            transform: translateX(-50%); /* Para centralizar o texto */
+            background-color: white; /* Cor de fundo da descrição */
+            color: #007bff;
+            padding: 5px 10px;
+            font-size: 1rem;
+            border: #1af306 solid 0.1rem;
+            border-radius: 4px;
 
-                    }
-                    .ms-selection {
-                    position: relative; /* Necessário para posicionar o pseudo-elemento */
-                    border: 2px solid #1af306!important; /* Adiciona a borda */
-                    padding: 20px !important; /* Ajuste o padding conforme necessário */
-                    border-radius: 8px; /* Bordas arredondadas */
-                  }                    
-                  
-                    .ms-selection:before{
-                      content: "Localidades atendidas pela escola" !important; 
-                      position: absolute !important;
-                      top: -20px; /* Ajuste a posição do texto para cima */
-                      left: 30%;
-                      transform: translateX(-50%); /* Para centralizar o texto */
-                      background-color: white; /* Cor de fundo da descrição */
-                      color: #007bff;
-                      padding: 5px 10px;
-                      font-size: 1rem;
-                      border: #1af306 solid 0.1rem;
-                      border-radius: 4px;
-
-                    }
-                  </style>
-
-
-
-
-                  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
-                  <!-- Bootstrap JavaScript -->
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
-                    <link rel="{% static 'multi-select/css/multi-select.css' %}" href="style.css">
-                    <section>
-                      {{escola_dados_form.bairro_atendEscola.label_tag}} 
-                      {{escola_dados_form.bairro_atendEscola}}   <br>
-                      {{escola_dados_form.bairro_atendEscola.error}}
-                    </section> 
-                    <script src="{% static 'multi-select/js/jquery.multi-select.js' %}" type="text/javascript">
-                    </script>
-                    <script type="text/javascript">
-                      // run callbacks
-                          $('#id_bairro_atendEscola').multiSelect({
-                          afterSelect: function(values){
-                            alert("Bairro selecionado de nº: "+values);
-                          },
-                          afterDeselect: function(values){
-                            alert("Remover o bairro de nº: "+values);
-                          }
-                        });
-                      </script>
+          }
+        </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+        <!-- Bootstrap JavaScript -->
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
+          <link rel="{% static 'multi-select/css/multi-select.css' %}" href="style.css">
+          <section>
+            {{escola_dados_form.bairro_atendEscola.label_tag}} 
+            {{escola_dados_form.bairro_atendEscola}}   <br>
+            {{escola_dados_form.bairro_atendEscola.error}}
+          </section> 
+          <script src="{% static 'multi-select/js/jquery.multi-select.js' %}" type="text/javascript">
+          </script>
+          <script type="text/javascript">
+            // run callbacks
+                $('#id_bairro_atendEscola').multiSelect({
+                afterSelect: function(values){
+                  alert("Bairro selecionado de nº: "+values);
+                },
+                afterDeselect: function(values){
+                  alert("Remover o bairro de nº: "+values);
+                }
+              });
+            </script>
+            
+          
+            <button type="submit" class="btn btn-sm btn-success w-100">Atualizar localidades próximas <i class="fa-solid fa-people-roof"></i></button>     
                       
-                    
-                      <button type="submit" class="btn btn-sm btn-success w-100">Atualizar localidades próximas <i class="fa-solid fa-people-roof"></i></button>     
-
-
-
-
-                               
-              </form>
-            </div>           
-          </div>              
-        </div>               
-      </div>              
-    </div> 
-  </div>   
-</div>                       
+    </form>
+  </div>           
+</div>              
+{% include "Escola/partials/modal_partials/modal_bottom.html" %}               
 {% endif %}    
 {% include "Escola/partials/utils/dragDrop.html" %}
 

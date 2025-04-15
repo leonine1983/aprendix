@@ -1,44 +1,26 @@
-{% load static %}
-<div class="modal fade" id="modal_escola" style='background:#000'>
-    {% include 'Escola/partials/mensagens.html' %}
-    <div class="modal-dialog">
-        <div class="modal-content bg-secondary-subtle"style='height:100%!important' >
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <div class="fs-3">Escola</div>
-                    <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}">
-                        {% csrf_token %}
-                        <button type="submit" style="background-color: transparent !important; border: cadetblue 0.1rem solid !important;color: cadetblue !important;" class="mx-2"><i class="fa-thin fa-door-closed txt-p"></i> Sair</button>
-                    </form>                
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">Selecione uma escola</h5>
-                    <p class="m-0">Por favor, escolha uma das opções de escolas disponíveis:</p>       
-                    <ul class="list-group list-group-flush  rounded-start-3">
-                        <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-end">
-                            <div class="fs-6" >
-                                <i class="fa-solid fa-school-flag fs-6 p-1"></i>                    
-                                <select name="escola" id="form-select-sm" class="form-select">
-                                    {% for n in object_list %}
-                                        <option value="{{n.id}}">{{n.nome_escola}}</option> 
-                                    {% endfor %}                       
-                                </select>
-                            </div>           
-                            <button class="btn btn-primary m-2" onclick="selecionaEscola()">Selecionar</button>
-                        </li>                
-                    </ul>  
-                    <script>
-                            function selecionaEscola(){
-                                var selectElement = document.getElementById("form-select-sm");
-                                var selectedId = selectElement.value;
-                                if (selectedId){
-                                    window.location.href = "escolas/selecionar/" + selectedId + "/";
-                                }
-                            }            
-                    </script> 
-                </div>                
-            </div>
-            {% include "Escola/partials/utils/rodape-modal.html" %}          
-        </div>
-    </div>
-</div>
+{% include "Escola/partials/modal_partials/modal_top.html" %}
+<h5 class="card-title">Selecione uma escola</h5>
+<p class="m-0">Por favor, escolha uma das opções de escolas disponíveis:</p>       
+<ul class="list-group list-group-flush  rounded-start-3">
+    <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-end">
+        <div class="fs-6" >
+            <i class="fa-solid fa-school-flag fs-6 p-1"></i>                    
+            <select name="escola" id="form-select-sm" class="form-select">
+                {% for n in object_list %}
+                    <option value="{{n.id}}">{{n.nome_escola}}</option> 
+                {% endfor %}                       
+            </select>
+        </div>           
+        <button class="btn btn-primary m-2" onclick="selecionaEscola()">Selecionar</button>
+    </li>                
+</ul>  
+<script>
+        function selecionaEscola(){
+            var selectElement = document.getElementById("form-select-sm");
+            var selectedId = selectElement.value;
+            if (selectedId){
+                window.location.href = "escolas/selecionar/" + selectedId + "/";
+            }
+        }            
+</script> 
+{% include "Escola/partials/modal_partials/modal_bottom.html" %}

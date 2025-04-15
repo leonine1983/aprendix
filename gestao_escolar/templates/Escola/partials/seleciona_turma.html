@@ -1,30 +1,14 @@
- {% load static %}
- {% block script_head %}
- <style>
-  .grid{
-    display: grid;
-    grid-template-columns: 1fr 20rem;
-    gap:1rem;
-    margin-bottom:1rem
+{% include "Escola/partials/modal_partials/modal_top.html" %}
+<style>
+  .card-body{
+    width: 100%;
   }
- </style>
- {% endblock script_head %}
-<!-- Modal -->
-<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    {% include "Escola/partials/mensagens.html" %}    
-    <div class="modal-dialog w-100">
-    <div class="modal-content bg-secondary-subtle win11-window">
-        <div class="modal-header mb-5">
-          <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3"><i class="fs-4 fa-solid fa-people-roof"></i> {{titulo_page}}</span></h4>        
-          <button type="button" class="close btn btn-sm btn-primary" data-dismiss="modal"><i class="fa-solid fa-xmark"></i></button>      
-             
-        </div>        
-        <img src="{% static 'sala.png' %}" style='position:absolute; z-index:-0,1; width:20rem; top:3rem; left:2rem'  alt="">
-        <div class="modal-body shadow-sm bg-light-subtle  w-75 ">
-          <div class="modal_windows_title mb-3 p-2 bg-p-4 ">
-            <i class="fa-regular fa-face-grin-squint"></i> <span class="text-capitalize fs-7"> Olá, seja muito bem-vindo {% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}{{request.user}}{% endif %}!!</span>  
-          </div>
+</style>
           {% if not update %}
+            <section>
+              <h2>Turmas Cadastradas - {{request.session.anoLetivo_nome}}</h2>
+              <p>Esta seção apresenta a lista completa de todas as turmas registradas no sistema para o ano de {{request.session.anoLetivo_nome}}. Para adicionar novas turmas, clique no botão <strong class="fs-3">Criar +</strong>.</p>
+            </section>          
             <ul class="nav nav-tabs" id="myTab" role="tablist">              
                 <li class="nav-item" role="presentation">
                   <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"><i class="fs-4 fa-solid fa-people-roof"></i>Toda as Turmas</button>
@@ -41,14 +25,14 @@
                 {% include "Escola/partials/mensagens.html" %}
                 {% if not update %}
                 <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-                  <div class='p-2 fs-6 border-danger-subtle border-right d-flex text-light bg-p-3' >
+                  <div class='p-2 fs-6 border-danger-subtle border-right d-flex text-light bg-secondary' >
                     <div class=" p-1 mr-4 ">
                       <i class="fa-thin fa-tally "></i>
                       <span> Quantidades turmas: {{turmas | length}}</span>
                     </div>              
                       <!-- Exibir a paginação -->                                 
                   </div>
-                  <table class="win11-table">
+                  <table class="win11-table table-striped">
                     <thead>
                       <tr>
                         <th scope="col">#</th>

@@ -334,6 +334,9 @@
     padding: 20px;
   }
 
+  /* Cores Verde */
+  .text-green {color: #405a3f !important;}
+  .bg-green {background-color: #405a3f !important;}
   
     </style>
 
@@ -349,13 +352,14 @@
   </div> 
   <style>
     .phone-frame {
+      height: 100vh!important;
       }
       .phone-screen {
   align-items: center;
-  height: 100%;
   overflow: hidden;
   perspective: 460px;
   position: relative;
+  height: 100vh!important;
 }
 
 .menu {
@@ -384,7 +388,7 @@
   width: 70px;
   height: 70px;
   margin: 10px;
-  background-color: #2e2e2e;
+  background-color: #dfe9e3b9;
   border-radius: 14px;
   display: flex;
   flex-direction: column;
@@ -457,28 +461,31 @@
   all: unset;
 }
 
-
-
-
 /* Esconde por padrão */
 .button-menu1,
 .menu {
   display: none;
 }
 
+
 /* Exibe apenas em telas menores que 768px (mobile) */
-@media (max-width: 768px) {
+@media (max-width: 450px) {
   .button-menu1 {
     display: flex;
     bottom: 0;
-    right: 42%;
+    right: 30%;
     position: absolute;
     z-index: 1100;
     cursor: pointer;
     height: 30px;
-    width: 60px;
-    border-radius: 5%;
-    background-color: #0d2b20;
+    width: 120px;
+    padding-top: 0.5rem;
+    padding-left: 3rem;
+    border-top-right-radius: 1rem;
+    border-top-left-radius: 1rem;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    background-color: #405a3f;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     align-items: center;
     justify-content: center;
@@ -498,7 +505,7 @@
     height: 180px;
     flex-wrap: wrap;
     justify-content: space-around;
-    background: linear-gradient(180deg, #1f1f1f 0%, #2b2b2b 100%);
+    background: linear-gradient(180deg, #eff1f159 0%, #405a3f6b 100%);
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
     transform: translateY(180px);
     transition: transform 300ms ease-in-out;
@@ -532,7 +539,6 @@
   stroke: #fff;
   transform: translateY(-6px) rotate(-45deg);
 }
-
 
 </style>
 
@@ -652,33 +658,33 @@
         <div class="option">
           {% if request.session.escola_id   %}
           <a href="{% url 'Gestao_Escolar:DadosEscola' request.session.escola_id %}" class="nav-link link-light rounded-3 txt-p-nav" title="Cadstro de Escola" alt="Cadstro de Escola"  data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fa-duotone fa-solid fa-school-flag txt-p-nav text-light  fs-4"></i>            
+            <i class="fa-duotone fa-solid fa-school-flag text-green  fs-4"></i>            
           </a>
         {% endif %}
         </div>
         <div class="option">
           <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_create' %}" class="nav-link link-light  rounded-3 txt-p-nav" title="Cadastro de Alunos" data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fa-sharp fa-solid fa-people fs-5 txt-p-nav text-light"></i>
+            <i class="fa-sharp fa-solid fa-people fs-5 text-green"></i>
           </a>
         </div>
         <div class="option">
           <a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}" class="nav-link  rounded-3 txt-p-nav" title="Cadastro de Turmas data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fa-solid fa-people-roof fs-4 txt-p-nav  text-light"></i>            
+            <i class="fa-solid fa-people-roof fs-4  text-green"></i>            
           </a>
         </div>
         <div class="option">
           <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="nav-link  rounded-3 txt-p-nav" title="Matrícula de alunos nas turmas" data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fs-4 fa-solid fa-screen-users txt-p-nav text-light"></i>            
+            <i class="fs-4 fa-solid fa-screen-users text-green"></i>            
           </a>
         </div>
         <div class="option">
           <a href="{% url 'Gestao_Escolar:Grades_turmas' %}" class="nav-link  rounded-3 txt-p-nav" title="Grade de disciplinas" data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fs-4 fa-duotone fa-chart-network txt-p-nav text-light" style="font-size: 1.65rem;"></i>           
+            <i class="fs-4 fa-duotone fa-chart-network text-green" style="font-size: 1.65rem;"></i>           
           </a>
         </div>
         <div class="option">
           <a href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}" class="nav-link  rounded-3 txt-p-nav" title="Gestão das Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fs-4 fa-solid fa-users-gear txt-p-nav text-light" style="font-size: 1.65rem;"></i>            
+            <i class="fs-4 fa-solid fa-users-gear text-green" style="font-size: 1.65rem;"></i>            
           </a>
         </div>
         <div class="option">
