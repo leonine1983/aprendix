@@ -43,6 +43,11 @@
     <!-- js -->
     <script src="{% static 'global/js/partials/sidebars.js' %}"></script>
     <script src="{% static 'global/js/color-modes.js' %}"></script>
+
+    <!-- Cria intro explicativa -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js/minified/introjs.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/intro.js/minified/intro.min.js"></script>
+
    
    <style>
        body{
@@ -363,7 +368,7 @@
 }
 
 .menu {
-  position: fixed; /* fixado no canto inferior */
+  position: sticky; /* fixado no canto inferior */
   bottom: 0;
   left: 0;
   width: 100%;

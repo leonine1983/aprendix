@@ -3,7 +3,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
-from rh.models import Decreto, Escola, Ano, DecretoAnoLetivoAtivo
+from rh.models import Pessoas, Decreto, Escola, Ano, DecretoAnoLetivoAtivo
+from django.forms import ModelForm
 
 class DecretoListView(LoginRequiredMixin, ListView):
     model = Decreto
@@ -17,11 +18,47 @@ class DecretoDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'decreto'
     login_url = '/login/'  # URL para redirecionar se o usuário não estiver autenticado
 
+
+class CriaDecreto_form(ModelForm):
+    class Meta:
+        model = Decreto
+        fields = ['profissional', 'profissao', 'numero_decreto']
+    
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+
+        if self.request:
+            ano_atual = self.request.session.get('anoLetivo.id')
+            profissionais_excluidos = Decreto.objects.exclude(ano_decreto__id=ano_atual).values_list('profissional_id', flat=True)
+            self.fields['profissional'].queryset = Pessoas.objects.filter(id__in=profissionais_excluidos)
+            print(f"profissional 2024 : {profissionais_excluidos}")
+
+
+
+
 class DecretoCreateView(LoginRequiredMixin, CreateView):
     model = Decreto
     template_name = 'Escola/inicio.html'
+    #form_class = CriaDecreto_form
     fields = ['profissional', 'profissao', 'numero_decreto']
     success_url = reverse_lazy('Gestao_Escolar:decreto-create')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+
+        # Obtem o ano letivo atual da sessão
+        ano_atual_id = self.request.session.get('anoLetivo_id')
+
+        # Lista de IDs de profissionais que já têm decreto no ano atual
+        profissionais_com_decreto = Decreto.objects.filter(
+            ano_decreto__id=ano_atual_id
+        ).values_list('profissional_id', flat=True)
+
+        # Altera o queryset do campo 'profissional' para excluir esses IDs
+        form.fields['profissional'].queryset = Pessoas.objects.exclude(id__in=profissionais_com_decreto)
+
+        return form
 
     def form_valid(self, form):
         name = form.instance.profissional

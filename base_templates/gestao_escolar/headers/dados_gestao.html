@@ -1,3 +1,87 @@
+{% load static %}
+<style>
+    .introjs-tooltip {
+        min-width: 500px !important;
+        width:fit-content !important;   
+    }
+    .introjs-tooltip-header{
+        max-width: 450px!important;
+    }
+
+
+
+
+
+    .robot-container {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+  
+      .robot {
+        font-size: 48px;
+      }
+  
+      .chat-bubble {
+        background-color: #f0f4f8;
+        border: 2px solid #d0d8e0;
+        border-radius: 16px;
+        padding: 12px 16px;
+        max-width: 260px;
+        position: relative;
+        font-size: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+  
+      .chat-bubble::after {
+        content: "";
+        position: absolute;
+        top: 12px;
+        left: -10px;
+        width: 0;
+        height: 0;
+        border-top: 8px solid transparent;
+        border-bottom: 8px solid transparent;
+        border-right: 10px solid #f0f4f8;
+      }
+  
+      .dot-bounce {
+        display: flex;
+        gap: 4px;
+        margin-top: 6px;
+      }
+  
+      .dot-bounce span {
+        width: 6px;
+        height: 6px;
+        background-color: #555;
+        border-radius: 50%;
+        animation: bounce 0.6s infinite ease-in-out alternate;
+      }
+  
+      .dot-bounce span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+  
+      .dot-bounce span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+  
+      @keyframes bounce {
+        from {
+          transform: translateY(0);
+          opacity: 0.6;
+        }
+        to {
+          transform: translateY(-6px);
+          opacity: 1;
+        }
+      }
+
+
+
+    </style>
+
 <h1 class="text-uppercase txt-p fs-5 p-0 m-0">{{request.session.escola_nome}}  </h1>
 <p class="m-0 p-0 fs-6">Diretor 
     {{  request.session.diretor}}
@@ -11,7 +95,10 @@
             {% endfor %} 
         {% endif %}
         {% else %}
-        <a href="{% url 'Gestao_Escolar:decreto-create' %}"><span title='Vá em decretos e EXTENDA o decreto do último Diretor ou Cadastre um novo de decreto de Diretor'>(Ainda não definido para o Ano Letivo atual)</span></a>  
+        <a href="{% url 'Gestao_Escolar:decreto-create' %}" 
+        id="link-diretor"
+        data-intro="Clique aqui para começar a usar o sistema e criar seu primeiro decreto."
+        data-step="2"><span title='Vá em decretos e EXTENDA o decreto do último Diretor ou Cadastre um novo de decreto de Diretor'>(Ainda não definido para o Ano Letivo atual)</span></a>  
     {% endif %}
 </p>
 
@@ -27,7 +114,58 @@
             {% endfor %} 
         {% endif %}
         {% else %}
-        <a href="{% url 'Gestao_Escolar:decreto-create' %}"><span title='Vá em decretos e EXTENDA o decreto do último secretário ou Cadastre um novo de decreto de secretário'>(Ainda não definido para o Ano Letivo atual)</span></a>        
+        <a href="{% url 'Gestao_Escolar:decreto-create' %}"
+        id="link-secretaria"
+        data-intro="Clique aqui para começar a usar o sistema e criar seu primeiro decreto."
+        data-step="3"><span title='Vá em decretos e EXTENDA o decreto do último secretário ou Cadastre um novo de decreto de secretário'>(Ainda não definido para o Ano Letivo atual)</span></a>        
     {% endif %}
 </p>
 <p class="m-0 p-0 fs-6"><i class="fa-solid fa-calendar-days "></i> Ano Letivo: {{request.session.anoLetivo_nome}}</p>
+
+
+<script>
+    const iniciarTutorial = () => {
+        introJs().setOptions({
+            steps: [
+                {
+                    intro: "<div class='alert-info p-2 ' style='margin-top:-3rem'><img width='50' src='{% static 'logo.png' %}' /><strong>Bem-vindo ao Aprendix!</strong></div><div class='border border-info p-3 text-info fs-6'>Com o Aprendix, cada tarefa é uma oportunidade de aprender e transformar a gestão escolar em algo simples e poderoso</div>"
+                },
+                {% if not request.session.diretor %}
+                {
+                    element: document.querySelector('#link-diretor'),
+                    intro: "<div class='alert-info p-2 text-uppercase' style='margin-top:-3rem '>Decreto do Diretor</div><div class='border border-info p-3 text-info fs-6'>Repare que o nome da secretária ainda não está definido para o Ano Letivo atual. No lugar, aparece a mensagem: <b class='fs-6 text-primary'>“Ainda não definido para o Ano Letivo atual”</b>. Clique aqui para adicionar o decreto do diretor da escola.</div>",
+                    position: 'bottom'
+                },
+                {% endif %}
+                {% if not request.session.secretario %} 
+                {
+                    element: document.querySelector('#link-secretaria'),
+                    intro: "<div class='alert-info p-2 text-uppercase' style='margin-top:-3rem '>Decreto da Secretária</div><div class='border border-info p-3 text-info fs-6'>Repare que o nome da secretária ainda não está definido para o Ano Letivo atual. No lugar, aparece a mensagem: <b class='fs-6 text-primary'>“Ainda não definido para o Ano Letivo atual”</b>. Clique aqui para adicionar o decreto da secretária da escola.</div>",
+                    position: 'bottom'
+                },
+                {% endif %}
+                {
+                    element: document.querySelector('#link-diretor'),
+                    intro: "<div class='alert-info p-2 text-uppercase' style='margin-top:-3rem '><div class='robot-container'><div class='robot'>🤖</div>div class='chat-bubble'>Analisando...<div class='dot-bounce'><span></span><span></span><span></span></div></div></div><i class='fa-solid fa-robot'></i> Rastreamento de Inconsistências Ativado! </div><div class='border border-info p-3 text-info fs-6'><b>Vamos Conferir com Calma!</b> Até aqui, tudo parece estar certo, mas é importante ficar atento — pode haver algo que passou despercebido. O ideal é fazer uma avaliação detalhada, parte por parte, para garantir que nenhum ponto foi deixado de lado. Por segurança, vou pedir ao programador que me envie uma atualização, assim poderei identificar melhor possíveis inconsistências. Até lá, ótimo trabalho!.</div>",
+                    position: 'bottom'
+                }
+
+            ],
+            nextLabel: 'Próximo',
+            prevLabel: 'Voltar',
+            skipLabel: 'Pular',
+            doneLabel: 'Começar',
+            showProgress: true
+        }).start();
+    };
+  
+    document.addEventListener('DOMContentLoaded', function () {
+        const btnTutorial = document.getElementById('btn-ver-tutorial');
+        if (btnTutorial) {
+            btnTutorial.addEventListener('click', function () {
+                iniciarTutorial();
+            });
+        }
+    });
+  </script>
+  
