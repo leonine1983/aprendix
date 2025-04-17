@@ -12,6 +12,8 @@ urlpatterns = [
     path('escolas/selecionar/<int:pk>/', Seleciona_escola, name='escola-selecionar'),
     path('gestao_escolar/anoLetivo', Seleciona_anoLetivo.as_view(), name="GE_anoLetivo"),
     path('anoLetivo/selecionar/<int:pk>/', seleciona_anoLetivo_session, name='selecionar-ano'),
+
+    
     # A parti daqui o desenvolvimento da escola inicia
     path('gestao_escolar/Escola/', Pagina_inicio.as_view(), name="GE_Escola_inicio"),
     
