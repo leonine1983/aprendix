@@ -189,6 +189,7 @@ class Texto_Contrato(models.Model):
 class Escola(models.Model):
     prefeitura = models.ForeignKey(Prefeitura, on_delete=models.PROTECT, verbose_name='Nome da Instituição Responsável')
     nome_escola = models.CharField(max_length=60, verbose_name='Nome da Escola ou Departamento')
+    sigla_escola = models.CharField(max_length=60, verbose_name='Sigla da escola', null=True)
     #endereco_escola = models.CharField(max_length=100, null=True, blank=True, verbose_name='Endereço')
     #telefone_escola = models.CharField(max_length=30, null=True, blank=True, verbose_name='Telefone')
     created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    

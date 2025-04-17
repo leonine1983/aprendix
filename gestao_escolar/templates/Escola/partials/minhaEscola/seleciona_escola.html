@@ -15,26 +15,31 @@
     border-radius: 0.5rem;
 
   }
-  #visualizaNome {
-    position: relative; /* Necessário para posicionar o pseudo-elemento */
-    border: 2px solid #007bff; /* Adiciona a borda */
-    padding: 20px; /* Ajuste o padding conforme necessário */
-    border-radius: 8px; /* Bordas arredondadas */
+  #visualizaNome, #visualiza_sigla {
+    position: relative;
+    border: 2px solid #007bff; 
+    padding: 20px;
+    border-radius: 8px; 
   }
   
-  #visualizaNome::before {
+  #visualizaNome::before, #visualiza_sigla::before {
     content: "Atualize o nome da escola se necessário"; 
     position: absolute;
     top: -20px; /* Ajuste a posição do texto para cima */
-    left: 12%;
+    left: 30%;
     transform: translateX(-50%); /* Para centralizar o texto */
     background-color: white; /* Cor de fundo da descrição */
     color: #007bff;
     padding: 5px 10px;
-    font-size: 1rem;
+    font-size: 0.7rem;
     border: #007bff solid 0.1rem;
     border-radius: 4px;
   }
+  #visualiza_sigla::before{
+    content:"Atualize a sigla da escola"
+  }
+
+
   #id_nome_escola{
     min-width: 30rem;
     margin-top: 1rem!important;
@@ -54,64 +59,77 @@
     margin-left: 0px!important;
     
   }
+  .version_mobile{display:none}
+  @media (max-width: 450px) {
+      #version_mobileEscola {
+        display: block!important;
+      }
+      #version_desktop {
+        display: none;
+      }
+    }
  </style>
 
 {% endblock script_head %} 
 {% include "Escola/partials/modal_partials/modal_top.html" %}    
 {% if not update %}
-<ul class="nav nav-tabs bg-light" id="myTab" role="tablist">              
-  <li class="nav-item" role="presentation">
-    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"><i class="fa-duotone fa-solid fa-school-flag"></i> {{request.session.escola_nome}}</button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Informações Gerais <i class="fa-solid fa-plus"></i> </button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="profile-tab2" data-bs-toggle="tab" data-bs-target="#profile-tab-pane2" type="button" role="tab" aria-controls="profile-tab-pane2" aria-selected="false"> Gestão | Coordenação<i class="fa-solid fa-plus"></i> </button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="profile-tab3" data-bs-toggle="tab" data-bs-target="#profile-tab-pane3" type="button" role="tab" aria-controls="profile-tab-pane3" aria-selected="false">Outros<i class="fa-solid fa-plus"></i> </button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane5" type="button" role="tab" aria-controls="profile-tab-pane5" aria-selected="false">Bairros atendidos pela escola <i class="fa-solid fa-plus"></i> </button>
-  </li>
-</ul>
-<div class="tab-content" id="myTabContent">
-  <div class="tab-pane fade show active bg-p-3 " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">              
-    <form class='d-flex ' action="" id="atualizaEscola" method="post">
-      {% csrf_token %}
-      <div id='visualizaNome' class="d-flex align-items-center justify-content-center fs-4 rounded-2 p-1 m-3 text-primary ">
-        {{form.nome_escola}}
-      </div>
-      <button type="submit" class="btn col-3 btn-sm btn-success w-100"> {{button}} <i class="fa-solid fa-people-roof"></i></button>     
-    </form>  
-    {% include "Escola/partials/minhaEscola/dados_impressao.html" %}              
-  </div> 
-    <!--Informações Gerais -->
-  <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-    <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post" enctype="multipart/form-data">                        
+<div id="version_desktop">
+  <ul class="nav nav-tabs bg-light" id="myTab" role="tablist">              
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"><i class="fa-duotone fa-solid fa-school-flag"></i> {{request.session.escola_nome}}</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Informações Gerais <i class="fa-solid fa-plus"></i> </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="profile-tab2" data-bs-toggle="tab" data-bs-target="#profile-tab-pane2" type="button" role="tab" aria-controls="profile-tab-pane2" aria-selected="false"> Gestão | Coordenação<i class="fa-solid fa-plus"></i> </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="profile-tab3" data-bs-toggle="tab" data-bs-target="#profile-tab-pane3" type="button" role="tab" aria-controls="profile-tab-pane3" aria-selected="false">Outros<i class="fa-solid fa-plus"></i> </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane5" type="button" role="tab" aria-controls="profile-tab-pane5" aria-selected="false">Bairros atendidos pela escola <i class="fa-solid fa-plus"></i> </button>
+    </li>
+  </ul>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active bg-p-3 " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">              
+      <form class='d-flex ' action="" id="atualizaEscola" method="post">
         {% csrf_token %}
-        {% include "Escola/partials/minhaEscola/form_Informações_Gerais.html" %}                      
-    </form>
-  </div> 
-  <!--Identificação | Gestão | Coordenação-->
-  <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane2" role="tabpanel" aria-labelledby="profile-tab2" tabindex="0">
-    <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post">                        
-        {% csrf_token %}   
-        {% include "Escola/partials/minhaEscola/form_IdentificaçãoGestãoCoordenação.html" %}                   
-    </form>
-  </div> 
-  <!--Outros-->
-  <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane3" role="tabpanel" aria-labelledby="profile-tab3" tabindex="0">
-    <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post">                        
-        {% csrf_token %}     
-        {% include "Escola/partials/minhaEscola/form_Outros.html" %}              
-    </form>                 
-  </div> 
-    <!--Bairros atendidos pela escola -->
-  <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane5" role="tabpanel" aria-labelledby="profile-tab5" tabindex="0">
-    <h2 class="h2 alert alert-info">"Selecione as localidades e bairros aplicáveis para a matrícula online. As opções selecionadas permitirão que alunos residentes nessas localidades realizem sua matrícula na escola de forma prática e eficiente."</h2>
-    <form class='m-3 p-3 win11-form' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post" enctype="multipart/form-data">                        
+        <div id='visualizaNome' class="d-flex align-items-center justify-content-center fs-4 rounded-2 p-1 m-3 text-primary ">
+          {{form.nome_escola}}
+        </div>
+        <div id='visualiza_sigla' class="d-flex align-items-center justify-content-center fs-4 rounded-2 p-1 m-3 text-primary ">
+          {{form.sigla_escola}}
+        </div>
+        <button type="submit" class="btn col-3 btn-sm btn-success w-100"> {{button}} <i class="fa-solid fa-people-roof"></i></button>     
+      </form>  
+      {% include "Escola/partials/minhaEscola/dados_impressao.html" %}              
+    </div> 
+      <!--Informações Gerais -->
+    <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+      <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post" enctype="multipart/form-data">                        
+          {% csrf_token %}
+          {% include "Escola/partials/minhaEscola/form_Informações_Gerais.html" %}                      
+      </form>
+    </div> 
+    <!--Identificação | Gestão | Coordenação-->
+    <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane2" role="tabpanel" aria-labelledby="profile-tab2" tabindex="0">
+      <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post">                        
+          {% csrf_token %}   
+          {% include "Escola/partials/minhaEscola/form_IdentificaçãoGestãoCoordenação.html" %}                   
+      </form>
+    </div> 
+    <!--Outros-->
+    <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane3" role="tabpanel" aria-labelledby="profile-tab3" tabindex="0">
+      <form class='m-3 p-3' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post">                        
+          {% csrf_token %}     
+          {% include "Escola/partials/minhaEscola/form_Outros.html" %}              
+      </form>                 
+    </div> 
+      <!--Bairros atendidos pela escola -->
+    <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane5" role="tabpanel" aria-labelledby="profile-tab5" tabindex="0">
+      <h2 class="h2 alert alert-info">"Selecione as localidades e bairros aplicáveis para a matrícula online. As opções selecionadas permitirão que alunos residentes nessas localidades realizem sua matrícula na escola de forma prática e eficiente."</h2>
+      <form class='m-3 p-3 win11-form' action="{% url 'Gestao_Escolar:UPdateEscolaDados' object.related_dadosEscola.id %}" method="post" enctype="multipart/form-data">                        
         {% csrf_token %}
         <style>
           .ms-selectable {
@@ -155,34 +173,31 @@
         </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
         <!-- Bootstrap JavaScript -->
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
-          <link rel="{% static 'multi-select/css/multi-select.css' %}" href="style.css">
-          <section>
-            {{escola_dados_form.bairro_atendEscola.label_tag}} 
-            {{escola_dados_form.bairro_atendEscola}}   <br>
-            {{escola_dados_form.bairro_atendEscola.error}}
-          </section> 
-          <script src="{% static 'multi-select/js/jquery.multi-select.js' %}" type="text/javascript">
-          </script>
-          <script type="text/javascript">
-            // run callbacks
-                $('#id_bairro_atendEscola').multiSelect({
-                afterSelect: function(values){
-                  alert("Bairro selecionado de nº: "+values);
-                },
-                afterDeselect: function(values){
-                  alert("Remover o bairro de nº: "+values);
-                }
-              });
-            </script>
-            
-          
-            <button type="submit" class="btn btn-sm btn-success w-100">Atualizar localidades próximas <i class="fa-solid fa-people-roof"></i></button>     
-                      
-    </form>
-  </div>           
-</div>              
-{% include "Escola/partials/modal_partials/modal_bottom.html" %}               
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
+        <link rel="{% static 'multi-select/css/multi-select.css' %}" href="style.css">
+        <section>
+          {{escola_dados_form.bairro_atendEscola.label_tag}} 
+          {{escola_dados_form.bairro_atendEscola}}   <br>
+          {{escola_dados_form.bairro_atendEscola.error}}
+        </section> 
+        <script src="{% static 'multi-select/js/jquery.multi-select.js' %}" type="text/javascript"></script>
+        <script type="text/javascript">
+        // run callbacks
+            $('#id_bairro_atendEscola').multiSelect({
+            afterSelect: function(values){
+              alert("Bairro selecionado de nº: "+values);
+            },
+            afterDeselect: function(values){
+              alert("Remover o bairro de nº: "+values);
+            }
+          });
+        </script>                  
+        <button type="submit" class="btn btn-sm btn-success w-100">Atualizar localidades próximas <i class="fa-solid fa-people-roof"></i></button>                           
+      </form>
+    </div>           
+  </div>              
+</div>
+{% include "Escola/partials/modal_partials/modal_bottom.html" %}    
 {% endif %}    
 {% include "Escola/partials/utils/dragDrop.html" %}
 

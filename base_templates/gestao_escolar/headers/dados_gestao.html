@@ -78,14 +78,13 @@
         }
       }
 
-
-
     </style>
 
-<h1 class="text-uppercase txt-p fs-5 p-0 m-0">{{request.session.escola_nome}}  </h1>
+<h1 class="text-uppercase txt-p fs-5 p-0 m-0"><span class='fica-oculto_em_mobile'>{{request.session.escola_nome}} - </span><span  class="esc_sigla" title='{{request.session.escola_nome}}'>{{request.session.escola_nome_query.sigla_escola}}</span>  </h1>
 <p class="m-0 p-0 fs-6">Diretor 
     {{  request.session.diretor}}
-    {% if request.session.diretor %}
+    <span class='fica-oculto_em_mobile'>
+        {% if request.session.diretor %}
         {% if request.session.diretor.ano_decreto.id != request.session.anoLetivo_id %}
             | Extendido para
             {% for n in request.session.diretor.Decreto_decretoAtivo.all %}            
@@ -100,6 +99,7 @@
         data-intro="Clique aqui para começar a usar o sistema e criar seu primeiro decreto."
         data-step="2"><span title='Vá em decretos e EXTENDA o decreto do último Diretor ou Cadastre um novo de decreto de Diretor'>(Ainda não definido para o Ano Letivo atual)</span></a>  
     {% endif %}
+    </span>
 </p>
 
 <p class="m-0 p-0 fs-6">Secretário(a) 
