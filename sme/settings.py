@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'controle_estoque', 
     'docsGestao_Escolar',  
     'modulo_aluno',
+    'modulo_professor',
     'ckeditor',
     'ckeditor_uploader' 
 ]

@@ -41,7 +41,9 @@ class CreateLoginView(LoginView):
 
         # Verificar se o usuário é do grupo 'Aluno'
         if self.request.user.groups.filter(name='Aluno').exists():
-            return reverse_lazy('modulo_aluno:homeAluno')
+            return reverse_lazy('modulo_aluno:homeAluno')        
+        elif self.request.user.groups.filter(name='Professor').exists():
+            return reverse_lazy('modulo_professor:homeProfessor')                
         else:
             return reverse_lazy('Gestao_Escolar:GE_inicio')
 

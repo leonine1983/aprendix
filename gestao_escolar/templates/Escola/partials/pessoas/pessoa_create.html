@@ -1,29 +1,5 @@
- {% load static %}
- {% block script_head %}
- <style>
-  .grid{
-    display: grid;
-    grid-template-columns: 1fr 20rem;
-    gap:1rem;
-    margin-bottom:1rem
-  }
-  label{
-    color:black
-  }
-  .active{
-    border: 0.1rem solid rgb(243, 221, 206)!important;
-    border-radius: 0.5rem;
-  }
- </style>
- {% endblock script_head %}
-<!-- Modal -->
-<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">    
-  <div class="modal-dialog"  >
-    <div class="modal-content p-5" >  
-      <div class="mb-3 p-2 border-bottom ">          
-        <span class='mx-5 fs-4'><i class="fa-duotone fa-address-card" style="--fa-secondary-color: #511f3c;"></i> CADASTRO DE PESSOAS</span>
-      </div>
-      <ul class="nav nav-tabs" id="myTab" role="tablist">
+{% include "Escola/partials/modal_partials/modal_top.html" %}
+      <ul class="nav nav-tabs border border-light mt-5" id="myTab" role="tablist" >
         {% if rh_ativo == 'False' %}
         <li>
           <li id="all_people" class="nav-item rh-list mt-3" role="presentation">
@@ -32,7 +8,7 @@
           <!--<li id="cadastra_people" class="nav-item bg-secondary-subtle rh-list mt-3" role="presentation">
             <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false"><i class="fa-duotone fa-address-card" style="--fa-secondary-color: #511f3c;"></i> Encaminhamentos para a escola <i class="fa-duotone fa-person-sign"></i><i class="fa-sharp fa-solid fa-plus text-info"></i></button>
           </li>--> 
-          <li id="cadastra_people" class="nav-item bg-secondary-subtle rh-list mt-3" role="presentation">
+          <li id="cadastra_people" class="nav-item bg-secondary-subtle rh-list border-info" role="presentation">
             <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane1" type="button" role="tab" aria-controls="profile-tab-pane1" aria-selected="false"><i class="fa-duotone fa-address-card" style="--fa-secondary-color: #511f3c;"></i> Cadastrar nova pessoa <i class="fa-duotone fa-person-sign"></i><i class="fa-sharp fa-solid fa-plus text-info"></i></button>
           </li>                               
         {% endif %} 
@@ -49,8 +25,8 @@
         </div>
         
         <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">  
-          <!-- Encaminhamentos para a escola -->  
-          {% include 'Escola/partials/pessoas/pessoas_form.html' %}     
+          <!-- Encaminhamentos para a escola --> 
+          {% include 'Escola/partials/pessoas/pessoas_form.html' %}  
         </div> 
         <div class="tab-pane fade bg-secondary-subtle" id="profile-tab-pane1" role="tabpanel" aria-labelledby="profile-tab" tabindex="0"> 
           <!--  Cadastrar nova pessoa -->     
@@ -60,12 +36,6 @@
           {% include "Escola/partials/partials_professores/partials_seleciona _pessoas/PROFISSIONAIS_na_escola.html" %}
         </div>              
       </div>                       
-    </div>  
-    <!-- Rodapé do Modal -->
-    {% include "Escola/partials/utils/rodape-modal.html" %}     
-  </div>
-  
-</div>
-{% include "Escola/partials/utils/dragDrop.html" %}
+{% include "Escola/partials/modal_partials/modal_bottom.html" %}
 
 

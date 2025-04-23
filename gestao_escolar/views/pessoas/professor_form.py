@@ -8,7 +8,7 @@ import string
 # widget personalizado que usa as classes (form-control, border, p-3, pb-3 e ) para ser atribuido ao campo 'tempo_meses' 
 
 # 1º Esse
-bootstrap = {'class': "border border-info p-2 pb-1  text-secondary col  rounded-1"}
+bootstrap = {'class': "form-control"}
 
 class Pessoa_form(forms.ModelForm):   
     nome = forms.CharField(

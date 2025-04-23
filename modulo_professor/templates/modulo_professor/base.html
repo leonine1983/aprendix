@@ -1,0 +1,709 @@
+{% load static %}
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+  <head><script src="{% static 'global/js/color-modes.js' %}"></script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.111.3">    
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">   <title>AprendiX</title>   
+
+    <link href="{% static 'global/css/form_win11.css' %}" rel="stylesheet">  
+    <link href="{% static 'global/bootstrap/navbars/navbars.css' %}" rel="stylesheet">    
+    <link href="{% static 'global/css/bootstrap.min.css' %}" rel="stylesheet">
+    
+  <style>  
+    body{
+      width:100vw!important;
+      height:100vh!important;      
+      display: grid;
+      place-items: center;      
+    }
+    .bg-p-3
+    {
+      --s: 50px;
+      --c: #191b22;
+      --_s: calc(2*var(--s)) calc(2*var(--s));
+      --_g: 35.36% 35.36% at;
+      --_c: #0000 66%,#20222a 68% 70%,#0000 72%;
+      background: 
+        radial-gradient(var(--_g) 100% 25%,var(--_c)) var(--s) var(--s)/var(--_s), 
+        radial-gradient(var(--_g) 0 75%,var(--_c)) var(--s) var(--s)/var(--_s), 
+        radial-gradient(var(--_g) 100% 25%,var(--_c)) 0 0/var(--_s), 
+        radial-gradient(var(--_g) 0 75%,var(--_c)) 0 0/var(--_s), 
+        repeating-conic-gradient(var(--c) 0 25%,#0000 0 50%) 0 0/var(--_s), 
+        radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
+      background-attachment: fixed;
+    } 
+    .bg-p-2
+    {
+      --s: 50px;
+      --c: #94e4b5;
+      --_s: calc(2*var(--s)) calc(2*var(--s));
+      --_g: 35.36% 35.36% at;
+      --_c: #0000 66%,#377c56a4 68% 70%,#0000 72%;
+      background: 
+        radial-gradient(var(--_g) 100% 25%,var(--_c)) var(--s) var(--s)/var(--_s), 
+        radial-gradient(var(--_g) 0 75%,var(--_c)) var(--s) var(--s)/var(--_s), 
+        radial-gradient(var(--_g) 100% 25%,var(--_c)) 0 0/var(--_s), 
+        radial-gradient(var(--_g) 0 75%,var(--_c)) 0 0/var(--_s), 
+        repeating-conic-gradient(var(--c) 0 25%,#0000 0 50%) 0 0/var(--_s), 
+        radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
+      background-attachment: fixed;
+    } 
+    .bg-p-1
+    {
+      --s: 50px;
+      --c: #b0debc;
+      --_s: calc(2*var(--s)) calc(2*var(--s));
+      --_g: 35.36% 35.36% at;
+      --_c: #0000 66%,#889fbd3d  68% 70%,#0000 72%;
+      background: 
+        radial-gradient(var(--_g) 100% 25%,var(--_c)) var(--s) var(--s)/var(--_s), 
+        radial-gradient(var(--_g) 0 75%,var(--_c)) var(--s) var(--s)/var(--_s), 
+        radial-gradient(var(--_g) 100% 25%,var(--_c)) 0 0/var(--_s), 
+        radial-gradient(var(--_g) 0 75%,var(--_c)) 0 0/var(--_s), 
+        repeating-conic-gradient(var(--c) 0 25%,#0000 0 50%) 0 0/var(--_s), 
+        radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
+      background-attachment: fixed;
+    } 
+    .fs-6{font-size:xx-small;}
+    /* main wrapper and its layout */
+    /* main wrapper and its layout */
+    .wrapper {
+      width: 200px;
+      border-radius: 30px;
+      height: 50px;
+      background: white;
+      box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.281);
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      z-index: 5;
+      position: fixed; /* Mudado de relative para fixed */
+      bottom: 10px; /* Definido para ficar 10px acima da parte inferior */
+      left: 50%; /* Para centralizar horizontalmente */
+      transform: translateX(-50%); /* Para centralizar horizontalmente */
+    }
+
+    .item {
+      cursor: pointer;
+    }
+    .linee {
+      width: 20px;
+      height: 3px;
+      background: rgb(201, 198, 198);
+      margin-top: 3px;
+      border-radius: 5px;
+      transition: all 0.2s;
+    }
+    .linee1 {
+      width: 15px;
+      transform: translateX(5px);
+    }
+    .linee1::before {
+      content: "";
+      display: block;
+      transform: translateX(-5px);
+      width: 3px;
+      height: 3px;
+      background: rgb(201, 198, 198);
+      transition: width 0.2s ease 0.1s, transform 0.2s;
+    }
+    .linee3::after {
+      content: "";
+      display: block;
+      transform: translateX(17px);
+      width: 0px;
+      height: 3px;
+      background: rgb(201, 198, 198);
+      transition: width 0.2s ease 0.1s;
+    }
+    .linee3 {
+      width: 13px;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 5px);
+      grid-auto-rows: 5px;
+      grid-gap: 4px;
+      transform: translateY(3px);
+    }
+    .dot {
+      border: 1px solid rgb(139, 136, 136);
+      border-radius: 50%;
+    }
+    .add {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgb(201, 198, 198);
+      border: none;
+      position: relative;
+      z-index: 4;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+    .close {
+      position: relative;
+      left: 35%;
+      z-index: 4;
+      top: 50%;
+    }
+    .line {
+      position: absolute;
+      width: 10px;
+      height: 2px;
+      background: rgb(255, 255, 255);
+      transition: all 0.2s;
+    }
+    .line1 {
+      transform: rotate(0deg);
+    }
+    .line2 {
+      transform: rotate(90deg);
+    }
+    .search {
+      position: absolute;
+      top: 0;
+      left: 0%;
+      z-index: 0;
+      width: 0px!important;
+      height: 38px;
+      border-radius: 30px;
+      border: none;
+      color: white;
+      background: rgb(253, 95, 95);
+      box-sizing: border-box;
+      padding-left: 35px;
+      transition: all 0.3s ease;
+      outline: none;
+      box-shadow: none;
+    }
+    ::placeholder {
+      font-weight: bold;
+      color: white;
+    }
+    .circle {
+      width: 38px;
+      height: 38px;
+      background: rgb(201, 198, 198);
+      top: 0;
+      left: 10;
+      position: absolute;
+      z-index: 3;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.5s;
+    }
+    .nav-items {
+      width: 38px;
+      height: 38px;
+      background: rgb(246, 54, 54);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: pointer;
+      box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.212);
+      transform: scale(0);
+      transition: transform 0.1s cubic-bezier(0.23, -0.47, 0.58, -0.63);
+    }
+    .nav-items:hover {
+      transform: scale(1.1);
+      transition-timing-function: 0.1s;
+    }
+    .items1 {
+      top: -80%;
+      left: 90%;
+    }
+    .items2 {
+      top: -80%;
+      left: -10%;
+      transition-delay: 0.1s;
+    }
+    .items3 {
+      top: -150%;
+      left: 20%;
+      transition-delay: 0.2s;
+    }
+    .items4 {
+      top: -150%;
+      left: 60%;
+      transition-delay: 0.3s;
+    }
+    .box {
+      width: 100%;
+      position: absolute;
+      bottom: 110%; /* Mudado de top: 0% para bottom: 0% para iniciar de baixo */
+      left: 0;
+      height: 0px; /* Começa com altura zero */
+      overflow: hidden;
+      background: white;
+      display: grid;
+      grid-gap: 10px;
+      transition: height 0.1s cubic-bezier(0.075, 0.82, 0.165, 1);
+      z-index: 0;
+    }
+
+    .box-show {
+      height: 150px; /* Altere a altura conforme necessário */
+      box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.226);
+      padding: 10px;
+      transition-duration: 0.2s;
+    }
+
+    .box-line {
+      width: 100px;
+      height: 10px;
+      background: rgb(201, 198, 198);
+      border-radius: 10px;
+      opacity: 0;
+      z-index: 0;
+      transition: opacity 0s;
+    }
+    .box-line:nth-child(even) {
+      width: 130px;
+    }
+    .effect {
+      z-index: 3;
+      border-radius: 50%;
+      width: 200vmax;
+      height: 200vmax;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgb(246, 54, 54);
+      transition: transform 0.4s;
+    }
+
+    .box-line-show {
+      opacity: 1;
+      transition-duration:.1s;
+    }
+    footer{
+      display:flex;
+    position:fixed;
+      top:90%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      
+    }
+    footer a{
+    color:gray;
+    margin-left:30px;
+    font-size:1.8rem;}
+    a:nth-child(1):hover{
+      color:tomato;
+    }
+    a:nth-child(2):hover{
+      color:skyblue;
+    }
+    .color {
+      background: rgb(246, 54, 54);
+    }
+    .show-menu {
+      transform: scale(1);
+      transition: transform 0.5s cubic-bezier(0.23, -0.47, 0.58, -0.63);
+    }
+    .go {
+      transform: translateX(-125px);
+    }
+    .search-focus {
+      width: 180px;
+      left: 20%;
+      top: 1%;
+      height: 38px;
+      background: rgb(253, 95, 95);
+    }
+    .move {
+      transform: rotate(45deg);
+    }
+    .mov {
+      transform: rotate(-45deg);
+    }
+
+    .big {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    /* hover effect */
+    .menu:hover .linee1 {
+      width: 10px;
+      transform: translateX(0px);
+    }
+    .menu:hover .linee1::before {
+      width: 0px;
+      transform: translateX(0px);
+    }
+    .menu:hover .linee3 {
+      width: 15px;
+    }
+    .menu:hover .linee3::after {
+      content: "";
+      display: block;
+      transform: translateX(17px);
+      width: 3px;
+      height: 3px;
+      background: rgb(201, 198, 198);
+      transition: width 0.2s ease 0.1s;
+    }
+    .gallery:hover .dot1 {
+      animation: jump 0.4s ease 1;
+    }
+    .gallery:hover .dot2 {
+      animation: jump 0.4s ease 0.1s 1;
+    }
+    .gallery:hover .dot3 {
+      animation: jump 0.4s ease 0.2s 1;
+    }
+    .gallery:hover .dot4 {
+      animation: jump 0.4s ease 0.3s 1;
+    }
+    .gallery:hover .dot5 {
+      animation: jump 0.4s ease 0.4s 1;
+    }
+    .gallery:hover .dot6 {
+      animation: jump 0.4s ease 0.5s 1;
+    }
+    @keyframes jump {
+      50% {
+        transform: translateY(-4px);
+        border-color: rgb(117, 117, 117);
+      }
+      100% {
+        transform: translateY(0px);
+        border-color: rgb(119, 118, 118);
+      }
+    }
+    .close {
+      width: 10px;
+    }
+
+
+
+
+    .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      .b-example-divider {
+        width: 100%;
+        height: 3rem;
+        background-color: rgba(0, 0, 0, .1);
+        border: solid rgba(0, 0, 0, .15);
+        border-width: 1px 0;
+        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+      }
+
+      .b-example-vr {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 100vh;
+      }
+
+      .bi {
+        vertical-align: -.125em;
+        fill: currentColor;
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .btn-bd-primary {
+        --bd-violet-bg: #712cf9;
+        --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+
+        --bs-btn-font-weight: 600;
+        --bs-btn-color: var(--bs-white);
+        --bs-btn-bg: var(--bd-violet-bg);
+        --bs-btn-border-color: var(--bd-violet-bg);
+        --bs-btn-hover-color: var(--bs-white);
+        --bs-btn-hover-bg: #6528e0;
+        --bs-btn-hover-border-color: #6528e0;
+        --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+        --bs-btn-active-color: var(--bs-btn-hover-color);
+        --bs-btn-active-bg: #5a23c8;
+        --bs-btn-active-border-color: #5a23c8;
+      }
+      .bd-mode-toggle {
+        z-index: 1500;
+      }
+      .fs-6{font-size: 0.6rem!important}
+      .btn{
+        animation: 30ms ease-in-out all !important;
+      }
+      .btn:hover{
+        scale: 1.05!important;
+      }
+  </style>  
+</head>
+
+<body class=" bg-p-1">  
+ 
+  <main class="w-100 m-auto" >      
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary fixed-top  p-0" aria-label="Eighth navbar example">
+      <div class="container">
+        <div class='text-center'>
+        <img src="{% static 'rogerio.jpg' %}" alt="" srcset="" class="navbar-brand border rounded-3 p-0 m-0 mb-5 " style="margin: 0.25rem 0.1rem -1rem 0.1rem !important;" width="65"  ></br>
+        <figcaption class="fs-6 text-light pt-3 text-capitalize">
+          Prof. 
+          {{request.user.first_name}}</figcaption>
+    
+        </div>
+
+        
+        <ul class="me-auto mb-2 d-flex">
+          
+         
+        </ul>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarsExample07">
+          
+         
+
+
+
+
+
+
+
+          <div class="container">
+            <div class="row row-cols-3 row-cols-sm-3 row-cols-md-4 g-2 text-center">
+              
+              <div class="col">
+                <a class="nav-link btn" href="#">
+                  <img src="{% static 'svg/home_aluno.svg' %}" alt="" width="50" class="mx-2 mb-1"><br>
+                  <span class="fs-6 text-light">Início</span>
+                </a>
+              </div>
+          
+              <div class="col">
+                <a class="nav-link btn" href="">
+                  <img src="{% static 'matricula.png' %}" alt="" width="70"><br>
+                  <span class="fs-6 text-light">Matricula</span>
+                </a>
+              </div>
+          
+              <div class="col">
+                <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}">
+                  {% csrf_token %}
+                  <button type="submit" class="text-light btn">
+                    <img src="{% static 'sair.png' %}" alt="" width="50"><br>
+                    <span class="fs-6">Sair</span>
+                  </button>
+                </form>
+              </div>
+          
+              <div class="col-12">
+                <div class="dropdown border m-1 p-0 rounded-3  pb-1">
+                  <a class="nav-link link-light dropdown-toggle btn" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="{% static 'aluno.png' %}"  width="70" alt="">
+                    <span class="fs-5 ">Alunos</span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Notas</a></li>
+                    <li><a class="dropdown-item" href="#">Faltas</a></li>
+                    <li><a class="dropdown-item" href="#">Notificações</a></li>
+                  </ul>
+                </div>
+              </div>
+          
+            </div>
+          </div>
+          
+
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+    </nav>  
+    <!--Contudo dinamico -->
+    <div class="container-xl mb-4">
+      {% include 'Escola/partials/mensagens.html' %}   
+      {% block main %}         
+      <div class="text-center"><h2>        
+
+        <div class="container mt-5">
+          <div class="card text-center">
+            <div class="card-header">
+              Status da Pré Matrícula de
+              <span class='text-uppercase'>{{request.session.alunoUser.aluno.related_matriculaOnline_alunos.first}} para o {{request.session.alunoUser.aluno.related_matriculaOnline_alunos.first.serie}}</span>
+            </div>
+            <div class="card-body">
+              <table class="win11-table m-3">
+                <thead>
+                  <tr> 
+                    <th>Escola</th>
+                    <th>Ano Letivo</th>
+                    <th>Pré-matricula (Série)</th>
+                    <th>Situação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for a in professor %}
+                  <tr>
+                    <td>{{a.serie.escola}}</td>
+                    <td>{{a.serie.escola.ano_letivo}}</td>
+                    <td>{{a.serie}}</td>
+                    <td ><b class='fs-5'>Em análise...</b></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="card-footer text-muted fs-5">
+              Se tiver dúvidas, entre em contato com a secretaria da Escola.
+            </div>           
+          </div>
+        </div>        
+       </div>
+      {% endblock main %}
+      <div style="position: relative;z-index: 10;">
+        
+      </div>
+          
+    </div> 
+    <!-- end Contudo dinamico --> 
+
+    <div class="wrapper">
+      <div class="item menu">
+        <div class="linee linee1"></div>
+        <div class="linee linee2"></div>
+        <div class="linee linee3"></div>
+      </div>
+      <div class="item gallery">
+        <div class="dot dot1"></div>
+        <div class="dot dot2"></div>
+        <div class="dot dot3"></div>
+        <div class="dot dot4"></div>
+        <div class="dot dot5"></div>
+        <div class="dot dot6"></div>
+      </div>
+      <button class="item add">
+        <div class="circle">
+          <div class="close">
+          <div class="line line1"></div>
+          <div class="line line2"></div>
+        </div>
+        </div>
+        <input type="search" placeholder="search" class="search" />
+        
+      </button>
+        <div class="nav-items items1">
+          <i class="fas fa-home"></i>
+        </div>
+        <div class="nav-items items2">
+          <i class="fas fa-camera"></i>
+        </div>
+        <div class="nav-items items3">
+          <i class="fas fa-folder"></i>
+        </div>
+        <div class="nav-items items4">
+          <i class="fas fa-heart"></i>
+        </div>
+        <div class="box">
+          <div class="box-line box-line1"></div>
+          <div class="box-line box-line2"></div>
+          <div class="box-line box-line3"></div>
+          <div class="box-line box-line4"></div>
+        </div>
+      </div>
+
+      <div class="effect"></div> 
+      
+  </main>
+  <script>
+    document.querySelector(".circle").addEventListener("click", () => {
+        for (let i = 0; i <= 3; i++) {
+          document
+            .getElementsByClassName("nav-items")
+            [i].classList.remove("show-menu");
+          document
+            .getElementsByClassName("box-line")
+            [i].classList.remove("box-line-show");
+        }
+        document.querySelector(".box").classList.remove("box-show");
+        document.querySelector(".add").classList.toggle("go");
+        document.querySelector(".search").classList.toggle("search-focus");
+        document.querySelector(".search").focus();
+        document.querySelector(".circle").classList.toggle("color");
+        document.querySelector(".line1").classList.toggle("move");
+        document.querySelector(".line2").classList.toggle("mov");
+        document.querySelector(".effect").classList.toggle("big");
+      });
+      /* menu */
+      document.querySelector(".menu").addEventListener("click", () => {
+        for (let i = 0; i <= 3; i++) {
+          document.querySelector(".box").classList.remove("box-show");
+          document
+            .getElementsByClassName("nav-items")
+            [i].classList.toggle("show-menu");
+          document
+            .getElementsByClassName("box-line")
+            [i].classList.remove("box-line-show");
+        }
+      });
+      /* box */
+      document.querySelector(".gallery").addEventListener("click", () => {
+        document.querySelector(".box").classList.toggle("box-show");
+        for (let i = 0; i <= 3; i++) {
+          document
+            .getElementsByClassName("box-line")
+            [i].classList.toggle("box-line-show");
+          document
+            .getElementsByClassName("nav-items")
+            [i].classList.remove("show-menu");
+        }
+      });
+  </script>
+  
+  
+</body>    
+</html>
+
+
+
+

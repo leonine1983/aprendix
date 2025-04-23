@@ -1,29 +1,43 @@
 {% load static %}
-<h2>
-Formulário de Cadastro de Pessoas para o Sistema Aprendix</h2>
+<h2>Formulário de Cadastro de Pessoas para o Sistema Aprendix</h2>
+
 <p>
-Formulário de Cadastro de Pessoas para o Sistema Aprendix.
+    Formulário de Cadastro de Pessoas para o Sistema Aprendix.
     Este formulário é projetado para registrar informações detalhadas sobre indivíduos, 
     facilitando a contratação de profissionais e o gerenciamento de decretos. Com ele, 
     o sistema pode manter um banco de dados atualizado e organizado para suportar processos 
     administrativos e operacionais.
 </p>
-<div class='p-2 fs-6 border-danger-subtle border-right  text-light bg-p-3' >
-<form class='m-3 p-3 ' action="" method="post">
-    {% csrf_token %}
-    <div>
-    {{ form.non_field_errors }}
-    {% for field in form %}                                                      
-    <section class="links">
-        {{field.label_tag}}   
-        <section class='d-flex'>
-        {{field}}
-        </section>
-    </section>
-    {% endfor %}
-    </div>
-    <button type="submit" class="btn btn-sm btn-success w-100"> <i class="fa-light fa-people"></i> Cadastro de Pessoas   (Aguardando para ser excluida esa pagina)</button>     
-</form>                    
-</div> 
 
+<div class="p-2 fs-6 border-danger-subtle border-right">
+    <form class="container my-4 p-4 border rounded shadow-sm" action="" method="post">
+        {% csrf_token %}
 
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <div class="row">
+            {% for field in form %}
+            <div class="col-md-6 col-sm-12 mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label fw-bold">
+                    {{ field.label }}f
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="text-danger small">
+                    {{ field.errors|striptags }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-success mt-4 w-100">
+            <i class="fa-light fa-people"></i> Cadastro de Pessoas 
+            <small class="d-block text-white-50">(Aguardando para ser excluída esta página)</small>
+        </button>
+    </form>
+</div>

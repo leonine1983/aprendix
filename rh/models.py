@@ -184,6 +184,20 @@ class Texto_Contrato(models.Model):
     def __str__(self):
         return self.tipo
     
+
+class UserPessoas(models.Model):
+    """
+    Modelo que representa o vínculo entre um usuário do sistema (User) 
+    e um registro de pessoa (Pessoas).
+
+    Esse relacionamento é um-para-um, garantindo que cada usuário 
+    esteja associado a uma única pessoa e vice-versa.
+    """ 
+    user = models.OneToOneField(User, related_name="related_vinculoUserPessoa", on_delete=models.CASCADE)
+    pessoa = models.OneToOneField(Pessoas, related_name="related_vinculoPessoaUser", on_delete=models.PROTECT)
+
+    def __str__(self) :
+        return f'{self.pessoa.nome} {self.pessoa.sobrenome}'
     
 
 class Escola(models.Model):

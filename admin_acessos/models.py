@@ -69,12 +69,7 @@ def setup_post_migrate(sender, **kwargs):
         Group.objects.get_or_create(name=group_name)
 
 
-class UserPessoas(models.Model):
-    user = models.OneToOneField(User, related_name="related_vinculoUserPessoa", on_delete=models.CASCADE)
-    pessoa = models.OneToOneField(Pessoas, related_name="related_vinculoPessoaUser", on_delete=models.PROTECT)
 
-    def __str__(self) :
-        return self.pessoa
     
 """
 from rh.models import Escola, Ano
