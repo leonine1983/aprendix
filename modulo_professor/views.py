@@ -1,6 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from gestao_escolar.models import TurmaDisciplina, AnoLetivo
+from gestao_escolar.models import TurmaDisciplina, AnoLetivo, GestaoTurmas
+from rh.models import Escola
+from django.contrib import messages
 
 
 # Create your views here.
@@ -8,18 +10,36 @@ from gestao_escolar.models import TurmaDisciplina, AnoLetivo
 def home_professor(request):
     userProfessor = request.user.related_vinculoUserPessoa
     request.session['professorUser'] = userProfessor
-    pessoa = userProfessor.pessoa.id
-
-    
+    pessoa = userProfessor.pessoa.id     
 
     # Pequisa pra verifica se existe matricula feita do aluno
     professorGrade = TurmaDisciplina.objects.filter(professor__encaminhamento__contratado__id=pessoa)
     ano = AnoLetivo.objects.all()
     
-
-    return render(request, 'modulo_professor/base.html', {
+    return render(request, 'modulo_professor/home.html', {
         'professor':professorGrade,
         'anoLetivo': ano})
+
+
+@login_required
+def home_sessaoIniciada(request):
+    escola = request.POST.get('escola')
+    ano_id = request.POST.get('ano')
+
+    # Armazena os valor na sessao
+    request.session['escola'] = Escola.objects.get(pk=escola)
+    request.session['anoLetivo'] = AnoLetivo.objects.get(pk=ano_id)    
+
+    escolaSession = request.session['escola'] 
+    anoSession = request.session['anoLetivo']
+
+    messages.success(request, f"A escola {escolaSession} foi iniciada com sucesso para o ano letivo de {anoSession}✨")   
+    
+    return redirect("modulo_professor:homeProfessor")
+
+
+
+
 
 
 
@@ -65,6 +85,18 @@ class GestaoTurmas(models.Model):
     notas = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     faltas = models.IntegerField(null=True, blank=True)
     profissional_resp = models.CharField(max_length=40, null=True)
+
+
+
+
+
+class GestaoTurmas(models.Model):
+    aluno = models.ForeignKey(Matriculas, related_name='gestao_turmas_related', null=True, on_delete=models.CASCADE)
+    grade = models.ForeignKey(TurmaDisciplina, null=True, related_name='grade_disciplina', on_delete=models.CASCADE)
+    trimestre = models.ForeignKey(Trimestre, related_name='trimestre_related_turma', null=True, on_delete=models.CASCADE)
+    notas = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    faltas = models.IntegerField(null=True, blank=True)
+    profissional_resp = models.CharField(max_length=40, null=True)
     data_hora_mod = models.DateTimeField(null=True)
 
     parecer_descritivo = models.TextField(max_length=500, default="Ainda não há parecer do aluno para esse período")
@@ -77,8 +109,5 @@ class GestaoTurmas(models.Model):
     conselho_classe = models.BooleanField(default=False)
 
     aprovado = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.aluno.aluno.nome_completo
 
 """

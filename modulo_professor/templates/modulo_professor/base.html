@@ -477,7 +477,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-secondary fixed-top  p-0" aria-label="Eighth navbar example">
       <div class="container">
         <div class='text-center'>
-        <img src="{% static 'rogerio.jpg' %}" alt="" srcset="" class="navbar-brand border rounded-3 p-0 m-0 mb-5 " style="margin: 0.25rem 0.1rem -1rem 0.1rem !important;" width="65"  ></br>
+        <img src="{% static 'logo.png' %}" alt="" srcset="" class="navbar-brand border rounded-3 p-0 m-0 mb-5 " style="margin: 0.25rem 0.1rem -1rem 0.1rem !important;" width="65"  ></br>
         <figcaption class="fs-6 text-light pt-3 text-capitalize">
           Prof. 
           {{request.user.first_name}}</figcaption>
@@ -485,23 +485,16 @@
         </div>
 
         
-        <ul class="me-auto mb-2 d-flex">
-          
-         
-        </ul>
-
+        <div class="me-auto mb-2 d-flex flex-column px-2">
+          <span class="fs-6 display-4 fw-semibold text-primary">{{ request.session.escola }}</span>
+          <span class="fs-6 text-muted">Ano Letivo: {{ request.session.anoLetivo }}</span>
+        </div>
+        
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         
         <div class="collapse navbar-collapse" id="navbarsExample07">
-          
-         
-
-
-
-
-
 
 
           <div class="container">
@@ -538,7 +531,7 @@
                     <span class="fs-5 ">Alunos</span>
                   </a>
                   <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Notas</a></li>
+                    <li><button class="dropdown-item btn btn-light btn-sm"  id="openDialog_notas" title='Notas dos alunos' ><i class="fa-duotone fs-2 fa-solid fa-file-word"></i> Notas </button></li>
                     <li><a class="dropdown-item" href="#">Faltas</a></li>
                     <li><a class="dropdown-item" href="#">Notificações</a></li>
                   </ul>
@@ -555,48 +548,73 @@
       {% include 'Escola/partials/mensagens.html' %}   
       {% block main %}  
       {% endblock main %}
+     
+      {% if not request.session.escola %} 
+      <!-- Modal   -->
+      <div class="modal fade" id="modalExemplo" tabindex="-1" aria-labelledby="modalExemploLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalExemploLabel">Bem-vindo, <span>Prof. {{request.user.first_name}} {{request.user.last_name}}</span>!</h5>
+            </div>
+            <div class="modal-body">
 
+              <div class="container mt-2 shadow shadow-sm p-4">
+                <h2 class="mb-4">Seleciona Escola</h2>
+                <div class="alert alert-info" role="alert">
+                  <strong>Atenção:</strong> Antes de continuar, é necessário selecionar a <strong>escola</strong> e o <strong>ano letivo</strong> em que você irá desempenhar suas atividades como docente aqui no <strong>Aprendix</strong>.
+                </div>        
+                <form method="post" action="{% url 'modulo_professor:sessaoEscola' %}">
+                    {% csrf_token %}
+                    
+                    <!-- Select para Escola / Grade do Professor -->
+                    <div class="mb-3">
+                        <label for="escola" class="form-label">Selecione a Escola / Disciplina</label>
+                        <select id="escola" name="escola" class="form-select" required>
+                            {% for escola in professor %}
+                                <option value="{{ escola.turma.escola.id }}">{{ escola.turma.escola}} </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+        
+                    <!-- Select para Ano Letivo -->
+                    <div class="mb-3">
+                        <label for="ano" class="form-label">Selecione o Ano Letivo</label>
+                        <select id="ano" name="ano" class="form-select" required>
+                            {% for a in anoLetivo %}
+                                <option value="{{ a.id }}">{{ a.ano}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+        
+                    <button type="submit" class="btn btn-primary">Iniciar</button>
+                </form>
+            </div>
 
-<!-- Modal -->
-<div class="modal fade" id="modalExemplo" tabindex="-1" aria-labelledby="modalExemploLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalExemploLabel">Bem-vindo, <span>Prof. {{request.user.first_name}} {{request.user.last_name}}</span>!</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <!-- foooter -->
+          </div>
+        </div>
       </div>
-      <div class="modal-body">
 
-        {% if professor %}
-          <ul>
-            {% for prof in professor %}
-              <li>{{ prof.turma.escola}}</li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p>Você ainda não está cadastrado como professor em nenhuma escola.</p>
-        {% endif %}
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-        <button type="button" class="btn btn-primary">Confirmar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-<!-- Scripts do Bootstrap e inicialização do modal -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    var myModal = new bootstrap.Modal(document.getElementById('modalExemplo'));
-    myModal.show();
-  });
-</script>
-
+      <!-- Scripts do Bootstrap e inicialização do modal -->
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+      <!--<script>
+        document.addEventListener('DOMContentLoaded', function () {
+          var myModal = new bootstrap.Modal(document.getElementById('modalExemplo'));
+          myModal.show();
+        });
+      </script> -->
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          var myModal = new bootstrap.Modal(document.getElementById('modalExemplo'), {
+            backdrop: 'static', // Impede o fechamento ao clicar fora
+            keyboard: false      // Impede o fechamento com a tecla Esc
+          });
+          myModal.show();
+        });
+      </script>
+      {% endif %}
 
 
 
@@ -698,6 +716,71 @@
         }
       });
   </script>
+
+
+
+
+
+
+<dialog id="instructions_notas" class="w-75 mt-5">
+    <div class="alert  alert-dismissible fade show" role="alert">
+        <h2 class="alert-heading" style='border-bottom:0.1rem solid salmon; padding-bottom: 0.5rem;  '><i class="fa-duotone fa-solid fs-1 fa-file-word"></i> Resumo - {{request.session.escola_nome}}</h2>
+        <p style="text-transform: none;"><strong>Esta janela exibe informações detalhadas</strong> do banco de dados escolar do sistema <strong>AprendiX</strong>. Os dados mostrados são resumos importantes sobre o perfil dos alunos da instituição, organizados de forma analítica.</p>        
+        <ul>
+            <li><strong>Quantidade de alunos por gênero</strong></li>
+            <li><strong>Distribuição por etnia</strong></li>
+            <li><strong>Informações sobre tamanhos de uniformes</strong></li>
+            <li><strong>Outros dados relevantes para gestão escolar</strong></li>
+        </ul>        
+        <p style="text-transform: none;"><strong>IMPORTANTE:</strong> Esses resumos são gerados automaticamente e refletem o conteúdo atual do banco de dados. Tenha em mente que somente usuários autorizados devem acessar essas informações.</p>        
+        <p><strong>🔒 Atenção à segurança dos dados!</strong></p>
+    </div>
+    <div class="container mt-4">        
+        <!-- genero--> 
+        <h4 class="alert alert-info"><i class="fa-regular fa-venus-mars"></i> Quantidade de alunos por gênero - Ano letivo {{request.session.anoLetivo_nome}}</h4>
+        <table class="win11-table">
+            <thead>
+                <tr>
+                    <th rowspan="2">Turmas</th>
+                    <th colspan="2">Gênero</th>
+                </tr>
+                <tr>
+                    <th>Masculino</th>
+                    <th>Feminino</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for turma in request.session.matriculas_all %}
+                <tr>
+                    <td>{{ turma.nome }} <span class='text-uppercase'>{{ turma.descritivo_turma }}</span></td>   
+                    <td>{{ turma.masculino }}</td>
+                    <td>{{ turma.feminino }}</td>
+                </tr>
+                {% endfor %}                                
+                <!-- Linha de Totais -->
+                <tr class='bg-success-subtle text-black fs-2'>
+                    <td><strong>Total</strong></td>
+                    <td>{{ request.session.totais.total_masculino }}</td>
+                    <td>{{ request.session.totais.total_feminino }}</td>
+                </tr>
+            </tbody>
+        </table>           
+    </div>
+    <button id="closeDialog_notas" class="btn btn-secondary mt-5">Fechar</button>
+</dialog>  
+<script>
+    const dialog_notas = document.getElementById('instructions_notas');
+    const openButton_notas = document.getElementById('openDialog_notas');
+    const closeButton_notas = document.getElementById('closeDialog_notas');
+
+    openButton_notas.addEventListener('click', () => {
+        dialog_notas.showModal(); // Abre a caixa de diálogo como modal
+        });
+
+    closeButton_notas.addEventListener('click', () => {
+        dialog_notas.close(); // Fecha a caixa de diálogo
+        });
+</script>    
   
   
 </body>    
