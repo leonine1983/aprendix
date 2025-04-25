@@ -1,68 +1,50 @@
 <style>
-   /* Estilo do título */
 .option_form {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 colunas de largura igual */
+    grid-template-columns: repeat(4, 1fr); 
     padding: 5px;
-    background-color: #f3f4f6; /* Cor de fundo similar ao estilo Windows 11 */
+    background-color: #f3f4f6; 
     border-radius: 8px;   
     font-weight: bold;
     margin:0 -1.25rem -1.1rem -1.25rem!important;
     text-align: center;
 }
-
-/* Estilo das linhas do cliente */
 .option_form_cliente {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 colunas de largura igual */
+    grid-template-columns: repeat(4, 1fr); 
     padding: 5px;
     border-radius: 8px;
     margin: -0.4rem!important;
-    text-align: center; /* Centralizar o texto das colunas */
+    text-align: center; 
 }
-
-/* Estilo das células individuais */
 .option_form div, .option_form_cliente div {
     padding: 8px;
-    text-align: center; /* Centraliza o texto dentro das células */
+    text-align: center; 
     border-left: 0.1rem solid rgb(230, 223, 218);
     border-right: 0.1rem solid rgb(230, 223, 218);
 }
-
-/* Melhora o estilo da tabela e ajusta o espaçamento */
 .table {
     width: 100%;
-    border-collapse: collapse; /* Remover espaçamento entre as células */
+    border-collapse: collapse; 
 }
-
-/* Melhora as linhas da tabela */
 .table th, .table td {
     padding: 5px; 
     vertical-align: middle!important;
-    border: 1px solid #e0e0e0; /* Borda mais suave */
+    border: 1px solid #e0e0e0; 
     text-align: center;
     font-size:  0.7rem;
 }
-
-
-/* Estilo do cabeçalho */
 .table th {
     background-color: #f8f9fa;
     font-weight: bold;
 }
-
-/* Linha alternada para melhor legibilidade */
 .table-striped tbody tr:nth-child(odd) {
     background-color: #f9f9f9;
 }
-
-/* Estilo do ícone */
 .option_form i {
     font-size: 1.1em;
-    color: #0078d4; /* Cor azul do Windows 11 */
+    color: #0078d4; 
 }
-
-/* Estilo dos botões de ação */
 .btn-primary {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
@@ -70,13 +52,10 @@
     border-color: #0078d4;
     border-radius: 4px;
 }
-
 .btn-primary:hover {
     background-color: #005a9e;
     border-color: #005a9e;
 }
-
-/* Estilo para as mensagens de aniversariante */
 .e_aniversario {
     background-color: #ffeb3b;
     color: #f44336;
@@ -84,14 +63,11 @@
     border-radius: 12px;
     font-weight: bold;
 }
-
-/* Adiciona efeitos de hover para as células */
 .table td:hover {
     background-color: #f0f0f0;
     cursor: pointer;
 }
 </style>
-
 <div class="container m-0 w-100">
     {% include "Escola/partials/mensagens.html" %}
     <div class="alert alert-info fs-6" style="min-width: 85vw;">
@@ -182,7 +158,20 @@
                     </section>
                 </td>
                 <td>
-                    <a href="{% url 'Gestao_Escolar:pessoas-update' l.pk %}" title='Editar informações pessoais'>
+                    <!-- Deletar Pessoa -->
+                    {% if  l.pessoa_contratada.first.encaminhamento_escolar.first.gradeProfessor1_related.first %}
+                        {% if not l.pessoa_contratada.first.encaminhamento_escolar.first.gradeProfessor2_related.first %}
+                            {% if not l.pessoa_contratada.first.encaminhamento_escolar.first.reservaTecnica_related.first %}
+                                {% if not l.pessoa_contratada.first.encaminhamento_escolar.first.auxiliarClasse_related.first %}
+                                    <a href="{% url 'Gestao_Escolar:pessoas-delete' l.pk %}" title='Deletar informações pessoais' class='p-2  border link-danger'>
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                    <!-- Update Pessoa -->
+                    <a href="{% url 'Gestao_Escolar:pessoas-update' l.pk %}" title='Editar informações pessoais' class='p-2 border'>
                         <i class="fa-duotone fa-solid fa-user-pen"></i>
                     </a>
                 </td>

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from gestao_escolar.models import TurmaDisciplina, AnoLetivo, GestaoTurmas
+from gestao_escolar.models import TurmaDisciplina, AnoLetivo, GestaoTurmas, Trimestre
 from rh.models import Escola
 from django.contrib import messages
 
@@ -12,12 +12,21 @@ def home_professor(request):
     request.session['professorUser'] = userProfessor
     pessoa = userProfessor.pessoa.id     
 
+    busca = request.GET.get('disciplina')
+    if busca:
+        notas = GestaoTurmas.objects.filter(grade__id = busca)
+    else:
+        notas = {}
+   
+
     # Pequisa pra verifica se existe matricula feita do aluno
     professorGrade = TurmaDisciplina.objects.filter(professor__encaminhamento__contratado__id=pessoa)
     ano = AnoLetivo.objects.all()
     
     return render(request, 'modulo_professor/home.html', {
         'professor':professorGrade,
+        'trimestre': Trimestre.objects.all(),
+        'notas':notas,
         'anoLetivo': ano})
 
 

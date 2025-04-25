@@ -397,9 +397,35 @@
         user-select: none;
       }
 
+      #menu-mobile {
+  background: 
+    linear-gradient(135deg, #eca06c, #cc5200),
+    url('https://www.transparenttextures.com/patterns/web.png'); /* textura tipo web */
+  background-blend-mode: overlay;
+  background-size: cover;
+  padding: 50px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+      #nome_escola{
+          display:inline;
+        }
+
       @media (min-width: 768px) {
         .bd-placeholder-img-lg {
           font-size: 3.5rem;
+        }
+      }
+      @media (max-width: 400px){
+        #nome_escola{
+          display:none;
+        }
+        .menu-aluno{
+          background:rgba(0, 128, 0, 0.281);
+          margin:1rem 0rem;
+          padding:1rem;
+          box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
         }
       }
 
@@ -472,302 +498,53 @@
 
 <body class=" bg-p-1">  
  
-  <main class="w-100 m-auto" >      
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary fixed-top  p-0" aria-label="Eighth navbar example">
-      <div class="container">
-        <div class='text-center'>
-        <img src="{% static 'logo.png' %}" alt="" srcset="" class="navbar-brand border rounded-3 p-0 m-0 mb-5 " style="margin: 0.25rem 0.1rem -1rem 0.1rem !important;" width="65"  ></br>
-        <figcaption class="fs-6 text-light pt-3 text-capitalize">
-          Prof. 
-          {{request.user.first_name}}</figcaption>
+  <main class="w-100 m-auto" > 
+    <!-- Nav -->     
+    {% include 'modulo_professor/partial/nav.html' %}
     
-        </div>
-
-        
-        <div class="me-auto mb-2 d-flex flex-column px-2">
-          <span class="fs-6 display-4 fw-semibold text-primary">{{ request.session.escola }}</span>
-          <span class="fs-6 text-muted">Ano Letivo: {{ request.session.anoLetivo }}</span>
-        </div>
-        
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        
-        <div class="collapse navbar-collapse" id="navbarsExample07">
-
-
-          <div class="container">
-            <div class="row row-cols-3 row-cols-sm-3 row-cols-md-4 g-2 text-center">
-              
-              <div class="col">
-                <a class="nav-link btn" href="#">
-                  <img src="{% static 'svg/home_aluno.svg' %}" alt="" width="50" class="mx-2 mb-1"><br>
-                  <span class="fs-6 text-light">Início</span>
-                </a>
-              </div>
-          
-              <div class="col">
-                <a class="nav-link btn" href="">
-                  <img src="{% static 'matricula.png' %}" alt="" width="70"><br>
-                  <span class="fs-6 text-light">Matricula</span>
-                </a>
-              </div>
-          
-              <div class="col">
-                <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}">
-                  {% csrf_token %}
-                  <button type="submit" class="text-light btn">
-                    <img src="{% static 'sair.png' %}" alt="" width="50"><br>
-                    <span class="fs-6">Sair</span>
-                  </button>
-                </form>
-              </div>
-          
-              <div class="col-12">
-                <div class="dropdown border m-1 p-0 rounded-3  pb-1">
-                  <a class="nav-link link-light dropdown-toggle btn" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="{% static 'aluno.png' %}"  width="70" alt="">
-                    <span class="fs-5 ">Alunos</span>
-                  </a>
-                  <ul class="dropdown-menu">
-                    <li><button class="dropdown-item btn btn-light btn-sm"  id="openDialog_notas" title='Notas dos alunos' ><i class="fa-duotone fs-2 fa-solid fa-file-word"></i> Notas </button></li>
-                    <li><a class="dropdown-item" href="#">Faltas</a></li>
-                    <li><a class="dropdown-item" href="#">Notificações</a></li>
-                  </ul>
-                </div>
-              </div>
-          
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>  
     <!--Contudo dinamico -->
     <div class="container-xl mb-4">
       {% include 'Escola/partials/mensagens.html' %}   
+      {% include 'modulo_professor/partial/modal_abertura.html' %} 
+
       {% block main %}  
-      {% endblock main %}
-     
-      {% if not request.session.escola %} 
-      <!-- Modal   -->
-      <div class="modal fade" id="modalExemplo" tabindex="-1" aria-labelledby="modalExemploLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="modalExemploLabel">Bem-vindo, <span>Prof. {{request.user.first_name}} {{request.user.last_name}}</span>!</h5>
-            </div>
-            <div class="modal-body">
+      {% endblock main %}    
 
-              <div class="container mt-2 shadow shadow-sm p-4">
-                <h2 class="mb-4">Seleciona Escola</h2>
-                <div class="alert alert-info" role="alert">
-                  <strong>Atenção:</strong> Antes de continuar, é necessário selecionar a <strong>escola</strong> e o <strong>ano letivo</strong> em que você irá desempenhar suas atividades como docente aqui no <strong>Aprendix</strong>.
-                </div>        
-                <form method="post" action="{% url 'modulo_professor:sessaoEscola' %}">
-                    {% csrf_token %}
-                    
-                    <!-- Select para Escola / Grade do Professor -->
-                    <div class="mb-3">
-                        <label for="escola" class="form-label">Selecione a Escola / Disciplina</label>
-                        <select id="escola" name="escola" class="form-select" required>
-                            {% for escola in professor %}
-                                <option value="{{ escola.turma.escola.id }}">{{ escola.turma.escola}} </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-        
-                    <!-- Select para Ano Letivo -->
-                    <div class="mb-3">
-                        <label for="ano" class="form-label">Selecione o Ano Letivo</label>
-                        <select id="ano" name="ano" class="form-select" required>
-                            {% for a in anoLetivo %}
-                                <option value="{{ a.id }}">{{ a.ano}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-        
-                    <button type="submit" class="btn btn-primary">Iniciar</button>
-                </form>
-            </div>
-
-            </div>
-            <!-- foooter -->
-          </div>
-        </div>
-      </div>
-
-      <!-- Scripts do Bootstrap e inicialização do modal -->
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-      <!--<script>
-        document.addEventListener('DOMContentLoaded', function () {
-          var myModal = new bootstrap.Modal(document.getElementById('modalExemplo'));
-          myModal.show();
-        });
-      </script> -->
-      <script>
-        document.addEventListener('DOMContentLoaded', function () {
-          var myModal = new bootstrap.Modal(document.getElementById('modalExemplo'), {
-            backdrop: 'static', // Impede o fechamento ao clicar fora
-            keyboard: false      // Impede o fechamento com a tecla Esc
-          });
-          myModal.show();
-        });
-      </script>
-      {% endif %}
-
-
-
-
-      <div style="position: relative;z-index: 10;">
-      </div>
-          
+      <div style="position: relative;z-index: 10;"></div>          
     </div> 
-    <!-- end Contudo dinamico --> 
-
-    <div class="wrapper">
-      <div class="item menu">
-        <div class="linee linee1"></div>
-        <div class="linee linee2"></div>
-        <div class="linee linee3"></div>
-      </div>
-      <div class="item gallery">
-        <div class="dot dot1"></div>
-        <div class="dot dot2"></div>
-        <div class="dot dot3"></div>
-        <div class="dot dot4"></div>
-        <div class="dot dot5"></div>
-        <div class="dot dot6"></div>
-      </div>
-      <button class="item add">
-        <div class="circle">
-          <div class="close">
-          <div class="line line1"></div>
-          <div class="line line2"></div>
-        </div>
-        </div>
-        <input type="search" placeholder="search" class="search" />
-        
-      </button>
-        <div class="nav-items items1">
-          <i class="fas fa-home"></i>
-        </div>
-        <div class="nav-items items2">
-          <i class="fas fa-camera"></i>
-        </div>
-        <div class="nav-items items3">
-          <i class="fas fa-folder"></i>
-        </div>
-        <div class="nav-items items4">
-          <i class="fas fa-heart"></i>
-        </div>
-        <div class="box">
-          <div class="box-line box-line1"></div>
-          <div class="box-line box-line2"></div>
-          <div class="box-line box-line3"></div>
-          <div class="box-line box-line4"></div>
-        </div>
-      </div>
-
-      <div class="effect"></div> 
+    <!-- end Contudo dinamico -->    
       
   </main>
-  <script>
-    document.querySelector(".circle").addEventListener("click", () => {
-        for (let i = 0; i <= 3; i++) {
-          document
-            .getElementsByClassName("nav-items")
-            [i].classList.remove("show-menu");
-          document
-            .getElementsByClassName("box-line")
-            [i].classList.remove("box-line-show");
-        }
-        document.querySelector(".box").classList.remove("box-show");
-        document.querySelector(".add").classList.toggle("go");
-        document.querySelector(".search").classList.toggle("search-focus");
-        document.querySelector(".search").focus();
-        document.querySelector(".circle").classList.toggle("color");
-        document.querySelector(".line1").classList.toggle("move");
-        document.querySelector(".line2").classList.toggle("mov");
-        document.querySelector(".effect").classList.toggle("big");
-      });
-      /* menu */
-      document.querySelector(".menu").addEventListener("click", () => {
-        for (let i = 0; i <= 3; i++) {
-          document.querySelector(".box").classList.remove("box-show");
-          document
-            .getElementsByClassName("nav-items")
-            [i].classList.toggle("show-menu");
-          document
-            .getElementsByClassName("box-line")
-            [i].classList.remove("box-line-show");
-        }
-      });
-      /* box */
-      document.querySelector(".gallery").addEventListener("click", () => {
-        document.querySelector(".box").classList.toggle("box-show");
-        for (let i = 0; i <= 3; i++) {
-          document
-            .getElementsByClassName("box-line")
-            [i].classList.toggle("box-line-show");
-          document
-            .getElementsByClassName("nav-items")
-            [i].classList.remove("show-menu");
-        }
-      });
-  </script>
+  <!-- Nav Bottom mobile -->
+  {% include 'modulo_professor/partial/nav_bottom.html' %} 
 
 
-
-
-
-
-<dialog id="instructions_notas" class="w-75 mt-5">
+<dialog id="instructions_notas" class="w-100 mt-5">
     <div class="alert  alert-dismissible fade show" role="alert">
-        <h2 class="alert-heading" style='border-bottom:0.1rem solid salmon; padding-bottom: 0.5rem;  '><i class="fa-duotone fa-solid fs-1 fa-file-word"></i> Resumo - {{request.session.escola_nome}}</h2>
-        <p style="text-transform: none;"><strong>Esta janela exibe informações detalhadas</strong> do banco de dados escolar do sistema <strong>AprendiX</strong>. Os dados mostrados são resumos importantes sobre o perfil dos alunos da instituição, organizados de forma analítica.</p>        
-        <ul>
-            <li><strong>Quantidade de alunos por gênero</strong></li>
-            <li><strong>Distribuição por etnia</strong></li>
-            <li><strong>Informações sobre tamanhos de uniformes</strong></li>
-            <li><strong>Outros dados relevantes para gestão escolar</strong></li>
-        </ul>        
-        <p style="text-transform: none;"><strong>IMPORTANTE:</strong> Esses resumos são gerados automaticamente e refletem o conteúdo atual do banco de dados. Tenha em mente que somente usuários autorizados devem acessar essas informações.</p>        
-        <p><strong>🔒 Atenção à segurança dos dados!</strong></p>
-    </div>
-    <div class="container mt-4">        
-        <!-- genero--> 
-        <h4 class="alert alert-info"><i class="fa-regular fa-venus-mars"></i> Quantidade de alunos por gênero - Ano letivo {{request.session.anoLetivo_nome}}</h4>
-        <table class="win11-table">
-            <thead>
-                <tr>
-                    <th rowspan="2">Turmas</th>
-                    <th colspan="2">Gênero</th>
-                </tr>
-                <tr>
-                    <th>Masculino</th>
-                    <th>Feminino</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for turma in request.session.matriculas_all %}
-                <tr>
-                    <td>{{ turma.nome }} <span class='text-uppercase'>{{ turma.descritivo_turma }}</span></td>   
-                    <td>{{ turma.masculino }}</td>
-                    <td>{{ turma.feminino }}</td>
-                </tr>
-                {% endfor %}                                
-                <!-- Linha de Totais -->
-                <tr class='bg-success-subtle text-black fs-2'>
-                    <td><strong>Total</strong></td>
-                    <td>{{ request.session.totais.total_masculino }}</td>
-                    <td>{{ request.session.totais.total_feminino }}</td>
-                </tr>
-            </tbody>
-        </table>           
+      <form method="GET" >
+        <div class="mb-3">
+          <div class='alert alert-info mb-3 border  p-2'>
+            <span class="fw-semibold ">{{ request.session.escola }} </span><br>
+            <span id='anoLetvo' class="">Ano Letivo: {{ request.session.anoLetivo }}</span>
+          </div>
+          <p class="text-muted">Olá, professor! Por favor, selecione uma disciplina para continuar.</p>
+          <label for="disciplina" class="form-label">Disciplinas</label>
+          <select class="form-select" id="disciplina" name="disciplina" required>
+            <option value="" disabled selected>Escolha uma disciplina</option>
+            {% for d in professor %}
+              <option value="{{ d.id}}">{{ d.disciplina }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">Buscar</button>
+        </div>
+      </form>
+        
     </div>
     <button id="closeDialog_notas" class="btn btn-secondary mt-5">Fechar</button>
 </dialog>  
+
 <script>
     const dialog_notas = document.getElementById('instructions_notas');
     const openButton_notas = document.getElementById('openDialog_notas');
@@ -780,8 +557,7 @@
     closeButton_notas.addEventListener('click', () => {
         dialog_notas.close(); // Fecha a caixa de diálogo
         });
-</script>    
-  
+</script>      
   
 </body>    
 </html>
@@ -789,3 +565,4 @@
 
 
 
+professor

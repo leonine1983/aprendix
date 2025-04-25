@@ -130,14 +130,15 @@ class PessoasUpdateView(LoginRequiredMixin, UpdateView):
 class PessoasDeleteView(LoginRequiredMixin, DeleteView):
     model = Pessoas
     template_name = 'Escola/inicio.html'
-    success_url = reverse_lazy('pessoas-list')
-    login_url = '/login/'
 
-    def delete(self, request, *args, **kwargs):
-        messages.success(self.request, 'Pessoa excluída com sucesso!')
-        return super().delete(request, *args, **kwargs)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['btn_bg'] = "btn-danger"
+        context['titulo_page'] = "Excluí pessoa do sistema"        
+        context['button'] = "Excluir registro de "
+        context['conteudo_page'] = 'Update_Delete'        
+        return context 
     
-    def delete(self, request, *args, **kwargs):
-        response = super().delete(request, *args, **kwargs)
-        messages.success(self.request, 'Pessoa excluída com sucesso!')
-        return response
+    def get_success_url(self):
+        messages.success(self.request, 'Pessoa Atualizada com sucesso!')
+        return reverse_lazy('Gestao_Escolar:pessoas-create')

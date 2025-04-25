@@ -1,0 +1,70 @@
+{% load static %}
+<nav id='menu-mobile' class="navbar navbar-expand-lg fixed-top  p-0" aria-label="Eighth navbar example">
+    <div class="container">
+      <div class='text-center'>
+      <img src="{% static 'logo.png' %}" alt="" srcset="" class="navbar-brand border rounded-3 p-0 m-0 mb-5 " style="margin: 0.25rem 0.1rem -1rem 0.1rem !important;" width="65"  ></br>
+      <figcaption class="fs-6 text-light pt-3 text-capitalize">
+        Prof. 
+        {{request.user.first_name}}</figcaption>    
+      </div>        
+      <div class="me-auto mb-2 d-flex flex-column px-2">
+        <div class='d-flex'>
+          <span id='nome_escola' class="fw-semibold text-light">{{ request.session.escola }} - </span>
+          <span id='sigla_escola' class="fw-semibold text-light mx-1"> {{ request.session.escola.sigla_escola }}</span>
+        </div>
+        <span id='anoLetvo' class="text-light">Ano Letivo: {{ request.session.anoLetivo }}</span>
+      </div>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarsExample07">
+
+
+        <div class="container menu-aluno">
+          <div class="row row-cols-3 row-cols-sm-3 row-cols-md-4 g-2 text-center">
+            
+            <div class="col">
+              <a class="nav-link btn" href="#">
+                <img src="{% static 'svg/home_aluno.svg' %}" alt="" width="50" class="mx-2 mb-1"><br>
+                <span class="fs-6 text-light">Início</span>
+              </a>
+            </div>
+        
+            <div class="col">
+              <a class="nav-link btn" href="">
+                <img src="{% static 'matricula.png' %}" alt="" width="70"><br>
+                <span class="fs-6 text-light">Matricula</span>
+              </a>
+            </div>
+        
+            <div class="col">
+              <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="text-light btn">
+                  <img src="{% static 'sair.png' %}" alt="" width="50"><br>
+                  <span class="fs-6">Sair</span>
+                </button>
+              </form>
+            </div>
+        
+            <div class="col-12">
+              <div class="dropdown  m-1 p-0 rounded-3  pb-1">
+                <a class="nav-link link-light dropdown-toggle btn mt-3" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                  <img src="{% static 'aluno.png' %}"  width="70" alt="">
+                  <span class="fs-5 ">Alunos</span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><button class="dropdown-item btn btn-light btn-sm"  id="openDialog_notas" title='Notas dos alunos' ><i class="fa-duotone fs-2 fa-solid fa-file-word"></i> Notas </button></li>
+                  <li><a class="dropdown-item" href="#">Faltas</a></li>
+                  <li><a class="dropdown-item" href="#">Notificações</a></li>
+                </ul>
+              </div>
+            </div>
+        
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>  

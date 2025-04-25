@@ -89,7 +89,7 @@ urlpatterns = [
     #path('pessoas/<int:pk>/', PessoasDetailView.as_view(), name='pessoas-detail'),
     path('pessoas/criar/', PessoasCreateView.as_view(), name='pessoas-create'),
     path('pessoas/<int:pk>/editar/', PessoasUpdateView.as_view(), name='pessoas-update'),
-    #path('pessoas/<int:pk>/excluir/', PessoasDeleteView.as_view(), name='pessoas-delete'),
+    path('pessoas/<int:pk>/excluir/', PessoasDeleteView.as_view(), name='pessoas-delete'),
 
     # pessoasContrato (para uso de decreto e outros) ----------------------------------------------
     path('pessoas/contrato/<int:pk>', PessoasContratoCreateView.as_view(), name='pessoasContrato-create'),
