@@ -678,6 +678,17 @@ class GestaoTurmas(models.Model):
     def __str__(self):
         return self.aluno.aluno.nome_completo
     
+
+class ComposicaoNotas(models.Model):
+    aluno = models.ForeignKey(Matriculas, related_name='compoeNotaAlunos_related', null=True, on_delete=models.CASCADE)
+    grade = models.ForeignKey(TurmaDisciplina, null=True, related_name='compoeNota_disciplina', on_delete=models.CASCADE)
+    trimestre = models.ForeignKey(Trimestre, related_name='compoeNotatrimestre_related', null=True, on_delete=models.CASCADE)
+    notas = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    
+
+    def __str__(self):
+        return self.aluno.aluno.nome_completo
+    
 class ParecerDescritivo(models.Model):
     matricula = models.ForeignKey(Matriculas, blank=True, on_delete=models.CASCADE, related_name='pareceres_aluno')
     trimestre = models.ForeignKey(Trimestre, related_name='trimestre_related_turma_parecer', null=True, on_delete=models.CASCADE)
