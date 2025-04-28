@@ -20,13 +20,12 @@ class Create_Matriculas(LoginRequiredMixin, SuccessMessageMixin, CreateView, ):
 
     def get_success_url(self):
         turma = self.object.turma.id
-        print (f'essa é a turma {turma}')
         return reverse_lazy('Gestao_Escolar:GE_Escola_Matricula_create', kwargs={'pk': turma}) 
     
 
     # envio_form Envia as informações de TURMA, ALUNOS para o form e ignora os alunos que ja estiverem matriculados
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
+        kwargs = super().get_form_kwargs()        
         kwargs ['turma_queryset'] = Turmas.objects.filter(pk = self.kwargs['pk'])
         aluno_da_turma = Matriculas.objects.filter(turma = self.kwargs['pk']).values_list('id', flat=True)      
         todos  = Alunos.objects.exclude(id__in = aluno_da_turma)       

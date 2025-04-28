@@ -1,7 +1,7 @@
 from gestao_escolar.models import Matriculas, Alunos, Turmas
+from rh.models import Ano
 from django.views.generic import CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
 from django.urls import reverse_lazy
 from .matriculas_form import Matricula_form_retorno_aluno
 from django.core.paginator import Paginator
@@ -20,6 +20,13 @@ class Create_Matriculas_Retorno_alunos(LoginRequiredMixin, CreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs ['aluno'] = Alunos.objects.filter(pk = self.kwargs['pk'])
+        escola_id = self.request.session['escola_id']
+
+        ano_nome = self.request.session['anoLetivo_nome']
+        ano = Ano.objects.get(ano=ano_nome)
+
+        turma = Turmas.objects.filter(ano_letivo = ano.id, escola__id = escola_id)
+        kwargs ['turma_queryset'] = turma
         return kwargs    
     
     def get_context_data(self, **kwargs):

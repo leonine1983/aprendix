@@ -31,7 +31,7 @@ class Create_Alunos(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
     def get_context_data(self, **kwargs):        
         context = super().get_context_data(**kwargs)        
-        context['titulo_page'] = 'Alunos'          
+        context['titulo_page'] = 'ALUNOS – Relação de todos os estudantes registrados na plataforma Aprendix.'          
         context['conteudo_page'] = 'Registrar Alunos'   
         context['sub_Info_page'] = 'Antes de procedermos com o cadastro do aluno,\
               é imprescindível realizar uma verificação para confirmar se ele já está\

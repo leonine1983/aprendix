@@ -2,9 +2,42 @@
 
 {% block main %}  
 
-{% if notas %}
-{{notas}}
+
+{% if mural == "notas" %}
+<div class='bg-light rounded-3 shadow '>
+<section class='d-flex p-2 shadow shadown-sm '><h1>{{alunos.0.turma}}</h1> | {{alunos|length}} alunos <span class='fs-3 mx-5'>Composição de NOTAS do {{trimestre_choice}}</span></section>
+<div class="table-responsive-md p-1">
+    <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nome do aluno</th>
+            <th scope="col">Prova (50%)</th>
+            <th scope="col">Trabalho (20%)</th>
+            <th scope="col">Participação (15%)</th>
+            <th scope="col">Tarefas (15%)</th>
+            <th scope="col">Nota Final</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in alunos %}    
+            <th scope="row">{{forloop.count}}</th>
+            <td class="fs-6">{{a}}</td>
+            <td>{{ a.prova }}</td>
+            <td>{{ a.trabalho }}</td>
+            <td>{{ a.participacao }}</td>
+            <td>{{ a.tarefas }}</td>
+            <td>{{ a.nota_final }}</td>
+          </tr>
+          {% endfor %}
+          
+        </tbody>
+      </table>
+</div>
+</div>
 {% endif %}
+
+
 
 
 

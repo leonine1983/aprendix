@@ -158,7 +158,7 @@ class Matricula_form_retorno_aluno(forms.ModelForm):
         )   
 
     turma = forms.ModelChoiceField(
-        queryset=Turmas.objects.all(),
+        queryset=Turmas.objects.none(),
         widget=forms.Select(attrs={'class': 'border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1'}),
     ) 
 
@@ -175,16 +175,19 @@ class Matricula_form_retorno_aluno(forms.ModelForm):
     # Para aceitar o modificação do form feita lá na view
     def __init__(self, *args, **kwargs):
         aluno_queryset = kwargs.pop('aluno', None)
+        turma_queryset = kwargs.pop('turma_queryset', None)
         super().__init__(*args, **kwargs)
 
         if aluno_queryset is not None:
             self.fields['aluno'].queryset = aluno_queryset
 
+        if turma_queryset is not None:
+            self.fields['turma'].queryset = turma_queryset
+
         # Dentro do metodo init, iniciaremos o campo serie_multiseriada OCULTA, e        
-        # só exiberemos ela se a turma tiver valor true para o campo multiserie        
+        # só exiberemos ela se a turma tiver valor true para o campo multiserie 
         self.fields['serie_multiseriada'].widget = forms.Select(attrs={'class': 'border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1'})
-        self.fields['serie_multiseriada'].queryset = Serie_Escolar.objects.all()
-           
+        self.fields['serie_multiseriada'].queryset = Serie_Escolar.objects.all()           
     
     class Meta:
         model = Matriculas

@@ -14,7 +14,6 @@ class PessoasDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'pessoa'
 
 
-
 class PessoasCreateView(LoginRequiredMixin, CreateView):
     """
     View responsável por criar um novo registro de Pessoa no sistema, 
@@ -79,7 +78,6 @@ class PessoasCreateView(LoginRequiredMixin, CreateView):
         return super().form_invalid(form)
     
     def get_success_url(self):
-        messages.success(self.request, 'Pessoa criada com sucesso!')
         return reverse_lazy('Gestao_Escolar:pessoas-create')
     
     def get_context_data(self, **kwargs):

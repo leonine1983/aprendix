@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from gestao_escolar.models import TurmaDisciplina, AnoLetivo, GestaoTurmas, Trimestre
+from gestao_escolar.models import TurmaDisciplina, AnoLetivo, GestaoTurmas, Trimestre, Matriculas
 from rh.models import Escola
 from django.contrib import messages
 
@@ -10,14 +10,36 @@ from django.contrib import messages
 def home_professor(request):
     userProfessor = request.user.related_vinculoUserPessoa
     request.session['professorUser'] = userProfessor
-    pessoa = userProfessor.pessoa.id     
-
-    busca = request.GET.get('disciplina')
+    pessoa = userProfessor.pessoa.id   
+    trimestre = request.GET.get('trimestre')
+    busca = request.GET.get('disciplina')    
+    
     if busca:
-        notas = GestaoTurmas.objects.filter(grade__id = busca)
+        request.session['escola']        
+        trimestre_choice = Trimestre.objects.get(id=trimestre)
+        notas = GestaoTurmas.objects.filter(grade__id = busca, trimestre__id = trimestre)
+        mural = "notas"
+
+        """
+        Obtém todos os alunos matriculados em uma turma específica a partir de uma instância de TurmaDisciplina.
+        Processo:
+        1. Recupera o objeto `TurmaDisciplina` com base no ID passado em `busca`.
+        2. Acessa a `turma` associada àquela instância de `TurmaDisciplina`.
+        3. Filtra todas as matrículas (`Matriculas`) que estão relacionadas a essa turma específica.
+        Resultado:
+        Uma queryset contendo todos os alunos matriculados na turma correspondente à disciplina buscada.
+        """
+        grade = TurmaDisciplina.objects.get(id=busca)
+        turma = grade.turma
+        alunos = Matriculas.objects.filter(turma = turma )
+    
+
     else:
-        notas = {}
-   
+        mural = ""
+        trimestre_choice = {}
+        notas = {}  
+        alunos = {}  
+    
 
     # Pequisa pra verifica se existe matricula feita do aluno
     professorGrade = TurmaDisciplina.objects.filter(professor__encaminhamento__contratado__id=pessoa)
@@ -25,8 +47,11 @@ def home_professor(request):
     
     return render(request, 'modulo_professor/home.html', {
         'professor':professorGrade,
-        'trimestre': Trimestre.objects.all(),
+        'trimestre': Trimestre.objects.filter(final= False),        
         'notas':notas,
+        'alunos':alunos,
+        'mural': mural,
+        'trimestre_choice':trimestre_choice,
         'anoLetivo': ano})
 
 
