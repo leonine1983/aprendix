@@ -35,14 +35,7 @@ def home_professor(request):
         alunos = Matriculas.objects.filter(turma = turma )
         compoeNotas = ComposicaoNotas.objects.filter(grade = grade )
 
-        notas_dict = {}
-        for a in alunos:
-            nota = ComposicaoNotas.objects.filter(
-                aluno=a,
-                grade=grade,
-                trimestre=trimestre_choice
-            ).first()
-            notas_dict[a.id] = nota
+        
     else:
         notas_dict = {}
         mural = ""
