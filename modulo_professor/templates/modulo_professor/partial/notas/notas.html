@@ -1,0 +1,21 @@
+{% extends "modulo_professor/base.html" %}
+
+{% block main %}  
+<h2>Lançamento de Notas</h2>
+
+<form method="post">
+    <div class="d-flex">
+        {% csrf_token %}
+        {% for field in form  %}
+            <div>
+                {{field.label_tag}}
+                {{field}}
+            </div>    
+        {% endfor %}
+    </div>
+
+  <button type="submit" class="btn btn-primary">Lançar Notas</button>
+</form>
+
+
+{% endblock main %}

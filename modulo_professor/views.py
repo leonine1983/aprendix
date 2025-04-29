@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from gestao_escolar.models import TurmaDisciplina, AnoLetivo, GestaoTurmas, Trimestre, Matriculas
 from rh.models import Escola
+from .models import ComposicaoNotas
 from django.contrib import messages
 
 
@@ -32,13 +33,25 @@ def home_professor(request):
         grade = TurmaDisciplina.objects.get(id=busca)
         turma = grade.turma
         alunos = Matriculas.objects.filter(turma = turma )
-    
+        compoeNotas = ComposicaoNotas.objects.filter(grade = grade )
 
+        notas_dict = {}
+        for a in alunos:
+            nota = ComposicaoNotas.objects.filter(
+                aluno=a,
+                grade=grade,
+                trimestre=trimestre_choice
+            ).first()
+            notas_dict[a.id] = nota
     else:
+        notas_dict = {}
         mural = ""
         trimestre_choice = {}
         notas = {}  
         alunos = {}  
+        compoeNotas = {}
+        grade = {}
+
     
 
     # Pequisa pra verifica se existe matricula feita do aluno
@@ -48,11 +61,78 @@ def home_professor(request):
     return render(request, 'modulo_professor/home.html', {
         'professor':professorGrade,
         'trimestre': Trimestre.objects.filter(final= False),        
+        'compoemNotas': compoeNotas,
         'notas':notas,
         'alunos':alunos,
+        'notas_dict': notas_dict,
         'mural': mural,
         'trimestre_choice':trimestre_choice,
+        'grade':grade,
         'anoLetivo': ano})
+
+
+
+
+
+from django import forms
+from .models import ComposicaoNotas
+class ComposicaoNotasForm(forms.ModelForm):
+    class Meta:
+        model = ComposicaoNotas
+        fields = [ 'prova', 'trabalho', 'participacao', 'tarefas', 'anotacoes']
+        widgets = {
+            'anotacoes': forms.Textarea(attrs={'rows': 3}),
+        }
+
+
+
+from django.contrib import messages
+from django.shortcuts import redirect, render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def criaNotasComposicao(request, aluno, grade, trimestre):
+    aluno_obj = get_object_or_404(Matriculas, id=aluno)
+    grade_obj = get_object_or_404(TurmaDisciplina, id=grade)
+    trimestre_obj = get_object_or_404(Trimestre, id=trimestre)
+
+    composicao_existente = ComposicaoNotas.objects.filter(
+        aluno=aluno_obj,
+        grade=grade_obj,
+        trimestre=trimestre_obj
+    ).first()
+
+    if request.method == "POST":
+        form = ComposicaoNotasForm(request.POST, instance=composicao_existente)
+        if form.is_valid():
+            confirmar = request.POST.get("confirmar", "nao")
+
+            if composicao_existente and confirmar != "sim":
+                return render(request, "modulo_professor/partial/notas/confirmaAtualiza.html", {
+                    "form": form,
+                    "confirmar_pendente": True,
+                })
+
+            nova_instancia = form.save(commit=False)
+            nova_instancia.aluno = aluno_obj
+            nova_instancia.grade = grade_obj
+            nova_instancia.trimestre = trimestre_obj
+            nova_instancia.save()
+
+            messages.success(request, "Notas do aluno foram salvas com sucesso!")
+            return redirect("modulo_professor:homeProfessor")
+    else:
+        form = ComposicaoNotasForm(instance=composicao_existente)
+
+    return render(request, "modulo_professor/partial/notas/notas.html", {"form": form})
+
+
+
+
+
+
+
+
 
 
 @login_required
@@ -70,6 +150,10 @@ def home_sessaoIniciada(request):
     messages.success(request, f"A escola {escolaSession} foi iniciada com sucesso para o ano letivo de {anoSession}✨")   
     
     return redirect("modulo_professor:homeProfessor")
+
+
+
+
 
 
 

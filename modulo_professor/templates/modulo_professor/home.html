@@ -4,41 +4,144 @@
 
 
 {% if mural == "notas" %}
-<div class='bg-light rounded-3 shadow '>
-<section class='d-flex p-2 shadow shadown-sm '><h1>{{alunos.0.turma}}</h1> | {{alunos|length}} alunos <span class='fs-3 mx-5'>Composição de NOTAS do {{trimestre_choice}}</span></section>
-<div class="table-responsive-md p-1">
-    <table class="table table-striped">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Nome do aluno</th>
-            <th scope="col">Prova (50%)</th>
-            <th scope="col">Trabalho (20%)</th>
-            <th scope="col">Participação (15%)</th>
-            <th scope="col">Tarefas (15%)</th>
-            <th scope="col">Nota Final</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for a in alunos %}    
-            <th scope="row">{{forloop.count}}</th>
-            <td class="fs-6">{{a}}</td>
-            <td>{{ a.prova }}</td>
-            <td>{{ a.trabalho }}</td>
-            <td>{{ a.participacao }}</td>
-            <td>{{ a.tarefas }}</td>
-            <td>{{ a.nota_final }}</td>
-          </tr>
-          {% endfor %}
-          
-        </tbody>
-      </table>
+<style>
+  @media print {
+    /* Oculta todo o conteúdo da página visualmente */
+    body * {
+      visibility: hidden;
+    }
+    h1{font-size: 1.5rem;}
+
+    /* Torna visível apenas a .imprimir */
+    .imprimir, .imprimir * {
+      visibility: visible;
+    }
+
+    /* Posiciona a .imprimir como o único elemento da página */
+    .imprimir {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 0px;     
+
+      background: white !important;
+    }
+
+    /* Remove botões e ações de impressão */
+    .imprimir a.btn, .imprimir .btn, .imprimir .d-print-none , .ocultar{
+      display: none !important;
+    }
+
+    /* Mantém o estilo da tabela */
+    table.table {
+      width: 100% !important;
+      border-collapse: collapse;
+    }
+
+    table th, table td {
+      border: 1px solid #ccc;
+      padding: 6px;
+    }
+
+    .text-danger {
+      color: red !important;
+    }
+
+    .text-primary {
+      color: #0d6efd !important;
+    }
+
+    .fw-bolder {
+      font-weight: bolder;
+    }
+
+    .alert {
+      background-color: #f8f9fa !important;
+      border: 1px solid #dee2e6;
+      color: black !important;
+    }
+
+    table, tr, td, th {
+      page-break-inside: avoid !important;
+    }
+  }
+</style>
+
+
+
+
+
+<!-- Botão imprimir -->
+<div class="text-end my-3 d-print-none mt-5">
+  <button onclick="window.print()" class="btn btn-primary mt-4">
+    🖨️ Imprimir
+  </button>
 </div>
+
+<div  class='imprimir bg-light rounded-3 shadow '>
+  <div class="p-2 shadow shadown-sm ">
+    <section class='d-flex '><h1>{{alunos.0.turma}}</h1> | {{alunos|length}} alunos <span class="mx-3 pt-1 small text-uppercasec"  ><strong> Composição de NOTAS da turma | {{request.session.escola.sigla_escola}}  </strong></span></section>
+    <section class='fs-3 mx-5 text-center '> <strong>{{trimestre_choice}}</strong> ({{grade}}) </section>
+    <section class='fs-3 mx-5 text-center '> </section>
+  </div>
+  <div class="table-responsive-md p-1">
+      <div class="alert alert-info" role="alert">
+        <h5 class="alert-heading">💡 Como é calculada a nota final do aluno?</h5>
+        <p>A <strong>nota final</strong> é calculada automaticamente com base nos seguintes pesos atribuídos a cada componente da avaliação:</p>
+        <ul>
+          <li><strong>Prova</strong>: 50% da nota final</li>
+          <li><strong>Trabalho</strong>: 20% da nota final</li>
+          <li><strong>Participação</strong> em aula: 15% da nota final</li>
+          <li><strong>Tarefas</strong> (atividades complementares): 15% da nota final</li>
+        </ul>
+        <p>A fórmula usada é:</p>
+        <pre><code>nota_final = (prova × 0.5) + (trabalho × 0.2) + (participação × 0.15) + (tarefas × 0.15)</code></pre>
+        <p><strong>Importante:</strong> Se o aluno não tiver nota em algum dos campos, será atribuído <strong>zero</strong> automaticamente para que o cálculo da nota final possa ser realizado corretamente.</p>
+      </div>  
+      <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col" class="ocultar">#</th>
+              <th scope="col">Nome do aluno</th>
+              <th scope="col">Prova (50%)</th>
+              <th scope="col">Trabalho (20%)</th>
+              <th scope="col">Participação (15%)</th>
+              <th scope="col">Tarefas (15%)</th>
+              <th scope="col">Nota Final</th>
+              <th scope="col" class="ocultar">Anotação</th>
+              <th scope="col" class="ocultar">Ação</th>
+              
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in alunos %}
+              <tr>
+                  <td scope="row" class="ocultar">{{ forloop.count }}</td>
+                  <td class="small">{{ a }}</td>
+                  {% for c in a.compoeNotaAlunos_related.all %}
+                    {% if c.trimestre.id == trimestre_choice.id %}
+                    <td class='text-center'>{% if c.prova is not None %}{{ c.prova}} {% else %}0{% endif %}</td>
+                    <td class='text-center'>{% if c.trabalho is not None  %}{{ c.trabalho }}{% else %}0{% endif %}</td>
+                    <td class='text-center'>{% if c.participacao is not None %}{{ c.participacao }}{% else %}0{% endif %}</td>
+                    <td class='text-center'>{% if c.tarefas is not None  %}{{ c.tarefas }}{% else %}0{% endif %}</td>
+                    <td class='text-center {% if c.nota_final <= 4.99 %}text-danger {% else %}text-primary fw-bolder{% endif %}'><strong>{{ c.nota_final }}</strong></td>
+                    <td class="ocultar">{{ c.anotacoes }}</td>   
+                    {% endif %}
+                  {% endfor %}
+                  <td class="ocultar">
+                    <a href="{% url 'modulo_professor:criaNotasComposicao' a.id grade.id trimestre_choice.id %}" class="btn btn-success btn-sm">add Notas</a>
+                </td>  
+              </tr>
+            {% endfor %}          
+          </tbody>
+        </table>
+
+
+
+  </div>
 </div>
 {% endif %}
-
-
-
 
 
 

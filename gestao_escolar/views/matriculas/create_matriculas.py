@@ -91,8 +91,6 @@ class Create_Matriculas(LoginRequiredMixin, SuccessMessageMixin, CreateView, ):
         
         # Chame o método da superclasse para definir self.object
         self.object = form.save(commit=False)  # Isso pode variar com base na lógica do seu 
-        
-        print(f"olha a turmaaaa {self.object.turma}")
 
         if self.object:
             matricula_exist = Matriculas.objects.filter(aluno=self.object.aluno, turma__ano_letivo=self.request.session['anoLetivo_id'])

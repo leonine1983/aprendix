@@ -1,0 +1,25 @@
+{% extends "modulo_professor/base.html" %}
+
+{% block main %}  
+<div class="container mt-5">
+    <div class="alert alert-warning">
+        <h4 class="alert-heading">⚠️ Notas já existentes!</h4>
+        <p>Já existem notas registradas para este aluno neste trimestre e disciplina.</p>
+        <p>Se você continuar, os dados atuais serão <strong>substituídos</strong> pelas novas informações preenchidas no formulário.</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <input type="hidden" name="confirmar" value="sim">
+        
+        <div class="mt-3">
+            <button type="submit" class="btn btn-danger">Confirmar atualização</button>
+            <a href="{% url 'modulo_professor:homeProfessor' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+
+{% endblock main %}
