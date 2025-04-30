@@ -13,11 +13,14 @@ def home_professor(request):
     request.session['professorUser'] = userProfessor
     pessoa = userProfessor.pessoa.id   
     trimestre = request.GET.get('trimestre')
-    busca = request.GET.get('disciplina')    
+    busca = request.GET.get('disciplina')   
+
+    trimestreALL = Trimestre.objects.all()
     
     if busca:
         request.session['escola']        
         trimestre_choice = Trimestre.objects.get(id=trimestre)
+        final = trimestre_choice.final
         notas = GestaoTurmas.objects.filter(grade__id = busca, trimestre__id = trimestre)
         mural = "notas"
 
@@ -30,12 +33,31 @@ def home_professor(request):
         Resultado:
         Uma queryset contendo todos os alunos matriculados na turma correspondente à disciplina buscada.
         """
+
         grade = TurmaDisciplina.objects.get(id=busca)
         turma = grade.turma
         alunos = Matriculas.objects.filter(turma = turma )
         compoeNotas = ComposicaoNotas.objects.filter(grade = grade )
 
-        
+
+        notas_dict = {}
+
+        for a in alunos:
+            notas_dict = {}  # Reiniciado a cada aluno
+            for t in trimestreALL:
+                for ac in a.compoeNotaAlunos_related.all():
+                    if ac.trimestre.id == t.id and ac.grade == grade:
+                        aluno_id = ac.aluno.id
+                        notas_dict[aluno_id] = {
+                            'aluno_nome': ac.aluno.aluno,
+                            'notas': {},
+                            'trimestre': t.numero_nome,
+                            'trimestre_id': t.id,
+                            'media_final': ac.media_final  # <-- Aqui você adiciona o campo desejado
+                        }
+                        notas_dict[aluno_id]['notas'][t.id] = ac.nota_final
+
+                
     else:
         notas_dict = {}
         mural = ""
@@ -44,20 +66,21 @@ def home_professor(request):
         alunos = {}  
         compoeNotas = {}
         grade = {}
-
-    
+        final = False
+       
 
     # Pequisa pra verifica se existe matricula feita do aluno
     professorGrade = TurmaDisciplina.objects.filter(professor__encaminhamento__contratado__id=pessoa)
     ano = AnoLetivo.objects.all()
     
     return render(request, 'modulo_professor/home.html', {
+        'notas_dict':notas_dict ,
+        'final':final,        
         'professor':professorGrade,
-        'trimestre': Trimestre.objects.filter(final= False),        
+        'trimestre': trimestreALL,        
         'compoemNotas': compoeNotas,
         'notas':notas,
         'alunos':alunos,
-        'notas_dict': notas_dict,
         'mural': mural,
         'trimestre_choice':trimestre_choice,
         'grade':grade,
@@ -72,7 +95,7 @@ from .models import ComposicaoNotas
 class ComposicaoNotasForm(forms.ModelForm):
     class Meta:
         model = ComposicaoNotas
-        fields = [ 'prova', 'trabalho', 'participacao', 'tarefas', 'anotacoes']
+        fields = [ 'prova', 'trabalho', 'participacao', 'tarefas', 'anotacoes', 'prova_paralela']
         widgets = {
             'anotacoes': forms.Textarea(attrs={'rows': 3}),
         }

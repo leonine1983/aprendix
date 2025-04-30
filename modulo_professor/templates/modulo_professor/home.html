@@ -1,4 +1,5 @@
 {% extends "modulo_professor/base.html" %}
+{% load meus_filtros %}
 
 {% block main %}  
 
@@ -99,18 +100,20 @@
         <pre><code>nota_final = (prova × 0.5) + (trabalho × 0.2) + (participação × 0.15) + (tarefas × 0.15)</code></pre>
         <p><strong>Importante:</strong> Se o aluno não tiver nota em algum dos campos, será atribuído <strong>zero</strong> automaticamente para que o cálculo da nota final possa ser realizado corretamente.</p>
       </div>  
-      <table class="table table-striped">
-          <thead>
+      {% if not final %}
+      <table class="table table-striped table-bordered">
+          <thead class='bg-secondary '>
             <tr>
-              <th scope="col" class="ocultar">#</th>
-              <th scope="col">Nome do aluno</th>
-              <th scope="col">Prova (50%)</th>
-              <th scope="col">Trabalho (20%)</th>
-              <th scope="col">Participação (15%)</th>
-              <th scope="col">Tarefas (15%)</th>
-              <th scope="col">Nota Final</th>
-              <th scope="col" class="ocultar">Anotação</th>
-              <th scope="col" class="ocultar">Ação</th>
+              <th scope="col" class="ocultar text-center align-middle text-light">#</th>
+              <th scope="col" class='text-center align-middle text-light'>Nome do aluno</th>
+              <th scope="col" class='text-center align-middle text-light'>Prova (50%)</th>
+              <th scope="col" class='text-center align-middle text-light'>Trabalho (20%)</th>
+              <th scope="col" class='text-center align-middle text-light'>Participação (15%)</th>
+              <th scope="col" class='text-center align-middle text-light'>Tarefas (15%)</th>
+              <th scope="col" class='text-center align-middle text-light'>Nota Final</th>
+              <th scope="col" class='text-center align-middle text-light'>Paralela</th>
+              <th scope="col" class="ocultar text-center align-middle text-light">Anotação</th>
+              <th scope="col" class="ocultar text-center align-middle text-light">Ação</th>
               
             </tr>
           </thead>
@@ -121,32 +124,62 @@
                   <td class="small">{{ a }}</td>
                   {% for c in a.compoeNotaAlunos_related.all %}
                     {% if c.trimestre.id == trimestre_choice.id %}
-                    <td class='text-center'>{% if c.prova is not None %}{{ c.prova}} {% else %}0{% endif %}</td>
-                    <td class='text-center'>{% if c.trabalho is not None  %}{{ c.trabalho }}{% else %}0{% endif %}</td>
-                    <td class='text-center'>{% if c.participacao is not None %}{{ c.participacao }}{% else %}0{% endif %}</td>
-                    <td class='text-center'>{% if c.tarefas is not None  %}{{ c.tarefas }}{% else %}0{% endif %}</td>
-                    <td class='text-center {% if c.nota_final <= 4.99 %}text-danger {% else %}text-primary fw-bolder{% endif %}'><strong>{{ c.nota_final }}</strong></td>
-                    <td class="ocultar">{{ c.anotacoes }}</td>   
+                    <td class='text-center align-middle '>{% if c.prova is not None %}{{ c.prova}} {% else %}0{% endif %}</td>
+                    <td class='text-center align-middle '>{% if c.trabalho is not None  %}{{ c.trabalho }}{% else %}0{% endif %}</td>
+                    <td class='text-center align-middle '>{% if c.participacao is not None %}{{ c.participacao }}{% else %}0{% endif %}</td>
+                    <td class='text-center align-middle '>{% if c.tarefas is not None  %}{{ c.tarefas }}{% else %}0{% endif %}</td>
+                    <td class='text-center align-middle  {% if c.nota_final <= 4.99 %}text-danger {% else %}text-primary fw-bolder{% endif %}'>
+                      <strong>{% if c.nota_final is not None %}{{ c.nota_final }}{% endif %}</strong></td>
+                    <td class='text-center align-middle  {% if c.prova_paralela <= 4.99 %}text-danger {% else %}text-primary fw-bolder{% endif %}'>
+                      <strong>{% if  c.prova_paralela is not None %}{{ c.prova_paralela }}{% endif %}</strong>
+                    </td>
+                    <td class="ocultar align-middle " style='font-size:0.8rem'>{{ c.anotacoes }}</td>   
                     {% endif %}
                   {% endfor %}
-                  <td class="ocultar">
+                  <td class="ocultar align-middle ">
                     <a href="{% url 'modulo_professor:criaNotasComposicao' a.id grade.id trimestre_choice.id %}" class="btn btn-success btn-sm">add Notas</a>
                 </td>  
               </tr>
             {% endfor %}          
           </tbody>
         </table>
+        {% else %}
 
 
-
-
-        
-
-
-
-
-
-
+        <table class="table table-striped table-bordered">
+          <thead class='bg-secondary '>
+            <tr>
+              <th scope="col" class="ocultar text-light">#</th>
+              <th scope="col" class='text-light'>Nome do aluno</th>
+              {% for t in trimestre %}
+              <th scope="col" class='text-center text-light'>{{t}}</th>
+              {% endfor %}
+              
+              
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in alunos %}
+              <tr>
+                  <td scope="row" class="ocultar">{{ forloop.count }}</td>
+                  <td class="small">{{ a }}</td>
+                  {% for t in trimestre %}
+                    {% with nota=a.compoeNotaAlunos_related.all|get_nota_por_trimestre:t %}
+                      <td class="text-center {% if nota.nota_final <= 4.99 %}text-danger{% endif %}">
+                        {% if nota %}
+                          {{ nota.nota_final }}
+                        {% else %}
+                                                  -
+                        {% endif %}
+                      </td>                      
+                    {% endwith %}
+                  {% endfor %}
+              </tr>
+            {% endfor %}          
+          </tbody>
+        </table>
+        {% endif %}
+      {% else %}
   </div>
 </div>
 {% endif %}

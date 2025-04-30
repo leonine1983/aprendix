@@ -45,7 +45,9 @@ class ComposicaoNotas(models.Model):
     trabalho = models.DecimalField("Trabalho (20%)", max_digits=5, decimal_places=2, null=True, blank=True)
     participacao = models.DecimalField("Participação (15%)", max_digits=5, decimal_places=2, null=True, blank=True)
     tarefas = models.DecimalField("Tarefas (15%)", max_digits=5, decimal_places=2, null=True, blank=True)
+    prova_paralela = models.DecimalField("Prova Paralela)", max_digits=5, decimal_places=2, null=True, blank=True)
     nota_final = models.DecimalField("Nota Final", max_digits=5, decimal_places=2, null=True, blank=True)
+    media_final = models.DecimalField("Nota Final", max_digits=5, decimal_places=2, null=True, blank=True)
 
     anotacoes = models.TextField("Anotações", null=True, blank=True)
 
@@ -68,13 +70,22 @@ class ComposicaoNotas(models.Model):
             2
         )
 
-
-
     def save(self, *args, **kwargs):
-        from decimal import Decimal
+        from django.db.models import Avg
 
         # Calcula e atualiza a nota final
-        self.nota_final = self.calcular_nota_final()
+        nota_calculada = self.calcular_nota_final()
+
+        if self.prova_paralela and self.prova_paralela > nota_calculada:
+            self.nota_final = self.prova_paralela
+            mensagem = "Nota da prova paralela foi maior e utilizada como nota final."
+            if self.anotacoes:
+                self.anotacoes += f"\n{mensagem}"
+            else:
+                self.anotacoes = mensagem
+        else:
+            self.nota_final = nota_calculada
+
         super().save(*args, **kwargs)
 
         # Atualiza ou cria o registro correspondente em GestaoTurmas
@@ -89,6 +100,27 @@ class ComposicaoNotas(models.Model):
                 gestao_turma.notas = self.nota_final
                 gestao_turma.save()
 
+        # Atualiza a média final apenas se o trimestre atual for o trimestre final
+        if self.aluno and self.grade and self.trimestre:
+            try:
+                tFinal = Trimestre.objects.get(final=True)
+                print(f'olha o tfina e {tFinal}')                
+                media = ComposicaoNotas.objects.filter(
+                    aluno=self.aluno,
+                    grade=self.grade,
+                    nota_final__isnull=False
+                ).aggregate(media=Avg('nota_final'))['media'] or Decimal('0.00')
+
+                self.media_final = round(Decimal(media), 1)
+                # Salva novamente apenas esse campo
+                compoe = ComposicaoNotas.objects.filter(pk=self.pk, trimestre = tFinal)
+                print(f'esse agora {compoe}')
+                compoe.update_or_create(
+                    nota_final=self.media_final,
+                    trimestre = tFinal,                        
+                )
+            except Trimestre.DoesNotExist:
+                pass  # Trimestre final ainda não foi definido no sistema
 
     def __str__(self):
         return self.aluno.aluno.nome_completo
