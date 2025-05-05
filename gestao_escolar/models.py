@@ -667,7 +667,7 @@ class GestaoTurmas(models.Model):
     parecer_descritivo = models.TextField(max_length=500, default="Ainda não há parecer do aluno para esse período")
 
     faltas_total = models.IntegerField(null=True, blank=True)
-    recuperacao_final = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    recuperacao_final = models.DecimalField("Recuperaçao Final", max_digits=5, decimal_places=2, null=True, blank=True)
     media_final = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)   
 
     media_anterior_conselho_classe = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)

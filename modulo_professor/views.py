@@ -143,6 +143,63 @@ def criaNotasComposicao(request, aluno, grade, trimestre):
     return render(request, "modulo_professor/partial/notas/notas.html", {"form": form})
 
 
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import ComposicaoNotas, GestaoTurmas, Trimestre, Matriculas, TurmaDisciplina
+from django.contrib import messages
+
+from django import forms
+from .models import ComposicaoNotas
+
+class ComposicaoNotasForm(forms.ModelForm):
+    class Meta:
+        model = ComposicaoNotas
+        fields = ['recuperacao_final']  # adicione outros campos se quiser exibir mais
+
+
+def atualizaRecuperaFinal(request, pk, grade):
+    # Obtém o trimestre final
+    try:
+        tFinal = Trimestre.objects.get(final=True)
+    except Trimestre.DoesNotExist:
+        messages.error(request, "Trimestre final não está configurado.")
+        return redirect('sua_view_de_erro')  # Redirecione apropriadamente
+
+    # Obtém ou cria ComposicaoNotas para esse aluno/grade no trimestre final
+    aluno = get_object_or_404(Matriculas, pk=pk)
+    grade_disc = get_object_or_404(TurmaDisciplina, pk=grade)
+
+    comp, created = ComposicaoNotas.objects.get_or_create(
+        aluno=aluno,
+        grade=grade_disc,
+        trimestre=tFinal
+    )
+
+    if request.method == 'POST':
+        form = ComposicaoNotasForm(request.POST, instance=comp)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Recuperação final atualizada com sucesso. Aluno {aluno}")
+            return redirect('modulo_professor:homeProfessor')  # Redirecione após salvar
+        else:
+            messages.error(request, "Erro ao salvar os dados. Verifique o formulário.")
+    else:
+        form = ComposicaoNotasForm(instance=comp)
+
+    context = {
+        'form': form,
+        'aluno': aluno,
+        'grade': grade_disc,
+        'composicao': comp,
+        'criado': created
+    }
+
+    return render(request, 'modulo_professor/partial/recuperação/recuperaFinal.html', context)
+
+
+            
+
+
+
 
 
 

@@ -149,13 +149,20 @@
         <table class="table table-striped table-bordered">
           <thead class='bg-secondary '>
             <tr>
-              <th scope="col" class="ocultar text-light">#</th>
-              <th scope="col" class='text-light'>Nome do aluno</th>
+              <th scope="col" class="ocultar text-light align-middle">#</th>
+              <th scope="col" class='text-light align-middle'>Nome do aluno</th>
               {% for t in trimestre %}
-              <th scope="col" class='text-center text-light'>{{t}}</th>
+              <th scope="col" {% if t.final %}  rowspan="2"  colspan="2"{% endif %} class='text-center text-light align-middle p-0'>
+                <div class="w-100 mb-2 pt-1 ">{{t}}</div>
+                {% if t.final %}  
+                <div class="d-flex ">
+                  <div class="col border">N</div>
+                  <div class="col border bg-info">Rec</div>
+                </div>
+                {% endif %}
+              </th>
               {% endfor %}
-              
-              
+              <th scope="col" class='text-light align-middle text-center'>Ação</th>              
             </tr>
           </thead>
           <tbody>
@@ -167,13 +174,22 @@
                     {% with nota=a.compoeNotaAlunos_related.all|get_nota_por_trimestre:t %}
                       <td class="text-center {% if nota.nota_final <= 4.99 %}text-danger{% endif %}">
                         {% if nota %}
-                          {{ nota.nota_final }}
-                        {% else %}
-                                                  -
+                          {{ nota.nota_final }} 
                         {% endif %}
-                      </td>                      
+                      </td> 
+                      {% if t.final %}    
+                      <td class="text-center {% if nota.nota_final <= 4.99 %}text-danger{% endif %}">
+                        {% if nota %}
+                          {% if nota.recuperacao_final %}
+                            {{ nota.recuperacao_final }} 
+                            {% else %}
+                          {% endif %}
+                        {% endif %}
+                      </td>  
+                      {% endif %}                  
                     {% endwith %}
                   {% endfor %}
+                  <td class="small text-center"><a class='btn btn-sm btn-primary' href="{% url "modulo_professor:atualiza_recuperacao_final" a.id grade.id %}">Recuperação</a></td>                 
               </tr>
             {% endfor %}          
           </tbody>
