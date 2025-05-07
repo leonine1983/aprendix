@@ -1,21 +1,36 @@
 {% extends "modulo_professor/base.html" %}
 
 {% block main %}  
-<h2>Lançamento de Notas</h2>
 
-<form method="post">
-    <div class="d-flex">
-        {% csrf_token %}
-        {% for field in form  %}
-            <div>
-                {{field.label_tag}}
-                {{field}}
-            </div>    
-        {% endfor %}
+    <div  class='imprimir bg-light rounded-3 shadow '>
+        <div class="p-2 shadow shadown-sm ">
+            <section class='d-flex '><h1>{{grade.turma}} </h1> | {{grade}}</section>
+            <section class='fs-3 mx-5 text-center '><h2>Composiçao de notas do aluno</h2> {{aluno}}</section>
+            <section class='fs-3 mx-5 text-center '> </section>
+        </div>
+        <div class="d-flex justify-content-between w-50 m-auto mt-4 mb-5">         
+
+            <form method="post">
+                <div class="d-flex">
+                    {% csrf_token %}
+                    <div class="row border">
+                        {% for field in form %}
+                            <div class="col-12 col-md-6 col-lg-4 p-3">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger">
+                                        {{ field.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>            
+                </div>
+                <button type="submit" class="btn btn-primary mb-3 mt-3">Lançar Notas</button>
+            </form>
+        </div>
     </div>
-
-  <button type="submit" class="btn btn-primary">Lançar Notas</button>
-</form>
 
 
 {% endblock main %}

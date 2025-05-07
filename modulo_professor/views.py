@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from gestao_escolar.models import TurmaDisciplina, AnoLetivo, GestaoTurmas, Trimestre, Matriculas
+from gestao_escolar.models import Turmas, TurmaDisciplina, AnoLetivo, GestaoTurmas, Trimestre, Matriculas, Presenca
 from rh.models import Escola
 from .models import ComposicaoNotas
 from django.contrib import messages
@@ -140,7 +140,10 @@ def criaNotasComposicao(request, aluno, grade, trimestre):
     else:
         form = ComposicaoNotasForm(instance=composicao_existente)
 
-    return render(request, "modulo_professor/partial/notas/notas.html", {"form": form})
+    return render(request, "modulo_professor/partial/notas/notas.html", {
+        "form": form,
+        'grade': grade_obj,
+        'aluno': aluno_obj})
 
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -150,7 +153,7 @@ from django.contrib import messages
 from django import forms
 from .models import ComposicaoNotas
 
-class ComposicaoNotasForm(forms.ModelForm):
+class ComposicaoRecuperaForm(forms.ModelForm):
     class Meta:
         model = ComposicaoNotas
         fields = ['recuperacao_final']  # adicione outros campos se quiser exibir mais
@@ -175,7 +178,7 @@ def atualizaRecuperaFinal(request, pk, grade):
     )
 
     if request.method == 'POST':
-        form = ComposicaoNotasForm(request.POST, instance=comp)
+        form = ComposicaoRecuperaForm(request.POST, instance=comp)
         if form.is_valid():
             form.save()
             messages.success(request, f"Recuperação final atualizada com sucesso. Aluno {aluno}")
@@ -183,7 +186,7 @@ def atualizaRecuperaFinal(request, pk, grade):
         else:
             messages.error(request, "Erro ao salvar os dados. Verifique o formulário.")
     else:
-        form = ComposicaoNotasForm(instance=comp)
+        form = ComposicaoRecuperaForm(instance=comp)
 
     context = {
         'form': form,
@@ -194,18 +197,6 @@ def atualizaRecuperaFinal(request, pk, grade):
     }
 
     return render(request, 'modulo_professor/partial/recuperação/recuperaFinal.html', context)
-
-
-            
-
-
-
-
-
-
-
-
-
 
 
 @login_required
@@ -225,80 +216,59 @@ def home_sessaoIniciada(request):
     return redirect("modulo_professor:homeProfessor")
 
 
+# PRESENÇA ------------------------------------------------------------------
+from django.shortcuts import render, get_object_or_404, redirect
+from datetime import date
+
+# PRESENÇA DIÁRIA
+def registrar_presenca_diaria_view(request, turma_id):
+    turma = get_object_or_404(Turmas, id=turma_id)
+    matriculas = Matriculas.objects.filter(turma=turma)
+
+    if request.method == 'POST':
+        data_presenca = request.POST.get('data')
+        alunos_presentes_ids = request.POST.getlist('presentes')
+        for matricula in matriculas:
+            presente = str(matricula.id) in alunos_presentes_ids
+            Presenca.objects.update_or_create(
+                matricula=matricula,
+                data=data_presenca,
+                turma_disciplina=None,
+                aula_numero=None,
+                defaults={'presente': presente, 'controle_diario': True}
+            )
+        return redirect('sucesso')  # Crie uma página de sucesso simples se desejar
+
+    return render(request, 'modulo_professor/partial/presenca/presenca_diaria.html', {
+        'matriculas': matriculas,
+        'turma': turma,
+        'today': date.today()
+    })
 
 
+# PRESENÇA POR AULA
+def registrar_presenca_por_aula_view(request, turma_disciplina_id):
+    turma_disciplina = get_object_or_404(TurmaDisciplina, id=turma_disciplina_id)
+    turma = turma_disciplina.turma
+    matriculas = Matriculas.objects.filter(turma=turma)
 
+    if request.method == 'POST':
+        data_presenca = request.POST.get('data')
+        aula_numero = request.POST.get('aula_numero')
+        alunos_presentes_ids = request.POST.getlist('presentes')
+        for matricula in matriculas:
+            presente = str(matricula.id) in alunos_presentes_ids
+            Presenca.objects.update_or_create(
+                matricula=matricula,
+                data=data_presenca,
+                turma_disciplina=turma_disciplina,
+                aula_numero=aula_numero,
+                defaults={'presente': presente, 'controle_diario': False}
+            )
+        return redirect('sucesso')
 
-
-
-
-
-
-
-"""
-request.session['escola_nome_query'] = escola
-
-
-class TurmaDisciplina(models.Model):
-    turma = models.ForeignKey(Turmas, related_name='gradeTurma_related', on_delete=models.CASCADE, null=True)
-    disciplina = models.ForeignKey(Disciplina, on_delete=models.CASCADE, null=True)
-    quant_aulas_semana = models.IntegerField(default=5, null=True)
-    quant_aulas_dia = models.IntegerField(default=3, null=True)
-    professor = models.ForeignKey(Encaminhamentos, related_name='gradeProfessor1_related', on_delete=models.PROTECT, null=True)
-    professo2 = models.ForeignKey(Encaminhamentos, related_name='gradeProfessor2_related', on_delete=models.PROTECT, null=True, blank=True)
-    reserva_tecnica = models.ForeignKey(Encaminhamentos, related_name='reservaTecnica_related',on_delete=models.PROTECT,  null=True, blank=True)
-    auxiliar_classe = models.ForeignKey(Encaminhamentos, related_name='auxiliarClasse_related',on_delete=models.PROTECT, null=True, blank=True)
-
-    carga_horaria_anual = models.IntegerField(null=True)
-    limite_faltas = models.IntegerField(null=True)
-
-    def __str__(self):
-        return f'{self.disciplina.nome} - {self.professor.encaminhamento}'
-
-class Turmas(models.Model):
-    nome = models.CharField(max_length=10)
-    descritivo_turma = models.CharField(max_length=10, default='única')
-    escola = models.ForeignKey('rh.Escola', on_delete=models.CASCADE)
-    ano_letivo = models.ForeignKey(AnoLetivo, on_delete=models.CASCADE)
-    serie =  models.ForeignKey(Serie_Escolar, on_delete=models.CASCADE)
-    turno = models.CharField(choices=turno, null=False, default=1, max_length=12)        
-    turma_multiserie = models.BooleanField(null=True, default=False)
-    turma_concluida = models.BooleanField(null=True, default=False)
-    quantidade_vagas = models.IntegerField(default=36) 
-    vagas_disponiveis = models.IntegerField(null=True)
-
-
-
-class GestaoTurmas(models.Model):
-    aluno = models.ForeignKey(Matriculas, related_name='gestao_turmas_related', null=True, on_delete=models.CASCADE)
-    grade = models.ForeignKey(TurmaDisciplina, null=True, related_name='grade_disciplina', on_delete=models.CASCADE)
-    trimestre = models.ForeignKey(Trimestre, related_name='trimestre_related_turma', null=True, on_delete=models.CASCADE)
-    notas = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    faltas = models.IntegerField(null=True, blank=True)
-    profissional_resp = models.CharField(max_length=40, null=True)
-
-
-
-
-
-class GestaoTurmas(models.Model):
-    aluno = models.ForeignKey(Matriculas, related_name='gestao_turmas_related', null=True, on_delete=models.CASCADE)
-    grade = models.ForeignKey(TurmaDisciplina, null=True, related_name='grade_disciplina', on_delete=models.CASCADE)
-    trimestre = models.ForeignKey(Trimestre, related_name='trimestre_related_turma', null=True, on_delete=models.CASCADE)
-    notas = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    faltas = models.IntegerField(null=True, blank=True)
-    profissional_resp = models.CharField(max_length=40, null=True)
-    data_hora_mod = models.DateTimeField(null=True)
-
-    parecer_descritivo = models.TextField(max_length=500, default="Ainda não há parecer do aluno para esse período")
-
-    faltas_total = models.IntegerField(null=True, blank=True)
-    recuperacao_final = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    media_final = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)   
-
-    media_anterior_conselho_classe = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    conselho_classe = models.BooleanField(default=False)
-
-    aprovado = models.BooleanField(default=False)
-
-"""
+    return render(request, 'presenca_por_aula.html', {
+        'matriculas': matriculas,
+        'turma_disciplina': turma_disciplina,
+        'today': date.today()
+    })

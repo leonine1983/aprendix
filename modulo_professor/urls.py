@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import home_professor,home_sessaoIniciada, criaNotasComposicao, atualizaRecuperaFinal
+from .views import home_professor,home_sessaoIniciada, criaNotasComposicao, atualizaRecuperaFinal, registrar_presenca_diaria_view
+
 app_name = 'modulo_professor'
 
 urlpatterns = [
@@ -7,4 +8,7 @@ urlpatterns = [
     path('/sessao/', home_sessaoIniciada, name='sessaoEscola'),
     path('notas/criar/<int:aluno>/<int:grade>/<int:trimestre>', criaNotasComposicao, name='criaNotasComposicao'),
     path('recuperacao-final/<int:pk>/<int:grade>/', atualizaRecuperaFinal, name='atualiza_recuperacao_final'),
+
+    path('presenca/diaria/<int:turma_id>/', registrar_presenca_diaria_view, name='presenca_diaria'),
+
 ]

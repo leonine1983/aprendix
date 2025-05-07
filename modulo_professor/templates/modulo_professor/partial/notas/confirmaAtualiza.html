@@ -7,11 +7,24 @@
         <p>Já existem notas registradas para este aluno neste trimestre e disciplina.</p>
         <p>Se você continuar, os dados atuais serão <strong>substituídos</strong> pelas novas informações preenchidas no formulário.</p>
     </div>
-
+    
     <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-
+        <div class="d-flex">
+            {% csrf_token %}
+            <div class="row border bg-light shadow">
+                {% for field in form %}
+                    <div class="col-12 col-md-6 col-lg-4 p-3">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>            
+        </div>
         <input type="hidden" name="confirmar" value="sim">
         
         <div class="mt-3">

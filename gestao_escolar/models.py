@@ -600,7 +600,8 @@ class Periodo(models.Model):
         """
         return self.hora_inicio < other.hora_inicio
     
-
+    
+# Modelos relacionados ao horário de aula e presença dos alunos
 class Validade_horario(models.Model):    
     escola = models.ForeignKey('rh.Escola', related_name='escola_validade_related', on_delete=models.CASCADE, null=True)
     turma = models.ForeignKey(Turmas,null=True, related_name='turma_Validade_related', on_delete=models.CASCADE)  
@@ -610,18 +611,7 @@ class Validade_horario(models.Model):
     horario_ativo = models.BooleanField(default=False)
 
     def __str__(self):
-        return (f'{self.nome_validade}: {self.data_inicio} a {self.data_fim}')
-    
-
-class DiaSemana(models.Model):
-    nome_dia = models.CharField(max_length=10)
-    numero_dia = models.IntegerField()
-    
-    class Meta:
-        ordering = ['numero_dia']
-
-    def __str__(self):
-        return self.nome_dia
+        return (f'{self.nome_validade}: {self.data_inicio} a {self.data_fim}')   
     
 
 class Horario(models.Model):
@@ -638,14 +628,54 @@ class Horario(models.Model):
     def __str__(self):
         return f"Horario - {self.turma} - {self.periodo}"
     
-
+"""
 class Presenca(models.Model):
     horario = models.ForeignKey(Horario, related_name='presencas', on_delete=models.CASCADE)
-    matricula = models.ForeignKey(Matriculas, related_name='presencas', on_delete=models.CASCADE)
+    matricula = models.ForeignKey(Matriculas, related_name='presencas_aluno', on_delete=models.CASCADE)
     presente = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.matricula.aluno.nome_completo} - {self.horario} - {"Presente" if self.presente else "Ausente"}'
+"""
+class Presenca(models.Model):
+    matricula = models.ForeignKey(Matriculas, related_name='presencas_aluno', on_delete=models.CASCADE)
+    data = models.DateField()
+
+    controle_diario = models.BooleanField(default=True)
+
+    turma_disciplina = models.ForeignKey(
+        TurmaDisciplina,
+        related_name='presencas_por_disciplina',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
+    aula_numero = models.PositiveSmallIntegerField(null=True, blank=True)
+
+    presente = models.BooleanField(default=True)
+    observacao = models.TextField(null=True, blank=True)
+
+    # ✅ Horário como referência (opcional)
+    horario = models.ForeignKey(
+        Horario,
+        related_name='presencas',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    class Meta:
+        unique_together = ('matricula', 'data', 'turma_disciplina', 'aula_numero')
+
+    def __str__(self):
+        nome = self.matricula.aluno.nome_completo
+        tipo = "Dia" if self.controle_diario else f"Aula {self.aula_numero} - {self.turma_disciplina}"
+        status = "Presente" if self.presente else "Ausente"
+        return f'{nome} - {self.data} - {tipo} - {status}'
+
+
+
 
 class SequenciaDidatica(models.Model):
     horario = models.ForeignKey(Horario, related_name='sequencias_didaticas', on_delete=models.CASCADE)
@@ -748,6 +778,16 @@ class Agendamento(models.Model):
         return f'Agendamento de {self.aluno} com {self.profissional} em {self.data_agendamento}'
 
 
+
+class DiaSemana(models.Model):
+    nome_dia = models.CharField(max_length=10)
+    numero_dia = models.IntegerField()
+    
+    class Meta:
+        ordering = ['numero_dia']
+
+    def __str__(self):
+        return self.nome_dia
 
 # REGISTROS INICIAIS ---------------------
 
