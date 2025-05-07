@@ -15,10 +15,9 @@ class View_turmas_Grade(LoginRequiredMixin, ListView ):
     def get_queryset(self):
         buscar_turma = self.request.GET.get ('busca-turma')
         if buscar_turma:
-            turmas = Turmas.objects.filter(Q(nome__icontains = buscar_turma))
+            turmas = Turmas.objects.filter(Q(ano_letivo = self.request.session["anoLetivo_id"]))
         else:
-            turmas = Turmas.objects.all()
-
+            turmas = Turmas.objects.filter(ano_letivo = self.request.session["anoLetivo_id"])
         return turmas
 
     def get_context_data(self, **kwargs):
