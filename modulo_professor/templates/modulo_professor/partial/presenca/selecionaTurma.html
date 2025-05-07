@@ -1,0 +1,42 @@
+{% extends "modulo_professor/base.html" %}
+
+{% block main %}  
+<div class="imprimir bg-light rounded-3 shadow p-3">
+    <div class="p-2 shadow-sm">
+        <section class="d-flex flex-wrap align-items-center gap-2">
+            <h1 class="me-3">{{ grade.turma }}</h1>
+            <span class="fs-4">{{ grade }}</span>
+        </section>
+
+    </div>
+
+    <!-- ALERTA EXPLICATIVO -->
+    <div class="alert alert-info mt-4" role="alert">
+        <h5 class="alert-heading">Registro de Frequência</h5>
+        <p>Para registrar a frequência dos alunos, clique na turma correspondente na lista abaixo.</p>
+        <p>Cada item representa uma disciplina vinculada à sua turma. Após clicar, você será direcionado para a página de chamada, onde poderá marcar os alunos presentes ou ausentes na data desejada.</p>
+        <hr>
+        <small class="text-muted">Em caso de dúvidas, entre em contato com a coordenação pedagógica da sua escola.</small>
+    </div>
+
+    <!-- LISTA DE DISCIPLINAS -->
+    <div class="row mt-4">
+        {% for d in pessoa %}
+            <div class="col-12 col-md-6 col-lg-4 mb-3">
+                <div class="list-group shadow-sm">
+                    <a href="{% url 'modulo_professor:presenca_diaria' d.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ d.disciplina }}</strong> — {{ d.turma }} | <b class='fw-bold'>{{ request.session.escola.sigla_escola }}</b>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">
+                            Registrar presença
+                        </span>
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endblock main %}

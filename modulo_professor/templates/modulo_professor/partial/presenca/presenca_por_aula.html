@@ -1,0 +1,19 @@
+<h2>Registrar Presença por Aula</h2>
+<form method="post">
+  {% csrf_token %}
+  <label for="data">Data:</label>
+  <input type="date" name="data" value="{{ data|default:today }}" required><br><br>
+
+  <label for="aula_numero">Número da Aula:</label>
+  <input type="number" name="aula_numero" min="1" max="10" required><br><br>
+
+  <h3>Alunos</h3>
+  {% for matricula in matriculas %}
+    <label>
+      <input type="checkbox" name="presentes" value="{{ matricula.id }}" checked>
+      {{ matricula.aluno.nome_completo }}
+    </label><br>
+  {% endfor %}
+
+  <br><input type="submit" value="Salvar Presença">
+</form>

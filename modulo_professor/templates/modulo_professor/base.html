@@ -564,19 +564,21 @@
     <button id="closeDialog_notas" class="btn btn-secondary mt-5">Fechar</button>
 </dialog>  
 
-<script>
-    const dialog_notas = document.getElementById('instructions_notas');
-    const openButton_notas = document.getElementById('openDialog_notas');
-    const closeButton_notas = document.getElementById('closeDialog_notas');
+  <script>
+      const dialog_notas = document.getElementById('instructions_notas');
+      const openButton_notas = document.getElementById('openDialog_notas');
+      const closeButton_notas = document.getElementById('closeDialog_notas');
 
-    openButton_notas.addEventListener('click', () => {
-        dialog_notas.showModal(); // Abre a caixa de diálogo como modal
-        });
+      openButton_notas.addEventListener('click', () => {
+          dialog_notas.showModal(); // Abre a caixa de diálogo como modal
+          });
 
-    closeButton_notas.addEventListener('click', () => {
-        dialog_notas.close(); // Fecha a caixa de diálogo
-        });
-</script>      
+      closeButton_notas.addEventListener('click', () => {
+          dialog_notas.close(); // Fecha a caixa de diálogo
+          });
+  </script>
+
+   
   
 </body>    
 </html>
