@@ -297,10 +297,6 @@ def registrar_presenca_por_aula_view(request, turma_disciplina_id):
 
 
 
-# Presençã por disciplina
-from django.shortcuts import render, get_object_or_404, redirect
-from datetime import date
-from .models import Matriculas, Turmas, TurmaDisciplina, Horario, Presenca
 
 # PRESENÇA DIÁRIA
 def registrar_presenca_diaria_view(request, turma_id):
