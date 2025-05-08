@@ -249,6 +249,8 @@ from datetime import date
 
 
 
+
+# PRESENÇA DIÁRIA
 @login_required
 def registrar_presenca_por_aula_view(request, turma_disciplina_id):
     turma_disciplina = get_object_or_404(TurmaDisciplina, id=turma_disciplina_id)
@@ -296,32 +298,6 @@ def registrar_presenca_por_aula_view(request, turma_disciplina_id):
     })
 
 
-
-
-# PRESENÇA DIÁRIA
-def registrar_presenca_diaria_view(request, turma_id):
-    turma = get_object_or_404(Turmas, id=turma_id)
-    matriculas = Matriculas.objects.filter(turma=turma)
-
-    if request.method == 'POST':
-        data_presenca = request.POST.get('data')
-        alunos_presentes_ids = request.POST.getlist('presentes')
-        for matricula in matriculas:
-            presente = str(matricula.id) in alunos_presentes_ids
-            Presenca.objects.update_or_create(
-                matricula=matricula,
-                data=data_presenca,
-                turma_disciplina=None,
-                aula_numero=None,
-                defaults={'presente': presente, 'controle_diario': True}
-            )
-        return redirect('sucesso')  # Crie uma página de sucesso simples se desejar
-
-    return render(request, 'presenca_diaria.html', {
-        'matriculas': matriculas,
-        'turma': turma,
-        'today': date.today()
-    })
 
 
 # PRESENÇA POR AULA
