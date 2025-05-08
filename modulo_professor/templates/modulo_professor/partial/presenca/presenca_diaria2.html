@@ -1,0 +1,60 @@
+{% extends "modulo_professor/base.html" %}
+
+{% block main %}  
+<div class="container my-4">
+  <div class="bg-white rounded-4 shadow-sm p-4">
+    
+    <!-- TÍTULO E IDENTIFICAÇÃO -->
+    <div class="d-flex flex-wrap align-items-center mb-3">
+      <h1 class="me-3 mb-0">{{ grade.turma }}</h1>
+      <span class="fs-5 text-muted">{{ grade }}</span>
+    </div>
+
+    <!-- ALERTA INFORMATIVO -->
+    <div class="alert alert-info" role="alert">
+      <h5 class="alert-heading">Registro de Frequência de Alunos</h5>
+      <p class="mb-1">Utilize o formulário abaixo para registrar a presença dos alunos da turma <strong>{{ grade.turma }}</strong>.</p>
+      <p class="mb-2">Selecione a data desejada e marque os alunos que estiveram presentes. Aqueles que não forem marcados serão considerados ausentes.</p>
+      <hr>
+      <small class="text-muted">Em caso de dúvidas, entre em contato com a coordenação pedagógica da sua escola.</small>
+    </div>
+
+    <!-- FORMULÁRIO DE PRESENÇA -->
+    <div class="mt-4">
+      <h2 class="h4 mb-3">Registrar Presença</h2>
+      
+      <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        
+        <div class="mb-3">
+          <label for="data" class="form-label">Data da Aula</label>
+          <input type="date" id="data" name="data" class="form-control" value="{{ data }}" required >
+        </div>
+
+        <div class="mb-3">
+          <h3 class="h5">Lista de Alunos</h3>
+          <p class="text-muted mb-2">Marque os alunos que estiveram presentes nesta data:</p>
+          <div class="form-check">
+            {% for matricula in matriculas %}
+              <div class="form-check mb-1">
+                <input class="form-check-input" type="checkbox" id="matricula_{{ matricula.id }}" name="presentes" value="{{ matricula.id }}" checked>
+                <label class="form-check-label px-1" for="matricula_{{ matricula.id }}">
+                  {{ matricula.aluno.nome_completo }}
+                </label>
+              </div>
+              <a href="{% url 'modulo_professor:historico_faltas' matricula.id %}">
+                Ver faltas
+            </a>
+            
+            {% endfor %}
+          </div>
+        </div>
+        
+
+        <button type="submit" class="btn btn-primary mt-3">Salvar Frequência</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock main %}

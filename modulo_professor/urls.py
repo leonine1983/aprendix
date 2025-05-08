@@ -1,5 +1,8 @@
 from django.urls import path
-from .views import home_professor,home_sessaoIniciada, criaNotasComposicao, atualizaRecuperaFinal, registrar_presenca_diaria_view, selecionaTurma, registrar_presenca_por_aula_view
+from .views import (home_professor,home_sessaoIniciada, criaNotasComposicao, 
+                    atualizaRecuperaFinal, registrar_presenca_diaria_view, 
+                    selecionaTurma, registrar_presenca_por_aula_view, 
+                    historico_faltas_view, historico_faltas_view)
 
 app_name = 'modulo_professor'
 
@@ -11,8 +14,10 @@ urlpatterns = [
 
     path('presenca/diaria/seleciona/', selecionaTurma, name='selecionaTurmaFalta'),
     path('presenca/diaria/<int:turma_id>/', registrar_presenca_diaria_view, name='presenca_diaria'),
+    path('faltas/<int:matricula_id>/', historico_faltas_view, name='historico_faltas'),
 
     path('presenca/aula/<int:turma_disciplina_id>/', registrar_presenca_por_aula_view, name='presenca_por_aula'),
+    #path('historico-faltas/<int:matricula_id>/<int:turma_disciplina_id>/', historico_faltasPAula_view, name='historico_faltas'),
     #path('sucesso/', lambda request: render(request, 'sucesso.html'), name='sucesso'),
 
 ]

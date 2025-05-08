@@ -1,0 +1,61 @@
+{% extends "modulo_professor/base.html" %}
+
+{% load static %}
+{% load meus_filtros %}
+
+{% block main %}
+<div class="container mt-4">
+    <div class="bg-light rounded-3 shadow p-3">
+        <div class="p-2 shadow-sm mb-3">
+            <section class="d-flex flex-wrap align-items-center gap-2">
+                <h1 class="me-3">{{ grade.turma }}</h1>
+                <span class="fs-4">{{ grade }}</span>
+            </section>
+        </div>
+
+        <!-- ALERTA EXPLICATIVO -->
+        <div class="alert alert-info mt-4" role="alert">
+            <h5 class="alert-heading">Registro de Frequência</h5>
+            <p>Para registrar a frequência dos alunos, clique na turma correspondente na lista abaixo.</p>
+            <p>Cada item representa uma disciplina vinculada à sua turma. Após clicar, você será direcionado para a página de chamada, onde poderá marcar os alunos presentes ou ausentes na data desejada.</p>
+            <hr>
+            <small class="text-muted">Em caso de dúvidas, entre em contato com a coordenação pedagógica da sua escola.</small>
+        </div>
+
+        <!-- HISTÓRICO DE FALTAS -->
+        <h2>Histórico de Faltas - {{ matricula.aluno.nome_completo }}</h2>
+
+        {% for mes, faltas in faltas_por_mes.items %}
+        <div class="mb-4">
+            <h3>Mês: {{ mes }}/2025</h3>
+
+            <!-- Tabela Responsiva -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead>
+                        <tr>
+                            {% for dia in dias_do_mes %}
+                            <th>{{ dia }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            {% for dia in faltas %}
+                            <td class="{% if dia == 'F' %}text-danger font-weight-bold{% endif %}">
+                                {% if dia == 'F' %}
+                                    F
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

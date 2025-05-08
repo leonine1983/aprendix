@@ -206,11 +206,141 @@ def home_sessaoIniciada(request):
 
 
 # PRESENÇA ------------------------------------------------------------------
-from django.shortcuts import render, get_object_or_404, redirect
+
+# PRESENÇA DIÁRIA ------------------------
+@login_required
+def registrar_presenca_diaria_view(request, turma_id):
+    turma = get_object_or_404(Turmas, id=turma_id)
+    matriculas = Matriculas.objects.filter(turma=turma)
+
+    if request.method == 'POST':
+        data_presenca_str = request.POST.get('data')
+        try:
+            data_presenca = datetime.strptime(data_presenca_str, '%Y-%m-%d').date()
+        except ValueError:
+            return render(request, 'modulo_professor/partial/presenca/presenca_diaria.html', {
+                'matriculas': matriculas,
+                'turma': turma,
+                'today': date.today(),
+                'erro': 'Data inválida. Use o formato yyyy-mm-dd.'
+            })
+
+        alunos_presentes_ids = request.POST.getlist('presentes')
+        for matricula in matriculas:
+            presente = str(matricula.id) in alunos_presentes_ids
+            Presenca.objects.update_or_create(
+                matricula=matricula,
+                data=data_presenca,
+                turma_disciplina=None,
+                aula_numero=None,
+                defaults={'presente': presente, 'controle_diario': True}
+            )
+        return redirect('sucesso')  # Ajuste para a URL de sucesso de sua aplicação
+
+    return render(request, 'modulo_professor/partial/presenca/presenca_diaria.html', {
+        'matriculas': matriculas,
+        'turma': turma,
+        'today': date.today()
+    })
+
+
+
+# ------- Mostra faltas -------------------------
+from collections import defaultdict
+from django.shortcuts import render, get_object_or_404
+from datetime import datetime
+
+from django.shortcuts import render
+
+@login_required
+def historico_faltas_view(request, matricula_id):
+    matricula = get_object_or_404(Matriculas, id=matricula_id)
+    presencas = Presenca.objects.filter(matricula=matricula).order_by('data')
+
+    faltas_por_mes = defaultdict(lambda: [None]*31)  # 31 dias no máximo
+
+    for presenca in presencas:
+        if not presenca.presente:
+            mes = presenca.data.month
+            dia = presenca.data.day
+            faltas_por_mes[mes][dia - 1] = 'F'  # 'F' para Falta
+
+    # Gerando intervalo de dias para passar ao template
+    dias_do_mes = list(range(1, 32))  # Dias de 1 a 31
+
+    return render(request, 'modulo_professor/partial/presenca/historico_faltasDias.html', {
+        'matricula': matricula,
+        'faltas_por_mes': dict(faltas_por_mes),
+        'dias_do_mes': dias_do_mes,
+    })
+
+
+
+
+# PRESENÇA POR AULA
+@login_required
+def selecionaTurma(request):
+    userProfessor = request.user.related_vinculoUserPessoa
+    pessoa = userProfessor.pessoa.id  
+    professorGrade = TurmaDisciplina.objects.filter(professor__encaminhamento__contratado__id=pessoa)
+    return render(request, 'modulo_professor/partial/presenca/selecionaTurma.html', {'pessoa':professorGrade})
+
+
 from datetime import date
 
-# PRESENÇA DIÁRIA
+
 @login_required
+def registrar_presenca_por_aula_view(request, turma_disciplina_id):
+    turma_disciplina = get_object_or_404(TurmaDisciplina, id=turma_disciplina_id)
+    turma = turma_disciplina.turma
+    matriculas = Matriculas.objects.filter(turma=turma)
+
+    if request.method == 'POST':
+        data_presenca_str = request.POST.get('data')
+        aula_numero = request.POST.get('aula_numero')
+        alunos_presentes_ids = request.POST.getlist('presentes')
+
+        # Conversão da data de dd/mm/aaaa para yyyy-mm-dd
+        try:
+            dia, mes, ano = map(int, data_presenca_str.split('/'))
+            data_presenca = date(ano, mes, dia)
+        except ValueError:
+            return render(request, 'modulo_professor/partial/presenca/presenca_por_aula.html', {
+                'matriculas': matriculas,
+                'turma_disciplina': turma_disciplina,
+                'data': data_presenca_str,
+                'erro': 'Data inválida. Use o formato dd/mm/aaaa.'
+            })
+
+        # Registro das presenças por aula
+        for matricula in matriculas:
+            presente = str(matricula.id) in alunos_presentes_ids
+            Presenca.objects.update_or_create(
+                matricula=matricula,
+                data=data_presenca,
+                turma_disciplina=turma_disciplina,
+                aula_numero=aula_numero,
+                defaults={'presente': presente, 'controle_diario': False}
+            )
+
+        return redirect('sucesso')  # Ajuste para a URL de sucesso de sua aplicação
+
+    # Envia a data atual formatada como dd/mm/aaaa
+    data_formatada = date.today().strftime('%d/%m/%Y')
+
+    return render(request, 'modulo_professor/partial/presenca/presenca_por_aula.html', {
+        'matriculas': matriculas,
+        'turma_disciplina': turma_disciplina,
+        'data': data_formatada
+    })
+
+
+
+
+
+
+# PRESENÇA DIÁRIA
+"""
 def registrar_presenca_diaria_view(request, turma_id):
     turma = get_object_or_404(Turmas, id=turma_id)
     matriculas = Matriculas.objects.filter(turma=turma)
@@ -229,100 +359,9 @@ def registrar_presenca_diaria_view(request, turma_id):
             )
         return redirect('sucesso')  # Crie uma página de sucesso simples se desejar
 
-    return render(request, 'modulo_professor/partial/presenca/presenca_diaria.html', {
+    return render(request, 'presenca_diaria.html', {
         'matriculas': matriculas,
         'turma': turma,
         'today': date.today()
-    })
+    })"""
 
-
-# PRESENÇA POR AULA
-@login_required
-def selecionaTurma(request):
-    userProfessor = request.user.related_vinculoUserPessoa
-    pessoa = userProfessor.pessoa.id  
-    professorGrade = TurmaDisciplina.objects.filter(professor__encaminhamento__contratado__id=pessoa)
-    return render(request, 'modulo_professor/partial/presenca/selecionaTurma.html', {'pessoa':professorGrade})
-
-
-from datetime import date
-
-
-
-
-# PRESENÇA DIÁRIA
-@login_required
-def registrar_presenca_por_aula_view(request, turma_disciplina_id):
-    turma_disciplina = get_object_or_404(TurmaDisciplina, id=turma_disciplina_id)
-    turma = turma_disciplina.turma
-    matriculas = Matriculas.objects.filter(turma=turma)
-
-    if request.method == 'POST':
-        data_presenca_str = request.POST.get('data')
-        aula_numero = request.POST.get('aula_numero')
-        alunos_presentes_ids = request.POST.getlist('presentes')
-
-        # Conversão da data de dd/mm/aaaa para yyyy-mm-dd para salvar corretamente
-        try:
-            dia, mes, ano = map(int, data_presenca_str.split('/'))
-            data_presenca = date(ano, mes, dia)
-        except ValueError:
-            # Se a data estiver inválida, recarrega a página com erro
-            return render(request, 'presenca_por_aula.html', {
-                'matriculas': matriculas,
-                'turma_disciplina': turma_disciplina,
-                'data': data_presenca_str,
-                'erro': 'Data inválida. Use o formato dd/mm/aaaa.'
-            })
-
-        # Registro das presenças
-        for matricula in matriculas:
-            presente = str(matricula.id) in alunos_presentes_ids
-            Presenca.objects.update_or_create(
-                matricula=matricula,
-                data=data_presenca,
-                turma_disciplina=turma_disciplina,
-                aula_numero=aula_numero,
-                defaults={'presente': presente, 'controle_diario': False}
-            )
-
-        return redirect('sucesso')  # ajuste para a sua URL de sucesso
-
-    # Envia a data atual formatada como dd/mm/aaaa
-    data_formatada = date.today().strftime('%d/%m/%Y')
-
-    return render(request, 'presenca_por_aula.html', {
-        'matriculas': matriculas,
-        'turma_disciplina': turma_disciplina,
-        'data': data_formatada
-    })
-
-
-
-
-# PRESENÇA POR AULA
-def registrar_presenca_por_aula_view(request, turma_disciplina_id):
-    turma_disciplina = get_object_or_404(TurmaDisciplina, id=turma_disciplina_id)
-    turma = turma_disciplina.turma
-    matriculas = Matriculas.objects.filter(turma=turma)
-
-    if request.method == 'POST':
-        data_presenca = request.POST.get('data')
-        aula_numero = request.POST.get('aula_numero')
-        alunos_presentes_ids = request.POST.getlist('presentes')
-        for matricula in matriculas:
-            presente = str(matricula.id) in alunos_presentes_ids
-            Presenca.objects.update_or_create(
-                matricula=matricula,
-                data=data_presenca,
-                turma_disciplina=turma_disciplina,
-                aula_numero=aula_numero,
-                defaults={'presente': presente, 'controle_diario': False}
-            )
-        return redirect('sucesso')
-
-    return render(request, 'presenca_por_aula.html', {
-        'matriculas': matriculas,
-        'turma_disciplina': turma_disciplina,
-        'today': date.today()
-    })

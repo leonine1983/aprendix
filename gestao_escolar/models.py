@@ -666,6 +666,9 @@ class Presenca(models.Model):
     )
 
     class Meta:
+        app_label = 'modulo_professor'
+        verbose_name = 'Frequência do aluno'
+        verbose_name_plural = 'Frequências dos alunos'
         unique_together = ('matricula', 'data', 'turma_disciplina', 'aula_numero')
 
     def __str__(self):

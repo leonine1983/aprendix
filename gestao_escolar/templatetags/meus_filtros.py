@@ -38,3 +38,8 @@ def first_item(value):
 @register.filter
 def get_nota_por_trimestre(notas, trimestre):
     return next((n for n in notas if n.trimestre == trimestre), None)
+
+
+@register.filter
+def to(value):
+    return range(1, value + 1)
