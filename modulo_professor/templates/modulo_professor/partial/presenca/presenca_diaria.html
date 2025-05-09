@@ -1,24 +1,75 @@
-<form method="post">
-  {% csrf_token %}
-  <h2>Registrar Presença - {{ turma.nome }}</h2>
-  <label for="data">Data:</label>
-  <input type="date" name="data" value="{{ today|date:'Y-m-d' }}" required>
+{% extends "modulo_professor/base.html" %}
 
-  <ul>
-      {% for matricula in matriculas %}
-          <li>
-              <label>
-                  <input type="checkbox" name="presentes" value="{{ matricula.id }}">
-                  {{ matricula.aluno.nome_completo }}
-              </label>
-          </li>
-          <a href="{% url 'modulo_professor:historico_faltas' matricula.id %}">ver<a>
-      {% endfor %}
-  </ul>
+{% block main %}
+<div class="container my-4">
+  <div class="bg-white rounded-4 shadow-sm p-4">
+    
+    <!-- Cabeçalho -->
+    <div class="d-flex flex-wrap align-items-center mb-4">
+      <h1 class="me-3 mb-0">{{ grade.turma }}</h1>
+      <span class="fs-5 text-muted">{{ grade }}</span>
+    </div>
 
-  <button type="submit">Salvar Presençasdd</button>
-</form>
+    <!-- Alerta informativo -->
+    <div class="alert alert-info">
+      <h5 class="alert-heading">Registro de Frequência de Alunos</h5>
+      <p>Utilize o formulário abaixo para registrar a presença dos alunos da turma <strong>{{ grade.turma }}</strong>.</p>
+      <p>Selecione a data desejada e marque os alunos que estiveram presentes. Os não marcados serão considerados ausentes.</p>
+      <hr>
+      <small class="text-muted">Em caso de dúvidas, entre em contato com a coordenação pedagógica.</small>
+    </div>
 
-{% if erro %}
-<p style="color: red;">{{ erro }}</p>
-{% endif %}
+    <!-- Formulário de presença -->
+    <form method="post" class="mt-4">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="data" class="form-label fw-semibold">Data da Aula</label>
+        <input type="date" name="data" id="data" class="form-control" value="{{ today|date:'Y-m-d' }}" required>
+      </div>
+
+      <h2 class="h5 mt-4 mb-3">Alunos da Turma</h2>
+      <div class="list-group mb-3">
+        {% for matricula in matriculas %}
+          <label class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <input type="checkbox"
+                     class="form-check-input me-2 aluno-checkbox"
+                     name="presentes"
+                     value="{{ matricula.id }}"
+                     id="checkbox-{{ matricula.id }}"
+                     checked>
+              <span class="aluno-nome" data-id="{{ matricula.id }}">{{ matricula.aluno.nome_completo }}</span>
+              <span class="text-danger fw-bold ms-2 d-none" id="falta-{{ matricula.id }}">[Faltou]</span>
+            </div>
+            <a href="{% url 'modulo_professor:historico_faltas' matricula.id %}" class="btn btn-sm btn-outline-primary">Ver histórico</a>
+          </label>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="btn btn-success w-100 py-2 fw-bold">
+        Salvar Presenças
+      </button>
+
+      {% if erro %}
+        <div class="alert alert-danger mt-3" role="alert">
+          {{ erro }}
+        </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.aluno-checkbox').forEach(function(checkbox) {
+    checkbox.addEventListener('change', function() {
+      const id = this.value;
+      const faltaLabel = document.getElementById('falta-' + id);
+      if (this.checked) {
+        faltaLabel.classList.add('d-none');
+      } else {
+        faltaLabel.classList.remove('d-none');
+      }
+    });
+  });
+</script>
+{% endblock main %}

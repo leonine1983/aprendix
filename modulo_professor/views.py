@@ -235,13 +235,33 @@ def registrar_presenca_diaria_view(request, turma_id):
                 aula_numero=None,
                 defaults={'presente': presente, 'controle_diario': True}
             )
-        return redirect('sucesso')  # Ajuste para a URL de sucesso de sua aplicação
+        return redirect('modulo_professor:lista_presenca_diaria', turma.id, data_presenca.strftime('%Y-%m-%d'))
+
 
     return render(request, 'modulo_professor/partial/presenca/presenca_diaria.html', {
         'matriculas': matriculas,
         'turma': turma,
         'today': date.today()
     })
+
+
+@login_required
+def lista_presenca_diaria_view(request, turma_id, data_str):
+    turma = get_object_or_404(Turmas, id=turma_id)
+    data_presenca = datetime.strptime(data_str, '%Y-%m-%d').date()
+    
+    presencas = Presenca.objects.filter(turma_disciplina=None, controle_diario=True, data=data_presenca, matricula__turma=turma)
+
+    alunos_presentes = presencas.filter(presente=True)
+    alunos_faltosos = presencas.filter(presente=False)
+
+    return render(request, 'modulo_professor/partial/presenca/lista_presenca_diaria.html', {
+        'turma': turma,
+        'data': data_presenca,
+        'presentes': alunos_presentes,
+        'faltosos': alunos_faltosos,
+    })
+
 
 
 

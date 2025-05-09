@@ -1,0 +1,137 @@
+{% extends "modulo_professor/base.html" %}
+
+{% block main %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Relatório de Presença</h2>
+        <button class="btn btn-secondary" onclick="printDiv('conteudo-impressao')">
+            <i class="bi bi-printer me-1"></i> Imprimir
+        </button>
+    </div>
+
+    <div id="conteudo-impressao" class="bg-white shadow-sm rounded-4 p-4">
+
+        <div class="text-center mb-2">
+            <h3 class="fw-bold mb-1">Relatório de Presença de Alunos</h3>
+            <p class="mb-0">Turma: <strong>{{ turma }}</strong></p>
+            <p class="mb-0">Data do registro: <strong>{{ data|date:"d/m/Y" }}</strong></p>
+        </div>
+
+        <div class="mb-2">
+            <p class="text-muted mb-0">
+                Este relatório apresenta a lista de alunos que estiveram presentes e ausentes na turma informada na data especificada.
+                A presença é marcada automaticamente, e o professor pode desmarcar os alunos que estiveram ausentes no momento do registro.
+            </p>
+        </div>
+
+        <div class="row g-2">
+            <div class="col-md-6">
+                <div class="border-start border-success ps-2">
+                    <h5 class="text-success fw-bold mb-2 mt-0">Alunos Presentes ({{ presentes.count }})</h5>
+                    <ul class="list-group">
+                        {% for presenca in presentes %}
+                            <li class="list-group-item p-1">{{ presenca.matricula.aluno.nome_completo }}</li>
+                        {% empty %}
+                            <li class="list-group-item text-muted p-1">Nenhum aluno presente.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="border-start border-danger ps-2">
+                    <h5 class="text-danger fw-bold mb-2 mt-0">Alunos Faltosos ({{ faltosos.count }})</h5>
+                    <ul class="list-group">
+                        {% for presenca in faltosos %}
+                            <li class="list-group-item p-1">{{ presenca.matricula.aluno.nome_completo }}</li>
+                        {% empty %}
+                            <li class="list-group-item text-muted p-1">Nenhum aluno faltou.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-start mt-3">
+        <a href="{% url 'modulo_professor:presenca_diaria' turma.id %}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+</div>
+
+<script>
+    function printDiv(divId) {
+        const originalContent = document.body.innerHTML;
+        const printContent = document.getElementById(divId).innerHTML;
+        document.body.innerHTML = printContent;
+        window.print();
+        document.body.innerHTML = originalContent;
+        location.reload();
+    }
+</script>
+
+<style>
+    @media print {
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            font-size: 12px; /* Reduzir o tamanho da fonte geral */
+        }
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #conteudo-impressao {
+            padding: 10px; /* Reduzir o padding geral do conteúdo */
+            margin-bottom: 5px; /* Reduzir a margem inferior do conteúdo */
+            border: 1px solid #ccc; /* Adicionar uma borda para melhor visualização na impressão */
+        }
+        .text-center {
+            text-align: center;
+            margin-bottom: 5px; /* Reduzir a margem inferior do título e data */
+        }
+        h3 {
+            margin-bottom: 5px; /* Reduzir a margem inferior do título principal */
+            font-size: 1.3em; /* Reduzir o tamanho da fonte do título */
+        }
+        h5 {
+            margin-top: 5px; /* Reduzir a margem superior dos subtítulos */
+            margin-bottom: 3px; /* Reduzir a margem inferior dos subtítulos */
+            font-size: 1em; /* Reduzir o tamanho da fonte dos subtítulos */
+        }
+        p {
+            margin-bottom: 3px; /* Reduzir a margem inferior dos parágrafos */
+            font-size: 0.9em; /* Reduzir o tamanho da fonte dos parágrafos */
+        }
+        .row {
+            margin-bottom: 5px; /* Reduzir a margem inferior das linhas */
+            gap: 5px; /* Reduzir o espaçamento entre as colunas */
+            page-break-inside: avoid;
+        }
+        .col-md-6 {
+            padding-left: 5px; /* Reduzir o padding esquerdo das colunas */
+            padding-right: 5px; /* Reduzir o padding direito das colunas */
+        }
+        .list-group {
+            margin-bottom: 0; /* Remover a margem inferior da lista */
+        }
+        .list-group-item {
+            margin: 0;
+            padding: 3px 5px; /* Reduzir o padding dos itens da lista */
+            font-size: 0.8em; /* Reduzir o tamanho da fonte dos itens da lista */
+            border: 1px solid #eee; /* Manter ou ajustar a borda dos itens da lista */
+        }
+        .border-start {
+            padding-left: 5px !important; /* Reduzir o padding esquerdo da borda */
+            border-width: 2px !important;
+        }
+        button, .mt-*, .mb-* {
+            display: none !important; /* Ocultar botões e remover margens do Bootstrap */
+        }
+    }
+</style>
+
+{% endblock %}
