@@ -317,31 +317,43 @@ def registrar_presenca_por_aula_view(request, turma_disciplina_id):
 
     if request.method == 'POST':
         data_presenca_str = request.POST.get('data')
+
+        print(f"a data {data_presenca_str}")
         aula_numero = request.POST.get('aula_numero')
         alunos_presentes_ids = request.POST.getlist('presentes')
-
+        data_presenca = data_presenca_str
         # Conversão da data de dd/mm/aaaa para yyyy-mm-dd
+        """
         try:
             dia, mes, ano = map(int, data_presenca_str.split('/'))
             data_presenca = date(ano, mes, dia)
         except ValueError:
+            
+            print("cair no erroooooooooooooooooooooooooooooo")
+            today = date.today()
             return render(request, 'modulo_professor/partial/presenca/presenca_por_aula.html', {
                 'matriculas': matriculas,
                 'turma_disciplina': turma_disciplina,
                 'data': data_presenca_str,
-                'erro': 'Data inválida. Use o formato dd/mm/aaaa.'
+                'erro': 'Data inválida. Use o formato dd/mm/aaaa.',
+                'today': today,
             })
+        """
 
         # Registro das presenças por aula
         for matricula in matriculas:
             presente = str(matricula.id) in alunos_presentes_ids
-            Presenca.objects.update_or_create(
-                matricula=matricula,
-                data=data_presenca,
-                turma_disciplina=turma_disciplina,
-                aula_numero=aula_numero,
-                defaults={'presente': presente, 'controle_diario': False}
-            )
+            try:
+                Presenca.objects.update_or_create(
+                    matricula=matricula,
+                    data=data_presenca,
+                    turma_disciplina=turma_disciplina,
+                    aula_numero=aula_numero,
+                    defaults={'presente': presente, 'controle_diario': False}
+                )
+            except Exception as e:
+                print(f"Erro ao registrar presença para matrícula {matricula.id}: {e}")
+
 
         return redirect('sucesso')  # Ajuste para a URL de sucesso de sua aplicação
 
