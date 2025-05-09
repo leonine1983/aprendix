@@ -1,19 +1,88 @@
-<h2>Registrar Presença por Aula</h2>
-<form method="post">
-  {% csrf_token %}
-  <label for="data">Data:</label>
-  <input type="date" name="data" value="{{ data|default:today }}" required><br><br>
+{% extends "modulo_professor/base.html" %}
 
-  <label for="aula_numero">Número da Aula:</label>
-  <input type="number" name="aula_numero" min="1" max="10" required><br><br>
+{% block main %}  
+<div class="imprimir bg-white rounded-4 shadow p-4">
+    <div class="mb-4 border-bottom pb-2">
+        <section class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2">
+            <h1 class="me-3 h3 fw-semibold text-primary">{{ grade.turma }}</h1>
+            <span class="fs-6 text-muted">{{ grade }}</span>
+        </section>
+    </div>
 
-  <h3>Alunos</h3>
-  {% for matricula in matriculas %}
-    <label>
-      <input type="checkbox" name="presentes" value="{{ matricula.id }}" checked>
-      {{ matricula.aluno.nome_completo }}
-    </label><br>
-  {% endfor %}
+    <h2 class="h4 mb-3 text-dark">Registrar Presença por Aula</h2>
+    <div class="alert alert-info border-0 rounded-3 shadow-sm small">
+        <div><i class="bi bi-journal-text me-2"></i>{{ turma_disciplina }}</div>
+        <div><i class="bi bi-building me-2"></i>{{ request.session.escola }}</div>
+    </div>
 
-  <br><input type="submit" value="Salvar Presença">
-</form>
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="data" class="form-label">Data</label>
+                <input type="date" name="data" class="form-control border-primary-subtle" value="{{ data|default:today }}" required>
+
+            </div>
+
+            <div class="col-md-6">
+                <label for="aula_numero" class="form-label">Número da Aula</label>
+                <input type="number" name="aula_numero" class="form-control border-primary-subtle" min="1" max="10" required>
+                <div class="form-text text-muted">
+                    Ex: primeira aula do dia = 1, segunda = 2, etc.
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <h3 class="h5 mb-3">Lista de Alunos</h3>
+        <div class="row gy-3">
+            {% for matricula in matriculas %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="border rounded-3 p-3 bg-light d-flex align-items-center justify-content-between">
+                        <div class="form-check form-switch mb-0">
+                            <input 
+                                class="form-check-input" 
+                                type="checkbox" 
+                                name="presentes" 
+                                value="{{ matricula.id }}" 
+                                id="presente-{{ matricula.id }}" 
+                                checked>
+                            <label class="form-check-label ms-2" for="presente-{{ matricula.id }}">
+                                {{ matricula.aluno.nome_completo }}
+                            </label>
+                        </div>
+                        <span class="badge bg-success px-3 py-1" id="status-{{ matricula.id }}">P</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-5">
+            <button type="submit" class="btn btn-primary btn-lg w-100 w-md-auto shadow-sm">
+                <i class="bi bi-save me-2"></i>Salvar Presença
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('input[type="checkbox"][name="presentes"]').forEach((checkbox) => {
+            const statusSpan = document.getElementById(`status-${checkbox.value}`);
+
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    statusSpan.textContent = 'P';
+                    statusSpan.classList.remove('bg-danger');
+                    statusSpan.classList.add('bg-success');
+                } else {
+                    statusSpan.textContent = 'F';
+                    statusSpan.classList.remove('bg-success');
+                    statusSpan.classList.add('bg-danger');
+                }
+            });
+        });
+    });
+</script>
+{% endblock main %}

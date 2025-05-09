@@ -27,7 +27,7 @@
         <input type="date" name="data" id="data" class="form-control" value="{{ today|date:'Y-m-d' }}" required>
       </div>
 
-      <h2 class="h5 mt-4 mb-3">Alunos da Turma</h2>
+      <h2 class="h5 mt-4 mb-3">Alunos da Turma  <a href="{% url 'modulo_professor:lista_presenca_diaria' turma.id today %}" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-eye"></i> Ver Frequência do dia </a></h2>
       <div class="list-group mb-3">
         {% for matricula in matriculas %}
           <label class="list-group-item d-flex justify-content-between align-items-center">

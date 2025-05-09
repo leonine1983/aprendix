@@ -346,12 +346,15 @@ def registrar_presenca_por_aula_view(request, turma_disciplina_id):
         return redirect('sucesso')  # Ajuste para a URL de sucesso de sua aplicação
 
     # Envia a data atual formatada como dd/mm/aaaa
-    data_formatada = date.today().strftime('%d/%m/%Y')
+    today = date.today()
+    data_formatada = today.strftime('%d/%m/%Y')
+
 
     return render(request, 'modulo_professor/partial/presenca/presenca_por_aula.html', {
-        'matriculas': matriculas,
-        'turma_disciplina': turma_disciplina,
-        'data': data_formatada
+    'matriculas': matriculas,
+    'turma_disciplina': turma_disciplina,
+    'data': data_formatada,
+    'today': today,
     })
 
 

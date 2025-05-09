@@ -17,24 +17,38 @@
         <p>Cada item representa uma disciplina vinculada à sua turma. Após clicar, você será direcionado para a página de chamada, onde poderá marcar os alunos presentes ou ausentes na data desejada.</p>
         <hr>
         <small class="text-muted">Em caso de dúvidas, entre em contato com a coordenação pedagógica da sua escola.</small>
+
+    </div>
+    <div class="list-group shadow-sm border border-success">
+        <a href="{% url 'modulo_professor:presenca_diaria' pessoa.0.turma.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ pessoa.0.turma }}</strong> | <b class='fw-bold'>{{ request.session.escola.sigla_escola }}</b>
+            </div>
+            <span class="badge bg-success rounded-pill p-3">
+                Registrar presença diária
+            </span>
+        </a>
     </div>
 
     <!-- LISTA DE DISCIPLINAS -->
-    <div class="row mt-4">
-        {% for d in pessoa %}
-            <div class="col-12 col-md-6 col-lg-4 mb-3">
-                <div class="list-group shadow-sm">
-                    <a href="{% url 'modulo_professor:presenca_diaria' d.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>{{ d.disciplina }}</strong> — {{ d.turma }} | <b class='fw-bold'>{{ request.session.escola.sigla_escola }}</b>
-                        </div>
-                        <span class="badge bg-primary rounded-pill">
-                            Registrar presença
-                        </span>
-                    </a>
+    <div class="border border-primary rounded-3 mt-2 shadow p-2">
+        <h1 class='fs-4 '>Frequência por Disciplina</h1>
+        <div class="row mt-4">
+            {% for d in pessoa %}
+                <div class="col-12 col-md-6 col-lg-4 mb-3">
+                    <div class="list-group shadow-sm">
+                        <a href="{% url 'modulo_professor:presenca_por_aula' d.turma.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ d.disciplina }}</strong> — {{ d.turma }} 
+                            </div>
+                            <span class="badge bg-primary rounded-pill">
+                                Registrar presença
+                            </span>
+                        </a>
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
 </div>
 
