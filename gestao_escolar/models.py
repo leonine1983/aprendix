@@ -656,7 +656,7 @@ class Presenca(models.Model):
     presente = models.BooleanField(default=True)
     observacao = models.TextField(null=True, blank=True)
 
-    # ✅ Horário como referência (opcional)
+    # ✅ Horário como referência 
     horario = models.ForeignKey(
         Horario,
         related_name='presencas',
