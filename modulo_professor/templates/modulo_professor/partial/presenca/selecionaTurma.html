@@ -37,7 +37,7 @@
             {% for d in pessoa %}
                 <div class="col-12 col-md-6 col-lg-4 mb-3">
                     <div class="list-group shadow-sm">
-                        <a href="{% url 'modulo_professor:presenca_por_aula' d.turma.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <a href="{% url 'modulo_professor:presenca_por_aula' d.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                             <div>
                                 <strong>{{ d.disciplina }}</strong> — {{ d.turma }} 
                             </div>
