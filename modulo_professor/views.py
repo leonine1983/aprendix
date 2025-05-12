@@ -306,8 +306,19 @@ def selecionaTurma(request):
     return render(request, 'modulo_professor/partial/presenca/selecionaTurma.html', {'pessoa':professorGrade})
 
 
-from datetime import date
 
+# PRESENÇA POR DISCIPLINA
+@login_required
+def selecionaTurmaDisciplina(request):
+    userProfessor = request.user.related_vinculoUserPessoa
+    pessoa = userProfessor.pessoa.id  
+    professorGrade = TurmaDisciplina.objects.filter(professor__encaminhamento__contratado__id=pessoa)
+    return render(request, 'modulo_professor/partial/presenca/selecionaTurmaDisciplina.html', {'pessoa':professorGrade})
+
+
+
+
+from datetime import date
 
 @login_required
 def registrar_presenca_por_aula_view(request, turma_disciplina_id):
@@ -317,8 +328,6 @@ def registrar_presenca_por_aula_view(request, turma_disciplina_id):
 
     if request.method == 'POST':
         data_presenca_str = request.POST.get('data')
-
-        print(f"a data {data_presenca_str}")
         aula_numero = request.POST.get('aula_numero')
         alunos_presentes_ids = request.POST.getlist('presentes')
         data_presenca = data_presenca_str
@@ -351,11 +360,11 @@ def registrar_presenca_por_aula_view(request, turma_disciplina_id):
                     aula_numero=aula_numero,
                     defaults={'presente': presente, 'controle_diario': False}
                 )
+                messages.success(request, "Frequência diária realizada com sucesso!!!")
             except Exception as e:
                 print(f"Erro ao registrar presença para matrícula {matricula.id}: {e}")
 
 
-        return redirect('sucesso')  # Ajuste para a URL de sucesso de sua aplicação
 
     # Envia a data atual formatada como dd/mm/aaaa
     today = date.today()
@@ -371,32 +380,48 @@ def registrar_presenca_por_aula_view(request, turma_disciplina_id):
 
 
 
-
-
-
-# PRESENÇA DIÁRIA
-"""
-def registrar_presenca_diaria_view(request, turma_id):
-    turma = get_object_or_404(Turmas, id=turma_id)
+# Exibe faltas por disciplina
+@login_required
+def faltas_por_disciplina_mes_view(request, turma_disciplina_id):
+    print(f"disciplina {turma_disciplina_id}")
+    turma_disciplina = get_object_or_404(TurmaDisciplina, id=turma_disciplina_id)
+    print(f"disciplina {turma_disciplina}")
+    turma = turma_disciplina.turma
     matriculas = Matriculas.objects.filter(turma=turma)
 
-    if request.method == 'POST':
-        data_presenca = request.POST.get('data')
-        alunos_presentes_ids = request.POST.getlist('presentes')
-        for matricula in matriculas:
-            presente = str(matricula.id) in alunos_presentes_ids
-            Presenca.objects.update_or_create(
-                matricula=matricula,
-                data=data_presenca,
-                turma_disciplina=None,
-                aula_numero=None,
-                defaults={'presente': presente, 'controle_diario': True}
-            )
-        return redirect('sucesso')  # Crie uma página de sucesso simples se desejar
+    # Pega o mês e ano da querystring (?mes=2025-05)
+    mes_param = request.GET.get('mes')
+    if mes_param:
+        try:
+            mes = datetime.strptime(mes_param, "%Y-%m")
+        except ValueError:
+            mes = datetime.today()
+    else:
+        mes = datetime.today()
 
-    return render(request, 'presenca_diaria.html', {
-        'matriculas': matriculas,
-        'turma': turma,
-        'today': date.today()
-    })"""
+    # Define início e fim do mês selecionado
+    inicio_mes = mes.replace(day=1)
+    if mes.month == 12:
+        fim_mes = mes.replace(year=mes.year + 1, month=1, day=1)
+    else:
+        fim_mes = mes.replace(month=mes.month + 1, day=1)
+
+    # Filtra presenças apenas do mês
+    presencas = Presenca.objects.filter(
+        turma_disciplina=turma_disciplina,
+        data__gte=inicio_mes,
+        data__lt=fim_mes
+    )
+
+    # Dicionário: {matricula.id: quantidade de faltas}
+    faltas_por_aluno = {}
+    for matricula in matriculas:
+        total_faltas = presencas.filter(matricula=matricula, presente=False).count()
+        faltas_por_aluno[matricula] = total_faltas
+
+    return render(request, 'modulo_professor/partial/presenca/faltas_por_disciplina_mes.html', {
+        'turma_disciplina': turma_disciplina,
+        'faltas_por_aluno': faltas_por_aluno,
+        'mes': mes.strftime('%Y-%m')
+    })
 

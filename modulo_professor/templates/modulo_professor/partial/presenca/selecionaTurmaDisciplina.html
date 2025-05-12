@@ -1,0 +1,46 @@
+{% extends "modulo_professor/base.html" %}
+
+{% block main %}  
+<div class="imprimir bg-light rounded-3 shadow p-3">
+    <div class="p-2 shadow-sm">
+        <section class="d-flex flex-wrap align-items-center gap-2">
+            <h1 class="me-3">{{ grade.turma }}</h1>
+            <span class="fs-4">{{ grade }}</span>
+        </section>
+
+    </div>
+
+    <!-- ALERTA EXPLICATIVO -->
+    <div class="alert alert-info mt-4" role="alert">
+        <h5 class="alert-heading">Registro de Frequência por Disciplina</h5>
+        <p>Cada item representa uma disciplina vinculada à sua turma. Após clicar, você será direcionado para a página de chamada, onde poderá marcar os alunos presentes ou ausentes na data desejada.</p>
+        <hr>
+        <small class="text-muted">Em caso de dúvidas, entre em contato com a coordenação pedagógica da sua escola.</small>
+
+    </div>  
+    <!-- LISTA DE DISCIPLINAS -->
+    <div class="border border-primary rounded-3 mt-2 shadow p-2">
+        <h1 class='fs-4 '>Frequência por Disciplina</h1>
+        <div class="row mt-4">
+            {% for d in pessoa %}
+                <div class="col-12 col-md-6 col-lg-5 mb-3">
+                    <div class="list-group shadow-sm">
+                        <a href="{% url 'modulo_professor:presenca_por_aula' d.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ d.disciplina }}</strong> — {{ d.turma }} 
+                            </div>
+                            <span class="badge bg-primary rounded-pill">
+                                Registrar presença
+                                
+                            </span>
+                            <a class="badge bg-primary " style="border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;" href="{% url 'modulo_professor:faltas_por_disciplina_mes' d.id %}"> {{d.disciplina.id}}  {{d.disciplina}} Ver Frequencia</a>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+{% endblock main %}

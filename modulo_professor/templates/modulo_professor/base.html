@@ -399,7 +399,8 @@
 
       #menu-mobile {
   background: 
-    linear-gradient(135deg, #eca06c, #cc5200),
+    linear-gradient(135deg,rgba(55, 68, 60, 0.78),rgba(74, 104, 85, 0.62)),
+    /* linear-gradient(135deg, #eca06c, #cc5200),*/
     url('https://www.transparenttextures.com/patterns/web.png'); /* textura tipo web */
   background-blend-mode: overlay;
   background-size: cover;
@@ -500,6 +501,13 @@
       .btn:hover{
         scale: 1.05!important;
       }
+
+
+
+
+
+      
+
   </style>  
 </head>
 
@@ -578,7 +586,225 @@
           });
   </script>
 
-   
+  
+
+
+
+
+
+
+
+
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* Sidebar */
+    .myapp-sidebar {
+      position: fixed;
+      top: 11%;
+      right: 0;
+      width: 70px; /* Apenas ícones visíveis */
+      height: 90%;
+      background-color: rgba(40, 40, 40, 0.12);
+      backdrop-filter: blur(10px); /* Efeito de desfoque */
+      box-shadow: -4px 0 8px rgba(0, 0, 0, 0.3);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      padding-top: 20px;
+      border-radius: 0 10px 10px 0;
+      transition: width 0.3s ease-in-out;
+    }
+
+    
+
+    /* Links da sidebar */
+    .myapp-sidebar-nav {
+      padding: 0;
+      list-style: none; 
+      margin-top:2.2rem;
+      flex-grow: 1;
+    }
+
+    .myapp-sidebar-item {
+      margin-bottom: 1rem;      
+      position: relative;
+    }
+
+    .myapp-sidebar-link, .myapp-sidebar-sub {
+      display: flex;
+      justify-content: left;
+      align-items: left;
+      padding: 10px;
+      font-size: 18px;
+      color: #17283f;
+      border-radius: 8px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      text-decoration: none;
+      
+    }
+    .myapp-sidebar-link{
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+    }
+
+
+    .myapp-sidebar-link:hover {
+      background-color: #57575733;
+      transform: scale(1.01);
+    }
+
+    /* Ícones */
+    .myapp-sidebar-icon {
+      width: 24px;
+      height: 24px;
+      color: #fff;
+      transition: color 0.3s ease;
+    }
+
+    /* Subnível escondido inicialmente */
+    .subnivel {
+      display: none;
+      padding-left: 20px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      margin-top: 10px;
+      max-height: 0; /* Inicialmente o subnível está fechado */
+      overflow: hidden;
+      transition: max-height 0.3s ease-out; /* Transição suave */
+    }
+
+    .subnivel .myapp-sidebar-link {
+      font-size: 18px;
+      padding: 8px 10px;
+    }
+
+    /* Mostra o subnível ao clicar */
+    .show-subnivel {
+      display: block;
+      max-height: 200px; /* O máximo que o subnível pode expandir */
+    }
+
+    /* Transição e animação para abrir/fechar a sidebar */
+    .myapp-sidebar.show {
+      width: 250px; /* Largura maior quando aberto */
+    }
+
+    /* Animação para ícones */
+    .myapp-sidebar.show .myapp-sidebar-item {
+      opacity: 1;
+      transform: translateX(0);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .myapp-sidebar-item {
+      opacity: 0;
+      transform: translateX(50px);
+    }
+
+    /* Botão de toggle mobile transformado em fatia de círculo */
+    .myapp-sidebar-toggle-btn {
+      position: fixed;
+      top: 50%;
+      right: -30px; /* Coloca o botão fora da área da sidebar */
+      transform: translateY(-50%) rotate(45deg); /* Cria a fatia de círculo */
+      background-color: #444;
+      border: none;
+      width: 60px;
+      height: 60px;
+      border-radius: 30px 30px 0 0; /* Formato de fatia */
+      z-index: 200;
+      cursor: pointer;
+      transition: right 0.3s ease;
+    }
+
+    .myapp-sidebar-toggle-btn:hover {
+      transform: translateY(-50%) rotate(45deg) scale(1.1);
+    }
+
+    .myapp-sidebar-toggle-btn svg {
+      width: 24px;
+      height: 24px;
+      color: #fff;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .myapp-sidebar {
+        width: 60px; /* Ícones visíveis no mobile */
+      }
+
+      .myapp-sidebar.show {
+        width: 250px;
+      }
+
+      .myapp-sidebar-toggle-btn {
+        display: block;
+      }
+
+     
+    }
+  </style>
+
+  <!-- Sidebar -->
+  <aside class="myapp-sidebar">
+
+    <nav class="myapp-sidebar-nav ">
+      <div class="myapp-sidebar-item  justify-content-start">
+        <a href="#" class="myapp-sidebar-link" onclick="toggleSubnivel(event)">
+          <div>
+            <img src="{% static 'escolas/presenca.svg' %}" width="35" alt="">
+            <small>Frequência do Aluno</small>
+          </div>          
+        </a>
+        <div class="subnivel ">
+          <div><a href="{% url 'modulo_professor:selecionaTurmaFalta' %}" class="myapp-sidebar-sub"><i class="fa-solid fa-turn-right fa-flip-vertical mx-1"></i><small> Frequência Diária</small></a></div>
+          <div><a href="{% url 'modulo_professor:selecionaTurmaFaltaDisciplina' %}" class="myapp-sidebar-sub"><i class="fa-solid fa-turn-right fa-flip-vertical mx-1"></i><small> Frequência por Disciplina</small></a></div>
+        </div>
+      </div>
+      <!-- NOtas -->
+      <div class="myapp-sidebar-item  justify-content-start">
+        <a href="#" class="myapp-sidebar-link" onclick="toggleSubnivel(event)">
+          <div>
+            <img src="{% static 'escolas/notas.svg' %}" width="35" alt="">
+            <small>Notas do Aluno</small>
+          </div>          
+        </a>
+        <div class="subnivel ">
+          <div><a href="#" class="myapp-sidebar-sub"><i class="fa-solid fa-turn-right fa-flip-vertical mx-1"></i><small> Frequência Diária</small></a></div>
+          <div><a href="#" class="myapp-sidebar-sub"><i class="fa-solid fa-turn-right fa-flip-vertical mx-1"></i><small> Frequência por Disciplina</small></a></div>
+        </div>
+      </div>
+
+    </nav>
+  </aside>
+
+  <!-- Botão para abrir/fechar a sidebar (em telas pequenas) -->
+  <button onclick="toggleSidebar()" class="myapp-sidebar-toggle-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+  </button>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.myapp-sidebar');
+      const button = document.querySelector('.myapp-sidebar-toggle-btn');
+      sidebar.classList.toggle('show');
+      button.style.right = sidebar.classList.contains('show') ? '250px' : '1rem'; // Ajusta a posição do botão
+    }
+
+    function toggleSubnivel(event) {
+      const subnivel = event.target.nextElementSibling; // Obtém o próximo <div> (subnível)
+      if (subnivel) {
+        subnivel.classList.toggle('show-subnivel'); // Alterna a visibilidade do subnível
+      }
+    }
+  </script>
+
+
   
 </body>    
 </html>
