@@ -10,6 +10,17 @@ from django import forms
 
 
 # Create your views here.
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from gestao_escolar.models import Turmas, TurmaDisciplina, AnoLetivo, GestaoTurmas, Trimestre, Matriculas, Presenca
+from rh.models import Escola
+from .models import ComposicaoNotas
+from django.contrib import messages
+from django.db.models import Count, Q, Avg
+from collections import defaultdict
+from datetime import datetime
+
+
 @login_required
 def home_professor(request):
     userProfessor = request.user.related_vinculoUserPessoa
@@ -26,27 +37,15 @@ def home_professor(request):
         request.session['escola']        
         trimestre_choice = Trimestre.objects.get(id=trimestre)
         final = trimestre_choice.final
-        notas = GestaoTurmas.objects.filter(grade__id = busca, trimestre__id = trimestre)
+        notas = GestaoTurmas.objects.filter(grade__id=busca, trimestre__id=trimestre)
         mural = "notas"
-
-        """
-        Obtém todos os alunos matriculados em uma turma específica a partir de uma instância de TurmaDisciplina.
-        Processo:
-        1. Recupera o objeto `TurmaDisciplina` com base no ID passado em `busca`.
-        2. Acessa a `turma` associada àquela instância de `TurmaDisciplina`.
-        3. Filtra todas as matrículas (`Matriculas`) que estão relacionadas a essa turma específica.
-        Resultado:
-        Uma queryset contendo todos os alunos matriculados na turma correspondente à disciplina buscada.
-        """
 
         grade = TurmaDisciplina.objects.get(id=busca)
         turma = grade.turma
-        alunos = Matriculas.objects.filter(turma = turma )
-        compoeNotas = ComposicaoNotas.objects.filter(grade = grade )
-
+        alunos = Matriculas.objects.filter(turma=turma)
+        compoeNotas = ComposicaoNotas.objects.filter(grade=grade)
 
         notas_dict = {}
-
         for a in alunos:
             notas_dict = {}  # Reiniciado a cada aluno
             for t in trimestreALL:
@@ -58,12 +57,9 @@ def home_professor(request):
                             'notas': {},
                             'trimestre': t.numero_nome,
                             'trimestre_id': t.id,
-                            'media_final': ac.media_final  # <-- Aqui você adiciona o campo desejado
+                            'media_final': ac.media_final
                         }
                         notas_dict[aluno_id]['notas'][t.id] = ac.nota_final
-        
-
-                
     else:
         notas_dict = {}
         mural = ""
@@ -73,24 +69,66 @@ def home_professor(request):
         compoeNotas = {}
         grade = {}
         final = False
-       
 
-    # Pequisa pra verifica se existe matricula feita do aluno
+    # Pesquisa se existe matrícula feita do aluno
     professorGrade = TurmaDisciplina.objects.filter(professor__encaminhamento__contratado__id=pessoa)
     request.session['turmaDisciplina'] = professorGrade
     ano = AnoLetivo.objects.all()
-    
+
+    # GRÁFICO 1: Faltas por mês (considerando disciplina do professor)
+    faltas_por_mes = defaultdict(int)
+    if professorGrade:
+        presencas = Presenca.objects.filter(
+            turma_disciplina__in=professorGrade,
+            presente=False
+        )
+
+        for p in presencas:
+            if p.data:
+                mes_ano = p.data.strftime("%Y-%m")
+                faltas_por_mes[mes_ano] += 1
+
+    faltas_labels = sorted(faltas_por_mes.keys())
+    faltas_values = [faltas_por_mes[mes] for mes in faltas_labels]
+
+    # GRÁFICO 2: Médias de notas por trimestre
+    notas_por_trimestre = defaultdict(list)
+    medias_trimestres = []
+
+    for grade in professorGrade:
+        composicoes = ComposicaoNotas.objects.filter(grade=grade)
+        for c in composicoes:
+            if c.nota_final is not None:
+                notas_por_trimestre[c.trimestre.numero_nome].append(c.nota_final)
+
+    for trimestre_nome in sorted(notas_por_trimestre.keys()):
+        notas = notas_por_trimestre[trimestre_nome]
+        media = round(sum(notas) / len(notas), 2) if notas else 0
+        medias_trimestres.append((trimestre_nome, media))
+
+    notas_labels = [m[0] for m in medias_trimestres]
+    notas_values = [m[1] for m in medias_trimestres]
+
     return render(request, 'modulo_professor/home.html', {
-        'notas_dict':notas_dict ,
-        'final':final,        
-        'professor':professorGrade,    
+        'notas_dict': notas_dict,
+        'final': final,        
+        'professor': professorGrade,    
         'compoemNotas': compoeNotas,
-        'notas':notas,
-        'alunos':alunos,
+        'notas': notas,
+        'alunos': alunos,
         'mural': mural,
-        'trimestre_choice':trimestre_choice,
-        'grade':grade,
-        'anoLetivo': ano})
+        'trimestre_choice': trimestre_choice,
+        'grade': grade,
+        'anoLetivo': ano,
+
+        # Dados dos gráficos
+        'faltas_labels': faltas_labels,
+        'faltas_values': faltas_values,
+        'notas_labels': notas_labels,
+        'notas_values': notas_values,
+    })
+
+
 
 
 class ComposicaoNotasForm(forms.ModelForm):
@@ -350,23 +388,6 @@ def registrar_presenca_por_aula_view(request, turma_disciplina_id):
         aula_numero = request.POST.get('aula_numero')
         alunos_presentes_ids = request.POST.getlist('presentes')
         data_presenca = data_presenca_str
-        # Conversão da data de dd/mm/aaaa para yyyy-mm-dd
-        """
-        try:
-            dia, mes, ano = map(int, data_presenca_str.split('/'))
-            data_presenca = date(ano, mes, dia)
-        except ValueError:
-            
-            print("cair no erroooooooooooooooooooooooooooooo")
-            today = date.today()
-            return render(request, 'modulo_professor/partial/presenca/presenca_por_aula.html', {
-                'matriculas': matriculas,
-                'turma_disciplina': turma_disciplina,
-                'data': data_presenca_str,
-                'erro': 'Data inválida. Use o formato dd/mm/aaaa.',
-                'today': today,
-            })
-        """
 
         # Registro das presenças por aula
         for matricula in matriculas:

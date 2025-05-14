@@ -1,7 +1,75 @@
 {% extends "modulo_professor/base.html" %}
 {% load meus_filtros %}
 
-{% block main %}  
+{% block main %} 
+
+
+
+
+
+<div  style="margin-top: 1g0rem ;">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<canvas id="graficoFaltas"></canvas>
+<canvas id="graficoNotas"></canvas>
+
+<script>
+const ctx1 = document.getElementById('graficoFaltas').getContext('2d');
+new Chart(ctx1, {
+    type: 'bar',
+    data: {
+        labels: {{ faltas_labels|safe }},
+        datasets: [{
+            label: 'Faltas por Mês',
+            data: {{ faltas_values|safe }},
+            backgroundColor: 'rgba(255, 99, 132, 0.7)'
+        }]
+    }
+});
+
+const ctx2 = document.getElementById('graficoNotas').getContext('2d');
+new Chart(ctx2, {
+    type: 'line',
+    data: {
+        labels: {{ notas_labels|safe }},
+        datasets: [{
+            label: 'Média de Notas por Trimestre',
+            data: {{ notas_values|safe }},
+            borderColor: 'rgba(54, 162, 235, 1)',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            fill: true,
+            tension: 0.3
+        }]
+    }
+});
+</script>
+
+</div>
+
+
+
+<div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 {% if mural == "notas" %}
