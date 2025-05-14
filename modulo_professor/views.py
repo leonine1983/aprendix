@@ -15,10 +15,12 @@ def home_professor(request):
     userProfessor = request.user.related_vinculoUserPessoa
     request.session['professorUser'] = userProfessor
     pessoa = userProfessor.pessoa.id   
+
     trimestre = request.GET.get('trimestre')
     busca = request.GET.get('disciplina')   
 
     trimestreALL = Trimestre.objects.all()
+    request.session['trimestres'] = trimestreALL
     
     if busca:
         request.session['escola']        
@@ -59,6 +61,7 @@ def home_professor(request):
                             'media_final': ac.media_final  # <-- Aqui você adiciona o campo desejado
                         }
                         notas_dict[aluno_id]['notas'][t.id] = ac.nota_final
+        
 
                 
     else:
@@ -74,13 +77,13 @@ def home_professor(request):
 
     # Pequisa pra verifica se existe matricula feita do aluno
     professorGrade = TurmaDisciplina.objects.filter(professor__encaminhamento__contratado__id=pessoa)
+    request.session['turmaDisciplina'] = professorGrade
     ano = AnoLetivo.objects.all()
     
     return render(request, 'modulo_professor/home.html', {
         'notas_dict':notas_dict ,
         'final':final,        
-        'professor':professorGrade,
-        'trimestre': trimestreALL,        
+        'professor':professorGrade,    
         'compoemNotas': compoeNotas,
         'notas':notas,
         'alunos':alunos,
@@ -99,6 +102,11 @@ class ComposicaoNotasForm(forms.ModelForm):
         }
 
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 
 @login_required
 def criaNotasComposicao(request, aluno, grade, trimestre):
@@ -130,14 +138,25 @@ def criaNotasComposicao(request, aluno, grade, trimestre):
             nova_instancia.save()
 
             messages.success(request, "Notas do aluno foram salvas com sucesso!")
-            return redirect("modulo_professor:homeProfessor")
+
+            # Recupera os valores simulando um GET
+            trimestre_valor = trimestre_obj.id
+            disciplina_valor = grade_obj.id 
+            # Monta a URL com parâmetros GET
+            url = reverse("modulo_professor:homeProfessor")
+            query_string = f"?trimestre={trimestre_valor}&disciplina={disciplina_valor}"
+            full_url = f"{url}{query_string}"
+            return HttpResponseRedirect(full_url)
+
     else:
         form = ComposicaoNotasForm(instance=composicao_existente)
 
     return render(request, "modulo_professor/partial/notas/notas.html", {
         "form": form,
         'grade': grade_obj,
-        'aluno': aluno_obj})
+        'aluno': aluno_obj
+    })
+
 
 
 
@@ -380,16 +399,14 @@ def registrar_presenca_por_aula_view(request, turma_disciplina_id):
 
 
 
-# Exibe faltas por disciplina
+from collections import defaultdict
+
 @login_required
 def faltas_por_disciplina_mes_view(request, turma_disciplina_id):
-    print(f"disciplina {turma_disciplina_id}")
     turma_disciplina = get_object_or_404(TurmaDisciplina, id=turma_disciplina_id)
-    print(f"disciplina {turma_disciplina}")
     turma = turma_disciplina.turma
     matriculas = Matriculas.objects.filter(turma=turma)
 
-    # Pega o mês e ano da querystring (?mes=2025-05)
     mes_param = request.GET.get('mes')
     if mes_param:
         try:
@@ -399,29 +416,26 @@ def faltas_por_disciplina_mes_view(request, turma_disciplina_id):
     else:
         mes = datetime.today()
 
-    # Define início e fim do mês selecionado
     inicio_mes = mes.replace(day=1)
     if mes.month == 12:
         fim_mes = mes.replace(year=mes.year + 1, month=1, day=1)
     else:
         fim_mes = mes.replace(month=mes.month + 1, day=1)
 
-    # Filtra presenças apenas do mês
     presencas = Presenca.objects.filter(
         turma_disciplina=turma_disciplina,
         data__gte=inicio_mes,
-        data__lt=fim_mes
-    )
+        data__lt=fim_mes,
+        presente=False
+    ).order_by('data')
 
-    # Dicionário: {matricula.id: quantidade de faltas}
-    faltas_por_aluno = {}
-    for matricula in matriculas:
-        total_faltas = presencas.filter(matricula=matricula, presente=False).count()
-        faltas_por_aluno[matricula] = total_faltas
+    # Armazena as faltas detalhadas: {matricula: [(data, numero_aula), ...]}
+    faltas_detalhadas = defaultdict(list)
+    for presenca in presencas:
+        faltas_detalhadas[presenca.matricula].append((presenca.data, presenca.aula_numero))
 
     return render(request, 'modulo_professor/partial/presenca/faltas_por_disciplina_mes.html', {
         'turma_disciplina': turma_disciplina,
-        'faltas_por_aluno': faltas_por_aluno,
+        'faltas_detalhadas': dict(faltas_detalhadas),
         'mes': mes.strftime('%Y-%m')
     })
-

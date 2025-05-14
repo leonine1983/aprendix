@@ -534,57 +534,6 @@
   {% include 'modulo_professor/partial/nav_bottom.html' %} 
 
 
-<dialog id="instructions_notas">
-    <div class="alert  alert-dismissible fade show" role="alert">
-      <form method="GET" class='form_alunos'>
-        <div class="mb-3">
-          <div class='alert alert-info mb-3 border  p-2'>
-            <span class="fw-semibold ">{{ request.session.escola }} </span><br>
-            <span id='anoLetvo' class="">Ano Letivo: {{ request.session.anoLetivo }}</span>
-          </div>
-          <p class="text-muted">Olá, professor! Por favor, selecione uma disciplina para continuar.</p>
-          <label for="disciplina" class="form-label">Disciplinas</label>
-          <select class="form-select" id="disciplina" name="disciplina" required>
-            <option value="" disabled selected>Escolha uma disciplina</option>
-            {% for d in professor %}
-              <option value="{{ d.id}}">{{ d.disciplina }} - {{ d.turma }}</option>
-            {% endfor %}
-          </select>
-
-
-          <p class="text-muted">Selecione o Trimestre para continuar.</p>
-          <label for="trimestre" class="form-label">Trimestre</label>
-          <select class="form-select" id="trimestre" name="trimestre" required>
-            <option value="" disabled selected>Escolha um trimestre</option>
-            {% for t in trimestre %}
-              <option value="{{ t.id}}">{{ t.numero_nome }}</option>
-            {% endfor %}
-          </select>
-
-          
-        </div>
-        <div class="d-grid">
-          <button type="submit" class="btn btn-primary">Buscar</button>
-        </div>
-      </form>
-        
-    </div>
-    <button id="closeDialog_notas" class="btn btn-secondary mt-5">Fechar</button>
-</dialog>  
-
-  <script>
-      const dialog_notas = document.getElementById('instructions_notas');
-      const openButton_notas = document.getElementById('openDialog_notas');
-      const closeButton_notas = document.getElementById('closeDialog_notas');
-
-      openButton_notas.addEventListener('click', () => {
-          dialog_notas.showModal(); // Abre a caixa de diálogo como modal
-          });
-
-      closeButton_notas.addEventListener('click', () => {
-          dialog_notas.close(); // Fecha a caixa de diálogo
-          });
-  </script>
 
   
 
@@ -602,7 +551,7 @@
       position: fixed;
       top: 11%;
       right: 0;
-      width: 70px; /* Apenas ícones visíveis */
+      width: 7px; /* Apenas ícones visíveis */
       height: 90%;
       background-color: rgba(40, 40, 40, 0.12);
       backdrop-filter: blur(10px); /* Efeito de desfoque */
@@ -703,9 +652,9 @@
     /* Botão de toggle mobile transformado em fatia de círculo */
     .myapp-sidebar-toggle-btn {
       position: fixed;
-      top: 50%;
-      right: -30px; /* Coloca o botão fora da área da sidebar */
-      transform: translateY(-50%) rotate(45deg); /* Cria a fatia de círculo */
+      top: 35%;
+      right: -10px; /* Coloca o botão fora da área da sidebar */
+      transform: translateY(1%) rotate(-90deg); /* Cria a fatia de círculo */
       background-color: #444;
       border: none;
       width: 60px;
@@ -717,7 +666,7 @@
     }
 
     .myapp-sidebar-toggle-btn:hover {
-      transform: translateY(-50%) rotate(45deg) scale(1.1);
+      transform: translateY(1%) rotate(-90deg) scale(1.1) ;
     }
 
     .myapp-sidebar-toggle-btn svg {
@@ -729,11 +678,13 @@
       left: 50%;
       transform: translate(-50%, -50%);
     }
+    .shadown-p{box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;}
+    .no-visible-mobile{display: block;}
 
     /* Responsividade */
     @media (max-width: 768px) {
       .myapp-sidebar {
-        width: 60px; /* Ícones visíveis no mobile */
+        width: 7px; /* Ícones visíveis no mobile */
       }
 
       .myapp-sidebar.show {
@@ -743,6 +694,7 @@
       .myapp-sidebar-toggle-btn {
         display: block;
       }
+      .no-visible-mobile{display: none;}
 
      
     }
@@ -765,17 +717,15 @@
         </div>
       </div>
       <!-- NOtas -->
+       
       <div class="myapp-sidebar-item  justify-content-start">
-        <a href="#" class="myapp-sidebar-link" onclick="toggleSubnivel(event)">
-          <div>
+        
+        <a href="#" class="myapp-sidebar-link">  
+          <button class="dropdown-item btn btn-light btn-sm"  id="openDialog_notas" title='Notas dos alunos' >
             <img src="{% static 'escolas/notas.svg' %}" width="35" alt="">
             <small>Notas do Aluno</small>
-          </div>          
+          </button>          
         </a>
-        <div class="subnivel ">
-          <div><a href="#" class="myapp-sidebar-sub"><i class="fa-solid fa-turn-right fa-flip-vertical mx-1"></i><small> Frequência Diária</small></a></div>
-          <div><a href="#" class="myapp-sidebar-sub"><i class="fa-solid fa-turn-right fa-flip-vertical mx-1"></i><small> Frequência por Disciplina</small></a></div>
-        </div>
       </div>
 
     </nav>
@@ -803,6 +753,64 @@
       }
     }
   </script>
+
+
+
+
+
+
+<dialog id="instructions_notas">
+    <div class="alert  alert-dismissible fade show" role="alert">
+      <form method="GET" class='form_alunos' action="{% url 'modulo_professor:homeProfessor' %}">
+        <div class="mb-3">
+          <div class='alert alert-info mb-3 border  p-2'>
+            <span class="fw-semibold ">{{ request.session.escola }} </span><br>
+            <span id='anoLetvo' class="">Ano Letivo: {{ request.session.anoLetivo }}</span>
+          </div>
+          <p class="text-muted">Olá, professor <b>{{request.session.professorUser}}</b>! Por favor, selecione uma disciplina para continuar.</p>
+          <label for="disciplina" class="form-label">Disciplinas</label>
+          <select class="form-select" id="disciplina" name="disciplina" required>
+            <option value="" disabled selected>Escolha uma disciplina</option>
+            {% for d in request.session.turmaDisciplina %}
+              <option value="{{ d.id}}">{{ d.disciplina }} - {{ d.turma }}</option>
+            {% endfor %}
+          </select>
+
+
+          <p class="text-muted">Selecione o Trimestre para continuar.</p>
+          <label for="trimestre" class="form-label">Trimestre</label>
+          <select class="form-select" id="trimestre" name="trimestre" required>
+            <option value="" disabled selected>Escolha um trimestre</option>
+            {% for t in request.session.trimestres %}
+              <option value="{{ t.id}}">{{ t.numero_nome }}</option>
+            {% endfor %}
+          </select>
+
+          
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">Buscar</button>
+        </div>
+      </form>
+        
+    </div>
+    <button id="closeDialog_notas" class="btn btn-secondary mt-5">Fechar</button>
+</dialog>  
+
+  <script>
+      const dialog_notas = document.getElementById('instructions_notas');
+      const openButton_notas = document.getElementById('openDialog_notas');
+      const closeButton_notas = document.getElementById('closeDialog_notas');
+
+      openButton_notas.addEventListener('click', () => {
+          dialog_notas.showModal(); // Abre a caixa de diálogo como modal
+          });
+
+      closeButton_notas.addEventListener('click', () => {
+          dialog_notas.close(); // Fecha a caixa de diálogo
+          });
+  </script>
+
 
 
   

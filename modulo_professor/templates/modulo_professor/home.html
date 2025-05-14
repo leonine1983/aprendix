@@ -81,11 +81,52 @@
 </div>
 
 <div  class='imprimir bg-light rounded-3 shadow '>
-  <div class="p-2 shadow shadown-sm ">
-    <section class='d-flex '><h1>{{alunos.0.turma}}</h1> | {{alunos|length}} alunos <span class="mx-3 pt-1 small text-uppercasec"  ><strong> Composição de NOTAS da turma | {{request.session.escola.sigla_escola}}  </strong></span></section>
+  <div class="p-2  shadown-p ">
+    <section class='d-flex '><h1>{{alunos.0.turma}}</h1> | {{alunos|length}} alunos <span class="mx-3 pt-1 small text-uppercasec"  ><strong> Composição de NOTAS da turma | {{request.session.escola.sigla_escola}}  </strong></span>
+    </section>
     <section class='fs-3 mx-5 text-center '> <strong>{{trimestre_choice}}</strong> ({{grade}}) </section>
     <section class='fs-3 mx-5 text-center '> </section>
   </div>
+
+  <!-- Selecona novo trimestre -->
+  <form method="GET" class='form_alunos p-0 m-0 ' action="{% url 'modulo_professor:homeProfessor' %}">
+  {% csrf_token %}
+  <div class="row justify-content-start mt-3">
+    
+    <!-- Campo oculto de disciplina (com opção marcada corretamente) -->
+    <div class="col-auto d-none">
+      <select class="form-select" id="disciplina" name="disciplina" required>
+        {% for d in request.session.turmaDisciplina %}
+          {% if d.turma == alunos.0.turma %}
+            <option value="{{ d.id }}" {% if d.id == grade.id %}selected{% endif %}>
+              {{ d.disciplina }} - {{ d.turma }}
+            </option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Campo visível de trimestre -->
+    <div class="col-4 no-visible-mobile">
+      <select class="form-select" id="trimestre" name="trimestre" required>
+        <option value="" disabled selected>Escolha um novo trimestre</option>
+        {% for t in request.session.trimestres %}
+          <option value="{{ t.id }}" {% if t.id == trimestre.id %}selected{% endif %}>
+            {{ t.numero_nome }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Botão de envio -->
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary">Buscar</button>
+    </div>
+
+  </div>
+  
+  </form>
+
   <div class="table-responsive-md p-1">
       <div class="alert alert-info" role="alert">
         <h5 class="alert-heading">💡 Como é calculada a nota final do aluno?</h5>

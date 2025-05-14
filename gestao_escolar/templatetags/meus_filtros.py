@@ -20,6 +20,25 @@ def soma(val1, val2, val3):
 
 @register.filter
 def unique_objects(queryset, field_name):
+    """
+    Retorna uma lista de objetos únicos de um queryset, 
+    com base em um campo específico.
+
+    Este filtro itera sobre um queryset e elimina objetos com valores repetidos 
+    no campo especificado, retornando apenas a primeira ocorrência de cada valor único.
+
+    Exemplo de uso no template:
+        {% for item in queryset|unique_objects:"nome_campo" %}
+            {{ item.nome }}
+        {% endfor %}
+
+    Args:
+        queryset (iterable): Um queryset ou lista de objetos Django.
+        field_name (str): O nome do campo que será usado para verificar duplicatas.
+
+    Returns:
+        list: Lista de objetos com valores únicos no campo especificado.
+    """
     seen = set()
     unique_list = []
     for item in queryset:
