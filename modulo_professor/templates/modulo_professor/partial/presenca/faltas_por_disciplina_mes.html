@@ -1,6 +1,16 @@
 {% extends "modulo_professor/base.html" %}
 
 {% block main %}
+<style>
+    .hoje{}
+    .hoje::before{
+        content: 'Hoje';
+        position: relative;
+        background-color: white;
+        left: -10px;
+        top: -10px;
+    }
+</style>
 <div class="bg-light rounded-3 shadow p-4 print-area mt-5 pt-5">
     <!-- Cabeçalho com botão de impressão -->
     <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 ">
@@ -53,34 +63,55 @@
           </tr>
       </thead>
       <tbody>
-          {% for matricula, faltas in faltas_detalhadas.items %}
-          <tr>
-              <td><small>{{ matricula.aluno.nome_completo }}</small></td>
-              <td class="text-center">                    
-                  {% for data, numero in faltas %}
-                  <small>{{ data|date:"d/m/Y" }}</small><br>
-                  {% endfor %}
-              </td>
-              <td class="text-center">
-                  {% for data, numero in faltas %}
-                  <small>{{ data|date:"l" }}</small><br>
-                  {% endfor %}
-              </td>
-              <td class="text-center">
-                  {% for data, numero in faltas %}
-                  <small>{{ numero }}º período</small><br>
-                  {% endfor %}
-              </td>
-              <td class="text-center">
-                  <span class="badge bg-danger">Total: {{ faltas|length }}</span><br>
-              </td>
-          </tr>
-          {% empty %}
-          <tr>
-              <td colspan="5" class="text-center text-muted">Nenhum registro de faltas.</td>
-          </tr>
-          {% endfor %}
-      </tbody>
+    {% for matricula, faltas in faltas_detalhadas.items %}
+    <tr>
+        <td><small>{{ matricula.aluno.nome_completo }}</small></td>
+
+        <!-- Data -->
+        <td class="text-center">                    
+            {% for data, numero in faltas %}
+                {% if data == hoje %}
+                    <small class="hoje text-danger fw-bold border border-danger p-1">{{ data|date:"d/m/Y" }}</small><br>
+                {% else %}
+                    <small>{{ data|date:"d/m/Y" }}</small><br>
+                {% endif %}
+            {% endfor %}
+        </td>
+
+        <!-- Dia da semana -->
+        <td class="text-center">
+            {% for data, numero in faltas %}
+                {% if data == hoje %}
+                    <small class="hoje text-danger fw-bold border border-danger p-1">{{ data|date:"l" }}</small><br>
+                {% else %}
+                    <small>{{ data|date:"l" }}</small><br>
+                {% endif %}
+            {% endfor %}
+        </td>
+
+        <!-- Aula do dia -->
+        <td class="text-center">
+            {% for data, numero in faltas %}
+                {% if data == hoje %}
+                    <small class="hoje text-danger fw-bold border border-danger p-1">{{ numero }}º período</small><br>
+                {% else %}
+                    <small>{{ numero }}º período</small><br>
+                {% endif %}
+            {% endfor %}
+        </td>
+
+        <!-- Total -->
+        <td class="text-center">
+            <span class="badge bg-danger">Total: {{ faltas|length }}</span><br>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5" class="text-center text-muted">Nenhum registro de faltas.</td>
+    </tr>
+    {% endfor %}
+</tbody>
+
   </table>
 </div>
 

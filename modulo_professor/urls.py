@@ -17,12 +17,12 @@ urlpatterns = [
     path('/presenca/diaria/<int:turma_id>/', registrar_presenca_diaria_view, name='presenca_diaria'),
     path('/turma/<int:turma_id>/presencas/<str:data_str>/', lista_presenca_diaria_view, name='lista_presenca_diaria'),
 
-    path('faltas/<int:matricula_id>/', historico_faltas_view, name='historico_faltas'),
+    path('/faltas/<int:matricula_id>/', historico_faltas_view, name='historico_faltas'),
 
     
-    path('presenca/diaria/seleciona/disciplina', selecionaTurmaDisciplina, name='selecionaTurmaFaltaDisciplina'),
-    path('presenca/aula/<int:turma_disciplina_id>/', registrar_presenca_por_aula_view, name='presenca_por_aula'),
-    path('faltas/<int:turma_disciplina_id>/disciplina', faltas_por_disciplina_mes_view, name='faltas_por_disciplina_mes'),
+    path('/presenca/diaria/seleciona/disciplina', selecionaTurmaDisciplina, name='selecionaTurmaFaltaDisciplina'),
+    path('/presenca/aula/<int:turma_disciplina_id>/', registrar_presenca_por_aula_view, name='presenca_por_aula'),
+    path('/faltas/<int:turma_disciplina_id>/disciplina', faltas_por_disciplina_mes_view, name='faltas_por_disciplina_mes'),
     #path('historico-faltas/<int:matricula_id>/<int:turma_disciplina_id>/', historico_faltasPAula_view, name='historico_faltas'),
     #path('sucesso/', lambda request: render(request, 'sucesso.html'), name='sucesso'),
 

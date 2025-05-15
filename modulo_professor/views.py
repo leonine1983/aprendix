@@ -399,10 +399,11 @@ def registrar_presenca_por_aula_view(request, turma_disciplina_id):
                     turma_disciplina=turma_disciplina,
                     aula_numero=aula_numero,
                     defaults={'presente': presente, 'controle_diario': False}
-                )
-                messages.success(request, "Frequência diária realizada com sucesso!!!")
+                )                
             except Exception as e:
                 print(f"Erro ao registrar presença para matrícula {matricula.id}: {e}")
+        messages.success(request, "Frequência diária realizada com sucesso!!!")
+        return redirect('modulo_professor:faltas_por_disciplina_mes', turma_disciplina_id=turma_disciplina.id)
 
 
 
@@ -458,5 +459,6 @@ def faltas_por_disciplina_mes_view(request, turma_disciplina_id):
     return render(request, 'modulo_professor/partial/presenca/faltas_por_disciplina_mes.html', {
         'turma_disciplina': turma_disciplina,
         'faltas_detalhadas': dict(faltas_detalhadas),
-        'mes': mes.strftime('%Y-%m')
+        'mes': mes.strftime('%Y-%m'),
+        'hoje': date.today(),
     })
