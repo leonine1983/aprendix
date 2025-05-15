@@ -9,14 +9,13 @@
       <h1 class="me-3 mb-0">{{ grade.turma }}</h1>
       <span class="fs-5 text-muted">{{ grade }}</span>
     </div>
+     <a class='btn btn-light no-visible-mobile' href="{% url 'modulo_professor:selecionaTurmaFalta' %}"><i class="fa-solid fa-angles-left"></i> Voltar</a>
 
     <!-- Alerta informativo -->
     <div class="alert alert-info">
       <h5 class="alert-heading">Registro de Frequência de Alunos</h5>
       <p>Utilize o formulário abaixo para registrar a presença dos alunos da turma <strong>{{ grade.turma }}</strong>.</p>
-      <p>Selecione a data desejada e marque os alunos que estiveram presentes. Os não marcados serão considerados ausentes.</p>
-      <hr>
-      <small class="text-muted">Em caso de dúvidas, entre em contato com a coordenação pedagógica.</small>
+      <p>Selecione a data desejada e marque os alunos que estiveram presentes. Os não marcados serão considerados ausentes.</p> 
     </div>
 
     <!-- Formulário de presença -->

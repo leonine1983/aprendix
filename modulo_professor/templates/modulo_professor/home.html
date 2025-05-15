@@ -5,9 +5,9 @@
 
 
 
+{% if not mural == "notas" %}
 
-
-<div  style="margin-top: 1g0rem ;">
+<div  style="margin-top: 10rem ;" class='bg-light p-3'>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <canvas id="graficoFaltas"></canvas>
@@ -53,7 +53,7 @@ new Chart(ctx2, {
 
 
 
-
+{% endif %}
 
 
 

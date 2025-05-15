@@ -3,13 +3,8 @@
 {% block main %}  
 <div class="imprimir bg-light rounded-3 shadow p-3">
     <div class="p-2 shadow-sm">
-        <section class="d-flex flex-wrap align-items-center gap-2">
-            <h1 class="me-3">{{ grade.turma }}</h1>
-            <span class="fs-4">{{ grade }}</span>
-        </section>
-
+        <a class='btn btn-light no-visible-mobile' href="{% url 'modulo_professor:homeProfessor' %}"><i class="fa-solid fa-angles-left"></i> Voltar</a>
     </div>
-
     <!-- ALERTA EXPLICATIVO -->
     <div class="alert alert-info mt-4" role="alert">
         <h5 class="alert-heading">Registro de Frequência Diária</h5>

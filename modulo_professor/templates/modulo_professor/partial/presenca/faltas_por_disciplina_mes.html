@@ -1,8 +1,7 @@
 {% extends "modulo_professor/base.html" %}
 
 {% block main %}
-<div class="bg-light rounded-3 shadow p-4 print-area">
-
+<div class="bg-light rounded-3 shadow p-4 print-area mt-5 pt-5">
     <!-- Cabeçalho com botão de impressão -->
     <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 ">
         <div style="display: flex; gap:1rem;">
@@ -13,7 +12,8 @@
             </div>
         </div>
         <div class="d-flex align-items-end gap-1">
-            <form method="get" class="col d-flex align-items-end gap-2 ">
+            <a class='btn btn-light no-visible-mobile' href="{% url 'modulo_professor:selecionaTurmaFaltaDisciplina' %}"><i class="fa-solid fa-angles-left"></i> Voltar</a>
+            <form method="get" class="col d-flex align-items-end gap-2 ">                
                 <div class="form-group">
                     <label for="mes" class="form-label mb-0">Mês de referência:</label>
                     <input type="month" class="form-control" id="mes" name="mes" value="{{ mes }}">
