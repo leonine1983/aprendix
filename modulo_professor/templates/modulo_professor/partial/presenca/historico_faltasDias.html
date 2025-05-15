@@ -81,6 +81,9 @@
                 <h2 class=" titulo h4">Histórico de Faltas - {{ matricula.aluno.nome_completo }}</h2>
                 <span class="fs-4">{{ grade }}</span>
             </section>
+            <a class='btn btn-light no-visible-mobile' href="{% url 'modulo_professor:presenca_diaria' matricula.turma.id %}"><i class="fa-solid fa-angles-left"></i> Voltar</a>
+
+            
         </div>
 
         <!-- ALERTA EXPLICATIVO -->
