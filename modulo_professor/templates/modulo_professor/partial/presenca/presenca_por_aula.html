@@ -20,12 +20,12 @@
         <div class="row g-3">
             <div class="col-md-6">
                 <label for="data" class="form-label">Data</label>
-                <input type="date" name="data" class="form-control border-primary-subtle" value="{{ data|default:today }}"  required>
-
+                <input type="date" name="data" id="data" class="form-control" value="{{ today|date:'Y-m-d' }}" required>
+                
             </div>
 
             <div class="col-md-6">
-                <label for="aula_numero" class="form-label">Número da Aula</label>
+                <label for="aula_numero" class="form-label">Ordem da Aula no Dia (1ª, 2ª ou 3ª)</label>
                 <input type="number" name="aula_numero" class="form-control border-primary-subtle" min="1" max="10" required>
                 <div class="form-text text-muted">
                     Ex: primeira aula do dia = 1, segunda = 2, etc.
