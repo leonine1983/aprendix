@@ -3,7 +3,8 @@ from .views import (home_professor,home_sessaoIniciada, criaNotasComposicao,
                     atualizaRecuperaFinal, registrar_presenca_diaria_view, 
                     selecionaTurma, registrar_presenca_por_aula_view, 
                     historico_faltas_view, historico_faltas_view, lista_presenca_diaria_view,
-                    selecionaTurmaDisciplina, faltas_por_disciplina_mes_view, alunoGestaoTurmasParecer)
+                    selecionaTurmaDisciplina, faltas_por_disciplina_mes_view, alunoGestaoTurmasParecer,
+                    parecerTurma)
 
 app_name = 'modulo_professor'
 
@@ -27,6 +28,7 @@ urlpatterns = [
     #path('sucesso/', lambda request: render(request, 'sucesso.html'), name='sucesso'),
 
     # Parecer descritivo
-    path('/aluno/<int:pk>/parecer/<int:trimestre>/', alunoGestaoTurmasParecer, name='aluno_parecer'),
+    path('/turma/parecer/<int:turma>/turma', parecerTurma, name='parecerTurma'),
+    path('/aluno/<int:pk>/trimestre/<int:trimestre>/', alunoGestaoTurmasParecer, name='aluno_parecer'),
 
 ]

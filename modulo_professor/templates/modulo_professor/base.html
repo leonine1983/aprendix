@@ -727,13 +727,11 @@
       </div>
 
       <!-- Parecer do Aluno -->       
-      <div class="myapp-sidebar-item  justify-content-start">        
-        <a href="#" class="myapp-sidebar-link">  
-          <button class="dropdown-item btn btn-light btn-sm"  id="openDialog_notas" title='Notas dos alunos' >
+      <div class="myapp-sidebar-item  justify-content-start">     
+          <button class="dropdown-item myapp-sidebar-link btn btn-light btn-sm"  id="openDialog_turmas" title='Notas dos alunos' >
             <i class="fa-solid fa-file-signature fs-2"></i>
             <small>Parecer Descritivo</small>
-          </button>          
-        </a>
+          </button>  
       </div>
       <div class="border border-light mt-5">
         <div class="p-2 bg-light text-center"><small>Em desenvolvimento</small></div>
@@ -862,6 +860,43 @@
   </script>
 
 
+
+
+  <!-- PARECER -->
+
+  
+
+
+<dialog id="instructions_turmas">
+    <div class="alert  alert-dismissible fade show" role="alert">
+        <div class="mb-3">
+          <div class='alert alert-info mb-3 border  p-2'>
+            <span class="fw-semibold ">{{ request.session.escola }} </span><br>
+            <span id='anoLetvo' class="">Ano Letivo: {{ request.session.anoLetivo }}</span>
+          </div>
+          <p class="text-muted">Olá, professor <b>{{request.session.professorUser}}</b>! Por favor, selecione uma turma para continuar.</p>
+          {% for d in request.session.turmaDisciplina %}
+            <a class="btn btn-secondary col-12" href="{% url 'modulo_professor:parecerTurma' d.turma.id %}">
+              <b>{{ d.turma }}</b> - {{ d.turma.escola }}
+            </a>
+          {% endfor %}   
+    </div>
+    <button id="closeDialog_turmas" class="btn btn-secondary mt-5">Fechar</button>
+</dialog>  
+
+  <script>
+      const dialog_turmas = document.getElementById('instructions_turmas');
+      const openButton_turmas = document.getElementById('openDialog_turmas');
+      const closeButton_turmas = document.getElementById('closeDialog_turmas');
+
+      openButton_turmas.addEventListener('click', () => {
+          dialog_turmas.showModal(); // Abre a caixa de diálogo como modal
+          });
+
+      closeButton_turmas.addEventListener('click', () => {
+          dialog_turmas.close(); // Fecha a caixa de diálogo
+          });
+  </script>
 
   
 </body>    

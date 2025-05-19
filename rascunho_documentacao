@@ -3,3 +3,31 @@
 2 - Gerenciamento de informações por Ano Letivo: O sistema organiza todas as informações de forma estruturada por ano letivo, evitando a dispersão dos dados e garantindo a confiabilidade e a precisão das informações.
 
 3 - Verificação de Gestores Escolares: O sistema realiza uma verificação para assegurar que o nome do diretor ou responsável pela escola esteja devidamente cadastrado. Isso previne a emissão de documentos sem as informações essenciais dos responsáveis pela instituição, garantindo a integridade dos registros e evitando inconsistências nos processos administrativos.
+
+
+
+
+#codigo pra enviar por email --------------------------------------------------------
+
+import smtplib
+
+# Crea a smtp session
+s= smtplib.SMTP('smtp.gmail.com', 587)
+
+
+# start TLS for security
+s.starttls()
+
+# Autenticação
+s.login ("sender_email_id", "send_email_id_password")
+
+# Message 
+message = "Message hello word"
+
+# sending email
+s.sendmail("sender_email_id", "receiver_email_id", message)
+
+# Finaliza
+s.quit()
+
+# end codigo pra enviar por email -----------------------------------------------------

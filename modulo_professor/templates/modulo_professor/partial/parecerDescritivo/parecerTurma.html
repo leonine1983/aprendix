@@ -1,0 +1,105 @@
+{% extends "modulo_professor/base.html" %}
+
+{% block main %}  
+
+    <div  class='imprimir bg-light rounded-3 shadow '>
+        <div class="p-2 shadow shadown-sm ">
+            <section class='d-flex '><h1>{{turma.0.turma}} </h1> | {{turma|length}} alunos matriculados</section>
+            <section class='fs-3 mx-5 text-center '>
+                <h2>PARECER DESCRITIVO</h2>
+                <h3><small class='h3 mx-5 text-center '>Selecione o aluno e o trimestre que deseja editar o parecer</small></h3>
+            </section>
+            
+        </div>
+        <div class="table-responsive">  
+        <table class="table table-bordered table-hover table-striped align-middle text-center">
+    <thead class="table-dark">
+        <tr>
+            <th>Aluno</th>
+            {% for t in trimestre %}
+                {% if not t.final %}
+                    <th>{{ t }}</th>
+                {% endif %}
+            {% endfor %}
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for a in turma %}
+        <tr>
+            <td class="text-start fw-semibold" data-aluno-id="{{ a.id }}">{{ a }}</td>
+
+            {% for t in trimestre %}
+                {% if not t.final %}
+                <td>
+                    <div class="form-check d-flex justify-content-center">
+                        <input class="form-check-input"
+                               type="radio"
+                               name="trimestre_{{ forloop.parentloop.counter }}"
+                               value="{{ t.id }}"
+                               required>
+                    </div>
+                </td>
+                {% endif %}
+            {% endfor %}
+
+            <td>
+                <button 
+                    class="btn btn-sm btn-primary editar-btn" 
+                    disabled 
+                    data-url-template="{% url 'modulo_professor:aluno_parecer' pk=0 trimestre=0 %}">
+                    Criar ou Editar
+                </button>
+
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+        </div>
+    </div>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const table = document.querySelector("table");
+
+    // Habilita o botão ao selecionar um radio
+    table.querySelectorAll("input[type='radio']").forEach(function (radio) {
+        radio.addEventListener("change", function () {
+            const row = radio.closest("tr");
+            const button = row.querySelector(".editar-btn");
+            button.disabled = false;
+        });
+    });
+
+    // Ao clicar no botão
+    table.querySelectorAll(".editar-btn").forEach(function (button) {
+        button.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            const row = button.closest("tr");
+            const alunoId = row.querySelector("[data-aluno-id]").getAttribute("data-aluno-id");
+            const selectedRadio = row.querySelector("input[type='radio']:checked");
+
+            if (!selectedRadio) {
+                alert("Selecione um trimestre.");
+                return;
+            }
+
+            const trimestreId = selectedRadio.value;
+            const template = button.dataset.urlTemplate;
+
+            // Substitui os '0' na URL gerada com os valores reais
+            const finalUrl = template
+                .replace(/\/0\//, `/${alunoId}/`)
+                .replace(/0\/?$/, `${trimestreId}/`);
+
+            window.location.href = finalUrl;
+        });
+    });
+});
+</script>
+
+{% endblock main %}

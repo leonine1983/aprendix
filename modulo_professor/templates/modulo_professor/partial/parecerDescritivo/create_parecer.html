@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Parecer do aluno {{ aluno.nome_completo }} - {{ trimestre }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Salvar Parecer</button>
+</form>
+
+{% endblock %}
