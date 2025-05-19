@@ -448,6 +448,7 @@ class ParecerDescritivoForm(forms.ModelForm):
             'comunicacao',
             'consideracoes_finais',
             'observacao_coordenador',
+            'resumo',
         ]
         widgets = {
             field: forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}) for field in fields
@@ -467,8 +468,7 @@ def parecerTurma(request, turma):
 
 
 @login_required
-def alunoGestaoTurmasParecer(request, pk, trimestre):
-    print(f'aluno {pk}, trimestre {trimestre}')
+def alunoGestaoTurmasParecer(request, pk, trimestre):    
     matricula = get_object_or_404(Matriculas, pk=pk)
     trimestre_obj = get_object_or_404(Trimestre, pk=trimestre)
 
@@ -514,7 +514,7 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
             parecer.resumo = resumo
             parecer.save()
 
-            return redirect('nome_da_sua_view_de_sucesso')  # Substitua com o nome da view desejada
+            return redirect('modulo_professor:parecerTurma')  # Substitua com o nome da view desejada
     else:
         form = ParecerDescritivoForm(instance=parecer)
 

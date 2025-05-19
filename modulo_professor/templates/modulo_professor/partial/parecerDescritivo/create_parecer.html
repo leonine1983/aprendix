@@ -1,12 +1,128 @@
-{% extends "base.html" %}
+{% extends "modulo_professor/base.html" %}
 
-{% block content %}
-<h2>Parecer do aluno {{ aluno.nome_completo }} - {{ trimestre }}</h2>
+{% block main %}  
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Salvar Parecer</button>
-</form>
+<div class="imprimir bg-light rounded-3 shadow p-4 my-4">
+  <!-- Cabeçalho -->
+  <div class="bg-white rounded shadow-sm p-3 mb-4">
+    <section class="d-flex flex-wrap align-items-center gap-2 mb-2">
+      <h1 class="mb-0 fs-2 text-primary">{{ grade.turma }}</h1>
+      <span class="text-muted">|</span>
+      <span class="fs-5 text-secondary">{{ grade }}</span>
+    </section>
+    <section class="text-center">
+      <h2 class="fs-4 fw-semibold mb-2">Criar ou Editar o Parecer do Aluno</h2>
+      <p class="fs-5 text-muted mb-0">{{ aluno }}</p>
+    </section>
+  </div>
 
-{% endblock %}
+  <!-- Formulário com Navegação Vertical -->
+  <div class="bg-white rounded shadow-sm p-4">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form.media }}
+
+      <div class="row">
+        <!-- Navegação vertical -->
+        <div class="col-md-4 mb-3">
+          <div class="nav flex-column nav-pills tab-nav-custom" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            {% for field in form %}
+              <button class="nav-link tab-color tab-color-{{ forloop.counter }} {% if forloop.first %}active{% endif %}"
+                      id="tab-{{ forloop.counter }}-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#tab-{{ forloop.counter }}"
+                      type="button"
+                      role="tab"
+                      aria-controls="tab-{{ forloop.counter }}"
+                      aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+                {{ field.label }}
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Conteúdo das Tabs -->
+        <div class="col-md-8">
+          <div class="tab-content" id="v-pills-tabContent">
+            {% for field in form %}
+              <div class="tab-pane fade {% if forloop.first %}show active{% endif %} tab-style tab-style-{{ forloop.counter }}"
+                   id="tab-{{ forloop.counter }}" role="tabpanel" aria-labelledby="tab-{{ forloop.counter }}-tab">
+                <div class="mb-4">
+                  <label for="{{ field.id_for_label }}" class="form-label fw-semibold text-uppercase">{{ field.label }}</label>
+                  {{ field }}
+                  {% if field.help_text %}
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                  {% endif %}
+                  {% if field.errors %}
+                    <div class="text-danger small mt-1">{{ field.errors }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="d-grid d-sm-flex justify-content-end gap-2 mt-4">
+        <button type="submit" class="btn btn-success px-4">
+          <i class="bi bi-save me-2"></i>Salvar Parecer
+        </button>
+        <a href="#" class="btn btn-outline-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+<style>
+  .tab-pane-custom {
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    color: #212529;
+  }
+
+  /* Cor das abas e conteúdos (mesmas classes) */
+  .tab-style-1,
+  .tab-color-1.active { background-color: #e3f2fd !important; border-left: 5px solid #0d6efd; color: #0d6efd !important; }
+  .tab-style-2,
+  .tab-color-2.active { background-color: #fff3cd !important; border-left: 5px solid #ffc107; color: #ffc107 !important; }
+  .tab-style-3,
+  .tab-color-3.active { background-color: #d1e7dd !important; border-left: 5px solid #198754;color:#198754!important;  }
+  .tab-style-4,
+  .tab-color-4.active { background-color: #f8d7da !important; border-left: 5px solid #dc3545; color: #dc3545 !important; }
+  .tab-style-5,
+  .tab-color-5.active { background-color: #f3e5f5 !important; border-left: 5px solid #6f42c1;color:#6f42c1!important;  }
+  .tab-style-6,
+  .tab-color-6.active { background-color: #e0f7fa !important; border-left: 5px solid #0dcaf0;color:  #0dcaf0!important;  }
+  .tab-style-7,
+  .tab-color-7.active { background-color: #e9ecef !important; border-left: 5px solid #6c757d;color:#6c757d !important;  }
+  .tab-style-8,
+  .tab-color-8.active { background-color: #fbe9e7 !important; border-left: 5px solid #fd7e14; color:  #fd7e14 !important; }
+  .tab-style-9,
+  .tab-color-9.active { background-color: #fff0f5 !important; border-left: 5px solid #d63384; color:  #d63384 !important; }
+
+  /* Estilo base dos botões de navegação */
+  .tab-nav-custom .nav-link {
+    border-left: 5px solid transparent;
+    border-radius: 0;
+    text-align: left;
+    padding-left: 1rem;
+    color: #333;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .tab-nav-custom .nav-link:hover {
+    background-color: #f8f9fa;
+  }
+
+  /* Estilo do conteúdo */
+  .tab-style {
+    padding: 1rem 1.25rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+  }
+</style>
+
+
+
+{% endblock main %}
