@@ -471,6 +471,8 @@ def parecerTurma(request, turma):
 def alunoGestaoTurmasParecer(request, pk, trimestre):    
     matricula = get_object_or_404(Matriculas, pk=pk)
     trimestre_obj = get_object_or_404(Trimestre, pk=trimestre)
+    trimestre=Trimestre.objects.all()
+    parecerAlunoImpressao = ParecerDescritivo.objects.filter(matricula = pk).order_by('trimestre__id')
 
     parecer, created = ParecerDescritivo.objects.get_or_create(matricula=matricula, trimestre=trimestre_obj)
 
@@ -513,8 +515,10 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
             resumo = response.choices[0].message.content
             parecer.resumo = resumo
             parecer.save()
+            
+            messages.success(request, f"O parecer do aluno {parecer.matricula} referente ao {parecer.trimestre} foi salvo com sucesso.")
+            return redirect('modulo_professor:aluno_parecer', pk=parecer.matricula.id, trimestre=parecer.trimestre.id)
 
-            return redirect('modulo_professor:parecerTurma')  # Substitua com o nome da view desejada
     else:
         form = ParecerDescritivoForm(instance=parecer)
 
@@ -522,8 +526,10 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
         'form': form,
         'aluno': matricula.aluno,
         'trimestre': trimestre_obj,
+        'trimestres': trimestre,
         'matricula': matricula,
         'parecer': parecer,
+        'parecerAlunoImpressao':parecerAlunoImpressao,
     }
     return render(request, 'modulo_professor/partial/parecerDescritivo/create_parecer.html', context)
 

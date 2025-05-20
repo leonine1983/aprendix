@@ -2,17 +2,32 @@
 
 {% block main %}  
 
-<div class="imprimir bg-light rounded-3 shadow p-4 my-4">
+<div class="imprimir bg-light rounded-3 shadow p-4 my-4" style="margin-top: 7rem!important;padding-right: 31rem;">
+  <div class="alert alert-info py-3 px-4">
+  <div class="text-center mb-3">
+    <h5 class="mb-0 fw-semibold text-primary">Selecione outro Trimestre</h5>
+  </div>
+  <div class="d-flex justify-content-center flex-wrap gap-2">
+    {% for t in trimestres %}
+        {% if not t.final %}
+        <a href="{% url 'modulo_professor:aluno_parecer' aluno.id t.id %}" class="btn btn-sm btn-outline-warning">
+          {{ t }}
+        </a>
+        {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+</section>
   <!-- Cabeçalho -->
   <div class="bg-white rounded shadow-sm p-3 mb-4">
     <section class="d-flex flex-wrap align-items-center gap-2 mb-2">
-      <h1 class="mb-0 fs-2 text-primary">{{ grade.turma }}</h1>
-      <span class="text-muted">|</span>
+      <h3><span class="badge text-bg-secondary">{{ trimestre }}</span> | {{matricula.turma}}</h3>
       <span class="fs-5 text-secondary">{{ grade }}</span>
     </section>
     <section class="text-center">
-      <h2 class="fs-4 fw-semibold mb-2">Criar ou Editar o Parecer do Aluno</h2>
-      <p class="fs-5 text-muted mb-0">{{ aluno }}</p>
+      <h2 class="fs-4 fw-semibold mb-2">PARECER DESCRITIVO</h2>
+      <small class="text-muted mb-0">{{ aluno }}</small>
     </section>
   </div>
 
@@ -71,6 +86,37 @@
       </div>
     </form>
   </div>
+  <section id="parecer" class="my-4 p-4 border rounded shadow-sm">
+  <div class="d-flex justify-content-end mb-3 d-print-none">
+    <button class="btn btn-primary d-print-none" onclick="printParecer()">
+      <i class="bi bi-printer"></i> Imprimir
+    </button>
+  </div>
+
+  <h5 class="mb-4 text-center fw-bold">Parecer Descritivo – Matrícula: {{ parecerAlunoImpressao.0.matricula }}</h5>
+
+  <div class="table-responsive">
+    <table class="table table-bordered align-middle table-striped">
+      <thead class="table-gradient">
+        <tr>
+          <th class="text-center" style="width: 20%;">Trimestre</th>
+          <th style="width: 80%;">Parecer</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pa in parecerAlunoImpressao %}
+          {% if not pa.trimestre.final %}
+          <tr style="order: {{pa.trimestre.id}};">
+            <td class="text-center fw-semibold">{{ pa.trimestre }} </td>
+            <td class="text-justify">{{ pa.resumo }}</td>
+          </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
 </div>
 <style>
   .tab-pane-custom {
@@ -121,8 +167,116 @@
     border-radius: 0.5rem;
     margin-bottom: 1rem;
   }
+  
+
 </style>
 
 
+<script>
+function printParecer() {
+  const content = document.getElementById('parecer').innerHTML;
+  const printWindow = window.open('', '', 'width=800,height=600');
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Parecer do Aluno</title>
+        <style>
+          body {
+            font-family: "Times New Roman", serif;
+            font-size: 12pt;
+            margin: 20mm;
+            color: #000;
+          }
+          .table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+          .table th, .table td {
+            border: 1px solid #000;
+            padding: 6px 10px;
+            vertical-align: top;
+            text-align: justify;
+          }
+          .table-gradient th {
+            background: #e6e6e6;
+          }
+          .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f7f7f7;
+          }
+          .table-striped tbody tr:nth-of-type(even) {
+            background-color: #fff;
+          }
+        </style>
+      </head>
+      <body>
+        ${content}
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.close();
+}
+</script>
+
+<style>
+  /* Degradê suave no cabeçalho */
+  .table-gradient th {
+    background: linear-gradient(90deg, #f0f0f0, #d9d9d9);
+  }
+
+  /* Listras suaves para impressão e tela */
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+  .table-striped tbody tr:nth-of-type(even) {
+    background-color: rgba(0, 0, 0, 0.00);
+  }
+
+  @media print {
+    body {
+      font-family: "Times New Roman", serif;
+      font-size: 12pt;
+      color: #000;
+      background: #fff !important;
+      margin: 20mm;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse !important;
+    }
+
+    .table th,
+    .table td {
+      border: 1px solid #000 !important;
+      padding: 6px 10px;
+      vertical-align: top;
+    }
+
+    /* Mantém o degradê em tons de cinza para impressão */
+    .table-gradient th {
+      background: #e6e6e6 !important;
+    }
+
+    /* Faixas alternadas em cinza bem claro (+ contraste) */
+    .table-striped tbody tr:nth-of-type(odd) {
+      background-color: #f7f7f7 !important;
+    }
+    .table-striped tbody tr:nth-of-type(even) {
+      background-color: #fff !important;
+    }
+
+    .d-print-none {
+      display: none !important;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 20mm;
+    }
+  }
+</style>
 
 {% endblock main %}
