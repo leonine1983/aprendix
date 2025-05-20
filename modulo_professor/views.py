@@ -475,6 +475,8 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
     parecerAlunoImpressao = ParecerDescritivo.objects.filter(matricula = pk).order_by('trimestre__id')
 
     parecer, created = ParecerDescritivo.objects.get_or_create(matricula=matricula, trimestre=trimestre_obj)
+    autor = f"Professor(a) {request.user.related_vinculoUserPessoa}"
+    
 
     if request.method == 'POST':
         form = ParecerDescritivoForm(request.POST, instance=parecer)
@@ -514,6 +516,11 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
 
             resumo = response.choices[0].message.content
             parecer.resumo = resumo
+
+            if created:
+                parecer.author_created = autor
+            else:
+                parecer.author_atualiza = autor
             parecer.save()
             
             messages.success(request, f"O parecer do aluno {parecer.matricula} referente ao {parecer.trimestre} foi salvo com sucesso.")

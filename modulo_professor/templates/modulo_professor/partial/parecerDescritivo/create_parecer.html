@@ -22,7 +22,7 @@
   <!-- Cabeçalho -->
   <div class="bg-white rounded shadow-sm p-3 mb-4">
     <section class="d-flex flex-wrap align-items-center gap-2 mb-2">
-      <h3><span class="badge text-bg-secondary">{{ trimestre }}</span> | {{matricula.turma}}</h3>
+      <h3><span class="badge text-bg-secondary">{{ trimestre }}</span> | {{matricula.turma}} | {{matricula.turma.gradeTurma_related.first}} </h3>
       <span class="fs-5 text-secondary">{{ grade }}</span>
     </section>
     <section class="text-center">
@@ -94,6 +94,7 @@
   </div>
 
   <h5 class="mb-4 text-center fw-bold">Parecer Descritivo – Matrícula: {{ parecerAlunoImpressao.0.matricula }}</h5>
+  <small>Turma: {{ parecerAlunoImpressao.0.matricula.turma }}</small>
 
   <div class="table-responsive">
     <table class="table table-bordered align-middle table-striped">
@@ -108,7 +109,34 @@
           {% if not pa.trimestre.final %}
           <tr style="order: {{pa.trimestre.id}};">
             <td class="text-center fw-semibold">{{ pa.trimestre }} </td>
-            <td class="text-justify">{{ pa.resumo }}</td>
+            <td class="text-justify">
+              <section>{{ pa.resumo }}</section>
+              <section class="mt-4">
+                <div class="card shadow-sm border-0">
+                  <div class="card-body">
+                    {% if pa.author_created %}
+                    <p class="mb-2 text-muted">
+                      <i class="bi bi-person-check"></i>
+                      <strong>Parecer criado por:</strong> {{ pa.author_created }} <br>
+                      <small class="text-secondary ms-4">
+                        <i class="bi bi-calendar-plus"></i> {{ pa.created|date:"d/m/Y H:i" }}
+                      </small>
+                    </p>
+                    {% endif %}
+                    {% if pa.author_atualiza %}
+                    <p class="text-muted">
+                      <i class="bi bi-pencil-square"></i>
+                      <strong>Última atualização por:</strong> {{ pa.author_atualiza }} <br>
+                      <small class="text-secondary ms-4">
+                        <i class="bi bi-calendar-event"></i> {{ pa.atualizado_em|date:"d/m/Y H:i" }}
+                      </small>
+                    </p>
+                    {% endif %}
+                  </div>
+                </div>
+              </section>
+
+            </td>
           </tr>
           {% endif %}
         {% endfor %}
