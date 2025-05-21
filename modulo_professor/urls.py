@@ -4,7 +4,8 @@ from .views import (home_professor,home_sessaoIniciada, criaNotasComposicao,
                     selecionaTurma, registrar_presenca_por_aula_view, 
                     historico_faltas_view, historico_faltas_view, lista_presenca_diaria_view,
                     selecionaTurmaDisciplina, faltas_por_disciplina_mes_view, alunoGestaoTurmasParecer,
-                    parecerTurma)
+                    parecerTurma, aulas_do_dia, PlanoDeAulaCreateView, PlanoDeAulaUpdateView,
+                    PlanoDeAulaDeleteView)
 
 app_name = 'modulo_professor'
 
@@ -30,5 +31,11 @@ urlpatterns = [
     # Parecer descritivo
     path('/turma/parecer/<int:turma>/turma', parecerTurma, name='parecerTurma'),
     path('/aluno/<int:pk>/trimestre/<int:trimestre>/', alunoGestaoTurmasParecer, name='aluno_parecer'),
+
+    # Diario de classe
+    path('planos-de-aula/novo/', PlanoDeAulaCreateView.as_view(), name='plano_de_aula_criar'),
+    path('planos-de-aula/<int:pk>/editar/', PlanoDeAulaUpdateView.as_view(), name='plano_de_aula_editar'),
+    path('planos-de-aula/<int:pk>/excluir/', PlanoDeAulaDeleteView.as_view(), name='plano_de_aula_excluir'),
+    path('aulas-do-dia/', aulas_do_dia, name='aulas_do_dia'),
 
 ]

@@ -1,0 +1,45 @@
+<h2>Aulas dadas em {{ data_hoje }}</h2>
+
+{% if aulas %}
+    {% for item in aulas %}
+        <div style="border: 1px solid #ccc; margin-bottom: 20px; padding: 15px;">
+            <h3>{{ item.aula.turma_disciplina }}</h3>
+            <p><strong>Hora:</strong> {{ item.aula.hora_inicio }} - {{ item.aula.hora_fim }}</p>
+            <p><strong>Conteúdo dado:</strong> {{ item.aula.conteudo_dado }}</p>
+
+            {% if item.plano %}
+                <h4>Plano de Aula</h4>
+                <p><strong>Objetivo Geral:</strong> {{ item.plano.objetivo_geral }}</p>
+                <p><strong>Competências BNCC:</strong> {{ item.plano.competencias_bncc }}</p>
+                <p><strong>Habilidades BNCC:</strong> {{ item.plano.habilidades_bncc }}</p>
+                <p><strong>Metodologia:</strong> {{ item.plano.metodologia }}</p>
+                <p><strong>Recursos Didáticos:</strong> {{ item.plano.recursos_didaticos }}</p>
+            {% endif %}
+
+            <div style="display: flex; gap: 40px; margin-top: 20px;">
+                <div>
+                    <h5 style="color: green;">Presentes</h5>
+                    <ul>
+                        {% for aluno in item.presentes %}
+                            <li>{{ aluno.nome_completo }}</li>
+                        {% empty %}
+                            <li>Nenhum aluno presente.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div>
+                    <h5 style="color: red;">Faltosos</h5>
+                    <ul>
+                        {% for aluno in item.faltosos %}
+                            <li>{{ aluno.nome_completo }}</li>
+                        {% empty %}
+                            <li>Nenhum aluno faltoso.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Nenhuma aula foi registrada hoje.</p>
+{% endif %}

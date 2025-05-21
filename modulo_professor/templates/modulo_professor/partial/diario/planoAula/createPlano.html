@@ -1,0 +1,76 @@
+{% extends "modulo_professor/base.html" %}
+
+{% block main %}  
+<div class="container my-5">
+  <div class="bg-light rounded-4 shadow p-4">
+    <!-- Cabeçalho -->
+    <div class="border-bottom pb-3 mb-4">
+      <div class="d-flex flex-wrap align-items-center justify-content-between">
+        <h1 class="fs-4 m-0">{{ grade.turma }}</h1>
+        <span class="text-muted">{{ grade }}</span>
+      </div>
+      <div class="text-center mt-3">
+        <h2 class="fs-3">Novo Plano de Aula</h2>
+        <p class="text-secondary">{{ aluno }}</p>
+      </div>
+    </div>
+
+    <!-- Formulário -->
+    <div class="row justify-content-center">
+      <div class="col-12">
+        <form method="post" class="row g-3" novalidate>
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="col-md-6">
+              <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="text-danger small">{{ field.errors }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          <div class="col-12 d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <a href="#" class="btn btn-secondary">Voltar para lista</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Lista de Planos de Aula -->
+    <div class="mt-5">
+      <h3>Planos de Aula Criados</h3>
+      {% if planos %}
+        <table class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>Turma Disciplina</th>
+              <th>Data Planejada</th>
+              <th>Conteúdo Planejado</th>
+              <th>Objetivo Geral</th>
+              <th>Competências BNCC</th>
+              <th>Habilidades BNCC</th>
+              <!-- Adicione outras colunas se desejar -->
+            </tr>
+          </thead>
+          <tbody>
+            {% for plano in planos %}
+            <tr>
+              <td>{{ plano.turma_disciplina }}</td>
+              <td>{{ plano.data_planejada }}</td>
+              <td>{{ plano.conteudo_planejado|truncatechars:50 }}</td>
+              <td>{{ plano.objetivo_geral|truncatechars:50 }}</td>
+              <td>{{ plano.competencias_bncc|truncatechars:50 }}</td>
+              <td>{{ plano.habilidades_bncc|truncatechars:50 }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>Nenhum plano de aula criado até o momento.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock main %}

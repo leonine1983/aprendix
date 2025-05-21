@@ -637,10 +637,10 @@ class Presenca(models.Model):
     def __str__(self):
         return f'{self.matricula.aluno.nome_completo} - {self.horario} - {"Presente" if self.presente else "Ausente"}'
 """
+
 class Presenca(models.Model):
     matricula = models.ForeignKey(Matriculas, related_name='presencas_aluno', on_delete=models.CASCADE)
     data = models.DateField()
-
     controle_diario = models.BooleanField(default=True)
 
     turma_disciplina = models.ForeignKey(
@@ -680,12 +680,6 @@ class Presenca(models.Model):
 
 
 
-class SequenciaDidatica(models.Model):
-    horario = models.ForeignKey(Horario, related_name='sequencias_didaticas', on_delete=models.CASCADE)
-    descricao = models.TextField()
-
-    def __str__(self):
-        return f'Sequência didática em {self.horario.data} - {self.horario.turma_disciplina.disciplina.nome}' 
 
 
 class GestaoTurmas(models.Model):

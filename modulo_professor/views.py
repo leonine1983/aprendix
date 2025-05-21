@@ -637,3 +637,171 @@ def atualizarResumoFinal(request, pk):
     })
  
 
+
+# Diario de Classe -----------------
+
+from django.views.generic import CreateView, ListView
+from django.urls import reverse_lazy
+from .models import PlanoDeAula
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django import forms
+from .models import PlanoDeAula
+from django.db.models import Q
+from django.db.models import Q
+from .models import TurmaDisciplina
+from rh.models import Encaminhamentos, UserPessoas
+
+class PlanoDeAulaForm(forms.ModelForm):
+    class Meta:
+        model = PlanoDeAula
+        fields = '__all__'
+        widgets = {
+            'data_planejada': forms.DateInput(attrs={'type': 'date'}),
+            'conteudo_planejado': forms.Textarea(attrs={'rows': 3}),
+            'objetivo_geral': forms.Textarea(attrs={'rows': 3}),
+            'competencias_bncc': forms.Textarea(attrs={'rows': 2}),
+            'habilidades_bncc': forms.Textarea(attrs={'rows': 2}),
+            'metodologia': forms.Textarea(attrs={'rows': 2}),
+            'recursos_didaticos': forms.Textarea(attrs={'rows': 2}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+
+        if request:
+            escola = request.session.get('escola')
+            user = request.user
+
+            try:
+                pessoa = UserPessoas.objects.get(user=user).pessoa
+                encaminhamentos = Encaminhamentos.objects.filter(encaminhamento__contratado=pessoa)
+
+                self.fields['turma_disciplina'].queryset = TurmaDisciplina.objects.filter(
+                    Q(professor__in=encaminhamentos) |
+                    Q(professo2__in=encaminhamentos) |
+                    Q(reserva_tecnica__in=encaminhamentos) |
+                    Q(auxiliar_classe__in=encaminhamentos),
+                    turma__escola=escola
+                ).distinct()
+
+            except UserPessoas.DoesNotExist:
+                self.fields['turma_disciplina'].queryset = TurmaDisciplina.objects.none()
+
+
+
+
+from django.db.models import Q
+from modulo_professor.models import TurmaDisciplina
+from rh.models import UserPessoas, Encaminhamentos
+
+from django.contrib import messages
+from django.db.models import Q
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.edit import CreateView
+from modulo_professor.models import TurmaDisciplina, PlanoDeAula
+from rh.models import UserPessoas, Encaminhamentos, Contrato
+
+
+class PlanoDeAulaCreateView(LoginRequiredMixin, CreateView):
+    model = PlanoDeAula
+    form_class = PlanoDeAulaForm
+    template_name = 'modulo_professor/partial/diario/planoAula/createPlano.html'
+    success_url = reverse_lazy('modulo_professor:plano_de_aula_criar')  # redireciona para mesma view
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        escola = self.request.session.get('escola')
+        usuario = self.request.user
+        pessoa = get_object_or_404(UserPessoas, user = usuario)
+
+        if escola and usuario:
+            try:
+                pessoa = UserPessoas.objects.get(user=usuario).pessoa
+            except UserPessoas.DoesNotExist:
+                pessoa = None
+
+            if pessoa:
+                planos = PlanoDeAula.objects.filter(
+                    turma_disciplina__professor__encaminhamento__contratado__id=pessoa.id,
+                    turma_disciplina__turma__escola__id=escola.id
+                ).distinct()
+            else:
+                planos = PlanoDeAula.objects.none()
+        else:
+            planos = PlanoDeAula.objects.none()
+
+        context['planos'] = planos
+        return context
+
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Plano de aula salvo com sucesso!")
+        return response
+
+
+
+
+
+
+from django.views.generic import UpdateView, DeleteView
+from django.urls import reverse_lazy
+
+class PlanoDeAulaUpdateView(LoginRequiredMixin, UpdateView):
+    model = PlanoDeAula
+    form_class = PlanoDeAulaForm
+    template_name = 'modulo_professor/partial/diario/planoAula/createPlano.html'
+    success_url = reverse_lazy('modulo_professor:plano_de_aula_lista')
+
+
+class PlanoDeAulaDeleteView(LoginRequiredMixin, DeleteView):
+    model = PlanoDeAula
+    template_name = 'modulo_professor/partial/diario/planoAula/plano_de_aula_confirm_delete.html'
+    success_url = reverse_lazy('modulo_professor:plano_de_aula_lista')
+
+
+
+
+
+
+from django.shortcuts import render
+from django.utils import timezone
+from .models import AulaDada
+
+def aulas_do_dia(request):
+    hoje = timezone.now().date()
+
+    # Busca todas as aulas dadas hoje
+    aulas_hoje = AulaDada.objects.filter(data=hoje).select_related('plano', 'turma_disciplina')
+
+    contexto_aulas = []
+
+    for aula in aulas_hoje:
+        # Presenças associadas à turma e data
+        presencas = Presenca.objects.filter(
+            turma_disciplina=aula.turma_disciplina,
+            data=aula.data
+        ).select_related('matricula__aluno')
+
+        presentes = [p.matricula.aluno for p in presencas if p.presente]
+        faltosos = [p.matricula.aluno for p in presencas if not p.presente]
+
+        contexto_aulas.append({
+            'aula': aula,
+            'plano': aula.plano,
+            'presentes': presentes,
+            'faltosos': faltosos,
+        })
+
+    return render(request, 'modulo_professor/partial/diario/aulas_do_dia.html', {
+        'aulas': contexto_aulas,
+        'data_hoje': hoje,
+    })
+

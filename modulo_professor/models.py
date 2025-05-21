@@ -1,5 +1,5 @@
 from django.db import models
-from gestao_escolar.models import Matriculas, TurmaDisciplina, Trimestre, GestaoTurmas
+from gestao_escolar.models import Matriculas, TurmaDisciplina, Trimestre, GestaoTurmas, Horario
 from decimal import Decimal
 
 
@@ -173,4 +173,57 @@ class ComposicaoNotas(models.Model):
         return  f"{self.aluno} - {self.trimestre} - {self.nota_final}"
     
 
+
+# Diario de Classe
+class PlanoDeAula(models.Model):
+    turma_disciplina = models.ForeignKey(
+        TurmaDisciplina,
+        on_delete=models.CASCADE,
+        related_name='planos_de_aula'
+    )
+    data_planejada = models.DateField()
+    conteudo_planejado = models.TextField()
+    objetivo_geral = models.TextField()
+    competencias_bncc = models.TextField(help_text="Códigos e descrições das competências BNCC")
+    habilidades_bncc = models.TextField(help_text="Códigos e descrições das habilidades BNCC")
+    metodologia = models.TextField(blank=True, null=True)
+    recursos_didaticos = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.turma_disciplina} - {self.data_planejada}'    
+
+
+class AulaDada(models.Model):
+    plano = models.ForeignKey(
+        PlanoDeAula,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='aulas_relacionadas'
+    )
+    turma_disciplina = models.ForeignKey(
+        TurmaDisciplina,
+        on_delete=models.CASCADE,
+        related_name='aulas_dadas'
+    )
+    data = models.DateField()
+    hora_inicio = models.TimeField()
+    hora_fim = models.TimeField()
+    conteudo_dado = models.TextField()
+    observacoes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.turma_disciplina} - {self.data}'
     
+
+class AnexoAula(models.Model):
+    aula = models.ForeignKey(
+        AulaDada,
+        on_delete=models.CASCADE,
+        related_name='anexos'
+    )
+    arquivo = models.FileField(upload_to='anexos_aulas/')
+    descricao = models.CharField(max_length=200, blank=True)
+
+    def __str__(self):
+        return f'Anexo para aula {self.aula.id}'

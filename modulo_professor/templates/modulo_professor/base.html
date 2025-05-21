@@ -663,6 +663,7 @@
       z-index: 200;
       cursor: pointer;
       transition: right 0.3s ease;
+      color: white;
     }
 
     .myapp-sidebar-toggle-btn:hover {
@@ -763,27 +764,16 @@
               <small>Prova online para os aluno</small>
             </button>          
           </a>
-        </div>
-
-
-        
-      </div>
-
-
-
-      
-      
-
-    
+        </div>        
+      </div>   
+          
     </nav>
 
   </aside>
 
   <!-- Botão para abrir/fechar a sidebar (em telas pequenas) -->
   <button onclick="toggleSidebar()" class="myapp-sidebar-toggle-btn">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-      <path d="M4 6h16M4 12h16M4 18h16"/>
-    </svg>
+    Alunos
   </button>
 
   <script>
@@ -801,10 +791,6 @@
       }
     }
   </script>
-
-
-
-
 
 
 <dialog id="instructions_notas">
@@ -897,6 +883,185 @@
           dialog_turmas.close(); // Fecha a caixa de diálogo
           });
   </script>
+
+
+
+
+
+
+
+
+<style>
+  .diario-sidebar {
+    position: fixed;
+    top: 11%;
+    left: 0;
+    width: 7px;
+    height: 90%;
+    background-color: rgba(40, 40, 40, 0.12);
+    backdrop-filter: blur(10px);
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.3);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+    border-radius: 0 10px 10px 0;
+    transition: width 0.3s ease-in-out;
+  }
+
+  .diario-sidebar.show {
+    width: 250px;
+  }
+
+  .diario-sidebar-nav {
+    padding: 0;
+    list-style: none;
+    margin-top: 2.2rem;
+    flex-grow: 1;
+  }
+
+  .diario-sidebar-item {
+    margin-bottom: 1rem;
+    position: relative;
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .diario-sidebar.show .diario-sidebar-item {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .diario-sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    font-size: 18px;
+    color: #17283f;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+  }
+
+  .diario-sidebar-link:hover {
+    background-color: #57575733;
+    transform: scale(1.01);
+  }
+
+  .diario-subnivel {
+    display: none;
+    padding-left: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    margin-top: 10px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+  }
+
+  .show-subnivel {
+    display: block;
+    max-height: 200px;
+  }
+
+  .diario-sidebar-toggle-btn {
+    position: fixed;
+    top: 35%;
+    left: -10px;
+    transform: translateY(1%) rotate(90deg);
+    background-color: #444;
+    border: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 30px 30px 0 0;
+    z-index: 200;
+    cursor: pointer;
+    color: white;
+    transition: left 0.3s ease;
+  }
+
+  .diario-sidebar-toggle-btn:hover {
+    transform: translateY(1%) rotate(90deg) scale(1.1);
+  }
+
+  @media (max-width: 768px) {
+    .diario-sidebar {
+      width: 7px;
+    }
+
+    .diario-sidebar.show {
+      width: 250px;
+    }
+
+    .diario-sidebar-toggle-btn {
+      display: block;
+    }
+  }
+</style>
+
+
+<!-- Sidebar da esquerda -->
+<!-- Sidebar Diário de Classe (esquerda) -->
+<aside class="diario-sidebar" id="diarioSidebar">
+  <nav class="diario-sidebar-nav">
+
+    <div class="diario-sidebar-item">
+      <a href="{% url 'modulo_professor:plano_de_aula_criar' %}" class="diario-sidebar-link" onclick="toggleSubnivelDiario(event)">
+        <i class="fa-solid fa-users-rectangle me-2"></i>
+        Plano de Aula
+      </a>
+    </div>
+
+    <div class="diario-sidebar-item">
+      <a href="#" class="diario-sidebar-link" onclick="toggleSubnivelDiario(event)">
+        <i class="fa-solid fa-chalkboard-user me-2"></i>
+        Planejamento
+      </a>
+      <div class="diario-subnivel">
+        <a href="#" class="diario-sidebar-link"><small>Plano de aula</small></a>
+        <a href="#" class="diario-sidebar-link"><small>Conteúdo aplicado</small></a>
+      </div>
+    </div>
+
+    <div class="diario-sidebar-item">
+      <a href="#" class="diario-sidebar-link" onclick="toggleSubnivelDiario(event)">
+        <i class="fa-solid fa-book-open-reader me-2"></i>
+        Relatórios
+      </a>
+      <div class="diario-subnivel">
+        <a href="#" class="diario-sidebar-link"><small>Relatório bimestral</small></a>
+        <a href="#" class="diario-sidebar-link"><small>Frequência geral</small></a>
+      </div>
+    </div>
+  </nav>
+</aside>
+
+<!-- Botão para abrir/fechar a sidebar do Diário de Classe -->
+<button onclick="toggleSidebarDiario()" class="diario-sidebar-toggle-btn">
+  Diário
+</button>
+
+
+<script>
+  function toggleSidebarDiario() {
+    const sidebar = document.getElementById('diarioSidebar');
+    const button = document.querySelector('.diario-sidebar-toggle-btn');
+    sidebar.classList.toggle('show');
+    button.style.left = sidebar.classList.contains('show') ? '250px' : '1rem';
+  }
+
+  function toggleSubnivelDiario(event) {
+    const parent = event.currentTarget.parentElement;
+    const subnivel = parent.querySelector('.diario-subnivel');
+    if (subnivel) {
+      subnivel.classList.toggle('show-subnivel');
+    }
+  }
+</script>
+
+
 
   
 </body>    
