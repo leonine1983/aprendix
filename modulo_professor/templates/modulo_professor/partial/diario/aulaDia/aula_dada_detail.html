@@ -1,0 +1,18 @@
+<h2>Detalhes da Aula</h2>
+<p><strong>Turma:</strong> {{ aula.turma_disciplina }}</p>
+<p><strong>Data:</strong> {{ aula.data }}</p>
+<p><strong>Conteúdo:</strong> {{ aula.conteudo_dado }}</p>
+<p><strong>Observações:</strong> {{ aula.observacoes }}</p>
+
+<h3>Anexos</h3>
+<ul>
+  {% for anexo in aula.anexos.all %}
+    <li>
+      <a href="{{ anexo.arquivo.url }}" target="_blank">{{ anexo.descricao }}</a>
+    </li>
+  {% empty %}
+    <li>Nenhum anexo</li>
+  {% endfor %}
+</ul>
+
+<a href="{% url 'modulo_professor:anexo_aula_criar' aula.pk %}">Adicionar Anexo</a>

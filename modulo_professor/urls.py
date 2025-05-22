@@ -1,12 +1,5 @@
 from django.urls import path
-from .views import (home_professor,home_sessaoIniciada, criaNotasComposicao, 
-                    atualizaRecuperaFinal, registrar_presenca_diaria_view, 
-                    selecionaTurma, registrar_presenca_por_aula_view, 
-                    historico_faltas_view, historico_faltas_view, lista_presenca_diaria_view,
-                    selecionaTurmaDisciplina, faltas_por_disciplina_mes_view, alunoGestaoTurmasParecer,
-                    parecerTurma, aulas_do_dia, PlanoDeAulaCreateView, PlanoDeAulaUpdateView,
-                    PlanoDeAulaDeleteView)
-
+from .views import *
 app_name = 'modulo_professor'
 
 urlpatterns = [
@@ -37,5 +30,10 @@ urlpatterns = [
     path('planos-de-aula/<int:pk>/editar/', PlanoDeAulaUpdateView.as_view(), name='plano_de_aula_editar'),
     path('planos-de-aula/<int:pk>/excluir/', PlanoDeAulaDeleteView.as_view(), name='plano_de_aula_excluir'),
     path('aulas-do-dia/', aulas_do_dia, name='aulas_do_dia'),
+
+    # AULA DIA
+    path('aulas/nova/', AulaDadaCreateView.as_view(), name='aula_dada_criar'),
+    path('aulas/<int:pk>/', AulaDadaDetailView.as_view(), name='aula_dada_detalhe'),
+    path('aulas/<int:pk>/anexo/', AnexoAulaCreateView.as_view(), name='anexo_aula_criar'),
 
 ]

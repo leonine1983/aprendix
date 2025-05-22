@@ -172,25 +172,66 @@ class ComposicaoNotas(models.Model):
     def __str__(self):
         return  f"{self.aluno} - {self.trimestre} - {self.nota_final}"
     
+from django.db import models
+from django.core.exceptions import ValidationError
+from ckeditor_uploader.fields import RichTextUploadingField
+from gestao_escolar.models import TurmaDisciplina
 
-
-# Diario de Classe
 class PlanoDeAula(models.Model):
     turma_disciplina = models.ForeignKey(
         TurmaDisciplina,
         on_delete=models.CASCADE,
-        related_name='planos_de_aula'
+        related_name='planos_de_aula',
+        verbose_name="Turma / Disciplina"
     )
-    data_planejada = models.DateField()
-    conteudo_planejado = models.TextField()
-    objetivo_geral = models.TextField()
-    competencias_bncc = models.TextField(help_text="Códigos e descrições das competências BNCC")
-    habilidades_bncc = models.TextField(help_text="Códigos e descrições das habilidades BNCC")
-    metodologia = models.TextField(blank=True, null=True)
-    recursos_didaticos = models.TextField(blank=True, null=True)
+
+    data_inicio = models.DateField(
+        verbose_name="Data de Início",
+        help_text="Data inicial do período do plano de aula"
+    )
+    data_fim = models.DateField(
+        verbose_name="Data de Fim",
+        help_text="Data final do período do plano de aula"
+    )
+
+    conteudo_planejado = RichTextUploadingField(
+        verbose_name="Conteúdo Planejado"
+    )
+    objetivo_geral = RichTextUploadingField(
+        verbose_name="Objetivo Geral"
+    )
+    competencias_bncc = RichTextUploadingField(
+        verbose_name="Competências da BNCC",
+        help_text="Informe os códigos e descrições das competências segundo a BNCC"
+    )
+    habilidades_bncc = RichTextUploadingField(
+        verbose_name="Habilidades da BNCC",
+        help_text="Informe os códigos e descrições das habilidades segundo a BNCC"
+    )
+    metodologia = RichTextUploadingField(
+        verbose_name="Metodologia",
+        blank=True, null=True
+    )
+    recursos_didaticos = RichTextUploadingField(
+        verbose_name="Recursos Didáticos",
+        blank=True, null=True
+    )
+
+    class Meta:
+        verbose_name = "Plano de Aula"
+        verbose_name_plural = "Planos de Aula"
+        ordering = ['-data_inicio']
 
     def __str__(self):
-        return f'{self.turma_disciplina} - {self.data_planejada}'    
+        return f'{self.turma_disciplina} - {self.data_inicio.strftime("%d/%m/%Y")} a {self.data_fim.strftime("%d/%m/%Y")}'
+
+    def clean(self):
+        super().clean()
+        if self.data_fim < self.data_inicio:
+            raise ValidationError({
+                'data_fim': "A data final não pode ser anterior à data inicial."
+            })
+
 
 
 class AulaDada(models.Model):
@@ -209,8 +250,16 @@ class AulaDada(models.Model):
     data = models.DateField()
     hora_inicio = models.TimeField()
     hora_fim = models.TimeField()
-    conteudo_dado = models.TextField()
-    observacoes = models.TextField(blank=True, null=True)
+    
+    conteudo_dado = RichTextUploadingField(
+        verbose_name="Conteúdo Dado"
+    )
+    observacoes = RichTextUploadingField(
+        verbose_name="Observações",
+        blank=True,
+        null=True
+    )
+
 
     def __str__(self):
         return f'{self.turma_disciplina} - {self.data}'
@@ -223,7 +272,11 @@ class AnexoAula(models.Model):
         related_name='anexos'
     )
     arquivo = models.FileField(upload_to='anexos_aulas/')
-    descricao = models.CharField(max_length=200, blank=True)
+    descricao  = RichTextUploadingField(
+        verbose_name="Observações",
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return f'Anexo para aula {self.aula.id}'

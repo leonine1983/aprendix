@@ -1,0 +1,85 @@
+{% extends "modulo_professor/base.html" %}
+
+{% block main %}  
+
+    <div  class='imprimir bg-light rounded-3 shadow '>
+        <div class="p-2 shadow shadown-sm ">
+            <section class='d-flex '><h1>{{grade.turma}} </h1> | {{grade}}</section>
+            <section class='fs-3 mx-5 text-center '><h2>Nova Aula Dada</h2> {{aluno}}</section>
+            <section class='fs-3 mx-5 text-center '> </section>
+        </div>
+       <div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 bg-white shadow rounded-3 p-4 border">
+
+      <h3 class="text-primary mb-4 text-center">
+        Registrar Aula Dada
+      </h3>
+
+      <form method="post" class="row g-4">
+        {% csrf_token %}
+        {{form.media}}
+        <!-- Plano de Aula -->
+        <div class="col-md-6 border p-2 ">
+            <div class="">
+                <label for="planoAula" class="form-label fw-semibold text-primary">Plano de Aula</label>
+                <div class="form-text text-muted">
+                    Selecione o plano de aula ao qual esta aula ministrada será vinculada.
+                </div>
+            </div>
+            {{ form.plano}}
+        </div>
+
+        <!-- Turma e Disciplina -->
+        <div class="col-md-6">
+          <label class="form-label text-secondary">Disciplina</label>
+          {{ form.turma_disciplina }}
+        </div>
+
+        <!-- Data -->
+        <div class="col-md-4">
+          <label class="form-label text-secondary">Data</label>
+          {{ form.data}}
+        </div>
+
+        <!-- Hora início -->
+        <div class="col-md-4">
+          <label class="form-label text-secondary">Hora de Início</label>
+          {{ form.hora_inicio}}
+        </div>
+
+        <!-- Hora fim -->
+        <div class="col-md-4">
+          <label class="form-label text-secondary">Hora de Término</label>
+          {{ form.hora_fim }}
+        </div>
+
+        <!-- Conteúdo Dado -->
+        <div class="col-12">
+          <label class="form-label text-secondary">Conteúdo Ministrado</label>
+          {{ form.conteudo_dado }}
+        </div>
+
+        <!-- Observações -->
+        <div class="col-12">
+          <label class="form-label text-secondary">Observações</label>
+          {{ form.observacoes }}
+        </div>
+
+        <!-- Botões -->
+        <div class="col-12 text-end">
+          <button type="submit" class="btn btn-success px-4">
+            <i class="bi bi-save me-2"></i>Salvar
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+  {{aulaDada}}
+</div>
+
+    </div>
+
+
+{% endblock main %}

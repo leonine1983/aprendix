@@ -553,7 +553,7 @@
       right: 0;
       width: 7px; /* Apenas ícones visíveis */
       height: 90%;
-      background-color: rgba(40, 40, 40, 0.12);
+      background-color: rgba(245, 242, 242, 0.67);
       backdrop-filter: blur(10px); /* Efeito de desfoque */
       box-shadow: -4px 0 8px rgba(0, 0, 0, 0.3);
       z-index: 50;
@@ -898,7 +898,7 @@
     left: 0;
     width: 7px;
     height: 90%;
-    background-color: rgba(40, 40, 40, 0.12);
+    background-color: rgba(245, 242, 242, 0.67);
     backdrop-filter: blur(10px);
     box-shadow: 4px 0 8px rgba(0, 0, 0, 0.3);
     z-index: 50;
@@ -1015,9 +1015,9 @@
     </div>
 
     <div class="diario-sidebar-item">
-      <a href="#" class="diario-sidebar-link" onclick="toggleSubnivelDiario(event)">
+      <a href="{% url 'modulo_professor:aula_dada_criar' %}" class="diario-sidebar-link" onclick="toggleSubnivelDiario(event)">
         <i class="fa-solid fa-chalkboard-user me-2"></i>
-        Planejamento
+        Aula Dada
       </a>
       <div class="diario-subnivel">
         <a href="#" class="diario-sidebar-link"><small>Plano de aula</small></a>

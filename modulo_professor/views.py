@@ -650,19 +650,23 @@ from django.db.models import Q
 from django.db.models import Q
 from .models import TurmaDisciplina
 from rh.models import Encaminhamentos, UserPessoas
+from django import forms
+from .models import PlanoDeAula
+from django.db.models import Q
 
 class PlanoDeAulaForm(forms.ModelForm):
     class Meta:
         model = PlanoDeAula
         fields = '__all__'
         widgets = {
-            'data_planejada': forms.DateInput(attrs={'type': 'date'}),
-            'conteudo_planejado': forms.Textarea(attrs={'rows': 3}),
-            'objetivo_geral': forms.Textarea(attrs={'rows': 3}),
-            'competencias_bncc': forms.Textarea(attrs={'rows': 2}),
-            'habilidades_bncc': forms.Textarea(attrs={'rows': 2}),
-            'metodologia': forms.Textarea(attrs={'rows': 2}),
-            'recursos_didaticos': forms.Textarea(attrs={'rows': 2}),
+            'data_inicio': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'data_fim': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'conteudo_planejado': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'objetivo_geral': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'competencias_bncc': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
+            'habilidades_bncc': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
+            'metodologia': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
+            'recursos_didaticos': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -742,9 +746,21 @@ class PlanoDeAulaCreateView(LoginRequiredMixin, CreateView):
 
 
     def form_valid(self, form):
+        print("FORM VALID - POST recebido com sucesso!")
         response = super().form_valid(form)
         messages.success(self.request, "Plano de aula salvo com sucesso!")
         return response
+    
+    def form_invalid(self, form):
+        # Captura os nomes legíveis dos campos com erro
+        campos_com_erro = [form.fields[field].label or field for field in form.errors]
+
+        # Cria uma mensagem amigável
+        mensagem = "Por favor, é preciso preencher os seguintes campos obrigatórios: " + ", ".join(campos_com_erro)
+
+        # Envia a mensagem de erro para o usuário
+        messages.error(self.request, mensagem)
+        return super().form_invalid(form)
 
 
 
@@ -758,13 +774,144 @@ class PlanoDeAulaUpdateView(LoginRequiredMixin, UpdateView):
     model = PlanoDeAula
     form_class = PlanoDeAulaForm
     template_name = 'modulo_professor/partial/diario/planoAula/createPlano.html'
-    success_url = reverse_lazy('modulo_professor:plano_de_aula_lista')
+    success_url = reverse_lazy('modulo_professor:plano_de_aula_criar') 
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        obj = form.instance
+        messages.success(
+            self.request,
+            f'O plano de aula de {obj.data_inicio} a {obj.data_fim} para {obj.turma_disciplina} foi atualizado com sucesso.'
+        )
+        return response
 
 
 class PlanoDeAulaDeleteView(LoginRequiredMixin, DeleteView):
     model = PlanoDeAula
     template_name = 'modulo_professor/partial/diario/planoAula/plano_de_aula_confirm_delete.html'
-    success_url = reverse_lazy('modulo_professor:plano_de_aula_lista')
+    success_url = reverse_lazy('modulo_professor:plano_de_aula_criar') 
+
+    
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        messages.success(request, f'O plano de aula de {obj.data_inicio} a {obj.data_fim} para {obj.turma_disciplina} foi excluído com sucesso.')
+        return super().delete(request, *args, **kwargs)
+
+
+
+# ----------------- AULA DIA ----------------------------------
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import ListView, CreateView, DetailView
+from django.urls import reverse_lazy
+from .models import AulaDada, AnexoAula
+from django import forms
+from django import forms
+from .models import AulaDada, PlanoDeAula
+from django.db.models import Q
+
+class AulaDadaForm(forms.ModelForm):
+    class Meta:
+        model = AulaDada
+        fields = ['plano', 'turma_disciplina', 'data', 'hora_inicio', 'hora_fim', 'conteudo_dado', 'observacoes']
+        widgets = {
+            'data': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'hora_inicio': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'hora_fim': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+
+        if request:
+            escola = request.session.get('escola')
+            user = request.user
+
+            try:
+                pessoa = UserPessoas.objects.get(user=user).pessoa
+                encaminhamentos = Encaminhamentos.objects.filter(encaminhamento__contratado=pessoa)
+
+                turmas_do_professor = TurmaDisciplina.objects.filter(
+                    Q(professor__in=encaminhamentos) |
+                    Q(professo2__in=encaminhamentos) |
+                    Q(reserva_tecnica__in=encaminhamentos) |
+                    Q(auxiliar_classe__in=encaminhamentos),
+                    turma__escola=escola
+                ).distinct()
+
+                self.fields['turma_disciplina'].queryset = turmas_do_professor
+                self.fields['plano'].queryset = PlanoDeAula.objects.filter(turma_disciplina__in=turmas_do_professor)
+
+            except UserPessoas.DoesNotExist:
+                self.fields['turma_disciplina'].queryset = TurmaDisciplina.objects.none()
+                self.fields['plano'].queryset = PlanoDeAula.objects.none()
+
+
+
+class AulaDadaCreateView(CreateView):
+    model = AulaDada
+    form_class = AulaDadaForm
+    template_name = 'modulo_professor/partial/diario/aulaDia/criarAulaDia.html'
+    success_url = reverse_lazy('modulo_professor:aula_dada_lista')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        escola = self.request.session.get('escola')
+        usuario = self.request.user
+        pessoa = get_object_or_404(UserPessoas, user = usuario)
+
+        if escola and usuario:
+            try:
+                pessoa = UserPessoas.objects.get(user=usuario).pessoa
+            except UserPessoas.DoesNotExist:
+                pessoa = None
+
+            if pessoa:
+                planos = AulaDada.objects.filter(
+                    plano__turma_disciplina__professor__encaminhamento__contratado__id=pessoa.id,
+                    turma_disciplina__turma__escola__id=escola.id
+                ).distinct()
+            else:
+                planos = AulaDada.objects.none()
+        else:
+            planos = AulaDada.objects.none()
+
+        context['aulaDada'] = planos
+        return context
+
+
+class AulaDadaDetailView(DetailView):
+    model = AulaDada
+    template_name = 'modulo_professor/aula_dada_detail.html'
+    context_object_name = 'aula'
+
+class AnexoAulaForm(forms.ModelForm):
+    class Meta:
+        model = AnexoAula
+        fields = ['arquivo', 'descricao']
+
+class AnexoAulaCreateView(CreateView):
+    model = AnexoAula
+    form_class = AnexoAulaForm
+    template_name = 'modulo_professor/anexo_aula_form.html'
+
+    def form_valid(self, form):
+        form.instance.aula_id = self.kwargs['pk']
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('modulo_professor:aula_dada_detalhe', kwargs={'pk': self.kwargs['pk']})
+
+
+
+
+
+
 
 
 

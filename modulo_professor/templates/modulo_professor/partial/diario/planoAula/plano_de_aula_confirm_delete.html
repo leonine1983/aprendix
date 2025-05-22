@@ -1,10 +1,40 @@
-  <div class="container">
-    <h2>Excluir Plano de Aula</h2>
-    <p>Tem certeza que deseja excluir o plano de aula do dia <strong>{{ object.data_planejada }}</strong> para <strong>{{ object.turma_disciplina }}</strong>?</p>
+{% extends "modulo_professor/base.html" %}
 
-    <form method="post">
-      {% csrf_token %}
-      <button type="submit">Confirmar exclusão</button>
-      <a href="{% url 'plano_de_aula_lista' %}">Cancelar</a>
-    </form>
-  </div>
+{% block main %}  
+
+    <div  class='imprimir bg-light rounded-3 shadow '>
+        <div class="p-2 shadow shadown-sm ">
+            <section class='d-flex '><h1>{{grade.turma}} </h1> | {{grade}}</section>
+            <section class='fs-3 mx-5 text-center '><h2>Excluir Plano de Aula</h2> </section>
+            <section class='fs-3 mx-5 text-center '> </section>
+        </div>
+       <div class="container mt-5 mb-5">
+          <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+              <div class="card shadow rounded-3">
+                <div class="card-body text-center">
+                  <p class="fs-5">
+                    Tem certeza que deseja <strong class="text-danger">excluir</strong> o plano de aula do dia
+                    <strong>{{ object.data_inicio }} a {{ object.data_fim }}</strong> para
+                    <strong>{{ object.turma_disciplina }}</strong>?
+                  </p>
+
+                  <form method="post" class="d-flex justify-content-center gap-3 flex-wrap mt-4">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                      <i class="bi bi-trash-fill me-1"></i> Confirmar exclusão
+                    </button>
+                    <a href="{% url 'modulo_professor:plano_de_aula_criar' %}" class="btn btn-secondary">
+                      Cancelar
+                    </a>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+</div>
+
+    </div>
+
+
+{% endblock main %}
