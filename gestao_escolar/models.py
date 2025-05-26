@@ -640,7 +640,10 @@ class Presenca(models.Model):
 
 class Presenca(models.Model):
     matricula = models.ForeignKey(Matriculas, related_name='presencas_aluno', on_delete=models.CASCADE)
-    data = models.DateField()
+    data = models.DateField(
+        verbose_name="Data da Aula",
+        help_text="Informe a data em que a aula foi ministrada."
+    )
     controle_diario = models.BooleanField(default=True)
 
     turma_disciplina = models.ForeignKey(

@@ -1,130 +1,28 @@
 from django.contrib.auth.decorators import login_required
-from gestao_escolar.models import Turmas, TurmaDisciplina, AnoLetivo, GestaoTurmas, Trimestre, Matriculas, Presenca, ParecerDescritivo
-from rh.models import Escola
-from .models import ComposicaoNotas
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect, render, get_object_or_404
+from django.http import JsonResponse, HttpResponseRedirect
+from django.urls import reverse, reverse_lazy
+from django.utils.safestring import mark_safe
+from django.utils import timezone
+from django.views.generic import ListView, CreateView, DetailView
 from django import forms
+from django.db.models import Q
 
-from collections import defaultdict
-from datetime import datetime
+from gestao_escolar.models import (
+    Turmas, TurmaDisciplina, AnoLetivo, GestaoTurmas, Trimestre,
+    Matriculas, Presenca, ParecerDescritivo
+)
+from rh.models import Escola, Encaminhamentos, UserPessoas
+from modulo_professor.models import (
+    ComposicaoNotas, AulaDada, AnexoAula, PlanoDeAula
+)
 
 from g4f.client import Client
-from django.http import JsonResponse
-from django.utils.safestring import mark_safe
+from collections import defaultdict
+from datetime import datetime, date
 
-from django.urls import reverse
-from django.http import HttpResponseRedirect
-from datetime import date
-from django.urls import reverse_lazy
-
-
-@login_required
-def home_professor(request):
-    userProfessor = request.user.related_vinculoUserPessoa
-    request.session['professorUser'] = userProfessor
-    pessoa = userProfessor.pessoa.id   
-
-    trimestre = request.GET.get('trimestre')
-    busca = request.GET.get('disciplina')   
-
-    trimestreALL = Trimestre.objects.all()
-    request.session['trimestres'] = trimestreALL
-    
-    if busca:
-        request.session['escola']        
-        trimestre_choice = Trimestre.objects.get(id=trimestre)
-        final = trimestre_choice.final
-        notas = GestaoTurmas.objects.filter(grade__id=busca, trimestre__id=trimestre)
-        mural = "notas"
-
-        grade = TurmaDisciplina.objects.get(id=busca)
-        turma = grade.turma
-        alunos = Matriculas.objects.filter(turma=turma)
-        compoeNotas = ComposicaoNotas.objects.filter(grade=grade)
-
-        notas_dict = {}
-        for a in alunos:
-            notas_dict = {}  # Reiniciado a cada aluno
-            for t in trimestreALL:
-                for ac in a.compoeNotaAlunos_related.all():
-                    if ac.trimestre.id == t.id and ac.grade == grade:
-                        aluno_id = ac.aluno.id
-                        notas_dict[aluno_id] = {
-                            'aluno_nome': ac.aluno.aluno,
-                            'notas': {},
-                            'trimestre': t.numero_nome,
-                            'trimestre_id': t.id,
-                            'media_final': ac.media_final
-                        }
-                        notas_dict[aluno_id]['notas'][t.id] = ac.nota_final
-    else:
-        notas_dict = {}
-        mural = ""
-        trimestre_choice = {}
-        notas = {}  
-        alunos = {}  
-        compoeNotas = {}
-        grade = {}
-        final = False
-
-    # Pesquisa se existe matrícula feita do aluno
-    professorGrade = TurmaDisciplina.objects.filter(professor__encaminhamento__contratado__id=pessoa)
-    request.session['turmaDisciplina'] = professorGrade
-    ano = AnoLetivo.objects.all()
-
-    # GRÁFICO 1: Faltas por mês (considerando disciplina do professor)
-    faltas_por_mes = defaultdict(int)
-    if professorGrade:
-        presencas = Presenca.objects.filter(
-            turma_disciplina__in=professorGrade,
-            presente=False
-        )
-
-        for p in presencas:
-            if p.data:
-                mes_ano = p.data.strftime("%Y-%m")
-                faltas_por_mes[mes_ano] += 1
-
-    faltas_labels = sorted(faltas_por_mes.keys())
-    faltas_values = [faltas_por_mes[mes] for mes in faltas_labels]
-
-    # GRÁFICO 2: Médias de notas por trimestre
-    notas_por_trimestre = defaultdict(list)
-    medias_trimestres = []
-
-    for grade in professorGrade:
-        composicoes = ComposicaoNotas.objects.filter(grade=grade)
-        for c in composicoes:
-            if c.nota_final is not None:
-                notas_por_trimestre[c.trimestre.numero_nome].append(c.nota_final)
-
-    for trimestre_nome in sorted(notas_por_trimestre.keys()):
-        notas = notas_por_trimestre[trimestre_nome]
-        media = round(sum(notas) / len(notas), 2) if notas else 0
-        medias_trimestres.append((trimestre_nome, media))
-
-    notas_labels = [m[0] for m in medias_trimestres]
-    notas_values = [m[1] for m in medias_trimestres]
-
-    return render(request, 'modulo_professor/home.html', {
-        'notas_dict': notas_dict,
-        'final': final,        
-        'professor': professorGrade,    
-        'compoemNotas': compoeNotas,
-        'notas': notas,
-        'alunos': alunos,
-        'mural': mural,
-        'trimestre_choice': trimestre_choice,
-        'grade': grade,
-        'anoLetivo': ano,
-
-        # Dados dos gráficos
-        'faltas_labels': faltas_labels,
-        'faltas_values': faltas_values,
-        'notas_labels': notas_labels,
-        'notas_values': notas_values,
-    })
 
 
 class ComposicaoNotasForm(forms.ModelForm):
@@ -231,21 +129,6 @@ def atualizaRecuperaFinal(request, pk, grade):
 
     return render(request, 'modulo_professor/partial/recuperação/recuperaFinal.html', context)
 
-
-@login_required
-def home_sessaoIniciada(request):
-    escola = request.POST.get('escola')
-    ano_id = request.POST.get('ano')
-
-    # Armazena os valor na sessao
-    request.session['escola'] = Escola.objects.get(pk=escola)
-    request.session['anoLetivo'] = AnoLetivo.objects.get(pk=ano_id)    
-
-    escolaSession = request.session['escola'] 
-    anoSession = request.session['anoLetivo']
-
-    messages.success(request, f"A escola {escolaSession} foi iniciada com sucesso para o ano letivo de {anoSession}✨")       
-    return redirect("modulo_professor:homeProfessor")
 
 
 # PRESENÇA ------------------------------------------------------------------
@@ -640,20 +523,6 @@ def atualizarResumoFinal(request, pk):
 
 # Diario de Classe -----------------
 
-from django.views.generic import CreateView, ListView
-from django.urls import reverse_lazy
-from .models import PlanoDeAula
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django import forms
-from .models import PlanoDeAula
-from django.db.models import Q
-from django.db.models import Q
-from .models import TurmaDisciplina
-from rh.models import Encaminhamentos, UserPessoas
-from django import forms
-from .models import PlanoDeAula
-from django.db.models import Q
-
 class PlanoDeAulaForm(forms.ModelForm):
     class Meta:
         model = PlanoDeAula
@@ -800,19 +669,10 @@ class PlanoDeAulaDeleteView(LoginRequiredMixin, DeleteView):
 
 
 # ----------------- AULA DIA ----------------------------------
-from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, CreateView, DetailView
-from django.urls import reverse_lazy
-from .models import AulaDada, AnexoAula
-from django import forms
-from django import forms
-from .models import AulaDada, PlanoDeAula
-from django.db.models import Q
-
 class AulaDadaForm(forms.ModelForm):
     class Meta:
         model = AulaDada
-        fields = ['plano', 'turma_disciplina', 'data', 'hora_inicio', 'hora_fim', 'conteudo_dado', 'observacoes']
+        fields = ['plano', 'turma_disciplina', 'aula_numero','data', 'hora_inicio', 'hora_fim', 'conteudo_dado', 'observacoes']
         widgets = {
             'data': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'hora_inicio': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
@@ -847,17 +707,26 @@ class AulaDadaForm(forms.ModelForm):
                 self.fields['plano'].queryset = PlanoDeAula.objects.none()
 
 
+from collections import OrderedDict
+from itertools import groupby
+from operator import attrgetter
+from django.contrib.messages.views import SuccessMessageMixin
 
-class AulaDadaCreateView(CreateView):
+class AulaDadaCreateView(LoginRequiredMixin, CreateView, SuccessMessageMixin):
     model = AulaDada
-    form_class = AulaDadaForm
+    form_class = AulaDadaForm    
     template_name = 'modulo_professor/partial/diario/aulaDia/criarAulaDia.html'
-    success_url = reverse_lazy('modulo_professor:aula_dada_lista')
+    success_url = reverse_lazy('modulo_professor:aula_dada_criar')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Aula registrada com sucesso!")  
+        return super().form_valid(form)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
-        return kwargs
+        return kwargs    
+    
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -875,14 +744,23 @@ class AulaDadaCreateView(CreateView):
                 planos = AulaDada.objects.filter(
                     plano__turma_disciplina__professor__encaminhamento__contratado__id=pessoa.id,
                     turma_disciplina__turma__escola__id=escola.id
-                ).distinct()
+                ).distinct().order_by('-id')
             else:
                 planos = AulaDada.objects.none()
         else:
             planos = AulaDada.objects.none()
 
-        context['aulaDada'] = planos
+        # Agrupando por plano
+        aula_agrupada_por_plano = OrderedDict()
+        for plano, aulas in groupby(planos, key=attrgetter('plano')):
+            aula_agrupada_por_plano[plano] = list(aulas)
+
+        context['aulas_agrupadas'] = aula_agrupada_por_plano
+    
         return context
+    
+
+
 
 
 class AulaDadaDetailView(DetailView):
@@ -913,14 +791,38 @@ class AnexoAulaCreateView(CreateView):
 
 
 
+def detalhar_aula(request, aula_id):
+    aula = get_object_or_404(AulaDada, id=aula_id)
+
+    # Buscar todas as presenças para a aula específica
+    presencas = Presenca.objects.filter(
+        turma_disciplina=aula.turma_disciplina,
+        #aula_numero = aula.aula_numero,
+        data=aula.data,
+        aula_numero=aula.aula_numero
+    ).select_related('matricula__aluno')
+
+    presentes = presencas.filter(presente=True)
+    faltaram = presencas.filter(presente=False)
+
+    context = {
+        'aula': aula,
+        'presentes': presentes,
+        'faltaram': faltaram,
+    }
+
+    return render(request, 'modulo_professor/partial/diario/aulaDia/detalhar_aula.html', context)
 
 
 
 
 
-from django.shortcuts import render
-from django.utils import timezone
-from .models import AulaDada
+
+
+
+
+
+
 
 def aulas_do_dia(request):
     hoje = timezone.now().date()

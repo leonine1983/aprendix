@@ -1,5 +1,6 @@
 from django.urls import path
 from rh import views
+
 app_name = 'RH'
 
 urlpatterns = [
@@ -35,6 +36,9 @@ urlpatterns = [
     path('contratos/texto/create/',views.Texto_contrato_createView.as_view(), name='Texto_Contrato_createView'),        
     path('pessoas/texto/update/<int:pk>',views.Texto_contrato_updateView.as_view(), name='Texto_Contrato_updateView'),      
     path('pessoas/texto/delete/<int:pk>',views.Pessoas_deleteView.as_view(), name='Texto_Contrato_deleteView'),
+
+
+  
 
 
     

@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'modulo_aluno',
     'modulo_professor',
     'ckeditor',
-    'ckeditor_uploader' 
+    'ckeditor_uploader',
 ]
 
 MIDDLEWARE = [

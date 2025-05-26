@@ -185,6 +185,13 @@ class PlanoDeAula(models.Model):
         verbose_name="Turma / Disciplina"
     )
 
+    tema = models.CharField(
+        max_length=150,
+        verbose_name="Tema ou assunto abordado no plano de aula",
+        help_text="Descreva brevemente o conteúdo principal ou tema do plano de aula.",
+        default="Tema não especificado"
+    )
+
     data_inicio = models.DateField(
         verbose_name="Data de Início",
         help_text="Data inicial do período do plano de aula"
@@ -223,7 +230,7 @@ class PlanoDeAula(models.Model):
         ordering = ['-data_inicio']
 
     def __str__(self):
-        return f'{self.turma_disciplina} - {self.data_inicio.strftime("%d/%m/%Y")} a {self.data_fim.strftime("%d/%m/%Y")}'
+        return f'{self.tema} - {self.data_inicio.strftime("%d/%m/%Y")} a {self.data_fim.strftime("%d/%m/%Y")}'
 
     def clean(self):
         super().clean()
@@ -240,25 +247,50 @@ class AulaDada(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='aulas_relacionadas'
+        related_name='aulas_relacionadas',
+        verbose_name="Plano de Aula",
+        help_text="Associe um plano de aula previamente elaborado, se houver."
     )
+
     turma_disciplina = models.ForeignKey(
         TurmaDisciplina,
         on_delete=models.CASCADE,
-        related_name='aulas_dadas'
+        related_name='aulas_dadas',
+        verbose_name="Disciplina",
+        help_text="Selecione a combinação de turma e disciplina a que esta aula pertence."
+        )
+
+    data = models.DateField(
+        verbose_name="Data da Aula",
+        help_text="Informe a data em que a aula foi ministrada."
     )
-    data = models.DateField()
-    hora_inicio = models.TimeField()
+
+    hora_inicio = models.TimeField(
+        verbose_name="Horário de Início",
+        help_text="Informe o horário de início da aula."
+    )
+
+    aula_numero = models.PositiveSmallIntegerField(
+        blank=True,
+        default=1,
+        verbose_name="Número da Aula",
+        help_text="Informe se esta é a 1ª, 2ª ou 3ª aula do dia."
+    )
+
     hora_fim = models.TimeField()
     
     conteudo_dado = RichTextUploadingField(
-        verbose_name="Conteúdo Dado"
+        verbose_name="Conteúdo Ministrado",
+        help_text="Descreva de forma objetiva o conteúdo efetivamente trabalhado em sala de aula."
     )
+
     observacoes = RichTextUploadingField(
-        verbose_name="Observações",
+        verbose_name="Observações Gerais",
+        help_text="Registre informações adicionais relevantes sobre a aula, como participação dos alunos, imprevistos ou outros comentários.",
         blank=True,
         null=True
     )
+
 
 
     def __str__(self):
