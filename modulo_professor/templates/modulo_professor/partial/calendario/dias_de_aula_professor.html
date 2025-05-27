@@ -1,0 +1,49 @@
+{% extends "modulo_professor/base.html" %}
+
+{% block main %}  
+
+    <div  class='imprimir bg-light rounded-3 shadow '>
+
+        <div class="imprimir bg-light rounded-3 shadow p-4">
+    <div class="mb-4 text-center">
+        <h2 class="fs-3">Dias de aula de <strong>{{ turma_disciplina }}</strong></h2>
+        <h3 class="fs-3"><strong>{{ turma_disciplina.turma }}</strong></h3>
+    </div>
+
+    {% if dias_com_aula %}
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle text-center shadow-sm rounded">
+                <thead class="table-primary">
+                    <tr>
+                        <th scope="col">Dia</th>
+                        <th scope="col">Horário</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in dias_com_aula %}
+                    <tr>
+                        <td>{{ item.dia }}</td>
+                        <td>{{ item.periodo }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center mt-4" role="alert">
+            Este professor não possui aulas cadastradas nessa escola no horário ativo.
+        </div>
+    {% endif %}
+
+
+
+    
+</div>
+
+      
+    </div>
+
+
+{% endblock main %}
+
+turmaAll

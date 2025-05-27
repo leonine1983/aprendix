@@ -36,4 +36,7 @@ urlpatterns = [
     path('aulas/<int:pk>/', AulaDadaDetailView.as_view(), name='aula_dada_detalhe'),
     path('aulas/<int:pk>/anexo/', AnexoAulaCreateView.as_view(), name='anexo_aula_criar'),
     path('aula/<int:aula_id>/', detalhar_aula, name='detalhar_aula'),
+
+    # Calendário
+    path('horario/professor/<int:turma_disciplina_id>', dias_de_aula_professor, name='dias_de_aula_professor'),
 ]
