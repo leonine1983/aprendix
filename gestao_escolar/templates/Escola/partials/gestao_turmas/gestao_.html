@@ -5,189 +5,182 @@
 
 {% endblock script_head %} 
 {% block script_footer %}{% endblock script_footer %} 
-<!-- Modal -->
-<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+{% include "Escola/partials/modal_partials/modal_top.html" %}
+{% if alerta_falta_matricula  %}
+  <div class='alert alert-warning shadow' role='alert'>
+    {{alerta_falta_matricula|safe}}
+    <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="btn btn-sm btn-primary" title="Matrícula" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="fs-5 fa-solid fa-screen-users  me-2"></i>
+      Matrícula de alunos nas turmas |  <b class='fs-5'>{{TurmaDisciplina.0.turma.nome}}{{TurmaDisciplina.0.turma.descritivo_turma}}</b>
+    </a>
+  </div>        
+{% endif %}
+{% if not matriculas %}
+  <div class="alert alert-info fs-5" role="alert">
+    Bem-vindo à área de gerenciamento de turmas! 📚 Para dar início à gestão, selecione a turma desejada e clique no botão <strong>Coordenar Turma</strong>. 
+  </div>
+  {% if not turmas %}
+    <div class='alert alert-warning shadow fs-5' role='alert'>
+      <i class="fa-sharp-duotone fa-solid fa-seal-exclamation"></i> Ainda não há turmas criadas para o ano letivo atual, {{request.session.anoLetivo_nome}}. Acesse a seção <a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}">"Turmas"</a> para criá-las e, em seguida, dirija-se à seção <a  href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" >"Matrículas"</a> para matricular os alunos.
+    </div>  
+  {% endif %}   
+{% else %}
+  <div class="alert alert-info fs-5" role="alert">
+    Nesta área, são lançadas as notas e faltas dos alunos por trimestre, permitindo acompanhar seu desempenho e frequência. Além disso, também se cria a grade de horários escolares, organizada para otimizar o aprendizado e atender às necessidades das turmas. Essa gestão é fundamental para promover um ambiente educacional eficiente e de qualidade.
+  
+  </div>
+{% endif %}
+
+<!-- tabs -->
+<div class="pcss3t pcss3t-effect-scale pcss3t-theme-1">
+  {% if not matriculas  %}       
+    <input type="radio" name="pcss3t" checked  id="tab1"class="tab-content-first">
+    <label for="tab1" class='col-3'><h1>Todas as turmas</h1></label>          
+  {% else %}        
+    <input type="radio" name="pcss3t" checked  id="tab1"class="tab-content-first">
+    <label for="tab1" class='col-3'><h1>Alunos ({{matriculas|length}})</h1></label>
     
-  <div class="modal-dialog w-100">
-  <div class="modal-content bg-secondary-subtle">
-      <div class="modal-header">
-        <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3 "><i style="font-size: 1.65rem;" class="fs-4 fa-solid fa-users-gear"></i> {{titulo_page}} <i class="fa-solid fa-angles-right"></i> {{matriculas.0.turma}}</span></h4>        
-        <button type="button" class="close" data-dismiss="modal">&times;</button>      
-      </div>
-      {% if alerta_falta_matricula  %}
-        <div class='alert alert-warning shadow' role='alert'>
-          {{alerta_falta_matricula|safe}}
-          <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="btn btn-sm btn-primary" title="Matrícula" data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fs-5 fa-solid fa-screen-users  me-2"></i>
-            Matrícula de alunos nas turmas |  <b class='fs-5'>{{TurmaDisciplina.0.turma.nome}}{{TurmaDisciplina.0.turma.descritivo_turma}}</b>
-          </a>
-        </div>        
-      {% endif %}
-      {% if not matriculas %}
-        <div class="alert alert-info fs-5" role="alert">
-          Bem-vindo à área de gerenciamento de turmas! 📚 Para dar início à gestão, selecione a turma desejada e clique no botão <strong>Coordenar Turma</strong>. 
-        </div>
-        {% if not turmas %}
-          <div class='alert alert-warning shadow fs-5' role='alert'>
-            <i class="fa-sharp-duotone fa-solid fa-seal-exclamation"></i> Ainda não há turmas criadas para o ano letivo atual, {{request.session.anoLetivo_nome}}. Acesse a seção <a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}">"Turmas"</a> para criá-las e, em seguida, dirija-se à seção <a  href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" >"Matrículas"</a> para matricular os alunos.
-          </div>  
-        {% endif %}   
-      {% else %}
-        <div class="alert alert-info fs-5" role="alert">
-          Nesta área, são lançadas as notas e faltas dos alunos por trimestre, permitindo acompanhar seu desempenho e frequência. Além disso, também se cria a grade de horários escolares, organizada para otimizar o aprendizado e atender às necessidades das turmas. Essa gestão é fundamental para promover um ambiente educacional eficiente e de qualidade.
-       
-        </div>
-      {% endif %}
+    <input type="radio" name="pcss3t" id="tab3" class="tab-content-3">
+    <label for="tab3"><i class="icon-cogs"></i>Disciplinas</label>
+    <input type="radio" name="pcss3t" id="tab4" class="tab-content-4">
+    <label for="tab4"><i class="icon-cogs"></i><img src="{% static 'svg/grade_horario.svg' %}" alt=""> Grade de Horários da Turma</label>
+    <a class='btn btn-success fs-7' href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}">Mudar Turma <i class="fa-regular fa-arrows-repeat"></i></i></a>               
+  {% endif %}
+  
+  <ul>
+    {% if not matriculas  %}
+    <li class="tab-content tab-content-first typography">                      
+      <table class='win11-table bg-p-3'>
+        <thead>
+          <tr>                  
+            <th class='p-2 text-center bg-secondary-subtle '>#</th>
+            <th class='p-2 text-center'>Turma</th>
+            <th class='p-2 text-center'>Turno</th>
+            <th class='p-2 text-center'>Série</th> 
+            <th class='p-2 text-center'>Ano Letivo</th> 
+            <th class='p-2 text-center'>Ação</th> 
+          </tr>
+        </thead>
+        <tbody>
+          {% for n in turmas %}
+          <tr >
+            
+            <td class='p-2 text-center '>{{forloop.counter}}</td>                  
+            <td class='p-2 text-left text-capitalize'>{{n.nome}} {{n.descritivo_turma}}</td>
+            <td class='p-2 text-center'>{{n.turno}}</td>
+            <td class='p-2 text-center'>{{n.serie}}</td>
+            <td class='p-2 text-center'>{{n.ano_letivo}}</td>
+            <td class='p-2 text-center'>                      
+              <a href='{% url "Gestao_Escolar:NotasAluno_one_create" n.pk %}' class='btn btn-sm btn-primary link-light  '>Coordenar essa turma: <b class='text-uppercase'>{{n.nome}}</b> <i class="ml-3  fa-duotone fa-circle-chevron-right fa-bounce" style="--fa-primary-color: #c565d2; --fa-secondary-color: #ffffff;"></i></a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table> 
+    </li>
+    {% else %}  
+    <li class="tab-content tab-content-first typography bg-secondary-subtle"> 
+      <nav class="nav-win11" style="margin-top:-0.5rem ;">
+        <a href="{% url 'Gestao_Escolar:NotasAluno' matriculas.0.turma.pk %}"><i class="fa-thin fa-hundred-points"></i> Notas <i class="fa-regular fa-ampersand me-2 mx-2"></i>  Faltas</a>             
+        <a href="{% url 'Gestao_Escolar:criaParecer' matriculas.0.turma.pk %}"> <img src="{% static 'svg/parecerDescritivo.svg' %}" alt=""><span class='mt-1'> Parecer Descritivo</span></a>
+        <a href="http://"><i class="fa-duotone fa-notebook"></i> Relatar Ocorrência</a>
+        <a href="http://"><i class="fa-light fa-message-pen"></i> Enviar Mensagem ao aluno</a>
+      </nav>                        
+      <table class="win11-table shadow">
+        <h1>Alunos da turma {{matriculas.0.turma}}</h1>
+        <thead>
+          <tr class="mt-2">
+            <th class="text-center">#</th> 
+            <th class="">Codigo da matrícula</th> 
+            <th class="text-left ">Aluno</th>                     
+            <th class="text-center">Situação</th>     
+            <th class="text-center">Data de Matricula</th>  
+          </tr>
+        </thead>
+        <tbody>                     
+          {% for n in matriculas %}
+          <tr>                    
+            <td >{{forloop.counter}}</td>                    
+            <td >{{n.cod_matricula}}</td>
+            <td >{{n.aluno}}</td>                                    
+            <td >{{n.situacao}}</td>
+            <td >{{n.data_matricula}}</td>
+          </tr> 
+          {% endfor %}                                            
+        </tbody>
+      </table>             
+    </li>          
+    <li class="tab-content tab-content-3 typography">
+      <h1>Em construção</h1>
       
-      <!-- tabs -->
-      <div class="pcss3t pcss3t-effect-scale pcss3t-theme-1">
-        {% if not matriculas  %}       
-          <input type="radio" name="pcss3t" checked  id="tab1"class="tab-content-first">
-          <label for="tab1" class='col-3'><h1>Todas as turmas</h1></label>          
-        {% else %}        
-          <input type="radio" name="pcss3t" checked  id="tab1"class="tab-content-first">
-          <label for="tab1" class='col-3'><h1>Alunos ({{matriculas|length}})</h1></label>
-          
-          <input type="radio" name="pcss3t" id="tab3" class="tab-content-3">
-          <label for="tab3"><i class="icon-cogs"></i>Disciplinas</label>
-          <input type="radio" name="pcss3t" id="tab4" class="tab-content-4">
-          <label for="tab4"><i class="icon-cogs"></i><img src="{% static 'svg/grade_horario.svg' %}" alt=""> Grade de Horários da Turma</label>
-          <a class='btn btn-success fs-7' href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}">Mudar Turma <i class="fa-regular fa-arrows-repeat"></i></i></a>               
-        {% endif %}
+    </li>     
+        <!-- O conteúdo que você deseja imprimir -->
+        <style>
+        /* Estilos para impressão */
+        @media print {
+          table.win11-table {
+              width: 100%;
+              border-collapse: collapse;
+          }
+          table.win11-table th, table.win11-table td {
+              padding: 8px;
+              border: 1px solid #d1d1d1;
+              text-align: center;
+          }
+          table.win11-table thead {
+              background-color: #f3f3f3;
+          }
+          .no-print {
+            display: none !important;
+        }
+        @page {
+          size: landscape;
+      }
+      }
+      
         
-        <ul>
-          {% if not matriculas  %}
-          <li class="tab-content tab-content-first typography">                      
-            <table class='win11-table bg-p-3'>
-              <thead>
-                <tr>                  
-                  <th class='p-2 text-center bg-secondary-subtle '>#</th>
-                  <th class='p-2 text-center'>Turma</th>
-                  <th class='p-2 text-center'>Turno</th>
-                  <th class='p-2 text-center'>Série</th> 
-                  <th class='p-2 text-center'>Ano Letivo</th> 
-                  <th class='p-2 text-center'>Ação</th> 
-                </tr>
-              </thead>
-              <tbody>
-                {% for n in turmas %}
-                <tr >
-                  
-                  <td class='p-2 text-center '>{{forloop.counter}}</td>                  
-                  <td class='p-2 text-left text-capitalize'>{{n.nome}} {{n.descritivo_turma}}</td>
-                  <td class='p-2 text-center'>{{n.turno}}</td>
-                  <td class='p-2 text-center'>{{n.serie}}</td>
-                  <td class='p-2 text-center'>{{n.ano_letivo}}</td>
-                  <td class='p-2 text-center'>                      
-                    <a href='{% url "Gestao_Escolar:NotasAluno_one_create" n.pk %}' class='btn btn-sm btn-primary link-light  '>Coordenar essa turma: <b class='text-uppercase'>{{n.nome}}</b> <i class="ml-3  fa-duotone fa-circle-chevron-right fa-bounce" style="--fa-primary-color: #c565d2; --fa-secondary-color: #ffffff;"></i></a></td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table> 
-          </li>
-          {% else %}  
-          <li class="tab-content tab-content-first typography bg-secondary-subtle"> 
-            <nav class="nav-win11" style="margin-top:-0.5rem ;">
-              <a href="{% url 'Gestao_Escolar:NotasAluno' matriculas.0.turma.pk %}"><i class="fa-thin fa-hundred-points"></i> Notas <i class="fa-regular fa-ampersand me-2 mx-2"></i>  Faltas</a>             
-              <a href="{% url 'Gestao_Escolar:criaParecer' matriculas.0.turma.pk %}"> <img src="{% static 'svg/parecerDescritivo.svg' %}" alt=""><span class='mt-1'> Parecer Descritivo</span></a>
-              <a href="http://"><i class="fa-duotone fa-notebook"></i> Relatar Ocorrência</a>
-              <a href="http://"><i class="fa-light fa-message-pen"></i> Enviar Mensagem ao aluno</a>
-            </nav>                        
-            <table class="win11-table shadow">
-              <h1>Alunos da turma {{matriculas.0.turma}}</h1>
-              <thead>
-                <tr class="mt-2">
-                  <th class="text-center">#</th> 
-                  <th class="">Codigo da matrícula</th> 
-                  <th class="text-left ">Aluno</th>                     
-                  <th class="text-center">Situação</th>     
-                  <th class="text-center">Data de Matricula</th>  
-                </tr>
-              </thead>
-              <tbody>                     
-                {% for n in matriculas %}
-                <tr>                    
-                  <td >{{forloop.counter}}</td>                    
-                  <td >{{n.cod_matricula}}</td>
-                  <td >{{n.aluno}}</td>                                    
-                  <td >{{n.situacao}}</td>
-                  <td >{{n.data_matricula}}</td>
-                </tr> 
-                {% endfor %}                                            
-              </tbody>
-            </table>             
-          </li>          
-          <li class="tab-content tab-content-3 typography">
-            <h1>Em construção</h1>
-            
-          </li>     
-             <!-- O conteúdo que você deseja imprimir -->
-             <style>
-              /* Estilos para impressão */
-              @media print {
-                table.win11-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-                table.win11-table th, table.win11-table td {
-                    padding: 8px;
-                    border: 1px solid #d1d1d1;
-                    text-align: center;
-                }
-                table.win11-table thead {
-                    background-color: #f3f3f3;
-                }
-                .no-print {
-                  display: none !important;
-              }
-              @page {
-                size: landscape;
-            }
-            }
-            
-             
-          </style>
-          <li id="content-to-print" class="tab-content tab-content-4 typography">
-            <button onclick="printContent()" class='btn btn-sm btn-info no-print m-1' title="Imprime a tabela de horários da turma">Imprimir Horário <i class="fa-thin fa-print text-light"></i></button>        
-            <div class="d-flex p-2 bg-p-5 justify-content-between">
-                <h1><img src="{% static 'svg/grade_horario.svg' %}" alt=""> Horários do {{matriculas.0.turma}}</h1>
-                <div class="mt-2">Validade: <mark class='rounded-2 p-2 shadow-sm'><b class='text-success '>{{horarios.0.validade.data_inicio }}</b> a <b class='text-success'>{{horarios.0.validade.data_fim }}</b></mark></div>
-                <div class='no-print'>
-                    <a class='btn btn-primary fs-7 no-print' href="{% url 'Gestao_Escolar:validadeHorario' matriculas.0.turma.pk %}">Nova Grade de Horários para a turma <i class="fa-solid fa-plus text-light"></i></a>
-                    
-                </div>
-            </div>
-            <table class="win11-table">
-              <thead class='bg-p-3 text-uppercase'>
-                  <tr>
-                      <th class='text-center'>Período</th>
-                      <th class='text-center'>Segunda</th>
-                      <th class='text-center'>Terça</th>
-                      <th class='text-center'>Quarta</th>
-                      <th class='text-center'>Quinta</th>
-                      <th class='text-center'>Sexta</th>
-                      <th class='text-center no-print'>EDITAR</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {% for horario in horarios %}
-                      <tr>
-                          <td class='text-center'>{{ horario.periodo }}</td>
-                          <td class='text-center'>{% if horario.segunda is not None %}{{ horario.segunda }}{% endif %}</td>
-                          <td class='text-center'>{% if horario.terca is not None %}{{ horario.terca }}{% endif %}</td>
-                          <td class='text-center'>{% if horario.quarta is not None %}{{ horario.quarta }}{% endif %}</td>
-                          <td class='text-center'>{% if horario.quinta is not None %}{{ horario.quinta }}{% endif %}</td>
-                          <td class='text-center'>{% if horario.sexta is not None %}{{ horario.sexta }}{% endif %}</td>
-                          <td class='text-center no-print'><a href="{% url 'Gestao_Escolar:horario_update' pk=horario.id turma_id=horario.turma.id %}">Editar <i class="fa-regular fa-pen-to-square"></i></a></td>
-                      </tr>
-                  {% endfor %}
-              </tbody>
-            </table>
-          </li>    
-           
-          {% endif %}
-        </ul>
+    </style>
+    <li id="content-to-print" class="tab-content tab-content-4 typography">
+      <button onclick="printContent()" class='btn btn-sm btn-info no-print m-1' title="Imprime a tabela de horários da turma">Imprimir Horário <i class="fa-thin fa-print text-light"></i></button>        
+      <div class="d-flex p-2 bg-p-5 justify-content-between">
+          <h1><img src="{% static 'svg/grade_horario.svg' %}" alt=""> Horários do {{matriculas.0.turma}}</h1>
+          <div class="mt-2">Validade: <mark class='rounded-2 p-2 shadow-sm'><b class='text-success '>{{horarios.0.validade.data_inicio }}</b> a <b class='text-success'>{{horarios.0.validade.data_fim }}</b></mark></div>
+          <div class='no-print'>
+              <a class='btn btn-primary fs-7 no-print' href="{% url 'Gestao_Escolar:validadeHorario' matriculas.0.turma.pk %}">Nova Grade de Horários para a turma <i class="fa-solid fa-plus text-light"></i></a>
+              
+          </div>
       </div>
+      <table class="win11-table">
+        <thead class='bg-p-3 text-uppercase'>
+            <tr>
+                <th class='text-center'>Período</th>
+                <th class='text-center'>Segunda</th>
+                <th class='text-center'>Terça</th>
+                <th class='text-center'>Quarta</th>
+                <th class='text-center'>Quinta</th>
+                <th class='text-center'>Sexta</th>
+                <th class='text-center no-print'>EDITAR</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for horario in horarios %}
+                <tr>
+                    <td class='text-center'>{{ horario.periodo }}</td>
+                    <td class='text-center'>{% if horario.segunda is not None %}{{ horario.segunda }}{% endif %}</td>
+                    <td class='text-center'>{% if horario.terca is not None %}{{ horario.terca }}{% endif %}</td>
+                    <td class='text-center'>{% if horario.quarta is not None %}{{ horario.quarta }}{% endif %}</td>
+                    <td class='text-center'>{% if horario.quinta is not None %}{{ horario.quinta }}{% endif %}</td>
+                    <td class='text-center'>{% if horario.sexta is not None %}{{ horario.sexta }}{% endif %}</td>
+                    <td class='text-center no-print'><a href="{% url 'Gestao_Escolar:horario_update' pk=horario.id turma_id=horario.turma.id %}">Editar <i class="fa-regular fa-pen-to-square"></i></a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+    </li>    
+      
+    {% endif %}
+  </ul>
+</div>
+{% include "Escola/partials/modal_partials/modal_bottom.html" %}
   </div> 
 </div>
 

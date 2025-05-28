@@ -5,18 +5,7 @@
 {% block css %}
 <link rel="stylesheet" href="{% static "global/css/search.css" %}">
 {% endblock css %}
-<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">    
-  <div class="modal-dialog w-100">
-    <div class="modal-content bg-secondary-subtle ">
-      <div class="modal-header">
-        <h4 class="modal-title  fs-6">
-          <span class="text-uppercase ml-5 fs-3 ">
-            <i class="fa-sharp fa-solid fa-people fs-5"></i>
-            {{titulo_page}}
-          </span>
-        </h4>        
-        <button type="button" class="close" data-dismiss="modal">&times;</button>        
-      </div>
+{% include "Escola/partials/modal_partials/modal_top.html" %}
       <div class="modal-body shadow-sm bg-light-subtle">            
         <ul class="nav nav-tabs" id="myTab" role="tablist">
           <li class="nav-item" role="presentation">
@@ -29,24 +18,27 @@
         <div class="tab-content" id="myTabContent">          
           <div class="tab-pane fade show active bg-light" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">  
            
-              <form method="post" class='m-3 text-center shadow mt-5'>
+            <div class="form-group border shadow bg-p-5">
+              <form method="post" >
                 {{ form.non_field_errors }}
                 {% csrf_token %}
                 {{form.media}}
-                <section class="m-3 text-center">
-                  <h2 class="m-3">{{sub_Info_page|safe}}</h2>
+                <div>
                   {% for field in form %}
-                    <section >
+                    <section>{{form.media}}
                         {{ field.label_tag }}
+
                         {{ field }}
                         {{ field.errors }}        
                     </section>                 
                   {% endfor %}                            
-                </section>   
-                <style>#btn-danger{background-color: rgb(226, 122, 122) !important;}</style>            
-                <button id="{{buttom_color}}" type="submit">{{bottom}}<i class='fs-3'> {{object}}? </i> </button>                
-              </form>     
-           
+                </div>  
+                <section class="d-flex justify-content-center gap-1 mb-4">
+                  <a class="col-5 btn btn-sm btn-danger"  href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}"  type="submit">Cancelar</a>
+                  <button class=" col-5 btn btn-sm btn-primary" type="submit">Matricular aluno</button>
+                </section>
+              </form>
+            </div>    
           </div>         
         </div>
       </div>        

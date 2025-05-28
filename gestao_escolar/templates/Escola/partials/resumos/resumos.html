@@ -1,131 +1,248 @@
 <button id="openDialog_resumos" title='Resumos' class='border-0  btn btn-sm  btn-light' style='margin:0 -1rem -1rem'><i class="fa-duotone fs-2 fa-solid fa-file-word"></i> Resumos (visualizar todos) </button>
-<dialog id="instructions_resumos" class="w-75 mt-5">
-    <div class="alert  alert-dismissible fade show" role="alert">
-        <h2 class="alert-heading" style='border-bottom:0.1rem solid salmon; padding-bottom: 0.5rem;  '><i class="fa-duotone fa-solid fs-1 fa-file-word"></i> Resumo - {{request.session.escola_nome}}</h2>
-        <p style="text-transform: none;"><strong>Esta janela exibe informações detalhadas</strong> do banco de dados escolar do sistema <strong>AprendiX</strong>. Os dados mostrados são resumos importantes sobre o perfil dos alunos da instituição, organizados de forma analítica.</p>        
-        <ul>
-            <li><strong>Quantidade de alunos por gênero</strong></li>
-            <li><strong>Distribuição por etnia</strong></li>
-            <li><strong>Informações sobre tamanhos de uniformes</strong></li>
-            <li><strong>Outros dados relevantes para gestão escolar</strong></li>
-        </ul>        
-        <p style="text-transform: none;"><strong>IMPORTANTE:</strong> Esses resumos são gerados automaticamente e refletem o conteúdo atual do banco de dados. Tenha em mente que somente usuários autorizados devem acessar essas informações.</p>        
-        <p><strong>🔒 Atenção à segurança dos dados!</strong></p>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+<dialog id="instructions_resumos" class="w-100 mt-4 p-4 rounded shadow-lg" style="max-width: 1200px;">
+    <div class="alert alert-light border position-relative" role="alert">
+        <h2 class="h4 mb-3 border-bottom pb-2">
+            <i class="fa-solid fa-file-lines text-primary me-2"></i> Resumo Geral – {{request.session.escola_nome}}
+        </h2>
+        <p><strong>Resumo gerado automaticamente com base no banco de dados da escola.</strong> Os dados abaixo representam informações essenciais sobre o perfil dos alunos, organizadas de forma analítica e visual.</p>
+        <ul class="mb-3">
+            <li>Distribuição por <strong>gênero</strong></li>
+            <li>Distribuição por <strong>etnia</strong></li>
+            <li>Quantidade de <strong>uniformes por tamanho</strong></li>
+            <li>Perfil de <strong>lateralidade</strong> dos alunos</li>
+        </ul>
+        <p class="mb-1"><strong>⚠️ Importante:</strong> Somente usuários autorizados devem visualizar essas informações.</p>
+        <p class="text-danger"><i class="fa-solid fa-lock me-1"></i> Proteja a confidencialidade dos dados!</p>
+        <button type="button" class="btn-close position-absolute top-0 end-0 mt-3 me-3" data-bs-dismiss="alert" aria-label="Fechar"></button>
     </div>
-    <div class="container mt-4">        
-        <!-- genero--> 
-        <h4 class="alert alert-info"><i class="fa-regular fa-venus-mars"></i> Quantidade de alunos por gênero - Ano letivo {{request.session.anoLetivo_nome}}</h4>
-        <table class="win11-table">
-            <thead>
-                <tr>
-                    <th rowspan="2">Turmas</th>
-                    <th colspan="2">Gênero</th>
-                </tr>
-                <tr>
-                    <th>Masculino</th>
-                    <th>Feminino</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for turma in request.session.matriculas_all %}
-                <tr>
-                    <td>{{ turma.nome }} <span class='text-uppercase'>{{ turma.descritivo_turma }}</span></td>   
-                    <td>{{ turma.masculino }}</td>
-                    <td>{{ turma.feminino }}</td>
-                </tr>
-                {% endfor %}                                
-                <!-- Linha de Totais -->
-                <tr class='bg-success-subtle text-black fs-2'>
-                    <td><strong>Total</strong></td>
-                    <td>{{ request.session.totais.total_masculino }}</td>
-                    <td>{{ request.session.totais.total_feminino }}</td>
-                </tr>
-            </tbody>
-        </table>    
-        <!-- etnia-->
-        <h4 class="alert alert-info mt-5"><i class="fa-duotone fa-solid fa-hands-holding-diamond"></i> Quantidade de alunos por etnia - Ano letivo {{request.session.anoLetivo_nome}}</h4>
-        <table class="win11-table">
-            <thead>
-                <tr>
-                    <th rowspan="2">Turmas</th>
-                    <th colspan="6">Etnia</th>
-                </tr>
-                <tr>
-                    <th>Brancos</th>
-                    <th>Pardos</th>
-                    <th>Negros</th>
-                    <th>Amarelos</th>
-                    <th>indigenas</th>
-                    <th>Não Declarados</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for turma in request.session.matriculas_all %}
-                <tr>
-                    <td>{{ turma.nome }} <span class='text-uppercase'>{{ turma.descritivo_turma }}</span></td>   
-                    <td>{{ turma.brancos }}</td>
-                    <td>{{ turma.pardos }}</td>
-                    <td>{{ turma.negros }}</td>
-                    <td>{{ turma.amarelos }}</td>
-                    <td>{{ turma.indigenas }}</td>
-                    <td>{{ turma.nDeclarados }}</td>
-                </tr>
-                {% endfor %}                                
-                <!-- Linha de Totais -->
-                <tr class='bg-success-subtle text-black fs-2'>
-                    <td><strong>Total</strong></td>
-                    <td>{{ request.session.totais.total_brancos }}</td>
-                    <td>{{ request.session.totais.total_pardos }}</td>
-                    <td>{{ request.session.totais.total_negros }}</td>
-                    <td>{{ request.session.totais.total_amarelos }}</td>
-                    <td>{{ request.session.totais.total_indigenas }}</td>
-                    <td>{{ request.session.totais.total_nDeclarados }}</td>
-                </tr>
-            </tbody>
-        </table>     
-        <!-- Uniforme-->
-        <h4 class="alert alert-info mt-5"><i class="fa-duotone fa-solid fa-uniform-martial-arts"></i> Quantidade de uniformes por tamanho - Ano letivo {{request.session.anoLetivo_nome}}</h4>
-        <table class="win11-table">
-            <thead>
-                <tr>
-                    <th rowspan="2">Turmas</th>
-                    <th colspan="5">Uniforme</th>
-                </tr>
-                <tr>
-                    <th>PP</th>
-                    <th>P</th>
-                    <th>M</th>
-                    <th>G</th>
-                    <th>GG</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for turma in request.session.matriculas_all %}
-                <tr>
-                    <td>{{ turma.nome }} <span class='text-uppercase'>{{ turma.descritivo_turma }}</span></td>   
-                    <td>{{ turma.alunosPP }}</td>
-                    <td>{{ turma.alunosP }}</td>
-                    <td>{{ turma.alunosM }}</td>
-                    <td>{{ turma.alunosG}}</td>
-                    <td>{{ turma.alunosGG }}</td>
-                </tr>
-                {% endfor %}                                
-                <!-- Linha de Totais -->
-                <tr class='bg-success-subtle text-black fs-2'>
-                    <td><strong>Total</strong></td>
-                    <td>{{ request.session.totais.total_pp}}</td>
-                    <td>{{ request.session.totais.total_p }}</td>
-                    <td>{{ request.session.totais.total_m }}</td>
-                    <td>{{ request.session.totais.total_g }}</td>
-                    <td>{{ request.session.totais.total_gg }}</td>
-                </tr>
-            </tbody>
-        </table>   
-        
-    </div>                    
-    <button id="closeDialog_resumos" class="btn btn-secondary mt-5">Fechar</button>
-</dialog>  
+
+    <div class="container-fluid mt-4">
+        <!-- Gênero -->
+        <h4 class="alert alert-info d-flex align-items-center">
+            <i class="fa-solid fa-venus-mars me-2"></i> Alunos por Gênero – {{request.session.anoLetivo_nome}}
+        </h4>
+        <!-- tabela gênero -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th rowspan="2">Turmas</th>
+                        <th colspan="2">Gênero</th>
+                    </tr>
+                    <tr>
+                        <th>Masculino</th>
+                        <th>Feminino</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for turma in request.session.matriculas_all %}
+                    <tr>
+                        <td>{{ turma.nome }} <span class="text-muted text-uppercase">({{ turma.descritivo_turma }})</span></td>
+                        <td>{{ turma.masculino }}</td>
+                        <td>{{ turma.feminino }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-success fw-bold">
+                        <td>Total</td>
+                        <td>{{ request.session.totais.total_masculino }}</td>
+                        <td>{{ request.session.totais.total_feminino }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Etnia -->
+        <h4 class="alert alert-info mt-5 d-flex align-items-center">
+            <i class="fa-solid fa-people-group me-2"></i> Alunos por Etnia – {{request.session.anoLetivo_nome}}
+        </h4>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th rowspan="2">Turmas</th>
+                        <th colspan="6">Etnia</th>
+                    </tr>
+                    <tr>
+                        <th>Brancos</th>
+                        <th>Pardos</th>
+                        <th>Negros</th>
+                        <th>Amarelos</th>
+                        <th>Indígenas</th>
+                        <th>Não Declarados</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for turma in request.session.matriculas_all %}
+                    <tr>
+                        <td>{{ turma.nome }} <span class="text-muted text-uppercase">({{ turma.descritivo_turma }})</span></td>
+                        <td>{{ turma.brancos }}</td>
+                        <td>{{ turma.pardos }}</td>
+                        <td>{{ turma.negros }}</td>
+                        <td>{{ turma.amarelos }}</td>
+                        <td>{{ turma.indigenas }}</td>
+                        <td>{{ turma.nDeclarados }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-success fw-bold">
+                        <td>Total</td>
+                        <td>{{ request.session.totais.total_brancos }}</td>
+                        <td>{{ request.session.totais.total_pardos }}</td>
+                        <td>{{ request.session.totais.total_negros }}</td>
+                        <td>{{ request.session.totais.total_amarelos }}</td>
+                        <td>{{ request.session.totais.total_indigenas }}</td>
+                        <td>{{ request.session.totais.total_nDeclarados }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Uniforme -->
+        <h4 class="alert alert-info mt-5 d-flex align-items-center">
+            <i class="fa-solid fa-shirt me-2"></i> Uniformes por Tamanho – {{request.session.anoLetivo_nome}}
+        </h4>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th rowspan="2">Turmas</th>
+                        <th colspan="5">Tamanhos</th>
+                    </tr>
+                    <tr>
+                        <th>PP</th>
+                        <th>P</th>
+                        <th>M</th>
+                        <th>G</th>
+                        <th>GG</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for turma in request.session.matriculas_all %}
+                    <tr>
+                        <td>{{ turma.nome }} <span class="text-muted text-uppercase">({{ turma.descritivo_turma }})</span></td>
+                        <td>{{ turma.alunosPP }}</td>
+                        <td>{{ turma.alunosP }}</td>
+                        <td>{{ turma.alunosM }}</td>
+                        <td>{{ turma.alunosG }}</td>
+                        <td>{{ turma.alunosGG }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-success fw-bold">
+                        <td>Total</td>
+                        <td>{{ request.session.totais.total_pp }}</td>
+                        <td>{{ request.session.totais.total_p }}</td>
+                        <td>{{ request.session.totais.total_m }}</td>
+                        <td>{{ request.session.totais.total_g }}</td>
+                        <td>{{ request.session.totais.total_gg }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Lateralidade -->
+        <h4 class="alert alert-info mt-5 d-flex align-items-center">
+            <i class="fa-solid fa-hand-pointer me-2"></i> Lateralidade – {{request.session.anoLetivo_nome}}
+        </h4>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th rowspan="2">Turmas</th>
+                        <th colspan="3">Lateralidade</th>
+                    </tr>
+                    <tr>
+                        <th>Destros</th>
+                        <th>Canhotos</th>
+                        <th>Ambidestros</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for turma in request.session.turma_lateralidade %}
+                    <tr>
+                        <td>{{ turma.nome }} <span class="text-muted text-uppercase">({{ turma.descritivo }})</span></td>
+                        <td>{{ turma.destros }}</td>
+                        <td>{{ turma.canhotos }}</td>
+                        <td>{{ turma.ambidestros }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-success fw-bold">
+                        <td>Total</td>
+                        <td>{{ request.session.totais_lateralidade.destros }}</td>
+                        <td>{{ request.session.totais_lateralidade.canhotos }}</td>
+                        <td>{{ request.session.totais_lateralidade.ambidestros }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Botões -->
+        <div class="d-flex justify-content-between mt-5">
+            <button id="printResumo" class="btn btn-outline-primary">
+                <i class="fa-solid fa-print me-2"></i> Imprimir
+            </button>
+            <button id="closeDialog_resumos" class="btn btn-secondary">
+                <i class="fa-solid fa-xmark me-2"></i> Fechar
+            </button>
+        </div>
+    </div>
+</dialog>
+
+<script>
+document.getElementById("printResumo").addEventListener("click", function () {
+    const dialog = document.getElementById("instructions_resumos");
+    const printContent = dialog.innerHTML;
+
+    // Abre nova janela
+    const printWindow = window.open('', '', 'width=1200,height=800');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Resumo Escolar</title>
+
+            <!-- Carrega o mesmo CSS da aplicação -->
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" media="all">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" media="all">
+            <link rel="stylesheet" href="/static/css/estilos-personalizados.css" media="all">
+
+            <style>
+                /* Força cores na impressão */
+                @media print {
+                    body {
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    table, th, td {
+                        border: 1px solid #dee2e6 !important;
+                    }
+                    th {
+                        background-color: #f8f9fa !important;
+                    }
+                    .table-success {
+                        background-color: #d1e7dd !important;
+                    }
+                    .alert-info {
+                        background-color: #cff4fc !important;
+                        color: #055160 !important;
+                    }
+                    .alert-light {
+                        background-color: #fefefe !important;
+                        color: #636464 !important;
+                    }
+                    .text-muted {
+                        color: #6c757d !important;
+                    }
+                }
+            </style>
+        </head>
+        <body onload="window.print(); window.close();">
+            ${printContent}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+});
+</script>
+
+
 <script>
     const dialog_resumos = document.getElementById('instructions_resumos');
     const openButton_resumos = document.getElementById('openDialog_resumos');

@@ -115,8 +115,36 @@ choice_local_diferenciado= {
 }
 
 class Alunos(models.Model):
-    nome_completo = models.CharField(max_length=120, null=False, default='Nome completo do aluno', verbose_name='Nome completo do aluno*')    
-    nome_social = models.CharField(max_length=30, null=True, blank=True, default='')
+    LATERALIDADE_CHOICES = [
+        ('destro', 'Destro'),
+        ('canhoto', 'Canhoto'),
+        ('ambidestro', 'Ambidestro'),
+    ]
+
+    nome_completo = models.CharField(
+        max_length=120,
+        null=False,
+        default='Nome completo do aluno',
+        verbose_name='Nome completo do aluno*'
+    )
+    nome_social = models.CharField(
+        max_length=30,
+        null=True,
+        blank=True,
+        default='',
+        verbose_name='Nome social'
+    )
+    lateralidade = models.CharField(
+        max_length=10,
+        choices=LATERALIDADE_CHOICES,
+        null=True,
+        blank=True,
+        verbose_name='Lateralidade (mão dominante)',
+        help_text="Informe a mão dominante do aluno: "
+                  "Destro (usa a mão direita), "
+                  "Canhoto (usa a mão esquerda), "
+                  "ou Ambidestro (usa ambas as mãos com igual habilidade)."
+    )
     sexo = models.ForeignKey(Sexo, on_delete= models.CASCADE, verbose_name='Gênero sexual do aluno*', null=True)
     data_nascimento = models.DateField(verbose_name='Data de Nascimento*', null=True)    
     idade = models.IntegerField(null=True, blank=True)
@@ -644,6 +672,15 @@ class Presenca(models.Model):
         verbose_name="Data da Aula",
         help_text="Informe a data em que a aula foi ministrada."
     )
+
+    trimestre = models.ForeignKey(
+        Trimestre, 
+        related_name='presencas_alunoTrimestre', 
+        on_delete=models.CASCADE,
+        verbose_name="Trimestre atual",
+        help_text="Informe o trimestre em que a presença do aluno está sendo registrada.",
+        null=True)
+    
     controle_diario = models.BooleanField(default=True)
 
     turma_disciplina = models.ForeignKey(

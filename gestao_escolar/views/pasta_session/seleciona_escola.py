@@ -25,6 +25,7 @@ def Seleciona_escola(request, pk):
     request.session['prefeitura'] = prefeitura
     request.session['nomeclatura'] = nomeclatura
     request.session['matriculas_painel'] = matriculas_painel
+    
     request.session['dia'] = datetime.now().day    
     meses = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -33,6 +34,7 @@ def Seleciona_escola(request, pk):
     # Obtém o mês atual (número de 1 a 12) e armazena o nome correspondente na sessão
     mes_atual = datetime.now().month
     request.session['mes'] = meses[mes_atual - 1]
+    
     
     # Redireciona a pagina
     messages.success(request, "Escola selecionada com sucesso!")
