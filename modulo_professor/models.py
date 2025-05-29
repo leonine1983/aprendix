@@ -75,15 +75,14 @@ class ComposicaoNotas(models.Model):
         from django.db.models import Avg
         from decimal import Decimal
 
-        # Verifica se estamos atualizando o trimestre final para evitar recursão infinita
-        if getattr(self, '_atualizando_trimestre_final', False):
-            print("[INFO] Salvamento ignorado para evitar recursão no trimestre final.")
+        # 🔁 FLAG: Verifica se o salvamento está sendo feito pela Gestão de Turmas.
+        # Se estiver, evita atualizar GestaoTurmas novamente e interrompe aqui.
+        if getattr(self, '_atualizando_por_gestao', False):
             super().save(*args, **kwargs)
             return
 
         print(f"[INFO] Salvando ComposicaoNotas para aluno={self.aluno}, grade={self.grade}, trimestre={self.trimestre}")
 
-        # Calcula a nota com base nas regras definidas
         nota_calculada = self.calcular_nota_final()
         print(f"[DEBUG] Nota calculada: {nota_calculada}")
 
@@ -91,16 +90,12 @@ class ComposicaoNotas(models.Model):
             self.nota_final = self.prova_paralela
             mensagem = "Nota da prova paralela foi maior e utilizada como nota final."
             self.anotacoes = f"{self.anotacoes}\n{mensagem}" if self.anotacoes else mensagem
-            print(f"[INFO] Usando nota da prova paralela: {self.nota_final}")
         else:
             self.nota_final = nota_calculada
-            print(f"[INFO] Usando nota calculada como nota final: {self.nota_final}")
 
-        # Salva a nota atual
         super().save(*args, **kwargs)
-        print(f"[SUCCESS] Nota salva para trimestre: {self.trimestre}")
 
-        # Atualiza/insere em GestaoTurmas
+        # Atualiza ou cria em GestaoTurmas, a menos que estejamos no trimestre final
         if self.aluno and self.grade and self.trimestre:
             gestao_turma, created = GestaoTurmas.objects.get_or_create(
                 aluno=self.aluno,
@@ -108,69 +103,15 @@ class ComposicaoNotas(models.Model):
                 trimestre=self.trimestre,
                 defaults={'notas': self.nota_final}
             )
-            if created:
-                print(f"[INFO] Criado novo registro em GestaoTurmas para {self.trimestre}")
-            else:
+            if not created:
+                # 🔁 FLAG: Evita recursão marcando que a atualização veio de ComposicaoNotas
+                gestao_turma._atualizando_por_composicao = True
                 gestao_turma.notas = self.nota_final
                 gestao_turma.save()
-                print(f"[INFO] Atualizado registro em GestaoTurmas com nota: {self.nota_final}")
-
-        # Atualiza a média no trimestre final
-        try:
-            tFinal = Trimestre.objects.get(final=True)
-            print(f"[INFO] Trimestre final identificado: {tFinal}")
-
-            media = ComposicaoNotas.objects.filter(
-                aluno=self.aluno,
-                grade=self.grade,
-                nota_final__isnull=False
-            ).exclude(trimestre=tFinal).aggregate(media=Avg('nota_final'))['media'] or Decimal('0.00')
-
-            media_final = round(Decimal(media), 1)
-            print(f"[INFO] Média calculada dos trimestres (exceto final): {media_final}")
-
-            final_entry = ComposicaoNotas.objects.filter(
-                aluno=self.aluno,
-                grade=self.grade,
-                trimestre=tFinal
-            ).first()
-
-            if final_entry:
-                print(f"[INFO] Atualizando nota do trimestre final existente.")
-                final_entry.nota_final = media_final
-                final_entry._atualizando_trimestre_final = True
-                final_entry.save(update_fields=['nota_final'])
-            else:
-                ComposicaoNotas.objects.create(
-                    aluno=self.aluno,
-                    grade=self.grade,
-                    trimestre=tFinal,
-                    nota_final=media_final
-                )
-                print(f"[SUCCESS] Criado novo registro no trimestre final com nota: {media_final}")
-
-            # Atualiza a media_final em GestaoTurmas
-            gestao_final, created = GestaoTurmas.objects.get_or_create(
-                aluno=self.aluno,
-                grade=self.grade,
-                trimestre=tFinal,
-                defaults={'media_final': media_final}
-            )
-            if not created:
-                gestao_final.media_final = media_final
-                gestao_final.save(update_fields=['media_final'])
-                print(f"[INFO] Média final atualizada em GestaoTurmas: {media_final}")
-            else:
-                print(f"[INFO] Média final salva em novo GestaoTurmas para trimestre final: {media_final}")
-
-        except Trimestre.DoesNotExist:
-            print("[WARN] Nenhum trimestre com final=True foi encontrado.")
-
-
-
 
     def __str__(self):
         return  f"{self.aluno} - {self.trimestre} - {self.nota_final}"
+    
     
 from django.db import models
 from django.core.exceptions import ValidationError

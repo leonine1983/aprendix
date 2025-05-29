@@ -24,6 +24,11 @@ class GestaoTurmasForm(forms.ModelForm):
  Ela permite a entrada de múltiplas notas, valida os dados e assegura o armazenamento eficiente. 
  A média é calculada conforme as regras definidas, facilitando o controle do desempenho acadêmico e simplificando relatórios para os professores.
 """
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
+
 @login_required
 def create_or_update_gestao_turmas(request, aluno_id, trimestre_id):
     aluno = get_object_or_404(Matriculas, pk=aluno_id)
@@ -32,28 +37,42 @@ def create_or_update_gestao_turmas(request, aluno_id, trimestre_id):
 
     if request.method == 'POST':
         for disciplina in disciplinas:
-            # Verificar se já existe um registro para a combinação de aluno, trimestre e disciplina
-            gestao_turma, created = GestaoTurmas.objects.get_or_create(aluno=aluno, trimestre=trimestre, grade=disciplina)
-            form = GestaoTurmasForm(request.POST, instance=gestao_turma, prefix=disciplina.disciplina)  # Prefixo é o nome da disciplina
+            gestao_turma, created = GestaoTurmas.objects.get_or_create(
+                aluno=aluno,
+                trimestre=trimestre,
+                grade=disciplina
+            )
+            form = GestaoTurmasForm(request.POST, instance=gestao_turma, prefix=disciplina.disciplina)
 
             if form.is_valid():
-                form.instance.profissional_resp = request.user.username
-                form.instance.data_hora_mod = timezone.now()
-                form.save()
+                instancia = form.save(commit=False)
+                instancia.profissional_resp = request.user.username
+                instancia.data_hora_mod = timezone.now()
+                instancia._usuario_atual = request.user.username  # Define o usuário logado
+                instancia.save()
+
         return redirect(reverse('Gestao_Escolar:create_or_update_media_turmas', kwargs={'aluno_id': aluno.pk}))
 
     else:
         forms_dict = {}
         for disciplina in disciplinas:
-            gestao_turma, created = GestaoTurmas.objects.get_or_create(aluno=aluno, trimestre=trimestre, grade=disciplina)
+            gestao_turma, created = GestaoTurmas.objects.get_or_create(
+                aluno=aluno,
+                trimestre=trimestre,
+                grade=disciplina
+            )
             initial_data = {'nota': gestao_turma.notas, 'faltas': gestao_turma.faltas} if gestao_turma else None
-            forms_dict[disciplina.disciplina] = GestaoTurmasForm(instance=gestao_turma, prefix=disciplina.disciplina, initial=initial_data)
+            forms_dict[disciplina.disciplina] = GestaoTurmasForm(
+                instance=gestao_turma,
+                prefix=disciplina.disciplina,
+                initial=initial_data
+            )
 
     context = {
         'forms_dict': forms_dict,
         'aluno': aluno,
         'trimestre': trimestre,
-        'conteudo_page': f"Gestão Turmas - Notas Update",
+        'conteudo_page': "Gestão Turmas - Notas Update",
     }
 
     return render(request, 'Escola/inicio.html', context)

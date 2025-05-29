@@ -196,7 +196,7 @@
                     <td class='text-center align-middle  {% if c.prova_paralela <= 4.99 %}text-danger {% else %}text-primary fw-bolder{% endif %}'>
                       <strong>{% if  c.prova_paralela is not None %}{{ c.prova_paralela }}{% endif %}</strong>
                     </td>
-                    <td class="ocultar align-middle " style='font-size:0.8rem'>{{ c.anotacoes }}</td>   
+                    <td class="ocultar align-middle " style='font-size:0.8rem'>{{ c.anotacoes|safe }}</td>   
                     {% endif %}
                   {% endfor %}
                   <td class="ocultar align-middle ">

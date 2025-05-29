@@ -19,7 +19,7 @@
               <h4 class="modal-title fs-6"><span class="text-uppercase ml-5 fs-3 "><i style="font-size: 1.65rem;" class="fs-4 fa-solid fa-users-gear"></i> {{ titulo_page }} {{ matriculas.0.turma }} <i class="fa-solid fa-angles-right me-1 mx-1"></i> {{ matriculas|length }} alunos </span></h4>
               <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
-
+AQUI É O ARQUIVO notas2.html --------------------------------------XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
           <div class="pcss3t pcss3t-effect-scale pcss3t-theme-1">
             {% for t in trimestre %}
                 <input type="radio" name="pcss3t" {% if t.id == 1 %} checked {% endif %} id="tab{{ t.id }}" class="{% if t.id == 1 %}tab-content-first{% else %}tab-content-{{ t.id }}{% endif %}">
@@ -43,7 +43,6 @@
                                                 {% if not t.final  %}
                                                 <tr>
                                                     <td style="width: 55px;" class="txt-p">Média</td>
-                                                    <td class="text-center">Faltas</td>
                                                 </tr>
                                                 {% else %}
                                                 <tr>
@@ -54,7 +53,6 @@
                                             </table>
                                         </th>
                                     {% endfor %}
-                                    <th class="text-center" >Profissional Resp.</th>     
                                     <th class="text-center">Ação</th> 
                                 </tr>
                             </thead>

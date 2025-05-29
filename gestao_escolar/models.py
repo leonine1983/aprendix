@@ -746,6 +746,41 @@ class GestaoTurmas(models.Model):
         return self.aluno.aluno.nome_completo
     
 
+    def save(self, *args, **kwargs):
+        from modulo_professor.models import ComposicaoNotas
+        from django.utils.timezone import now
+
+        # 🔁 FLAG: Verifica se o salvamento está sendo feito por ComposicaoNotas.
+        # Se sim, salva normalmente sem voltar a atualizar ComposicaoNotas.
+        if getattr(self, '_atualizando_por_composicao', False):
+            super().save(*args, **kwargs)
+            return
+
+        super().save(*args, **kwargs)
+
+        # Atualiza ou cria o registro correspondente em ComposicaoNotas
+        if self.notas is not None:
+            comp_nota, created = ComposicaoNotas.objects.get_or_create(
+                aluno=self.aluno,
+                grade=self.grade,
+                trimestre=self.trimestre,
+                defaults={'nota_final': self.notas}
+            )
+
+            mensagem = f"<div class='d-block p-1 bg-info m-1 rounded-1'>Nota inserida pela Gestão de Turmas pelo usuário {self.profissional_resp} em {now().strftime('%d/%m/%Y %H:%M')}</div>"
+            if not created:
+                comp_nota.nota_final = self.notas
+                comp_nota.anotacoes = f"{comp_nota.anotacoes}\n{mensagem}" if comp_nota.anotacoes else mensagem
+            else:
+                comp_nota.anotacoes = mensagem
+
+            # 🔁 FLAG: Indica que o salvamento está sendo disparado por Gestão de Turmas
+            comp_nota._atualizando_por_gestao = True
+            comp_nota.save()
+
+
+    
+
 
     
 class ParecerDescritivo(models.Model):

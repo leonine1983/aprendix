@@ -57,26 +57,12 @@
     
 
 </style>
+{% include "Escola/partials/modal_partials/modal_top.html" %}
+<h3>Lançamento de Notas do aluno {{ aluno}}</h3>
 
-
-
-
-
-
-<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    
-    <div class="modal-dialog w-100">
-        <div class="modal-content bg-secondary-subtle">
-            <div class="modal-header w-100">
-                <div class="mx-5 border-bottom ">
-                    <p class="m-0 p-0 h3 text-uppercase"><i style="font-size: 1.65rem;" class="fs-4 fa-solid fa-users-gear"></i> {{ aluno}}</p>                
-                    <p class="m-0 p-0 h4 mx-5 "> </span></h2></p>                         
-                </div>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
             <form method="post" class="win11-form">
                 {% csrf_token %}   
-                <h1>Lançamento de <b>NOTAS</b> e <b>FALTAS</b> do aluno | {{ trimestre }}</h1>
+                <h1> {{ trimestre }}</h1>
                 <table class='win11-table'>
                     <thead class="bg-p-5">
                         <tr>
@@ -109,10 +95,9 @@
                     </tbody>
                 </table>
                 <button type="submit" class="win11-button">Salvar</button>
-            </form>
-            
-      
-            
+            </form>   
         </div>
+    {% include "Escola/partials/modal_partials/modal_bottom.html" %}
     </div>
+   
 </div>

@@ -94,15 +94,11 @@
                                 {{ form.recuperacao_final }}
                                 {% for error in form.notas.errors %}
                                     <span class="error">{{ error }}</span>
-                                {% endfor %}
-                            </td>
-                          
                         </tr>
                         <input type="hidden" name="{{ form.prefix }}-disciplina" value="{{ disciplina_nome }}">
                         {% endfor %}
                     </tbody>
                 </table>
-                <button type="submit" class="win11-button">Salvar</button>
             </form>
             
       
