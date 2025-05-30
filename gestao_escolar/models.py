@@ -711,6 +711,40 @@ class Presenca(models.Model):
         verbose_name_plural = 'Frequências dos alunos'
         unique_together = ('matricula', 'data', 'turma_disciplina', 'aula_numero')
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.atualizar_faltas_gestao_turmas()
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        self.atualizar_faltas_gestao_turmas()
+
+    def atualizar_faltas_gestao_turmas(self):
+        if not self.trimestre or not self.turma_disciplina:
+            return  # Campos obrigatórios para calcular faltas
+
+        # Filtrar todas as presenças do aluno naquela disciplina e trimestre
+        faltas = Presenca.objects.filter(
+            matricula=self.matricula,
+            turma_disciplina=self.turma_disciplina,
+            trimestre=self.trimestre,
+            presente=False
+        )
+
+        total_faltas = faltas.count()
+
+        try:
+            gestao = GestaoTurmas.objects.get(
+                aluno=self.matricula,
+                grade=self.turma_disciplina,
+                trimestre=self.trimestre
+            )
+            gestao.faltas = total_faltas  # opcional: campo duplicado, se quiser mostrar também
+            gestao.faltas_total = total_faltas
+            gestao.save()
+        except GestaoTurmas.DoesNotExist:
+            pass  # Ou criar, dependendo da lógica desejada
+
     def __str__(self):
         nome = self.matricula.aluno.nome_completo
         tipo = "Dia" if self.controle_diario else f"Aula {self.aula_numero} - {self.turma_disciplina}"
