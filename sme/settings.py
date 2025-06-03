@@ -33,7 +33,7 @@ ALLOWED_HOSTS = [*
     #'https://kiweln.conteige.cloud'
 ]"""
 
-CSRF_TRUSTED_ORIGINS = ['https://89af-177-200-115-250.ngrok-free.app', 'https://uxcoov.conteige.cloud']
+CSRF_TRUSTED_ORIGINS = ['https://cauans-solutions.icu']
 
 
 # Application definition

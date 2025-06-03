@@ -116,8 +116,10 @@ urlpatterns = [
     path('gestao_escolar/Gestao_Turmas/aluno/notas/<int:pk>',gestao_turmas_update_view, name='gestao_turmas_update'),  
     path('gestao_escolar/Gestao_Turmas/aluno/conselhoClasse/<int:pk>',AprovaConselho.as_view(), name='aprovaConselho'),  
 
-    # GErar horario
+    # Plano de Aula
+    path('relatorio/plano/<int:plano_id>/', relatorio_plano_aula_frequencia, name='relatorio_plano_aula'),
 
+    # GErar horario
     path('horario/validade/<int:turma_id>/', CriaValidadeHorario.as_view(), name='validadeHorario'),
     path('horario/validade/update/<int:pk>/', CriaValidadeHorarioUpdate.as_view(), name='validadeHorarioUpdate'),
     path('horario/add/<int:turma_id>/', alocar_aulas, name='criar_horario'),

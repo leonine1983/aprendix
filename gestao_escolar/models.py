@@ -721,7 +721,8 @@ class Presenca(models.Model):
 
     def atualizar_faltas_gestao_turmas(self):
         if not self.trimestre or not self.turma_disciplina:
-            return  # Campos obrigatórios para calcular faltas
+            print("⚠️ Trimestre ou disciplina não definidos. Faltas não foram atualizadas.")
+            return
 
         # Filtrar todas as presenças do aluno naquela disciplina e trimestre
         faltas = Presenca.objects.filter(
@@ -739,11 +740,13 @@ class Presenca(models.Model):
                 grade=self.turma_disciplina,
                 trimestre=self.trimestre
             )
-            gestao.faltas = total_faltas  # opcional: campo duplicado, se quiser mostrar também
+            gestao.faltas = total_faltas
             gestao.faltas_total = total_faltas
             gestao.save()
+            print(f"✅ Faltas atualizadas para {gestao.aluno.aluno.nome_completo}: {total_faltas} faltas registradas.")
         except GestaoTurmas.DoesNotExist:
-            pass  # Ou criar, dependendo da lógica desejada
+            print(f"⚠️ GestaoTurmas não encontrada para {self.matricula}. Nenhuma atualização feita.")
+
 
     def __str__(self):
         nome = self.matricula.aluno.nome_completo

@@ -242,6 +242,11 @@
     {% endif %}
     <!--Grades End-->
 
+    <!-- Plano de Aula -->     
+    {% if  conteudo_page == "relatorio_planoAula" %}
+        {% include 'Escola/partials/gestao_turmas/planoAula/planoAula.html' %}
+    {% endif %}
+
     {% if  conteudo_page == 'cargos/funcionarios' %}
         {% include 'Escola/partials/selecionar_cargos_funcionarios.html' %}
     {% endif %}    

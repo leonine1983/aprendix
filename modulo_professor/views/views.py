@@ -230,44 +230,87 @@ def selecionaTurmaDisciplina(request):
 
 
 
+from django.contrib import messages
+from django.shortcuts import render, get_object_or_404, redirect
+from datetime import date
+
+from django import forms
+
+class PresencaAulaForm(forms.Form):
+    data = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        label="Data da Aula"
+    )
+    aula_numero = forms.IntegerField(
+        required=False,
+        min_value=1,
+        widget=forms.NumberInput(attrs={'class': 'form-control'}),
+        label="Número da Aula"
+    )
+    trimestre = forms.ModelChoiceField(
+        queryset=None,  # definiremos dinamicamente
+        label="Trimestre",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
+    def __init__(self, *args, **kwargs):
+        trimestres = kwargs.pop('trimestres', None)
+        super().__init__(*args, **kwargs)
+        if trimestres:
+            self.fields['trimestre'].queryset = trimestres
+
+
 @login_required
 def registrar_presenca_por_aula_view(request, turma_disciplina_id):
     turma_disciplina = get_object_or_404(TurmaDisciplina, id=turma_disciplina_id)
     turma = turma_disciplina.turma
     matriculas = Matriculas.objects.filter(turma=turma)
+    trimestres = Trimestre.objects.all()
 
-    if request.method == 'POST':
-        data_presenca_str = request.POST.get('data')
-        aula_numero = request.POST.get('aula_numero')
-        alunos_presentes_ids = request.POST.getlist('presentes')
-        data_presenca = data_presenca_str
-
-        # Registro das presenças por aula
-        for matricula in matriculas:
-            presente = str(matricula.id) in alunos_presentes_ids
-            try:
-                Presenca.objects.update_or_create(
-                    matricula=matricula,
-                    data=data_presenca,
-                    turma_disciplina=turma_disciplina,
-                    aula_numero=aula_numero,
-                    defaults={'presente': presente, 'controle_diario': False}
-                )                
-            except Exception as e:
-                print(f"Erro ao registrar presença para matrícula {matricula.id}: {e}")
-        messages.success(request, "Frequência diária realizada com sucesso!!!")
-        return redirect('modulo_professor:faltas_por_disciplina_mes', turma_disciplina_id=turma_disciplina.id)
-
-    # Envia a data atual formatada como dd/mm/aaaa
     today = date.today()
     data_formatada = today.strftime('%d/%m/%Y')
 
+    if request.method == 'POST':
+        form = PresencaAulaForm(request.POST, trimestres=trimestres)
+        if form.is_valid():
+            data_presenca = form.cleaned_data['data']
+            aula_numero = form.cleaned_data['aula_numero']
+            trimestre = form.cleaned_data['trimestre']
+            alunos_presentes_ids = request.POST.getlist('presentes')
+
+            for matricula in matriculas:
+                presente = str(matricula.id) in alunos_presentes_ids
+                try:
+                    Presenca.objects.update_or_create(
+                        matricula=matricula,
+                        data=data_presenca,
+                        turma_disciplina=turma_disciplina,
+                        aula_numero=aula_numero,
+                        defaults={
+                            'presente': presente,
+                            'controle_diario': False,
+                            'trimestre': trimestre
+                        }
+                    )
+                except Exception as e:
+                    print(f"Erro ao registrar presença para matrícula {matricula.id}: {e}")
+                    messages.warning(request, f"Erro ao salvar presença de {matricula.aluno.nome_completo}: {e}")
+
+            messages.success(request, "Frequência por aula registrada com sucesso.")
+            return redirect('modulo_professor:faltas_por_disciplina_mes', turma_disciplina_id=turma_disciplina.id)
+        else:
+            messages.error(request, "Por favor, corrija os erros no formulário.")
+    else:
+        form = PresencaAulaForm(initial={'data': today}, trimestres=trimestres)
+
     return render(request, 'modulo_professor/partial/presenca/presenca_por_aula.html', {
-    'matriculas': matriculas,
-    'turma_disciplina': turma_disciplina,
-    'data': data_formatada,
-    'today': today,
+        'form': form,
+        'matriculas': matriculas,
+        'turma_disciplina': turma_disciplina,
+        'data': data_formatada,
+        'today': today,
     })
+
 
 
 @login_required
