@@ -1,11 +1,9 @@
 {% include "Escola/partials/modal_partials/modal_top.html" %}
 {% load static %}
-
 <div class="text-center mb-4">
     <h5 class="card-title">Escolha uma escola</h5>
     <p class="text-muted">Selecione uma das escolas disponíveis abaixo para continuar.</p>
 </div>
-
 <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 gap-3 justify-content-center">
     {% for n in object_list %}
     <div class="col m-0 p-0">
@@ -21,7 +19,6 @@
     </div>
     {% endfor %}
 </div>
-
 <style>
     .hover-shadow:hover {
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -33,5 +30,4 @@
         object-fit: cover;
     }
 </style>
-
 {% include "Escola/partials/modal_partials/modal_bottom.html" %}
