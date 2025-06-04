@@ -13,15 +13,19 @@ from django.contrib import messages
 def Seleciona_escola(request, pk):
     # Recupera a escola com base no id fornecido
     escola = Escola.objects.get(pk = pk)    
+    request.session['escola_id'] = escola.id    
+    request.session['escola_nome'] = escola.nome_escola
+    request.session['escola_nome_query'] = escola
+    print(f'a escola {escola}')
+    print(f'a escola na sessão {request.session['escola_nome']}')
+    print(f"a escola ID  {request.session['escola_id']}")
     nomeclatura = NomeclaturaJanelas.objects.latest('id')
     prefeitura = Prefeitura.objects.get(pk = 1)    
     
     # outros
     matriculas_painel = Turmas.objects.filter(escola = escola)
     # Armazena o Id e o nome da escola na sessão
-    request.session['escola_id'] = escola.id
-    request.session['escola_nome'] = escola.nome_escola
-    request.session['escola_nome_query'] = escola
+    
     request.session['prefeitura'] = prefeitura
     request.session['nomeclatura'] = nomeclatura
     request.session['matriculas_painel'] = matriculas_painel

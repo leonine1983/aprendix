@@ -1,26 +1,37 @@
 {% include "Escola/partials/modal_partials/modal_top.html" %}
-<h5 class="card-title">Selecione uma escola</h5>
-<p class="m-0">Por favor, escolha uma das opções de escolas disponíveis:</p>       
-<ul class="list-group list-group-flush  rounded-start-3">
-    <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-end">
-        <div class="fs-6" >
-            <i class="fa-solid fa-school-flag fs-6 p-1"></i>                    
-            <select name="escola" id="form-select-sm" class="form-select">
-                {% for n in object_list %}
-                    <option value="{{n.id}}">{{n.nome_escola}}</option> 
-                {% endfor %}                       
-            </select>
-        </div>           
-        <button class="btn btn-primary m-2" onclick="selecionaEscola()">Selecionar</button>
-    </li>                
-</ul>  
-<script>
-        function selecionaEscola(){
-            var selectElement = document.getElementById("form-select-sm");
-            var selectedId = selectElement.value;
-            if (selectedId){
-                window.location.href = "escolas/selecionar/" + selectedId + "/";
-            }
-        }            
-</script> 
+{% load static %}
+
+<div class="text-center mb-4">
+    <h5 class="card-title">Escolha uma escola</h5>
+    <p class="text-muted">Selecione uma das escolas disponíveis abaixo para continuar.</p>
+</div>
+
+<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 gap-3 justify-content-center">
+    {% for n in object_list %}
+    <div class="col m-0 p-0">
+        <a href="{% url 'Gestao_Escolar:escola-selecionar' n.id %}" class="text-decoration-none">
+            <div class="card h-100 w-100 shadow-sm border-0 hover-shadow transition p-1">
+                <!-- Imagem ilustrativa -->
+                <img src="{% static 'schooll.png' %}" class="card-img-top" alt="Imagem da escola {{ n.nome_escola }}">
+                <div class="card-body text-center">
+                    <h6 class="card-title mb-0">{{ n.nome_escola }}</h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+    .card-img-top {
+        height: 120px;
+        object-fit: cover;
+    }
+</style>
+
 {% include "Escola/partials/modal_partials/modal_bottom.html" %}
