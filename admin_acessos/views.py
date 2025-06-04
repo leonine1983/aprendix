@@ -22,9 +22,7 @@ class CreateLoginView(LoginView):
         return super().form_invalid(form)
 
     def get_success_url(self):
-        # Lista de mensagens aleatórias de boas-vindas
         name = self.request.user.username.capitalize()
-
         mensagens_boas_vindas = [
             f'Sabe {name}, \'A educação é a arma mais poderosa que você pode usar para mudar o mundo.\' - Nelson Mandela',
             f'{name}, \'O sucesso é ir de fracasso em fracasso sem perder o entusiasmo.\' - Winston Churchill',
@@ -75,17 +73,11 @@ class CreateLoginView(LoginView):
             f'{name}, \'Quando você quer alguma coisa, todo o universo conspira para que você realize seu desejo.\' - Paulo Coelho',
             f'{name}, \'O futuro pertence àqueles que acreditam na beleza de seus sonhos.\' - Eleanor Roosevelt',
             f'{name}, \'A felicidade é a única coisa que se multiplica quando é dividida.\' - Albert Schweitzer'
-        ]
-
-        
-        # Escolher uma mensagem aleatória
+        ]        
         mensagem = random.choice(mensagens_boas_vindas)
         mensagem = mensagem.format(self.request.user.first_name)
-
-        # Exibir a mensagem de boas-vindas
         messages.info(self.request, f'<i class="fa-duotone fa-solid fa-hand-wave fa-shake fs-1"></i> {mensagem}')
 
-        # Verificar se o usuário é do grupo 'Aluno'
         if self.request.user.groups.filter(name='Aluno').exists():
             return reverse_lazy('modulo_aluno:homeAluno')        
         elif self.request.user.groups.filter(name='Professor').exists():
@@ -103,10 +95,12 @@ class LogoutView_logout(LogoutView):
     def dispatch(self, request, *args, **kwargs):
         logout(request)
         return super().dispatch(request, *args, **kwargs)
+    
 
 # Painel de Acesso
 class PainelAcessoView(LoginRequiredMixin, TemplateView):
     template_name = 'admin_acessos/features/panel_acesso.html'
+
 
 # Message User Form
 class MessageUserForm(forms.ModelForm):
@@ -118,6 +112,7 @@ class MessageUserForm(forms.ModelForm):
         widgets = {
             'remetente': forms.HiddenInput(),  # Manter o remetente como um campo oculto
         }
+
 
 # Create Message
 class MensagemCreateView(CreateView):
@@ -131,6 +126,7 @@ class MensagemCreateView(CreateView):
         mensagem.remetente = self.request.user
         mensagem.save()
         return super().form_valid(form)
+    
 
 # List Messages
 class MensagemListView(ListView):
@@ -139,6 +135,7 @@ class MensagemListView(ListView):
 
     def get_queryset(self):
         return MessageUser.objects.filter(user=self.request.user)
+    
 
 # Update Message
 class MensagemUpdateView(UpdateView):
@@ -146,11 +143,13 @@ class MensagemUpdateView(UpdateView):
     fields = '__all__'
     template_name = 'Controle_Estoque/mensagem/mensagem_envia.html'
 
+
 # Delete Message
 class MensagemDeleteView(DeleteView):
     model = MessageUser
     template_name = 'Controle_Estoque/mensagem/mensagem_envia.html'
     success_url = reverse_lazy('admin_acessos:mensagem_lista')
+
 
 # Update Message Status
 class UpdateMessageView(View):
@@ -160,6 +159,7 @@ class UpdateMessageView(View):
         message.aberta = True
         message.save()
         return redirect(reverse('admin_acessos:mensagem_detalhe', args=[message_id]))
+    
 
 # Message Detail
 class DetalheMensagemView(DetailView):
@@ -174,6 +174,7 @@ class DetalheMensagemView(DetailView):
         context['active'] = 'mensagem'
         context['tipo'] = 'visualiza'
         return context
+
 
 # Paletas de Cores Views
 class PaletaCoresListView(ListView):
@@ -229,6 +230,7 @@ class UserCreationFormAll(forms.ModelForm):
         if commit:
             user.save()
         return user
+    
 
 class CreateUsers(LoginRequiredMixin, CreateView):
     model = User
@@ -236,21 +238,28 @@ class CreateUsers(LoginRequiredMixin, CreateView):
     template_name = 'Escola/inicio.html'
 
     def get_success_url(self):
-        return reverse_lazy('admin_acessos:CreateUsers')
+        #return reverse_lazy('admin_acessos:CreateUsers')
+        return reverse_lazy('Gestao_Escolar:GE_Escola_inicio')
     
     def form_valid(self, form):
         # Salva o objeto no banco de dados primeiro
         response = super().form_valid(form)
         user_pk = form.instance.pk
-        print(f"Id do usuario {user_pk}")
-        usuario = User.objects.get(pk=user_pk)
-        print(f"Usuario econtrado {usuario}")
-        
+
         school_pk = self.request.session['escola_id']
+        escola = Escola.objects.get(pk=school_pk)
+        user = User.objects.get(pk=user_pk)
+
         EscolaUser.objects.create(
-            escola = Escola.objects.get(pk=school_pk),
-            usuario = User.objects.get(pk=user_pk)
+            escola=escola,
+            usuario=user
         )
+
+        messages.success(
+            self.request,
+            f'Usuário {user.first_name or user.username} criado com sucesso e vinculado à escola "{escola.nome_escola}"!'
+        )
+
         return response
 
     def get_context_data(self, **kwargs) :

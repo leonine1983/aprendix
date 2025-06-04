@@ -1,177 +1,149 @@
+{% load static %}
 <style>
 .navbar {
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 4px; /* Sombra sutil */
-  border-radius: 0.75rem; /* Bordas arredondadas no topo */
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 4px;
+  border-radius: 0.75rem;
 }
-.navbar li{
-  height:3.5rem!important;
-  margin-right: 2rem!important;
+.navbar li {
+  height: 3.5rem !important;
+  margin-right: 2rem !important;
 }
 
 .navbar-brand img {
-  margin-left: -1rem; /* Ajuste da margem da imagem */
+  margin-left: -1rem;
 }
 
 .navbar-toggler {
-  border: none; /* Remove a borda do botão */
+  border: none;
 }
 
 .navbar-toggler-icon {
-  background-color: #0078d4; /* Cor do ícone de toggle */
+  background-color: #0078d4;
 }
 
 .nav-link {
-  color: #333; /* Cor do texto do link */
-  transition: color 0.2s ease, background-color 0.2s ease; /* Transições suaves */
+  color: #333;
+  transition: color 0.2s ease, background-color 0.2s ease;
 }
 
-.nav-link:hover, .nav-link:focus {
-  color: #0078d4; /* Cor do texto ao passar o mouse */
+.nav-link:hover,
+.nav-link:focus {
+  color: #0078d4;
   scale: 1.1;
- 
 }
 
-.dropdown-menu {
-  /*background-color:transparent;*/
-  /*backdrop-filter: blur(10px);*/
-  background-color:rgb(170, 209, 209);
-  border: none;
-  box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px; 
-  border-radius: 0.5rem; 
-  padding: 0; 
-}
-.dropdown-menu:hover { 
-  border:#0078d4 0.1rem solid;
-}
-
-.dropdown-item {
-  display: block;
-  color: #1b1b1b; 
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid #000000; 
-  border-radius: 0.5rem; 
-  transition: background-color 0.2s ease, transform 0.2s ease;
-  margin-left: 1rem;
-  margin-top: 0.5rem;
-} 
-
-.dropdown-item:last-child {
-  border-bottom: none; /* Remove a borda inferior do último item */
-}
 .fs-6 {
   font-size: 0.9rem !important;
 }
 
-/*menu vertical*/
-  
-    .custom-nav {
-      margin-top: -2.2rem;
-      background-color: #a68500be;
-      background-image: url("https://www.transparenttextures.com/patterns/groovepaper.png");
-      box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
-      position: relative;
-      border-bottom-left-radius: 0.5rem;
-      border-bottom-right-radius: 0.5rem;
+/* menu vertical customizado */
+.custom-nav {
+  margin-top: -2.2rem;
+  background-color: #a68500be;
+  background-image: url("https://www.transparenttextures.com/patterns/groovepaper.png");
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
+              rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+  position: relative;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+}
 
-    }
+.custom-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 
-    .custom-nav-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content:center;
-    }
+.custom-nav-list li {
+  position: relative;
+}
 
-    .custom-nav-list li {
-      position: relative;      
-    }
+.custom-nav-list li a {
+  display: block;
+  padding: 1rem 2rem;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.95);
+  transition: background 0.3s ease-in-out;
+}
 
-    .custom-nav-list li a {
-      display: block;
-      padding: 1rem 2rem;
-      text-decoration: none;
-      color: rgba(255, 255, 255, 0.95);
-      transition: background 0.3s ease-in-out;
-    }
+.custom-nav-list li a:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
 
-    .custom-nav-list li a:hover {
-      background: rgba(0, 0, 0, .15);
-    }
+.custom-nav-list li a:not(:only-child)::after {
+  content: ' ▾';
+  padding-left: 5px;
+}
 
-    .custom-nav-list li a:not(:only-child)::after {
-      content: ' ▾';
-      padding-left: 5px;
-    }
+.custom-dropdown {
+  display: none;
+  position: absolute;
+  background: white;
+  top: 100%;
+  left: 0;
+  box-shadow: 0 4px 10px rgba(10, 20, 30, 0.4);
+  min-width: 190px;
+  z-index: 1000;
+  width: 20vw;
+  text-align: start;
+  border: 0.1rem solid #a68500be;
+}
 
-    .custom-dropdown {
-      display: none;
-      position: absolute;
-      background: white;
-      top: 100%;
-      left: 0;
-      box-shadow: 0 4px 10px rgba(10, 20, 30, .4);
-      min-width: 190px;
-      z-index: 1000;
-      width: 20vw;
-      text-align: start;
-      border: 0.1rem solid #a68500be;;
-      
-    }
+.custom-dropdown li a {
+  padding: 0.8rem 1rem;
+  color: #555;
+  border-bottom: 1px solid #eee;
+}
 
-    .custom-dropdown li a {
-      padding: 0.8rem 1rem;
-      color: #555;
-      border-bottom: 1px solid #eee;
-    }
+.custom-dropdown li a:hover {
+  background: #f0f0f0;
+  color: #111;
+}
 
-    .custom-dropdown li a:hover {
-      background: #f0f0f0;
-      color: #111;
-    }
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  padding: 1rem;
+  cursor: pointer;
+}
 
-    /* MOBILE MENU */
-    .menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      padding: 1rem;
-      cursor: pointer;
-    }
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
 
-    @media (max-width: 768px) {
-      .menu-toggle {
-        display: block;
-      }
+  .custom-nav-list {
+    display: none;
+    flex-direction: column;
+  }
 
-      .custom-nav-list {
-        display: none;
-        flex-direction: column;
-      }
+  .custom-nav-list.active {
+    display: flex;
+  }
 
-      .custom-nav-list.active {
-        display: flex;
-      }
+  .custom-nav-list li {
+    width: 100%;
+  }
 
-      .custom-nav-list li {
-        width: 100%;
-      }
+  .custom-dropdown {
+    position: static;
+    box-shadow: none;
+  }
 
-      .custom-dropdown {
-        position: static;
-        box-shadow: none;
-      }
+  .custom-dropdown li a {
+    padding-left: 2rem;
+    width: 75vw;
+    background-color: aliceblue;
+  }
+}
+</style>
 
-      .custom-dropdown li a {
-        padding-left: 2rem;
-        width: 75vw;
-        background-color: aliceblue;
-      }
-    }
-  </style>
 
 
   <nav class="custom-nav">
@@ -220,8 +192,9 @@
       <!-- Relatórios -->
       <li class="custom-drop text-center  border">
         <a href="#"><i class="fa-sharp-duotone fa-solid fa-face-smiling-hands fs-5"></i><br>Apoio/Suporte</a>   
-        <ul class="custom-dropdown">
-          <li><a href='{% url "Gestao_Escolar:GE_anoLetivo" %}'><i class="fa-regular fa-arrows-retweet txt-p-nav fs-4"></i><sup class="txt-p-nav ">{{request.session.anoLetivo_nome}}</sup> Alternar entre Anos Letivos | Mudar Exercício</a>
+        <ul class="custom-dropdown">          
+          <li><a href='{% url "Gestao_Escolar:GE_anoLetivo" %}'><i class="fa-regular fa-arrows-retweet txt-p-nav fs-4"></i><sup class="txt-p-nav text-success fw-bold ">{{request.session.anoLetivo_nome}}</sup> Alternar entre Anos Letivos | Mudar Exercício</a>
+          <li><a href='{% url "Gestao_Escolar:GE_inicio" %}'><img src="{% static 'school.png' %}" width='30px' alt=""><sup class="txt-p-nav "></sup> Alternar entre Escolas</a>
           {% if user.is_superuser %}
             <li><a href='{% url "Gestao_Escolar:CreateEscola" %}'><i class="fa-duotone fa-solid fa-school-flag txt-p-nav me-2 fs-4"></i> Criar nova Escola (Super User)</a></li>
           {% endif %}

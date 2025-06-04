@@ -295,6 +295,41 @@ class Contrato(models.Model):
         super().save(*args, **kwargs)
 
 
+class ProfEfetivo(models.Model):
+    pessoa = models.ForeignKey(Pessoas, related_name='pessoa_efetiva', verbose_name='Pessoa efetiva', on_delete=models.CASCADE)    
+    matricula = models.CharField("Matrícula funcional", max_length=20, unique=True)
+    cargo = models.CharField("Cargo", max_length=100)
+    funcao = models.CharField("Função exercida", max_length=100, blank=True, null=True)
+    data_ingresso = models.DateField("Data de ingresso no município")
+    data_posse = models.DateField("Data de posse no cargo", blank=True, null=True)
+    regime_trabalho = models.CharField(
+        "Regime de trabalho",
+        max_length=30,
+        choices=[('20h', '20h'), ('30h', '30h'), ('40h', '40h')],
+        default='40h'
+    )
+    situacao = models.CharField(
+        "Situação funcional",
+        max_length=20,
+        choices=[('ativo', 'Ativo'), ('afastado', 'Afastado'), ('aposentado', 'Aposentado')],
+        default='ativo'
+    )
+    escola_lotacao = models.ForeignKey( Escola, related_name='profissionais_efetivos',
+        verbose_name='Unidade de lotação',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
+    observacoes = models.TextField("Observações", blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Profissional Efetivo"
+        verbose_name_plural = "Profissionais Efetivos"
+
+    def __str__(self):
+        return f"{self.pessoa.nome_completo} ({self.matricula})"
+
+
     
 class Decreto(models.Model):
     profissional = models.ForeignKey(Pessoas, related_name='decreto_profissional', verbose_name='Profissional em que foi emitido o decreto', on_delete=models.CASCADE)
@@ -409,7 +444,7 @@ class Escola_admin(models.Model):
 
 
 class Encaminhamentos(models.Model):
-    encaminhamento = models.ForeignKey(Contrato, related_name='encaminhamento_escolar', verbose_name='Profissional a ser encaminhado', on_delete=models.CASCADE)
+    encaminhamento = models.ForeignKey(Contrato, related_name='encaminhamento_escolar', verbose_name='Profissional a ser encaminhado', on_delete=models.CASCADE)        
     destino = models.ForeignKey(Escola, related_name='local_encaminhamento', null=False, verbose_name='Local onde o profissional será encaminhado', on_delete=models.CASCADE)
     profissao = models.ForeignKey(Profissao, null=False, verbose_name="Atividade a ser realizada pelo profissional", on_delete=models.CASCADE)
 
