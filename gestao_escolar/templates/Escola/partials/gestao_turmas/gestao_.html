@@ -94,6 +94,7 @@
             <th class="text-left ">Aluno</th>                     
             <th class="text-center">Situação</th>     
             <th class="text-center">Data de Matricula</th>  
+            <th class="text-center">Histórico Escolar</th>              
           </tr>
         </thead>
         <tbody>                     
@@ -104,6 +105,14 @@
             <td >{{n.aluno}}</td>                                    
             <td >{{n.situacao}}</td>
             <td >{{n.data_matricula}}</td>
+            <td>
+              <a href="{% url 'Gestao_Escolar:historico_escolar' n.id %}" title="Impressão de histórico escolar">   
+                  <div style="margin-bottom:0.9rem">
+                    <img src="{% static 'svg/boletim_aluno.svg' %}" alt="mdo" class="pt-1 pb-1">
+                  </div>   
+                  <span>Histórico Escolar</span>
+                </a> 
+            </td>
           </tr> 
           {% endfor %}                                            
         </tbody>

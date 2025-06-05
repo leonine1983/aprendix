@@ -245,6 +245,14 @@ class AlunoUser(models.Model):
 
 
 class Disciplina(models.Model):
+    CAMPO_CONHECIMENTO_CHOICES = [
+        ('linguagens', 'Linguagens'),
+        ('matematica', 'Matemática'),
+        ('ciencias_natureza', 'Ciências da Natureza'),
+        ('ciencias_humanas', 'Ciências Humanas'),
+        ('outras', 'Outras'),
+    ]
+
     nome = models.CharField(max_length=100)
     ordem_historico = models.FloatField(null=True)
     n_A = models.BooleanField(verbose_name="Destacar como N/S (Não avaliado) nos impressos", default=False, null=True)
@@ -252,7 +260,15 @@ class Disciplina(models.Model):
     notas = models.BooleanField(verbose_name="Não permitir lançamento de notas", default=False, null=True)
     historico_escolar = models.BooleanField(verbose_name="Não mostrar no histórico escolar", default=False, null=True)
     papeletas = models.BooleanField(verbose_name="Não mostrar em papeletas", default=False, null=True)
-    ata_final = models.BooleanField(verbose_name="Não mostrar em Atas Finais", default=False, null=True)   
+    ata_final = models.BooleanField(verbose_name="Não mostrar em Atas Finais", default=False, null=True)
+
+    campo_conhecimento = models.CharField(
+        max_length=30,
+        choices=CAMPO_CONHECIMENTO_CHOICES,
+        verbose_name='Campo do Conhecimento',
+        default='matematica',
+        help_text='Selecione o campo do conhecimento da disciplina'
+    )
 
     class Meta:
         ordering = ['ordem_historico']

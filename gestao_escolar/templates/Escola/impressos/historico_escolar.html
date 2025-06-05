@@ -1,0 +1,174 @@
+<style>
+  .historico-wrapper {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+  }
+
+  .historico-wrapper h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #343a40;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  }
+
+  thead {
+    background-color: #007bff;
+    color: white;
+  }
+
+  th, td {
+    padding: 0.75rem 1rem;
+    text-align: center;
+    border: 1px solid #dee2e6;
+    font-size: 0.95rem;
+  }
+
+  th[rowspan="2"] {
+    background-color: #0056b3;
+    font-weight: bold;
+  }
+
+  th[colspan="2"] {
+    font-weight: 500;
+    background-color: #007bff;
+  }
+
+  thead small {
+    font-size: 0.8rem;
+    color: #f1f1f1;
+    font-weight: 400;
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: #f2f6fc;
+  }
+
+  tbody td:first-child {
+    text-align: left;
+    font-weight: 500;
+    background-color: #f0f0f0;
+  }
+</style>
+
+{% load meus_filtros %}
+
+<div class="historico-wrapper">
+  <h2>Histórico Escolar de {{ matricula.aluno.nome_completo }}</h2>
+  
+  <table>
+    <thead>
+      <tr>
+        <th rowspan="2" colspan="2">Componentes Curriculares</th>
+        {% for t in serie %}
+          <th colspan="2">{{ t }}</th>
+        {% endfor %}
+      </tr>
+      <tr>
+        {% for t in serie %}
+          <th><small>N</small></th>
+          <th><small>CH</small></th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+    {% for h in historico %}
+      <tr>
+        <td style="text-transform: uppercase; writing-mode: vertical-rl; text-orientation: upright;">
+        {{ h.grade.disciplina.campo_conhecimento }}
+        </td>
+
+        <td>{{ h.grade.disciplina }}</td>
+        {% for t in serie %}
+          {% if h.grade.turma.serie.id == t.id %}
+            <td title="{{ h.grade.turma }}" id="n_{{ h.grade.turma }}">{{ h.media_final }}</td>
+            <td class="ch-cell" data-serie="{{ t.id }}">{{ h.grade.carga_horaria_anual }}</td>
+          {% else %}
+            <td contenteditable="true" ></td>
+            <td contenteditable="true" class="ch-cell" data-serie="{{ t.id }}"></td>
+          {% endif %}
+        {% endfor %}
+      </tr>
+    {% endfor %}
+      <tr>
+        <td colspan="2"><strong>Carga Horária Total</strong></td>
+        {% for t in serie %}
+          <td colspan="2" class="total-ch" data-serie="{{ t.id }}"></td>
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Função que atualiza o total para cada série
+    function atualizarTotais() {
+      const totalCells = document.querySelectorAll('.total-ch');
+      totalCells.forEach(totalCell => {
+        const serieId = totalCell.getAttribute('data-serie');
+        const chCells = document.querySelectorAll(`.ch-cell[data-serie="${serieId}"]`);
+        let soma = 0;
+        chCells.forEach(cell => {
+          const valor = parseFloat(cell.textContent.trim());
+          if (!isNaN(valor)) soma += valor;
+        });
+        totalCell.textContent = soma;
+      });
+    }
+
+    // Seleciona todas as células editáveis com classe ch-cell
+    const chCellsEditaveis = document.querySelectorAll('.ch-cell[contenteditable="true"]');
+
+    chCellsEditaveis.forEach(cell => {
+      // Ao digitar (input), valida e atualiza a soma
+      cell.addEventListener('input', (e) => {
+        // Remove tudo que não for número ou ponto decimal
+        let valor = e.target.textContent;
+        valor = valor.replace(/[^0-9.,]/g, ''); // aceita números, vírgula e ponto
+        // Substitui vírgula por ponto para parseFloat
+        valor = valor.replace(',', '.');
+
+        // Atualiza o conteúdo da célula já formatado
+        e.target.textContent = valor;
+
+        // Coloca o cursor no fim após manipulação do conteúdo
+        placeCaretAtEnd(e.target);
+
+        // Atualiza os totais após a digitação
+        atualizarTotais();
+      });
+
+      // Também atualiza total ao sair da célula (opcional)
+      cell.addEventListener('blur', atualizarTotais);
+    });
+
+    // Função para colocar o cursor no fim da célula editável (bom para UX)
+    function placeCaretAtEnd(el) {
+      el.focus();
+      if (typeof window.getSelection != "undefined"
+          && typeof document.createRange != "undefined") {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+
+    // Atualiza os totais no carregamento inicial também
+    atualizarTotais();
+  });
+</script>

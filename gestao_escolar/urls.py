@@ -144,6 +144,7 @@ urlpatterns = [
     path('escolas/impressao', Imprime_Escolas.as_view(), name='imprime_list_escolas'),
     path('horarios/all/impressao', ImprimeAllHorarios .as_view(), name='imprime_all_horarios'),
     
+    path('historico/<int:pk>/', HistoricoEscolarAlunoView.as_view(), name='historico_escolar'),
 
 
     # Ferramentas
