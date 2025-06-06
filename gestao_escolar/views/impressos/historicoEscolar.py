@@ -1,7 +1,7 @@
 from django.views.generic import DetailView
 from django.db.models import F
 from collections import defaultdict
-from gestao_escolar.models import Matriculas, GestaoTurmas, Serie_Escolar
+from gestao_escolar.models import Matriculas, GestaoTurmas, Serie_Escolar, Disciplina
 
 class HistoricoEscolarAlunoView(DetailView):
     model = Matriculas
@@ -16,10 +16,16 @@ class HistoricoEscolarAlunoView(DetailView):
         registros = GestaoTurmas.objects.filter(
             aluno=matricula,
             trimestre__final = True
-        )
+        ).order_by('grade__disciplina__campo_conhecimento')
 
-        
+        disciplina_linguagens = Disciplina.objects.filter(campo_conhecimento ='linguagens')
+        disciplina_matematica = Disciplina.objects.filter(campo_conhecimento ='matematica')
+        disciplina_cienciasNatureza = Disciplina.objects.filter(campo_conhecimento ='ciencias_natureza')
+        disciplina_cienciasHumanas = Disciplina.objects.filter(campo_conhecimento ='ciencias_humanas')
+        disciplina_outras = Disciplina.objects.filter(campo_conhecimento ='outras')
+
         # Ordena por ano
         context['historico'] = registros
         context['serie'] =Serie_Escolar.objects.exclude(nivel_escolar__nome = 'Etapa Creche')
+        context['disciplina'] =Disciplina.objects.all()
         return context

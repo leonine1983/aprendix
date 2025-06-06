@@ -60,17 +60,25 @@
     font-weight: 500;
     background-color: #f0f0f0;
   }
-</style>
 
+  .vertical-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg); /* para deixar a leitura de baixo para cima */
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  display: flex;
+}
+</style>
 {% load meus_filtros %}
 
 <div class="historico-wrapper">
   <h2>Histórico Escolar de {{ matricula.aluno.nome_completo }}</h2>
-  
+
   <table>
     <thead>
       <tr>
-        <th rowspan="2" colspan="2">Componentes Curriculares</th>
+        <th rowspan="2" colspan="2">Disciplina</th>
         {% for t in serie %}
           <th colspan="2">{{ t }}</th>
         {% endfor %}
@@ -83,92 +91,77 @@
       </tr>
     </thead>
     <tbody>
-    {% for h in historico %}
-      <tr>
-        <td style="text-transform: uppercase; writing-mode: vertical-rl; text-orientation: upright;">
-        {{ h.grade.disciplina.campo_conhecimento }}
-        </td>
+  {% for grupo in disciplina|unique_objects:"campo_conhecimento" %}
+    {% with grupo.campo_conhecimento as campo %}
+      {% with disciplina|filter_campo_conhecimento:campo as disciplinas_do_campo %}
+        {% for d in disciplinas_do_campo %}
+          <tr>
+            {% if forloop.first %}
+              <td rowspan="{{ disciplinas_do_campo|length }}"  style="text-transform: uppercase; background-color: #f0f0f0;">
+                <div class="vertical-text">
+                  {{ campo }}
+                </div>
+              </td>
+            {% endif %}
+            <td style="text-align: left; ">{{ d }}</td>
+            {% for t in serie %}
+              {% with d|make_tuple:t as dt %}
+                {% with historico|get_historico:dt as h %}
+                  {% if h %}
+                    <td>{{ h.media_final }}</td>
+                    <td class="ch-cell" data-serie="{{ t.id }}">{{ h.grade.carga_horaria_anual }}</td>
+                  {% else %}
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true" class="ch-cell" data-serie="{{ t.id }}"></td>
+                  {% endif %}
+                {% endwith %}
+              {% endwith %}
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      {% endwith %}
+    {% endwith %}
+  {% endfor %}
 
-        <td>{{ h.grade.disciplina }}</td>
-        {% for t in serie %}
-          {% if h.grade.turma.serie.id == t.id %}
-            <td title="{{ h.grade.turma }}" id="n_{{ h.grade.turma }}">{{ h.media_final }}</td>
-            <td class="ch-cell" data-serie="{{ t.id }}">{{ h.grade.carga_horaria_anual }}</td>
-          {% else %}
-            <td contenteditable="true" ></td>
-            <td contenteditable="true" class="ch-cell" data-serie="{{ t.id }}"></td>
-          {% endif %}
-        {% endfor %}
-      </tr>
+  <tr>
+    <td colspan="2"><strong>Carga Horária Total</strong></td>
+    {% for t in serie %}
+      <td colspan="2" class="total-ch" data-serie="{{ t.id }}"></td>
     {% endfor %}
-      <tr>
-        <td colspan="2"><strong>Carga Horária Total</strong></td>
-        {% for t in serie %}
-          <td colspan="2" class="total-ch" data-serie="{{ t.id }}"></td>
-        {% endfor %}
-      </tr>
-    </tbody>
+  </tr>
+</tbody>
+
   </table>
 </div>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // Função que atualiza o total para cada série
     function atualizarTotais() {
       const totalCells = document.querySelectorAll('.total-ch');
       totalCells.forEach(totalCell => {
         const serieId = totalCell.getAttribute('data-serie');
         const chCells = document.querySelectorAll(`.ch-cell[data-serie="${serieId}"]`);
         let soma = 0;
+
         chCells.forEach(cell => {
-          const valor = parseFloat(cell.textContent.trim());
-          if (!isNaN(valor)) soma += valor;
+          const texto = cell.textContent.trim().replace(',', '.'); // aceita vírgula ou ponto
+          const valor = parseFloat(texto);
+          if (!isNaN(valor)) {
+            soma += valor;
+          }
         });
-        totalCell.textContent = soma;
+
+        totalCell.textContent = soma.toFixed(0); // sem casas decimais
       });
     }
 
-    // Seleciona todas as células editáveis com classe ch-cell
-    const chCellsEditaveis = document.querySelectorAll('.ch-cell[contenteditable="true"]');
-
-    chCellsEditaveis.forEach(cell => {
-      // Ao digitar (input), valida e atualiza a soma
-      cell.addEventListener('input', (e) => {
-        // Remove tudo que não for número ou ponto decimal
-        let valor = e.target.textContent;
-        valor = valor.replace(/[^0-9.,]/g, ''); // aceita números, vírgula e ponto
-        // Substitui vírgula por ponto para parseFloat
-        valor = valor.replace(',', '.');
-
-        // Atualiza o conteúdo da célula já formatado
-        e.target.textContent = valor;
-
-        // Coloca o cursor no fim após manipulação do conteúdo
-        placeCaretAtEnd(e.target);
-
-        // Atualiza os totais após a digitação
-        atualizarTotais();
-      });
-
-      // Também atualiza total ao sair da célula (opcional)
+    // Recalcular totais quando o conteúdo editável for alterado
+    const chEditaveis = document.querySelectorAll('.ch-cell[contenteditable="true"]');
+    chEditaveis.forEach(cell => {
+      cell.addEventListener('input', atualizarTotais);
       cell.addEventListener('blur', atualizarTotais);
     });
 
-    // Função para colocar o cursor no fim da célula editável (bom para UX)
-    function placeCaretAtEnd(el) {
-      el.focus();
-      if (typeof window.getSelection != "undefined"
-          && typeof document.createRange != "undefined") {
-        const range = document.createRange();
-        range.selectNodeContents(el);
-        range.collapse(false);
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
-      }
-    }
-
-    // Atualiza os totais no carregamento inicial também
-    atualizarTotais();
+    atualizarTotais(); // roda ao carregar
   });
 </script>

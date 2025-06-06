@@ -62,3 +62,27 @@ def get_nota_por_trimestre(notas, trimestre):
 @register.filter
 def to(value):
     return range(1, value + 1)
+
+
+
+@register.filter
+def campo_conhecimento_count(disciplinas, campo):
+    return sum(1 for d in disciplinas if d.campo_conhecimento == campo)
+
+@register.filter
+def make_tuple(a, b):
+    return (a, b)
+
+@register.filter
+def get_historico(historico_list, disciplina_turma):
+    disciplina, turma = disciplina_turma
+    for h in historico_list:
+        if h.grade.disciplina == disciplina and h.grade.turma.serie == turma:
+            return h
+    return None
+
+
+@register.filter
+def filter_campo_conhecimento(disciplinas, campo):
+    return [d for d in disciplinas if d.campo_conhecimento == campo]
+
