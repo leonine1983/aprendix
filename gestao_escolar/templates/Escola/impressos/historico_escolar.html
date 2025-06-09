@@ -217,16 +217,93 @@
     {% endfor %}
   </tbody>
 </table>
-
+<small class="p-0 m-0 d-block">
+  Observação D. M. O de 08 de abril de 2021, DEC.282/2021, que versa a Resolução SME/CP nº02, de 10 de dezembro de 2020, que institui Diretrizes Nacionais, orientadores para a implantação dos 
+dispostos d Lei nº14.040, de agosto de 2020, que estabelece Normas Educacionais excepcionais a serem adotadas, pelos sistemas de Ensino do Município de Vera Cruz. 
+</small>
 <button type="button" id="adicionarLinha" class="btn btn-sm btn-outline-primary mt-2">
   + Adicionar Linha
 </button>
-
-
 </div>
 
-
-
+<!-- Boletim -->
+ <div class="d-flex"> 
+  <!-- esquerdo-->
+  <div class="col">
+    <table>
+      <thead>
+        <tr>
+          <th>Componentes Curriculares</th>
+          {% for t in trimestre %}
+          <th>{{t}}</th>
+          {% endfor %}
+          <th>Nº Faltas</th>
+          <th>Aulas Ministradas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td></td>
+          {% for t in trimestre %}
+          <td>{{t}}</td>
+          {% endfor %}
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- direito -->
+  <div class="col">
+      <table>
+        <thead>
+          <tr>
+            <th>Componentes Curriculares</th>
+            {% for t in trimestre %}
+            <th>{{t}}</th>
+            {% endfor %}
+            <th>Nº Faltas</th>
+            <th>Aulas Ministradas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            {% for t in trimestre %}
+            <td>{{t}}</td>
+            {% endfor %}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- CERTIFICAÇÃO E ASSINATURA -->    
+  </div>
+  <div class="d-flex m-4">
+    <div class="col border">
+      <h3 class="text-center m-3">Certificado</h3>
+      <div class="text-justify">
+        Certificamos que o(a) aluno(a) <span><b>.....</b></span> cursou nesta Unidade de Ensino
+        o <span><b>.....</b></span> no ano letivo de <span><b>....</b></span>, e logrou aprovação.
+      </div>
+      <div class="text-center m-3">Vera Cruz, <span><b>.....</b></span></div>
+    </div> 
+    
+    
+    <div class="col d-flex pt-5">
+      <div class="col">
+        <div class="text-center">
+          <hr class="bg-black">
+          <strong class="text-capitalize small">{{  request.session.secretario}}</strong>
+          <br>Ass. do(a) secretário(a) escolar 
+        </div>
+      </div>
+      <div class="col">
+        <div class="text-center">
+          <hr class="bg-black">
+          <strong class="text-capitalize small">{{  request.session.diretor}}</strong>
+          <br>Ass. do(a) diretor(a) escolar 
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -262,7 +339,7 @@
 </script>
 
 
-
+<!-- Adiciona Linhas na Tabela e ordena por data-->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   const tabela = document.getElementById('historicoEscolas');
@@ -278,6 +355,7 @@ document.addEventListener('DOMContentLoaded', function () {
       td.contentEditable = true;
       tr.appendChild(td);
     }
+    ativarEventosDeRemocao(tr);
     return tr;
   }
 
@@ -288,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Remove linhas vazias (exceto a última)
   function removerLinhasVazias() {
-    const linhas = tbody.querySelectorAll('tr.linha-editavel');
+    const linhas = Array.from(tbody.querySelectorAll('tr.linha-editavel'));
     linhas.forEach((linha, index) => {
       const ehUltima = index === linhas.length - 1;
       if (linhaEstaVazia(linha) && !ehUltima) {
@@ -297,37 +375,69 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Adiciona nova linha e remove vazias
-  function adicionarLinha() {
-    removerLinhasVazias();
-    const novaLinha = criarLinhaVazia();
-    tbody.appendChild(novaLinha);
-    novaLinha.cells[0].focus();
+  // Ordena a tabela por ano (coluna 1 = índice 1)
+  function ordenarPorAno() {
+    const linhas = Array.from(tbody.querySelectorAll('tr'));
+    const naoVazias = linhas.filter(l => !linhaEstaVazia(l));
+
+    naoVazias.sort((a, b) => {
+      const anoA = parseInt(a.cells[1]?.textContent || 0);
+      const anoB = parseInt(b.cells[1]?.textContent || 0);
+      return anoA - anoB;
+    });
+
+    tbody.innerHTML = '';
+    naoVazias.forEach(l => tbody.appendChild(l));
+
+    // Garante pelo menos uma linha vazia
+    if (!tbody.lastElementChild || !linhaEstaVazia(tbody.lastElementChild)) {
+      tbody.appendChild(criarLinhaVazia());
+    }
   }
 
-  // Eventos para remoção automática
+  // Adiciona nova linha e reordena
+  function adicionarLinha() {
+    removerLinhasVazias();
+    tbody.appendChild(criarLinhaVazia());
+    ordenarPorAno();
+    tbody.lastElementChild.cells[0].focus();
+  }
+
+  // Ativa remoção e ordenação em cada célula editável
   function ativarEventosDeRemocao(linha) {
     linha.querySelectorAll('td').forEach(td => {
-      td.addEventListener('blur', removerLinhasVazias);
-      td.addEventListener('keydown', function (e) {
+      td.addEventListener('blur', () => {
+        removerLinhasVazias();
+        ordenarPorAno();
+      });
+      td.addEventListener('keydown', e => {
         if (e.key === 'Tab' || e.key === 'Enter') {
-          setTimeout(removerLinhasVazias, 10);
+          setTimeout(() => {
+            removerLinhasVazias();
+            ordenarPorAno();
+          }, 10);
         }
       });
     });
   }
 
-  // Ativar nos campos já existentes
-  document.querySelectorAll('#historicoEscolas tbody tr.linha-editavel').forEach(ativarEventosDeRemocao);
-
-  // Botão de adicionar linha
-  botao.addEventListener('click', function () {
-    adicionarLinha();
-    const novaLinha = tbody.querySelector('tr:last-child');
-    ativarEventosDeRemocao(novaLinha);
+  // Inicializa eventos em linhas existentes
+  Array.from(tbody.querySelectorAll('tr')).forEach(linha => {
+    if (!linha.classList.contains('linha-editavel')) {
+      linha.classList.add('linha-editavel');
+    }
+    ativarEventosDeRemocao(linha);
   });
+
+  // Evento botão
+  botao.addEventListener('click', adicionarLinha);
+
+  // Inicial
+  ordenarPorAno();
 });
 </script>
+
+
 
 
 

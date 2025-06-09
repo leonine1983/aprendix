@@ -1,7 +1,7 @@
 from django.views.generic import DetailView
 from django.db.models import F
 from collections import defaultdict
-from gestao_escolar.models import Matriculas, GestaoTurmas, Serie_Escolar, Disciplina
+from gestao_escolar.models import Matriculas, GestaoTurmas, Serie_Escolar, Disciplina, Trimestre
 
 class HistoricoEscolarAlunoView(DetailView):
     model = Matriculas
@@ -28,5 +28,6 @@ class HistoricoEscolarAlunoView(DetailView):
         context['historico'] = registros
         context['serie'] =Serie_Escolar.objects.exclude(nivel_escolar__nome = 'Etapa Creche')
         context['disciplina'] =Disciplina.objects.all()
+        context['trimestre'] = Trimestre.objects.exclude(final=True)
         context['conteudo_page'] = "historicoAluno"
         return context
