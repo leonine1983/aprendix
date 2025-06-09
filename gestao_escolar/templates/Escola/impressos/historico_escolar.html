@@ -1,4 +1,15 @@
-<style>
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'global/css/search.css' %}">
+{% endblock css %}
+{% include "Escola/partials/modal_partials/modal_top.html" %}
+<h3 class="fs-5"></h3>
+{% if messages %}                
+  {% include 'Escola/partials/mensagens.html' %}    
+{% endif %}  
+               
+  <div class="tab-content" id="myTabContent">
+    <style>
   .historico-wrapper {
     background-color: #f8f9fa;
     padding: 2rem;
@@ -27,9 +38,10 @@
     background-color: #007bff;
     color: white;
   }
+  
 
   th, td {
-    padding: 0.75rem 1rem;
+    padding: 0.1rem 1rem;
     text-align: center;
     border: 1px solid #dee2e6;
     font-size: 0.95rem;
@@ -46,7 +58,7 @@
   }
 
   thead small {
-    font-size: 0.8rem;
+    font-size: 0.5rem;
     color: #f1f1f1;
     font-weight: 400;
   }
@@ -63,11 +75,19 @@
 
   .vertical-text {
   writing-mode: vertical-rl;
-  transform: rotate(180deg); /* para deixar a leitura de baixo para cima */
-  text-align: center;
+  transform: rotate(180deg); 
   vertical-align: middle;
   white-space: nowrap;
   display: flex;
+  justify-content: center;
+}
+.ch-cell, .med, .text_CH{
+  font-size: 0.8rem;
+  padding: 0rem;
+}
+.text_CH{
+  padding: 0.5rem;
+  text-align: center;
 }
 </style>
 {% load meus_filtros %}
@@ -91,47 +111,122 @@
       </tr>
     </thead>
     <tbody>
-  {% for grupo in disciplina|unique_objects:"campo_conhecimento" %}
-    {% with grupo.campo_conhecimento as campo %}
-      {% with disciplina|filter_campo_conhecimento:campo as disciplinas_do_campo %}
-        {% for d in disciplinas_do_campo %}
-          <tr>
-            {% if forloop.first %}
-              <td rowspan="{{ disciplinas_do_campo|length }}"  style="text-transform: uppercase; background-color: #f0f0f0;">
-                <div class="vertical-text">
-                  {{ campo }}
-                </div>
-              </td>
-            {% endif %}
-            <td style="text-align: left; ">{{ d }}</td>
-            {% for t in serie %}
-              {% with d|make_tuple:t as dt %}
-                {% with historico|get_historico:dt as h %}
-                  {% if h %}
-                    <td>{{ h.media_final }}</td>
-                    <td class="ch-cell" data-serie="{{ t.id }}">{{ h.grade.carga_horaria_anual }}</td>
-                  {% else %}
-                    <td contenteditable="true"></td>
-                    <td contenteditable="true" class="ch-cell" data-serie="{{ t.id }}"></td>
-                  {% endif %}
-                {% endwith %}
-              {% endwith %}
+      {% for grupo in disciplina|unique_objects:"campo_conhecimento" %}
+        {% with grupo.campo_conhecimento as campo %}
+          {% with disciplina|filter_campo_conhecimento:campo as disciplinas_do_campo %}
+            {% for d in disciplinas_do_campo %}
+              <tr>
+                {% if forloop.first %}
+                  <td rowspan="{{ disciplinas_do_campo|length }}"  style="text-transform: uppercase; background-color: #f0f0f0;" class="text_CH">
+                    {% if disciplinas_do_campo|length >= 2 %}
+                      <div class="vertical-text">   
+                        {{ campo }} 
+                      </div>
+                      {% else %}
+                        <div >                  
+                          {% if campo == 'linguagens' %} 
+                            LING 
+                            {% elif campo == 'matematica'  %}
+                              MAT
+                            {% elif campo == 'ciencias_natureza' %}
+                              NAT
+                            {% elif campo == 'ciencias_humanas' %}
+                              HUM
+                            {% elif campo == 'outras' %}
+                              OUT
+                            {% else %}                    
+                          {% endif %}
+                        </div>
+                    {% endif %}                
+                  </td>
+                {% endif %}
+                <td style="text-align: left; ">{{ d }}</td>
+                {% for t in serie %}
+                  {% with d|make_tuple:t as dt %}
+                    {% with historico|get_historico:dt as h %}
+                      {% if h %}
+                        <td class="med">{{ h.media_final }}</td>
+                        <td class="ch-cell" data-serie="{{ t.id }}">{{ h.grade.carga_horaria_anual }}</td>
+                      {% else %}
+                        <td contenteditable="true" class="med"></td>
+                        <td contenteditable="true" class="ch-cell" data-serie="{{ t.id }}"></td>
+                      {% endif %}
+                    {% endwith %}
+                  {% endwith %}
+                {% endfor %}
+              </tr>
             {% endfor %}
-          </tr>
+          {% endwith %}
+        {% endwith %}
+      {% endfor %}
+      {% for i in "12345" %}
+      <tr>
+        <td colspan="1" class="text-muted text-center"></td>
+        <td contenteditable="true" class="text-start"></td>
+        {% for t in serie %}
+          <td contenteditable="true"></td>
+          <td contenteditable="true" class="ch-cell" data-serie="{{ t.id }}"></td>
         {% endfor %}
-      {% endwith %}
-    {% endwith %}
-  {% endfor %}
+      </tr>
+      {% endfor %}
 
-  <tr>
-    <td colspan="2"><strong>Carga Horária Total</strong></td>
-    {% for t in serie %}
-      <td colspan="2" class="total-ch" data-serie="{{ t.id }}"></td>
-    {% endfor %}
-  </tr>
-</tbody>
-
+      
+      <tr>
+        <td colspan="2"><strong>Carga Horária Total</strong></td>
+        {% for t in serie %}
+          <td colspan="2" class="total-ch" data-serie="{{ t.id }}"></td>
+        {% endfor %}
+      </tr>
+    </tbody>
   </table>
+  
+  <div class="w-auto d-flex justify-content-between">
+    <div class="col bg-primary text-white vertical-align-middle py-1">
+    Legenda das Siglas
+    </div>
+    <div class="col-10 card-body d-flex justify-content-between flex-wrap p-0 px-1 border border-primary">
+      <div class="py-1"><strong>LING</strong> = Linguagens</div>
+      <div class="py-1"><strong>MAT</strong> = Matemática</div>
+      <div class="py-1"><strong>NAT</strong> = Ciências da Natureza</div>
+      <div class="py-1"><strong>HUM</strong> = Ciências Humanas</div>
+      <div class="py-1"><strong>OUT</strong> = Outras</div>
+    </div>
+  </div>
+  <div class="m-3">Quebra de linha -----------------</div>
+
+  <!-- Escolas por onde o aluno passou-->
+<table id="historicoEscolas" class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Série</th>
+      <th>Ano</th>
+      <th>Unidade de Ensino</th>
+      <th>Município/Cidade</th>
+      <th>Estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for h in historico %}
+      <tr>
+        <td>{{ h.aluno.turma.serie }}</td>
+        <td>{{ h.aluno.turma.ano_letivo }}</td>
+        <td>{{ h.aluno.turma.escola }}{% if h.aluno.turma.escola.sigla_escola %} - {{ h.aluno.turma.escola.sigla_escola }}{% endif %}</td>
+        <td>{{ h.aluno.turma.escola.prefeitura.cidade }}</td>
+        <td>{{ h.aluno.turma.escola.prefeitura.estado }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<button type="button" id="adicionarLinha" class="btn btn-sm btn-outline-primary mt-2">
+  + Adicionar Linha
+</button>
+
+
+</div>
+
+
+
 </div>
 
 <script>
@@ -165,3 +260,79 @@
     atualizarTotais(); // roda ao carregar
   });
 </script>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const tabela = document.getElementById('historicoEscolas');
+  const tbody = tabela.querySelector('tbody');
+  const botao = document.getElementById('adicionarLinha');
+
+  // Cria uma nova linha editável
+  function criarLinhaVazia() {
+    const tr = document.createElement('tr');
+    tr.classList.add('linha-editavel');
+    for (let i = 0; i < 5; i++) {
+      const td = document.createElement('td');
+      td.contentEditable = true;
+      tr.appendChild(td);
+    }
+    return tr;
+  }
+
+  // Verifica se a linha está vazia
+  function linhaEstaVazia(tr) {
+    return [...tr.cells].every(td => td.textContent.trim() === '');
+  }
+
+  // Remove linhas vazias (exceto a última)
+  function removerLinhasVazias() {
+    const linhas = tbody.querySelectorAll('tr.linha-editavel');
+    linhas.forEach((linha, index) => {
+      const ehUltima = index === linhas.length - 1;
+      if (linhaEstaVazia(linha) && !ehUltima) {
+        linha.remove();
+      }
+    });
+  }
+
+  // Adiciona nova linha e remove vazias
+  function adicionarLinha() {
+    removerLinhasVazias();
+    const novaLinha = criarLinhaVazia();
+    tbody.appendChild(novaLinha);
+    novaLinha.cells[0].focus();
+  }
+
+  // Eventos para remoção automática
+  function ativarEventosDeRemocao(linha) {
+    linha.querySelectorAll('td').forEach(td => {
+      td.addEventListener('blur', removerLinhasVazias);
+      td.addEventListener('keydown', function (e) {
+        if (e.key === 'Tab' || e.key === 'Enter') {
+          setTimeout(removerLinhasVazias, 10);
+        }
+      });
+    });
+  }
+
+  // Ativar nos campos já existentes
+  document.querySelectorAll('#historicoEscolas tbody tr.linha-editavel').forEach(ativarEventosDeRemocao);
+
+  // Botão de adicionar linha
+  botao.addEventListener('click', function () {
+    adicionarLinha();
+    const novaLinha = tbody.querySelector('tr:last-child');
+    ativarEventosDeRemocao(novaLinha);
+  });
+});
+</script>
+
+
+
+
+                 
+  </div>
+</div>  
+{% include "Escola/partials/modal_partials/modal_bottom.html" %}   

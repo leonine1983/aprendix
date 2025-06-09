@@ -86,3 +86,47 @@ def get_historico(historico_list, disciplina_turma):
 def filter_campo_conhecimento(disciplinas, campo):
     return [d for d in disciplinas if d.campo_conhecimento == campo]
 
+@register.filter
+def filter_tipo_disciplina(disciplinas, tipo):
+    return [d for d in disciplinas if d.tipo_disciplina == tipo]
+
+@register.filter
+def unique_tipos(disciplinas):
+    vistos = set()
+    unicos = []
+    for d in disciplinas:
+        if d.tipo_disciplina not in vistos:
+            vistos.add(d.tipo_disciplina)
+            unicos.append(d)
+    return unicos
+
+
+
+@register.filter
+def filter_tipo_disciplina(disciplinas, tipo):
+    return [d for d in disciplinas if d.tipo_disciplina == tipo]
+
+@register.filter
+def unique_tipos(disciplinas):
+    vistos = set()
+    unicos = []
+    for d in disciplinas:
+        if d.tipo_disciplina not in vistos:
+            vistos.add(d.tipo_disciplina)
+            unicos.append(d)
+    return unicos
+
+@register.filter
+def filter_campo_conhecimento(disciplinas, campo):
+    return [d for d in disciplinas if d.campo_conhecimento == campo]
+
+@register.filter
+def unique_campos(disciplinas):
+    vistos = set()
+    unicos = []
+    for d in disciplinas:
+        if d.campo_conhecimento not in vistos:
+            vistos.add(d.campo_conhecimento)
+            unicos.append(d)
+    return unicos
+

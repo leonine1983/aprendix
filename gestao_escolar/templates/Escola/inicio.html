@@ -341,6 +341,10 @@
     {% if  conteudo_page == "boletim_trimestral"%}
         {% include 'docsGestao_escolar/boletins/seleciona_trimestral_boletim.html' %}
     {% endif %} 
+    
+    {% if  conteudo_page == "historicoAluno"  %}
+        {% include 'Escola/impressos/historico_escolar.html' %}
+    {% endif %}  
 
     <!--Errors 400, 403, 404, 500-->
 

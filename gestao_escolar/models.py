@@ -261,6 +261,7 @@ class Disciplina(models.Model):
     historico_escolar = models.BooleanField(verbose_name="Não mostrar no histórico escolar", default=False, null=True)
     papeletas = models.BooleanField(verbose_name="Não mostrar em papeletas", default=False, null=True)
     ata_final = models.BooleanField(verbose_name="Não mostrar em Atas Finais", default=False, null=True)
+    
 
     campo_conhecimento = models.CharField(
         max_length=30,

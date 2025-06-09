@@ -5,7 +5,7 @@ from gestao_escolar.models import Matriculas, GestaoTurmas, Serie_Escolar, Disci
 
 class HistoricoEscolarAlunoView(DetailView):
     model = Matriculas
-    template_name = 'Escola/impressos/historico_escolar.html'
+    template_name = 'Escola/inicio.html'
     context_object_name = 'matricula'
 
     def get_context_data(self, **kwargs):
@@ -28,4 +28,5 @@ class HistoricoEscolarAlunoView(DetailView):
         context['historico'] = registros
         context['serie'] =Serie_Escolar.objects.exclude(nivel_escolar__nome = 'Etapa Creche')
         context['disciplina'] =Disciplina.objects.all()
+        context['conteudo_page'] = "historicoAluno"
         return context
