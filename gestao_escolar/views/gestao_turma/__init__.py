@@ -10,3 +10,5 @@ from .notas import *
 from .gerarHorario import *
 from .conselhoClasse import *
 from .parecerDescritivo import *
+
+from .apuracaoFinal import *

@@ -1,0 +1,57 @@
+{% block script_head %}
+
+
+{% endblock script_head %}  
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'global/css/search.css' %}">
+{% endblock css %}
+{% include "Escola/partials/modal_partials/modal_top.html" %}                      
+<div class="tab-content " id="myTabContent">
+  <div class="tab-pane fade show active pl-4 pr-4" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">  
+       
+    <div class="container mt-4">
+    <div class="shadow-sm">
+        <div class="card-body">
+            <p class="lead text-muted mb-4">
+                <i class="bi bi-info-circle-fill text-primary me-2"></i>
+                Selecione uma turma abaixo para iniciar o processo de apuração final
+            </p>
+            
+            <div class="">              
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Alunos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in turma %}
+                        <tr>
+                            <td>
+                                {{t}}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+              
+            </div>
+        </div>
+        <div class="card-footer bg-light">
+            <small class="text-muted">
+                <i class="bi bi-clock-history me-1"></i>
+                Última atualização: {% now "DATETIME_FORMAT" %}
+            </small>
+        </div>
+    </div>
+</div>
+
+
+  </div>             
+</div>
+</div>
+{% include "Escola/partials/modal_partials/modal_bottom.html" %}
+        
+{% include "Escola/partials/grades/multiselect.html" %}
+

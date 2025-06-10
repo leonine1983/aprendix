@@ -277,13 +277,13 @@ dispostos d Lei nº14.040, de agosto de 2020, que estabelece Normas Educacionais
     <!-- CERTIFICAÇÃO E ASSINATURA -->    
   </div>
   <div class="d-flex m-4">
-    <div class="col border">
+    <div class="col border bg-info-subtle">
       <h3 class="text-center m-3">Certificado</h3>
       <div class="text-justify">
-        Certificamos que o(a) aluno(a) <span><b>.....</b></span> cursou nesta Unidade de Ensino
-        o <span><b>.....</b></span> no ano letivo de <span><b>....</b></span>, e logrou aprovação.
+        Certificamos que o(a) aluno(a) <span><strong>{{matricula}}</strong></span> cursou nesta Unidade de Ensino
+        <span><strong class="text-uppercase">{{matricula.turma.escola}}</strong></span> no ano letivo de <span><strong class="text-uppercase">{{matricula.turma.ano_letivo}}</strong></span>, e logrou aprovação.
       </div>
-      <div class="text-center m-3">Vera Cruz, <span><b>.....</b></span></div>
+      <div class="text-center m-3 text-end">Vera Cruz, <span><b>{% now "j \d\e F \d\e Y" %}</b></span></div>
     </div> 
     
     

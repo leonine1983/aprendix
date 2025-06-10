@@ -195,7 +195,14 @@ urlpatterns = [
     path('matricula_online/<int:aluno_id>/', matricular_aluno, name='matricular_aluno'),
     path('matricula_online/<int:aluno_id>/<int:serie_id>/', finaliza_matricular_aluno, name='matricular_alunoSerie'),
     path('matricula_online/impugna/<int:mat_id>', matricula_confirma_impugna, name='matricular_confirma_impugna'),
-    path('matricula_online/impugna/confirmada/<int:mat_id>', matricula_confirmada, name='matricularOnine_confirma')
+    path('matricula_online/impugna/confirmada/<int:mat_id>', matricula_confirmada, name='matricularOnine_confirma'),
+
+    
+    # Apuração final
+    path('apuracaoFinal/selecionaTurma/', listaTurmaApuracao, name='apuracaoSelecTurma'),
+    path('apuracaoFinal/selecionaTurma/<int:turma_id>', selecionaTurmaSelecionada, name='apuracaoSelec'),
+
+    
 
 
     

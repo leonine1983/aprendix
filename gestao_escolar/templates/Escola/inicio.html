@@ -346,6 +346,16 @@
         {% include 'Escola/impressos/historico_escolar.html' %}
     {% endif %}  
 
+    <!-- Apuraçao final -->
+     {% if  conteudo_page == 'SelecinaTurmaApuração'  %}
+        {% include 'Escola/partials/apuracaoFinal/apuracaoFinalTurmas.html' %}
+    {% endif %}  
+    {% if  conteudo_page == 'ApuraçãoFinal' %}
+        {% include 'Escola/partials/apuracaoFinal/apuracaoFinal.html' %}
+    {% endif %}  
+
+
+
     <!--Errors 400, 403, 404, 500-->
 
     {% if  conteudo_page == "500" %}    
