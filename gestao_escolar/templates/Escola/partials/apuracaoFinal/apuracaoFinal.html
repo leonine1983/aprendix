@@ -1,57 +1,199 @@
-{% block script_head %}
-
-
-{% endblock script_head %}  
 {% load static %}
+{% load meus_filtros %}
+
 {% block css %}
-<link rel="stylesheet" href="{% static 'global/css/search.css' %}">
+    <link rel="stylesheet" href="{% static 'global/css/search.css' %}">
 {% endblock css %}
-{% include "Escola/partials/modal_partials/modal_top.html" %}                      
-<div class="tab-content " id="myTabContent">
-  <div class="tab-pane fade show active pl-4 pr-4" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">  
-       
-    <div class="container mt-4">
-    <div class="shadow-sm">
-        <div class="card-body">
-            <p class="lead text-muted mb-4">
-                <i class="bi bi-info-circle-fill text-primary me-2"></i>
-                Selecione uma turma abaixo para iniciar o processo de apuração final
-            </p>
-            
-            <div class="">              
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Alunos</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for t in turma %}
-                        <tr>
-                            <td>
-                                {{t}}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-              
+
+{% include "Escola/partials/modal_partials/modal_top.html" %}
+
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active pl-4 pr-4" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">  
+        <p style="margin-bottom: 16px; font-size: 15px; line-height: 1.6; color: #444;" class="m-2">
+            Este documento apresenta a <strong>tabela com as médias finais dos alunos por disciplina</strong>, acompanhadas do <strong>total de faltas acumuladas</strong> ao longo do período letivo. Ao final de cada linha, é indicada a <strong>situação final do aluno</strong>, que pode ser:
+            <ul style="margin-top: 8px; padding-left: 20px;">
+                <li><strong>Aprovado</strong> – alcançou média e frequência mínimas exigidas;</li>
+                <li><strong>Aprovado pelo conselho</strong> – aprovado por decisão do conselho de classe;</li>
+                <li><strong>Retido</strong> – não atingiu os critérios de aprovação;</li>
+                <li><strong>Em andamento</strong> – turma ainda em processo de avaliação.</li>
+            </ul>
+        </p>            
+
+        <div class="">
+            <div class="card-body">
+
+                <style>
+                    @media print {
+                        @page {
+                            size: landscape;
+                            margin: 0.1cm;
+                        }
+                        body * {
+                            visibility: hidden;
+                            padding: 0px!important;
+                            margin-top: 0px!important;
+                        }
+                        #ata_notas, #ata_notas * {
+                            visibility: visible;
+                        }
+                        #ata_notas {
+                            -webkit-print-color-adjust: exact;
+                            print-color-adjust: exact; 
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+                            width: 100%;
+                            box-shadow: none !important;
+                            border: none !important;
+                            background: white !important;
+                        }
+                        .ata_notasTitle button {
+                            display: none;
+                        }
+                    }
+
+                    /* Estilo Windows 12 para tela */
+                    #ata_notas {
+                        margin: 30px auto;
+                        background: #f5f7fa;
+                        border-radius: 16px;
+                        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+                        padding: 24px;
+                        font-family: "Segoe UI", sans-serif;
+                        color: #333;
+                    }
+
+                    .ata_notasTitle h5 {
+                        font-size: 20px;
+                        font-weight: 600;
+                        margin: 0;
+                    }
+
+                    .ata_notasTitle button {
+                        background-color: #0078d4;
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        padding: 10px 16px;
+                        font-size: 14px;
+                        cursor: pointer;
+                        transition: background 0.3s;
+                    }
+
+                    .ata_notasTitle button:hover {
+                        background-color: #005a9e;
+                    }
+
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        background: white;
+                        border-radius: 12px;
+                        overflow: hidden;
+                    }
+
+                    th, td {
+                        padding: 2px 6px;
+                        text-align: center;
+                        border: 1px solid #ddd;
+                    }
+
+                    th {
+                        background-color: #f0f2f5;
+                        font-weight: 600;
+                    }
+
+                    tbody tr:nth-child(even) {
+                        background-color: #fafafa;
+                    }
+
+                    td {
+                        font-size: 14px;
+                    }
+                </style>
+
+                <div id='ata_notas'>
+                    <div class="ata_notasTitle">
+                        <hr>
+                        <h3>{{ request.session.escola_nome }}</h3>
+                        <section>Ano letivo de {{ request.session.anoLetivo_nome }}</section>
+                        <div style="text-align: center; font-weight: bolder;">
+                            <h4>Ata de notas da Turma {{ matriculas.0.turma }}</h4>
+                        </div>
+                        <button onclick="printTable()" class="m-2">Imprimir</button>
+                    </div>
+
+                    <div id="tabela-alunos">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">Aluno</th>
+                                    {% for d in disciplinas %}
+                                        <th colspan="2">{{ d.disciplina.nome }}</th>
+                                    {% endfor %}
+                                    <th rowspan="2">Situação</th>
+                                </tr>
+                                <tr>
+                                    {% for d in disciplinas %}
+                                        <th>Média</th>
+                                        <th>Faltas</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for m in matriculas %}
+                                    <tr>
+                                        <td>{{ m.aluno.nome_completo }}</td>
+                                        {% for d in disciplinas %}
+                                            {% with dados=dados_por_matricula|get_item:m.id|get_item:d.disciplina.id %}
+                                                {% if dados %}
+                                                    <td {% if dados.media <= 5 %}class='text-danger'{% else %}class='text-primary'{% endif %}>{{ dados.media }}</td>
+                                                    <td>{{ dados.faltas }}</td>
+                                                {% else %}
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                {% endif %}
+                                            {% endwith %}
+                                        {% endfor %}
+                                        <td>
+                                            {% if not m.gestao_turmas_related.first.trimestre.final == 'False' %}
+                                                {% if m.gestao_turmas_related.first.aprovado %}
+                                                    Aprovado
+                                                {% else %}
+                                                    {% if m.gestao_turmas_related.first.conselho_classe %}
+                                                        Aprovado pelo conselho
+                                                    {% else %}
+                                                        Retido
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% else %}
+                                                Em andamento
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <script>
+                    function printTable() {
+                        window.print();
+                    }
+                </script>
+
             </div>
-        </div>
-        <div class="card-footer bg-light">
-            <small class="text-muted">
-                <i class="bi bi-clock-history me-1"></i>
-                Última atualização: {% now "DATETIME_FORMAT" %}
-            </small>
+
+            <div class="card-footer bg-light">
+                <small class="text-muted">
+                    <i class="bi bi-clock-history me-1"></i>
+                    Última atualização: {% now "DATETIME_FORMAT" %}
+                </small>
+            </div>
         </div>
     </div>
 </div>
 
-
-  </div>             
-</div>
-</div>
 {% include "Escola/partials/modal_partials/modal_bottom.html" %}
-        
 {% include "Escola/partials/grades/multiselect.html" %}
-

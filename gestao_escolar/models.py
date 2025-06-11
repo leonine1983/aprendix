@@ -802,7 +802,8 @@ class GestaoTurmas(models.Model):
 
     def save(self, *args, **kwargs):
         from modulo_professor.models import ComposicaoNotas
-        from django.utils.timezone import now
+        from django.utils.timezone import now        
+        from django.db.models import Sum
 
         # 🔁 FLAG: Verifica se o salvamento está sendo feito por ComposicaoNotas.
         # Se sim, salva normalmente sem voltar a atualizar ComposicaoNotas.
@@ -832,8 +833,23 @@ class GestaoTurmas(models.Model):
             comp_nota._atualizando_por_gestao = True
             comp_nota.save()
 
+             # ✅ Calcula o total de faltas dos trimestres com final=False
+            total_faltas = GestaoTurmas.objects.filter(
+                aluno=self.aluno,
+                grade=self.grade,
+                trimestre__final=False
+            ).aggregate(total=Sum('faltas'))['total'] or 0
 
-    
+            # ✅ Atualiza o campo faltas_total do registro com trimestre final=True
+            final_turma = GestaoTurmas.objects.filter(
+                aluno=self.aluno,
+                grade=self.grade,
+                trimestre__final=True
+            ).first()
+
+            if final_turma:
+                # Evita recursão: atualiza diretamente com .update()
+                GestaoTurmas.objects.filter(pk=final_turma.pk).update(faltas_total=total_faltas)           
 
 
     
