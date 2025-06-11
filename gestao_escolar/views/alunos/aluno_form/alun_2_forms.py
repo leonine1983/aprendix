@@ -84,6 +84,7 @@ class Alunos_form_etapa2(forms.ModelForm):
     )
     
     foto_aluno = forms.ImageField(
+        required=False
     )
     
     lateralidade = forms.ChoiceField(
