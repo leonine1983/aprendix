@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="{% static "global/css/search.css" %}">
 <style>.hidden-details{display:none;}</style>
 {% endblock css %}
-
+{% block title_page %}Alunos{% endblock title_page %}
 {% include "Escola/partials/modal_partials/modal_top.html" %}
   {% if not oculta_tab %}            
     <ul class="nav nav-tabs" id="myTab" role="tablist">          
@@ -102,10 +102,17 @@
                     {% endif %}
                   </td>                     
                   <td class="border">
-                    <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_update' n.pk %}"><span class='btn btn-sm btn-info mr-1'>Editar</span></a>
-                    {% if not n.related_matricula_alunos.all %}
-                      <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_delete' n.pk %}"><span class='btn btn-sm btn-danger '>Excluir</span></a>
-                    {% endif %}                           
+                    <div class='d-flex'>
+                      <div class='col'>
+                        {% url 'Gestao_Escolar:GE_Escola_alunos_update' n.pk  as editar_url %}
+                        {% include "Escola/components/linkEditar.html" with link=editar_url title="Editar dados do aluno" %}
+                      </div>                      
+                      {% if not n.related_matricula_alunos.all %}
+                        <div class='col'>
+                          {% url 'Gestao_Escolar:GE_Escola_alunos_delete' n.pk as editar_url %}
+                          {% include "Escola/components/linkExcluir.html" with link=editar_url title="Editar decreto" %}
+                        </div>
+                      {% endif %}                           
                   </td>                       
                 </tr>    
               {% endfor %}                
@@ -135,4 +142,3 @@
   {% endif %}    
   </div>    
   {% include 'Escola/partials/modal_partials/modal_bottom.html' %}
-  
