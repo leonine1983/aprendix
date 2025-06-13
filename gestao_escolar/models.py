@@ -154,19 +154,31 @@ class Alunos(models.Model):
     email = models.EmailField(max_length=200, null=False, verbose_name='Email*')
     # Endereço do aluno
     rua = models.CharField(max_length=30, null=False, default='Av., Rua, Travessa')
-    bairro = models.ForeignKey(Bairro, null=True, on_delete=models.CASCADE)
-    cidade = models.ForeignKey(Cidade, null=True, on_delete=models.CASCADE)   
-    estado = models.ForeignKey(Uf_Unidade_Federativa, related_name="estado_relatec",verbose_name='Estado onde vive', null=True, on_delete=models.CASCADE)
+    #bairro = models.ForeignKey(Bairro, null=True, on_delete=models.CASCADE)    
+    #cidade = models.ForeignKey(Cidade, null=True, on_delete=models.CASCADE)   
+    #estado = models.ForeignKey(Uf_Unidade_Federativa, related_name="estado_relatec",verbose_name='Estado onde vive', null=True, on_delete=models.CASCADE)
+
+    # Modificando os campos de endereço para usar CharField em vez de ForeignKey
+    estado = models.CharField(max_length=2, null=True, verbose_name='Estado onde vive')
+    cidade = models.CharField(max_length=100, null=True, verbose_name='Cidade onde vive')
+    bairro = models.CharField(max_length=100, null=True, verbose_name='Bairro onde vive')
+    
+    # Campos de naturalidade
+    estado_naturalidade = models.CharField(max_length=2, null=True, verbose_name='Estado onde nasceu')
+    cidade_naturalidade = models.CharField(max_length=100, null=True, verbose_name='Cidade onde nasceu')
+
+    #naturalidade = models.ForeignKey(Cidade, null=True, on_delete=models.CASCADE, related_name="related_naturalidade", verbose_name='Cidade onde nasceu')
+    #estado_naturalidade = models.ForeignKey(Uf_Unidade_Federativa, related_name="estado_nascimento",verbose_name='Estado onde nasceu', null=True, on_delete=models.CASCADE)
+    nacionalidade = models.ForeignKey(Nacionalidade, on_delete=models.CASCADE, default=1, verbose_name='Nacionalidade*')
+
+
+
     # Informações Paternas e Maternas
     nome_mae = models.CharField(max_length=120, null=False, default='', verbose_name='Nome da Mãe*')
     CPF_mae = models.CharField(max_length=14, null=True, blank=True, default='000.000.000-00')   
     tel_celular_mae = models.CharField(max_length=30, null=True, verbose_name='Nº do celular do mãe*')
     nome_pai = models.CharField(max_length=120, null=True, default='Não consta')
-    tel_celular_pai = models.CharField(max_length=30, null=True)      
-    # Dados de Nacimento
-    naturalidade = models.ForeignKey(Cidade, null=True, on_delete=models.CASCADE, related_name="related_naturalidade", verbose_name='Cidade onde nasceu')
-    estado_naturalidade = models.ForeignKey(Uf_Unidade_Federativa, related_name="estado_nascimento",verbose_name='Estado onde nasceu', null=True, on_delete=models.CASCADE)
-    nacionalidade = models.ForeignKey(Nacionalidade, on_delete=models.CASCADE, default=1, verbose_name='Nacionalidade*')
+    tel_celular_pai = models.CharField(max_length=30, null=True)          
     # Se exterior
     aluno_exterior = models.BooleanField(default=False, verbose_name="Marque se o aluno veio do Exterior")
     pais_origem = models.ForeignKey(Pais_origem, blank=True, null=True, on_delete=models.CASCADE)
@@ -196,7 +208,6 @@ class Alunos(models.Model):
     RG_UF = models.ForeignKey(Uf_Unidade_Federativa, on_delete=models.CASCADE, null=True, blank=True)
     orgao_emissor = models.CharField(max_length=5, null=True, blank=True)
 
-    renda_familiar = models.CharField(max_length=7, null=True, blank=True)
     #situacao_familiar = models.CharField(max_length=15, null=True, blank=True)
     CPF = models.CharField(max_length=14, null=True, blank=True, default='000.000.000-00')   
 
@@ -217,7 +228,7 @@ class Alunos(models.Model):
     cartorio = models.CharField(max_length=100, null=True, blank=True)
     comarca = models.CharField(max_length=100, null=True, blank=True)
     cartorio_uf = models.ForeignKey(Uf_Unidade_Federativa, related_name='relatio_cartorio_UF', null=True, on_delete=models.CASCADE)
-    justificativa_falta_document = models.CharField(max_length=2, choices=choice_justifica_falta_document, null=True, blank=True, verbose_name='Justificativa da falta de documentação')
+    justificativa_falta_documento = models.CharField(max_length=2, choices=choice_justifica_falta_document, null=True, blank=True, verbose_name='Justificativa da falta de documentação')
     local_diferenciado = models.CharField(max_length=2, choices=choice_justifica_falta_document, null=True, blank=True, verbose_name='Local Diferenciado')
     obito = models.BooleanField(null=True, blank=True,default=False)
     data_obito = models.DateField(null=True, blank=True)

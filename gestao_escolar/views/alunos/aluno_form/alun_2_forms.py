@@ -33,7 +33,7 @@ class Alunos_form_etapa2(forms.ModelForm):
     )   
     data_nascimento = forms.DateField(
         label='Data de Nascimento:',
-        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3  text-info col2 m-2 rounded-1' }),        
+        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3  text-info col2 m-2 rounded-1', 'type':'date' }),        
     )
     
     sexo = forms.ModelChoiceField(
@@ -74,15 +74,6 @@ class Alunos_form_etapa2(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1', 'type': 'tel'}),
         required=False
     )
-    naturalidade = forms.ModelChoiceField(        
-        queryset=Cidade.objects.all(),
-        widget=forms.Select(attrs={'class': ' border border-info p-1 pb-1 bg-transparent text-info col m-2 rounded-1'}),
-    )
-    nacionalidade = forms.ModelChoiceField(
-        queryset=Nacionalidade.objects.all(),
-        widget=forms.Select(attrs={'class': ' border border-info p-1 pb-1 bg-transparent text-info col m-2 rounded-1'}),
-    )
-    
     foto_aluno = forms.ImageField(
         required=False
     )
@@ -102,6 +93,5 @@ class Alunos_form_etapa2(forms.ModelForm):
         fields = [
             'nome_social', 'data_nascimento', 'sexo', 'etnia',
             'tel_celular_aluno', 'email', 'tel_celular_mae',
-            'nome_pai', 'tel_celular_pai', 'naturalidade',
-            'nacionalidade', 'foto_aluno', 'lateralidade'  # Adicionado aqui também
+            'nome_pai', 'tel_celular_pai',  'foto_aluno', 'lateralidade'
         ]

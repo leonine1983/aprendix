@@ -158,13 +158,15 @@ urlpatterns = [
     path('cidade/bairro/<int:pk>/editar/', BairroUpdateView.as_view(), name='bairro-update'),
     path('cidade/bairro/<int:pk>/deletar/', BairroDeleteView.as_view(), name='bairro-delete'),
 
-    # Bairro   
+    # Cidade   
     path('cidade/novo/', CidadeCreateView.as_view(), name='cidade-create'),
     path('cidade/<int:pk>/editar/', CidadeUpdateView.as_view(), name='cidade-update'),
     path('cidade/<int:pk>/deletar/', CidadeDeleteView.as_view(), name='cidade-delete'),
-
     path('resumo/<int:pk>/', atualizarResumoFinal, name='resumo'),
-    
+
+    # Bairo e cidde Dinamico
+    path('ajax/cidades/', carregar_cidades, name='ajax_carregar_cidades'),
+    path('ajax/bairros/', carregar_bairros, name='ajax_carregar_bairros'),
 
     # Feriados
     path('calendario/<int:ano>/<int:mes>/', calendario_mes, name='calendario_mes'),

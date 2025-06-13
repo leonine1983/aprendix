@@ -1,6 +1,7 @@
 {% load static %}
 <!--Etapa 1 Nome completo e nome da mae-->
 
+
 {% if bottom_ativo %}
 <style>
   #botao{display:none}
@@ -9,15 +10,12 @@
 <form method="post" class="m-3" enctype="multipart/form-data">
   <div>
     {% csrf_token %}
-    {{ form.as_p }}
-    {{ form.non_field_errors }}
+    {{ form.as_div }}
+    {{ form.non_field_errors }}   
 
-
-    
-
-    <button id="botao" type="submit" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 justify-content-center fs-3" disabled>
+    <button {% if mascara_cpf %}  id="botao" disabled{% endif %} type="submit" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 justify-content-center fs-3 m-3" >
       <i class="fa-solid fa-user-plus"></i>
-      Criar Aluno
+      Salvar 
     </button>
   </div>
 </form>
@@ -57,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-
+{% if 'Registrar Alunos' %}{% endif %}
 <!-- Bibliotecas -->
 <script>
 function validaCPF(cpf) {

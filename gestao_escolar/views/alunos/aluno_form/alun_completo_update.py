@@ -89,5 +89,5 @@ class Alunos_atualiza(forms.ModelForm):
     
     class Meta:
         model = Alunos
-        fields = ['nome_social', 'data_nascimento', 'sexo', 'etnia', 'tel_celular_aluno', 'email', 'tel_celular_mae', 'nome_pai', 'tel_celular_pai',
+        fields = ['nome_social', 'data_nascimento', 'sexo', 'etnia', 'tel_celular_aluno', 'email', 'tel_celular_mae','nome_mae', 'nome_pai', 'tel_celular_pai',
                   'naturalidade', 'nacionalidade', 'foto_aluno', 'espectro_autista']

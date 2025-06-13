@@ -1,5 +1,3 @@
-
-<!-- Bootstrap Datepicker CSS -->
 <!-- Modal -->
 <div class="modal fade" id="modal_escola"   tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     
@@ -45,7 +43,7 @@
                       </section>
                     </section>
                   </div>
-
+    
                   <section>
                     <h2 class="h2 mt-2">Dados do RG</h2>
                     <div class="border p-3 row row-cols-4 rounded-3 bg-light-subtle mb-5">                          
@@ -70,15 +68,20 @@
                         {{form.orgao_emissor.errors}}
                       </section>
                       <section class="col-2">
-                        <p>Cidade onde nasceu:</p>
-                        {{form.cidade_nascimento}}
-                        {{form.cidade_nascimento.errors}}
+                        <p>Estado onde nasceu:</p>
+                        {{form.nacionalidade}}
+                        {{form.nacionalidade.errors}}
                       </section>
                       <section class="col-2">
                         <p>Estado onde nasceu:</p>
-                        {{form.estado}}
-                        {{form.estado.errors}}
+                        {{form.estado_naturalidade}}
+                        {{form.estado_naturalidade.errors}}
                       </section>
+                      <section class="col-2">
+                        <p>Cidade onde nasceu:</p>
+                        {{form.cidade_naturalidade}}
+                        {{form.cidade_naturalidade.errors}}
+                      </section>                      
                     </div>
                   </section>
 
@@ -136,17 +139,23 @@
                         ENDEREÇO/Rua:</p>
                         {{form.rua}}
                         {{form.rua.errors}}
-                      </section>   
+                      </section>  
                       <section class="col">
-                        ENDEREÇO/Bairro:</p>
+                        Estado em que o aluno reside:</p>
+                        {{form.estado}}
+                        {{form.estado.errors}}
+                      </section> 
+                      <section class="col">
+                        Cidade em que o aluno reside:</p>
+                        {{form.cidade}}
+                        {{form.cidade.errors}}
+                      </section>  
+                      <section class="col">
+                        Bairro:</p>
                         {{form.bairro}}
                         {{form.bairro.errors}}
                       </section>      
-                      <section class="col">
-                        ENDEREÇO/Cidade em que o aluno reside:</p>
-                        {{form.cidade}}
-                        {{form.cidade.errors}}
-                      </section>         
+                             
                     </div>
                   </section>
 
@@ -287,3 +296,136 @@ document.getElementById("mySelect").addEventListener("change", function() {
 });
 
 </script>
+
+
+
+<!-- Seus scripts existentes... -->
+
+<!-- Adicione este novo script para a seleção dinâmica -->
+<script>
+// Função para carregar cidades com base no estado selecionado
+function carregarCidades() {
+    const estadoSelect = document.getElementById('id_estado');
+    const cidadeSelect = document.getElementById('id_cidade');
+    
+    const uf = estadoSelect.value;
+    
+    if (uf) {
+        cidadeSelect.disabled = false;
+        cidadeSelect.innerHTML = '<option value="">Carregando cidades...</option>';
+        
+        fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`)
+            .then(response => response.json())
+            .then(data => {
+                cidadeSelect.innerHTML = '<option value="">Selecione uma cidade</option>';
+                data.forEach(cidade => {
+                    const option = document.createElement('option');
+                    option.value = cidade.nome;
+                    option.textContent = cidade.nome;
+                    cidadeSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar cidades:', error);
+                cidadeSelect.innerHTML = '<option value="">Erro ao carregar cidades</option>';
+            });
+    } else {
+        cidadeSelect.disabled = true;
+        cidadeSelect.innerHTML = '<option value="">Selecione um estado primeiro</option>';
+    }
+    
+    // Limpa o campo de bairro
+    document.getElementById('id_bairro').innerHTML = '<option value="">Selecione uma cidade primeiro</option>';
+    document.getElementById('id_bairro').disabled = true;
+}
+
+// Função para carregar bairros (simplificado)
+function carregarBairros() {
+    const cidadeSelect = document.getElementById('id_cidade');
+    const bairroSelect = document.getElementById('id_bairro');
+    
+    const cidade = cidadeSelect.value;
+    
+    if (cidade) {
+        bairroSelect.disabled = false;
+        bairroSelect.innerHTML = '<option value="">Carregando bairros...</option>';
+        
+        // Simulando uma requisição assíncrona
+        setTimeout(() => {
+            bairroSelect.innerHTML = '<option value="">Selecione um bairro</option>';
+            
+            // Exemplo de bairros - na prática, você buscaria de uma API ou banco de dados
+            const bairrosExemplo = [
+                {% for b in bairros %}
+                  '{{b.nome_bairro}}',
+                {% endfor %}
+            ];
+            
+            bairrosExemplo.forEach(bairro => {
+                const option = document.createElement('option');
+                option.value = bairro;
+                option.textContent = bairro;
+                bairroSelect.appendChild(option);
+            });
+        }, 500);
+    } else {
+        bairroSelect.disabled = true;
+        bairroSelect.innerHTML = '<option value="">Selecione uma cidade primeiro</option>';
+    }
+}
+
+// Função similar para naturalidade
+function carregarCidadesNaturalidade() {
+    const estadoSelect = document.getElementById('id_estado_naturalidade');
+    const cidadeSelect = document.getElementById('id_cidade_naturalidade');
+    
+    const uf = estadoSelect.value;
+    
+    if (uf) {
+        cidadeSelect.disabled = false;
+        cidadeSelect.innerHTML = '<option value="">Carregando cidades...</option>';
+        
+        fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`)
+            .then(response => response.json())
+            .then(data => {
+                cidadeSelect.innerHTML = '<option value="">Selecione uma cidade</option>';
+                data.forEach(cidade => {
+                    const option = document.createElement('option');
+                    option.value = cidade.nome;
+                    option.textContent = cidade.nome;
+                    cidadeSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar cidades:', error);
+                cidadeSelect.innerHTML = '<option value="">Erro ao carregar cidades</option>';
+            });
+    } else {
+        cidadeSelect.disabled = true;
+        cidadeSelect.innerHTML = '<option value="">Selecione um estado primeiro</option>';
+    }
+}
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+    // Configura os eventos
+    document.getElementById('id_estado').addEventListener('change', carregarCidades);
+    document.getElementById('id_cidade').addEventListener('change', carregarBairros);
+    document.getElementById('id_estado_naturalidade').addEventListener('change', carregarCidadesNaturalidade);
+    
+    // Desabilita os campos dependentes inicialmente
+    document.getElementById('id_cidade').disabled = true;
+    document.getElementById('id_bairro').disabled = true;
+    document.getElementById('id_cidade_naturalidade').disabled = true;
+    
+    // Se já houver um estado selecionado (em caso de edição), carrega as cidades
+    if (document.getElementById('id_estado').value) {
+        carregarCidades();
+    }
+    if (document.getElementById('id_estado_naturalidade').value) {
+        carregarCidadesNaturalidade();
+    }
+});
+</script>
+
+<!-- Seus outros scripts existentes... -->

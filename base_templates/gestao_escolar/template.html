@@ -3,735 +3,833 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Meta Tags de SEO -->
+    <title>APRENDIX - Solução Completa para Escolas</title>
+    <meta name="description" content="APRENDIX é um sistema ERP completo para gestão escolar, ideal para secretarias municipais de educação e escolas particulares. Melhore a administração, pedagogia e comunicação escolar com nossa solução integrada.">
+    <meta name="keywords" content="ERP escolar, gestão escolar, sistema de ensino, software para escolas, secretaria de educação, APRENDIX, evasão escolar, caderneta digital, gestão pedagógica">
+    <meta name="author" content="CAUAN's Solutions | Dev. Rogério Cerqueira da Silva">
     
-    <meta name="description" content="">
-    <meta name="author" content="Rogério Cerqueria da Silva">
-   
+    <!-- Canonical URL (ajustar conforme a URL real do site) -->
+    <link rel="canonical" href="https://www.seusite.com/sistema-erp-escolar-aprendix">
     
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="Sistema ERP para Gestão Escolar APRENDIX - Solução Completa para Escolas">
+    <meta property="og:description" content="APRENDIX é um sistema ERP completo para gestão escolar, ideal para secretarias municipais de educação e escolas particulares.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.seusite.com/sistema-erp-escolar-aprendix">
+    <meta property="og:image" content="https://www.seusite.com/static/logo-aprendix.jpg">
+    <meta property="og:site_name" content="APRENDIX - Sistema de Gestão Escolar">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Sistema ERP para Gestão Escolar APRENDIX">
+    <meta name="twitter:description" content="Solução completa para gestão escolar com IA integrada para secretarias e escolas particulares.">
+    <meta name="twitter:image" content="https://www.seusite.com/static/logo-aprendix.jpg">
+    
+    <!-- Favicon e Ícones -->
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    
+    <!-- Schema.org Markup para Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Sistema ERP para Gestão Escolar APRENDIX",
+      "description": "Solução completa para gestão escolar com IA integrada para secretarias e escolas particulares.",
+      "url": "https://www.seusite.com/sistema-erp-escolar-aprendix",
+      "operatingSystem": "Web",
+      "applicationCategory": "BusinessApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "BRL"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "CAUAN's Solutions"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "25"
+      }
+    }
+    </script>
+
+
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    
-    <!--link google--> 
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400&display=swap" rel="stylesheet">    
+    <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=El+Messiri&family=Gruppo&display=swap" rel="stylesheet">
 
-    <!-- css -->  
     <link href="{% static 'global/css/partials/sidebars.css' %}" rel="stylesheet">
-    <link href="{% static 'global/css/partials/headers.css' %}" rel="stylesheet">    
-    <link href="{% static 'global/css/bootstrap.min.css' %}" rel="stylesheet"> 
+    <link href="{% static 'global/css/partials/headers.css' %}" rel="stylesheet">
+    <link href="{% static 'global/css/bootstrap.min.css' %}" rel="stylesheet">
 
-  
     <link rel="stylesheet" href="{% static 'fontawesome/css/all.css' %}">
-   
-   
-   <link rel="stylesheet" href="{% static 'select2/select2.min.css' %}" />   
-   <link rel="stylesheet" href="{% static 'select2/select2-bootstrap-5-theme.min.css' %}" />
-   <!-- Or for RTL support -->
-   <link rel="stylesheet" href="{% static 'select2/select2-bootstrap-5-theme.rtl.min.css' %}" />
 
-   <link rel="stylesheet" href="{% static 'css/media_print.css' %}" />
-   
-   <script src="{% static 'select2/js/jquery.slim.min.js' %}"></script>
-   <script src="{% static 'select2/js/bootstrap.bundle.min.js' %}"></script>
-   <script src="{% static 'select2/js/select2.full.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'select2/select2.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'select2/select2-bootstrap-5-theme.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'select2/select2-bootstrap-5-theme.rtl.min.css' %}" />
 
-   <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon"> 
-    <!-- js -->
+    <link rel="stylesheet" href="{% static 'css/media_print.css' %}" />
+
+    <script src="{% static 'select2/js/jquery.slim.min.js' %}"></script>
+    <script src="{% static 'select2/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'select2/js/select2.full.min.js' %}"></script>
+
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
     <script src="{% static 'global/js/partials/sidebars.js' %}"></script>
     <script src="{% static 'global/js/color-modes.js' %}"></script>
 
-    <!-- Cria intro explicativa -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js/minified/introjs.min.css">
     <script src="https://cdn.jsdelivr.net/npm/intro.js/minified/intro.min.js"></script>
 
-   
-   <style>
-       body{
-           font-family: 'El Messiri', sans-serif !important;
-           font-family: 'Gruppo', sans-serif;
-           font-weight:200!important;
-         
-       }
-       body, html {
-    overflow-x: hidden;
-    max-width: 100%;
-}
+    <style>
+        body {
+            font-family: 'El Messiri', sans-serif !important;
+            font-family: 'Gruppo', sans-serif;
+            font-weight: 200 !important;
+        }
 
-       .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
+        body,
+        html {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
         }
 
         @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-            font-size: 3.5rem;
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
         }
-        }
-        
-        .btn-bd-primary {
-        --bd-violet-bg: #712cf9;
-        --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
 
-        --bs-btn-font-weight: 600;
-        --bs-btn-color: var(--bs-white);
-        --bs-btn-bg: var(--bd-violet-bg);
-        --bs-btn-border-color: var(--bd-violet-bg);
-        --bs-btn-hover-color: var(--bs-white);
-        --bs-btn-hover-bg: #6528e0;
-        --bs-btn-hover-border-color: #6528e0;
-        --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
-        --bs-btn-active-color: var(--bs-btn-hover-color);
-        --bs-btn-active-bg: #5a23c8;
-        --bs-btn-active-border-color: #5a23c8;
+        .btn-bd-primary {
+            --bd-violet-bg: #712cf9;
+            --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+            --bs-btn-font-weight: 600;
+            --bs-btn-color: var(--bs-white);
+            --bs-btn-bg: var(--bd-violet-bg);
+            --bs-btn-border-color: var(--bd-violet-bg);
+            --bs-btn-hover-color: var(--bs-white);
+            --bs-btn-hover-bg: #6528e0;
+            --bs-btn-hover-border-color: #6528e0;
+            --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+            --bs-btn-active-color: var(--bs-btn-hover-color);
+            --bs-btn-active-bg: #5a23c8;
+            --bs-btn-active-border-color: #5a23c8;
         }
-        .bg-silver{
-          background:#d3dfdf!important;
+
+        .bg-silver {
+            background: #d3dfdf !important;
         }
-        .bg-silver-2{
-          background:#bbd8d8!important;
+
+        .bg-silver-2 {
+            background: #bbd8d8 !important;
         }
+
         .bd-mode-toggle {
-        z-index: 1500;
+            z-index: 1500;
         }
+
         #oculto {
             display: none;
             width: 0;
             overflow: hidden;
             transition: width 0.5s ease-in-out !important;
         }
+
         #oculto.exibindo {
             width: 200px;
         }
-        #sidebar{
-          box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
-        }      
+
+        #sidebar {
+            box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+        }
+
         .shadow-bottom {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-          margin-left: -1rem !important;
-          margin-right: -1rem !important;
-          width: calc(100% + 2rem) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin-left: -1rem !important;
+            margin-right: -1rem !important;
+            width: calc(100% + 2rem) !important;
         }
+
         h1 {
-          font-family: 'Darker Grotesque', sans-serif !important;
-          font-size: 1.6rem;
+            font-family: 'Darker Grotesque', sans-serif !important;
+            font-size: 1.6rem;
         }
+
         h2 {
-          font-family: 'Darker Grotesque', sans-serif !important;
-          font-size: 1.3rem;
+            font-family: 'Darker Grotesque', sans-serif !important;
+            font-size: 1.3rem;
         }
+
         table thead tr th {
-          font-family: 'Darker Grotesque', sans-serif !important;
-          font-size: 1rem;
+            font-family: 'Darker Grotesque', sans-serif !important;
+            font-size: 1rem;
         }
-        input{
-          text-transform: uppercase;
+
+        input {
+            text-transform: uppercase;
         }
+
         /*paleta*/
-        .bg-verde-1{background: #b4d6c1;}
-        .bg-verde-2{background: #dfeae2;}
- 
-  /** Padrão cinza */
-  .bg-p-1 {
-  background-color: #1e312a; /* Cor de fundo clara, base neutra */
-  color: #c5c5c5; /* Cor do texto principal */
-  border: 1px solid #d1d1d1; /* Borda suave cinza */
-  border-radius: 10px; /* Bordas arredondadas */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); /* Sombra sutil */
-  padding: 1rem; /* Espaçamento interno */
-  transition: background-color 2s, box-shadow 0.3s, border-color 0.3s !important; /* Transições suaves para interações */
-}
+        .bg-verde-1 {
+            background: #b4d6c1;
+        }
 
-/* Efeito de hover para bg-p-1 */
-.bg-p-1:hover {
-  background-color: #e0dbbf; /* Fundo ligeiramente mais escuro ao passar o mouse */
-  border-color: #ccfa76; /* Cor da borda muda para um laranja suave */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08); /* Sombra mais pronunciada ao passar o mouse */
-  color: #191b22;  
-}
+        .bg-verde-2 {
+            background: #dfeae2;
+        }
 
-/* Adicionando uma borda laranja sutil para foco */
-.bg-p-1:focus-within {
-  border-color: #f9a825; /* Cor da borda muda para um laranja suave quando em foco */
-}
-/* Estilo para a classe txt-p */
-.txt-p {
-  color: #acaaaa !important; /* Cor do texto principal, boa para legibilidade */
-  line-height: 1.5 !important; /* Espaçamento entre linhas para melhor leitura */
-  text-align: left !important; /* Alinhamento do texto */
-  margin: 0 !important; /* Remover margens adicionais */
-  padding: 0 !important; /* Remover padding adicional */
-  transition: color 0.3s !important; /* Transição suave para a cor do texto */
-}
+        /** Padrão cinza */
+        .bg-p-1 {
+            background-color: #1e312a;
+            /* Cor de fundo clara, base neutra */
+            color: #c5c5c5;
+            /* Cor do texto principal */
+            border: 1px solid #d1d1d1;
+            /* Borda suave cinza */
+            border-radius: 10px;
+            /* Bordas arredondadas */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            /* Sombra sutil */
+            padding: 1rem;
+            /* Espaçamento interno */
+            transition: background-color 2s, box-shadow 0.3s, border-color 0.3s !important;
+            /* Transições suaves para interações */
+        }
 
-/* Efeito de hover para txt-p, se aplicável */
-.txt-p:hover {
-  color: #0078d4 !important; /* Cor de texto azul clara similar ao Windows 11 ao passar o mouse */
-}
+        /* Efeito de hover para bg-p-1 */
+        .bg-p-1:hover {
+            background-color: #e0dbbf;
+            /* Fundo ligeiramente mais escuro ao passar o mouse */
+            border-color: #ccfa76;
+            /* Cor da borda muda para um laranja suave */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08);
+            /* Sombra mais pronunciada ao passar o mouse */
+            color: #191b22;
+        }
 
-/* Efeito para texto secundário */
-.txt-p.secondary {
-  color: #666 !important; /* Cor de texto secundária para menos destaque */
-  font-size: 0.875rem !important; /* Tamanho da fonte menor para texto secundário */
-}
+        /* Adicionando uma borda laranja sutil para foco */
+        .bg-p-1:focus-within {
+            border-color: #f9a825;
+            /* Cor da borda muda para um laranja suave quando em foco */
+        }
 
-/* Efeito para texto de destaque ou título */
-.txt-p.highlight {
-  color: #0078d4 !important; /* Cor de destaque azul clara */
-  font-weight: bold !important; /* Texto em negrito para destacar */
-}
+        /* Estilo para a classe txt-p */
+        .txt-p {
+            color: #acaaaa !important;
+            /* Cor do texto principal, boa para legibilidade */
+            line-height: 1.5 !important;
+            /* Espaçamento entre linhas para melhor leitura */
+            text-align: left !important;
+            /* Alinhamento do texto */
+            margin: 0 !important;
+            /* Remover margens adicionais */
+            padding: 0 !important;
+            /* Remover padding adicional */
+            transition: color 0.3s !important;
+            /* Transição suave para a cor do texto */
+        }
 
-/* Efeito para texto de link */
-.txt-p a {
-  color: #0078d4 !important; /* Cor azul clara para links */
-  text-decoration: none !important; /* Remover sublinhado padrão */
-  transition: color 0.3s !important; /* Transição suave para a cor do link */
-}
+        /* Efeito de hover para txt-p, se aplicável */
+        .txt-p:hover {
+            color: #0078d4 !important;
+            /* Cor de texto azul clara similar ao Windows 11 ao passar o mouse */
+        }
 
-.txt-p a:hover {
-  text-decoration: underline !important; /* Sublinhado ao passar o mouse para links */
-}
+        /* Efeito para texto secundário */
+        .txt-p.secondary {
+            color: #666 !important;
+            /* Cor de texto secundária para menos destaque */
+            font-size: 0.875rem !important;
+            /* Tamanho da fonte menor para texto secundário */
+        }
 
-  .bg-p-2{
-      --s: 50px;
-      --c: #191b22;
-      --_s: calc(2*var(--s)) calc(2*var(--s));
-      --_g: 35.36% 35.36% at;
-      --_c: #0000 66%,#20222a 68% 70%,#0000 72%;
-      background: 
-        radial-gradient(var(--_g) 100% 25%,var(--_c)) var(--s) var(--s)/var(--_s), 
-        radial-gradient(var(--_g) 0 75%,var(--_c)) var(--s) var(--s)/var(--_s), 
-        radial-gradient(var(--_g) 100% 25%,var(--_c)) 0 0/var(--_s), 
-        radial-gradient(var(--_g) 0 75%,var(--_c)) 0 0/var(--_s), 
-        repeating-conic-gradient(var(--c) 0 25%,#0000 0 50%) 0 0/var(--_s), 
-        radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
-      background-attachment: fixed;
-    }
-    .bg-p-3 {
-  background-color: #f3f3f3; /* Cor de fundo clara, base neutra */
-  color: #333; /* Cor do texto principal */
-  border: 1px solid #cf7021; /* Borda suave cinza */
-  border-radius: 10px; /* Bordas arredondadas */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); /* Sombra sutil */
-  padding: 1rem; /* Espaçamento interno */
-  transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s; /* Transições suaves para interações */
-}
+        /* Efeito para texto de destaque ou título */
+        .txt-p.highlight {
+            color: #0078d4 !important;
+            /* Cor de destaque azul clara */
+            font-weight: bold !important;
+            /* Texto em negrito para destacar */
+        }
 
-/* Efeito de hover para bg-p-3 */
-.bg-p-3:hover {
-  background-color: #f3fcf3; /* Fundo ligeiramente mais escuro ao passar o mouse */
-  border-color: #4caf50; /* Cor da borda muda para um verde suave */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08); /* Sombra mais pronunciada ao passar o mouse */
-}
+        /* Efeito para texto de link */
+        .txt-p a {
+            color: #0078d4 !important;
+            /* Cor azul clara para links */
+            text-decoration: none !important;
+            /* Remover sublinhado padrão */
+            transition: color 0.3s !important;
+            /* Transição suave para a cor do link */
+        }
 
-/* Adicionando uma borda verde sutil para foco */
-.bg-p-3:focus-within {
-  border-color: #4caf50; /* Cor da borda muda para um verde suave quando em foco */
-}
+        .txt-p a:hover {
+            text-decoration: underline !important;
+            /* Sublinhado ao passar o mouse para links */
+        }
 
+        .bg-p-2 {
+            --s: 50px;
+            --c: #191b22;
+            --_s: calc(2*var(--s)) calc(2*var(--s));
+            --_g: 35.36% 35.36% at;
+            --_c: #0000 66%, #20222a 68% 70%, #0000 72%;
+            background:
+                radial-gradient(var(--_g) 100% 25%, var(--_c)) var(--s) var(--s)/var(--_s),
+                radial-gradient(var(--_g) 0 75%, var(--_c)) var(--s) var(--s)/var(--_s),
+                radial-gradient(var(--_g) 100% 25%, var(--_c)) 0 0/var(--_s),
+                radial-gradient(var(--_g) 0 75%, var(--_c)) 0 0/var(--_s),
+                repeating-conic-gradient(var(--c) 0 25%, #0000 0 50%) 0 0/var(--_s),
+                radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
+            background-attachment: fixed;
+        }
 
-.bg-p-4 {
-  background-color: #f3f3f3; /* Cor de fundo clara, base neutra */
-  color: #333; /* Cor do texto principal */
-  border: 1px solid #d1d1d1; /* Borda suave cinza */
-  border-radius: 10px; /* Bordas arredondadas */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); /* Sombra sutil */
-  padding: 1rem; /* Espaçamento interno */
-  transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s; /* Transições suaves para interações */
-}
+        .bg-p-3 {
+            background-color: #f3f3f3;
+            /* Cor de fundo clara, base neutra */
+            color: #333;
+            /* Cor do texto principal */
+            border: 1px solid #cf7021;
+            /* Borda suave cinza */
+            border-radius: 10px;
+            /* Bordas arredondadas */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            /* Sombra sutil */
+            padding: 1rem;
+            /* Espaçamento interno */
+            transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
+            /* Transições suaves para interações */
+        }
 
-/* Efeito de hover para bg-p-3 */
-.bg-p-4:hover {
-  background: linear-gradient(to bottom, #fceff3, #f5d9e2);
-  border-color: #e91e63; /* Cor da borda muda para um rosa suave */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08); /* Sombra mais pronunciada ao passar o mouse */
-}
+        /* Efeito de hover para bg-p-3 */
+        .bg-p-3:hover {
+            background-color: #f3fcf3;
+            /* Fundo ligeiramente mais escuro ao passar o mouse */
+            border-color: #4caf50;
+            /* Cor da borda muda para um verde suave */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08);
+            /* Sombra mais pronunciada ao passar o mouse */
+        }
 
+        /* Adicionando uma borda verde sutil para foco */
+        .bg-p-3:focus-within {
+            border-color: #4caf50;
+            /* Cor da borda muda para um verde suave quando em foco */
+        }
 
-/* Adicionando uma borda rosa sutil para foco */
-.bg-p-4:focus-within {
-  border-color: #e91e63; /* Cor da borda muda para um rosa suave quando em foco */
-}
-.bg-p-4 {
-  background: linear-gradient(to bottom, #e2e7fa, #f5f5f7); /* Gradiente de fundo inicial */
-  color: #333; /* Cor do texto principal */
-  border: 1px solid #d1d1d1; /* Borda suave cinza */
-  border-radius: 10px; /* Bordas arredondadas */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); /* Sombra sutil */
-  padding: 1rem; /* Espaçamento interno */
-  transition: background 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Transições suaves para fundo, borda e sombra */
-}
+        .bg-p-4 {
+            background-color: #f3f3f3;
+            /* Cor de fundo clara, base neutra */
+            color: #333;
+            /* Cor do texto principal */
+            border: 1px solid #d1d1d1;
+            /* Borda suave cinza */
+            border-radius: 10px;
+            /* Bordas arredondadas */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            /* Sombra sutil */
+            padding: 1rem;
+            /* Espaçamento interno */
+            transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
+            /* Transições suaves para interações */
+        }
 
-/* Efeito de hover para bg-p-4 */
-.bg-p-4:hover {
-  background: linear-gradient(to bottom, #fceff3, #f5d9e2); /* Gradiente de fundo no hover */
-  border-color: #e91e63; /* Cor da borda muda para rosa suave no hover */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08); /* Sombra mais pronunciada no hover */
-}
-
-
-/* Adicionando uma borda rosa sutil para foco */
-.bg-p-4:focus-within {
-  border-color: #e91e63; /* Cor da borda muda para um rosa suave quando em foco */
-}
-.bg-p-5 {
-  background-color: transparent;
-  backdrop-filter: blur(20px);
-  color: #333; /* Cor do texto principal */
-  border: 1px solid #d1d1d1; /* Borda suave cinza */
-  border-radius: 10px; /* Bordas arredondadas */
-  transition: border-color 0.3s, box-shadow 0.3s; /* Transições suaves para interações */
-  overflow: hidden; /* Garante que o pseudo-elemento não saia do container */
-}
-
-/* Pseudo-elemento para o efeito de desfoque com fundo transparente */
-.bg-p-5::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: -1; /* Garante que o conteúdo fique acima do fundo desfocado */
-  transition: background 0.3s, filter 0.3s; /* Transição suave para gradiente e desfoque */
-}
-
-/* Efeito de hover para bg-p-5 */
-.bg-p-5:hover::before {
-  background: rgba(0, 150, 255, 0.4); /* Fundo transparente com tom azulado */
-  filter: blur(6px); /* Efeito de desfoque mais forte */
-}
-
-.bg-p-5:hover {
-  border-color: #1e07f0; /* Cor da borda muda para azul escuro */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08); /* Sombra mais pronunciada ao passar o mouse */
-}
-
-/* Adicionando uma borda azul escura sutil para foco */
-.bg-p-5:focus-within {
-  border-color: #1e07f0; /* Cor da borda muda para azul escuro quando em foco */
-}
-
-  .bg-trimestre-1 {background-color: #5b2b10;}
-  .bg-trimestre-2 {background-color: #a76036;}
-  .bg-trimestre-3 {background-color: #b68d7a;}  
-  .bg-trimestre-4 {background-color: #85685a;}
+        /* Efeito de hover para bg-p-3 */
+        .bg-p-4:hover {
+            background: linear-gradient(to bottom, #fceff3, #f5d9e2);
+            border-color: #e91e63;
+            /* Cor da borda muda para um rosa suave */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08);
+            /* Sombra mais pronunciada ao passar o mouse */
+        }
 
 
-  #landscape-warning {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.9);
-    color: white;
-    font-size: 1.5rem;
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    z-index: 99999;
-    padding: 20px;
-  }
+        /* Adicionando uma borda rosa sutil para foco */
+        .bg-p-4:focus-within {
+            border-color: #e91e63;
+            /* Cor da borda muda para um rosa suave quando em foco */
+        }
 
-  /* Cores Verde */
-  .text-green {color: #405a3f !important;}
-  .bg-green {background-color: #405a3f !important;}
-  
+        .bg-p-4 {
+            background: linear-gradient(to bottom, #e2e7fa, #f5f5f7);
+            /* Gradiente de fundo inicial */
+            color: #333;
+            /* Cor do texto principal */
+            border: 1px solid #d1d1d1;
+            /* Borda suave cinza */
+            border-radius: 10px;
+            /* Bordas arredondadas */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            /* Sombra sutil */
+            padding: 1rem;
+            /* Espaçamento interno */
+            transition: background 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            /* Transições suaves para fundo, borda e sombra */
+        }
+
+        /* Efeito de hover para bg-p-4 */
+        .bg-p-4:hover {
+            background: linear-gradient(to bottom, #fceff3, #f5d9e2);
+            /* Gradiente de fundo no hover */
+            border-color: #e91e63;
+            /* Cor da borda muda para rosa suave no hover */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08);
+            /* Sombra mais pronunciada no hover */
+        }
+
+
+        /* Adicionando uma borda rosa sutil para foco */
+        .bg-p-4:focus-within {
+            border-color: #e91e63;
+            /* Cor da borda muda para um rosa suave quando em foco */
+        }
+
+        .bg-p-5 {
+            background-color: transparent;
+            backdrop-filter: blur(20px);
+            color: #333;
+            /* Cor do texto principal */
+            border: 1px solid #d1d1d1;
+            /* Borda suave cinza */
+            border-radius: 10px;
+            /* Bordas arredondadas */
+            transition: border-color 0.3s, box-shadow 0.3s;
+            /* Transições suaves para interações */
+            overflow: hidden;
+            /* Garante que o pseudo-elemento não saia do container */
+        }
+
+        /* Pseudo-elemento para o efeito de desfoque com fundo transparente */
+        .bg-p-5::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            /* Garante que o conteúdo fique acima do fundo desfocado */
+            transition: background 0.3s, filter 0.3s;
+            /* Transição suave para gradiente e desfoque */
+        }
+
+        /* Efeito de hover para bg-p-5 */
+        .bg-p-5:hover::before {
+            background: rgba(0, 150, 255, 0.4);
+            /* Fundo transparente com tom azulado */
+            filter: blur(6px);
+            /* Efeito de desfoque mais forte */
+        }
+
+        .bg-p-5:hover {
+            border-color: #1e07f0;
+            /* Cor da borda muda para azul escuro */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08);
+            /* Sombra mais pronunciada ao passar o mouse */
+        }
+
+        /* Adicionando uma borda azul escura sutil para foco */
+        .bg-p-5:focus-within {
+            border-color: #1e07f0;
+            /* Cor da borda muda para azul escuro quando em foco */
+        }
+
+        .bg-trimestre-1 {
+            background-color: #5b2b10;
+        }
+
+        .bg-trimestre-2 {
+            background-color: #a76036;
+        }
+
+        .bg-trimestre-3 {
+            background-color: #b68d7a;
+        }
+
+        .bg-trimestre-4 {
+            background-color: #85685a;
+        }
+
+
+        #landscape-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            font-size: 1.5rem;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+        }
+
+        /* Cores Verde */
+        .text-green {
+            color: #405a3f !important;
+        }
+
+        .bg-green {
+            background-color: #405a3f !important;
+        }
     </style>
 
-</style>
     {% block css %}{% endblock css %}
-    {% block script_head %}{% endblock script_head %}   
-    <title>{% block title_page %}{% endblock title_page %}</title> 
+    {% block script_head %}{% endblock script_head %}
+    <title>{% block title_page %}{% endblock title_page %}</title>
 </head>
 
-<body>     
-  <div id="landscape-warning" class="bg-black" style="background-color: #191b22;">
-    <img width='150px' src="{% static 'Vire.gif' %}" alt="">
-  </div> 
-  <style>
-    .phone-frame {
-      height: 100vh!important;
-      }
-      .phone-screen {
-  align-items: center;
-  overflow: hidden;
-  perspective: 460px;
-  position: relative;
-  height: 100vh!important;
-}
-
-.menu {
-  position: sticky; /* fixado no canto inferior */
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 180px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  background: linear-gradient(180deg, #1f1f1f 0%, #2b2b2b 100%);
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
-  transform: translateY(180px);
-  transition: transform 300ms ease-in-out;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  z-index: 1000;
-}
-
-.active .menu {
-  transform: translateY(0);
-}
-
-.option {
-  width: 70px;
-  height: 70px;
-  margin: 10px;
-  background-color: #dfe9e3b9;
-  border-radius: 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 12px;
-  font-family: 'Segoe UI', sans-serif;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  transition: background-color 0.2s;
-}
-
-.option:active {
-  background-color: #444;
-}
-
-.option svg,
-.food {
-  width: 32px;
-  height: 32px;
-  margin-bottom: 6px;
-}
-
-.button-menu1 {
-  bottom: 100px;
-  right: 50%;
-  position: fixed;
-  z-index: 2000;
-  cursor: pointer;
-  height: 56px;
-  width: 56px;
-  border-radius: 50%;
-  background-color: #0e3024;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s;
-}
-
-.button-menu1:active {
-  background-color: #132e25;
-}
-
-.bg {
-  fill: none;
-}
-
-.line {
-  stroke: white;
-  stroke-width: 2;
-  transition: transform 300ms ease, stroke 300ms ease;
-  transform-origin: 50%;
-}
-
-.active .line1 {
-  stroke: #fff;
-  transform: translateY(6px) rotate(45deg);
-}
-.active .line2 {
-  stroke: #fff;
-  transform: scale(0);
-}
-.active .line3 {
-  stroke: #fff;
-  transform: translateY(-6px) rotate(-45deg);
-}
-
-      .modal-backdrop {
-  all: unset;
-}
-
-/* Esconde por padrão */
-.button-menu1,
-.menu {
-  display: none;
-}
-
-.fica-oculto_em_mobile{display:inline}
-/* Exibe apenas em telas menores que 768px (mobile) */
-@media (max-width: 450px) {
-  .fica-oculto_em_mobile{display:none}
-  .button-menu1 {
-    display: flex;
-    bottom: 0;
-    right: 30%;
-    position: absolute;
-    z-index: 1100;
-    cursor: pointer;
-    height: 30px;
-    width: 120px;
-    padding-top: 0.5rem;
-    padding-left: 3rem;
-    border-top-right-radius: 1rem;
-    border-top-left-radius: 1rem;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    background-color: #405a3f;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s;
-  }
-
-  .button-menu1:active {
-    background-color: #3baf8a;
-  }
-
-  .menu {
-    display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 180px;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    background: linear-gradient(180deg, #eff1f159 0%, #405a3f6b 100%);
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
-    transform: translateY(180px);
-    transition: transform 300ms ease-in-out;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    z-index: 1000;
-  }
-
-  .active .menu {
-    transform: translateY(0);
-  }
-}
-
-/* Linhas do ícone (hambúrguer) */
-.line {
-  stroke: white;
-  stroke-width: 2;
-  transition: transform 300ms ease, stroke 300ms ease;
-  transform-origin: 50%;
-}
-
-.active .line1 {
-  stroke: #fff;
-  transform: translateY(6px) rotate(45deg);
-}
-.active .line2 {
-  stroke: #fff;
-  transform: scale(0);
-}
-.active .line3 {
-  stroke: #fff;
-  transform: translateY(-6px) rotate(-45deg);
-}
-
-</style>
-
-<div class="phone-frame">
-    <div class="phone-screen">
-      <div class="imageContainer"> 
-
-  <div id="site-content">    
-    <main id="content-main" class='shadow  mb-2 bg-white rounded'> 
-      <!--Botão muda tema-->
-      <!-- Fim Botão muda tema-->
-
-      {% comment "Head" %} Cabeçalho ----------------------------------------------- {% endcomment %}
-          {% include 'gestao_escolar/headers/index.html' %}      
-      
-          <div class="d-flex" style="overflow-y: auto;">
-
-        {% comment "Sidebar" %} Menu lateral esquerdo  ------------------------------- {% endcomment %}
-          {% include 'gestao_escolar/sidebars/index.html' %}  
-        {% comment "Main" %} Conteudo Principal{% endcomment %}      
-          {% block main %}{% endblock main %}
-      </div>      
-      {% comment "Footer" %} Rodape do site ----------------------------------------- {% endcomment %}
-          {% block footer %}
-          
-          {% endblock footer %}
-      {% comment "Scripts" %} Área pra scripts fim da pagina {% endcomment %}
-          {% block script_footer %}{% endblock script_footer %}             
-    </main> 
-  </div>
- 
-       
-      </div>
-      <!-- <div class="button-menu button-menu1"></div> -->
-      <svg class="button-menu button-menu1" height="24" width="24" onclick="document.querySelector('.phone-screen').classList.toggle('active')">
-        <circle class="bg" r="12" cx="12" cy="12" />
-        <path class="line line1" d="M 6,8 H 18" />
-        <path class="line line2" d="M 6,12 H 18" />
-        <path class="line line3" d="M 6,16 H 18" />
-        
-      </svg>
-
-
-
-
-
-
-
-
-
-
-  <!--Versão Mobile 
-     
-        <li>
-          <a href="{% url 'Gestao_Escolar:GE_Create_Professores' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Professores" data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fs-5 fa-duotone fa-person-chalkboard txt-p-nav me-2"></i>
-            Cadastro de Profissionais
-          </a>
-        </li>
-        
-        <li>
-          <a href="{% url 'Gestao_Escolar:pessoas-create' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Professores" data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fs-5 fa-duotone fa-person-chalkboard txt-p-nav me-2"></i>
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Matrícula" data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fs-4 fa-solid fa-screen-users txt-p-nav me-2"></i>
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'Gestao_Escolar:Grades_turmas' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Grade de Disciplinas" data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fs-4 fa-duotone fa-chart-network txt-p-nav me-2" style="font-size: 1.65rem;"></i>
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Gestão das Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fs-4 fa-solid fa-users-gear txt-p-nav me-2" style="font-size: 1.65rem;"></i>
-          </a>
-        </li>
-        <li class='mt-5'>
-          <a href="{% url 'Gestao_Escolar:adicionar_escola' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Espaço reservado para a matricula online" data-bs-toggle="tooltip" data-bs-placement="right">          
-            <img src="{% static 'svg/matriOn.svg' %}" alt="">
-          </a>
-        </li>  
-    </ul>
-    <div class="dropdown border-top">
-      <a href="#" class="d-flex align-items-center justify-content-center p-3 link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        <img src="https://github.com/mdo.png" alt="mdo" width="24" height="24" class="rounded-circle">
-      </a>
-      <ul class="dropdown-menu text-small shadow">
-
-        <li><a class="dropdown-item" href="#">New project...</a></li>
-        <li><a class="dropdown-item" href="#">Settings</a></li>
-        <li><a class="dropdown-item" href="#">Profile</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="#">Sign out</a></li>
-      </ul>
+<body>
+    <div id="landscape-warning" class="bg-black" style="background-color: #191b22;">
+        <img width='150px' src="{% static 'Vire.gif' %}" alt="">
     </div>
-  </div>
+    <style>
+        .phone-frame {
+            height: 100vh !important;
+        }
+
+        .phone-screen {
+            align-items: center;
+            overflow: hidden;
+            perspective: 460px;
+            position: relative;
+            height: 100vh !important;
+        }
+
+        .menu {
+            position: sticky;
+            /* fixado no canto inferior */
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 180px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            background: linear-gradient(180deg, #1f1f1f 0%, #2b2b2b 100%);
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+            transform: translateY(180px);
+            transition: transform 300ms ease-in-out;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            z-index: 1000;
+        }
+
+        .active .menu {
+            transform: translateY(0);
+        }
+
+        .option {
+            width: 70px;
+            height: 70px;
+            margin: 10px;
+            background-color: #dfe9e3b9;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 12px;
+            font-family: 'Segoe UI', sans-serif;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.2s;
+        }
+
+        .option:active {
+            background-color: #444;
+        }
+
+        .option svg,
+        .food {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 6px;
+        }
+
+        .button-menu1 {
+            bottom: 100px;
+            right: 50%;
+            position: fixed;
+            z-index: 2000;
+            cursor: pointer;
+            height: 56px;
+            width: 56px;
+            border-radius: 50%;
+            background-color: #0e3024;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .button-menu1:active {
+            background-color: #132e25;
+        }
+
+        .bg {
+            fill: none;
+        }
+
+        .line {
+            stroke: white;
+            stroke-width: 2;
+            transition: transform 300ms ease, stroke 300ms ease;
+            transform-origin: 50%;
+        }
+
+        .active .line1 {
+            stroke: #fff;
+            transform: translateY(6px) rotate(45deg);
+        }
+
+        .active .line2 {
+            stroke: #fff;
+            transform: scale(0);
+        }
+
+        .active .line3 {
+            stroke: #fff;
+            transform: translateY(-6px) rotate(-45deg);
+        }
+
+        .modal-backdrop {
+            all: unset;
+        }
+
+        /* Esconde por padrão */
+        .button-menu1,
+        .menu {
+            display: none;
+        }
+
+        .fica-oculto_em_mobile {
+            display: inline
+        }
+
+        /* Exibe apenas em telas menores que 768px (mobile) */
+        @media (max-width: 450px) {
+            .fica-oculto_em_mobile {
+                display: none
+            }
+
+            .button-menu1 {
+                display: flex;
+                bottom: 0;
+                right: 30%;
+                position: absolute;
+                z-index: 1100;
+                cursor: pointer;
+                height: 30px;
+                width: 120px;
+                padding-top: 0.5rem;
+                padding-left: 3rem;
+                border-top-right-radius: 1rem;
+                border-top-left-radius: 1rem;
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                background-color: #405a3f;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                align-items: center;
+                justify-content: center;
+                transition: background-color 0.3s;
+            }
+
+            .button-menu1:active {
+                background-color: #3baf8a;
+            }
+
+            .menu {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 180px;
+                flex-wrap: wrap;
+                justify-content: space-around;
+                background: linear-gradient(180deg, #eff1f159 0%, #405a3f6b 100%);
+                box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+                transform: translateY(180px);
+                transition: transform 300ms ease-in-out;
+                border-top-left-radius: 20px;
+                border-top-right-radius: 20px;
+                z-index: 1000;
+            }
+
+            .active .menu {
+                transform: translateY(0);
+            }
+        }
+
+        /* Linhas do ícone (hambúrguer) */
+        .line {
+            stroke: white;
+            stroke-width: 2;
+            transition: transform 300ms ease, stroke 300ms ease;
+            transform-origin: 50%;
+        }
+
+        .active .line1 {
+            stroke: #fff;
+            transform: translateY(6px) rotate(45deg);
+        }
+
+        .active .line2 {
+            stroke: #fff;
+            transform: scale(0);
+        }
+
+        .active .line3 {
+            stroke: #fff;
+            transform: translateY(-6px) rotate(-45deg);
+        }
+    </style>
+
+    <div class="phone-frame">
+        <div class="phone-screen">
+            <div class="imageContainer">
+
+                <div id="site-content">
+                    <main id="content-main" class='shadow mb-2 bg-white rounded'>
+                        {% comment "Head" %} Cabeçalho ----------------------------------------------- {% endcomment %}
+                        {% include 'gestao_escolar/headers/index.html' %}
+
+                        <div class="d-flex" style="overflow-y: auto;">
+
+                            {% comment "Sidebar" %} Menu lateral esquerdo ------------------------------- {% endcomment %}
+                            {% include 'gestao_escolar/sidebars/index.html' %}
+                            {% comment "Main" %} Conteudo Principal{% endcomment %}
+                            {% block main %}{% endblock main %}
+                        </div>
+                        {% comment "Footer" %} Rodape do site ----------------------------------------- {% endcomment %}
+                        {% block footer %}
+
+                        {% endblock footer %}
+                        {% comment "Scripts" %} Área pra scripts fim da pagina {% endcomment %}
+                        {% block script_footer %}{% endblock script_footer %}
+                    </main>
+                </div>
 
 
+            </div>
+            <svg class="button-menu button-menu1" height="24" width="24"
+                onclick="document.querySelector('.phone-screen').classList.toggle('active')">
+                <circle class="bg" r="12" cx="12" cy="12" />
+                <path class="line line1" d="M 6,8 H 18" />
+                <path class="line line2" d="M 6,12 H 18" />
+                <path class="line line3" d="M 6,16 H 18" />
 
+            </svg>
 
--->
-
-
-
-
-
-      <div class="menu" >        
-        <div class="option">
-          {% if request.session.escola_id   %}
-          <a href="{% url 'Gestao_Escolar:DadosEscola' request.session.escola_id %}" class="nav-link link-light rounded-3 txt-p-nav" title="Cadstro de Escola" alt="Cadstro de Escola"  data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fa-duotone fa-solid fa-school-flag text-green  fs-4"></i>            
-          </a>
-        {% endif %}
+            <div class="menu">
+                <div class="option">
+                    {% if request.session.escola_id %}
+                    <a href="{% url 'Gestao_Escolar:DadosEscola' request.session.escola_id %}"
+                        class="nav-link link-light rounded-3 txt-p-nav" title="Cadstro de Escola"
+                        alt="Cadstro de Escola" data-bs-toggle="tooltip" data-bs-placement="right">
+                        <i class="fa-duotone fa-solid fa-school-flag text-green fs-4"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="option">
+                    <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_create' %}"
+                        class="nav-link link-light rounded-3 txt-p-nav" title="Cadastro de Alunos"
+                        data-bs-toggle="tooltip" data-bs-placement="right">
+                        <i class="fa-sharp fa-solid fa-people fs-5 text-green"></i>
+                    </a>
+                </div>
+                <div class="option">
+                    <a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}" class="nav-link rounded-3 txt-p-nav"
+                        title="Cadastro de Turmas data-bs-toggle=" tooltip" data-bs-placement="right">
+                        <i class="fa-solid fa-people-roof fs-4 text-green"></i>
+                    </a>
+                </div>
+                <div class="option">
+                    <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}"
+                        class="nav-link rounded-3 txt-p-nav" title="Matrícula de alunos nas turmas"
+                        data-bs-toggle="tooltip" data-bs-placement="right">
+                        <i class="fs-4 fa-solid fa-screen-users text-green"></i>
+                    </a>
+                </div>
+                <div class="option">
+                    <a href="{% url 'Gestao_Escolar:Grades_turmas' %}" class="nav-link rounded-3 txt-p-nav"
+                        title="Grade de disciplinas" data-bs-toggle="tooltip" data-bs-placement="right">
+                        <i class="fs-4 fa-duotone fa-chart-network text-green" style="font-size: 1.65rem;"></i>
+                    </a>
+                </div>
+                <div class="option">
+                    <a href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}" class="nav-link rounded-3 txt-p-nav"
+                        title="Gestão das Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
+                        <i class="fs-4 fa-solid fa-users-gear text-green" style="font-size: 1.65rem;"></i>
+                    </a>
+                </div>
+                <div class="option">
+                    <a href="{% url 'Gestao_Escolar:adicionar_escola' %}" class="nav-link rounded-3 txt-p-nav"
+                        title="Espaço reservado para a matricula online" data-bs-toggle="tooltip"
+                        data-bs-placement="right">
+                        <img src="{% static 'svg/matriOn.svg' %}" alt="">
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="option">
-          <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_create' %}" class="nav-link link-light  rounded-3 txt-p-nav" title="Cadastro de Alunos" data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fa-sharp fa-solid fa-people fs-5 text-green"></i>
-          </a>
-        </div>
-        <div class="option">
-          <a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}" class="nav-link  rounded-3 txt-p-nav" title="Cadastro de Turmas data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fa-solid fa-people-roof fs-4  text-green"></i>            
-          </a>
-        </div>
-        <div class="option">
-          <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="nav-link  rounded-3 txt-p-nav" title="Matrícula de alunos nas turmas" data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fs-4 fa-solid fa-screen-users text-green"></i>            
-          </a>
-        </div>
-        <div class="option">
-          <a href="{% url 'Gestao_Escolar:Grades_turmas' %}" class="nav-link  rounded-3 txt-p-nav" title="Grade de disciplinas" data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fs-4 fa-duotone fa-chart-network text-green" style="font-size: 1.65rem;"></i>           
-          </a>
-        </div>
-        <div class="option">
-          <a href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}" class="nav-link  rounded-3 txt-p-nav" title="Gestão das Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fs-4 fa-solid fa-users-gear text-green" style="font-size: 1.65rem;"></i>            
-          </a>
-        </div>
-        <div class="option">
-          <a href="{% url 'Gestao_Escolar:adicionar_escola' %}" class="nav-link  rounded-3 txt-p-nav" title="Espaço reservado para a matricula online" data-bs-toggle="tooltip" data-bs-placement="right">          
-            <img src="{% static 'svg/matriOn.svg' %}" alt="">            
-          </a>
-        </div>
-
-        
-      </div>
     </div>
-  </div>
 
-  <script>
-    function exibirDiv() {
-        var divOculta = document.getElementById('oculto');        
-        divOculta.style.display = 'block';
-    }
-    function ocultarDiv() {
-        var divOculta = document.getElementById('oculto');
-        divOculta.style.display = 'none';
-    }
-</script>
+    <script>
+        function exibirDiv() {
+            var divOculta = document.getElementById('oculto');
+            divOculta.style.display = 'block';
+        }
 
-<!-- Aviso de orientação -->
-<script>
-  function verificarOrientacao() {
-    const aviso = document.getElementById('landscape-warning');
-    const conteudo = document.getElementById('site-content');
+        function ocultarDiv() {
+            var divOculta = document.getElementById('oculto');
+            divOculta.style.display = 'none';
+        }
+    </script>
 
-    if (window.innerHeight > window.innerWidth) {
-      // Modo retrato
-      aviso.style.display = 'flex';
-      conteudo.style.display = 'none';
-    } else {
-      // Modo paisagem
-      aviso.style.display = 'none';
-      conteudo.style.display = 'block';
-    }
-  }
+    <script>
+        function verificarOrientacao() {
+            const aviso = document.getElementById('landscape-warning');
+            const conteudo = document.getElementById('site-content');
 
-  window.addEventListener('load', verificarOrientacao);
-  window.addEventListener('resize', verificarOrientacao);
-  window.addEventListener('orientationchange', verificarOrientacao);
-</script>
+            if (window.innerHeight > window.innerWidth) {
+                // Modo retrato
+                aviso.style.display = 'flex';
+                conteudo.style.display = 'none';
+            } else {
+                // Modo paisagem
+                aviso.style.display = 'none';
+                conteudo.style.display = 'block';
+            }
+        }
 
+        window.addEventListener('load', verificarOrientacao);
+        window.addEventListener('resize', verificarOrientacao);
+        window.addEventListener('orientationchange', verificarOrientacao);
+    </script>
 
 </body>
 </html>

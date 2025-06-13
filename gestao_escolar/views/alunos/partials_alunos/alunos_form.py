@@ -91,181 +91,116 @@ choice_justifica_falta_document= {
 }
 
 
+import random
+import string
+from django import forms
+
 class Aluno_documento_form(forms.ModelForm):   
-    
     class Meta:
         model = Alunos
-        fields = ['aluno', 'CPF', 'RG', 'RG_emissao', 'RG_UF', 'orgao_emissor','cidade_nascimento','estado','renda_familiar','cidade',  'bairro', 'login_aluno', 'senha', 'cartao_nacional_saude_cns', 'nis', 'inep',
-                'estado_civil', 'tipo_certidao', 'numero_certidao', 'livro', 'folha', 'termo', 'emissao', 'distrito_certidao', 'cartorio', 'comarca', 'cartorio_uf',
-                'justificativa_falta_documento', 'local_diferenciado', 'obito', 'data_obito'  ]    
+        fields = ['aluno', 'CPF', 'RG', 'RG_emissao', 'RG_UF', 'orgao_emissor','nacionalidade','estado_naturalidade', 
+                 'cidade_naturalidade', 'estado', 'cidade', 'bairro', 'rua', 'login_aluno', 'senha', 
+                 'cartao_nacional_saude_cns', 'nis', 'inep', 'estado_civil', 'tipo_certidao', 
+                 'numero_certidao', 'livro', 'folha', 'termo', 'emissao', 'distrito_certidao', 
+                 'cartorio', 'comarca', 'cartorio_uf', 'justificativa_falta_documento', 
+                 'local_diferenciado', 'obito', 'data_obito']
     
     aluno = forms.ModelChoiceField(
         queryset=Alunos.objects.none(),
-        widget=forms.Select(attrs={'class': 'border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1',  'readonly': 'readonly'}),
+        widget=forms.Select(attrs={'class': 'border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1', 'readonly': 'readonly'}),
         required=False
     )
-    CPF = forms.CharField(
-        label='Número do CPF',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
+    
+    # Alterado de ChoiceField para CharField para campos dinâmicos
+    estado = forms.CharField(
+        widget=forms.Select(attrs={
+            'class': 'border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1',
+            'id': 'id_estado',
+            'onchange': 'carregarCidades()'
+        }),
         required=False
     )
-    RG = forms.CharField(
-        label='Número do RG',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
+    
+    cidade = forms.CharField(
+        widget=forms.Select(attrs={
+            'class': 'border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1',
+            'id': 'id_cidade',
+            'onchange': 'carregarBairros()',
+            'disabled': 'disabled'
+        }),
         required=False
     )
-    RG_emissao = forms.DateField(
-        label = "Data de emissão do RG",
-        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col2 m-2 rounded-1'}), 
-        required=False 
-    )
-    RG_UF = forms.ModelChoiceField(
-        label="UF do RG",
-        queryset=Uf_Unidade_Federativa.objects.all(),
-        widget=forms.Select(attrs={'class': ' border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1'}),  
-        required=False   
-    )
-    orgao_emissor = forms.CharField(
-        label="Órgão Emissor",
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
+    
+    bairro = forms.CharField(
+        widget=forms.Select(attrs={
+            'class': 'border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1',
+            'id': 'id_bairro',
+            'disabled': 'disabled'
+        }),
         required=False
     )
-    rua = forms.CharField(
-        label="Rua, Av., Travessa",
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'})        
-    )
-    estado = forms.ModelChoiceField(
-        queryset = Uf_Unidade_Federativa.objects.all(),
-        widget=forms.Select(attrs={'class': ' border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1'}),
-        required=False   
-    )
-    cidade_nascimento = forms.ModelChoiceField(
-        queryset = Cidade.objects.all(),
-        widget=forms.Select(attrs={'class': ' border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1'}),
-        required=False   
-    )
-    renda_familiar = forms.CharField(
-        label='Renda Familiar',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
+    
+    estado_naturalidade = forms.CharField(
+        widget=forms.Select(attrs={
+            'class': 'border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1',
+            'id': 'id_estado_naturalidade',
+            'onchange': 'carregarCidadesNaturalidade()'
+        }),
         required=False
     )
-    login_aluno = forms.CharField(
-        label='Login',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
-        required=False,
-        disabled=True
-    )   
-    senha = forms.CharField(
-        label='Senha do aluno',
-        widget=forms.PasswordInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
-        required=False,
-        disabled=True
-    )
-    cartao_nacional_saude_cns = forms.CharField(
-        label='Cartão Nacional de Saúde / CNS',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
+    
+    cidade_naturalidade = forms.CharField(
+        widget=forms.Select(attrs={
+            'class': 'border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1',
+            'id': 'id_cidade_naturalidade',
+            'disabled': 'disabled'
+        }),
         required=False
     )
-    nis = forms.CharField(
-        label='NIS',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
-        required=False
-    )
-    inep = forms.CharField(
-        label='INEP do Aluno',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
-        required=False
-    )
-    estado_civil = forms.ChoiceField(
-        label='Estado Civil',
-        choices=choice_estado_civil,
-        widget=forms.Select(attrs={'class': ' border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
-        required=False
-    )
-    tipo_certidao = forms.ChoiceField(
-        label='Tipo de Certidão',
-        choices=choice_modelo_certidao,
-        widget=forms.Select(attrs={'class': ' border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
-        required=False
-    )
-    numero_certidao = forms.CharField(
-        label='Número da Certidão',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
-        required=False
-    )
-    livro = forms.CharField(
-        label='Livro',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
-        required=False
-    )
-    folha = forms.CharField(
-        label='Folha',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
-        required=False
-    )
-    termo = forms.CharField(
-        label='Termo',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
-        required=False
-    )
-    emissao = forms.DateField(
-        label = "Data de emissão do RG",
-        widget=forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col2 m-2 rounded-1'}), 
-        required=False 
-    )
-    distrito_certidao = forms.CharField(
-        label='Distrito',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1', }),
-        required=False
-    )
-    cartorio = forms.CharField(
-        label='Cartório',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
-        required=False
-    )
-    comarca = forms.CharField(
-        label='Comarca',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
-        required=False
-    )
-    cartorio_uf = forms.ModelChoiceField(
-        label="UF do Cartório",
-        queryset = Uf_Unidade_Federativa.objects.all(),
-        widget=forms.Select(attrs={'class': ' border border-info p-2 pb-1 bg-transparent text-info col m-2 rounded-1'}),
-        required=False        
-    )    
-    justificativa_falta_documento = forms.ChoiceField(
-        label='Justificativa da falta de documentação',
-        choices=choice_justifica_falta_document,
-        widget=forms.Select(attrs={'class': ' border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
-        required=False
-    )
-    local_diferenciado = forms.CharField(
-        label='Local Diferenciado',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
-        required=False
-    )
-    obito  = forms.BooleanField(   
-        label='Óbito / Falecimento do aluno',
-        widget = forms.CheckboxInput(attrs={'class': 'border border-info p-1 pb-1 bg-transparent text-info col m-2 rounded-1'}),
-        required=False        
-    )
-    data_obito = forms.DateField(
-        label = "Data óbito / Data de Falecimento",
-        widget= forms.DateInput(attrs={'class': 'form-control border border-info p-3 pb-3  text-info col m-2 rounded-1'}),
-        required=False  
-    )
-
+    
     def __init__(self, *args, **kwargs):
-        aluno_create = kwargs.pop('aluno_create', None)
+        # Remove o aluno_create dos kwargs antes de chamar o super()
+        self.aluno_create = kwargs.pop('aluno_create', None)
         super().__init__(*args, **kwargs)
-
-        if aluno_create is not None:
-            self.fields['aluno'].queryset = aluno_create
-            self.fields['aluno'].initial = aluno_create.first()    
+        
+        if self.aluno_create is not None:
+            self.fields['aluno'].queryset = self.aluno_create
+            self.fields['aluno'].initial = self.aluno_create.first()    
             self.fields['login_aluno'].initial = self.generate_login()           
             self.fields['senha'].initial = "12345678"
-                    
+        
+        # Carrega os estados brasileiros
+        estados_brasileiros = [
+            ('AC', 'Acre'), ('AL', 'Alagoas'), ('AP', 'Amapá'), ('AM', 'Amazonas'),
+            ('BA', 'Bahia'), ('CE', 'Ceará'), ('DF', 'Distrito Federal'), ('ES', 'Espírito Santo'),
+            ('GO', 'Goiás'), ('MA', 'Maranhão'), ('MT', 'Mato Grosso'), ('MS', 'Mato Grosso do Sul'),
+            ('MG', 'Minas Gerais'), ('PA', 'Pará'), ('PB', 'Paraíba'), ('PR', 'Paraná'),
+            ('PE', 'Pernambuco'), ('PI', 'Piauí'), ('RJ', 'Rio de Janeiro'), ('RN', 'Rio Grande do Norte'),
+            ('RS', 'Rio Grande do Sul'), ('RO', 'Rondônia'), ('RR', 'Roraima'), ('SC', 'Santa Catarina'),
+            ('SP', 'São Paulo'), ('SE', 'Sergipe'), ('TO', 'Tocantins')
+        ]
+        
+        # Atualiza os widgets Select com as opções de estado
+        self.fields['estado'].widget.choices = [('', 'Selecione um estado')] + estados_brasileiros
+        self.fields['estado_naturalidade'].widget.choices = [('', 'Selecione um estado')] + estados_brasileiros
+    
+    def clean_cidade(self):
+        """Validação personalizada para o campo cidade"""
+        cidade = self.cleaned_data.get('cidade')
+        # Aqui você pode adicionar validações adicionais se necessário
+        return cidade
+    
+    def clean_cidade_naturalidade(self):
+        """Validação personalizada para o campo cidade_naturalidade"""
+        cidade = self.cleaned_data.get('cidade_naturalidade')
+        # Aqui você pode adicionar validações adicionais se necessário
+        return cidade
+    
+    def clean_bairro(self):
+        """Validação personalizada para o campo bairro"""
+        bairro = self.cleaned_data.get('bairro')
+        # Aqui você pode adicionar validações adicionais se necessário
+        return bairro
     
     def generate_login(self):
         while True:
@@ -274,4 +209,3 @@ class Aluno_documento_form(forms.ModelForm):
             login = f'{letra}/{numero}'
             if not Alunos.objects.filter(login_aluno=login).exists():
                 return login
-

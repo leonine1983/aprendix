@@ -46,7 +46,7 @@ class CreateAlunosConfirma(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         context['sub_Info_page'] = 'Antes de procedermos com o cadastro do aluno,\
               é imprescindível realizar uma verificação para confirmar se ele já está\
                   registrado no sistema. Essa medida visa evitar duplicatas e garantir a\
-                      integridade dos dados.' 
+                      integridade dos dados.'         
         aluno_query = self.get_queryset()                
         context['Alunos'] = aluno_query
         context['now'] = datetime.now()    

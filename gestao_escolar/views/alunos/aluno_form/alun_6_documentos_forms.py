@@ -41,7 +41,7 @@ class Aluno_documentoUpadate_form(forms.ModelForm):
     
     class Meta:
         model = Alunos
-        fields = ['aluno', 'CPF', 'RG', 'RG_emissao', 'RG_UF', 'orgao_emissor','renda_familiar', 'cartao_nacional_saude_cns', 'nis', 'inep',
+        fields = ['aluno', 'CPF', 'RG', 'RG_emissao', 'RG_UF', 'orgao_emissor', 'cartao_nacional_saude_cns', 'nis', 'inep',
                 'estado_civil', 'tipo_certidao', 'numero_certidao', 'livro', 'folha', 'termo', 'emissao', 'distrito_certidao', 'cartorio', 'comarca', 'cartorio_uf',
                 'justificativa_falta_documento', 'local_diferenciado', 'obito', 'data_obito'  ]    
         
@@ -78,12 +78,7 @@ class Aluno_documentoUpadate_form(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
         required=False
     )
-    
-    renda_familiar = forms.CharField(
-        label='Renda Familiar',
-        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
-        required=False
-    )      
+        
     
     cartao_nacional_saude_cns = forms.CharField(
         label='Cartão Nacional de Saúde / CNS',

@@ -20,4 +20,5 @@ from .pessoas_contrato import *
 from .frequencia_e_feriados import *
 from .matriculaOnline import *
 from .gestao_turma.planoAula import *
+from .bairro_E_cidade_dinamicos import *
 #from .ferramentas import *
