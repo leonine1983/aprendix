@@ -6,14 +6,24 @@
   #botao{display:none}
 </style>
 {% endif %}
-<form method="post"class='m-3' enctype="multipart/form-data"> 
-    <div>
-      {% csrf_token %}      
-      {{form.as_p}} 
-      {{ form.non_field_errors }}   
+<form method="post" class="m-3" enctype="multipart/form-data">
+  <div>
+    {% csrf_token %}
+    {{ form.as_p }}
+    {{ form.non_field_errors }}
+
+
     
-    <button id="botao" type="submit" class='fs-family-nunito btn btn-orange m-auto {{btn_bg}}'> {{bottom}} {{object}} {{btn_bg}}<img style='margin:-10rem 0' src="{% static 'animations/paperAvion.gif' %}" class='anime-h' srcset=""></button>                             
-</form> 
+
+    <button id="botao" type="submit" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 justify-content-center fs-3" disabled>
+      <i class="fa-solid fa-user-plus"></i>
+      Criar Aluno
+    </button>
+  </div>
+</form>
+
+
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var checkbox = document.getElementById('id_aluno_exterior');
@@ -48,18 +58,73 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 
-<script src="https://cdn.jsdelivr.net/npm/cpf-cnpj-validator@1.0.3/dist/cpf.min.js"></script>
+<!-- Bibliotecas -->
 <script>
-function validarCPF() {
-  const input = document.getElementById('id_CPF_mae');
-  const cpf = input.value;
+function validaCPF(cpf) {
+	cpf = cpf.replace(/\D+/g, '');
+	if (cpf.length !== 11) return false;
 
-  if (!CPF.isValid(cpf)) {
-    alert('CPF inválido!');
-    input.focus();
-    return false;
-  }
+	let soma = 0;
+	let resto;
+	if (/^(\d)\1{10}$/.test(cpf)) return false;
 
-  return true;
+	for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i-1, i)) * (11 - i);
+	resto = (soma * 10) % 11;
+	if ((resto === 10) || (resto === 11)) resto = 0;
+	if (resto !== parseInt(cpf.substring(9, 10))) return false;
+
+	soma = 0;
+	for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i-1, i)) * (12 - i);
+	resto = (soma * 10) % 11;
+	if ((resto === 10) || (resto === 11)) resto = 0;
+	if (resto !== parseInt(cpf.substring(10, 11))) return false;
+
+	return true;
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+	const cpfInput = document.getElementById('id_CPF_mae');
+	const botao = document.getElementById('botao');
+	const cpfStatus = document.getElementById('cpf-status');
+
+	// Desabilita o botão no início
+	botao.disabled = true;
+
+	// Aplica a máscara e valida
+	cpfInput.addEventListener('input', function (e) {
+		let value = e.target.value.replace(/\D/g, '');
+
+		// Aplica a máscara
+		value = value
+			.replace(/(\d{3})(\d)/, '$1.$2')
+			.replace(/(\d{3})(\d)/, '$1.$2')
+			.replace(/(\d{3})(\d)/, '$1-$2')
+			.replace(/(-\d{2})\d+?$/, '$1');
+
+		e.target.value = value;
+
+		// Valida CPF (sem máscara)
+		const cpfLimpo = value.replace(/\D+/g, '');
+
+		if (validaCPF(cpfLimpo)) {
+			botao.disabled = false;
+			cpfInput.classList.add('is-valid');
+			cpfInput.classList.remove('is-invalid');
+			cpfStatus.textContent = "CPF válido";
+			cpfStatus.style.color = "#28a745";
+		} else {
+			botao.disabled = true;
+			cpfInput.classList.remove('is-valid');
+			if (cpfLimpo.length === 11) {
+				cpfInput.classList.add('is-invalid');
+				cpfStatus.textContent = "CPF inválido";
+				cpfStatus.style.color = "#dc3545";
+			} else {
+				cpfInput.classList.remove('is-invalid');
+				cpfStatus.textContent = "";
+			}
+		}
+	});
+});
 </script>
+
