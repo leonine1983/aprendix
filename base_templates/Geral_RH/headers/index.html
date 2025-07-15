@@ -1,0 +1,177 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'fontawesome/css/all.css' %}">
+<link rel="stylesheet" href="{% static 'global/css/select2.min.css' %}">
+<style>
+  .bg-secondary{
+    background-color: rgb(198, 209, 209) !important;    
+  }
+  .text-secondary p{
+    margin: 0px !important;
+  }
+  .fa-comments, .fa-envelope {
+    color: rgb(248, 89, 15) !important;
+    text-shadow: rgba(0, 0, 0, 0.07) 0px 1px 1px, rgba(0, 0, 0, 0.07) 0px 2px 2px, rgba(0, 0, 0, 0.07) 0px 4px 4px, rgba(0, 0, 0, 0.07) 0px 8px 8px, rgba(0, 0, 0, 0.07) 0px 16px 16px;}
+  .a_msg:hover{
+    color:red
+  }
+  header{
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-image: url({% static "rh/fundo.svg" %});
+      margin:-1rem -1rem;
+  }
+</style>
+      <header class="p-2">
+        <div style="
+        background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(157, 221, 221, 0.5) 100%);
+        height: 8rem;
+        margin-top: -1rem;">
+          <div > 
+            <div id="header-cont" class="container  p-3"  style=" width: 100%; object-fit: cover; ">  
+              <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">                    
+                  <img class="bi me-2" width="300" src="{% static 'rh/S-RHE.svg' %} " alt="" sizes="" srcset="">                     
+                </a>
+                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                  <li>
+                    <a class="nav-link  link-secondary btn btn-sm btn-light m-2 border border-1 border-secondary" href="{% url 'Admin_Acessos:painel_acesso'%}">
+                      <svg class="bi" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm161.5-86.1c-12.2-5.2-26.3 .4-31.5 12.6s.4 26.3 12.6 31.5l11.9 5.1c17.3 7.4 35.2 12.9 53.6 16.3v50.1c0 4.3-.7 8.6-2.1 12.6l-28.7 86.1c-4.2 12.6 2.6 26.2 15.2 30.4s26.2-2.6 30.4-15.2l24.4-73.2c1.3-3.8 4.8-6.4 8.8-6.4s7.6 2.6 8.8 6.4l24.4 73.2c4.2 12.6 17.8 19.4 30.4 15.2s19.4-17.8 15.2-30.4l-28.7-86.1c-1.4-4.1-2.1-8.3-2.1-12.6V235.5c18.4-3.5 36.3-8.9 53.6-16.3l11.9-5.1c12.2-5.2 17.8-19.3 12.6-31.5s-19.3-17.8-31.5-12.6L338.7 175c-26.1 11.2-54.2 17-82.7 17s-56.5-5.8-82.7-17l-11.9-5.1zM256 160a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"/></svg>
+                      <p class="m-0">Área de Acessos</p>
+                    </a>
+                  </li>            
+                  <li>
+                    <a href="{% url 'Controle_Estoque:about' %}" class="nav-link px-2 link-body-emphasis  btn btn-sm btn-light m-2 border border-1 border-secondary">
+                      <svg class="bi" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M289.6 97.5l31.6 31.7-76.3 76.5V97.5zm-162.4 31.7l76.3 76.5V97.5h-44.7zm41.5-41.6h44.7v127.9l10.8 10.8 10.8-10.8V87.6h44.7L224.2 32zm26.2 168.1l-10.8-10.8H55.5v-44.8L0 255.7l55.5 55.6v-44.8h128.6l10.8-10.8zm79.3-20.7h107.9v-44.8l-31.6-31.7zm173.3 20.7L392 200.1v44.8H264.3l-10.8 10.8 10.8 10.8H392v44.8l55.5-55.6zM65.4 176.2l32.5-31.7 90.3 90.5h15.3v-15.3l-90.3-90.5 31.6-31.7H65.4zm316.7-78.7h-78.5l31.6 31.7-90.3 90.5V235h15.3l90.3-90.5 31.6 31.7zM203.5 413.9V305.8l-76.3 76.5 31.6 31.7h44.7zM65.4 235h108.8l-76.3-76.5-32.5 31.7zm316.7 100.2l-31.6 31.7-90.3-90.5h-15.3v15.3l90.3 90.5-31.6 31.7h78.5zm0-58.8H274.2l76.3 76.5 31.6-31.7zm-60.9 105.8l-76.3-76.5v108.1h44.7zM97.9 352.9l76.3-76.5H65.4v44.8zm181.8 70.9H235V295.9l-10.8-10.8-10.8 10.8v127.9h-44.7l55.5 55.6zm-166.5-41.6l90.3-90.5v-15.3h-15.3l-90.3 90.5-32.5-31.7v78.7h79.4z"/></svg>
+                      <p class="m-0">Sobre o sistema</p>
+                    </a>
+                  </li>
+                  <li><a href="#" class="nav-link px-2 link-secondary ">Usuários</a></li>
+                  <li><a href="#" class="nav-link px-2 link-body-emphasis  ">Tutoriais</a></li>
+                  <li><a href="#" class="nav-link px-2 link-body-emphasis  ">Contato</a></li>
+                </ul>
+                <!-- SE PRECISAR CRIAR UM CAMPO DE BUSCA
+                <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+                  <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+                </form> -->
+                <div class="dropdown text-end d-flex">    
+                  
+                  <div class='m-1'>
+                    {% if aberta_info == 1 %}    
+                    <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">                               
+                      <i class="fa-solid fa-circle-info fa-beat"></i>   
+                    </a>
+                    <ul class="dropdown-menu text-small">
+                      <!--<li><a class="dropdown-item" href="#">New project...</a></li>
+                      <li><a class="dropdown-item" href="#">Settings</a></li>
+                      <li><a class="dropdown-item" href="#">Profile</a></li>
+                      <li><hr class="dropdown-divider"></li>-->
+                      <li><a class="dropdown-item" href="{% url 'Admin_Acessos:logout'%}">Mensagem {{usuario}}</a></li>
+                    </ul>
+                    {% endif %}  
+                  </div>
+      
+      
+                  <div class='m-1'>
+                    <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                     
+                        {% if not aberto %}         
+                          <i class="fa-solid fa-comment fa-flip-horizontal"></i>
+                        {% else %}  
+                          <i class="fa-solid fa-comments fa-beat text-info h5 "> <b style="font-size:0.5rem; color:black">MSG</b><sup style="font-size:0.4rem; color:black; margin-right: -0.1rem;"></sup></i>                    
+                        {% endif %}
+        
+                    </a>
+                    <ul class="dropdown-menu text-small">
+                      <!--<li><a class="dropdown-item" href="#">New project...</a></li>
+                      <li><a class="dropdown-item" href="#">Settings</a></li>
+                      <li><a class="dropdown-item" href="#">Profile</a></li>
+                      <li><hr class="dropdown-divider"></li>--> 
+      
+                      
+                      {% for n in usuario %}                  
+                        {% if n.aberta %}         
+                        <li>
+                          <a class="a_msg dropdown-item m-0 p-0 bg-secondary text-secondary " href=" {% url 'Admin_Acessos:mensagem_detalhe' n.pk %} " >
+                            <div class='border p-1 m-0 d-flex'>
+                              <span class="w-100" ><img src="{% static n.remetente.foto %}" alt="mdo" width="32" height="32" class="rounded-circle"> {{n.assunto}} </span>
+                              <span class="w-25 " style="padding-left: 1rem;">
+                                <i class="fa-regular fa-eye"></i>
+                              </span>
+                            </div>
+                          </a>
+                        </li>                  
+                        {% else %}                    
+                        <li>
+                          <a class="a_msg dropdown-item m-0 p-0  text-secondary" style=' background-color: rgb(243, 182, 154) !important;' href="{% url 'Admin_Acessos:mensagem_update' n.pk %} ">                 
+                            <div class='border p-1 m-0 d-flex'>
+                              <div class="w-100" ><img src="{% static n.remetente.foto %}" alt="mdo" width="32" height="32" class="rounded-circle"><i class="w-25 fa-solid fa-volume-high"></i> {{n.assunto}}  </div>
+                              <div class="w-25 " style="padding-left: 1rem;">
+                                <i class="fa-solid fa-envelope fa-beat text-info  "></i>
+                              </div>
+                            </div>
+                            </a>
+                        </li>
+                        {% endif %} 
+                      {% endfor %}
+                    </ul>
+                  </div>
+      
+      
+                  <div class='m-1'>
+                    <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">             
+                      <img src="{% static user.foto %}" alt="mdo" width="32" height="32" class="rounded-circle">       
+                      {% if user.is_authenticated %}
+                      <span> <b class='text-uppercase'>{{ user.username }}!</b></span>
+                      
+                      {% else %}
+                      <span>Você ainda não está logado.</span>
+                    {% endif %}       
+                    </a>
+                    <ul class="dropdown-menu text-small">
+                      <!--<li><a class="dropdown-item" href="#">New project...</a></li>
+                      <li><a class="dropdown-item" href="#">Settings</a></li>
+                      <li><a class="dropdown-item" href="#">Profile</a></li>
+                      <li><hr class="dropdown-divider"></li>-->
+                      <li>
+                        <a class="dropdown-item" href="{% url 'Admin_Acessos:mensagem'%}">
+                          <i class="fa-regular fa-envelope"></i>
+                          <span>Enviar mensagem</span>
+                        </a>
+                      </li>
+                      <li><a class="dropdown-item" href="{% url 'Admin_Acessos:logout'%}">Sair </a></li>
+                      
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>          
+      </header>
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</header>

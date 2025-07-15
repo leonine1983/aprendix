@@ -1,0 +1,448 @@
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'global/css/search.css' %}">
+{% endblock css %}
+{% include "Escola/partials/modal_partials/modal_top.html" %}
+<h3 class="fs-5"></h3>
+{% if messages %}                
+  {% include 'Escola/partials/mensagens.html' %}    
+{% endif %}  
+               
+  <div class="tab-content" id="myTabContent">
+    <style>
+  .historico-wrapper {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+  }
+
+  .historico-wrapper h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #343a40;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  }
+
+  thead {
+    background-color: #007bff;
+    color: white;
+  }
+  
+
+  th, td {
+    padding: 0.1rem 1rem;
+    text-align: center;
+    border: 1px solid #dee2e6;
+    font-size: 0.95rem;
+  }
+
+  th[rowspan="2"] {
+    background-color: #0056b3;
+    font-weight: bold;
+  }
+
+  th[colspan="2"] {
+    font-weight: 500;
+    background-color: #007bff;
+  }
+
+  thead small {
+    font-size: 0.5rem;
+    color: #f1f1f1;
+    font-weight: 400;
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: #f2f6fc;
+  }
+
+  tbody td:first-child {
+    text-align: left;
+    font-weight: 500;
+    background-color: #f0f0f0;
+  }
+
+  .vertical-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg); 
+  vertical-align: middle;
+  white-space: nowrap;
+  display: flex;
+  justify-content: center;
+}
+.ch-cell, .med, .text_CH{
+  font-size: 0.8rem;
+  padding: 0rem;
+}
+.text_CH{
+  padding: 0.5rem;
+  text-align: center;
+}
+</style>
+{% load meus_filtros %}
+
+<div class="historico-wrapper">
+  <h2>Histórico Escolar de {{ matricula.aluno.nome_completo }}</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th rowspan="2" colspan="2">Disciplina</th>
+        {% for t in serie %}
+          <th colspan="2">{{ t }}</th>
+        {% endfor %}
+      </tr>
+      <tr>
+        {% for t in serie %}
+          <th><small>N</small></th>
+          <th><small>CH</small></th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for grupo in disciplina|unique_objects:"campo_conhecimento" %}
+        {% with grupo.campo_conhecimento as campo %}
+          {% with disciplina|filter_campo_conhecimento:campo as disciplinas_do_campo %}
+            {% for d in disciplinas_do_campo %}
+              <tr>
+                {% if forloop.first %}
+                  <td rowspan="{{ disciplinas_do_campo|length }}"  style="text-transform: uppercase; background-color: #f0f0f0;" class="text_CH">
+                    {% if disciplinas_do_campo|length >= 2 %}
+                      <div class="vertical-text">   
+                        {{ campo }} 
+                      </div>
+                      {% else %}
+                        <div >                  
+                          {% if campo == 'linguagens' %} 
+                            LING 
+                            {% elif campo == 'matematica'  %}
+                              MAT
+                            {% elif campo == 'ciencias_natureza' %}
+                              NAT
+                            {% elif campo == 'ciencias_humanas' %}
+                              HUM
+                            {% elif campo == 'outras' %}
+                              OUT
+                            {% else %}                    
+                          {% endif %}
+                        </div>
+                    {% endif %}                
+                  </td>
+                {% endif %}
+                <td style="text-align: left; ">{{ d }}</td>
+                {% for t in serie %}
+                  {% with d|make_tuple:t as dt %}
+                    {% with historico|get_historico:dt as h %}
+                      {% if h %}
+                        <td class="med">{{ h.media_final }}</td>
+                        <td class="ch-cell" data-serie="{{ t.id }}">{{ h.grade.carga_horaria_anual }}</td>
+                      {% else %}
+                        <td contenteditable="true" class="med"></td>
+                        <td contenteditable="true" class="ch-cell" data-serie="{{ t.id }}"></td>
+                      {% endif %}
+                    {% endwith %}
+                  {% endwith %}
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          {% endwith %}
+        {% endwith %}
+      {% endfor %}
+      {% for i in "12345" %}
+      <tr>
+        <td colspan="1" class="text-muted text-center"></td>
+        <td contenteditable="true" class="text-start"></td>
+        {% for t in serie %}
+          <td contenteditable="true"></td>
+          <td contenteditable="true" class="ch-cell" data-serie="{{ t.id }}"></td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+
+      
+      <tr>
+        <td colspan="2"><strong>Carga Horária Total</strong></td>
+        {% for t in serie %}
+          <td colspan="2" class="total-ch" data-serie="{{ t.id }}"></td>
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+  
+  <div class="w-auto d-flex justify-content-between">
+    <div class="col bg-primary text-white vertical-align-middle py-1">
+    Legenda das Siglas
+    </div>
+    <div class="col-10 card-body d-flex justify-content-between flex-wrap p-0 px-1 border border-primary">
+      <div class="py-1"><strong>LING</strong> = Linguagens</div>
+      <div class="py-1"><strong>MAT</strong> = Matemática</div>
+      <div class="py-1"><strong>NAT</strong> = Ciências da Natureza</div>
+      <div class="py-1"><strong>HUM</strong> = Ciências Humanas</div>
+      <div class="py-1"><strong>OUT</strong> = Outras</div>
+    </div>
+  </div>
+  <div class="m-3">Quebra de linha -----------------</div>
+
+  <!-- Escolas por onde o aluno passou-->
+<table id="historicoEscolas" class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Série</th>
+      <th>Ano</th>
+      <th>Unidade de Ensino</th>
+      <th>Município/Cidade</th>
+      <th>Estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for h in historico %}
+      <tr>
+        <td>{{ h.aluno.turma.serie }}</td>
+        <td>{{ h.aluno.turma.ano_letivo }}</td>
+        <td>{{ h.aluno.turma.escola }}{% if h.aluno.turma.escola.sigla_escola %} - {{ h.aluno.turma.escola.sigla_escola }}{% endif %}</td>
+        <td>{{ h.aluno.turma.escola.prefeitura.cidade }}</td>
+        <td>{{ h.aluno.turma.escola.prefeitura.estado }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<small class="p-0 m-0 d-block">
+  Observação D. M. O de 08 de abril de 2021, DEC.282/2021, que versa a Resolução SME/CP nº02, de 10 de dezembro de 2020, que institui Diretrizes Nacionais, orientadores para a implantação dos 
+dispostos d Lei nº14.040, de agosto de 2020, que estabelece Normas Educacionais excepcionais a serem adotadas, pelos sistemas de Ensino do Município de Vera Cruz. 
+</small>
+<button type="button" id="adicionarLinha" class="btn btn-sm btn-outline-primary mt-2">
+  + Adicionar Linha
+</button>
+</div>
+
+<!-- Boletim -->
+ <div class="d-flex"> 
+  <!-- esquerdo-->
+  <div class="col">
+    <table>
+      <thead>
+        <tr>
+          <th>Componentes Curriculares</th>
+          {% for t in trimestre %}
+          <th>{{t}}</th>
+          {% endfor %}
+          <th>Nº Faltas</th>
+          <th>Aulas Ministradas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td></td>
+          {% for t in trimestre %}
+          <td>{{t}}</td>
+          {% endfor %}
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- direito -->
+  <div class="col">
+      <table>
+        <thead>
+          <tr>
+            <th>Componentes Curriculares</th>
+            {% for t in trimestre %}
+            <th>{{t}}</th>
+            {% endfor %}
+            <th>Nº Faltas</th>
+            <th>Aulas Ministradas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            {% for t in trimestre %}
+            <td>{{t}}</td>
+            {% endfor %}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- CERTIFICAÇÃO E ASSINATURA -->    
+  </div>
+  <div class="d-flex m-4">
+    <div class="col border bg-info-subtle">
+      <h3 class="text-center m-3">Certificado</h3>
+      <div class="text-justify">
+        Certificamos que o(a) aluno(a) <span><strong>{{matricula}}</strong></span> cursou nesta Unidade de Ensino
+        <span><strong class="text-uppercase">{{matricula.turma.escola}}</strong></span> no ano letivo de <span><strong class="text-uppercase">{{matricula.turma.ano_letivo}}</strong></span>, e logrou aprovação.
+      </div>
+      <div class="text-center m-3 text-end">Vera Cruz, <span><b>{% now "j \d\e F \d\e Y" %}</b></span></div>
+    </div> 
+    
+    
+    <div class="col d-flex pt-5">
+      <div class="col">
+        <div class="text-center">
+          <hr class="bg-black">
+          <strong class="text-capitalize small">{{  request.session.secretario}}</strong>
+          <br>Ass. do(a) secretário(a) escolar 
+        </div>
+      </div>
+      <div class="col">
+        <div class="text-center">
+          <hr class="bg-black">
+          <strong class="text-capitalize small">{{  request.session.diretor}}</strong>
+          <br>Ass. do(a) diretor(a) escolar 
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    function atualizarTotais() {
+      const totalCells = document.querySelectorAll('.total-ch');
+      totalCells.forEach(totalCell => {
+        const serieId = totalCell.getAttribute('data-serie');
+        const chCells = document.querySelectorAll(`.ch-cell[data-serie="${serieId}"]`);
+        let soma = 0;
+
+        chCells.forEach(cell => {
+          const texto = cell.textContent.trim().replace(',', '.'); // aceita vírgula ou ponto
+          const valor = parseFloat(texto);
+          if (!isNaN(valor)) {
+            soma += valor;
+          }
+        });
+
+        totalCell.textContent = soma.toFixed(0); // sem casas decimais
+      });
+    }
+
+    // Recalcular totais quando o conteúdo editável for alterado
+    const chEditaveis = document.querySelectorAll('.ch-cell[contenteditable="true"]');
+    chEditaveis.forEach(cell => {
+      cell.addEventListener('input', atualizarTotais);
+      cell.addEventListener('blur', atualizarTotais);
+    });
+
+    atualizarTotais(); // roda ao carregar
+  });
+</script>
+
+
+<!-- Adiciona Linhas na Tabela e ordena por data-->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const tabela = document.getElementById('historicoEscolas');
+  const tbody = tabela.querySelector('tbody');
+  const botao = document.getElementById('adicionarLinha');
+
+  // Cria uma nova linha editável
+  function criarLinhaVazia() {
+    const tr = document.createElement('tr');
+    tr.classList.add('linha-editavel');
+    for (let i = 0; i < 5; i++) {
+      const td = document.createElement('td');
+      td.contentEditable = true;
+      tr.appendChild(td);
+    }
+    ativarEventosDeRemocao(tr);
+    return tr;
+  }
+
+  // Verifica se a linha está vazia
+  function linhaEstaVazia(tr) {
+    return [...tr.cells].every(td => td.textContent.trim() === '');
+  }
+
+  // Remove linhas vazias (exceto a última)
+  function removerLinhasVazias() {
+    const linhas = Array.from(tbody.querySelectorAll('tr.linha-editavel'));
+    linhas.forEach((linha, index) => {
+      const ehUltima = index === linhas.length - 1;
+      if (linhaEstaVazia(linha) && !ehUltima) {
+        linha.remove();
+      }
+    });
+  }
+
+  // Ordena a tabela por ano (coluna 1 = índice 1)
+  function ordenarPorAno() {
+    const linhas = Array.from(tbody.querySelectorAll('tr'));
+    const naoVazias = linhas.filter(l => !linhaEstaVazia(l));
+
+    naoVazias.sort((a, b) => {
+      const anoA = parseInt(a.cells[1]?.textContent || 0);
+      const anoB = parseInt(b.cells[1]?.textContent || 0);
+      return anoA - anoB;
+    });
+
+    tbody.innerHTML = '';
+    naoVazias.forEach(l => tbody.appendChild(l));
+
+    // Garante pelo menos uma linha vazia
+    if (!tbody.lastElementChild || !linhaEstaVazia(tbody.lastElementChild)) {
+      tbody.appendChild(criarLinhaVazia());
+    }
+  }
+
+  // Adiciona nova linha e reordena
+  function adicionarLinha() {
+    removerLinhasVazias();
+    tbody.appendChild(criarLinhaVazia());
+    ordenarPorAno();
+    tbody.lastElementChild.cells[0].focus();
+  }
+
+  // Ativa remoção e ordenação em cada célula editável
+  function ativarEventosDeRemocao(linha) {
+    linha.querySelectorAll('td').forEach(td => {
+      td.addEventListener('blur', () => {
+        removerLinhasVazias();
+        ordenarPorAno();
+      });
+      td.addEventListener('keydown', e => {
+        if (e.key === 'Tab' || e.key === 'Enter') {
+          setTimeout(() => {
+            removerLinhasVazias();
+            ordenarPorAno();
+          }, 10);
+        }
+      });
+    });
+  }
+
+  // Inicializa eventos em linhas existentes
+  Array.from(tbody.querySelectorAll('tr')).forEach(linha => {
+    if (!linha.classList.contains('linha-editavel')) {
+      linha.classList.add('linha-editavel');
+    }
+    ativarEventosDeRemocao(linha);
+  });
+
+  // Evento botão
+  botao.addEventListener('click', adicionarLinha);
+
+  // Inicial
+  ordenarPorAno();
+});
+</script>
+
+
+
+
+
+
+                 
+  </div>
+</div>  
+{% include "Escola/partials/modal_partials/modal_bottom.html" %}   

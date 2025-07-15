@@ -1,0 +1,31 @@
+<!--Iniciar tabs verticais com opções dos professores-->
+<div class="row  pt-3 bg-dark-subtle w-100 ml-1">
+    <div class="col-2">
+      <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        <button class="nav-link active" id="v-pills-home-tab" data-toggle="pill" data-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">Disponível à escola em {{request.session.anoLetivo_nome}}</button>
+        <button class="nav-link" id="v-pills-profile-tab" data-toggle="pill" data-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false">Não Vinculados</button>
+        <!--<button class="nav-link" id="v-pills-messages-tab" data-toggle="pill" data-target="#v-pills-messages" type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false">Messages</button>
+        <button class="nav-link" id="v-pills-settings-tab" data-toggle="pill" data-target="#v-pills-settings" type="button" role="tab" aria-controls="v-pills-settings" aria-selected="false">Settings</button>-->
+      </div>
+    </div>
+    <div class="col-10">
+      <div class="tab-content" id="v-pills-tabContent">
+        <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+          {% include "Escola/partials/partials_professores/context_people.html" %}
+        </div>
+        <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+          {% include "Escola/partials/partials_professores/context_people_exclude.html" %}
+          <hr>
+          <div class="border border-danger p-2 bg-danger-subtle">
+          <h3>Sem vínculos (Contrato, Decreto ou Estágio) para o ano letivo de {{request.session.anoLetivo_nome}}</h3>
+          <p class='p-0 m-1 fs-7 text-justify'>
+            Aqui estão todas as pessoas registradas no sistema que não possuem contratos ativos para o ano letivo atual. Pode haver situações em que algumas delas tiveram seus contratos renovados para o próximo ano. Nestes casos, é necessário refazer a vinculação contratual clicando no botão "Definir Vínculo".
+          </p>
+          {% include "Escola/partials/partials_professores/falta_definir_vinculo.html" %}
+          </div>
+        </div>
+        <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">...</div>
+        <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">...</div>
+      </div>
+    </div>
+  </div>              

@@ -1,0 +1,94 @@
+<style>
+    dialog {
+        border: none;
+        border-radius: 8px;
+        padding: 20px;
+        width: 90%;
+        max-width: 800px;
+    }
+    
+    dialog::backdrop {
+        background: rgba(0, 0, 0, 0.5);
+    }
+    
+    h2 {
+        margin-top: 0;
+    }
+    
+    .dialog-content {
+        margin-bottom: 20px;
+    }
+    
+    .btn-close {
+        margin-top: 10px;
+    }
+    li strong:first-child{
+        text-transform: uppercase;
+    }
+    strong{
+        font-weight: 800;
+    }
+</style>
+
+<div class="container mt-3 mb-0">
+    <button id="openDialog" class="btn btn-primary"> <i class="fa-sharp-duotone fa-solid fa-comments-question-check"></i> Abrir Instruções para saber como utilizaro botão "add Profissionais <i class="fa-solid fa-plus"></i>"</button>
+    <dialog id="instructionsDialog">
+        <h2>Instruções para o Uso do Botão "Add Profissionais <i class="fa-solid fa-plus"></i>"</h2>
+        <div class="container mt-4">
+            <div class="alert alert-info" role="alert">
+                <strong>Instruções para o Uso do Botão "<a class='btn btn-success m-2 ' href="{% url "Gestao_Escolar:Professores_Pessoa_create" %}">Add Profissionais <i class="fa-solid fa-plus"></i></a>"</strong>
+            </div>        
+            <p>Por favor, siga estas diretrizes ao utilizar o botão "Add Profissionais" no formulário:</p>
+        
+            <ol class="list-group list-group-numbered">
+                <li class="list-group-item">
+                    <strong>Função do Botão "Add Profissionais":</strong> O botão "Add Profissionais" tem a função específica de adicionar profissionais à lista disponível nos campos destacados do formulário. Ele deve ser utilizado apenas para incluir novos profissionais que não estão presentes na lista atual ou se não houver nenhum profissional listado nos campos selecionados.
+                </li>
+                
+                <li class="list-group-item">
+                    <strong>Quando Clicar em "Add Profissionais":</strong>
+                    <ul class="list-group mt-2">
+                        <li class="list-group-item">
+                            <strong>Campo "Selecione o professor":</strong> Clique no botão apenas se o professor que você procura não estiver na lista de opções. Se o professor desejado já estiver listado, selecione-o diretamente.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Campo "Selecione o professor se houver necessidade de atribuir mais um professor":</strong> Utilize o botão se o professor adicional necessário não estiver disponível na lista atual.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Campo "Selecione professores de Reserva Técnica":</strong> Caso precise adicionar professores de reserva técnica que não estão na lista, use o botão para adicioná-los.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Campo "Selecione os auxiliares de classe":</strong> Se houver auxiliares de classe que não estão disponíveis na lista, clique no botão para incluí-los.
+                        </li>
+                    </ul>
+                </li>
+                
+                <li class="list-group-item">
+                    <strong>Não Utilize o Botão Se:</strong>
+                    <ul class="list-group mt-2">
+                        <li class="list-group-item">Já houver um profissional listado nos campos destacados.</li>
+                        <li class="list-group-item">O profissional que você procura já estiver presente na lista disponível.</li>
+                    </ul>
+                </li>
+            </ol>
+        
+            <p class="mt-3">O objetivo do botão é garantir que você possa adicionar profissionais que não estão disponíveis na lista atual, mantendo os dados atualizados e completos. Agradecemos a sua atenção e colaboração para o correto preenchimento do formulário.</p>
+        </div>
+        
+        <button id="closeDialog" class="btn btn-secondary btn-close">Fechar</button>
+    </dialog>
+</div>
+
+<script>
+    const dialog = document.getElementById('instructionsDialog');
+    const openButton = document.getElementById('openDialog');
+    const closeButton = document.getElementById('closeDialog');
+
+    openButton.addEventListener('click', () => {
+        dialog.showModal(); // Abre a caixa de diálogo como modal
+        });
+
+    closeButton.addEventListener('click', () => {
+        dialog.close(); // Fecha a caixa de diálogo
+        });
+</script>

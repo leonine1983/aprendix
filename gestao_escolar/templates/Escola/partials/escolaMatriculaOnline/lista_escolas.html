@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Escolas</title>
+</head>
+<body>
+    <h1>Lista de Escolas</h1>
+    <a href="{% url 'adicionar_escola' %}">Adicionar Nova Escola</a>
+    <ul>
+        {% for escola in escolas %}
+            <li>
+                {{ escola }} - 
+                <a href="{% url 'editar_escola' pk=escola.pk %}">Editar</a> | 
+                <a href="{% url 'deletar_escola' pk=escola.pk %}">Deletar</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,67 @@
+{% load static %}
+{% if not request.session.escola %} 
+      <!-- Modal   -->
+      <div class="modal fade" id="modalExemplo" tabindex="-1" aria-labelledby="modalExemploLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalExemploLabel">Bem-vindo, <span>Prof. {{request.user.first_name}} {{request.user.last_name}}</span>!</h5>
+            </div>
+            <div class="modal-body">
+
+              <div class="container mt-2 shadow shadow-sm p-4">
+                <h2 class="mb-4">Seleciona Escola</h2>
+                <div class="alert alert-info" role="alert">
+                  <strong>Atenção:</strong> Antes de continuar, é necessário selecionar a <strong>escola</strong> e o <strong>ano letivo</strong> em que você irá desempenhar suas atividades como docente aqui no <strong>Aprendix</strong>.
+                </div>        
+                <form method="post" action="{% url 'modulo_professor:sessaoEscola' %}">
+                    {% csrf_token %}
+                    
+                    <!-- Select para Escola / Grade do Professor -->
+                    <div class="mb-3">
+                        <label for="escola" class="form-label">Selecione a Escola / Disciplina</label>
+                        <select id="escola" name="escola" class="form-select" required>
+                            {% for escola in professor %}
+                                <option value="{{ escola.turma.escola.id }}">{{ escola.turma.escola}} </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+        
+                    <!-- Select para Ano Letivo -->
+                    <div class="mb-3">
+                        <label for="ano" class="form-label">Selecione o Ano Letivo</label>
+                        <select id="ano" name="ano" class="form-select" required>
+                            {% for a in anoLetivo %}
+                                <option value="{{ a.id }}">{{ a.ano}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+        
+                    <button type="submit" class="btn btn-primary">Iniciar</button>
+                </form>
+            </div>
+
+            </div>
+            <!-- foooter -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Scripts do Bootstrap e inicialização do modal -->
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+      <!--<script>
+        document.addEventListener('DOMContentLoaded', function () {
+          var myModal = new bootstrap.Modal(document.getElementById('modalExemplo'));
+          myModal.show();
+        });
+      </script> -->
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          var myModal = new bootstrap.Modal(document.getElementById('modalExemplo'), {
+            backdrop: 'static', // Impede o fechamento ao clicar fora
+            keyboard: false      // Impede o fechamento com a tecla Esc
+          });
+          myModal.show();
+        });
+      </script>
+      {% endif %}

@@ -1,0 +1,161 @@
+{% load static %}
+<style>
+    #openDialog_matriculaOnline {
+        position: fixed; /* Fixa o elemento na tela */
+        top: 25%; /* 30% do topo da tela */
+        right: 1%; /* Alinha o elemento à direita */
+        z-index: 9999; /* Garante que o elemento fique sobre todos os outros */
+        background-color: rgba(148, 190, 127, 0.9); /* Fundo alaranjado semi-transparente */
+        padding: 10px; /* Espaçamento interno */
+        color: rgb(36, 1, 1); /* Cor do texto */
+        border-radius: 5px; /* Bordas arredondadas */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombras para profundidade */
+        
+        /* Animação de pulsação */
+        animation: pulse 2s infinite; /* Aplique a animação de pulsação */
+    }
+    
+    /* Efeito de pulsação (aumentar de tamanho) */
+    @keyframes pulse {
+        0% {
+            transform: scale(1); /* Tamanho normal */
+        }
+        50% {
+            transform: scale(1.1); /* Aumenta 10% do tamanho */
+        }
+        100% {
+            transform: scale(1); /* Volta ao tamanho original */
+        }
+    }
+    
+    /* Efeito de piscar (opacidade) */
+    @keyframes blink {
+        0% {
+            opacity: 1; /* Visível */
+        }
+        50% {
+            opacity: 0; /* Invisível */
+        }
+        100% {
+            opacity: 1; /* Visível novamente */
+        }
+    }
+    
+    /* Aplicar animação de piscar */
+    #openDialog_matriculaOnline.blink {
+        animation: blink 1s infinite; /* Animação de piscar */
+    }
+    
+.imgMatricula {
+    position: absolute; /* Posiciona a imagem acima do botão */
+    top: -90px; /* Ajusta a distância entre a imagem e o botão, pode ser ajustado */
+    width: 100px; /* Tamanho da imagem (ajuste conforme necessário) */
+    height: auto; /* Mantém a proporção da imagem */
+    left:1%;
+}
+ #cke_id_pendecia div div, #cke_id_pendecia div , #cke_id_pendecia {
+    padding: 0!important;
+}
+label{
+    text-transform: none!important;
+}
+#form_pendencia {
+    position: relative;
+    padding-top: 30px; /* Adicionando um padding para garantir que o texto não sobreponha o conteúdo */
+    border: 1px solid #ddd; /* Bordas para a div */
+    border-radius: 8px; /* Arredondando as bordas da div para um visual mais suave */
+    margin-top: 5rem!important;
+}
+
+#form_pendencia::before {
+    content: "Use o formulário abaixo para sinalizar que a matrícula não pode ser confirmada";
+    position: absolute;
+    top: -15px; /* Posicionando o texto ligeiramente acima da borda superior */
+    left: 10px; /* Colocando o texto um pouco afastado da borda esquerda */
+    right: 10px; /* Garantindo que o texto não ultrapasse a borda direita */
+    background-color: #af48f3; /* Fundo leve para destacar o texto */
+    padding: 8px 12px; /* Espaçamento interno para o texto */
+    color: #eee7e7; /* Cor do texto */
+    font-size: 14px; /* Tamanho de fonte adequado */
+    border-radius: 8px 8px 0 0; /* Arredondando os cantos superiores para combinar com a borda da div */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Adicionando sombra para dar um destaque */
+}
+
+</style>
+
+    {% if escolaMatriculaOnline|length >= 1 %}
+        <button id="openDialog_matriculaOnline" title='Matrícula Pública' class='border-0  btn btn-sm  btn-light' style='margin:0 -1rem -1rem'>
+            <img class='imgMatricula' src="{% static 'matONline.png' %}" alt="">
+            ATENÇÃO! Matriculas Públicas   <br>
+        </button>
+
+        <dialog id="instructions_matriculaOnline" class="w-75 mt-5">
+            <div class="alert  alert-dismissible fade show" role="alert">
+                {{request.session.escola_MatriculaPublica}}
+            </div>
+            <div class="container mt-4">        
+                <!-- genero--> 
+                <div class="container mt-4">
+                    <div class="alert alert-info" role="alert">
+                        <h4 class="alert-heading">Atenção às Matrículas Realizadas</h4>
+                        <p>A tabela abaixo contém todas as matrículas públicas feitas para a escola. 
+                            É importante que as matrículas sejam analisadas com atenção, pois cada aluno foi alocado com base na série escolhida no momento da matrícula online. 
+                            Após a verificação, é necessário remanejar os alunos para uma das turmas disponíveis na escola, conforme a série indicada.</p>
+                        <hr>
+                        <p class="mb-0">Por favor, verifique e atualize as informações para um melhor gerenciamento das turmas.</p>
+                    </div>
+                    
+                    <table class="table table-bordered table-striped mt-3">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Série</th>
+                                <th scope="col">Aluno</th>
+                                <th scope="col">Data da Matrícula</th>
+                                <th scope="col">Remanejamento</th>
+                                <th>Situação</th>
+                            </tr>                    
+                        </thead>
+                        <tbody>
+                            {% for e in escolaMatriculaOnline %}
+                                <tr>  
+                                    <td>{{ e.serie }}</td>
+                                    <td class="text-uppercase">{{ e.aluno }}</td>
+                                    <td class="text-uppercase">{{ e.data_matricula }}</td>
+                                    <td class="text-uppercase">
+                                        <!--TD dialog-->
+                                        <a href="{% url 'Gestao_Escolar:matricular_confirma_impugna' e.id %}"class='border-0 btn btn-sm btn-secondary'><i class="fa-regular fa-address-book"></i> Vê documentação do aluno</a>
+                                        <!--end Ativa e desativa form para IMPUGNAR MATRICULA -->
+                                        <!--fim TD dialog-->
+                                    </td>
+                                    <td>
+                                        {% if e.impugnar %}
+                                            <span class='fw-bold text-secondary'>Matricula com Incosistências:</span></br>
+                                            {{e.pendecia|safe}}
+                                            {% else %}
+                                            Aguardando..
+                                        {% endif %}
+                                    </td>
+                                </tr>                                    
+                            {% endfor %}                                  
+                        </tbody>
+                    </table>                   
+                </div>  
+            </div>                    
+            <button id='closeDialog_matriculaOnline'class="btn btn-secondary mt-5">Fechar</button>
+        </dialog>  
+
+        <!-- Abertura do dialog principal -->
+        <script>
+            const dialog_matriculaOnline= document.getElementById('instructions_matriculaOnline');
+            const openButton_matriculaOnline = document.getElementById('openDialog_matriculaOnline');
+            const closeButton_matriculaOnline = document.getElementById('closeDialog_matriculaOnline');
+        
+            openButton_matriculaOnline.addEventListener('click', () => {
+                dialog_matriculaOnline.showModal(); // Abre a caixa de diálogo como modal
+                });
+        
+            closeButton_matriculaOnline.addEventListener('click', () => {
+                dialog_matriculaOnline.close(); // Fecha a caixa de diálogo
+                });
+        </script> 
+    {% endif %}   

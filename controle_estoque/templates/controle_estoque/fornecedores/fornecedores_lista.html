@@ -1,0 +1,70 @@
+{% extends 'global/template.html' %}
+{% load static %}
+{% block css %}
+.modal-sheet .modal-dialog {
+    width: 380px;
+    transition: bottom .75s ease-in-out;
+  }
+  .modal-sheet .modal-footer {
+    padding-bottom: 2rem;
+  }
+
+{% endblock css %}
+{% block menu_horizontal %}
+<!--Menu horizontal Local-->
+{% include 'global/partials/breadcrumbs/index.html' %}
+
+{% endblock menu_horizontal %}
+{% block main %}
+<div class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalTour">
+  <div class="d-flex bg-body-secondary p-2 ">
+    <h2 class='raleway'>{{svg|safe}} {{title}}</h2> <a class="ml-5 w-50 " href="{% url 'controle_estoque:fornecedor_CreateVies' %}"><button type="button" class="btn btn-primary btn-sm mt-2" onclick="">Adicionar <svg xmlns="http://www.w3.org/2000/svg" class=" text-light " height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg></button></a>
+  </div>
+      <div class="modal-content rounded-4 shadow">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nome da Empresa</th>
+            <th scope="col">Código</th>
+            <th scope="col">CNPJ</th>
+            <th scope="col">Telefone</th>
+            <th scope="col">AÇÕES</th>
+          </tr>
+          </thead>
+          <tbody>
+            {% for n in object_list %}
+          <tr>            
+            <th scope="row">{{n.pk}}</th>
+            <td>{{n.nome}}</td>
+            <td>{{n.codigo}}</td>
+            <td>{{n.cnpj}}</td>
+            <td>{{n.telefone}}</td>
+            <td class=''>
+              <a href="{% url 'controle_estoque:fornecedor_UpdateView' n.pk %}" class='pt-0' title='Editar'>
+                <span class="material-symbols-outlined  text-primary ">edit_square</span></a> 
+              <a href="{% url 'controle_estoque:fornecedor_DeleteViews' n.pk %}" title='Excluir'> 
+                <span class="material-symbols-outlined text-danger">delete</span>
+              </a></td>
+          </tr>  
+          {% endfor %}        
+          </tbody>
+        </table>        
+      </div>
+    
+  </div>
+{% endblock main %}
+{% block script %}
+
+      
+</script>
+
+ 
+<script>
+        // In your Javascript (external .js resource or <script> tag)
+    $(document).ready(function() {
+        $('#id_bairro').select2();
+        $('#id_rua').select2();
+    });
+</script>
+{% endblock script %}

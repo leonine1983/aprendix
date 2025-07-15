@@ -1,0 +1,149 @@
+{% include "Escola/partials/modal_partials/modal_top.html" %}
+      <section>
+        <h2> {{request.session.escola_nome_query.prefeitura}}</h2>      
+      </section>  
+      {% block content %}
+      <div class="w-100 py-5">
+        <div class="">
+          <form method="post" enctype="multipart/form-data" id="prefeituraForm">
+            {% csrf_token %}
+            <!-- GRID: duas colunas (empilha em telas xs) -->
+            <section class="d-flex g-3">
+              <!-- Coluna 1 -->
+              <div class="col-12 col-md-6 shadow-none">
+                <label for="{{ form.nome.id_for_label }}" class="form-label">Nome</label>
+                {{ form.nome }}
+
+                <label for="{{ form.instituto.id_for_label }}" class="form-label mt-3">Instituição</label>
+                {{ form.instituto }}
+
+                <label for="{{ form.endereco.id_for_label }}" class="form-label mt-3">Endereço</label>
+                {{ form.endereco }}
+
+                <label for="{{ form.pessoa_publica.id_for_label }}" class="form-label mt-3">Pessoa Pública</label>
+                {{ form.pessoa_publica }}
+                <label for="{{ form.cidade.id_for_label }}" class="form-label">Cidade</label>
+                {{ form.cidade }}
+
+                <label for="{{ form.estado.id_for_label }}" class="form-label mt-3">Estado</label>
+                {{ form.estado }}
+              </div>
+
+              <!-- Coluna 2 -->
+              <section class="col-12 col-md-6">   
+                <label class="form-label mt-3">Brasão da Prefeitura</label>
+                <!-- Pré‑visualização / imagem já existente -->
+                <section id="preview-wrapper" class="mb-3">
+                  {% if object and object.brasao %}
+                    <img id="preview-image"
+                        src="{{ object.brasao.url }}"
+                        alt="Brasão atual"
+                        class="img-thumbnail"
+                        style="max-height: 200px;">
+                  {% else %}
+                    <img id="preview-image"
+                        src=""
+                        alt=""
+                        class="img-thumbnail d-none"
+                        style="max-height: 200px;">
+                  {% endif %}
+                </section>
+
+                <!-- Área drag‑and‑drop -->
+                <div id="dropzone"
+                    class="border border-2 border-primary border-dashed rounded-3 p-4 text-center
+                            d-flex flex-column justify-content-center align-items-center"
+                    style="cursor:pointer;">
+                  <span class="fs-5 mb-2">Arraste a imagem aqui<br>ou clique para escolher</span>
+                  <i class="bi bi-cloud-arrow-up fs-1"></i>
+                  {{ form.brasao }}   {# input escondido (d‑none) #}
+                </div>
+                <div id="file-name" class="mt-2 text-muted small"></div>
+              </div>
+            </section>
+
+            <div class="d-flex justify-content-end mt-4">
+              <button type="submit" class="btn btn-success px-4 py-2 rounded-pill">
+                💾 Salvar
+              </button>
+            </div>
+
+          </form>
+          <hr class='border-black'>
+        </div>
+      </div>
+    
+
+<!-- Bootstrap Icons (somente para o ícone de nuvem) -->
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<script>
+(function () {
+  const dropzone     = document.getElementById('dropzone');
+  const inputFile    = document.getElementById('id_brasao_input');
+  const fileNameEl   = document.getElementById('file-name');
+  const previewImg   = document.getElementById('preview-image');
+  const previewWrap  = document.getElementById('preview-wrapper');
+
+  /* helpers */
+  function showPreview(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      previewImg.src = e.target.result;
+      previewImg.classList.remove('d-none');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* clique na área → diálogo */
+  dropzone.addEventListener('click', () => inputFile.click());
+
+  /* seleção via diálogo */
+  inputFile.addEventListener('change', () => {
+    if (inputFile.files.length) {
+      fileNameEl.textContent = inputFile.files[0].name;
+      showPreview(inputFile.files[0]);
+    }
+  });
+
+  /* comportamento drag */
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt =>
+    dropzone.addEventListener(evt, e => e.preventDefault())
+  );
+  ['dragenter', 'dragover'].forEach(evt =>
+    dropzone.addEventListener(evt, () => dropzone.classList.add('bg-primary','bg-opacity-10'))
+  );
+  ['dragleave', 'drop'].forEach(evt =>
+    dropzone.addEventListener(evt, () => dropzone.classList.remove('bg-primary','bg-opacity-10'))
+  );
+
+  /* soltar arquivo */
+  dropzone.addEventListener('drop', e => {
+    inputFile.files = e.dataTransfer.files;
+    fileNameEl.textContent = inputFile.files[0].name;
+    showPreview(inputFile.files[0]);
+  });
+})();
+</script>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    </div>
+</div>
+{% include "Escola/partials/utils/dragDrop.html" %}

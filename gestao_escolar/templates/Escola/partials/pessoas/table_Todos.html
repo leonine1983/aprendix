@@ -1,0 +1,173 @@
+<style>
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table th, .table td {
+    padding: 5px;
+    vertical-align: middle !important;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    font-size: 0.7rem;
+}
+.table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+.table-striped tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+.btn-primary {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    background-color: #0078d4;
+    border-color: #0078d4;
+    border-radius: 4px;
+}
+.btn-primary:hover {
+    background-color: #005a9e;
+    border-color: #005a9e;
+}
+.e_aniversario {
+    background-color: #ffeb3b;
+    color: #f44336;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-weight: bold;
+}
+.table td:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+</style>
+
+<div class="container m-0 w-100">
+    {% include "Escola/partials/mensagens.html" %}
+    <div class="alert alert-info fs-6" style="min-width: 85vw;">
+        <h4 class="alert-heading">Instruções para Criação de Contrato no Aprendix </h4>
+        <p>Após cadastrar uma pessoa no sistema Aprendix, é fundamental que você crie o contrato correspondente para o ano letivo. Para isso, siga os passos abaixo:</p>
+        <ol>
+            <li><strong>Localize o cadastro na tabela abaixo:</strong> Encontre a pessoa que você acabou de cadastrar.</li>
+            <li><strong>Criar Contrato:</strong> Clique na opção “Criar + [ano letivo]” para iniciar a elaboração do contrato.</li>
+        </ol>
+        <p>Certifique-se de preencher todas as informações necessárias e revisar os dados antes de finalizar o processo. Isso garantirá que o contrato esteja correto e completo, evitando possíveis problemas futuros.</p>
+    </div>
+</div>
+
+<div class="table-responsive" style="overflow-x:auto;" >
+    <table class="table table-striped table-bordered ">
+        <thead class="table-light">
+            <tr>
+                <th>Ordem</th>
+                <th>Nome completo</th>
+                <th>Gênero Sexual</th>
+                <th>Data Nascimento</th>
+                <th>Idade</th>
+                <th>RG</th>
+                <th>Login Aprendix</th>
+
+                <th>Último Contrato</th>
+                <th><i class="fa-regular fa-book-copy" title="Ver todos os contratos da pessoa"></i><br> Contratos</th>
+                <th><i class="fa-duotone fa-solid fa-school-flag" title="Vinculado a escolar {{request.session.escola_nome}}?"></i> <br> Encaminhamentos</th>
+                <th><i class="fa-duotone fa-solid fa-chalkboard-user" title="Professor?"></i></th>
+                <th>Decretos</th>
+
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for l in pessoas %}
+            <tr>
+                <td>{{forloop.counter}}</td>
+                <td class="text-uppercase text-start">{{l.nome}} {{l.sobrenome}}</td>
+                <td>{% if l.sexo %}{{l.sexo}}{% else %}Não especificou{% endif %}</td>
+                <td>
+                    {{ l.data_nascimento }} 
+                    {% if l.e_aniversario_hoje %}
+                    <span class="e_aniversario btn border">
+                        <i class="fa-thin fa-balloons"></i> Aniversariante 
+                        <i class="fa-sharp-duotone fa-solid fa-cake-candles"></i>
+                    </span>
+                    {% endif %}
+                </td>
+                <td>{{l.idade}}</td>
+                <td>{{l.rg}}</td>
+                <td class='fw-bold'>{{l.login_professor}}</td>
+
+                <!--Último Contrato-->
+                <td>
+                    {% if l.pessoa_contratada.last.ano_contrato.ano %}
+                        {% if request.session.anoLetivo_nome == l.pessoa_contratada.last.ano_contrato.ano %} 
+                            <i class="fa-duotone fa-solid fa-check fa-beat text-success fs-4" title="Contratado para ano letivo de {{request.session.anoLetivo_nome}}?"></i> 
+                            {{l.pessoa_contratada.last.ano_contrato.ano}}                                    
+                        {% else %}
+                            {{l.pessoa_contratada.last.ano_contrato.ano}} 
+                            <a class='btn btn-primary p-1 fs-8' href="{% url 'Gestao_Escolar:pessoasContrato-create' l.id %}">Criar <i class="fa-solid fa-plus"></i> {{request.session.anoLetivo_nome}}</a>
+                        {% endif %} 
+                    {% else %}
+                        <!--Não há nenhum contrato  -->
+                        <a class='btn btn-primary p-1 fs-8' href="{% url 'Gestao_Escolar:pessoasContrato-create' l.id %}">Criar <i class="fa-solid fa-plus"></i> {{request.session.anoLetivo_nome}}</a>
+                    {% endif %}  
+                </td>
+
+                <!--Contratos-->
+                <td>{% include "Escola/partials/pessoas/anos_contratos.html" %}</td>
+
+                <!--Encaminhamentos-->
+                <td>
+                    {% if l.pessoa_contratada.last.ano_contrato.ano %} 
+                        {% if request.session.anoLetivo_nome == l.pessoa_contratada.last.ano_contrato.ano %}
+                            {% for e in l.pessoa_contratada.last.encaminhamento_escolar.all %}
+                                {% if e.encaminhamento.ano_contrato.ano == request.session.anoLetivo_nome %}
+                                <div>                                            
+                                    {{e.destino.nome_escola}} 
+                                </div>
+                                <a class='btn btn-primary p-1 fs-8' href="{% url 'Gestao_Escolar:encaminha_escola' l.id %}"><i class="fa-solid fa-plus"></i> add Escola</a>
+                                {% endif %}
+                            {% endfor %}                                   
+                        {% endif %}
+                        
+                        {% if not request.session.anoLetivo_nome == l.pessoa_contratada.last.ano_contrato.ano %}
+                            <a title= "Profissional ainda não contratado em {{request.session.anoLetivo_nome}}. Antes de encaminhá-lo, é necessário efetuar a contratação." class='btn btn-primary p-1 fs-8' href="{% url 'Gestao_Escolar:pessoasContrato-create' l.id %}">Criar <i class="fa-solid fa-plus"></i> {{request.session.anoLetivo_nome}}</a>                                                                            
+                        {% endif %}
+                        
+                    {% endif %}
+                </td>
+                <!-- É professor? -->
+                <td>{{l.pessoa_contratada.last.encaminhamento_escolar.last.profissao}}</td>
+
+                <!-- Decretos -->
+                <td>
+                    {% if l.decreto_profissional.first %}
+                            {% for d in l.decreto_profissional.all  %}
+                                {{ d.destino}} | {{d.profissao}}
+                            {% endfor %}
+                        {% else %}
+                            Nenhum decreto
+                    {% endif %}
+                </td>
+                
+                <td>
+                    <!-- Deletar Pessoa -->
+                    {{l.pessoa_contratada.first.encaminhamento_escolar.first.gradeProfessor1_related.first}} 
+                    {% if  l.pessoa_contratada.first.encaminhamento_escolar.first.gradeProfessor1_related.first %}
+                        {% if not l.pessoa_contratada.first.encaminhamento_escolar.first.gradeProfessor2_related.first %}
+                            {% if not l.pessoa_contratada.first.encaminhamento_escolar.first.reservaTecnica_related.first %}
+                                {% if not l.pessoa_contratada.first.encaminhamento_escolar.first.auxiliarClasse_related.first %}
+                                    <a href="{% url 'Gestao_Escolar:pessoas-delete' l.pk %}" title='Deletar informações pessoais' class='p-2  border link-danger'>
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                    <!-- Update Pessoa -->
+                    <a href="{% url 'Gestao_Escolar:pessoas-update' l.pk %}" title='Editar informações pessoais' class='p-2 border'>
+                        <i class="fa-duotone fa-solid fa-user-pen"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

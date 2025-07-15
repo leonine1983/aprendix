@@ -1,0 +1,1 @@
+from .imagem_p_docx import *

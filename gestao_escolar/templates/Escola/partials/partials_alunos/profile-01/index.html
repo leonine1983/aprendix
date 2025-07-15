@@ -1,0 +1,455 @@
+{% load static %}
+{% load meus_filtros %}
+<style>
+  /* Paleta com cores suaves e equilibradas, tons de verde, azul e vermelho */
+
+  /* Fundo branco suave */
+  .bg-white {
+    background-color: #f0f4f3 !important; /* branco suavizado, menos "brilhante" */
+  }
+
+  /* Header */
+  .profile__header {
+    background-color: #5a8a7f; /* verde-acinzentado médio */
+    border-color: #3a6150 !important; /* verde escuro, contraste */
+  }
+
+  /* Texto principal */
+  .text-primary {
+    color: #2c4a72 !important; /* azul escuro moderado */
+  }
+
+  .text-success {
+    color: #3a6b53 !important; /* verde escuro agradável */
+  }
+
+  .text-info {
+    color: #51708a !important; /* azul acinzentado médio */
+  }
+
+  .text-secondary {
+    color: #7a4e4e !important; /* vermelho-terra suave */
+  }
+
+  .border-info-subtle {
+    border-color: #9ab4bb !important; /* azul acinzentado claro */
+  }
+
+  .border-primary {
+    border-color: #2c4a72 !important; /* azul escuro moderado */
+  }
+
+  /* Botões e links */
+  .nav-link.active {
+    color: #3a6b53 !important; /* verde escuro */
+    border-color: #3a6b53 !important;
+  }
+
+  .nav-link {
+    color: #51708a !important; /* azul acinzentado */
+  }
+
+  /* Tabs container */
+  .tabs-wrapper {
+    border-bottom: 2px solid #3a6b53 !important; /* verde escuro */
+  }
+
+  /* Avatar border */
+  .profile__avatar img {
+    border-color: #3a6b53 !important; /* verde escuro */
+  }
+
+  /* Lista */
+  ul.list-unstyled li b {
+    color: #2c4a72; /* azul escuro moderado */
+  }
+
+  ul.list-unstyled li span {
+    color: #51708a; /* azul acinzentado médio */
+  }
+
+  /* Social links */
+ .social-links a {
+  transition: color 0.3s;
+}
+
+/* Github: tom suave do preto */
+.social-links a .fa-github {
+  color: #333333;
+}
+.social-links a:hover .fa-github {
+  color: #6e5494; /* roxo GitHub */
+}
+
+/* LinkedIn: azul oficial */
+.social-links a .fa-linkedin {
+  color: #0077b5;
+}
+.social-links a:hover .fa-linkedin {
+  color: #0a66c2;
+}
+
+/* Twitter (X): azul */
+.social-links a .fa-x-twitter {
+  color: #1DA1F2;
+}
+.social-links a:hover .fa-x-twitter {
+  color: #0d95e8;
+}
+
+/* Instagram: gradiente pode ser difícil, usar um tom próximo */
+.social-links a .fa-instagram {
+  color: #C13584; /* rosa magenta */
+}
+.social-links a:hover .fa-instagram {
+  color: #E1306C; /* tom mais vivo */
+}
+
+/* YouTube: vermelho */
+.social-links a .fa-youtube {
+  color: #FF0000;
+}
+.social-links a:hover .fa-youtube {
+  color: #cc0000;
+}
+
+/* Link genérico: azul escuro */
+.social-links a .fa-link {
+  color: #34568B;
+}
+.social-links a:hover .fa-link {
+  color: #5472d3;
+}
+
+
+  /* Responsividade simplificada para mobile */
+  @media (max-width: 576px) {
+    .profile__header {
+      flex-direction: column !important;
+      text-align: center;
+      gap: 1rem;
+    }
+    .profile__avatar img {
+      width: 50% !important;
+    }
+    .text-end {
+      text-align: center !important;
+    }
+  }
+</style>
+
+<!-- O resto do seu HTML permanece igual -->
+<div class="p-3 w-75 m-auto bg-white shadow rounded-4 border border-info-subtle">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'profile-01/style.css' %}">
+
+    <header class="profile__header d-flex justify-content-between align-items-center rounded-3 border-bottom mb-3">
+        <div class="profile__highlight__wrapper text-success">
+            <div class="profile__highlight fw-semibold d-flex align-items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-school text-primary" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M22 9l-10 -4l-10 4l10 4l10 -4v6" />
+                    <path d="M6 10.6v5.4a6 3 0 0 0 12 0v-5.4" />
+                </svg>
+                {{ object.sexo.nome }}
+            </div>
+            <span class="text-secondary small" style='color:#fff!important'>Estudante</span>
+        </div>
+
+        <div class="profile__avatar text-center">
+            {% if object.sexo.nome == 'Masculino' %}
+                <img src="{% static 'man.png' %}" class="object-fit-cover rounded-circle w-75 border p-1" loading="lazy">
+            {% else %}
+                <img src="{% static 'woman.png' %}" class="object-fit-cover rounded-circle w-75 border p-1" loading="lazy">
+            {% endif %}
+        </div>
+
+        <div class="profile__highlight__wrapper text-info text-center">
+            <div class="profile__highlight fw-semibold d-flex align-items-center justify-content-center gap-2" >
+                {% if object.idade < 2 %}
+                    <i class="fa-solid fa-baby-carriage fs-5"></i>
+                {% elif object.idade < 12 %}
+                    <i class="fa-solid fa-child fs-5"></i>
+                {% elif object.idade < 18 %}
+                    <i class="fa-solid fa-child-reaching fs-5"></i>
+                {% else %}
+                    <i class="fa-solid fa-user fs-5"></i>
+                {% endif %}
+                {{ object.idade }} anos
+            </div>
+            <span class="text-secondary small" style='color:#fff!important'>
+                {% if object.idade < 2 %}
+                    Etapa creche
+                {% elif object.idade < 12 %}
+                    Criança
+                {% elif object.idade < 18 %}
+                    Adolescente
+                {% else %}
+                    Adulto
+                {% endif %}
+            </span>
+        </div>
+    </header>
+
+    <div class="profile__name text-center mb-3">
+        <h2 class="text-uppercase h4 text-primary fw-bold">
+            {{ object }}
+            <img src="{% static 'profile-01/assets/verified.svg' %}" alt="Verificado">
+        </h2>
+        <p class="text-secondary mb-0">{{ object.related_matricula_alunos.first.turma }} {{ object.related_matricula_alunos.first.turma.ano_letivo }}</p>
+    </div>
+
+
+    
+
+
+ <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0d6efd;
+      --background: #f5f7fa;
+      --card-bg: #ffffff;
+      --text-dark: #212529;
+      --text-muted: #6c757d;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+   
+    .tab-container {
+      max-width: 900px;
+      margin: auto;
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #dee2e6;
+      background: #fff;
+    }
+
+    .tabs a {
+      flex: 1;
+      text-align: center;
+      padding: 1.2rem;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .tabs a.active {
+      color: var(--primary);
+      background-color: #f9fafc;
+    }
+
+    .tabs a.active::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 30%;
+      width: 40%;
+      height: 3px;
+      background-color: var(--primary);
+      border-radius: 8px;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 2rem 2.5rem;
+      animation: fadeIn 0.3s ease-in-out;
+
+      min-height:60rem;
+    }
+
+    .tab-content--active {
+      display: block;
+    }
+
+    .info-row {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 1rem;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .info-value {
+      color: var(--text-dark);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .info-row {
+        grid-template-columns: 1fr;
+      }
+      .tabs a {
+        padding: 1rem 0.5rem;
+        font-size: 0.95rem;
+      }
+    }
+  /* Cores diferentes para cada tabela de trimestre */
+  .trimestre-1 table {
+    background-color: #f1f8ff;
+  }
+  .trimestre-2 table {
+    background-color: #fff8e1;
+  }
+  .trimestre-3 table {
+    background-color: #e8f5e9;
+  }
+
+  /* Redução de padding */
+  .table td,
+  .table th {
+    padding: 0.3rem !important;
+    font-size: 0.9rem;
+  }
+
+  /* Cabeçalho mais destacado */
+  .table thead {
+    background-color: #ddd;
+    font-weight: bold;
+  }
+
+  /* Bordas mais suaves */
+  .table {
+    border: 1px solid #ccc;
+  }
+</style>
+
+  <div class="tab-container">
+
+    <div class="tabs">
+      <a id="tab1" href="#tab1-content" class="active"><i class="fa-solid fa-user"></i> Sobre o Aluno</a>
+      <a id="tab2" href="#tab2-content"><i class="fa-solid fa-file-lines"></i> Matrículas</a>
+      <a id="tab3" href="#tab3-content"><i class="fa-solid fa-file-lines"></i> Boletim | Ano letivo {{request.session.anoLetivo_nome}} </a>
+    </div>
+
+    <div id="tab1-content" class="tab-content tab-content--active">
+      {% include "Escola/partials/partials_alunos/profile-01/partial_sobre_o_aluno/sobre_o_aluno.html" %}
+    </div>
+
+    <div id="tab2-content" class="tab-content">      
+      {% include "Escola/partials/partials_alunos/profile-01/matriculas/todas_as_matriculas.html" %}      
+    </div>
+    <div id="tab3-content" class="tab-content">      
+
+
+
+
+
+<h4 class="mt-4">Boletim Anual | Turma: {{matriculas.0.turma}}</h4>
+<hr class='bg-black'>
+
+{% for trimestre in trimestres %}
+  <div class="trimestre-{{ forloop.counter }}">
+    <h5 class="mt-4">{{ trimestre.numero_nome }}</h5>
+    <div class="table-responsive mb-4">
+      <table class="table table-bordered text-center align-middle">
+        <thead>
+          <tr>
+            <th>Disciplina</th>
+            <th>Nota</th>
+            <th>Faltas</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for disciplina, dados in boletim_dict.items %}
+            <tr>
+              <td>{{ disciplina }}</td>
+              <td>{{ dados.notas|get_item:trimestre.numero_nome|default:"-" }}</td>
+              <td>{{ dados.faltas|get_item:trimestre.numero_nome|default:"-" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endfor %}
+
+
+
+
+</tbody>
+
+  </table>
+</div>
+
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+  </div>
+
+  <script>
+    const links = document.querySelectorAll(".tabs a");
+    const contents = document.querySelectorAll(".tab-content");
+
+    links.forEach(link => {
+      link.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        links.forEach(l => l.classList.remove("active"));
+        contents.forEach(c => c.classList.remove("tab-content--active"));
+
+        this.classList.add("active");
+        const content = document.querySelector(this.getAttribute("href"));
+        if (content) {
+          content.classList.add("tab-content--active");
+        }
+      });
+    });
+  </script>
+
+
+    <ul class="social-links list-inline text-center mt-4">
+        <li class="list-inline-item"><a href="#"><i class="fa-brands fa-github fa-lg"></i></a></li>
+        <li class="list-inline-item"><a href="#"><i class="fa-brands fa-linkedin fa-lg"></i></a></li>
+        <li class="list-inline-item"><a href="#"><i class="fa-brands fa-x-twitter fa-lg"></i></a></li>
+        <li class="list-inline-item"><a href="#"><i class="fa-brands fa-instagram fa-lg"></i></a></li>
+        <li class="list-inline-item"><a href="#"><i class="fa-brands fa-youtube fa-lg"></i></a></li>
+        <li class="list-inline-item"><a href="#"><i class="fa-solid fa-link fa-lg"></i></a></li>
+    </ul>
+</div>

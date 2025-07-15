@@ -1,0 +1,123 @@
+ {% block script_head %}
+ {% load qr_code %}
+ {% load static %}
+ <style>
+  .grid{
+    display: grid;
+    grid-template-columns: 1fr 20rem;
+    gap:1rem;
+    margin-bottom:1rem
+  }
+  @media print {
+  /* Ocultar a data e hora no cabeçalho da impressão */
+  @page {
+    margin-top: 0;
+  }
+
+  @page :first {
+    margin-top: 0;
+  }
+
+  @page header {
+    display: none;
+  }
+}
+
+
+
+ </style>
+ {% endblock script_head %}
+<!-- Modal -->
+<div class="modal fade" id="modal_escola" style='background:#000'  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    
+    <div class="modal-dialog w-100">
+    <div class="modal-content bg-secondary-subtle ">
+        <div class="modal-header">
+        <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3"><i style="font-size: 1.65rem;" class="fa-duotone fa-qrcode"></i> {{titulo_page}}</span></h4>        
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        
+        </div>
+        <div class="modal-body shadow-sm bg-light-subtle">            
+            <div  class='p-2 fs-6 border-danger-subtle border-right d-flex text-light' style= 'box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgb(209, 213, 219) 0px 0px 0px 1px inset; background-color:rgb(116, 145, 140)'>
+              <div  class=" p-1 mr-4  fs-5"><i class="fa-thin fa-tally ">
+
+              </i> t or T: tiny (value: 6)
+                  s or S: small (value: 12)
+                  m or M: medium (value: 18)
+                  l or L: large (value: 30)
+                  h or H: huge (value: 48)</div>              
+                <!-- Exibir a paginação -->
+                <a href="{% url 'Gestao_Escolar:image_to_doc' %}">clique aquiiii</a>
+                <button type="button" class="close" data-dismiss="modal" onclick="imprimirConteudoDiv()"><i class="fa-thin fa-print"></i> Imprimir QRcode</button>
+              </div>
+            </div>   
+            <div style='background-color:white; width: 70rem; margin: 1rem auto; ' id="qrcodee"  class="shadow shadow-sm" >
+              <div style="height:3rem ;"></div>
+              <div  style="width: 50rem; display: flex; margin: 2rem auto 1rem auto;">
+                
+                <div style="display: flex" >
+                  <img style='width:10rem; margin:auto' src='{% static "secretaria_sme.png" %}' alt="" srcset="">  
+                  <div class="ml-4" style="margin-left:2rem;margin-top: 0.5rem;">
+                    <p class="m-0" style="margin:0px ;">ESTADO DA BAHIA</p>
+                    <p class="m-0" style="margin:0px ;">PREFEITURA MUNICIPAL DE VERA CRUZ</p>
+                    <p class="m-0" style="margin:0px ;">CNPJ: 13.891.130/0001-03</p>
+                    <p class="m-0" style="margin:0px ;">Rua São Bento, 123 – Centro – Mar Grande </p>
+                    <p class="m-0" style="margin:0px ;">CEP: 44.470-000 - Vera Cruz / Bahia</p>
+                  </div>
+                </div>
+                <img style='width:10rem; margin:auto' src='{% static "SME - 2 PNG.png" %}' alt="" srcset="">  
+              </div>         
+              <div id="qrcode" style="width: 75rem !important;margin-left: 20% !important;">
+                <p class="" style="margin-top:5rem; text-transform: uppercase; font-size: 2rem; margin-left: 5%;">QRcode para acesso ao SIEWEB</p>
+                {% qr_from_text "http://177.200.115.230:8071/sieweb/" size="M" image_format="png" error_correction="L" %}            
+              </div>
+              <div style="width: 70rem; margin: auto; text-align: center; font-size: 2rem;">
+                <p class="m-0 p-0 fa-save">Acesso ao Sieweb | Sistema Web de Gerenciamente Escolar</p>
+                <p class="m-0 p-0">http://177.200.115.230:8071/sieweb/</p>
+              </div>
+            </div>
+
+
+
+
+
+        </div>        
+    </div>
+    </div>
+</div>
+
+
+
+
+<script>
+
+function imprimirConteudoDiv() {
+  var qrcodeElement = document.getElementById("qrcodee");
+
+  if (qrcodeElement) {
+    // Crie uma nova janela temporária com um documento HTML vazio
+    var janelaTemporaria = window.open('', '', 'width=800,height=600');
+    
+    // Crie um documento HTML temporário
+    var documentoTemporario = janelaTemporaria.document;
+    documentoTemporario.open();
+    
+    // Copie o conteúdo da div para o documento temporário
+    documentoTemporario.write('<html><head><title>Imprimir Conteúdo</title></head><body>');
+    documentoTemporario.write(qrcodeElement.innerHTML);
+    documentoTemporario.write('</body></html>');
+    
+    // Feche o documento temporário e inicie a impressão
+    documentoTemporario.close();
+    janelaTemporaria.print();
+    janelaTemporaria.close();
+  } else {
+    console.error("Elemento com ID 'qrcode' não encontrado.");
+  }
+}
+
+// Chame a função para imprimir o conteúdo da div quando necessário
+imprimirConteudoDiv();
+
+</script>
+

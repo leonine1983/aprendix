@@ -1,0 +1,162 @@
+
+<!-- Bootstrap Datepicker CSS -->
+<!-- Modal -->
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static "global/css/search.css" %}">
+{% endblock css %}
+<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    
+    <div class="modal-dialog w-100">
+    <div class="modal-content bg-secondary-subtle " >
+        <div class="modal-header">
+        <h4 class="modal-title  fs-6">
+          <span class="text-uppercase ml-5 fs-3 ">
+            <i class="fa-sharp fa-solid fa-people fs-5"></i>
+            {{titulo_page}}
+          </span>
+        </h4>        
+        <button type="button" class="close" data-dismiss="modal">&times;</button>        
+        </div>
+        <div class="modal-body shadow-sm bg-light-subtle">            
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">
+                    <i style="font-size: 1.65rem;" class=" fa-duotone fa-book-open-reader"></i>
+                    <span>Todas as Disciplinas</span>
+                  </button>
+                </li>
+                <li class="nav-item bg-secondary-subtle" role="presentation">
+                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">
+                    Criar nova disciplina 
+                    <i class="fa-sharp fa-solid fa-plus"></i> </button>
+                </li>  
+              </ul> 
+            <div  class='p-2 fs-6 border-danger-subtle border-right d-flex text-light' style= 'box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgb(209, 213, 219) 0px 0px 0px 1px inset; background-color:rgb(116, 145, 140)'>
+              <div  class="  mr-4  fs-5 d-flex  w-100">             
+                <div class="mt-0 mb-0" style='margin:auto;  width:90%; '>
+                  <form action="?" method="GET" class="form-inline">
+                      {% csrf_token %}            
+                      <div class="search-wrapper" style='margin:1rem auto 1rem auto;  width:110%; '>
+                        <input type="text" class="search-input rounded-3 m-0 mr-2 ml-2" placeholder="Buscar disciplina" name="busca-disciplina" style='margin:1rem auto 1rem auto;  width:90%; ' >
+                        <button class="search-button" type="submit"  style='height: 10rem importamt;border-radius: 1rem;'><i class="fa-regular fa-user-magnifying-glass"></i></button>
+                      </div>
+                    </form> 
+                </div>             
+              
+              </div>              
+              </div>
+            </div>  
+              <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active bg-light" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">  
+                    <table class="table table-striped m-auto w-75 border">
+                        <thead>
+                      <tr>
+                        <th scope="col" style='width:5rem'>Ordem</th> 
+                        <th scope="col" style='width:20rem'>Nome da Disciplina</th>                                               
+                        <th scope="col" class='center'>Ação</th>                        
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% comment "" %}
+                    Query enviado via contexto para o template
+                    context['Alunos'] = Alunos.objects.all()
+                    {% endcomment %}
+                    {% for n in query %}
+                      <tr>
+                        <th scope="row">{{n.ordem_historico}}</th>
+                        <td>{{n.nome}}</td>  
+                        <td>
+                          <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_update' n.pk %}"><span class='btn btn-sm btn-info mr-1'>Editar</span></a>
+                          <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_delete' n.pk %}"><span class='btn btn-sm btn-danger '>Excluir</span></a>
+                        </td>
+                      </tr>    
+                    {% endfor %}                
+                    </tbody>                  
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                  <div class="form-group ">
+                    {% block script_head %}
+                    
+                    <style>
+                      .form-group div p{margin-bottom: -0.5rem;}
+                    </style>
+                    {% endblock script_head %}  
+
+
+                    <form method="post" class='m-3'>
+                      {{ form.non_field_errors }}
+                      {% csrf_token %}
+                      <div class="form-group p-4" style='background-color: rgb(248, 242, 242);'>
+                        <span>Informações Básicas</span>
+                        <div class="border p-3 row row-cols-3 rounded-3 bg-light-subtle mb-5">
+                          <div class='col-8'>
+                            <p>Nome da disciplina</p>
+                            {{ form.nome }}
+                          </div>
+                          <div>
+                            <p>Nº de ordem da disciplina na caderneta</p>
+                            {{ form.ordem_historico }}
+                          </div>
+                        </div>
+                        <button class="btn btn-sm btn-primary p-1 w-100" type="submit">Criar registro do aluno <i class="fa-sharp fa-solid fa-people fs-5"></i></button>
+                      </div>
+                    </form>
+                    
+                </div>               
+              </div>
+
+
+        </div>        
+    </div>
+    </div>
+</div>     
+    
+
+{% load static %}
+
+<!-- Mascara para formularios-->
+<script src="{% static 'global/js/jquery.mask.min.js' %}"></script>
+<script>
+    $(document).ready(function(){
+        $("#id_tel_celular_aluno").mask("(00) 0 0000 0000")
+    })
+    $(document).ready(function(){
+        $("#id_tel_celular_mae").mask("(00) 0 0000 0000")
+    })
+    $(document).ready(function(){
+        $("#id_tel_celular_pai").mask("(00) 0 0000 0000")
+    })
+    
+</script>
+<!--FIM Mascara para formularios-->
+
+
+<!--
+<script src="{% static 'base_static/select2/select2.min.css' %}"></script>
+    <script>
+        // In your Javascript (external .js resource or <script> tag)
+    $(document).ready(function() {
+        $('#id_paciente_envio_triagem').select2();
+  
+    });
+    </script>
+-->
+
+
+<script>
+  // Adicione um ouvinte de evento de mudança ao <select>
+document.getElementById("mySelect").addEventListener("change", function() {
+  // Remove a classe 'selected' de todas as opções
+  var options = this.getElementsByTagName("option");
+  for (var i = 0; i < options.length; i++) {
+    options[i].classList.remove("selected");
+  }
+
+  // Adiciona a classe 'selected' à opção selecionada
+  var selectedOption = this.options[this.selectedIndex];
+  selectedOption.classList.add("selected");
+});
+
+</script>

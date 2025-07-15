@@ -1,0 +1,27 @@
+{% include "Escola/partials/modal_partials/modal_top.html" %}
+<h5 class="card-title">Selecione o Ano Letivo</h5>
+<p class="card-text">Para que possamos determinar o período específico e carregar as informações correspondentes.</p>
+<ul class="list-group list-group-flush shadow shadow-sm rounded-start-3">
+    <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-end ">
+        <div class='fs-5 w-100'>                        
+            <i class="fa-solid fa-calendar-days fa-bounce"></i> 
+            Selecione o Ano Letivo                   
+            <select id="form-select-sm" name="escola" class="m-auto mb-2"> 
+                {% for n in anoLetivo %}
+                <option value="{{n.id}}" class="fs-3 text-primary">{{n.ano}}</option> 
+                {% endfor %}                       
+            </select>
+        </div>           
+        <button class="btn btn-primary m-2" onclick="selecionaAnoLetivo()">Selecionar</button>
+    </li>
+</ul>  
+<script>
+        function selecionaAnoLetivo(){
+            var selectElement = document.getElementById("form-select-sm");
+            var selectedId = selectElement.value;
+            if (selectedId){
+                window.location.href = "/anoLetivo/selecionar/" + selectedId + "/";
+            }
+        }            
+</script> 
+{% include "Escola/partials/modal_partials/modal_bottom.html" %}     

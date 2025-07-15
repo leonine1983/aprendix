@@ -1,0 +1,464 @@
+{% extends 'gestao_escolar/template.html' %}
+{% load static %}
+{% block script_head %}
+ {% include 'gestao_escolar/links_modal.html' %}
+<script src="{% static 'select2/js/select2.full.min.js' %}"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Importação da família de fontes Nunito -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link href="{% static 'global/css/geral_styler.css' %}" rel="stylesheet">
+    <link href="{% static 'global/css/modals.css' %}" rel="stylesheet">
+    <link href="{% static 'global/css/table_win11.css' %}" rel="stylesheet">
+    <link href="{% static 'global/css/table_win11.css' %}" rel="stylesheet" media="print">   
+
+    <style>
+        .anime-h{height: 5rem !important;}
+
+
+
+
+        /* Define o estilo geral para os cards */
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;  /* Espaçamento entre os cards */
+            justify-content: center;
+            width: 100%; /* Garantir que a largura da container seja total */
+        }
+
+        /* Estilo para cada card */
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Ocupa 100% da largura por padrão */
+            max-width: 800px; /* Limita a largura máxima dos cards */
+            padding: 10px;
+        }
+
+        /* Responsividade: quando a tela for maior que 576px, exibe 2 colunas */
+        @media (min-width: 1000px) {
+            .card {
+                width: 48%; /* Ocupa 48% da largura, permitindo que dois cards fiquem lado a lado */
+            }
+        }
+
+
+
+
+
+
+
+    </style>
+{% endblock script_head %} 
+{% block main %}
+<div class="shadow-sm p-3 mb-3  w-100 " >
+    {% if messages %}                
+        {% include 'Escola/partials/mensagens.html' %}          
+    {% endif %}
+    <div class='p-4 h5 ' style='margin:-2.5rem -1rem 0 -1rem'></div>   
+        {% if escolaMatriculaOnline %}
+            {% include "Escola/matriculaOnline/partial_alunosEmPre_matricula.html" %}
+        {% endif %}
+        <div class=" rounded-top-2  bg-body-tertiary " style='margin:-1.2rem 0rem 1rem 0rem !important'>
+            <div class='mb-2'>
+                {% include 'gestao_escolar/navbars/index.html' %} 
+            </div>
+
+            <div class="cards-container">
+                <!-- Primeiro Card -->
+                <div class="card">
+                    <div class="card-header bg-info text-light text-uppercase">
+                        {% include "Escola/partials/resumos/resumos.html" %}
+                    </div>
+                    <div class="card-body">
+                        <table class="win11-table">
+                            <thead>
+                                <tr>
+                                    <th>Turmas</th>
+                                    <th>Alunos matriculados</th>
+                                    <th>Limite de Vagas</th>
+                                    <th>Vagas disponíveis</th>
+                                    <th>Autistas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for turma in request.session.matriculas_all %}
+                                <tr>
+                                    <td>{{ turma.nome }} <span class='text-uppercase'>{{ turma.descritivo_turma }}</span></td>
+                                    <td>{{ turma.matriculas }}</td>
+                                    <td>{{ turma.quantidade_vagas }}</td>
+                                    <td>{{ turma.vagas_disponiveis }}</td>
+                                    <td>{{ turma.autistas }}</td>
+                                </tr>
+                                {% endfor %}
+                                
+                                <!-- Linha de Totais -->
+                                <tr class='bg-success-subtle text-black fs-2'>
+                                    <td><strong>Total</strong></td>
+                                    <td>{{ request.session.totais.total_matriculas }}</td>
+                                    <td>{{ request.session.totais.total_vagas }}</td>
+                                    <td>{{ request.session.totais.vagas_disponiveis_total }}</td>
+                                    <td>{{ request.session.totais.total_autistas }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Segundo Card -->
+                <div class="card">
+                    <div class="card-header bg-danger-subtle text-light text-start text-uppercase">
+                        <i class="fa-duotone fa-solid fa-chart-simple"></i> Gráficos
+                    </div>
+                    <div class="card-body">
+                    </div>
+                    <div class="card-footer text-muted">
+                        {{ graph|safe }}
+                        <p>Data e horário do acesso: {{ now }}</p>
+                    </div>                   
+                </div>
+            </div>
+            
+        </div>
+    
+    {% if  conteudo_page == 'create_users'  %}
+        {% include 'Escola/partials/usuarios/createUsers.html' %}
+    {% endif %}
+
+    <!-- Ano letivo -->
+    {% if  conteudo_page == 'criar Ano Letivo' %}
+        {% include 'Escola/partials/ano/cria_ano.html' %}
+    {% endif %}
+    
+    <!-- End informações-->    
+    {% if  conteudo_page == 'Nome das Escolas' %}
+        {% include 'Escola/partials/seleciona_escola.html' %}
+    {% endif %}
+    {% if  conteudo_page == 'Ano Letivo' %}
+        {% include 'Escola/partials/seleciona_anoLetivo.html' %}
+    {% endif %}
+
+    <!--Prefeitura-->
+    {% if  conteudo_page == 'prefeituraUdate' %}
+        {% include 'Escola/partials/prefeitura/PrefeituraUpdate.html' %}
+    {% endif %}    
+    
+    <!--Dados Escola-->
+    {% if  conteudo_page == 'Atualiza Escola'  %}
+        {% include 'Escola/partials/minhaEscola/seleciona_escola.html' %}
+    {% endif %}
+    {% if  conteudo_page == 'CreateEscola'  %}
+        {% include 'Escola/partials/minhaEscola/createEscola.html' %}
+    {% endif %}
+    <!--Turmas-->
+    {% if  conteudo_page == 'Criar Turmas' %}
+        {% include 'Escola/partials/seleciona_turma.html' %}
+    {% endif %}
+    {% if  conteudo_page == 'Criar Turmas update' %}
+        {% include 'Escola/partials/turmas/update_or_delete.html' %}
+    {% endif %}
+    {% if  conteudo_page == 'Registrar Alunos' %}
+        {% include 'Escola/partials/seleciona_aluno.html' %}
+    {% endif %}   
+    {% if  conteudo_page == 'Registrar Alunos Documento' %}
+        {% include 'Escola/partials/seleciona_aluno_documento.html' %}
+    {% endif %}
+    {% if  conteudo_page == 'Todas as matriculas' %}
+        {% include 'Escola/partials/seleciona_matricula_turmas.html' %}
+    {% endif %}  
+    <!--Matriculas-->
+    {% if  conteudo_page == 'Matricular Aluno' %}
+        {% include 'Escola/partials/matriculas/seleciona_matricular_aluno.html' %}
+    {% endif %} 
+    {% if  conteudo_page == 'matricula_update_or_delete' %}
+        {% include 'Escola/partials/matriculas/update_or_delete.html' %}
+    {% endif %} 
+    <!--Matriculas END-->
+
+    {% if  conteudo_page == 'Remaneja Aluno' %}
+        {% include 'Escola/partials/seleciona_matricular_remanejamento.html' %}
+    {% endif %} 
+    <!-- Professores -->
+    {% if  conteudo_page == 'Professores' %}
+        {% include 'Escola/partials/seleciona_professores.html' %}
+    {% endif %} 
+    {% if  conteudo_page == 'Professores-Pessoas' %}
+        {% include 'Escola/partials/partials_professores/seleciona_pessoas.html' %}
+    {% endif %} 
+    {% if  conteudo_page == 'Professores-Pessoas-Vinculo' %}
+        {% include 'Escola/partials/partials_professores/seleciona_pessoas-vinculo.html' %}
+    {% endif %} 
+    {% if  conteudo_page == 'seleciona_pessoas-vinculo_contrato' %}
+        {% include 'Escola/partials/partials_professores/seleciona_pessoas-vinculo_contrato.html' %}
+    {% endif %} 
+    {% if  conteudo_page == 'encaminha_para_escola' %}
+        {% include 'Escola/partials/partials_professores/encaminhamentos/encaminha_para_escola.html' %}
+    {% endif %} 
+    {% if  conteudo_page == 'encaminha_para_escola_deleteORupdate' %}
+        {% include 'Escola/partials/partials_professores/encaminhamentos/update_or_delete.html' %}
+    {% endif %} 
+
+    <!-- Professores -->
+    {% if  conteudo_page == 'Criar Disciplina' %}
+        {% include 'Escola/partials/seleciona_disciplinas.html' %}
+    {% endif %} 
+    {% if  conteudo_page == 'Grades' %}
+        {% include 'Escola/partials/seleciona_grades.html' %}
+    {% endif %} 
+    {% if  conteudo_page == 'QR_code' %}
+        {% include 'Escola/partials/seleciona_qrCode.html' %}
+    {% endif %} 
+    {% if  conteudo_page == 'Turmas Escolha' %}
+        {% include 'Escola/partials/seleciona_Turma_retorno_aluno.html' %}
+    {% endif %} 
+    
+    <!--Pessoas para uso de decreto e outros-->
+    {% if  conteudo_page ==  'Pessoa Create' %}
+        {% include 'Escola/partials/pessoas/pessoa_create.html' %}
+    {% endif %}
+    {% if  conteudo_page ==  'Update_Delete' %}
+        {% include 'Escola/partials/pessoas/update_or_delete.html' %}
+    {% endif %}
+    
+    <!--PessoasContrato para uso de decreto e outros-->
+    {% if  conteudo_page ==  'Contrato Create' %}
+        {% include 'Escola/partials/pessoasContrato/pessoaContrato_create.html' %}
+    {% endif %}
+    {% if  conteudo_page ==  'Contrato Update_Delete' %}
+        {% include 'Escola/partials/pessoasContrato/update_or_delete.html' %}
+    {% endif %}
+
+    
+   
+    <!--Decreto-->
+    {% if  conteudo_page ==  'Decreto Create'  %}
+        {% include 'Escola/partials/decreto/decreto_create.html' %}
+    {% endif %}
+    {% if  conteudo_page ==  'Decreto Update or Delete' %}
+        {% include 'Escola/partials/decreto/decreto_create.html' %}
+    {% endif %}  
+
+    <!--Decreto ativo-->    
+    {% if  conteudo_page ==  'Decreto Ativo' %}
+        {% include 'Escola/partials/decreto/decreto_createAtivo.html' %}
+    {% endif %}   
+    
+    <!--Grades-->
+    {% if  conteudo_page == 'Todas as turmas-grade' %}
+        {% include 'Escola/partials/grades/seleciona_grade_turma.html' %}
+    {% endif %} 
+    {% if  conteudo_page == "Updade_or_Delete Grade" %}
+        {% include 'Escola/partials/grades/update_or_delete.html' %}
+    {% endif %}
+    <!--Grades End-->
+
+    <!-- Plano de Aula -->     
+    {% if  conteudo_page == "relatorio_planoAula" %}
+        {% include 'Escola/partials/gestao_turmas/planoAula/planoAula.html' %}
+    {% endif %}
+
+    {% if  conteudo_page == 'cargos/funcionarios' %}
+        {% include 'Escola/partials/selecionar_cargos_funcionarios.html' %}
+    {% endif %}    
+    {% if  conteudo_page == 'Gestão Turmas' %}
+        {% include 'Escola/partials/gestao_turmas/gestao_.html' %}
+    {% endif %}  
+    {% if  conteudo_page ==  "Gestão Turmas - Notas Aluno"   %}
+        {% include 'Escola/partials/gestao_turmas/notas.html' %}
+    {% endif %}  
+    <!-- Parecer Descritivo do Aluno-->
+    {% if  conteudo_page ==  "Gestão Turmas - Parecer"   %}
+        {% include 'Escola/partials/gestao_turmas/parecer_descritivo/parecer.html' %}
+    {% endif %}  
+
+    {% if  conteudo_page ==  "Gestão Turmas - Notas Update"   %}
+        {% include 'Escola/partials/gestao_turmas/notasFORM.html' %}
+    {% endif %}  
+    {% if  conteudo_page ==  "Gestão Turmas - Notas Recupera Update"  %}
+        {% include 'Escola/partials/gestao_turmas/notasRecuperForm.html' %}
+    {% endif %}  
+
+    {% if  conteudo_page ==  "Gestão Turmas - GerarHorario"   %}
+        {% include 'Escola/partials/gestao_turmas/horarioAula.html' %}
+    {% endif %} 
+    {% if  conteudo_page ==  "Gestão Turmas - DefineValidadeHorario"   %}
+        {% include 'Escola/partials/gestao_turmas/defineValidadeHorario.html' %}
+    {% endif %} 
+
+    
+    <!--Impressos **************-->
+
+    {% if  conteudo_page == "imprime_escolas" %}
+        {% include 'Escola/partials/impressos/impresso_escolas.html' %}
+    {% endif %}   
+        
+    {% if  conteudo_page == "imprime_turma" %}
+        {% include 'Escola/partials/impressos/impresso_turmas.html' %}
+    {% endif %}   
+    {% if  conteudo_page == "imprime_turma_filtros"     %}
+        {% include 'Escola/partials/impressos/impressoTurmasFiltros.html' %}
+    {% endif %}   
+    {% if  conteudo_page == "imprime_all_horario"     %}
+        {% include 'Escola/partials/impressos/horarios/geral.html' %}
+    {% endif %}   
+    
+    
+        
+    {% if  conteudo_page == "imprime_turma_matricula" %}
+        {% include 'Escola/partials/impressos/impresso_turmas_matricula.html' %}
+    {% endif %}   
+    {% if  conteudo_page == "imprime_comprovante_matricula" %}
+        {% include 'Escola/partials/impressos/impresso_comprovante_matricula.html' %}
+    {% endif %}   
+    <!--END Impressos **************-->
+    {% if  conteudo_page == 'delete' %}
+        {% include 'Escola/partials/seleciona_DELETE.html' %}
+    {% endif %}    
+    {% if  conteudo_page == 'update' %}
+        {% include 'Escola/partials/seleciona_UPDATE.html' %}
+    {% endif %}   
+    <!-- Bairros -->
+    {% if  conteudo_page == 'Criar Bairros' %}
+        {% include 'Escola/partials/bairros/seleciona_bairros.html' %}
+    {% endif %}    
+    {% if  conteudo_page == 'update_or_delete' %}
+        {% include 'Escola/partials/bairros/update_or_delete.html' %}
+    {% endif %}     
+    <!-- Cidade -->
+    {% if  conteudo_page == 'Criar Cidade' %}
+        {% include 'Escola/partials/cidade/seleciona_cidade.html' %}
+    {% endif %}    
+    {% if  conteudo_page == 'update_or_delete' %}
+        {% include 'Escola/partials/cidade/update_or_delete.html' %}
+    {% endif %}    
+    <!--Ferramentas-->
+    {% if  conteudo_page == 'imagem-docx' %}
+        {% include 'Escola/partials/bairros/seleciona_bairros.html' %}
+    {% endif %} 
+    
+    <!--Ferramentas-->
+    {% if  conteudo_page == "freqenciaImpressa"  %}
+        {% include 'Escola/partials/feriados_frequencia/calendario_mes.html' %}
+    {% endif %} 
+
+    <!--Documentos-->
+    {% if  conteudo_page == "boletim"  %}
+        {% include 'docsGestao_escolar/boletins/seleciona_turma_boletim.html' %}
+    {% endif %} 
+    {% if  conteudo_page == "boletim_aluno" %}
+        {% include 'docsGestao_escolar/boletins/seleciona_aluno_boletim.html' %}
+    {% endif %} 
+    {% if  conteudo_page == "boletim_trimestral"%}
+        {% include 'docsGestao_escolar/boletins/seleciona_trimestral_boletim.html' %}
+    {% endif %} 
+    
+    {% if  conteudo_page == "historicoAluno"  %}
+        {% include 'Escola/impressos/historico_escolar.html' %}
+    {% endif %}  
+
+    <!-- Apuraçao final -->
+     {% if  conteudo_page == 'SelecinaTurmaApuração'  %}
+        {% include 'Escola/partials/apuracaoFinal/apuracaoFinalTurmas.html' %}
+    {% endif %}  
+    {% if  conteudo_page == 'ApuraçãoFinal' %}
+        {% include 'Escola/partials/apuracaoFinal/apuracaoFinal.html' %}
+    {% endif %}  
+
+
+
+    <!--Errors 400, 403, 404, 500-->
+
+    {% if  conteudo_page == "500" %}    
+        {% include 'docsGestao_escolar/boletins/seleciona_trimestral_boletim.html' %}
+    {% endif %} 
+
+    <!--Matricula online VERIFICAR 
+    {% if  conteudo_page == "Add Matricula Online"%}    
+        {% include 'Escola/partials/escolaMatriculaOnline/adicionar_escola.html' %}
+    {% endif %} 
+    {% if  conteudo_page == "Add Series Online" %}    
+        {% include 'Escola/partials/escolaMatriculaOnline/adicionar_serie.html' %}
+    {% endif %} 
+    {% if  conteudo_page == 'impugnarConfirmar' %}    
+        {% include 'Escola/matriculaOnline/confirmarOUimpuganar.html' %}
+    {% endif %} 
+    
+    -->  
+    
+    
+    
+    <!-- Condiciionais-->
+    {% if 'escola_id' not in request.session %}
+        {% include 'Escola/partials/seleciona_escola.html' %}        
+    {% endif %}
+    {% comment "se existir professor" %}
+    {% if not condicional_aluno.exists %}
+        {% include 'Escola/partials/verifica_sem_registros/n_aluno.html' %}
+    {% endif %}
+
+    
+    {% if not condicional_professor.exists %}
+        {% include 'Escola/partials/verifica_sem_registros/n_professor.html' %}
+    {% endif %}
+    
+
+    {% if not condicional_turma.exists %}    
+        {% include 'Escola/partials/verifica_sem_registros/n_turma.html' %}
+    {% endif %} 
+    {% endcomment %}   
+</div>
+
+
+
+
+
+
+
+{% block script_footer %}
+<script>
+    $(document).ready(function(){
+        $('#modal_escola').modal("show");
+
+        // Adiciona um evento de clique ao botão de fechar
+        $('.close, .modal').click(function(e) {
+            if (e.target === this) {
+                $('#modal_escola').modal('hide');
+                window.location.href = "{% url 'Gestao_Escolar:GE_Escola_inicio' %}";
+            }
+        });
+    });
+</script>
+
+<script>
+    // Small using Bootstrap 5 classes
+$("#form-select-sm").select2({
+    theme: "bootstrap-5",
+    dropdownParent: $("#form-select-sm").parent(), // Required for dropdown styling
+});
+</script>
+
+<script>
+var datepickers = [].slice.call(document.querySelectorAll('[data-datepicker]'))
+var datepickersList = datepickers.map(function (el) {
+    return new Datepicker(el, {
+        buttonClass: 'btn'
+    });
+});
+</script>
+<!--Esconde e exibe detalhes-->
+<script>
+    function toggleDetails(button) {
+        var details = button.nextElementSibling;
+        if (details.style.display === "none" || details.style.display === "") {
+            details.style.display = "block";
+            button.innerHTML = "Fechar";
+        } else {
+            details.style.display = "none";
+            button.innerHTML = "Leia mais...";
+        }
+    }
+</script>  
+{% endblock script_footer %} 
+{% endblock main %}

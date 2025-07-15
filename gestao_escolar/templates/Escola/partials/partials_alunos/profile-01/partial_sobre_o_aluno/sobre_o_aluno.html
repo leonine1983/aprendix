@@ -1,0 +1,108 @@
+<div class="profile__info-container row row-cols-1 row-cols-md-2 g-4">
+
+  <!-- INFORMAÇÕES PESSOAIS -->
+  <div class="col">
+    <h6 class="text-info fw-bold border-bottom pb-1 mb-2">Informações Pessoais</h6>
+    <ul class="list-unstyled mb-0">
+      <li><b>Nome completo:</b> <span class="text-uppercase">{{ object.nome_completo }}</span></li>
+      {% if object.nome_social %}
+        <li><b>Nome social:</b> <span class="text-uppercase">{{ object.nome_social }}</span></li>
+      {% endif %}
+      <li><b>Data de nascimento:</b> <span>{{ object.data_nascimento|date:"d/m/Y" }}</span></li>
+      <li><b>Idade:</b> <span>{{ object.idade }} anos</span></li>
+      <li><b>Sexo:</b> <span>{{ object.sexo }}</span></li>
+      <li><b>Lateralidade:</b> <span>{{ object.get_lateralidade_display }}</span></li>
+      <li><b>Etnia:</b> <span>{{ object.etnia }}</span></li>
+      <li><b>Tipo sanguíneo:</b> <span>{{ object.tipo_sanguineo }}</span></li>
+      <li><b>É Quilombola:</b> <span>{% if object.quilombola %}Sim{% else %}Não{% endif %}</span></li>
+      <li><b>Tem irmão(s) gêmeos:</b> <span>{% if object.irmao_gemeo %}Sim{% else %}Não{% endif %}</span></li>
+      <li><b>Beneficiário do Bolsa Família/Aux. Brasil:</b> <span>{% if object.beneficiario_aux_Brasil %}Sim{% else %}Não{% endif %}</span></li>
+      <li><b>Telefone do aluno:</b> <span>{{ object.tel_celular_aluno }}</span></li>
+    </ul>
+  </div>
+
+  <!-- DOCUMENTAÇÃO E REGISTRO -->
+  <div class="col">
+    <h6 class="text-info fw-bold border-bottom pb-1 mb-2">Documentação</h6>
+    <ul class="list-unstyled mb-0">
+      <li><b>RG:</b> <span>{{ object.RG }}</span></li>
+      <li><b>Data de emissão do RG:</b> <span>{{ object.RG_emissao|date:"d/m/Y" }}</span></li>
+      <li><b>UF do RG:</b> <span>{{ object.RG_UF }}</span></li>
+      <li><b>Órgão emissor:</b> <span>{{ object.orgao_emissor }}</span></li>
+      <li><b>CPF:</b> <span>{{ object.CPF }}</span></li>
+      <li><b>Certidão (Matrícula Única):</b> <span>{{ object.numero_certidao }}</span></li>
+      <li><b>Livro:</b> <span>{{ object.livro }}</span></li>
+      <li><b>Folha:</b> <span>{{ object.folha }}</span></li>
+      <li><b>Termo:</b> <span>{{ object.termo }}</span></li>
+      <li><b>Emissão:</b> <span>{{ object.emissao|date:"d/m/Y" }}</span></li>
+      <li><b>Distrito da certidão:</b> <span>{{ object.distrito_certidao }}</span></li>
+      <li><b>Cartório:</b> <span>{{ object.cartorio }}</span></li>
+      <li><b>Comarca:</b> <span>{{ object.comarca }}</span></li>
+      <li><b>UF do cartório:</b> <span>{{ object.cartorio_uf }}</span></li>
+      <li><b>Justificativa pela falta de documento:</b> <span>{{ object.get_justificativa_falta_documento_display }}</span></li>
+      <li><b>Local diferenciado:</b> <span>{{ object.get_local_diferenciado_display }}</span></li>
+    </ul>
+  </div>
+
+  <!-- SAÚDE E NECESSIDADES ESPECIAIS -->
+  <div class="col">
+    <h6 class="text-info fw-bold border-bottom pb-1 mb-2">Saúde e Atendimento Especial</h6>
+    <ul class="list-unstyled mb-0">
+      <li><b>Possui deficiência:</b> <span>{{ object.deficiencia_aluno }}</span></li>
+      <li><b>Necessita atendimento especial:</b> <span>{% if object.necessita_edu_especial %}Sim{% else %}Não{% endif %}</span></li>
+      <li><b>Autismo (TEA):</b> <span>{% if object.espectro_autista %}Sim{% else %}Não{% endif %}</span></li>
+      <li><b>Síndrome de Down:</b> <span>{% if object.sindrome_de_Down %}Sim{% else %}Não{% endif %}</span></li>
+      <li><b>Vacina COVID-19:</b> <span>{% if object.vacina_covid_19 %}Sim{% else %}Não{% endif %}</span></li>
+      <li><b>Doses da vacina COVID-19:</b> <span>{{ object.dose_vacina_covid_19 }}</span></li>
+    </ul>
+  </div>
+
+  <!-- ENDEREÇO -->
+  <div class="col">
+    <h6 class="text-info fw-bold border-bottom pb-1 mb-2">Endereço</h6>
+    <ul class="list-unstyled mb-0">
+      <li><b>Rua:</b> <span class="text-uppercase">{{ object.rua }}</span></li>
+      <li><b>Bairro:</b> <span class="text-uppercase">{{ object.bairro }}</span></li>
+      <li><b>Cidade:</b> <span class="text-uppercase">{{ object.cidade }}</span></li>
+      <li><b>Estado:</b> <span class="text-uppercase">{{ object.estado }}</span></li>
+    </ul>
+  </div>
+
+  <!-- INFORMAÇÕES FAMILIARES -->
+  <div class="col">
+    <h6 class="text-info fw-bold border-bottom pb-1 mb-2">Informações Familiares</h6>
+    <ul class="list-unstyled mb-0">
+      <li><b>Nome da mãe:</b> <span class="text-uppercase">{{ object.nome_mae }}</span></li>
+      <li><b>CPF da mãe:</b> <span>{{ object.CPF_mae }}</span></li>
+      <li><b>Telefone da mãe:</b> <span>{{ object.tel_celular_mae }}</span></li>
+      <li><b>Nome do pai:</b>
+        <span class="text-uppercase">
+          {% if object.nome_pai %}{{ object.nome_pai }}{% else %}Não declarado{% endif %}
+        </span>
+      </li>
+      <li><b>Telefone do pai:</b> <span>{{ object.tel_celular_pai }}</span></li>
+    </ul>
+  </div>
+
+  <!-- NATURALIDADE -->
+  <div class="col">
+    <h6 class="text-info fw-bold border-bottom pb-1 mb-2">Naturalidade</h6>
+    <ul class="list-unstyled mb-0">
+      <li><b>Estado onde nasceu:</b> <span>{{ object.estado_naturalidade }}</span></li>
+      <li><b>Cidade onde nasceu:</b> <span>{{ object.cidade_naturalidade }}</span></li>
+      <li><b>Nacionalidade:</b> <span>{{ object.nacionalidade }}</span></li>
+    </ul>
+  </div>
+
+  <!-- INFORMAÇÕES EXTERNAS -->
+  <div class="col">
+    <h6 class="text-info fw-bold border-bottom pb-1 mb-2">Residência e Documentação Estrangeira</h6>
+    <ul class="list-unstyled mb-0">
+      <li><b>Veio do exterior:</b> <span>{% if object.aluno_exterior %}Sim{% else %}Não{% endif %}</span></li>
+      <li><b>País de origem:</b> <span>{{ object.pais_origem }}</span></li>
+      <li><b>Data de entrada no Brasil:</b> <span>{{ object.data_entrada_no_pais|date:"d/m/Y" }}</span></li>
+      <li><b>Documento estrangeiro:</b> <span>{{ object.documento_estrangeiro }}</span></li>
+    </ul>
+  </div>
+
+</div>

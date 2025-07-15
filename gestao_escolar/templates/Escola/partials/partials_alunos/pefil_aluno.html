@@ -1,0 +1,29 @@
+{% load static %}
+<style>
+    .windows-link {
+        text-decoration: none;
+        padding: 10px 20px;
+        background-color: #f0f0f0;
+        color: #000;
+        border: 1px solid #c3c3c3;
+        border-radius: 5px;
+        margin-left: 10px;
+        font-weight: bold;
+        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }    
+    .windows-link:hover {
+        background-color: #0078d7;
+        color: #fff;
+        border-color: #0078d7;
+    }
+    
+    .windows-link:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 120, 215, 0.5); /* Efeito de foco estilo Windows */
+    }
+    </style>
+<div class='d-flex justify-content-end m-3'>
+    <a id='editar_aluno' href="{% url 'Gestao_Escolar:GE_Escola_alunos_update' object.pk %}" class="windows-link">Editar dados básicos</a>
+    <a id='doc_aluno' href="{% url 'Gestao_Escolar:GE_alunos_update_document' object.pk %}" class="windows-link">Editar Documentação</a>   
+</div>
+{% include "Escola/partials/partials_alunos/profile-01/index.html" %}

@@ -1,0 +1,43 @@
+{# 
+  ✅ Componente: linkEditar.html
+
+  Este componente é um botão estilizado com Bootstrap e FontAwesome,
+  usado para editar registros de forma consistente e reutilizável.
+
+  🔧 Parâmetros esperados:
+    - link   → URL de destino (obrigatório)
+    - title  → Tooltip (texto ao passar o mouse)
+    - label  → Texto exibido no botão (opcional; padrão: "Editar")
+
+  💡 Exemplo de uso dentro de um loop for:
+  
+    {% url 'Gestao_Escolar:decreto-update' d.id as editar_url %}
+    {% include "Escola/components/linkEditar.html" with link=editar_url title="Editar decreto" %}
+  
+  🔒 Importante:
+    - Você deve capturar a URL com `{% url ... as var %}` e passar como argumento.
+    - Este componente deve ser incluído **dentro de um loop** quando for usado com objetos iteráveis (como `d` no exemplo).
+#}
+
+
+{# 
+  ✅ Componente: linkEditar.html
+
+  Este componente é um botão estilizado com Bootstrap e FontAwesome,
+  usado para editar registros de forma consistente e reutilizável.
+
+  🔧 Parâmetros esperados:
+    - link   → URL de destino (obrigatório)
+    - title  → Tooltip (texto ao passar o mouse)
+    - label  → Texto exibido no botão (opcional; padrão: "Editar")
+
+  💡 Exemplo de uso dentro de um loop for:
+  
+    {% url 'Gestao_Escolar:decreto-update' d.id as editar_url %}
+    {% include "Escola/components/linkExcluir.html" with link=editar_url title="Editar decreto" %}
+  
+  🔒 Importante:
+    - Você deve capturar a URL com `{% url ... as var %}` e passar como argumento.
+    - Este componente deve ser incluído **dentro de um loop** quando for usado com objetos iteráveis (como `d` no exemplo).
+#}
+

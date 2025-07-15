@@ -1,0 +1,74 @@
+
+
+{% load static %}
+<div class="card text-center">
+    <div class="card-header bg-danger text-light text-uppercase">
+    ATENÇÃO {{request.user.first_name}} {{request.user.last_name}}<i class="fa-solid fa-exclamation"></i><i class="fa-solid fa-exclamation"></i>
+    </div>
+    <div class="card-body">
+    <h5 class="card-title">Para dar continuidade, vamos precisar que você escolha uma escola que mais lhe agrada. 😊</h5>
+    <button class="btn btn-primary" onclick="location.reload()">Selecionar Escola</button>        
+    </div>
+    <div class="card-footer text-muted">
+    <p>Data e horário do acesso: {{ now }}</p>
+    </div>
+</div>    
+<!-- Modal -->
+<div class="modal fade" id="modal_escola" style='background:#000'>
+    <div class="modal-dialog w-100">
+    <div class="modal-content bg-secondary-subtle">
+        <div class="modal-header">
+        <h4 class="modal-title  fs-6"><i class="fa-regular fa-face-grin-squint"></i> Olá, seja muito bem-vindo, <span class="text-capitalize">{% if request.user.first_name %}{{request.user.first_name}} {{request.user.last_name}}{% else %}{{request.user}}{% endif %}!!</span></h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body shadow-sm bg-light-subtle">
+            <h2 class="m-0"><i class="fa-duotone fa-solid fa-users"></i> Criação de Novo Usuário</h2>
+            <p class="m-2 ml-5">Preencha o formulário abaixo para criar um novo usuário. 
+                Todos os campos são obrigatórios, e a senha deve ser confirmada para 
+                garantir a segurança da conta.</p>
+       
+            <div class="row row-cols-2">
+                <div class="col">
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <div class="m-2 p-2">
+                            {{form.as_p}}            
+                        </div>
+                        <button type="submit">Criar</button>
+                    </form>
+                </div>
+                <div class="col">
+                    <table class='win11-table'>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Usuário</th>
+                                <th>Nome Completo</th>
+                                <th>Email</th>
+                                <th>Escola</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in all_user_school %}
+                            <tr>
+                                <td>{{forloop.counter}}</td>
+                                <td>{{user.username}}</td>
+                                <td>{{user.first_name}} {{user.last_name}}</td>
+                                <td>{{user.email}}</td>
+                                <td>{{user.related_UserEscola.first.escola}}</td>
+                                {% if request.user.related_UserEscola.superuser or request.user.is_superuser %}
+                                    <td>Excluir</td>
+                                {% else %}
+                                    <td></td>                                
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>         
+    </div>
+</div>
+    </div>
+</div>

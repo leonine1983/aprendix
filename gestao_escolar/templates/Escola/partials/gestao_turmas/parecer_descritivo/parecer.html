@@ -1,0 +1,213 @@
+{% load static %}
+{% load meus_filtros %}
+{% block script_head %}<link rel="stylesheet" href="{% static 'global/css/css3_tab.css' %}">{% endblock script_head %} 
+{% block script_footer %}{% endblock script_footer %} 
+<style>
+    .ckeditor div{
+        box-shadow: none !important;
+        padding: 0rem !important;
+        border: none!important;
+    }
+</style>
+<!-- Modal -->
+<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">   
+  <div class="modal-dialog w-100">
+      <div class="modal-content bg-secondary-subtle">
+          <div class="modal-header border-bottom border-primary bg-primary-subtle ">
+              <h4 class="modal-title fs-6 text-secondary"><span class="text-uppercase ml-5 fs-3 "><i style="font-size: 1.65rem;" class="fs-4 fa-solid fa-users-gear"></i> {{ titulo_page }} {{ turma.0.turma}}<i class="fa-solid fa-angles-right me-1 mx-1"></i> {{ turma.all|length }} alunos </span></h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div>
+            <a href="" rel="noopener noreferrer" class="btn btn-primary btn-sm">Voltar a secção anterior  </a>
+          </div>
+
+          <div class="pcss3t pcss3t-effect-scale pcss3t-theme-1">           
+            {% for t in trimestres %}
+                <input type="radio" name="pcss3t" {% if t.id == 1 %} checked {% endif %} id="tab{{ t.id }}" class="{% if t.id == 1 %}tab-content-first{% else %}tab-content-{{ t.id }}{% endif %}">
+                <label for="tab{{ t.id }}" class="col-2 text-center {% if t.final %} col-5 bg-success-subtle {% endif %}"><h1>{% if t.final %}Análise feita pela IA e PARERECER DESCRITIVO FINAL<span class='fs-1'>🤖</span>{% else %}{{ t.numero_nome }}{% endif %}</h1></label>
+                
+            {% endfor %}
+        
+            <ul>
+                {% for t in trimestres %}         
+                    <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography  {% if t.final %} bg-success-subtle {% endif %}">                           
+                        {% include "Escola/partials/mensagens.html" %}
+                        {% if t.final %}
+                        <div class=" row row-cols-2" role="alert">
+                            <div class="col-2">
+                                <img src="{% static 'professorCoruja/img/professorCoruja.png' %}" class='w-100' alt="">
+                            </div>
+                            <style>
+                                .speech-bubble {
+                                    position: relative;
+                                    display: inline-block;
+                                    background: #f0f8ff;
+                                    border: 2px solid #007bff;
+                                    border-radius: 10px;
+                                    padding: 15px;
+                                    margin: 10px;
+                                    font-family: Arial, sans-serif;
+                                    align-self: flex-start; /* Alinha à esquerda */
+                                }                            
+                               
+                                .speech-bubble:after {
+                                    content: '';
+                                    position: absolute;
+                                    top: 40%; /* Centraliza verticalmente */
+                                    left: -35px; /* Posiciona o "triângulo" à esquerda do balão */
+                                    margin-top: -10px; /* Ajusta a posição vertical do triângulo */
+                                    border-width: 5px 35px 35px 0; /* Define a largura das bordas */
+                                    border-style: solid;
+                                    border-color: transparent #007bff transparent transparent; /* Define a cor azul na borda direita */
+                                }
+
+                            
+                                .speech-bubble h2 {
+                                    margin: 0 0 10px 0;
+                                }
+                            </style>
+                            
+                            <div class="speech-bubble col-8 ">
+                                <h2>Área de Análise Comportamental</h2>
+                                Nesta área, eu, Professor Coruja, apresento uma análise detalhada do comportamento do aluno, gerada por inteligência artificial. Com exceção do <strong>Parecer Geral</strong>, os demais campos fornecem dicas práticas para ajudá-lo a interagir melhor com o aluno, com base nos pareceres descritivos que você disponibiliza. Essas informações são fundamentais para que eu possa auxiliar você a promover um acompanhamento mais efetivo do desempenho e das oportunidades de desenvolvimento.
+                            </div>
+                            
+                        </div>
+                        
+                        {% else %} 
+                        <h2 class="text-center">Lançamento e Acompanhamento do Parecer Descritivo do Aluno</h2>
+                        <div class="alert alert-info mt-4">
+                            <p>Bem-vindo ao espaço destinado ao lançamento e acompanhamento do parecer descritivo do aluno por trimestres. Aqui, você poderá registrar e visualizar as avaliações de desempenho, comportamentos e progressos do estudante ao longo do ano letivo.</p>
+                            <p>Por favor, preencha as informações necessárias para cada trimestre, garantindo que o parecer reflita de forma precisa o desenvolvimento do aluno. Este formulário é uma ferramenta essencial para que pais, professores e alunos possam acompanhar juntos o aprendizado e as conquistas ao longo do tempo.</p>
+                            <p>Agradecemos pela colaboração!</p>
+                        </div>                      
+                        {% endif %} 
+                        
+                        <table class="win11-table bg-light">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" >Alunos</th>                                    
+                                    <th colspan="9" class="text-uppercase bg-info">Parecer Descritivo</th>
+                                    {% if t.final %}
+                                        <th rowspan='2' style='background:rgb(247, 189, 134) !important'><i class="fa-duotone fa-solid fa-book-user fs-2"></i><br>  Parecer Descritivo Final </th>
+                                    {% else %}
+                                    <th rowspan='2' style='background:rgb(247, 189, 134) !important'><i class="fa-light fa-book-sparkles fs-3"></i><br>  Parecer Descritivo (Análise IA) </th>
+                                    {% endif %}
+                                </tr>
+                                <tr>
+                                    <th>Aspec. Cognitivos</th>
+                                    <th>Aspec. Socioemocionais</th>
+                                    <th>Aspec. Físicos e Motores</th>
+                                    <th>Habilidades</th>
+                                    <th>Cont. Abordados</th>
+                                    <th>Interação Social</th>
+                                    <th>Comunicação</th>
+                                    <th>Consid. Finais</th>
+                                    <th>Obs. do Coordenador</th>                                    
+                                </tr>
+                            </thead>
+                            {% if not t.final %}
+                            <tbody >
+                                {% for tu in turma %}
+                                <tr>
+                                    <td>{{tu.aluno}} <a href="{% url 'Gestao_Escolar:resumo' tu.id %}">resumo</a></td>
+                                    <td>                                        
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/CognitivosAluno.html" %}
+                                    </td>
+                                    <td>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/Socioemocionais.html" %}   
+                                    </td>
+                                    <td>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/Aspectos_Fiscos_Motores.html" %}
+                                    </td>
+                                    <td>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/HabilidadesAcademicas.html" %}                                    
+                                    </td>
+                                    <td>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ConteudosAbordados.html" %}                                    
+                                    </td>
+                                    <td>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/interacao_social.html" %}
+                                    </td>
+                                    <td>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/comunicao.html" %}
+                                    </td>
+                                    <td>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/consideracoes_finais.html" %}
+                                    </td>
+                                    <td>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/observacao_coordenador.html" %}
+                                    </td>     
+                                    <td style='background:rgb(241, 212, 185) !important'>
+                                        {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ResumoParecerfinal.html" %}
+                                    </td>     
+                                                                   
+                                </tr>
+                                
+                                {% endfor %}                            
+                            {% else %}
+                                {% for tu in turma %}
+
+                                    {% for tp in tu.pareceres_aluno.all %}
+                                        {% if tp.trimestre.final %}
+                                        <tr class="t-final">
+                                            <td>{{tp.matricula}} </td>
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/Cognitivos_IA.html" %}
+                                            </td>                                       
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/Socioemocionais_IA.html" %}
+                                            </td>    
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/aspectos_fisicos_motoras.html" %}
+                                            </td>  
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/habilidades_IA.html" %}
+                                            </td>     
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/conteudos_abordados.html" %}
+                                            </td>   
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/interacao_social.html" %}
+                                            </td>    
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/comunicacao.html" %}
+                                            </td>    
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/consideracoes_finais.html" %}
+                                            </td>   
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/observacao_coordenador_IA.html" %}
+                                            </td> 
+                                            <td>                                        
+                                                {% include "Escola/partials/gestao_turmas/parecer_descritivo/partials/ia/ResumoParecerfinal_IA.html" %}
+                                            </td>      
+                                        </tr>  
+                                        {% endif %}
+                                    {% endfor %}  
+                                    <script>
+                                         // Script para modificar "História fictícia:"
+            document.addEventListener('DOMContentLoaded', () => {
+                const paragraphs = document.querySelectorAll('.fs-5');
+                paragraphs.forEach(paragraph => {
+                    paragraph.innerHTML = paragraph.innerHTML.replace(
+                        /História fictícia:/,
+                        '<br><br><strong style="color: blue;">História fictícia:</strong>'
+                    );
+                });
+            });
+                                    </script>
+                                    
+                                {% endfor %}                              
+                            {% endif %}
+                            </tbody>
+                        </table>                        
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>        
+
+    </div>
+  </div>
+</div>
+

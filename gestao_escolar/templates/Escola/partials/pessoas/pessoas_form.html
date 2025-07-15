@@ -1,0 +1,104 @@
+{% load static %}
+<h2>Formulário de Cadastro de Pessoas para o Sistema Aprendix</h2>
+
+<p>
+    Formulário de Cadastro de Pessoas para o Sistema Aprendix.
+    Este formulário é projetado para registrar informações detalhadas sobre indivíduos, 
+    facilitando a contratação de profissionais e o gerenciamento de decretos. Com ele, 
+    o sistema pode manter um banco de dados atualizado e organizado para suportar processos 
+    administrativos e operacionais.
+</p>
+
+<div class="p-2 fs-6 border-danger-subtle border-right">
+    <form class="container my-4 p-4 border rounded shadow-sm" action="" method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <div class="row">
+            {% for field in form %}
+            <div class="col-md-6 col-sm-12 mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label fw-bold">
+                    {{ field.label }}f
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="text-danger small">
+                    {{ field.errors|striptags }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+      
+
+
+        <button type="submit" class="btn btn-success mt-4 w-100">
+            <i class="fa-light fa-people"></i> Cadastro de Pessoas ggggggggggggggggggggggggggggggggggggggggggggggggggg
+            <small class="d-block text-white-50">(Aguardando para ser excluída esta página)</small>
+        </button>
+    </form>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const estadoSelect = document.getElementById('id_estado');
+  const cidadeSelect = document.getElementById('id_cidade');
+  const bairroSelect = document.getElementById('id_bairro');
+
+  // 1. Carrega os estados do IBGE
+  fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome')
+    .then(response => response.json())
+    .then(estados => {
+      estadoSelect.innerHTML = '<option value="">Selecione um estado</option>';
+      estados.forEach(estado => {
+        const opt = document.createElement('option');
+        opt.value = estado.id;  // OBS: agora estamos usando o ID do estado
+        opt.textContent = estado.nome;
+        estadoSelect.appendChild(opt);
+      });
+    });
+
+  // 2. Quando selecionar um estado, busca cidades da view Django
+  estadoSelect.addEventListener('change', () => {
+    const estadoId = estadoSelect.value;
+    cidadeSelect.innerHTML = '<option>Carregando cidades...</option>';
+    bairroSelect.innerHTML = '<option value="">Selecione a cidade primeiro</option>';
+
+    fetch(`/ajax/cidades/?uf=${estadoId}`)
+      .then(response => response.json())
+      .then(data => {
+        cidadeSelect.innerHTML = '<option value="">Selecione a cidade</option>';
+        data.cidades.forEach(cidade => {
+          const opt = document.createElement('option');
+          opt.value = cidade.id; // Atenção: usando ID da cidade, pois o backend espera isso
+          opt.textContent = cidade.nome;
+          cidadeSelect.appendChild(opt);
+        });
+      });
+  });
+
+  // 3. Quando selecionar uma cidade, busca bairros da view Django
+  cidadeSelect.addEventListener('change', () => {
+    const cidadeId = cidadeSelect.value;
+    if (!cidadeId) return;
+
+    fetch(`/ajax/bairros/?cidade=${cidadeId}`)
+      .then(response => response.json())
+      .then(data => {
+        bairroSelect.innerHTML = '<option value="">Selecione o bairro</option>';
+        data.bairros.forEach(bairro => {
+          const opt = document.createElement('option');
+          opt.value = bairro.id;
+          opt.textContent = bairro.nome;
+          bairroSelect.appendChild(opt);
+        });
+      });
+  });
+});
+</script>

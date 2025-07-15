@@ -1,0 +1,85 @@
+<style>
+  .matricula-card {
+    border-left: 5px solid #0d6efd;
+    background: #f8f9fa;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    border-radius: 10px;
+  }
+  .matricula-card div div p{
+    padding:0px;
+    margin:0px
+  }
+
+  .matricula-card h5, .matricula-card div div p strong {
+    color: #0d6efd;
+  }
+  .badge-sim {
+    background-color: #198754;
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+  }
+  .badge-nao {
+    background-color: #dc3545;
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+  }
+</style>
+<div class="container mt-4">
+  <h2 class="mb-4">Histórico de Matrículas de {{ matriculas.0.aluno }}</h2>
+
+  {% for m in matriculas %}
+    <div class="matricula-card">
+      <h5>Ano Letivo: {{ m.turma.ano_letivo }}</h5>
+      <div class="row">
+        <div class="col-md-6">
+            <h6>{{m.turma.escola}}</h6>
+          <p><strong>Código da Matrícula:</strong> {{ m.cod_matricula }}</p>
+          <p><strong>Turma:</strong> {{ m.turma.nome }} - {{ m.turma.turno }}</p>
+          <p><strong>Tamanho da Camisa:</strong> {{ m.camisa_tamanho }}</p>
+          <p><strong>Data da Matrícula:</strong> {{ m.data_matricula|date:"d/m/Y" }}</p>
+          <p><strong>Escolarização em outra escola:</strong> 
+            {% if m.escolarizacao_fora == '1' %}Sim{% else %}Não{% endif %}
+          </p>
+          {% if m.serie_multiseriada %}
+            <p><strong>Série Multiseriada:</strong> {{ m.serie_multiseriada }}</p>
+          {% endif %}
+          {% if m.data_afastamento_inicio %}
+            <p><strong>Período de Afastamento:</strong> 
+              {{ m.data_afastamento_inicio|date:"d/m/Y" }} até {{ m.data_afastamento_fim|date:"d/m/Y" }}
+            </p>
+            <p><strong>Motivo:</strong> {{ m.motivo_afastamento }}</p>
+          {% endif %}
+        </div>
+        <div class="col-md-6">
+          <p><strong>Profissional Responsável Pela Matrícula:</strong> {{ m.profissional_matricula.get_full_name }}</p>
+          {% if m.obervacao %}
+            <p><strong>Observações:</strong> {{ m.obervacao|safe }}</p>
+          {% endif %}
+          <hr>
+          <p><strong>Participa do Cálculo de Média?</strong> 
+            {% if m.calcula_media %}<span class="badge badge-sim">Sim</span>
+            {% else %}<span class="badge badge-nao">Não</span>{% endif %}
+          </p>
+          <p><strong>Aprovado pelo Conselho?</strong> 
+            {% if m.aprovado_conselho %}<span class="badge badge-sim">Sim</span>
+            {% else %}<span class="badge badge-nao">Não</span>{% endif %}
+          </p>
+          <p><strong>Aprovado na Recuperação?</strong> 
+            {% if m.aprovado_recupera %}<span class="badge badge-sim">Sim</span>
+            {% else %}<span class="badge badge-nao">Não</span>{% endif %}
+          </p>
+          <p><strong>Não Foi à Recuperação?</strong> 
+            {% if m.naoFoi_a_recupera %}<span class="badge badge-sim">Sim</span>
+            {% else %}<span class="badge badge-nao">Não</span>{% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-muted">Nenhuma matrícula registrada para este aluno.</p>
+  {% endfor %}
+</div>

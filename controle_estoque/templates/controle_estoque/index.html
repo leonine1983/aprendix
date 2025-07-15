@@ -1,0 +1,189 @@
+{% extends 'global/template.html' %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'global/css/cheatsheet.css' %}">
+<style>
+.bg_personalizado{
+  background-color: burlywood !important;
+}
+</style>
+
+{% endblock css %}
+{% block script %}
+<script src="{% static 'global/js/cheatsheet.js' %}"></script>
+<!--Bibliotecas Jquery para tornar o elemento redimensionavel na tela-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/smoothness/jquery-ui.css">
+<script>
+  $(document).ready(function() {
+    $("#resizable-toast").resizable({
+      handles: "e", // permite redimensionamento apenas pelo lado leste (direito)
+      minWidth: 200, // largura mínima permitida
+      maxWidth: 800 // largura máxima permitida
+    });
+
+    $("#resizable-moviEstoque").resizable({
+      handles: "e", // permite redimensionamento apenas pelo lado leste (direito)
+      minWidth: 200, // largura mínima permitida
+      maxWidth: 800 // largura máxima permitida
+    });
+  });
+</script>
+
+<!--ENDE Bibliotecas Jquery para tornar o elemento redimensionavel na tela-->
+
+{% endblock script %}
+{% block main %}
+<h2 class="raleway">
+  <svg width="30" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>
+  Informações Básicas
+</h2>
+<hr>
+    
+<div>
+  <div class="bd-example-snippet bd-code-snippet  w-100">
+    <div class="bd-example row p-1 align-items-center">
+
+      {% for categorias in categoria  %}
+      <div class="toast shadow-sm m-2 " role="alert" aria-live="assertive" aria-atomic="true" id="resizable-toast">       
+    
+        <div class="toast-header">
+          <svg class="bd-placeholder-img rounded me-2 " width="20" height="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#007aff"/></svg>
+          <strong class="me-auto">{{categorias.nome}} </strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+
+        <div class="toast-body">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Nome</th>
+                <th scope="col">Quantidade</th>
+              </tr>
+            </thead>
+            {% for produto in categorias.alimentos_set.all  %}   
+            <tbody>
+              <tr>
+                <td>{{produto.nome}}</td>
+                <td>{{produto.quantidade_disponivel}} {{produto.unidade}}</td>
+              </tr>
+            </tbody>
+            {% endfor %}
+          </table>             
+        </div>
+      </div>   
+      {% endfor %}
+    </div> 
+
+  <!--MOVIMENTAÇÃO DE ESTOQUE-->
+  <div class="toast shadow-sm m-2 w-100  bg-light-subtle resizable moveDiv" role="alert" aria-live="assertive" aria-atomic="true" id="resizable-moviEstoque">
+    <div class="toast-header">
+      <svg class="bd-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#007aff"/></svg>
+      <strong class="me-auto">Últimas Movimentações</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th scope="col">TIPO</th>
+          <th scope="col">DATA</th>
+          <th scope="col">PRODUTO</th>
+          <th scope="col">QUANTIDADE</th>          
+          <th scope="col">ORIGEM</th>
+          <th scope="col">DESTINO</th>          
+          <th scope="col">RESP. INFOMAÇÃO</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        {% for d in movimenta_estoque %}                   
+          <tr>            
+            <td>{{d.tipo}} </td>            
+            <td>{{d.data_hora}}</td>
+            <td>{{d.alimento.nome}} kg</td>
+            <td>{{d.quantidade}} kg</td>           
+            <td>{{d.fornecedor_alimento.nome}} kg</td>
+            <td>{{d.local_destino}}</td>
+            <td>{{d.responsavel}}</td>
+          </tr>  
+         {% endfor %}                  
+        </tbody>
+      </table>
+      <!--Controle-->
+      <div>     
+
+        {% if page_obj.has_previous %}
+            <a class="" href="?page={{page_obj.previous_page_number}}"><i class="fa-solid fa-angles-left"></i> Voltar</a>    
+                          
+        {% endif %}
+        {% if page_obj.has_next %}               
+            <a href="?page={{ page_obj.next_page_number }}">Próxima página <i class="fa-solid fa-angles-right"></i></a>    
+        {% endif %}
+      </div>
+
+
+    </div>
+  </div>   
+
+
+</div>
+
+<!--
+
+        {% if page_obj.has_previous %}
+            <a class="" href="?page={{page_obj.previous_page_number}}"><i class="fa-solid fa-angles-left"></i> Voltar</a>    
+                          
+        {% endif %}
+        {% if page_obj.has_next %}               
+            <a href="?page={{ page_obj.next_page_number }}">Próxima página <i class="fa-solid fa-angles-right"></i></a>    
+        {% endif %}
+
+
+-->
+
+<!--Bibliotecas Jquery para tornar o elemento redimensionavel na tela-->
+
+<script src="{% static 'global/js/cheatsheet.js' %}"></script>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/smoothness/jquery-ui.css">
+<script>
+  $(document).ready(function() {
+    $(".toast").resizable({
+      handles: "n, e, s, w", // permite redimensionamento apenas pelo lado leste (direito)
+      minWidth: 600, // largura mínima permitida
+      maxWidth: 1500 // largura máxima permitida
+    });
+
+    $(".toast").resizable({
+      handles: "n, e, s, w", // permite redimensionamento apenas pelo lado leste (direito)
+      minWidth: 200, // largura mínima permitida
+      maxWidth: 1500 // largura máxima permitida
+    });
+  });
+</script>
+
+<!--remover o link de desenvolvedor do grafico-->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      var plotlyLinks = document.querySelectorAll('.js-plot-link-container a:not([href^="https://plotly.com"])');
+      Array.prototype.forEach.call(plotlyLinks, function (plotlyLink) {
+          plotlyLink.style.display = 'none';
+      });
+  });
+</script>
+
+<!--DRAG AND DROP-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+  $(document).ready(function() {
+    $(".toast").draggable();
+  });
+</script>
+<!--fim DRAG AND DROP-->
+{% endblock main %}

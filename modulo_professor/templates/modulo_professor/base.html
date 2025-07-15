@@ -1,0 +1,1073 @@
+{% load static %}
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+  <head><script src="{% static 'global/js/color-modes.js' %}"></script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.111.3">    
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">   <title>AprendiX</title>   
+
+    <link href="{% static 'global/css/form_win11.css' %}" rel="stylesheet">  
+    <link href="{% static 'global/bootstrap/navbars/navbars.css' %}" rel="stylesheet">    
+    <link href="{% static 'global/css/bootstrap.min.css' %}" rel="stylesheet">
+    
+  <style>  
+    body{
+      width:100vw!important;
+      height:100vh!important;      
+      display: grid;
+      place-items: center;      
+    }
+    .bg-p-3
+    {
+      --s: 50px;
+      --c: #191b22;
+      --_s: calc(2*var(--s)) calc(2*var(--s));
+      --_g: 35.36% 35.36% at;
+      --_c: #0000 66%,#20222a 68% 70%,#0000 72%;
+      background: 
+        radial-gradient(var(--_g) 100% 25%,var(--_c)) var(--s) var(--s)/var(--_s), 
+        radial-gradient(var(--_g) 0 75%,var(--_c)) var(--s) var(--s)/var(--_s), 
+        radial-gradient(var(--_g) 100% 25%,var(--_c)) 0 0/var(--_s), 
+        radial-gradient(var(--_g) 0 75%,var(--_c)) 0 0/var(--_s), 
+        repeating-conic-gradient(var(--c) 0 25%,#0000 0 50%) 0 0/var(--_s), 
+        radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
+      background-attachment: fixed;
+    } 
+    .bg-p-2
+    {
+      --s: 50px;
+      --c: #94e4b5;
+      --_s: calc(2*var(--s)) calc(2*var(--s));
+      --_g: 35.36% 35.36% at;
+      --_c: #0000 66%,#377c56a4 68% 70%,#0000 72%;
+      background: 
+        radial-gradient(var(--_g) 100% 25%,var(--_c)) var(--s) var(--s)/var(--_s), 
+        radial-gradient(var(--_g) 0 75%,var(--_c)) var(--s) var(--s)/var(--_s), 
+        radial-gradient(var(--_g) 100% 25%,var(--_c)) 0 0/var(--_s), 
+        radial-gradient(var(--_g) 0 75%,var(--_c)) 0 0/var(--_s), 
+        repeating-conic-gradient(var(--c) 0 25%,#0000 0 50%) 0 0/var(--_s), 
+        radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
+      background-attachment: fixed;
+    } 
+    .bg-p-1
+    {
+      --s: 50px;
+      --c: #b0debc;
+      --_s: calc(2*var(--s)) calc(2*var(--s));
+      --_g: 35.36% 35.36% at;
+      --_c: #0000 66%,#889fbd3d  68% 70%,#0000 72%;
+      background: 
+        radial-gradient(var(--_g) 100% 25%,var(--_c)) var(--s) var(--s)/var(--_s), 
+        radial-gradient(var(--_g) 0 75%,var(--_c)) var(--s) var(--s)/var(--_s), 
+        radial-gradient(var(--_g) 100% 25%,var(--_c)) 0 0/var(--_s), 
+        radial-gradient(var(--_g) 0 75%,var(--_c)) 0 0/var(--_s), 
+        repeating-conic-gradient(var(--c) 0 25%,#0000 0 50%) 0 0/var(--_s), 
+        radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
+      background-attachment: fixed;
+    } 
+    .fs-6{font-size:xx-small;}
+    /* main wrapper and its layout */
+    /* main wrapper and its layout */
+    .wrapper {
+      width: 200px;
+      border-radius: 30px;
+      height: 50px;
+      background: white;
+      box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.281);
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      z-index: 5;
+      position: fixed; /* Mudado de relative para fixed */
+      bottom: 10px; /* Definido para ficar 10px acima da parte inferior */
+      left: 50%; /* Para centralizar horizontalmente */
+      transform: translateX(-50%); /* Para centralizar horizontalmente */
+    }
+
+    .item {
+      cursor: pointer;
+    }
+    .linee {
+      width: 20px;
+      height: 3px;
+      background: rgb(201, 198, 198);
+      margin-top: 3px;
+      border-radius: 5px;
+      transition: all 0.2s;
+    }
+    .linee1 {
+      width: 15px;
+      transform: translateX(5px);
+    }
+    .linee1::before {
+      content: "";
+      display: block;
+      transform: translateX(-5px);
+      width: 3px;
+      height: 3px;
+      background: rgb(201, 198, 198);
+      transition: width 0.2s ease 0.1s, transform 0.2s;
+    }
+    .linee3::after {
+      content: "";
+      display: block;
+      transform: translateX(17px);
+      width: 0px;
+      height: 3px;
+      background: rgb(201, 198, 198);
+      transition: width 0.2s ease 0.1s;
+    }
+    .linee3 {
+      width: 13px;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 5px);
+      grid-auto-rows: 5px;
+      grid-gap: 4px;
+      transform: translateY(3px);
+    }
+    .dot {
+      border: 1px solid rgb(139, 136, 136);
+      border-radius: 50%;
+    }
+    .add {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgb(201, 198, 198);
+      border: none;
+      position: relative;
+      z-index: 4;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+    .close {
+      position: relative;
+      left: 35%;
+      z-index: 4;
+      top: 50%;
+    }
+    .line {
+      position: absolute;
+      width: 10px;
+      height: 2px;
+      background: rgb(255, 255, 255);
+      transition: all 0.2s;
+    }
+    .line1 {
+      transform: rotate(0deg);
+    }
+    .line2 {
+      transform: rotate(90deg);
+    }
+    .search {
+      position: absolute;
+      top: 0;
+      left: 0%;
+      z-index: 0;
+      width: 0px!important;
+      height: 38px;
+      border-radius: 30px;
+      border: none;
+      color: white;
+      background: rgb(253, 95, 95);
+      box-sizing: border-box;
+      padding-left: 35px;
+      transition: all 0.3s ease;
+      outline: none;
+      box-shadow: none;
+    }
+    ::placeholder {
+      font-weight: bold;
+      color: white;
+    }
+    .circle {
+      width: 38px;
+      height: 38px;
+      background: rgb(201, 198, 198);
+      top: 0;
+      left: 10;
+      position: absolute;
+      z-index: 3;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.5s;
+    }
+    .nav-items {
+      width: 38px;
+      height: 38px;
+      background: rgb(246, 54, 54);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: pointer;
+      box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.212);
+      transform: scale(0);
+      transition: transform 0.1s cubic-bezier(0.23, -0.47, 0.58, -0.63);
+    }
+    .nav-items:hover {
+      transform: scale(1.1);
+      transition-timing-function: 0.1s;
+    }
+    .items1 {
+      top: -80%;
+      left: 90%;
+    }
+    .items2 {
+      top: -80%;
+      left: -10%;
+      transition-delay: 0.1s;
+    }
+    .items3 {
+      top: -150%;
+      left: 20%;
+      transition-delay: 0.2s;
+    }
+    .items4 {
+      top: -150%;
+      left: 60%;
+      transition-delay: 0.3s;
+    }
+    .box {
+      width: 100%;
+      position: absolute;
+      bottom: 110%; /* Mudado de top: 0% para bottom: 0% para iniciar de baixo */
+      left: 0;
+      height: 0px; /* Começa com altura zero */
+      overflow: hidden;
+      background: white;
+      display: grid;
+      grid-gap: 10px;
+      transition: height 0.1s cubic-bezier(0.075, 0.82, 0.165, 1);
+      z-index: 0;
+    }
+
+    .box-show {
+      height: 150px; /* Altere a altura conforme necessário */
+      box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.226);
+      padding: 10px;
+      transition-duration: 0.2s;
+    }
+
+    .box-line {
+      width: 100px;
+      height: 10px;
+      background: rgb(201, 198, 198);
+      border-radius: 10px;
+      opacity: 0;
+      z-index: 0;
+      transition: opacity 0s;
+    }
+    .box-line:nth-child(even) {
+      width: 130px;
+    }
+    .effect {
+      z-index: 3;
+      border-radius: 50%;
+      width: 200vmax;
+      height: 200vmax;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgb(246, 54, 54);
+      transition: transform 0.4s;
+    }
+
+    .box-line-show {
+      opacity: 1;
+      transition-duration:.1s;
+    }
+    footer{
+      display:flex;
+    position:fixed;
+      top:90%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      
+    }
+    footer a{
+    color:gray;
+    margin-left:30px;
+    font-size:1.8rem;}
+    a:nth-child(1):hover{
+      color:tomato;
+    }
+    a:nth-child(2):hover{
+      color:skyblue;
+    }
+    .color {
+      background: rgb(246, 54, 54);
+    }
+    .show-menu {
+      transform: scale(1);
+      transition: transform 0.5s cubic-bezier(0.23, -0.47, 0.58, -0.63);
+    }
+    .go {
+      transform: translateX(-125px);
+    }
+    .search-focus {
+      width: 180px;
+      left: 20%;
+      top: 1%;
+      height: 38px;
+      background: rgb(253, 95, 95);
+    }
+    .move {
+      transform: rotate(45deg);
+    }
+    .mov {
+      transform: rotate(-45deg);
+    }
+
+    .big {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    /* hover effect */
+    .menu:hover .linee1 {
+      width: 10px;
+      transform: translateX(0px);
+    }
+    .menu:hover .linee1::before {
+      width: 0px;
+      transform: translateX(0px);
+    }
+    .menu:hover .linee3 {
+      width: 15px;
+    }
+    .menu:hover .linee3::after {
+      content: "";
+      display: block;
+      transform: translateX(17px);
+      width: 3px;
+      height: 3px;
+      background: rgb(201, 198, 198);
+      transition: width 0.2s ease 0.1s;
+    }
+    .gallery:hover .dot1 {
+      animation: jump 0.4s ease 1;
+    }
+    .gallery:hover .dot2 {
+      animation: jump 0.4s ease 0.1s 1;
+    }
+    .gallery:hover .dot3 {
+      animation: jump 0.4s ease 0.2s 1;
+    }
+    .gallery:hover .dot4 {
+      animation: jump 0.4s ease 0.3s 1;
+    }
+    .gallery:hover .dot5 {
+      animation: jump 0.4s ease 0.4s 1;
+    }
+    .gallery:hover .dot6 {
+      animation: jump 0.4s ease 0.5s 1;
+    }
+    @keyframes jump {
+      50% {
+        transform: translateY(-4px);
+        border-color: rgb(117, 117, 117);
+      }
+      100% {
+        transform: translateY(0px);
+        border-color: rgb(119, 118, 118);
+      }
+    }
+    .close {
+      width: 10px;
+    }
+
+
+
+
+    .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      #menu-mobile {
+  background: 
+    linear-gradient(135deg,rgba(55, 68, 60, 0.78),rgba(74, 104, 85, 0.62)),
+    /* linear-gradient(135deg, #eca06c, #cc5200),*/
+    url('https://www.transparenttextures.com/patterns/web.png'); /* textura tipo web */
+  background-blend-mode: overlay;
+  background-size: cover;
+  padding: 50px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+      #nome_escola{
+          display:inline;
+        }
+        .form_alunos{
+          width:75%;
+          margin:10% auto;
+        }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+      @media (max-width: 400px){
+        #nome_escola{
+          display:none;
+        }
+        .menu-aluno{
+          background:rgba(0, 128, 0, 0.281);
+          margin:1rem 0rem;
+          padding:1rem;
+          box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+        }
+        .form_alunos{
+          width:100%;
+        }
+      }
+
+      .b-example-divider {
+        width: 100%;
+        height: 3rem;
+        background-color: rgba(0, 0, 0, .1);
+        border: solid rgba(0, 0, 0, .15);
+        border-width: 1px 0;
+        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+      }
+
+      .b-example-vr {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 100vh;
+      }
+
+      .bi {
+        vertical-align: -.125em;
+        fill: currentColor;
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .btn-bd-primary {
+        --bd-violet-bg: #712cf9;
+        --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+
+        --bs-btn-font-weight: 600;
+        --bs-btn-color: var(--bs-white);
+        --bs-btn-bg: var(--bd-violet-bg);
+        --bs-btn-border-color: var(--bd-violet-bg);
+        --bs-btn-hover-color: var(--bs-white);
+        --bs-btn-hover-bg: #6528e0;
+        --bs-btn-hover-border-color: #6528e0;
+        --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+        --bs-btn-active-color: var(--bs-btn-hover-color);
+        --bs-btn-active-bg: #5a23c8;
+        --bs-btn-active-border-color: #5a23c8;
+      }
+      .bd-mode-toggle {
+        z-index: 1500;
+      }
+      .fs-6{font-size: 0.6rem!important}
+      .btn{
+        animation: 30ms ease-in-out all !important;
+      }
+      .btn:hover{
+        scale: 1.05!important;
+      }
+
+
+
+
+
+      
+
+  </style>  
+</head>
+
+<body class=" bg-p-1">  
+ 
+  <main class="w-100 m-auto" > 
+    <!-- Nav -->     
+    {% include 'modulo_professor/partial/nav.html' %}
+    
+    <!--Contudo dinamico -->
+    <div class="container-xl mb-4">
+      {% include 'Escola/partials/mensagens.html' %}   
+      {% include 'modulo_professor/partial/modal_abertura.html' %} 
+
+      {% block main %}  
+      {% endblock main %}    
+
+      <div style="position: relative;z-index: 10;"></div>          
+    </div> 
+    <!-- end Contudo dinamico -->    
+      
+  </main>
+  <!-- Nav Bottom mobile -->
+  {% include 'modulo_professor/partial/nav_bottom.html' %} 
+
+
+
+  
+
+
+
+
+
+
+
+
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* Sidebar */
+    .myapp-sidebar {
+      position: fixed;
+      top: 11%;
+      right: 0;
+      width: 7px; /* Apenas ícones visíveis */
+      height: 90%;
+      background-color: rgba(245, 242, 242, 0.67);
+      backdrop-filter: blur(10px); /* Efeito de desfoque */
+      box-shadow: -4px 0 8px rgba(0, 0, 0, 0.3);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      padding-top: 20px;
+      border-radius: 0 10px 10px 0;
+      transition: width 0.3s ease-in-out;
+    }
+
+    
+
+    /* Links da sidebar */
+    .myapp-sidebar-nav {
+      padding: 0;
+      list-style: none; 
+      margin-top:2.2rem;
+      flex-grow: 1;
+    }
+
+    .myapp-sidebar-item {
+      margin-bottom: 1rem;      
+      position: relative;
+    }
+
+    .myapp-sidebar-link, .myapp-sidebar-sub {
+      display: flex;
+      justify-content: left;
+      align-items: left;
+      padding: 10px;
+      font-size: 18px;
+      color: #17283f;
+      border-radius: 8px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      text-decoration: none;
+      
+    }
+    .myapp-sidebar-link{
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+    }
+
+
+    .myapp-sidebar-link:hover {
+      background-color: #57575733;
+      transform: scale(1.01);
+    }
+
+    /* Ícones */
+    .myapp-sidebar-icon {
+      width: 24px;
+      height: 24px;
+      color: #fff;
+      transition: color 0.3s ease;
+    }
+
+    /* Subnível escondido inicialmente */
+    .subnivel {
+      display: none;
+      padding-left: 20px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      margin-top: 10px;
+      max-height: 0; /* Inicialmente o subnível está fechado */
+      overflow: hidden;
+      transition: max-height 0.3s ease-out; /* Transição suave */
+    }
+
+    .subnivel .myapp-sidebar-link {
+      font-size: 18px;
+      padding: 8px 10px;
+    }
+
+    /* Mostra o subnível ao clicar */
+    .show-subnivel {
+      display: block;
+      max-height: 200px; /* O máximo que o subnível pode expandir */
+    }
+
+    /* Transição e animação para abrir/fechar a sidebar */
+    .myapp-sidebar.show {
+      width: 250px; /* Largura maior quando aberto */
+    }
+
+    /* Animação para ícones */
+    .myapp-sidebar.show .myapp-sidebar-item {
+      opacity: 1;
+      transform: translateX(0);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .myapp-sidebar-item {
+      opacity: 0;
+      transform: translateX(50px);
+    }
+
+    /* Botão de toggle mobile transformado em fatia de círculo */
+    .myapp-sidebar-toggle-btn {
+      position: fixed;
+      top: 35%;
+      right: -10px; /* Coloca o botão fora da área da sidebar */
+      transform: translateY(1%) rotate(-90deg); /* Cria a fatia de círculo */
+      background-color: #444;
+      border: none;
+      width: 60px;
+      height: 60px;
+      border-radius: 30px 30px 0 0; /* Formato de fatia */
+      z-index: 200;
+      cursor: pointer;
+      transition: right 0.3s ease;
+      color: white;
+    }
+
+    .myapp-sidebar-toggle-btn:hover {
+      transform: translateY(1%) rotate(-90deg) scale(1.1) ;
+    }
+
+    .myapp-sidebar-toggle-btn svg {
+      width: 24px;
+      height: 24px;
+      color: #fff;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .shadown-p{box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;}
+    .no-visible-mobile{display: block;}
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .myapp-sidebar {
+        width: 7px; /* Ícones visíveis no mobile */
+      }
+
+      .myapp-sidebar.show {
+        width: 250px;
+      }
+
+      .myapp-sidebar-toggle-btn {
+        display: block;
+      }
+      .no-visible-mobile{display: none;}
+
+     
+    }
+  </style>
+
+  <!-- Sidebar -->
+  <aside class="myapp-sidebar">
+
+    <nav class="myapp-sidebar-nav ">
+      <div class="myapp-sidebar-item  justify-content-start">
+        <a href="#" class="myapp-sidebar-link" onclick="toggleSubnivel(event)">
+          <div>
+            <img src="{% static 'escolas/presenca.svg' %}" width="35" alt="">
+            <small>Frequência do Aluno</small>
+          </div>          
+        </a>
+        <div class="subnivel ">
+          <div><a href="{% url 'modulo_professor:selecionaTurmaFalta' %}" class="myapp-sidebar-sub"><i class="fa-solid fa-turn-right fa-flip-vertical mx-1"></i><small> Frequência Diária</small></a></div>
+          <div><a href="{% url 'modulo_professor:selecionaTurmaFaltaDisciplina' %}" class="myapp-sidebar-sub"><i class="fa-solid fa-turn-right fa-flip-vertical mx-1"></i><small> Frequência por Disciplina</small></a></div>
+        </div>
+      </div>
+      <!-- NOtas -->       
+      <div class="myapp-sidebar-item  justify-content-start">        
+        <a href="#" class="myapp-sidebar-link">  
+          <button class="dropdown-item btn btn-light btn-sm"  id="openDialog_notas" title='Notas dos alunos' >
+            <img src="{% static 'escolas/notas.svg' %}" width="35" alt="">
+            <small>Notas do Aluno</small>
+          </button>          
+        </a>
+      </div>
+
+      <!-- Parecer do Aluno -->       
+      <div class="myapp-sidebar-item  justify-content-start">     
+          <button class="dropdown-item myapp-sidebar-link btn btn-light btn-sm"  id="openDialog_turmas" title='Notas dos alunos' >
+            <i class="fa-solid fa-file-signature fs-2"></i>
+            <small>Parecer Descritivo</small>
+          </button>  
+      </div>
+      <div class="border border-light mt-5">
+        <div class="p-2 bg-light text-center"><small>Em desenvolvimento</small></div>
+        <!-- Credito de alunos -->       
+        <div class="myapp-sidebar-item  justify-content-start">        
+          <a href="#" class="myapp-sidebar-link" title="Visualizar ou adicionar créditos no sistema de recompensas escolares dos alunos">  
+            <button class="dropdown-item btn btn-light btn-sm" >
+              <i class="fa-solid fa-coins fs-3"></i>
+              <small>EduCoin - Créditos do aluno</small>
+            </button>          
+          </a>
+        </div>
+
+        <!-- Atividades de alunos -->       
+        <div class="myapp-sidebar-item  justify-content-start ">        
+          <a href="#" class="myapp-sidebar-link" title="Visualizar ou aplicar atividades escolares aos alunos">  
+            <button class="dropdown-item btn btn-light btn-sm"   >
+              <i class="fa-solid fa-file-word fs-3"></i>
+              <small>Atividades online para os aluno</small>
+            </button>          
+          </a>
+        </div>
+
+        <!-- Provas -->       
+        <div class="myapp-sidebar-item  justify-content-start ">        
+          <a href="#" class="myapp-sidebar-link" title="Visualizar ou aplicar atividades escolares aos alunos">  
+            <button class="dropdown-item btn btn-light btn-sm"  >
+              <i class="fa-solid fa-file-signature fs-3"></i>
+              <small>Prova online para os aluno</small>
+            </button>          
+          </a>
+        </div>        
+      </div>   
+          
+    </nav>
+
+  </aside>
+
+  <!-- Botão para abrir/fechar a sidebar (em telas pequenas) -->
+  <button onclick="toggleSidebar()" class="myapp-sidebar-toggle-btn">
+    Alunos
+  </button>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.myapp-sidebar');
+      const button = document.querySelector('.myapp-sidebar-toggle-btn');
+      sidebar.classList.toggle('show');
+      button.style.right = sidebar.classList.contains('show') ? '250px' : '1rem'; // Ajusta a posição do botão
+    }
+
+    function toggleSubnivel(event) {
+      const subnivel = event.target.nextElementSibling; // Obtém o próximo <div> (subnível)
+      if (subnivel) {
+        subnivel.classList.toggle('show-subnivel'); // Alterna a visibilidade do subnível
+      }
+    }
+  </script>
+
+
+
+
+<dialog id="instructions_notas">
+    <div class="alert  alert-dismissible fade show" role="alert">
+      <form method="GET" class='form_alunos' action="{% url 'modulo_professor:homeProfessor' %}">
+        <div class="mb-3">
+          <div class='alert alert-info mb-3 border  p-2'>
+            <span class="fw-semibold ">{{ request.session.escola }} </span><br>
+            <span id='anoLetvo' class="">Ano Letivo: {{ request.session.anoLetivo }}</span>
+          </div>
+          <p class="text-muted">Olá, professor <b>{{request.session.professorUser}}</b>! Por favor, selecione uma disciplina para continuar.</p>
+          <label for="disciplina" class="form-label">Disciplinas</label>
+          <select class="form-select" id="disciplina" name="disciplina" required>
+            <option value="" disabled selected>Escolha uma disciplina</option>
+            {% for d in request.session.turmaDisciplina %}
+              <option value="{{ d.id}}">{{ d.disciplina }} - {{ d.turma }}</option>
+            {% endfor %}
+          </select>
+
+
+          <p class="text-muted">Selecione o Trimestre para continuar.</p>
+          <label for="trimestre" class="form-label">Trimestre</label>
+          <select class="form-select" id="trimestre" name="trimestre" required>
+            <option value="" disabled selected>Escolha um trimestre</option>
+            {% for t in request.session.trimestres %}
+              <option value="{{ t.id}}">{{ t.numero_nome }}</option>
+            {% endfor %}
+          </select>
+
+          
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">Buscar</button>
+        </div>
+      </form>
+        
+    </div>
+    <button id="closeDialog_notas" class="btn btn-secondary mt-5">Fechar</button>
+</dialog>  
+
+  <script>
+      const dialog_notas = document.getElementById('instructions_notas');
+      const openButton_notas = document.getElementById('openDialog_notas');
+      const closeButton_notas = document.getElementById('closeDialog_notas');
+
+      openButton_notas.addEventListener('click', () => {
+          dialog_notas.showModal(); // Abre a caixa de diálogo como modal
+          });
+
+      closeButton_notas.addEventListener('click', () => {
+          dialog_notas.close(); // Fecha a caixa de diálogo
+          });
+  </script>
+
+
+
+
+  <!-- PARECER -->
+
+  
+
+
+<dialog id="instructions_turmas">
+    <div class="alert  alert-dismissible fade show" role="alert">
+        <div class="mb-3">
+          <div class='alert alert-info mb-3 border  p-2'>
+            <span class="fw-semibold ">{{ request.session.escola }} </span><br>
+            <span id='anoLetvo' class="">Ano Letivo: {{ request.session.anoLetivo }}</span>
+          </div>
+          <p class="text-muted">Olá, professor <b>{{request.session.professorUser}}</b>! Por favor, selecione uma turma para continuar.</p>
+          {% for d in request.session.turmaDisciplina %}
+            <a class="btn btn-secondary col-12" href="{% url 'modulo_professor:parecerTurma' d.turma.id %}">
+              <b>{{ d.turma }}</b> - {{ d.turma.escola }}
+            </a>
+          {% endfor %}   
+    </div>
+    <button id="closeDialog_turmas" class="btn btn-secondary mt-5">Fechar</button>
+</dialog>  
+
+  <script>
+      const dialog_turmas = document.getElementById('instructions_turmas');
+      const openButton_turmas = document.getElementById('openDialog_turmas');
+      const closeButton_turmas = document.getElementById('closeDialog_turmas');
+
+      openButton_turmas.addEventListener('click', () => {
+          dialog_turmas.showModal(); // Abre a caixa de diálogo como modal
+          });
+
+      closeButton_turmas.addEventListener('click', () => {
+          dialog_turmas.close(); // Fecha a caixa de diálogo
+          });
+  </script>
+
+
+
+
+
+
+
+
+<style>
+  .diario-sidebar {
+    position: fixed;
+    top: 11%;
+    left: 0;
+    width: 7px;
+    height: 90%;
+    background-color: rgba(245, 242, 242, 0.67);
+    backdrop-filter: blur(10px);
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.3);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+    border-radius: 0 10px 10px 0;
+    transition: width 0.3s ease-in-out;
+  }
+
+  .diario-sidebar.show {
+    width: 250px;
+  }
+
+  .diario-sidebar-nav {
+    padding: 0;
+    list-style: none;
+    margin-top: 2.2rem;
+    flex-grow: 1;
+  }
+
+  .diario-sidebar-item {
+    margin-bottom: 1rem;
+    position: relative;
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .diario-sidebar.show .diario-sidebar-item {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .diario-sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    font-size: 18px;
+    color: #17283f;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+  }
+
+  .diario-sidebar-link:hover {
+    background-color: #57575733;
+    transform: scale(1.01);
+  }
+
+  .diario-subnivel {
+    display: none;
+    padding-left: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    margin-top: 10px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+  }
+
+  .show-subnivel {
+    display: block;
+    max-height: 200px;
+  }
+
+  .diario-sidebar-toggle-btn {
+    position: fixed;
+    top: 35%;
+    left: -10px;
+    transform: translateY(1%) rotate(90deg);
+    background-color: #444;
+    border: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 30px 30px 0 0;
+    z-index: 200;
+    cursor: pointer;
+    color: white;
+    transition: left 0.3s ease;
+  }
+
+  .diario-sidebar-toggle-btn:hover {
+    transform: translateY(1%) rotate(90deg) scale(1.1);
+  }
+
+  @media (max-width: 768px) {
+    .diario-sidebar {
+      width: 7px;
+    }
+
+    .diario-sidebar.show {
+      width: 250px;
+    }
+
+    .diario-sidebar-toggle-btn {
+      display: block;
+    }
+  }
+  
+
+
+</style>
+
+
+<!-- Sidebar da esquerda -->
+<!-- Sidebar Diário de Classe (esquerda) -->
+<aside class="diario-sidebar" id="diarioSidebar">
+  <nav class="diario-sidebar-nav">
+
+    <div class="diario-sidebar-item">
+      <a href="{% url 'modulo_professor:plano_de_aula_criar' %}" class="diario-sidebar-link" onclick="toggleSubnivelDiario(event)">
+        <i class="fa-solid fa-users-rectangle me-2"></i>
+        Plano de Aula
+      </a>
+    </div>
+
+    <div class="diario-sidebar-item">
+      <a href="{% url 'modulo_professor:aula_dada_criar' %}" class="diario-sidebar-link" onclick="toggleSubnivelDiario(event)">
+        <i class="fa-solid fa-chalkboard-user me-2"></i>
+        Aula Dada
+      </a>
+    </div>
+
+    <div class="diario-sidebar-item">
+      <a href="#" class="diario-sidebar-link" onclick="toggleSubnivelDiario(event)">
+        <i class="fa-solid fa-book-open-reader me-2"></i>
+        Relatórios
+      </a>
+      <div class="diario-subnivel">
+        <a href="#" class="diario-sidebar-link"><small>Relatório bimestral</small></a>
+        <a href="#" class="diario-sidebar-link"><small>Frequência geral</small></a>
+      </div>
+    </div>
+  </nav>
+</aside>
+
+<!-- Botão para abrir/fechar a sidebar do Diário de Classe -->
+<button onclick="toggleSidebarDiario()" class="diario-sidebar-toggle-btn">
+  Diário
+</button>
+
+
+<script>
+  function toggleSidebarDiario() {
+    const sidebar = document.getElementById('diarioSidebar');
+    const button = document.querySelector('.diario-sidebar-toggle-btn');
+    sidebar.classList.toggle('show');
+    button.style.left = sidebar.classList.contains('show') ? '250px' : '1rem';
+  }
+
+  function toggleSubnivelDiario(event) {
+    const parent = event.currentTarget.parentElement;
+    const subnivel = parent.querySelector('.diario-subnivel');
+    if (subnivel) {
+      subnivel.classList.toggle('show-subnivel');
+    }
+  }
+</script>
+
+<!-- OPEN DIALOGS -->
+ {% include "modulo_professor/partial/open_dialogs/dialog_aulaDia.html" %}
+
+  
+</body>    
+</html>
+
+
+

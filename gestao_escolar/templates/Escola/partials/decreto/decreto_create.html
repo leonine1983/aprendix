@@ -1,0 +1,119 @@
+ {% load static %}
+ {% block script_head %}
+ <style>
+  .grid{
+    display: grid;
+    grid-template-columns: 1fr 20rem;
+    gap:1rem;
+    margin-bottom:1rem
+  }
+  label{
+    color:black
+  }
+  .active{
+    border: 0.1rem solid rgb(243, 221, 206)!important;
+    border-radius: 0.5rem;
+  }
+ </style>
+ {% endblock script_head %}
+<!-- Modal -->
+<div class="modal fade" id="modal_escola" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog border-0">
+    <div class="modal-content  border-0 shadow-0">
+      <div class="border-bottom mb-3 p-2">
+        <span class="mx-5 fs-4"><i class="fa-duotone fa-address-card" style="--fa-secondary-color: #511f3c;"></i> Gerenciador de Decretos</span>
+        <button type="button" class="close btn btn-sm btn-primary" data-dismiss="modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      
+      <div class="shadow-sm bg-light-subtle p-5" >
+        {% if not update %}
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"><i class="fa-duotone fa-solid fa-school-flag"></i> {{ request.session.escola_nome }}</button>
+          </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade show active p-3" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+            <h2>Gerenciamento de Decretos Administrativos</h2>
+            <p class="text-secondary p-2">
+              Este formulário serve para criar e gerenciar decretos administrativos. Ele permite registrar informações importantes, como quem é o profissional envolvido, para onde ele será encaminhado, qual será sua atividade e o ano em que o decreto foi emitido.
+            </p>
+            <table class="win11-table mb-3">
+              <thead>
+                <tr>
+                  <th class="bg-danger">Função</th>
+                  <th>Nome</th>
+                  <th>Escola</th>
+                  <th>Número/ordem</th>
+                  <th>Criado em</th>
+                  <th>Atualizado em</th>
+                  <th>Extender para {{ request.session.anoLetivo_nome }}</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for d in decretos %}
+                <tr>
+                  <td class="bg-danger-subtle fw-bolder"> {{ d.profissao }} </td>
+                  <td> {{ d.profissional }} </td>
+                  <td> {{ d.destino }} </td>
+                  <td> {{ d.numero_decreto }}/{{ d.ano_decreto }} </td>
+                  <td> {{ d.created }} | {{ d.author_created }} </td>
+                  <td> {{ d.atualizado_em }} | {{ d.author_atualiza }} </td>
+                  <td>
+                    {% if not d.Decreto_decretoAtivo.last.ano_ativo.ano == request.session.anoLetivo_nome %}
+                    <a href="{% url 'Gestao_Escolar:decreto-ativo' d.pk %}">Extender <i class="fa-sharp fa-thin fa-square-up-right"></i></a>
+                    {% else %}
+                    Já está em atividade em {{ request.session.anoLetivo_nome }}
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% url 'Gestao_Escolar:decreto-update' d.id as editar_url %}
+                    {% include "Escola/components/linkEditar.html" with link=editar_url title="Editar decreto" %}
+                    <!--
+                    <a href="{% url 'Gestao_Escolar:decreto-update' d.id %}" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" title="Editar decreto">
+                      <i class="fa-solid fa-pen-to-square"></i>
+                      <span class="d-none d-md-inline">Editar</span>
+                    </a>
+                    -->
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <div class="p-2 fs-6 border-danger-subtle border-right d-flex text-light bg-p-3">
+              <form class="m-3" action="" method="post">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <section class="row row-cols-2">
+                  {% for field in form %}
+                  <section>
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <section class="d-flex">
+                      {{ field }}
+                      {{ field.errors }}
+                    </section>
+                  </section>
+                  {% endfor %}
+                </section>
+                <button type="submit" class="btn btn-sm btn-success w-100 mt-2"> {{ button }} {{ object }} <i class="fa-solid fa-people-roof"></i></button>
+              </form>
+              <div class="border p-3 m-2 col-4">
+                <section class="text-secondary">Se o nome do profissional não constar na lista, clique em "Nova Pessoa" para adicioná-lo</section>
+                <a href="{% url 'Gestao_Escolar:pessoas-create' %}" class="link ml-2 w-50 btn btn-sm btn-success mt-3">Nova Pessoa <i class="fa-solid fa-plus"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      <!-- Rodapé do Modal -->
+      {% include "Escola/partials/utils/rodape-modal.html" %}
+    </div>
+  </div>
+</div>
+
+{% include "Escola/partials/utils/dragDrop.html" %}
+
+
+

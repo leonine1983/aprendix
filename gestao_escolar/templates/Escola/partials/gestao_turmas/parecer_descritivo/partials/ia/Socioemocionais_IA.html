@@ -1,0 +1,41 @@
+                
+    <style>
+        .capitular {
+            font-size: 3em; /* Tamanho maior para a letra inicial */
+            float: left; /* Para que a letra flutue à esquerda */
+            line-height: 0.8; /* Ajusta o espaço vertical */
+            margin-right: 0.1em; /* Espaçamento à direita da letra capitular */
+        }
+    </style>
+    <button id="openDialog_{{tu.aluno.id}}_socio_{{t.id}}" title='Ver todos os contratos' class='border-0 bg-transparent'> 
+        <i class="fa-solid fa-robot text-primary"></i>
+    </button>
+    <dialog id="instructionsDialog_{{tu.aluno.id}}_socio_{{t.id}}" class="w-75">
+        <div class="container mt-4">
+            <div class="container mt-5">
+                <h2 class="text-left text-primary">Orientações para Melhoria dos Aspectos Socioemocionais</h2>    
+                <p class="lead text-left text-dark">
+                    Esta é uma análise feita pela IA com o intuito de auxiliar o professor a identificar como melhorar os aspectos socioitivos do aluno. Ao preencher o campo "Aspectos socioitivos" no parecer descritivo, considere os seguintes dados essenciais:
+                </p>                
+                
+                <p class='fs-5 border border-danger p-3 rounded-3 lh-lg shadow bg-secondary-subtle'>
+                    <span class="fs-1">🤖</span>
+                    {{tp.aspectos_socioemocionais|safe}}
+                </p>                
+            </div>  
+        </div>                    
+        <button id="closeDialog_{{tu.aluno.id}}_socio_{{t.id}}" class="btn btn-secondary mt-5">Fechar</button>
+    </dialog>  
+    <script>
+        const dialog_{{tu.aluno.id}}_socio_{{t.id}} = document.getElementById('instructionsDialog_{{tu.aluno.id}}_socio_{{t.id}}');
+        const openButton_{{tu.aluno.id}}_socio_{{t.id}} = document.getElementById('openDialog_{{tu.aluno.id}}_socio_{{t.id}}');
+        const closeButton_{{tu.aluno.id}}_socio_{{t.id}} = document.getElementById('closeDialog_{{tu.aluno.id}}_socio_{{t.id}}');
+
+        openButton_{{tu.aluno.id}}_socio_{{t.id}}.addEventListener('click', () => {
+            dialog_{{tu.aluno.id}}_socio_{{t.id}}.showModal(); // Abre a caixa de diálogo como modal
+            });
+
+        closeButton_{{tu.aluno.id}}_socio_{{t.id}}.addEventListener('click', () => {
+            dialog_{{tu.aluno.id}}_socio_{{t.id}}.close(); // Fecha a caixa de diálogo
+            });
+    </script>    

@@ -1,0 +1,82 @@
+
+<!-- Bootstrap Datepicker CSS -->
+
+{% load static %}
+<!-- Modal -->
+<div class="modal fade" id="modal_escola" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog w-100">
+    <h2 class='p-2 bg-info-subtle'><i class="fa-duotone fa-solid fa-school-flag"></i> {{request.session.escola_nome}} <i class="ml-3 fa-solid fa-pen-line"></i> {{request.session.anoLetivo_nome}}</h2>
+    <div class="modal-content bg-secondary-subtle ">
+      <div class="modal-header">
+        <h4 class="modal-title  fs-6"><span class="text-uppercase ml-5 fs-3 "><i class="fa-solid fa-people-roof"></i> {{titulo_page}}</span></h4>        
+        <button type="button" class="close" data-dismiss="modal">&times;</button>      
+      </div>
+      <div class="modal-body shadow-sm bg-light-subtle">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Criar Vínculo  <i class="fa-sharp-duotone fa-solid fa-pen-line"></i> <span class='text-uppercase text-success'>{{lista_all.0.encaminhamento}}</span></button>
+          </li>                         
+        </ul>
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+            <div class='info-box m-2'>
+              <h3><i class="fa-light fa-location-exclamation"></i> Importante:</h3>
+              <p>
+                <span class='ml-3'>Nesta área</span>, você está visualizando os detalhes de vínculo dos profissionais com a escola selecionada. Para garantir que todos os registros estejam corretos e completos, é fundamental que você defina a função de cada funcionário.              
+                Por favor, informe se o profissional é um professor, merendeira, porteiro, ou desempenha outra função específica. A correta atribuição das funções ajuda na organização e no gerenciamento eficiente dos recursos da escola.             
+                Certifique-se de que todas as informações estejam atualizadas para um melhor acompanhamento e planejamento ao longo do ano letivo.
+              </p>
+            </div>
+            <div class='bg-primary-subtle p-2 m-2'>
+              
+            </div>  
+            
+            <div class='p-2 fs-6 border-danger-subtle border-right d-flex text-light' style= 'box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgb(209, 213, 219) 0px 0px 0px 1px inset; background-color:rgb(116, 145, 140)'>
+              <link rel="stylesheet" href="{% static 'global/css/css3_tab.css' %}">
+               <div class="page w-100">    
+                    <!-- tabs -->
+                    <div class="pcss3t pcss3t-effect-scale pcss3t-theme-1">
+                      <input type="radio" name="pcss3t" checked  id="tab1"class="tab-content-first">
+                      <label for="tab1"><i class="icon-bolt"></i>Ano Letivo {{request.session.anoLetivo_nome}}</label>
+                      
+                      <input type="radio" name="pcss3t" id="tab2" class="tab-content-2">
+                      <label for="tab2"><i class="icon-picture"></i>Todos os Encaminhamentos por Anos</label>
+                      
+                      <input type="radio" name="pcss3t" id="tab3" class="tab-content-3">
+                      <label for="tab3"><i class="icon-cogs"></i>Encaminhar ao Ano Letivo</label>
+                      
+                      <!--<input type="radio" name="pcss3t" id="tab5" class="tab-content-last">
+                      <label for="tab5"><i class="icon-globe"></i>Newton</label>-->
+                      
+                      <ul>
+                        <li class="tab-content tab-content-first typography">
+                          {% include "Escola/partials/partials_professores/encaminhamentos/partials_encaminhamento/letivo_atual.html" %}                          
+                        </li>                        
+                        <li class="tab-content tab-content-2 typography">                          
+                          {% include "Escola/partials/partials_professores/encaminhamentos/partials_encaminhamento/letivo_todos.html" %}                             
+                        </li>
+                        
+                        <li class="tab-content tab-content-3 typography">
+                          {% include "Escola/partials/partials_professores/encaminhamentos/partials_encaminhamento/letivo_create.html" %}
+                        </li>
+                        <!--
+                        <li class="tab-content tab-content-last typography">
+                          <div class="typography">
+                            <h1>Isaac Newton</h1>
+                            <p>English physicist and mathematician who is widely regarded as one of the most influential scientists of all time and as a key figure in the scientific revolution. His book Philosophiæ Naturalis Principia Mathematica ("Mathematical Principles of Natural Philosophy"), first published in 1687, laid the foundations for most of classical mechanics. Newton also made seminal contributions to optics and shares credit with Gottfried Leibniz for the invention of the infinitesimal calculus.</p>
+                            <p>Newton's Principia formulated the laws of motion and universal gravitation that dominated scientists' view of the physical universe for the next three centuries. It also demonstrated that the motion of objects on the Earth and that of celestial bodies could be described by the same principles. By deriving Kepler's laws of planetary motion from his mathematical description of gravity, Newton removed the last doubts about the validity of the heliocentric model of the cosmos.</p>
+                          <p class="text-right"><em>Find out more about Isaac Newton from <a href="http://en.wikipedia.org/wiki/Isaac_Newton" target="_blank">Wikipedia</a>.</em></p>		
+                          </div>
+                        </li>
+                        -->
+                      </ul>
+                    </div>
+                    <!--/ tabs -->
+                  </div>
+            </div>
+          </div>   
+        </div>        
+      </div>
+    </div>
+  </div>
+</div>

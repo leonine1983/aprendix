@@ -1,0 +1,70 @@
+{% extends "Admin_Acessos/base_template.html" %}
+{% load static %}
+{% block main %}
+
+<link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+<style>
+    #id_login_aluno, #id_senha{
+        background-color: rgb(248, 124, 200)!important;
+    }
+    .form-section-title {
+    font-size: 1.2rem;
+    color: #333;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+</style>
+{% include 'Escola/partials/mensagens.html' %}
+<link rel="stylesheet" href="{% static 'global/css/form_win11.css' %}">
+<!-- Botão de Impressão -->
+<button onclick="imprimirConteudo()" class="btn btn-success mt-3"><i class="fa-solid fa-print"></i> Imprimir Dados de Acesso</button>
+
+<!-- Conteúdo a ser impresso -->
+<div class="d-flex justify-content-end w-100 win11-header mt-2 mb-2">   
+    <a href="{% url 'admin_acessos:login_create' %}" class="btn btn-win11-primary m-2 btn-login">
+        <i class="fa-regular fa-address-card"></i> Login Matrícula
+    </a>
+</div>
+<div class="container p-4 bg-light text-muted" style="color: #fff; border-radius: 8px; width: 95vw">
+    <img src="{% static 'SME - 2 PNG.png' %}" width="150" alt="Logo do AprendiX">
+    <img src="{% static 'logo.png' %}" width="60" alt="Logo do AprendiX">
+
+    <h2 class="text-center mb-4 border-bottom border-1 border-dark mt-3">Acesse o Sistema AprendiX</h2>
+
+    <p class="text-center mb-4">Bem-vindo à plataforma AprendiX! Aqui você poderá acompanhar a matrícula e o progresso do aluno de forma simples e eficiente. Para garantir um acesso seguro e sem contratempos, utilize as credenciais abaixo para fazer login no sistema e acompanhar todas as informações acadêmicas e administrativas do aluno.</p>
+
+    <h3 class="mt-4">Seus Dados de Acesso:</h3>
+    <ul class="list-unstyled alert alert-info">
+        <li><strong>Usuário:</strong> {{aluno.login_aluno}}</li>
+        <li><strong>Senha:</strong> {{aluno.senha}}</li>
+        <li><strong>Email de Acesso:</strong> {{aluno.email}}</li>
+    </ul>
+
+    <p class="text-center mt-4">Lembre-se de manter suas credenciais de acesso em um local seguro. Caso precise de ajuda para acessar sua conta ou realizar a matrícula, entre em contato conosco através do suporte.</p>
+
+    <h3 class="mt-4">Pronto para começar?</h3>
+    <p class="text-center">Com seus dados de acesso, você pode facilmente acessar o AprendiX, realizar a matrícula e acompanhar o desempenho do aluno. Vamos juntos garantir o sucesso no aprendizado!</p>
+</div>
+
+<!-- Script de Impressão -->
+<script>
+    function imprimirConteudo() {
+        // Cria uma janela de impressão com o conteúdo da div desejada
+        var conteudo = document.querySelector('.container');
+        var novaJanela = window.open('', '', 'height=600,width=800');
+        novaJanela.document.write('<html><head><title>Imprimir</title>');
+        novaJanela.document.write('<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/5.1.0/css/bootstrap.min.css">'); // Link do Bootstrap (caso esteja usando)
+        novaJanela.document.write('</head><body>');
+        novaJanela.document.write(conteudo.innerHTML);  // Pega o conteúdo HTML da div
+        novaJanela.document.write('</body></html>');
+        novaJanela.document.close();
+        novaJanela.print();
+    }
+</script>
+
+{% endblock main %}

@@ -1,0 +1,51 @@
+{% load static %}
+<div class='m-2'>
+    <h2>Formulário de Cadastro de Pessoas para o Sistema Aprendix</h2>
+    <p>
+        Este formulário é projetado para registrar informações detalhadas sobre indivíduos, 
+        facilitando a contratação de profissionais e o gerenciamento de decretos. Com ele, 
+        o sistema pode manter um banco de dados atualizado e organizado para suportar processos 
+        administrativos e operacionais.
+    </p>
+    <p class='m-2 fs-5 text-info'>
+        <i class="fa-solid fa-circle-exclamation text-danger"></i> Obs.: Cadastrar uma pessoa não implica que ela seja um profissional da instituição. 
+        Para isso, é necessário que a pessoa passe pelos processos de contratação e encaminhamento ou obtenha um decreto correspondente.
+    </p>
+</div>
+    <hr>         
+</script> 
+<form method="post" class="container no-shadow-border">
+    <script src="{% static 'global/js/jquery.mask.min.js' %}"></script>    
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+
+    <div class="row">
+        {% for field in form %}
+        <section class="col-md-5 col-12 ">
+            <label class="form-label">{{ field.label }}</label>
+
+            {% if field.label == "Bairro" %}
+            <div class="d-flex flex-column flex-md-row align-items-start p-2 rounded sem-borda-sombra">
+                <div class="flex-fill">{{ field }}</div>
+                <a class="btn btn-sm btn-outline-primary ms-md-2 mt-2 mt-md-0" href="{% url 'Gestao_Escolar:bairro-create' %}">
+                    <i class="fa-solid fa-plus"></i> Bairro
+                </a>
+            </div>
+
+            {% elif field.label == "Cidade onde mora" %}
+            <div class="d-flex flex-column flex-md-row align-items-start p-2 rounded sem-borda-sombra">
+                <div class="flex-fill">{{ field }}</div>
+                <a class="btn btn-sm btn-outline-primary ms-md-2 mt-2 mt-md-0" href="{% url 'Gestao_Escolar:cidade-create' %}">
+                    <i class="fa-solid fa-plus"></i> Cidade
+                </a>
+            </div>
+            {% else %}
+            {{ field }}
+            {% endif %}
+            <article class="text-danger small">{{ field.errors }}</article>
+        </section>
+        {% endfor %}
+    </div>   
+    <button class="btn btn-sm btn-primary" type="submit">Salvar registro do professor</button>   
+</form>
+

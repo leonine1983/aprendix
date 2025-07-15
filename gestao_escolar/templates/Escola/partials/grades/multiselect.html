@@ -1,0 +1,41 @@
+{% load static %}
+<link rel="stylesheet" href="{% static "global/css/search.css" %}">
+
+<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="{% static 'multiselect-05/css/style.css' %}">
+  
+
+<script src="{% static 'multiselect-05/js/jquery.min.js' %}"></script>
+<script src="{% static 'multiselect-05/js/popper.js' %}"></script>
+<script src="{% static 'multiselect-05/js/bootstrap.min.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
+<script src="{% static 'multiselect-05/js/main.js' %}"></script>
+
+<script>
+    $("#id_reserva_tecnica").select2({
+		closeOnSelect : false,
+		placeholder : "Click to select an option",
+		allowHtml: true,
+		allowClear: true,
+		tags: true // создает новые опции на лету
+	});
+	$("#id_auxiliar_classe").select2({
+		closeOnSelect : false,
+		placeholder : "Click to select an option",
+		allowHtml: true,
+		allowClear: true,
+		tags: true // создает новые опции на лету
+	});
+	
+</script>
+
+
+
+
+
+
+

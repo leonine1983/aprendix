@@ -1,0 +1,195 @@
+<style>
+  #container_anoLetivo {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem;
+    flex-wrap: wrap; /* permite quebra no mobile */
+  }
+
+  #form_anoLetivo {
+    flex: 1 1 400px;
+    min-width: 300px;
+  }
+
+  #form_anoLetivo form {
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  #form_anoLetivo form p {
+    margin-bottom: 1.5rem;
+  }
+
+  #form_anoLetivo label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+
+  #form_anoLetivo input[type="text"],
+  #form_anoLetivo input[type="date"],
+  #form_anoLetivo select {
+    width: 100%;
+    height: 4rem;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  #form_anoLetivo input:focus,
+  #form_anoLetivo select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    outline: none;
+  }
+
+  #form_anoLetivo button[type="submit"] {
+    background-color: #3b82f6;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: block;
+    margin-left: auto;
+  }
+
+  #form_anoLetivo button[type="submit"]:hover {
+    background-color: #2563eb;
+  }
+
+  #tabela_anoLetivo {
+    flex: 1 1 400px;
+    min-width: 300px;
+    overflow-x: auto;
+  }
+
+  #tabela_anoLetivo table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  #tabela_anoLetivo th,
+  #tabela_anoLetivo td {
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  #tabela_anoLetivo th {
+    background-color: #f3f4f6;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    #container_anoLetivo {
+      flex-direction: column;
+      padding: 1rem;
+    }
+
+    #form_anoLetivo button[type="submit"] {
+      width: 100%;
+    }
+  }
+</style>
+
+<h1>Criar Novo Ano</h1>
+
+{% include "Escola/partials/modal_partials/modal_top.html" %}
+{% if messages %}                
+  {% include 'Escola/partials/mensagens.html' %}          
+{% endif %}
+<div id="container_anoLetivo">
+    
+  <!-- FORMULÁRIO -->
+  <div id="form_anoLetivo">
+    {% if title_page == "<b>Editar Ano Letivo</b>" %}
+    <div class="mb-0 d-flex border alert-info justify-content-between align-items-center px-3 py-2">
+        <h3 class="fs-5 m-0">{{ title_page|safe }} {{ano}}</h3>
+        {% url 'Gestao_Escolar:cria_ano' as editar_url %}
+        {% include "Escola/components/linkCriar.html" with link=editar_url title="Criar ano" %}
+    </div>
+    {% else %}
+    <div class="mb-0 d-flex border alert-info justify-content-between align-items-center px-3 py-2">
+        <h3 class="fs-5 m-0">Criar novo {{ title_page|safe }} {{ano}}</h3>
+    </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Salvar</button>
+    </form>
+  </div>
+
+  <!-- TABELA -->
+  <div id="tabela_anoLetivo">
+    <table>
+      <thead>
+        <tr>
+          <th>Ano Letivo</th>
+          <th>Início</th>
+          <th>Fim</th>
+          <th>Editar</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        {% for a in anos %}
+        <tr>
+          <td>{{ a.ano }}</td>
+          <td>{{ a.data_inicio }}</td>
+          <td>{{ a.data_fim }}</td>
+          <td>
+            {% url 'Gestao_Escolar:editar_ano' a.id as editar_url %}
+            {% include "Escola/components/linkEditar.html" with link=editar_url title="Editar ano" %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <nav aria-label="Paginação de anos letivos" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if anos.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ anos.previous_page_number }}">Anterior</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            {% endif %}
+
+            {% for num in anos.paginator.page_range %}
+            {% if anos.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > anos.number|add:'-3' and num < anos.number|add:'3' %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
+
+            {% if anos.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ anos.next_page_number }}">Próximo</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Próximo</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    
+    
+</div>

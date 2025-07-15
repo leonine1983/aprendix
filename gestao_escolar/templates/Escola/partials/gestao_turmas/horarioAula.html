@@ -1,0 +1,91 @@
+{% load static %}
+{% load meus_filtros %}
+{% block script_head %}<link rel="stylesheet" href="{% static 'global/css/css3_tab.css' %}">
+{% endblock script_head %} 
+{% block script_footer %}{% endblock script_footer %} 
+
+<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    
+    <div class="modal-dialog w-100">
+        <div class="modal-content bg-secondary-subtle p-5">
+            {% include "Escola/partials/mensagens.html" %}
+            
+            <div class="modal-header w-100 d-flex border-bottom border-secondary">
+            <div class='d-flex justify-content-between w-100'> 
+                <div><h1><img src="{% static 'svg/grade_horario.svg' %}" alt=""> Grade de Aula do {{horarios.0.turma}}</h1></div>
+                <div class="col-4 d-flex gap-2">
+                  <a href='{% url "Gestao_Escolar:NotasAluno_one_create" horarios.0.turma.pk %}' class='btn btn-sm btn-primary link-light mt-4 '>Voltar para Gestão da Turma</a>
+                  <a class='btn btn-success fs-7 mt-4' href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}">Mudar Turma <i class="fa-regular fa-arrows-repeat"></i></i></a>           
+                </div>
+            </div>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>                
+            </div>
+            <hr class="mb-0"> 
+            <button onclick="imprimirConteudo()">Imprimir</button>
+            <div id="content_imprimir">          
+            <table class="win11-table ">
+              <thead class='bg-p-3'>
+                <tr>
+                  <th class='text-center'>Período</th>
+                  <th class='text-center'>Segunda</th>
+                  <th class='text-center'>Terça</th>
+                  <th class='text-center'>Quarta</th>
+                  <th class='text-center'>Quinta</th>
+                  <th class='text-center'>Sexta</th>
+                  <th class='text-center'>Ação</th>
+
+                </tr>
+              </thead>
+              <tbody>
+                {% for horario in horarios %}                  
+                  <tr>
+                    <td class='text-center'>{{ horario.periodo }}</td>
+                    <td class='text-center'>{% if horario.quarta is not None %}{{ horario.segunda}}{% endif %}</td>
+                    <td class='text-center'>{% if horario.quarta is not None %}{{ horario.terca}}{% endif %}</td>
+                    <td class='text-center'>{% if horario.quarta is not None %}{{ horario.quarta}}{% endif %}</td>
+                    <td class='text-center'>{% if horario.quarta is not None %}{{ horario.quinta}}{% endif %}</td>
+                    <td class='text-center'>{% if horario.quarta is not None %}{{ horario.sexta}}{% endif %}</td>
+                    <td class='text-center'><a href="{% url 'Gestao_Escolar:horario_update' pk=horario.id turma_id=horario.turma.id %}">Editar <i class="fa-regular fa-pen-to-square"></i></a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+            {% if form %}
+            <form action="" method="post" class="win11-form" >
+              <div class='p-1 mt-3'> 
+                <h4 class="text-uppercase">{{object.validade.nome_validade}}</h4>
+                <h5 class="h5 fs-7"><span class="fs-8">VALIDADE:</span> {{object.validade.data_inicio}} a {{object.validade.data_fim}} </h5>
+                <h6><span class="fs-8">PERÍODO EM EDIÇÃO:</span> <span class="text-danger">{{object.periodo.nome_periodo}} - {{object.periodo}}</span></h6>                
+              </div>
+              <div class="win11-form w-100 d-flex gap-2">
+                
+                {% csrf_token %}
+                {{form.as_p}}
+              </div>
+              <button type="submit" class="btn btn-success m-auto w-75">Atualizar Horário</button>
+            </form>
+            {% endif %}   
+            
+            <script>
+              function imprimirConteudo() {
+                      // Obtém o conteúdo da div
+                      var conteudo = document.getElementById('content_imprimir').innerHTML;
+                      
+                      // Abre uma nova janela para impressão
+                      var janela = window.open('', '', 'height=600,width=800');
+                      janela.document.write('<html><head><link rel="stylesheet" href="{% static 'global/css/table_win11.css' %}"><title>Conteúdo</title></head>');
+                      janela.document.write('<body>');
+                      janela.document.write(conteudo); // Escreve o conteúdo na nova janela
+                      janela.document.write('</body></html>');
+                      
+                      // Fecha a nova janela após a impressão
+                      janela.document.close();
+                      janela.print();
+                  }
+            </script> 
+    </div>
+</div>
+
+

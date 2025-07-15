@@ -1,0 +1,36 @@
+
+<h2 class="border-top ">Registros de Decretos: {{request.session.escola_nome}}</h2>
+<p>
+  Este formulário é destinado à alocação das vagas para os seguintes cargos na instituição: Diretor, Vice-Diretor, Coordenador Pedagógico e Secretário. 
+  Através deste formulário, você poderá associar cada cargo disponível ao respectivo decreto que regulamenta a sua contratação e responsabilidades.
+</p>
+<table class='win11-table mt-3 mb-5'>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Nome</th>
+      <th>Escola</th>
+      <th>Função</th>
+      <th>Nº do Decreto</th>                            
+      <th>Ano</th>
+      <th>Criado em</th>                            
+      <th>Atualizado em</th>
+      <th>Ação</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for d in decreto  %}
+    <tr class='fs-6'>
+      <td>{{forloop.counter}}</td>
+      <td>{{d.profissional}}</td>
+      <td>{{d.destino}}</td>
+      <td><span class='fs-5'>{{d.profissao}}</span></td>
+      <td>{{d.numero_decreto}}</td>
+      <td>{{d.ano_decreto}}</td>
+      <td>{{d.created}} por {{d.author_created}}  </td>
+      <td>{{d.atualizado_em}} por {{d.author_atualiza}}  </td>
+      <td><a href="{% url "Gestao_Escolar:decreto-update" d.pk %}" class='text-primary'>Editar <i class="fa-solid fa-pen-to-square"></i></a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
