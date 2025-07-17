@@ -521,21 +521,7 @@ class TiposRemanejamentos(models.Model):
     def __str__(self):
         return self.nome
     
-    @receiver(post_migrate)
-    def createRegisterTR(sender, **kwargs):
-        if not TiposRemanejamentos.objects.exists():
-            tipos = [  
-                ['Desistente', 'Constatado que o aluno não frequenta mais as aulas há bastante tempo'],
-                ['Transferido', 'O aluno foi transferido para outra escola'],
-                ['Mudança de Turma', 'O aluno mudou para outra turma da mesma escola']
-            ]
-            for n, m in tipos:
-                TiposRemanejamentos.objects.create(
-                    nome = n,
-                    description = m
-                )
-
-
+    
 class Remanejamento(models.Model):    
     tipo = models.ForeignKey(TiposRemanejamentos, null=True, on_delete=models.CASCADE)    
     aluno = models.ForeignKey(Matriculas, null=True, blank=True, on_delete=models.CASCADE)    
@@ -983,6 +969,19 @@ def post_migrate_setup(sender, **kwargs):
             except GrauEscolar.DoesNotExist:
                 # Handle the case where GrauEscolar entries are not found
                 print("Alguns dos registros de GrauEscolar não foram encontrados.")
+
+
+    if not TiposRemanejamentos.objects.exists():
+            tipos = [  
+                ['Desistente', 'Constatado que o aluno não frequenta mais as aulas há bastante tempo'],
+                ['Transferido', 'O aluno foi transferido para outra escola'],
+                ['Mudança de Turma', 'O aluno mudou para outra turma da mesma escola']
+            ]
+            for n, m in tipos:
+                TiposRemanejamentos.objects.create(
+                    nome = n,
+                    description = m
+                )
 
     # Cria os registros TamanhoRoupa se não existirem
     if not TamanhoRoupa.objects.exists():
