@@ -987,18 +987,7 @@ def post_migrate_setup(sender, **kwargs):
             ('Educação Física', 9)
         ]
         Disciplina.objects.bulk_create([Disciplina(nome=nome, ordem_historico=ordem) for nome, ordem in disciplinas])
-
-    # Cria os registros Compatibilidade_EducaCenso se não existirem
-    if not Compatibilidade_EducaCenso.objects.exists():
-        areas = [
-            'Ensino Fundamental de 9 anos - 1ºano', 'Ensino Fundamental de 9 anos - 2ºano',
-            'Ensino Fundamental de 9 anos - 3ºano', 'Ensino Fundamental de 9 anos - 4ºano',
-            'Ensino Fundamental de 9 anos - 5ºano', 'Ensino Fundamental de 9 anos - 6ºano',
-            'Ensino Fundamental de 9 anos - 7ºano', 'Ensino Fundamental de 9 anos - 8ºano',
-            'Ensino Fundamental de 9 anos - 9ºano', 'EJA - Ensino Fundamental - Anos Iniciais',
-            'EJA - Ensino Fundamental - Anos Finais', 'Educação Infantil'
-        ]
-        Compatibilidade_EducaCenso.objects.bulk_create([Compatibilidade_EducaCenso(nome=area) for area in areas])
+    
 
     # Cria os registros GrauEscolar se não existirem
     if not GrauEscolar.objects.exists():
