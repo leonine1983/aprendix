@@ -848,7 +848,7 @@ class DiaSemana(models.Model):
         return self.nome_dia
 
 # REGISTROS INICIAIS ---------------------
-
+"""
 @receiver(post_migrate)
 def post_migrate_setup(sender, **kwargs):
     if sender.name != 'gestao_escolar':  # Verifica se o app é 'gestao_escolar'
@@ -1020,3 +1020,4 @@ def post_migrate_setup(sender, **kwargs):
             (5, 'Sexta-feira'), (6, 'Sábado'), (7, 'Domingo')
         ]
         DiaSemana.objects.bulk_create([DiaSemana(numero_dia=num, nome_dia=nome) for num, nome in dias_da_semana])
+"""
