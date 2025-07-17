@@ -294,104 +294,22 @@ class Compatibilidade_EducaCenso(models.Model):
 
     def __str__(self):
         return self.nome
-
-    @receiver(post_migrate)
-    def createCompatibilidadeEdu(sender, **kwargs):
-        if not Compatibilidade_EducaCenso.objects.exists():
-            nivel = [
-                'Berçário I (0 a 1 ano)',
-                'Berçário II (1 a 2 anos)',
-                'Maternal I (2 a 3 anos)',
-                'Maternal II (3 a 4 anos)',
-                'Pré I (ou Jardim I, 4 a 5 anos)',
-                'Pré II (ou Jardim II, 5 a 6 anos)',
-                '1º ano (6 a 7 anos)',
-                '2º ano (7 a 8 anos)',
-                '3º ano (8 a 9 anos)',
-                '4º ano (9 a 10 anos)',
-                '5º ano (10 a 11 anos)',
-                '6º ano (11 a 12 anos)',
-                '7º ano (12 a 13 anos)',
-                '8º ano (13 a 14 anos)',
-                '9º ano (14 a 15 anos)',
-                'Ciclo I (inicial, para jovens e adultos que ainda não completaram o Ensino Fundamental)',
-                'Ciclo II (avançado, para conclusão do Ensino Fundamental)'
-            ]
-            for nome in nivel:
-                Compatibilidade_EducaCenso.objects.create(nome=nome)
-
+       
 
 class GrauEscolar(models.Model):
     nome = models.CharField(max_length=30, verbose_name="Grau/Nível Escolar")
 
     def __str__(self):
         return self.nome
-
-    @receiver(post_migrate)
-    def criar_registerGrau(sender, **kwargs):
-        if not GrauEscolar.objects.exists():
-            grau = [
-                'Etapa Creche',
-                'Ensino Fundamental I (Séries Iniciais)',
-                'Ensino Fundamental II (Séries Finais)'
-            ]
-            for nome in grau:
-                GrauEscolar.objects.create(nome=nome)
-
-
+    
+    
 class Serie_Escolar(models.Model):
     nome = models.CharField(max_length=30)
     nivel_escolar = models.ForeignKey(GrauEscolar, null=False, on_delete=models.CASCADE)
     compatibilidade_EducaCenso = models.ForeignKey(Compatibilidade_EducaCenso, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.nome
-
-    @receiver(post_migrate)
-    def criar_registerSerie(sender, **kwargs):
-        if not Serie_Escolar.objects.exists():
-            try:
-                et = GrauEscolar.objects.get(nome='Etapa Creche')
-                f1 = GrauEscolar.objects.get(nome='Ensino Fundamental I (Séries Iniciais)')
-                f2 = GrauEscolar.objects.get(nome='Ensino Fundamental II (Séries Finais)')
-                
-                compatibilidades = list(Compatibilidade_EducaCenso.objects.all())
-
-                if len(compatibilidades) < 17:
-                    print("Não há compatibilidade suficiente registrada em Compatibilidade_EducaCenso.")
-                    return
-
-                series = [
-                    ('G1', et, compatibilidades[0]),
-                    ('G2', et, compatibilidades[1]),
-                    ('G3', et, compatibilidades[2]),
-                    ('G4', et, compatibilidades[3]),
-                    ('G5', et, compatibilidades[4]),
-                    ('G6', et, compatibilidades[5]),
-                    ('1 ano', f1, compatibilidades[6]),
-                    ('2 ano', f1, compatibilidades[7]),
-                    ('3 ano', f1, compatibilidades[8]),
-                    ('4 ano', f1, compatibilidades[9]),
-                    ('5 ano', f1, compatibilidades[10]),
-                    ('6 ano', f2, compatibilidades[11]),
-                    ('7 ano', f2, compatibilidades[12]),
-                    ('8 ano', f2, compatibilidades[13]),
-                    ('9 ano', f2, compatibilidades[14]),
-                    ('Ciclo I', f1, compatibilidades[15]),
-                    ('Ciclo II', f2, compatibilidades[16])
-                ]
-
-                for nome, nivel, compatibilidade in series:
-                    Serie_Escolar.objects.create(
-                        nome=nome,
-                        nivel_escolar=nivel,
-                        compatibilidade_EducaCenso=compatibilidade
-                    )
-
-            except GrauEscolar.DoesNotExist:
-                # Handle the case where GrauEscolar entries are not found
-                print("Alguns dos registros de GrauEscolar não foram encontrados.")
-
+        return self.nome 
 
 turno = {
     ('Matutino', 'Matutino'),
@@ -568,6 +486,7 @@ class Matriculas(models.Model):
     aprovado_conselho = models.BooleanField(default=False)
     aprovado_recupera = models.BooleanField(default=False)
     naoFoi_a_recupera = models.BooleanField(default=False)
+    
 
     @receiver(post_save)
     def verifica_vagas(sender, instance, **kwargs):
@@ -942,7 +861,7 @@ class DiaSemana(models.Model):
     def __str__(self):
         return self.nome_dia
 
-# REGISTROS INICIAIS ---------------------
+# REGISTROS INICIAIS ---------------------      
 
 @receiver(post_migrate)
 def post_migrate_setup(sender, **kwargs):
@@ -990,20 +909,73 @@ def post_migrate_setup(sender, **kwargs):
 
     # Cria os registros Compatibilidade_EducaCenso se não existirem
     if not Compatibilidade_EducaCenso.objects.exists():
-        areas = [
-            'Ensino Fundamental de 9 anos - 1ºano', 'Ensino Fundamental de 9 anos - 2ºano',
-            'Ensino Fundamental de 9 anos - 3ºano', 'Ensino Fundamental de 9 anos - 4ºano',
-            'Ensino Fundamental de 9 anos - 5ºano', 'Ensino Fundamental de 9 anos - 6ºano',
-            'Ensino Fundamental de 9 anos - 7ºano', 'Ensino Fundamental de 9 anos - 8ºano',
-            'Ensino Fundamental de 9 anos - 9ºano', 'EJA - Ensino Fundamental - Anos Iniciais',
-            'EJA - Ensino Fundamental - Anos Finais', 'Educação Infantil'
-        ]
-        Compatibilidade_EducaCenso.objects.bulk_create([Compatibilidade_EducaCenso(nome=area) for area in areas])
+            nivel = [
+                'Berçário I (0 a 1 ano)',
+                'Berçário II (1 a 2 anos)',
+                'Maternal I (2 a 3 anos)',
+                'Maternal II (3 a 4 anos)',
+                'Pré I (ou Jardim I, 4 a 5 anos)',
+                'Pré II (ou Jardim II, 5 a 6 anos)',
+                '1º ano (6 a 7 anos)',
+                '2º ano (7 a 8 anos)',
+                '3º ano (8 a 9 anos)',
+                '4º ano (9 a 10 anos)',
+                '5º ano (10 a 11 anos)',
+                '6º ano (11 a 12 anos)',
+                '7º ano (12 a 13 anos)',
+                '8º ano (13 a 14 anos)',
+                '9º ano (14 a 15 anos)',
+                'Ciclo I (inicial, para jovens e adultos que ainda não completaram o Ensino Fundamental)',
+                'Ciclo II (avançado, para conclusão do Ensino Fundamental)'
+            ]
+            for nome in nivel:
+                Compatibilidade_EducaCenso.objects.create(nome=nome)
+
 
     # Cria os registros GrauEscolar se não existirem
-    if not GrauEscolar.objects.exists():
-        graus = ['Ensino Fundamental', 'Ensino Infantil']
-        GrauEscolar.objects.bulk_create([GrauEscolar(nome=grau) for grau in graus])
+    if not Serie_Escolar.objects.exists():
+            try:
+                et = GrauEscolar.objects.get(nome='Etapa Creche')
+                f1 = GrauEscolar.objects.get(nome='Ensino Fundamental I (Séries Iniciais)')
+                f2 = GrauEscolar.objects.get(nome='Ensino Fundamental II (Séries Finais)')
+                
+                compatibilidades = list(Compatibilidade_EducaCenso.objects.all())
+
+                if len(compatibilidades) < 17:
+                    print("Não há compatibilidade suficiente registrada em Compatibilidade_EducaCenso.")
+                    return
+
+                series = [
+                    ('G1', et, compatibilidades[0]),
+                    ('G2', et, compatibilidades[1]),
+                    ('G3', et, compatibilidades[2]),
+                    ('G4', et, compatibilidades[3]),
+                    ('G5', et, compatibilidades[4]),
+                    ('G6', et, compatibilidades[5]),
+                    ('1 ano', f1, compatibilidades[6]),
+                    ('2 ano', f1, compatibilidades[7]),
+                    ('3 ano', f1, compatibilidades[8]),
+                    ('4 ano', f1, compatibilidades[9]),
+                    ('5 ano', f1, compatibilidades[10]),
+                    ('6 ano', f2, compatibilidades[11]),
+                    ('7 ano', f2, compatibilidades[12]),
+                    ('8 ano', f2, compatibilidades[13]),
+                    ('9 ano', f2, compatibilidades[14]),
+                    ('Ciclo I', f1, compatibilidades[15]),
+                    ('Ciclo II', f2, compatibilidades[16])
+                ]
+
+                for nome, nivel, compatibilidade in series:
+                    Serie_Escolar.objects.create(
+                        nome=nome,
+                        nivel_escolar=nivel,
+                        compatibilidade_EducaCenso=compatibilidade
+                    )
+
+            except GrauEscolar.DoesNotExist:
+                # Handle the case where GrauEscolar entries are not found
+                print("Alguns dos registros de GrauEscolar não foram encontrados.")
+
 
     # Cria os registros TamanhoRoupa se não existirem
     if not TamanhoRoupa.objects.exists():
