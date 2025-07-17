@@ -585,11 +585,11 @@ class Frequencia_mes(models.Model):
 
     def __str__(self):
         return self.mes   
-"""
+
 # REGISTROS INICIAS ------------------------------------------
 @receiver(post_migrate)
 def post_migrate_setup(sender, **kwargs):
-    if sender.name != 'rh':  
+    if sender.name != 'rh':  # Substitua 'rh' pelo nome do seu app
         return
     
     
@@ -761,4 +761,3 @@ def post_migrate_setup(sender, **kwargs):
                     print(f"Escola_admin criado para: {escola.nome_escola}")
                 else:
                     print(f"Já existe um Escola_admin para: {escola.nome_escola}")
-"""
