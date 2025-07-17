@@ -32,6 +32,13 @@ class PessoasCreateView(LoginRequiredMixin, CreateView):
     template_name = 'Escola/inicio.html'
     form_class = Pessoa_form
 
+    def get_queryset(self):
+        buscaPessoa = self.request.GET.get('busca-pessoa', '').strip()
+        if buscaPessoa:
+            return Pessoas.objects.filter(nome__icontains=buscaPessoa)
+        pessoas_object = Pessoas.objects.all()
+        return pessoas_object
+
     def form_valid(self, form):
         try:
             with transaction.atomic():
@@ -84,7 +91,7 @@ class PessoasCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context['btn_bg'] = "btn-success"
         context['conteudo_page'] = 'Pessoa Create'
-        context['pessoas'] = Pessoas.objects.all()
+        context['pessoas'] = pessoas_object,
         context['rh_ativo'] = 'False'
         context['titulo_page'] = 'Cadastro de Pessoas'
         context['svg'] = '<i class="fa-duotone fa-address-card" style="--fa-secondary-color: #511f3c;"></i>'

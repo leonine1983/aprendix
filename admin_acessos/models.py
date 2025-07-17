@@ -45,7 +45,7 @@ class NomeclaturaJanelas(models.Model):
     def __str__(self):
         return self.nome_disciplina
 
-
+"""
 @receiver(post_migrate)
 def setup_post_migrate(sender, **kwargs):
     if sender.name == 'admin_acessos':
@@ -68,7 +68,7 @@ def setup_post_migrate(sender, **kwargs):
     for group_name in group_names:
         Group.objects.get_or_create(name=group_name)
 
-
+"""
 
     
 """

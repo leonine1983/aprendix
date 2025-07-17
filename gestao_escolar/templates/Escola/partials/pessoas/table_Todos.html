@@ -54,6 +54,17 @@
         </div>
     </div>
 
+    <!-- Buscar Pessoa -->
+    <form action="?" method="GET" class="form-inline">
+        {% csrf_token %}
+        <div class="win11-search-wrapper-inner">
+        <input type="text" class="win11-search-input" placeholder="Buscar Pessoa ou Profissional" name="busca-pessoa">
+        <button class="win11-search-button" type="submit">
+            <i class="fa-regular fa-user-magnifying-glass"></i>
+        </button>
+        </div>
+    </form>
+
     <div class="table-responsive" style="overflow-x:auto;" >
         <table class="table table-striped table-bordered ">
             <thead class="table-light">
