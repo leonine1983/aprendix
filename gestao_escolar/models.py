@@ -301,18 +301,7 @@ class GrauEscolar(models.Model):
 
     def __str__(self):
         return self.nome
-
-    @receiver(post_migrate)
-    def criar_registerGrau(sender, **kwargs):
-        if not GrauEscolar.objects.exists():
-            grau = [
-                'Etapa Creche',
-                'Ensino Fundamental I (Séries Iniciais)',
-                'Ensino Fundamental II (Séries Finais)'
-            ]
-            for nome in grau:
-                GrauEscolar.objects.create(nome=nome)
-
+    
 
 class Serie_Escolar(models.Model):
     nome = models.CharField(max_length=30)
@@ -988,8 +977,13 @@ def post_migrate_setup(sender, **kwargs):
                 Compatibilidade_EducaCenso.objects.create(nome=nome)
 
     # Cria os registros GrauEscolar se não existirem
+
     if not GrauEscolar.objects.exists():
-        graus = ['Ensino Fundamental', 'Ensino Infantil']
+        graus = [
+            'Etapa Creche',
+            'Ensino Fundamental I (Séries Iniciais)',
+            'Ensino Fundamental II (Séries Finais)'
+        ]
         GrauEscolar.objects.bulk_create([GrauEscolar(nome=grau) for grau in graus])
 
     # Cria os registros TamanhoRoupa se não existirem
