@@ -294,32 +294,7 @@ class Compatibilidade_EducaCenso(models.Model):
 
     def __str__(self):
         return self.nome
-
-    @receiver(post_migrate)
-    def createCompatibilidadeEdu(sender, **kwargs):
-        if not Compatibilidade_EducaCenso.objects.exists():
-            nivel = [
-                'Berçário I (0 a 1 ano)',
-                'Berçário II (1 a 2 anos)',
-                'Maternal I (2 a 3 anos)',
-                'Maternal II (3 a 4 anos)',
-                'Pré I (ou Jardim I, 4 a 5 anos)',
-                'Pré II (ou Jardim II, 5 a 6 anos)',
-                '1º ano (6 a 7 anos)',
-                '2º ano (7 a 8 anos)',
-                '3º ano (8 a 9 anos)',
-                '4º ano (9 a 10 anos)',
-                '5º ano (10 a 11 anos)',
-                '6º ano (11 a 12 anos)',
-                '7º ano (12 a 13 anos)',
-                '8º ano (13 a 14 anos)',
-                '9º ano (14 a 15 anos)',
-                'Ciclo I (inicial, para jovens e adultos que ainda não completaram o Ensino Fundamental)',
-                'Ciclo II (avançado, para conclusão do Ensino Fundamental)'
-            ]
-            for nome in nivel:
-                Compatibilidade_EducaCenso.objects.create(nome=nome)
-
+        
 
 class GrauEscolar(models.Model):
     nome = models.CharField(max_length=30, verbose_name="Grau/Nível Escolar")
@@ -987,7 +962,30 @@ def post_migrate_setup(sender, **kwargs):
             ('Educação Física', 9)
         ]
         Disciplina.objects.bulk_create([Disciplina(nome=nome, ordem_historico=ordem) for nome, ordem in disciplinas])
-    
+
+    # Cria os registros Compatibilidade_EducaCenso se não existirem
+    if not Compatibilidade_EducaCenso.objects.exists():
+            nivel = [
+                'Berçário I (0 a 1 ano)',
+                'Berçário II (1 a 2 anos)',
+                'Maternal I (2 a 3 anos)',
+                'Maternal II (3 a 4 anos)',
+                'Pré I (ou Jardim I, 4 a 5 anos)',
+                'Pré II (ou Jardim II, 5 a 6 anos)',
+                '1º ano (6 a 7 anos)',
+                '2º ano (7 a 8 anos)',
+                '3º ano (8 a 9 anos)',
+                '4º ano (9 a 10 anos)',
+                '5º ano (10 a 11 anos)',
+                '6º ano (11 a 12 anos)',
+                '7º ano (12 a 13 anos)',
+                '8º ano (13 a 14 anos)',
+                '9º ano (14 a 15 anos)',
+                'Ciclo I (inicial, para jovens e adultos que ainda não completaram o Ensino Fundamental)',
+                'Ciclo II (avançado, para conclusão do Ensino Fundamental)'
+            ]
+            for nome in nivel:
+                Compatibilidade_EducaCenso.objects.create(nome=nome)
 
     # Cria os registros GrauEscolar se não existirem
     if not GrauEscolar.objects.exists():
