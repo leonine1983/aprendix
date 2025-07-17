@@ -46,6 +46,7 @@ class NomeclaturaJanelas(models.Model):
         return self.nome_disciplina
 
 
+
 @receiver(post_migrate)
 def setup_post_migrate(sender, **kwargs):
     if sender.name == 'admin_acessos':
@@ -56,12 +57,12 @@ def setup_post_migrate(sender, **kwargs):
                     assunto="Olá!",
                     mensagem="Bem-vindo ao nosso sistema!",
                 )
-
+    """
     if not NomeclaturaJanelas.objects.exists():
         NomeclaturaJanelas.objects.get_or_create(
             nome_disciplina='Objetos da Aprendizagem/Disciplinas',
             notas='Notas do Aluno'
-        )
+        ) """
     
     # Adicionar ou modificar grupos se necessário
     group_names = ['Nutricionista', 'Professor', 'Diretor', 'Aluno']
