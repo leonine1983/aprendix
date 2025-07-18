@@ -91,7 +91,7 @@ class PessoasCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context['btn_bg'] = "btn-success"
         context['conteudo_page'] = 'Pessoa Create'
-        context['pessoas'] = pessoas_object,
+        #context['pessoas'] = pessoas_object,
         context['rh_ativo'] = 'False'
         context['titulo_page'] = 'Cadastro de Pessoas'
         context['svg'] = '<i class="fa-duotone fa-address-card" style="--fa-secondary-color: #511f3c;"></i>'

@@ -98,7 +98,7 @@ class Movimentacao_Estoque(models.Model):
     alimento = models.ForeignKey(Alimentos, on_delete=models.CASCADE) 
     fornecedor_alimento = models.ForeignKey(Fornecedor, on_delete=models.PROTECT)           
     data_hora = models.DateTimeField(auto_now_add=True)     
-    quantidade = models.PositiveBigIntegerField(max_length=10)
+    quantidade = models.PositiveBigIntegerField()
     numero_nota_fiscal = models.CharField(max_length=9, verbose_name='Nº da nota fiscal', default='000000000')
     unidadeMedida = models.CharField(choices=medida, max_length=10, verbose_name='Unidade de Medida')      
     # Para criar uma relação ForeignKey com o modelo de usuário do Django (User),
