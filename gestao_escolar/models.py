@@ -519,22 +519,8 @@ class TiposRemanejamentos(models.Model):
     description = models.TextField(max_length=500, verbose_name="Descreve o tipo de remanejamento")
 
     def __str__(self):
-        return self.nome
+        return self.nome  
     
-    @receiver(post_migrate)
-    def createRegisterTR(sender, **kwargs):
-        if not TiposRemanejamentos.objects.exists():
-            tipos = [  
-                ['Desistente', 'Constatado que o aluno não frequenta mais as aulas há bastante tempo'],
-                ['Transferido', 'O aluno foi transferido para outra escola'],
-                ['Mudança de Turma', 'O aluno mudou para outra turma da mesma escola']
-            ]
-            for n, m in tipos:
-                TiposRemanejamentos.objects.create(
-                    nome = n,
-                    description = m
-                )
-
 
 class Remanejamento(models.Model):    
     tipo = models.ForeignKey(TiposRemanejamentos, null=True, on_delete=models.CASCADE)    
@@ -867,7 +853,7 @@ class DiaSemana(models.Model):
 def post_migrate_setup(sender, **kwargs):
     if sender.name != 'gestao_escolar':  # Verifica se o app é 'gestao_escolar'
         return
-
+    
     # Cria os registros Cargo se não existirem
     if not Cargo.objects.exists():
         cargos = [
@@ -888,10 +874,24 @@ def post_migrate_setup(sender, **kwargs):
         nacionalidades = ['Brasileira', 'Brasileiro nascido no exterior', 'Mexicano']
         Nacionalidade.objects.bulk_create([Nacionalidade(nome=nacionalidade) for nacionalidade in nacionalidades])
 
+
     # Cria os registros Pais_origem se não existirem
     if not Pais_origem.objects.exists():
         paises = ['Brasil', 'Japão', 'México']
         Pais_origem.objects.bulk_create([Pais_origem(nome=pais) for pais in paises])
+
+
+    if not TiposRemanejamentos.objects.exists():
+            tipos = [  
+                ['Desistente/Evasão Escolar', 'Constatado que o aluno não frequenta mais as aulas há bastante tempo'],
+                ['Transferido', 'O aluno foi transferido para outra escola'],
+                ['Mudança de Turma', 'O aluno mudou para outra turma da mesma escola']
+            ]
+            for n, m in tipos:
+                TiposRemanejamentos.objects.create(
+                    nome = n,
+                    description = m
+                )
 
     # Cria os registros Deficiencia_aluno se não existirem
     if not Deficiencia_aluno.objects.exists():
