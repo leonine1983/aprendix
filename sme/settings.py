@@ -33,7 +33,10 @@ ALLOWED_HOSTS = [*
     #'https://kiweln.conteige.cloud'
 ]"""
 
-CSRF_TRUSTED_ORIGINS = ['https://cauans-solutions.icu']
+#ALLOWED_HOSTS = ['aprendix.cauans-solutions.icu', 'www.aprendix.cauans-solutions.icu']
+
+
+CSRF_TRUSTED_ORIGINS = ['aprendix.cauans-solutions.icu', 'www.aprendix.cauans-solutions.icu']
 
 
 # Application definition
