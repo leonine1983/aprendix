@@ -3,6 +3,8 @@
 from pathlib import Path
 from django.contrib.messages import constants
 import os
+from decouple import config, Csv
+
 
 
 
@@ -14,12 +16,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-u7afypyeioy$6!z7+0_n9nhoj^zd4l=1$i5tewe7%v4llfr#9^'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 """
 ALLOWED_HOSTS = [*
     #'89af-177-200-115-250.ngrok-free.app' ,
@@ -192,12 +194,13 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST')
-EMAIL_PORT = os.environ.get('EMAIL_PORT')
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+
 
 # Message settings
 MESSAGE_TAGS = {
@@ -258,11 +261,9 @@ LOGGING = {
 
 
 # CONFIRGURAÇAÕ PARA O CONTEIGER.CLOUD
-# Porta do servidor HTTP
-PORT = int(os.environ.get('PORT', 8000))
-
-# Endereço/Host do servidor HTTP
-HOST = os.environ.get('HOST', '0.0.0.0')
+# Conteiger
+PORT = config('PORT', cast=int, default=8000)
+HOST = config('HOST', default='0.0.0.0')
 
 """
 Variáveis de Ambiente necessárias:
