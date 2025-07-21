@@ -300,6 +300,7 @@ class Compatibilidade_EducaCenso(models.Model):
 
 class GrauEscolar(models.Model):
     nome = models.CharField(max_length=30, verbose_name="Grau/Nível Escolar")
+    print('passoua aqui em grauesola')
 
     def __str__(self):
         return self.nome
@@ -938,13 +939,16 @@ def post_migrate_setup(sender, **kwargs):
 
 
         # Cria os registros GrauEscolar se não existirem
-        if not Serie_Escolar.objects.exists():
+        if not Serie_Escolar.objects.exists():     
+                print(f'entrou aqui em grau escolar')       
                 try:
                     et = GrauEscolar.objects.get(nome='Etapa Creche')
                     f1 = GrauEscolar.objects.get(nome='Ensino Fundamental I (Séries Iniciais)')
                     f2 = GrauEscolar.objects.get(nome='Ensino Fundamental II (Séries Finais)')
                     
                     compatibilidades = list(Compatibilidade_EducaCenso.objects.all())
+
+                    print(f'entrou aqui apos compatibilidade')
 
                     if len(compatibilidades) < 17:
                         print("Não há compatibilidade suficiente registrada em Compatibilidade_EducaCenso.")

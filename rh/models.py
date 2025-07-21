@@ -93,6 +93,10 @@ class Prefeitura(models.Model):
     def __str__(self):
         return f"{self.instituto} - {self.nome}"
 
+
+         
+
+
 # Função para pegar o primeiro registro de model prefeitura
 def get_default_prefeitura():
     return Prefeitura.objects.first().pk if Prefeitura.objects.exists() else None
@@ -699,18 +703,19 @@ def post_migrate_setup(sender, **kwargs):
                 cidade = Cidade.objects.get(pk=1)
                 estado = Uf_Unidade_Federativa.objects.get(pk=1)
                 Prefeitura.objects.create(
-                    prefeitura_nome='Prefeitura Municipal de Algum Lugar',
+                    nome='Prefeitura Municipal de Vera Cruz',
                     instituto='Secretaria Municipal da Educação',
                     cidade=cidade,
                     estado=estado,
                     endereco='Av. Te encontro lá',
-                    pessoa_publica='Petepan'
+                    pessoa_publica='Igor Pinho',
+                    brasao = ''
                 )
             except Cidade.DoesNotExist:
                 print("Cidade com PK 1 não encontrada.")
             except Uf_Unidade_Federativa.DoesNotExist:
                 print("UF Unidade Federativa com PK 1 não encontrada.")
-
+        
         # Cria o registro Ano se não existir
         if not Ano.objects.exists():
             Ano.objects.create(ano='2023')
