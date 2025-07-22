@@ -20,20 +20,11 @@ SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
+print(f'debug e : {DEBUG}')
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
-"""
-ALLOWED_HOSTS = [*
-    #'89af-177-200-115-250.ngrok-free.app' ,
-    #'localhost',
-    #'127.0.0.1',
-    #'192.168.15.19',
-    #'192.168.15.53',    
-    # Outros domínios permitidos
-    #'177.131.142.27',
-    #'kiweln.conteige.cloud',
-    #'https://kiweln.conteige.cloud'
-]"""
+#ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+
+ALLOWED_HOSTS = ['*']
 
 #ALLOWED_HOSTS = ['aprendix.cauans-solutions.icu', 'www.aprendix.cauans-solutions.icu']
 
@@ -42,8 +33,6 @@ CSRF_TRUSTED_ORIGINS = [
     'https://aprendix.cauans-solutions.icu',
     'https://www.aprendix.cauans-solutions.icu',
 ]
-
-
 
 # Application definition
 
