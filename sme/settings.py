@@ -20,7 +20,6 @@ SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
-print(f'debug e : {DEBUG}')
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default='*')
 
@@ -88,16 +87,28 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'sme.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# DATABASE ------------------------------------------------------
+DB_SQLITE = config('DB_SQLITE', default=False, cast=bool)
+if DB_SQLITE:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME', default='aprendix'),
+            'USER': config('DB_USER'),
+            'PASSWORD': config('DB_PASSWORD'),
+            'HOST': config('DB_HOST', default='localhost'),
+            'PORT': config('DB_PORT', default='5432'),
+        }
+    }
+# END DATABASE ----------------------------------------------------
+
 
 
 # Password validation
@@ -165,10 +176,8 @@ CKEDITOR_CONFIGS = {
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+#SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-# Adicione o tipo MIME correto para arquivos JS
 
 import mimetypes
 mimetypes.add_type("text/javascript", ".js", True)
@@ -215,22 +224,20 @@ CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', cast=bool)
 LOGIN_URL = 'admin_acessos:login_create'
 
 import os
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    """
     'handlers': {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'debug.log'),
+            'filename': BASE_DIR / 'debug.log',
         },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
         },
-    },"""
+    },
     'loggers': {
         'django': {
             'handlers': ['file', 'console'],
@@ -244,6 +251,7 @@ LOGGING = {
         },
     },
 }
+
 
 
 # CONFIRGURAÇAÕ PARA O CONTEIGER.CLOUD
