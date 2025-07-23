@@ -224,7 +224,7 @@ SESSION_COOKIE_SAMESITE = config('SESSION_COOKIE_SAMESITE', default='Strict')
 CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', cast=bool)
 
 # 3º Define o tempo de sessão para 1 hora (3600 segundos)
-#SESSION_COOKIE_AGE = 3600
+SESSION_COOKIE_AGE = 3600
 LOGIN_URL = 'admin_acessos:login_create'
 
 import os
