@@ -22,17 +22,11 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 print(f'debug e : {DEBUG}')
 
-#ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default='*')
 
-ALLOWED_HOSTS = ['*']
-
+#ALLOWED_HOSTS = ['*']
 #ALLOWED_HOSTS = ['aprendix.cauans-solutions.icu', 'www.aprendix.cauans-solutions.icu']
-
-
-CSRF_TRUSTED_ORIGINS = [
-    'https://aprendix.cauans-solutions.icu',
-    'https://www.aprendix.cauans-solutions.icu',
-]
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', cast=Csv())
 
 # Application definition
 
@@ -210,12 +204,11 @@ MESSAGE_TAGS = {
 # o 'django.contrib.sessions.backends.db' conforme a preferência. Foi escolhido armazenamento em cache
 SESSION_ENGINE =   'django.contrib.sessions.backends.cache'
 
-# 2º define a chave de assinatura da sessão
-SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Strict'
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+# Segurança dos cookies em produção (HTTPS)
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', cast=bool)
+SESSION_COOKIE_HTTPONLY = config('SESSION_COOKIE_HTTPONLY', cast=bool)
+SESSION_COOKIE_SAMESITE = config('SESSION_COOKIE_SAMESITE', default='Strict')
+CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', cast=bool)
 
 # 3º Define o tempo de sessão para 1 hora (3600 segundos)
 #SESSION_COOKIE_AGE = 3600
@@ -257,13 +250,3 @@ LOGGING = {
 # Conteiger
 PORT = config('PORT', cast=int, default=8000)
 HOST = config('HOST', default='0.0.0.0')
-
-"""
-Variáveis de Ambiente necessárias:
-
-Nome da Variável: PORT
-Valor da Variável: 8000 (ou qualquer outra porta desejada para o servidor HTTP)
-HOST:
-Nome da Variável: HOST
-Valor da Variável: 0.0.0.0 (ou o endereço IP específico que o conteiger.cloud recomenda para o host do servidor HTTP)
-"""
