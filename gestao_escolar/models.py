@@ -296,15 +296,49 @@ class Compatibilidade_EducaCenso(models.Model):
 
     def __str__(self):
         return self.nome
-       
+    
+# Cria os registros Compatibilidade_EducaCenso se não existirem
+@receiver(post_migrate)
+def createCompatibilidade(sender, **kwargs):
+    if not Compatibilidade_EducaCenso.objects.exists():
+            nivel = [
+                'Berçário I (0 a 1 ano)',
+                'Berçário II (1 a 2 anos)',
+                'Maternal I (2 a 3 anos)',
+                'Maternal II (3 a 4 anos)',
+                'Pré I (ou Jardim I, 4 a 5 anos)',
+                'Pré II (ou Jardim II, 5 a 6 anos)',
+                '1º ano (6 a 7 anos)',
+                '2º ano (7 a 8 anos)',
+                '3º ano (8 a 9 anos)',
+                '4º ano (9 a 10 anos)',
+                '5º ano (10 a 11 anos)',
+                '6º ano (11 a 12 anos)',
+                '7º ano (12 a 13 anos)',
+                '8º ano (13 a 14 anos)',
+                '9º ano (14 a 15 anos)',
+                'Ciclo I (inicial, para jovens e adultos que ainda não completaram o Ensino Fundamental)',
+                'Ciclo II (avançado, para conclusão do Ensino Fundamental)'
+            ]
+            for nome in nivel:
+                Compatibilidade_EducaCenso.objects.create(nome=nome)
+
+    
 
 class GrauEscolar(models.Model):
     nome = models.CharField(max_length=30, verbose_name="Grau/Nível Escolar")
-    print('passoua aqui em grauesola')
 
     def __str__(self):
         return self.nome
-    
+
+@receiver(post_migrate)
+def createGrauEscolar(sender, **kwargs):
+        graus = ['Etapa Creche', 'Ensino Fundamental I (Séries Iniciais)', 'Ensino Fundamental II (Séries Finais)' ]
+        if not GrauEscolar.objects.exists():
+            for g in graus:
+                GrauEscolar.objects.create(
+                    nome = g
+                )
     
 class Serie_Escolar(models.Model):
     nome = models.CharField(max_length=30)
@@ -691,8 +725,6 @@ class Presenca(models.Model):
         return f'{nome} - {self.data} - {tipo} - {status}'
 
 
-
-
 class GestaoTurmas(models.Model):
     aluno = models.ForeignKey(Matriculas, related_name='gestao_turmas_related', null=True, on_delete=models.CASCADE)
     grade = models.ForeignKey(TurmaDisciplina, null=True, related_name='grade_disciplina', on_delete=models.CASCADE)
@@ -766,8 +798,7 @@ class GestaoTurmas(models.Model):
 
             if final_turma:
                 # Evita recursão: atualiza diretamente com .update()
-                GestaoTurmas.objects.filter(pk=final_turma.pk).update(faltas_total=total_faltas)           
-
+                GestaoTurmas.objects.filter(pk=final_turma.pk).update(faltas_total=total_faltas)  
 
     
 class ParecerDescritivo(models.Model):
@@ -838,7 +869,6 @@ class Agendamento(models.Model):
         return f'Agendamento de {self.aluno} com {self.profissional} em {self.data_agendamento}'
 """
 
-
 class DiaSemana(models.Model):
     nome_dia = models.CharField(max_length=10)
     numero_dia = models.IntegerField()
@@ -854,10 +884,8 @@ class DiaSemana(models.Model):
 def post_migrate_setup(sender, **kwargs):
     if sender.name != 'gestao_escolar':  # Garante que o app é o correto
         return
-
     try:
         table_names = connection.introspection.table_names()
-
         if 'gestao_escolar_cargo' in table_names:
             if not Cargo.objects.exists():
                 cargos = [
@@ -867,8 +895,6 @@ def post_migrate_setup(sender, **kwargs):
                     'Porteiro', 'Estagiário'
                 ]
                 Cargo.objects.bulk_create([Cargo(nome=n) for n in cargos])
-
-
 
         # Cria os registros Etnia se não existirem
         if not Etnia.objects.exists():
@@ -913,42 +939,15 @@ def post_migrate_setup(sender, **kwargs):
             ]
             Disciplina.objects.bulk_create([Disciplina(nome=nome, ordem_historico=ordem) for nome, ordem in disciplinas])
 
-        # Cria os registros Compatibilidade_EducaCenso se não existirem
-        if not Compatibilidade_EducaCenso.objects.exists():
-                nivel = [
-                    'Berçário I (0 a 1 ano)',
-                    'Berçário II (1 a 2 anos)',
-                    'Maternal I (2 a 3 anos)',
-                    'Maternal II (3 a 4 anos)',
-                    'Pré I (ou Jardim I, 4 a 5 anos)',
-                    'Pré II (ou Jardim II, 5 a 6 anos)',
-                    '1º ano (6 a 7 anos)',
-                    '2º ano (7 a 8 anos)',
-                    '3º ano (8 a 9 anos)',
-                    '4º ano (9 a 10 anos)',
-                    '5º ano (10 a 11 anos)',
-                    '6º ano (11 a 12 anos)',
-                    '7º ano (12 a 13 anos)',
-                    '8º ano (13 a 14 anos)',
-                    '9º ano (14 a 15 anos)',
-                    'Ciclo I (inicial, para jovens e adultos que ainda não completaram o Ensino Fundamental)',
-                    'Ciclo II (avançado, para conclusão do Ensino Fundamental)'
-                ]
-                for nome in nivel:
-                    Compatibilidade_EducaCenso.objects.create(nome=nome)
-
+        
 
         # Cria os registros GrauEscolar se não existirem
-        if not Serie_Escolar.objects.exists():     
-                print(f'entrou aqui em grau escolar')       
+        if not Serie_Escolar.objects.exists():        
                 try:
                     et = GrauEscolar.objects.get(nome='Etapa Creche')
                     f1 = GrauEscolar.objects.get(nome='Ensino Fundamental I (Séries Iniciais)')
-                    f2 = GrauEscolar.objects.get(nome='Ensino Fundamental II (Séries Finais)')
-                    
+                    f2 = GrauEscolar.objects.get(nome='Ensino Fundamental II (Séries Finais)')                    
                     compatibilidades = list(Compatibilidade_EducaCenso.objects.all())
-
-                    print(f'entrou aqui apos compatibilidade')
 
                     if len(compatibilidades) < 17:
                         print("Não há compatibilidade suficiente registrada em Compatibilidade_EducaCenso.")
