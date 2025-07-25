@@ -8,16 +8,17 @@ from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from django.contrib import messages
 
+
 # Essa view lida com a seleção da escola e armazena os dados na sessão
 @login_required
 def Seleciona_escola(request, pk):
     # Recupera a escola com base no id fornecido
     escola = Escola.objects.get(pk = pk)    
-    request.session['escola_id'] = escola.id    
+    request.session['escola_id'] = escola.id        
     request.session['escola_nome'] = escola.nome_escola
-    request.session['escola_nome_query'] = escola
+    request.session['escola_nome_query'] = escola    
     nomeclatura = NomeclaturaJanelas.objects.latest('id')
-    prefeitura = Prefeitura.objects.get(pk = 1)    
+    prefeitura = Prefeitura.objects.get(pk = 1)   
     
     # outros
     matriculas_painel = Turmas.objects.filter(escola = escola)
