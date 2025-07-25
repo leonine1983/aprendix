@@ -203,7 +203,9 @@ MESSAGE_TAGS = {
 
 # 1º define o mecanismo de armazenamento de sessão para 'django.contrib.sessions.backends.cache' ou
 # o 'django.contrib.sessions.backends.db' conforme a preferência. Foi escolhido armazenamento em cache
-SESSION_ENGINE =   'django.contrib.sessions.backends.cache'
+#SESSION_ENGINE =   'django.contrib.sessions.backends.cache'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
 
 # Segurança dos cookies em produção (HTTPS)
 SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', cast=bool)
@@ -211,45 +213,10 @@ SESSION_COOKIE_HTTPONLY = config('SESSION_COOKIE_HTTPONLY', cast=bool)
 SESSION_COOKIE_SAMESITE = config('SESSION_COOKIE_SAMESITE', default='Strict')
 CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', cast=bool)
 
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-
-
-
 
 # 3º Define o tempo de sessão para 1 hora (3600 segundos)
 SESSION_COOKIE_AGE = 3600
 LOGIN_URL = 'admin_acessos:login_create'
-
-import os
-"""
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'debug.log',
-        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file', 'console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        '__main__': {
-            'handlers': ['file', 'console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-}
-"""
 
 
 # CONFIRGURAÇAÕ PARA O CONTEIGER.CLOUD
