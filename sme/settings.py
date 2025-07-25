@@ -221,6 +221,7 @@ SESSION_COOKIE_AGE = 3600
 LOGIN_URL = 'admin_acessos:login_create'
 
 import os
+"""
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -248,7 +249,7 @@ LOGGING = {
         },
     },
 }
-
+"""
 
 
 # CONFIRGURAÇAÕ PARA O CONTEIGER.CLOUD

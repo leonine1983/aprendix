@@ -5,6 +5,8 @@ from django.db.models.signals import post_migrate
 from ckeditor.fields import RichTextField
 from rh.models import Pessoas
 
+
+
 class MessageUser(models.Model):
     remetente = models.ForeignKey(User, null=True, on_delete=models.CASCADE, editable=False, verbose_name="Remetente da mensagem", related_name="sent_messages")
     destinatario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Destinatário da mensagem", related_name="received_messages")
@@ -46,7 +48,7 @@ class NomeclaturaJanelas(models.Model):
         return self.nome_disciplina
 
 
-
+"""
 from django.db import connection
 from django.db.utils import OperationalError
 from django.db.models.signals import post_migrate
@@ -86,6 +88,7 @@ def setup_post_migrate(sender, **kwargs):
 
     except OperationalError as e:
         print(f"Erro ao acessar tabelas: {e}")
+"""
 
 
 
