@@ -1,0 +1,33 @@
+py manage.py makemigrations admin_acessos
+py manage.py makemigrations rh
+py manage.py makemigrations controle_estoque
+py manage.py makemigrations gestao_escolar
+py manage.py makemigrations docsGestao_Escolar
+py manage.py makemigrations modulo_professor
+py manage.py makemigrations modulo_aluno
+
+
+
+
+py manage.py migrate admin_acessos
+py manage.py migrate rh
+py manage.py migrate controle_estoque
+py manage.py migrate gestao_escolar
+py manage.py migrate docsGestao_Escolar
+py manage.py migrate modulo_professor
+py manage.py migrate modulo_aluno
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    

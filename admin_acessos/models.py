@@ -1,10 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User, Group
-from django.dispatch import receiver
-from django.db.models.signals import post_migrate
+from django.contrib.auth.models import User
 from ckeditor.fields import RichTextField
-from rh.models import Pessoas
-
 
 
 class MessageUser(models.Model):
@@ -46,58 +42,3 @@ class NomeclaturaJanelas(models.Model):
 
     def __str__(self):
         return self.nome_disciplina
-
-
-"""
-from django.db import connection
-from django.db.utils import OperationalError
-from django.db.models.signals import post_migrate
-from django.dispatch import receiver
-from django.contrib.auth.models import User, Group
-from .models import MessageUser, NomeclaturaJanelas  # ajuste o import se necessário
-
-@receiver(post_migrate)
-def setup_post_migrate(sender, **kwargs):
-    try:
-        table_names = connection.introspection.table_names()
-
-        if sender.name == 'admin_acessos':
-            # Cria mensagens de boas-vindas para todos os usuários
-            if 'admin_acessos_messageuser' in table_names and 'auth_user' in table_names:
-                if not MessageUser.objects.exists():
-                    for user in User.objects.all():
-                        MessageUser.objects.get_or_create(
-                            destinatario=user,
-                            assunto="Olá!",
-                            mensagem="Bem-vindo ao nosso sistema!",
-                        )
-
-        # Cria registro padrão de NomeclaturaJanelas
-        if 'admin_acessos_nomeclaturajanelas' in table_names:
-            if not NomeclaturaJanelas.objects.exists():
-                NomeclaturaJanelas.objects.get_or_create(
-                    nome_disciplina='Objetos da Aprendizagem/Disciplinas',
-                    notas='Notas do Aluno'
-                )
-
-        # Cria grupos padrão
-        if 'auth_group' in table_names:
-            group_names = ['Nutricionista', 'Professor', 'Diretor', 'Aluno']
-            for group_name in group_names:
-                Group.objects.get_or_create(name=group_name)
-
-    except OperationalError as e:
-        print(f"Erro ao acessar tabelas: {e}")
-"""
-
-
-
-
-    
-"""
-from rh.models import Escola, Ano
-class ConfigAvisos(models.Model):
-    escola = models.ForeignKey(Escola, related_name="AvisoEscola_related", on_delete=models.CASCADE)
-    anoLetivo = models.ForeignKey(Ano, related_name='AvisoAnoLetivo_related', on_delete=models.CASCADE)
-    decreto_diretor = models.ForeignKey()
-"""

@@ -1,12 +1,7 @@
 from django.db import models
 from datetime import timedelta, date, datetime
-from django.dispatch import receiver
-from django.db.models.signals import post_migrate
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-from django.db import connection
-from django.db.utils import OperationalError
-
 
 
 class Config_plataforma(models.Model):
@@ -15,18 +10,13 @@ class Config_plataforma(models.Model):
     nome_sistema = models.CharField(max_length=100, default='SME Aprendix')
     versao = models.CharField(max_length=10, default='1.0.0')
 
-    print(f'config plataforma')
-
-
 
 class Uf_Unidade_Federativa(models.Model):
     sigla = models.CharField(max_length=2)
     estado = models.CharField(max_length=10)
 
     def __str__(self):
-        return f'{self.estado}/{self.sigla}'   
-    
-    print(f'unidade federaltiva')
+        return f'{self.estado}/{self.sigla}' 
 
     
 class Cidade(models.Model):
@@ -34,9 +24,8 @@ class Cidade(models.Model):
     nome_cidade = models.CharField(max_length=30)
 
     def __str__(self) -> str:
-        return self.nome_cidade   
+        return self.nome_cidade 
     
-    print(f'cidade')
 
 class Bairro(models.Model):    
     nome_cidade = models.ForeignKey(Cidade, on_delete=models.CASCADE)
@@ -44,8 +33,6 @@ class Bairro(models.Model):
 
     def __str__(self) -> str:
         return f'{self.nome_bairro}, {self.nome_cidade}'  
-
-    print(f'bairro')  
     
 
 class Prefeitura(models.Model):
@@ -67,6 +54,7 @@ class Prefeitura(models.Model):
         blank=True,
         verbose_name="Cidade"
     )
+    estado = models.CharField(max_length=100)
     estado = models.ForeignKey(
         'Uf_Unidade_Federativa',
         on_delete=models.CASCADE,
@@ -100,9 +88,6 @@ class Prefeitura(models.Model):
 
     def __str__(self):
         return f"{self.instituto} - {self.nome}"
-    
-    print(f'prefeitura')        
-
 
 
 class Ano(models.Model):
@@ -146,8 +131,6 @@ class Ano(models.Model):
                     data_inicio=date(int(proximo_ano), 1, 1),
                     data_fim=date(int(proximo_ano), 12, 31)
                 )
-    print("Ano")
-
 
 
 class Profissao(models.Model):
@@ -156,8 +139,6 @@ class Profissao(models.Model):
 
     def __str__(self):
         return self.nome_profissao
-    
-    print("Profissao")
     
 
 class Salario(models.Model):
@@ -169,43 +150,12 @@ class Salario(models.Model):
     def __str__(self):
         return self.valor
 
-    print("Salario")
 
 class Sexo(models.Model):
     nome = models.CharField(max_length=30)
     def __str__(self):
         return self.nome
     
-    print("Sexto")
-"""
-
-class Pessoas(models.Model):
-    nome = models.CharField(max_length=30, null=False, verbose_name='Nome')
-    foto = models.ImageField(upload_to='pessoa_fotos/', null=True, blank=True, verbose_name="Adicione uma foto")
-    sobrenome = models.CharField(max_length=30, null=False, verbose_name='Sobrenome')   
-    email = models.EmailField(max_length=100, null=True) 
-    sexo = models.ForeignKey(Sexo, models.CASCADE, null=True)
-    data_nascimento = models.DateField(null=True)    
-    idade = models.CharField(max_length=9, null=True, blank=True)
-    nome_profissao = models.ForeignKey(Profissao, null=True, blank=True, on_delete=models.CASCADE)    
-    cpf = models.CharField(max_length=30, null=True)
-    rg = models.CharField(max_length=30, null=True)
-    rua = models.CharField(max_length=50, null=True)
-    complemento = models.CharField(max_length=30, null=True)
-    numero_casa = models.CharField(max_length=10, null=True)
-    
-    estado = models.CharField(max_length=50, null=True, verbose_name='Estado')
-    cidade = models.CharField(max_length=50, null=True, verbose_name='Cidade')
-    bairro = models.CharField(max_length=50, null=True, verbose_name='Bairro')
-    cep = models.CharField(max_length=30, null=True)
-
-    login_professor = models.CharField(max_length=10, null=True, blank=True)     
-    senha = models.CharField(max_length=10, null=True, blank=True, default='12345678') 
-    profissional_efetivo_no_municipio = models.BooleanField(
-        default=False,
-        verbose_name="Profissional efetivo no município"
-    )
-    """
    
 class Pessoas(models.Model):
     nome = models.CharField(max_length=30, null=False, verbose_name='Nome')
@@ -279,6 +229,8 @@ CHOICES = [
     ('estagio', 'Estágio'),
     ('voluntario', 'Voluntário')
 ]
+
+
 class Texto_Contrato(models.Model):
     tipo = models.CharField(max_length=20, choices=CHOICES)
     # texto = RichTextField(blank=True, null=True)
@@ -286,8 +238,6 @@ class Texto_Contrato(models.Model):
 
     def __str__(self):
         return self.tipo
-    
-    print("Texto Contrato")
     
 
 class UserPessoas(models.Model):
@@ -322,7 +272,6 @@ class Escola(models.Model):
     def __str__(self):
         return self.nome_escola
     
-    print("Escola")
     
 class EscolaUser(models.Model):
     escola = models.ForeignKey(Escola, on_delete=models.CASCADE, verbose_name="Escola em que o usuário estará vinculado", related_name="related_escolaUser")
@@ -380,7 +329,6 @@ class Contrato(models.Model):
     def __str__(self):
         return str(self.contratado)
 
-
     # Sobrescreve o método save para verifique se já existe algum registros com as informações fornecidas pelo usuario
     def save(self, *args, **kwargs):
         # Verifica se já existe um contrato com as mesmas informações
@@ -396,7 +344,6 @@ class Contrato(models.Model):
         # Se já existir um contrato com as mesmas informações, gere um aviso
         if existing_contracts.exists():
             raise ValidationError ("Já existe contrato com as mesmas informações")
-
 
         # Se não existir um contrato com as mesmas informações, continue salvando
         super().save(*args, **kwargs)
@@ -435,8 +382,7 @@ class ProfEfetivo(models.Model):
 
     def __str__(self):
         return f"{self.pessoa.nome_completo} ({self.matricula})"
-
-
+    
     
 class Decreto(models.Model):
     profissional = models.ForeignKey(Pessoas, related_name='decreto_profissional', verbose_name='Profissional em que foi emitido o decreto', on_delete=models.CASCADE)
@@ -453,6 +399,7 @@ class Decreto(models.Model):
 
     def __str__(self):
         return f'{self.profissional}, Decreto n° {self.numero_decreto}/{self.ano_decreto}'
+    
 
 class DecretoAnoLetivoAtivo(models.Model):
     decreto = models.ForeignKey(Decreto, on_delete=models.CASCADE, related_name='Decreto_decretoAtivo', verbose_name="Definir se o decreto está ativo para o ano letivo atual")  
@@ -549,7 +496,6 @@ class Escola_admin(models.Model):
         return self.nome.nome_escola
 
 
-
 class Encaminhamentos(models.Model):
     encaminhamento = models.ForeignKey(Contrato, related_name='encaminhamento_escolar', verbose_name='Profissional a ser encaminhado', on_delete=models.CASCADE)        
     destino = models.ForeignKey(Escola, related_name='local_encaminhamento', null=False, verbose_name='Local onde o profissional será encaminhado', on_delete=models.CASCADE)
@@ -579,7 +525,6 @@ class Encaminhamentos(models.Model):
         if existing_encaminhaments.exists():
             raise ValidationError ("Já existe contrato com as mesmas informações")
 
-
         # Se não existir um contrato com as mesmas informações, continue salvando
         super().save(*args, **kwargs)
 
@@ -591,7 +536,6 @@ class Feriado(models.Model):
 
     def __str__(self):
         return self.nome
-
 
 
 class Frequencia_mes(models.Model):
@@ -609,186 +553,3 @@ class Frequencia_mes(models.Model):
     def __str__(self):
         return self.mes   
     
-    print("Frequencia")
-
-
-
-"""
-
-
-# REGISTROS INICIAS ------------------------------------------
-@receiver(post_migrate)
-def post_migrate_setup(sender, **kwargs):
-    if not Ano.objects.exists():
-        Ano.objects.create(ano=2024)
-        print("Ano migrate")
-
-    if not Config_plataforma.objects.exists():
-        Config_plataforma.objects.create(
-            nome_sistema='Meu Sistema',
-            versao='1.0.0'
-            # Adicione outros campos obrigatórios conforme o seu modelo
-        )
-    
-        # Cria os registros UF se não existirem
-    if not Uf_Unidade_Federativa.objects.exists():
-        uf_estados = [
-            ('AC', 'Acre'), ('AL', 'Alagoas'), ('AM', 'Amazonas'), ('AP', 'Amapá'),
-            ('BA', 'Bahia'), ('CE', 'Ceará'), ('DF', 'Distrito Federal'), ('ES', 'Espírito Santo'),
-            ('GO', 'Goiás'), ('MA', 'Maranhão'), ('MG', 'Minas Gerais'), ('MS', 'Mato Grosso do Sul'),
-            ('MT', 'Mato Grosso'), ('PA', 'Pará'), ('PB', 'Paraíba'), ('PE', 'Pernambuco'),
-            ('PI', 'Piauí'), ('PR', 'Paraná'), ('RJ', 'Rio de Janeiro'), ('RN', 'Rio Grande do Norte'),
-            ('RO', 'Roraima'), ('RR', 'Rondônia'), ('RS', 'Rio Grande do Sul'), ('SC', 'Santa Catarina'),
-            ('SE', 'Sergipe'), ('SP', 'São Paulo'), ('TO', 'Tocantins')
-        ]
-        Uf_Unidade_Federativa.objects.bulk_create(
-            [Uf_Unidade_Federativa(sigla=s, estado=e) for s, e in uf_estados]
-        )
-
-    # Cria registros Cidade e Bairro se não existirem
-    if not Cidade.objects.exists():
-        try:
-            uf_unidade_federativa = Uf_Unidade_Federativa.objects.get(id=5)
-
-            cidades_bahia = [
-                'Abaíra', 'Acajutiba', 'Adustina', 'Água Fria', 'Aiquara', 'Alagoinhas', 'Alcobaça', 'Almadina', 'Amargosa', 
-                'Amélia Rodrigues', 'Anagé', 'Andaraí', 'Angical', 'Anguera', 'Antas', 'Antônio Cardoso', 'Antônio Gonçalves', 
-                'Aporá', 'Aracatu', 'Araçás', 'Arataca', 'Aratuípe', 'Aurelino Leal', 'Baianópolis', 'Baixa Grande', 'Banzaê', 
-                'Barra', 'Barra da Estiva', 'Barra do Choça', 'Barra do Mendes', 'Barro Alto', 'Barrocas', 'Belmonte', 'Belo Campo', 
-                'Biritinga', 'Boa Nova', 'Boa Vista do Tupim', 'Bom Jesus da Lapa', 'Bom Jesus da Serra', 'Boninal', 'Bonito', 
-                'Boquira', 'Botuporã', 'Brejões', 'Brejolândia', 'Camaçari', 'Camacan', 'Candeias', 'Candido Motta', 'Cansanção', 
-                'Capela do Alto Alegre', 'Caraíbas', 'Caravelas', 'Cardeal da Silva', 'Carinhanha', 'Casa Nova', 'Castro Alves', 
-                'Catolândia', 'Catu', 'Cícero Dantas', 'Cipó', 'Coaraci', 'Coco', 'Conceição da Feira', 'Conceição do Almeida', 
-                'Conde', 'Condeúba', 'Contendas do Sincorá', 'Coração de Maria', 'Crisópolis', 'Cristópolis', 'Cururupe', 'Dário Meira', 
-                'Dias d\'Ávila', 'Dom Basílio', 'Dom Macedo Costa', 'Elísio Medrado', 'Encruzilhada', 'Entre Rios', 'Esplanada', 'Euclides da Cunha', 
-                'Eunápolis', 'Fátima', 'Feira de Santana', 'Filadélfia', 'Formosa do Rio Preto', 'Gandu', 'Gavião', 'Gentio do Ouro', 'Glória', 
-                'Gongogi', 'Governador Mangabeira', 'Guaratinga', 'Heliópolis', 'Ibotirama', 'Icaraí', 'Ichu', 'Igaporã', 'Igrapiúna', 'Iguaí', 
-                'Ilhéus', 'Inhambupe', 'Ipecaetá', 'Ipiaú', 'Ipirá', 'Iraquara', 'Irará', 'Irecê', 'Itabela', 'Itaberaba', 'Itabuna', 'Itacaré', 
-                'Itaeté', 'Itagi', 'Itagibá', 'Itajuípe', 'Itamaraju', 'Itanagra', 'Itaparica', 'Itapé', 'Itapetinga', 'Itapicuru', 'Itiruçu', 
-                'Itororó', 'Ituaçu', 'Ituberá', 'Jacobina', 'Jaguaçu', 'Jaguarari', 'Jandaíra', 'Jequié', 'Jeremoabo', 'Jiquiriçá', 'João Dourado', 
-                'Juazeiro', 'Jussara', 'Jussiape', 'Lafaiete Coutinho', 'Lagoa Real', 'Laje', 'Laje do Muriaé', 'Lencóis', 'Licínio de Almeida', 
-                'Livramento de Nossa Senhora', 'Luís Eduardo Magalhães', 'Macajuba', 'Macarani', 'Macaúbas', 'Madre de Deus', 'Maetinga', 'Mairi', 
-                'Malhada', 'Malhada de Pedras', 'Manoel Vitorino', 'Maracás', 'Maragogipe', 'Maraú', 'Marcionílio Souza', 'Mascote', 'Mata de São João', 
-                'Matina', 'Medeiros Neto', 'Miguel Calmon', 'Milagres', 'Mirangaba', 'Morro do Chapéu', 'Mortugaba', 'Mucugê', 'Mucuri', 'Mundo Novo', 
-                'Muniz Ferreira', 'Muquém de São Francisco', 'Muritiba', 'Mundo Novo', 'Nazaré', 'Nilo Peçanha', 'Nordestina', 'Nova Canaã', 
-                'Nova Fátima', 'Nova Ibiá', 'Nova Itarana', 'Nova Redenção', 'Nova Soure', 'Novo Horizonte', 'Olindina', 'Oliveira dos Brejinhos', 
-                'Ourolândia', 'Palmeiras', 'Paramirim', 'Paratinga', 'Paripiranga', 'Pau Brasil', 'Paulo Afonso', 'Pedrão', 'Pedro Alexandre', 'Piatan', 
-                'Pilão Arcado', 'Pindaí', 'Pintadas', 'Pojuca', 'Ponto Novo', 'Porto Seguro', 'Potiraguá', 'Prado', 'Presidente Jânio Quadros', 
-                'Presidente Tancredo Neves', 'Queimadas', 'Rafael Jambeiro', 'Remanso', 'Retirolândia', 'Riachão das Neves', 'Riachão do Jacuípe', 
-                'Ribeira do Pombal', 'Ribeirão do Largo', 'Rio de Contas', 'Rio Real', 'Salinas', 'Salvador', 'Santa Bárbara', 'Santa Brígida', 
-                'Santa Cruz Cabrália', 'Santa Cruz da Vitória', 'Santa Inês', 'Santa Luzia', 'Santa Maria da Vitória', 'Santana', 'Santanópolis', 
-                'Santo Amaro', 'Santo Estêvão', 'São Desidério', 'São Domingos', 'São Félix', 'São Felipe', 'São Francisco do Conde', 'São Gonçalo do Amarante',
-                'São João do Paraíso', 'São José da Vitória', 'São Miguel das Matas', 'São Sebastião do Passé', 'Sapeaçu', 'Santo Antônio de Jesus', 
-                'São Sebastião', 'Sítio do Mato', 'Sítio do Quinto', 'Sobradinho', 'Tanhaçu', 'Tanhaípe', 'Teixeira de Freitas', 'Teodoro Sampaio', 
-                'Tremedal', 'Tucano', 'Ubaíra', 'Ubatã', 'Uibaí', 'Utinga', 'Valença', 'Valente', 'Várzea da Roça', 'Várzea do Poço', 'Vera Cruz', 
-                'Vitória da Conquista'
-            ]
-
-            for cidade in cidades_bahia:
-                Cidade.objects.create(nome_estado=uf_unidade_federativa, nome_cidade=cidade)         
-
-
-
-        except Uf_Unidade_Federativa.DoesNotExist:
-            print("UF Unidade Federativa com ID 5 não encontrada.")
-
-    if not Bairro.objects.exists():
-        try:
-            cidade = Cidade.objects.get(nome_cidade='Vera Cruz')
-            bairros = [
-                "Aratuba", "Baiacu", "Barra do Gil", "Barra do Pote", "Berlinque",
-                "Cacha Pregos", "Campinas", "Cine", "Conceição", "Coroa", 
-                "Gamboa", "Ilhota", "Juerana", "Mar Grande", "Matarandiba", 
-                "Ponta Grossa", "Porrãozinho"
-            ]
-
-            for nome_bairro in sorted(bairros):  # Garantindo ordem alfabética
-                Bairro.objects.create(nome_cidade=cidade, nome_bairro=nome_bairro)
-
-        except Cidade.DoesNotExist:
-            print("Cidade com ID 1 não encontrada.")
-
-    # Cria o registro Prefeitura se não existir
-    if not Prefeitura.objects.exists():
-        try:
-            cidade = Cidade.objects.get(pk=1)
-            estado = Uf_Unidade_Federativa.objects.get(pk=1)
-            Prefeitura.objects.create(
-                nome='Prefeitura Municipal de Vera Cruz',
-                instituto='Secretaria Municipal da Educação',
-                cidade=cidade,
-                estado=estado,
-                endereco='Av. Te encontro lá',
-                pessoa_publica='Igor Pinho',
-                brasao = ''
-            )
-        except Cidade.DoesNotExist:
-            print("Cidade com PK 1 não encontrada.")
-        except Uf_Unidade_Federativa.DoesNotExist:
-            print("UF Unidade Federativa com PK 1 não encontrada.")
-    
-    # Cria o registro Ano se não existir
-    if not Ano.objects.exists():
-        Ano.objects.create(ano='2023')
-
-    # Cria registros de Profissao se não existirem
-    if not Profissao.objects.exists():
-        nome_descreve = [
-            ('Diretor Escolar', 'Profissional encarregado da administração e gestão de uma escola.'),
-            ('Vice-Diretor Escolar', 'Profissional que auxilia o diretor escolar na administração e gestão da escola, assumindo suas funções na sua ausência e colaborando nas decisões administrativas e pedagógicas.'),
-            ('Coordenador Escolar', 'Profissional que supervisiona as operações e as atividades educacionais de uma escola.'),
-            ('Secretária escolar', 'Profissional responsável por tarefas administrativas e organizacionais dentro de uma instituição de ensino.'),
-            ('Professor', 'Profissional dedicado à educação e ao ensino, desempenhando um papel fundamental na transmissão de conhecimentos, habilidades e valores para os alunos.'), 
-            ('Reserva Técnica', 'Profissional responsável por apoiar a infraestrutura e a logística do ambiente escolar, garantindo que todos os recursos necessários estejam disponíveis para o funcionamento adequado das atividades educacionais.'),
-            ('Auxiliar de Classe', 'Colaborador que assiste o professor no dia a dia da sala de aula, ajudando na gestão de alunos e na preparação de materiais, contribuindo para um ambiente de aprendizado mais eficaz e acolhedor.'),
-            ('Merendeira', 'Funcionária responsável pela preparação e distribuição das refeições escolares.'),
-            ('Técnica em alimentação escolar', 'Profissional especializada em planejar, preparar e supervisionar refeições nutritivas e balanceadas.'),
-            ('Porteiro escolar', 'Profissional encarregado de monitorar e controlar o acesso à escola.'),            
-            ('Auxiliar Administrativo Escolar', 'Profissional que oferece suporte em atividades administrativas dentro de uma instituição educacional.')
-            
-        ]
-
-        Profissao.objects.bulk_create(
-            [Profissao(nome_profissao=nome, descricao=descricao) for nome, descricao in nome_descreve]
-        )
-
-    # Cria registros de Sexo se não existirem
-    if not Sexo.objects.exists():
-        Sexo.objects.bulk_create(
-            [Sexo(nome=sexo) for sexo in ['Masculino', 'Feminino']]
-        )
-
-
-    # Cria registros de Escola se não existirem
-    # Cria registros de Escola se não existirem
-    if not Escola.objects.exists():
-        prefeitura = Prefeitura.objects.all().first()
-        
-        if prefeitura is None:
-            print("Nenhuma prefeitura encontrada.")
-        else:
-            # Definindo as escolas a serem criadas
-            escolas = [
-                (prefeitura, "Escola Municipal Geralda Maria"),
-                (prefeitura, "Colégio Municipal de Vera Cruz")
-            ]
-            
-            # Criar as escolas
-            escolas_criadas = Escola.objects.bulk_create(
-                [Escola(prefeitura=p, nome_escola=n) for p, n in escolas]
-            )
-            print(f"Escolas criadas: {[escola.nome_escola for escola in escolas_criadas]}")
-
-            # Criar um único registro de Escola_admin para cada Escola, garantindo um relacionamento um-para-um
-            for escola in escolas_criadas:
-                if not Escola_admin.objects.filter(nome=escola).exists():
-                    # Criar o registro de Escola_admin para a escola
-                    Escola_admin.objects.create(nome=escola)
-                    print(f"Escola_admin criado para: {escola.nome_escola}")
-                else:
-                    print(f"Já existe um Escola_admin para: {escola.nome_escola}")
-
-
-
-
-"""
