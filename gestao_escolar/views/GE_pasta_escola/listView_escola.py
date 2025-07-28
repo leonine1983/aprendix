@@ -12,7 +12,6 @@ class ListView_Escola(LoginRequiredMixin, TemplateView):
     context_object_name = 'escolas'
 
     def get_context_data(self, **kwargs):
-
         ano_id = self.request.session.get('anoLetivo_id')
         escola_id = self.request.session.get('escola_id')
         if ano_id and escola_id:
