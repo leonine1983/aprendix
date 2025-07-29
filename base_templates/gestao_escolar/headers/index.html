@@ -143,7 +143,10 @@
       </button>
       
       <div class="collapse navbar-collapse " id="navbarSupportedContent">
-        <div class="nav-right" >
+        <div class="nav-right" >          
+          <a href="{% url "Gestao_Escolar:tutorial_pdf" %}" class="d-block  text-decoration-none txt-p  mr-2" title="Apostila do Sistema"  target='__parent'>
+            <i class="fa-solid fa-download"></i>      
+          </a>
           <a href="#" class="d-block  text-decoration-none txt-p " data-bs-toggle="dropdown" aria-expanded="false">
               
             {% if not aberto %}         
