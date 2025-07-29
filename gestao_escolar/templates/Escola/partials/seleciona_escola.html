@@ -7,17 +7,32 @@
 
 <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 gap-3 justify-content-center">
     {% for n in object_list %}    
-    <div class="col m-0 p-0">
-        <a href="{% url 'Gestao_Escolar:escola-selecionar' n.id %}" class="text-decoration-none">
-            <div class="card h-100 w-100 shadow-sm border-0 hover-shadow transition p-1">
-                <!-- Imagem ilustrativa -->
-                <img src="{% static 'schooll.png' %}" class="card-img-top" alt="Imagem da escola {{ n.nome_escola }}">
-                <div class="card-body text-center">
-                    <h6 class="card-title mb-0">{{ n.nome_escola }}</h6>
-                </div>
+        {% if n.fund2 %}
+            <div class="col m-0 p-0 order-1">
+                <a href="{% url 'Gestao_Escolar:escola-selecionar' n.id %}" class="text-decoration-none">
+                    <div class="card h-100 w-100 shadow-sm border-0 hover-shadow transition p-1 bg-success-subtle ">
+                        <!-- Imagem ilustrativa -->
+                        <img src="{% static 'schooll.png' %}" class="card-img-top" alt="Imagem da escola {{ n.nome_escola }}">
+                        <div class="card-body text-center">
+                            <h6 class="card-title mb-0">{{ n.nome_escola }}</h6>
+                        </div>
+                    </div>
+                </a>
             </div>
-        </a>
-    </div>
+            {% else %}
+                <div class="col m-0 p-0 ">
+                        <a href="{% url 'Gestao_Escolar:escola-selecionar' n.id %}" class="text-decoration-none">
+                            <div class="card h-100 w-100 shadow-sm border-0 hover-shadow transition p-1">
+                                <!-- Imagem ilustrativa -->
+                                <img src="{% static 'schooll.png' %}" class="card-img-top" alt="Imagem da escola {{ n.nome_escola }}">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title mb-0">{{ n.nome_escola }}DDDDDDDDDDD</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endif %}
+        
     {% endfor %}
 </div>
 <style>

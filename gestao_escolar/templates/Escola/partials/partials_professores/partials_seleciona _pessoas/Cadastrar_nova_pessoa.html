@@ -14,31 +14,28 @@
 </div>
     <hr>         
 </script> 
-<form method="post" class="container no-shadow-border">
+<form method="post" class="no-shadow-border">
     <script src="{% static 'global/js/jquery.mask.min.js' %}"></script>    
     {{ form.non_field_errors }}
     {% csrf_token %}
-
-    <div class="row">
+    <div class="row justify-content-center" >
         {% for field in form %}
-        <section class="col-md-5 col-12 ">
+        <section class="col-md-2 col-12 ">
             <label class="form-label">{{ field.label }}</label>
-
             {% if field.label == "Bairro" %}
-            <div class="d-flex flex-column flex-md-row align-items-start p-2 rounded sem-borda-sombra">
+            <section class="d-flex flex-column flex-md-row align-items-start p-2 rounded sem-borda-sombra">
                 <div class="flex-fill">{{ field }}</div>
                 <a class="btn btn-sm btn-outline-primary ms-md-2 mt-2 mt-md-0" href="{% url 'Gestao_Escolar:bairro-create' %}">
                     <i class="fa-solid fa-plus"></i> Bairro
                 </a>
-            </div>
-
+            </section>
             {% elif field.label == "Cidade onde mora" %}
-            <div class="d-flex flex-column flex-md-row align-items-start p-2 rounded sem-borda-sombra">
+            <section class="d-flex flex-column flex-md-row align-items-start p-2 rounded sem-borda-sombra border">
                 <div class="flex-fill">{{ field }}</div>
                 <a class="btn btn-sm btn-outline-primary ms-md-2 mt-2 mt-md-0" href="{% url 'Gestao_Escolar:cidade-create' %}">
                     <i class="fa-solid fa-plus"></i> Cidade
                 </a>
-            </div>
+            </sectiion>
             {% else %}
             {{ field }}
             {% endif %}

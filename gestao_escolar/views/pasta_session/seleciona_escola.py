@@ -16,7 +16,7 @@ def Seleciona_escola(request, pk):
     escola = Escola.objects.get(pk = pk)    
     request.session['escola_id'] = escola.id        
     request.session['escola_nome'] = escola.nome_escola
-    request.session['escola_nome_query'] = escola    
+    #request.session['escola_nome_query'] = escola    
     nomeclatura = NomeclaturaJanelas.objects.latest('id')
     prefeitura = Prefeitura.objects.get(pk = 1)   
     

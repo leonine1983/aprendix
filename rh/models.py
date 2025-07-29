@@ -265,6 +265,7 @@ class Escola(models.Model):
     author_created = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da criação')
     atualizado_em = models.DateTimeField(auto_now=True, verbose_name='Data da Última Atualização')
     author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
+    fund2 = models.BooleanField(default=False, verbose_name="Escola de séries finais")
 
     class Meta:
         ordering = ['nome_escola']
