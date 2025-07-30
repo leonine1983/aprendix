@@ -4,6 +4,7 @@ from gestao_escolar.models import *
 from django.views.generic import TemplateView
 from rh.models import Escola, Encaminhamentos
 from gestao_escolar.models import Alunos, Turmas, EscolaMatriculaOnline
+from admin_acessos.models import AtualizacaoNotificacao
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 import plotly.graph_objects as go
@@ -52,11 +53,13 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
 
 
     def get_context_data(self, **kwargs):
+        user = self.request.user
         context = super().get_context_data(**kwargs)
         context['titulo_page'] = 'Selecione o ano letivo'
         context['svg'] = '<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="..."/></svg>'
         context['now'] = datetime.now()
         context['conteudo_page'] = 'info_escola'
+        context['notifica'] = AtualizacaoNotificacao.objects.filter(user = user, lida=False)
         # Carrega as informações do diretor para a pagina inicial para ativar o modal       
 
         # Obter a escola do banco de dados

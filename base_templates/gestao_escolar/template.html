@@ -875,11 +875,8 @@
     bottom: 1rem;
     right: 1rem;
     z-index: 9999;
-    display: flex;
-    flex-direction: column-reverse; /* para empilhar de baixo para cima */
-    gap: 1rem;
     width: 100%;
-    max-width: 400px;
+    max-width: 600px;
     pointer-events: none;
 }
 
@@ -952,45 +949,57 @@
 </style>
 
 <div class="container-notify">
-    <div class="notification notification--success" role="status" aria-live="polite">
-        <button class="notification__close" aria-label="Fechar notificação">&times;</button>
-        <div class="notification__body">
-            <img src="assets/check-circle.svg" alt="Success" class="notification__icon" aria-hidden="true">
-            Your account has been created! 🚀
+    {% for not in notifica %} 
+        {% if not.tipo == 'aviso' %}
+        <div class="notification notification--success" role="status" aria-live="polite">
+            <button class="notification__close" aria-label="Fechar notificação">&times;</button>
+            <div class="notification__body">
+                <h5>{{not.titulo}}</h3>
+                {{not.mensagem|safe}}
+            </div>
         </div>
-    </div>
+        {% endif %}
 
-    <div class="notification notification--failure" role="alert" aria-live="assertive">
-        <button class="notification__close" aria-label="Fechar notificação">&times;</button>
-        <div class="notification__body">
-            <img src="assets/cross-circle.svg" alt="Failure" class="notification__icon" aria-hidden="true">
-            Account creation failed! 😢
+        {% if not.tipo == 'info' %}     
+        <div class="notification notification--failure" role="alert" aria-live="assertive">
+            <button class="notification__close" aria-label="Fechar notificação">&times;</button>
+            <div class="notification__body">
+                <h3>{{not.titulo}}</h3>
+                {{not.mensagem|safe}}
+            </div>
         </div>
-    </div>
+        {% endif %}  
+        
+        {% if not.tipo == 'urgente' %}    
+        <div class="notification notification--warning" role="alert" aria-live="assertive">
+            <button class="notification__close" aria-label="Fechar notificação">&times;</button>
+            <div class="notification__body">
+                <h3>{{not.titulo}}</h3>
+                {{not.mensagem|safe}}
+            </div>
+        </div>
+        {% endif %} 
+        
+        {% if not.tipo == 'atualizado' %}
+        <div class="notification notification--info" role="status" aria-live="polite">
+            <button class="notification__close" aria-label="Fechar notificação">&times;</button>
+            <div class="notification__body text-center">
+                <h3>{{not.titulo}}</h3>
+                {{not.mensagem|safe}}
+            </div>
+        </div>
+        {% endif %}
 
-    <div class="notification notification--warning" role="alert" aria-live="assertive">
-        <button class="notification__close" aria-label="Fechar notificação">&times;</button>
-        <div class="notification__body">
-            <img src="assets/warning-triangle.svg" alt="Warning" class="notification__icon" aria-hidden="true">
-            A new software update is available!
+                <!--
+        <div class="notification notification--finalised" role="status" aria-live="polite">
+            <button class="notification__close" aria-label="Fechar notificação">&times;</button>
+            <div class="notification__body">
+                
+                The data export has been finalised!
+            </div>
         </div>
-    </div>
-
-    <div class="notification notification--info" role="status" aria-live="polite">
-        <button class="notification__close" aria-label="Fechar notificação">&times;</button>
-        <div class="notification__body">
-            <img src="assets/info-circle.svg" alt="Info" class="notification__icon" aria-hidden="true">
-            A new message has been received!
-        </div>
-    </div>
-
-    <div class="notification notification--finalised" role="status" aria-live="polite">
-        <button class="notification__close" aria-label="Fechar notificação">&times;</button>
-        <div class="notification__body">
-            <img src="assets/finalised-circle.svg" alt="Finalised" class="notification__icon" aria-hidden="true">
-            The data export has been finalised!
-        </div>
-    </div>
+        -->
+    {% endfor %}
 </div>
 
 <script>
