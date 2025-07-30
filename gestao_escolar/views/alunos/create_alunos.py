@@ -54,7 +54,7 @@ class Create_Alunos(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         })
         return context
 
-
+    """
     def form_valid(self, form):
         nome_completo = form.cleaned_data.get('nome_completo', '').strip()
         nome_mae = form.cleaned_data.get('nome_mae', '').strip()
@@ -75,7 +75,35 @@ class Create_Alunos(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         form.instance.nome_completo = nome_completo.upper()
         form.instance.nome_mae = nome_mae.upper()
 
-        return super().form_valid(form)
+        return super().form_valid(form)"""
+    
+    def form_valid(self, form):
+        nome_completo = form.cleaned_data.get('nome_completo', '').strip()
+        nome_mae = form.cleaned_data.get('nome_mae', '').strip()
+
+        if Alunos.objects.filter(
+            nome_completo__icontains=nome_completo,
+            nome_mae__icontains=nome_mae
+        ).exists():
+            return redirect(
+                'Gestao_Escolar:alunos_encontred',
+                nome_completo=nome_completo,
+                nome_mae=nome_mae
+            )
+
+        user = self.request.user
+        nome_usuario = f'{user.first_name} {user.last_name}'.strip() or user.username
+        form.instance.res_cadastro = nome_usuario
+        form.instance.nome_completo = nome_completo.upper()
+        form.instance.nome_mae = nome_mae.upper()
+
+        try:
+            return super().form_valid(form)
+        except Exception as e:
+            print("ERRO AO SALVAR O FORMULÁRIO:", e)
+            print("Dados do formulário:", form.cleaned_data)
+            raise e
+
 
     def form_invalid(self, form):
         for field_errors in form.errors.values():
