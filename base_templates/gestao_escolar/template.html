@@ -864,5 +864,153 @@
 
 <!-- FIM SCRIPT LOALDING-->
 
+
+<style>
+:root {
+    --bg: #fff;
+}
+
+.container-notify {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column-reverse; /* para empilhar de baixo para cima */
+    gap: 1rem;
+    width: 100%;
+    max-width: 400px;
+    pointer-events: none;
+}
+
+.notification--info {
+    --bg: #F0FBFE;
+    --primary: #0EA1E7;
+}
+
+.notification--finalised {
+    --bg: #F7F6FB;
+    --primary: #9077DF;
+}
+
+.notification--failure {
+    --bg: #FFF1F6;
+    --primary: #C43060;
+}
+
+.notification--warning {
+    --bg: #FFF9EB;
+    --primary: #d6a024;
+}
+
+.notification--success {
+    --bg: #ECFBF2;
+    --primary: #335D48;
+}
+
+.notification {
+    position: relative;
+    background: var(--bg);
+    color: var(--primary);
+    border-left: 0.25rem solid var(--primary);
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    pointer-events: auto;
+    opacity: 1;
+    visibility: visible;
+    transition: all 0.3s ease-in-out;
+}
+
+.notification__icon {
+    height: 1.625rem;
+    width: 1.625rem;
+    margin-right: 0.45rem;
+}
+
+.notification__body {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 1rem 0.5rem 1rem 1rem;
+}
+
+.notification__close {
+    position: absolute;
+    top: 0.3rem;
+    right: 0.5rem;
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.notification__progress {
+    display: none;
+}
+</style>
+
+<div class="container-notify">
+    <div class="notification notification--success" role="status" aria-live="polite">
+        <button class="notification__close" aria-label="Fechar notificação">&times;</button>
+        <div class="notification__body">
+            <img src="assets/check-circle.svg" alt="Success" class="notification__icon" aria-hidden="true">
+            Your account has been created! 🚀
+        </div>
+    </div>
+
+    <div class="notification notification--failure" role="alert" aria-live="assertive">
+        <button class="notification__close" aria-label="Fechar notificação">&times;</button>
+        <div class="notification__body">
+            <img src="assets/cross-circle.svg" alt="Failure" class="notification__icon" aria-hidden="true">
+            Account creation failed! 😢
+        </div>
+    </div>
+
+    <div class="notification notification--warning" role="alert" aria-live="assertive">
+        <button class="notification__close" aria-label="Fechar notificação">&times;</button>
+        <div class="notification__body">
+            <img src="assets/warning-triangle.svg" alt="Warning" class="notification__icon" aria-hidden="true">
+            A new software update is available!
+        </div>
+    </div>
+
+    <div class="notification notification--info" role="status" aria-live="polite">
+        <button class="notification__close" aria-label="Fechar notificação">&times;</button>
+        <div class="notification__body">
+            <img src="assets/info-circle.svg" alt="Info" class="notification__icon" aria-hidden="true">
+            A new message has been received!
+        </div>
+    </div>
+
+    <div class="notification notification--finalised" role="status" aria-live="polite">
+        <button class="notification__close" aria-label="Fechar notificação">&times;</button>
+        <div class="notification__body">
+            <img src="assets/finalised-circle.svg" alt="Finalised" class="notification__icon" aria-hidden="true">
+            The data export has been finalised!
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.notification__close').forEach(button => {
+    button.addEventListener('click', function () {
+        const notification = this.parentElement;
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 300);
+    });
+});
+</script>
+
+
+
+
+
+
+
 </body>
 </html>

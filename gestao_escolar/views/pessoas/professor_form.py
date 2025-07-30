@@ -1,7 +1,7 @@
 from django import forms
 from rh.models import Escola
 from gestao_escolar.models import Turmas, Matriculas
-from rh.models import Pessoas, Vinculo_empregaticio, Ano, Contrato, Profissao, Encaminhamentos, Cidade, Bairro, Sexo
+from rh.models import Pessoas, Vinculo_empregaticio, Ano, Contrato, Profissao, Encaminhamentos, Cidade, Bairro, Sexo, Uf_Unidade_Federativa
 import random
 import string
 
@@ -47,6 +47,23 @@ class Pessoa_form(forms.ModelForm):
         label="Nº do RG",
         widget=forms.TextInput(attrs= bootstrap )
     )
+    estado = forms.ModelChoiceField(
+        queryset=Uf_Unidade_Federativa.objects.all(),
+        label="Estado",
+        widget=forms.Select(attrs=bootstrap)
+    )
+
+    cidade= forms.ModelChoiceField(
+        queryset=Cidade.objects.all(),        
+        label="Cidade onde mora",
+        widget=forms.Select(attrs= bootstrap )
+    )
+    bairro= forms.ModelChoiceField(
+        queryset=Bairro.objects.all(),
+        label="Bairro",
+        widget=forms.Select(attrs= bootstrap )
+    )    
+
     rua= forms.CharField(
         label=" Nome da Rua",
         widget=forms.TextInput(attrs= bootstrap )
@@ -63,16 +80,7 @@ class Pessoa_form(forms.ModelForm):
         label="Nº da casa (ou SN)",
         widget=forms.TextInput(attrs= bootstrap )
     )
-    bairro= forms.ModelChoiceField(
-        queryset=Bairro.objects.all(),
-        label="Bairro",
-        widget=forms.Select(attrs= bootstrap )
-    )
-    cidade= forms.ModelChoiceField(
-        queryset=Cidade.objects.all(),        
-        label="Cidade onde mora",
-        widget=forms.Select(attrs= bootstrap )
-    )
+    
     cep= forms.CharField(
         label="CEP",
         widget=forms.TextInput(attrs= bootstrap )        
@@ -93,7 +101,7 @@ class Pessoa_form(forms.ModelForm):
 
     class Meta:
         model = Pessoas
-        fields = ['nome', 'sobrenome','foto','sexo','email', 'data_nascimento', 'cpf', 'rg', 'numero_casa', 'bairro', 'cidade', 'cep', 'login_professor','profissional_efetivo_no_municipio', 'senha']
+        fields = ['nome', 'sobrenome','foto','sexo','email', 'data_nascimento', 'cpf', 'rg','estado','cidade', 'bairro','rua', 'numero_casa', 'cep', 'login_professor','profissional_efetivo_no_municipio', 'senha']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -174,7 +182,7 @@ class Pessoa_form_update(forms.ModelForm):
 
     class Meta:
         model = Pessoas
-        fields = ['nome', 'sobrenome','foto','sexo', "data_nascimento",  'cpf', 'rg', 'numero_casa', 'bairro', 'cidade', 'cep']
+        fields = ['nome', 'sobrenome','foto','sexo','email', 'data_nascimento', 'cpf', 'rg','estado','cidade', 'bairro','rua', 'numero_casa', 'cep', 'login_professor','profissional_efetivo_no_municipio', 'senha']
 
 
 

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from ckeditor.fields import RichTextField
+from django.utils import timezone
 
 
 class MessageUser(models.Model):
@@ -42,3 +43,28 @@ class NomeclaturaJanelas(models.Model):
 
     def __str__(self):
         return self.nome_disciplina
+
+
+class AtualizacaoNotificacao(models.Model):
+    TIPO_CHOICES = [
+        ('info', 'Informação'),
+        ('aviso', 'Aviso'),
+        ('urgente', 'Urgente'),
+        ('atualizado', 'Atualização do Sistema'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificacoes')
+    titulo = models.CharField(max_length=200)
+    mensagem = RichTextField(null=True, blank=True)
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, default='info')
+    lida = models.BooleanField(default=False)
+    criada_em = models.DateTimeField(default=timezone.now)
+    atualizada_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-criada_em']
+        verbose_name = 'Notificação de Atualização'
+        verbose_name_plural = 'Notificações de Atualizações'
+
+    def __str__(self):
+        return f'{self.titulo} - {"Lida" if self.lida else "Não lida"}'

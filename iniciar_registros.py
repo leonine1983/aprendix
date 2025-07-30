@@ -433,15 +433,6 @@ def iniciar_registros():
 
 
 
-        
-
-
-
-
-
-
-
-
 
 
 
