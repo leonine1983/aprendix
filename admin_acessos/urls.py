@@ -6,7 +6,7 @@ from .views import (
     PaletaCoresCreateView,
     PaletaCoresUpdateView,
     PaletaCoresDeleteView,
-    CreateUsers
+    CreateUsers, marcar_notificacao_como_lida
 )
 
 app_name = 'admin_acessos'
@@ -30,6 +30,9 @@ urlpatterns = [
     path('paleta/nova/', PaletaCoresCreateView.as_view(), name='paletacores_create'),
     path('paleta/<int:pk>/editar/', PaletaCoresUpdateView.as_view(), name='paletacores_update'),
     path('paleta/<int:pk>/deletar/', PaletaCoresDeleteView.as_view(), name='paletacores_delete'),
+
+    # Notificação
+     path('notificacao/lida/', marcar_notificacao_como_lida, name='notificacao_lida'),
 ]
 
 

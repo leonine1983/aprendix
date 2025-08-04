@@ -277,3 +277,37 @@ class CreateUsers(LoginRequiredMixin, CreateView):
         else:
             context['all_user_school'] = User.objects.filter(related_UserEscola__escola=pk_school)  
         return context
+    
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from .models import AtualizacaoNotificacao
+
+
+@require_POST
+@login_required
+def marcar_notificacao_como_lida(request):
+    notifica_id = request.POST.get('id')
+    try:
+        notifica = AtualizacaoNotificacao.objects.get(id = notifica_id, user = request.user)
+        notifica.lida = True
+        notifica.save()
+        return JsonResponse({'status': 'ok'})
+    except AtualizacaoNotificacao.DoesNotExist:
+        return JsonResponse({'status': 'erro', 'mensagem': 'Notificação não encontrada'}, status=400)
+
+"""
+@require_POST
+@login_required
+def marcar_notificacao_como_lida(request):
+    notificacao_id = request.POST.get('id')
+    try:
+        notificacao = AtualizacaoNotificacao.objects.get(id=notificacao_id, user=request.user)
+        notificacao.lida = True
+        notificacao.save()
+        return JsonResponse({'status': 'ok'})
+    except AtualizacaoNotificacao.DoesNotExist:
+        return JsonResponse({'status': 'erro', 'mensagem': 'Notificação não encontrada'}, status=404)
+
+"""

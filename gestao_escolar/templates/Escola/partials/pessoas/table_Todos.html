@@ -71,6 +71,7 @@
                 <tr>
                     <th>Ordem</th>
                     <th>Nome completo</th>
+                    <th>Profissional Efetivo?</th>
                     <th>Gênero Sexual</th>
                     <th>Data Nascimento</th>
                     <th>Idade</th>
@@ -91,6 +92,7 @@
                 <tr>
                     <td>{{forloop.counter}}</td>
                     <td class="text-uppercase text-start">{{l.nome}} {{l.sobrenome}}</td>
+                    <td class="text-uppercase text-center">{% if l.profissional_efetivo_no_municipio %}Sim{% endif %}</td>
                     <td>{% if l.sexo %}{{l.sexo}}{% else %}Não especificou{% endif %}</td>
                     <td>
                         {{ l.data_nascimento }} 

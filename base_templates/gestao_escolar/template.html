@@ -872,7 +872,7 @@
 
 .container-notify {
     position: fixed;
-    bottom: 1rem;
+    top: 1rem;
     right: 1rem;
     z-index: 9999;
     width: 100%;
@@ -952,7 +952,7 @@
     {% for not in notifica %} 
         {% if not.tipo == 'aviso' %}
         <div class="notification notification--success" role="status" aria-live="polite">
-            <button class="notification__close" aria-label="Fechar notificação">&times;</button>
+            <button class="notification__close" aria-label="Fechar notificação" onclick="fecharNotificacao({{ not.id }}, this)">&times;</button>
             <div class="notification__body">
                 <h5>{{not.titulo}}</h3>
                 {{not.mensagem|safe}}
@@ -962,7 +962,7 @@
 
         {% if not.tipo == 'info' %}     
         <div class="notification notification--failure" role="alert" aria-live="assertive">
-            <button class="notification__close" aria-label="Fechar notificação">&times;</button>
+            <button class="notification__close" aria-label="Fechar notificação" onclick="fecharNotificacao({{ not.id }}, this)">&times;</button>
             <div class="notification__body">
                 <h3>{{not.titulo}}</h3>
                 {{not.mensagem|safe}}
@@ -972,7 +972,7 @@
         
         {% if not.tipo == 'urgente' %}    
         <div class="notification notification--warning" role="alert" aria-live="assertive">
-            <button class="notification__close" aria-label="Fechar notificação">&times;</button>
+            <button class="notification__close" aria-label="Fechar notificação" onclick="fecharNotificacao({{ not.id }}, this)">&times;</button>
             <div class="notification__body">
                 <h3>{{not.titulo}}</h3>
                 {{not.mensagem|safe}}
@@ -982,7 +982,7 @@
         
         {% if not.tipo == 'atualizado' %}
         <div class="notification notification--info" role="status" aria-live="polite">
-            <button class="notification__close" aria-label="Fechar notificação">&times;</button>
+            <button class="notification__close" aria-label="Fechar notificação" onclick="fecharNotificacao({{ not.id }}, this)">&times;</button>
             <div class="notification__body text-center">
                 <h3>{{not.titulo}}</h3>
                 {{not.mensagem|safe}}
@@ -1001,6 +1001,27 @@
         -->
     {% endfor %}
 </div>
+<!-- Exibe notificações para o usuário-->
+<script>
+  function fecharNotificacao(notificacaoId, elemento) {
+    console.log(`resultado ${notificacaoId}`)
+    fetch("{% url 'admin_acessos:notificacao_lida' %}", {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: `id=${notificacaoId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'ok') {
+        elemento.closest('.notification').remove();  // Remove visualmente
+      }
+    });
+  }
+</script>
+
 
 <script>
 document.querySelectorAll('.notification__close').forEach(button => {
@@ -1014,6 +1035,11 @@ document.querySelectorAll('.notification__close').forEach(button => {
     });
 });
 </script>
+
+
+
+
+
 
 
 

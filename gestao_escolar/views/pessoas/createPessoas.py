@@ -41,9 +41,7 @@ class PessoasCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         try:
-            with transaction.atomic():
-                messages.success(self.request, 'Pessoa criada com sucesso!')
-
+            with transaction.atomic():    
                 nome = form.cleaned_data['nome']
                 sobrenome = form.cleaned_data['sobrenome']
                 email = form.cleaned_data['email']
@@ -68,8 +66,9 @@ class PessoasCreateView(LoginRequiredMixin, CreateView):
 
                 # Cria o vínculo entre usuário e pessoa
                 UserPessoas.objects.create(user=user, pessoa=self.object)
+                messages.success(self.request, 'Pessoa criada com sucesso!')
+                messages.info(self.request, f'Acesso ao ambiente docente liberado para {user.first_name} {user.last_name}. O profissional já pode acessar o sistema; as disciplinas serão exibidas após o seu vínculo como professor em uma turma.')
 
-                messages.success(self.request, f'Acesso ao sistema liberado para {user.first_name} {user.last_name}')
                 return super().form_valid(form)
 
         except IntegrityError as e:
@@ -87,8 +86,10 @@ class PessoasCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse_lazy('Gestao_Escolar:pessoas-create')
     
+    
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)        
+        context['pessoas'] = self.get_queryset()
         context['btn_bg'] = "btn-success"
         context['conteudo_page'] = 'Pessoa Create'
         #context['pessoas'] = pessoas_object,

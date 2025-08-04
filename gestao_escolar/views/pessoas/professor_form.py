@@ -10,6 +10,12 @@ import string
 # 1º Esse
 bootstrap = {'class': "form-control"}
 
+SIM_NAO = (
+    ('', '---'),   
+    ('True', 'Sim'),
+    ('False', 'Não'),
+)
+
 class Pessoa_form(forms.ModelForm):   
     nome = forms.CharField(
         label="Nome da Pessoa",
@@ -97,6 +103,11 @@ class Pessoa_form(forms.ModelForm):
         widget=forms.PasswordInput(attrs={'class': "border border-info p-2 pb-1 text-success col rounded-1"}),
         required=False,  
         disabled=True     
+    )
+    profissional_efetivo_no_municipio = forms.ChoiceField(
+        label="Sinalize se o profissional é efetivo:",
+        choices=SIM_NAO,
+        required=True
     )
 
     class Meta:

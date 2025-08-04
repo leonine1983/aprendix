@@ -1,6 +1,56 @@
 {% load static %}
+
 <style>
     input, select{padding:0 0.5rem!important;}
+
+    #id_profissional_efetivo_no_municipio {
+    display: flex !important;
+    gap: 1rem !important;
+    flex-wrap: wrap !important;
+    padding: 1rem !important;
+    background: #f8f9fa !important;
+    border: 2px solid #0d6efd !important;
+    border-radius: 1rem !important;
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.2) !important;
+    transition: all 0.3s ease-in-out !important;
+}
+#id_profissional_efetivo_no_municipio div {
+    box-shadow: none!important;
+    cursor: none !important;
+}
+
+#id_profissional_efetivo_no_municipio div {
+    flex: 1 1 150px !important;
+    display: flex !important;
+    align-items: center !important;
+    background-color: #fff !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 0.5rem !important;
+    padding: 0.5rem 1rem !important;
+    transition: 0.3s ease !important;
+    cursor: pointer !important;
+}
+
+#id_profissional_efetivo_no_municipio div:hover {
+    background-color: #e7f1ff !important;
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25) !important;
+}
+
+#id_profissional_efetivo_no_municipio label {
+    margin-bottom: 0 !important;
+    margin-left: 0.5rem !important;
+    color: #212529 !important;
+    font-weight: 500 !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+#id_profissional_efetivo_no_municipio input[type="radio"] {
+    accent-color: #0d6efd !important;
+    transform: scale(1.2) !important;
+}
+
 </style>
 <div class='m-2'>
     <h2>Formulário de Cadastro de Pessoas para o Sistema Aprendix</h2>
