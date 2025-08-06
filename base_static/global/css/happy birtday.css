@@ -1,0 +1,36 @@
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999; /* Fica sobre todos os elementos */
+  pointer-events: none; /* Permite clique nos elementos abaixo */
+}
+
+
+#c p {
+  margin: 0;
+  position: fixed;
+  font: 16px Verdana;
+  color: #eee;
+  height: 25px;
+  bottom: 5px;
+  left: 10px;
+  z-index: 10000;
+  text-shadow: 0 0 2px white;
+  pointer-events: none;
+}
+
+#c p a {
+  text-decoration: none;
+  color: #aaa;
+}
+
+#c span {
+  font-size: 11px;
+}
+
+#c p > a:first-of-type {
+  font-size: 20px;
+}
