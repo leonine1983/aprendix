@@ -9,7 +9,7 @@ from rh.models import Ano
 class ListView_Escola(LoginRequiredMixin, TemplateView):
     model = Escola
     template_name = 'Escola/inicio.html'
-    context_object_name = 'escolas'
+    context_object_name = 'escolas'    
 
     def get_context_data(self, **kwargs):
         ano_id = self.request.session.get('anoLetivo_id')

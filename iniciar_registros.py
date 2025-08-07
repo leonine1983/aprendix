@@ -178,15 +178,15 @@ def iniciar_registros():
             else:
                 # Definindo as escolas a serem criadas
                 escolas = [
-                        (prefeitura, "Escola Municipal Geralda Maria"),
-                        (prefeitura, "Colégio Municipal de Vera Cruz"),
+                        (prefeitura, "Escola Municipal Geralda Maria", True),
+                        (prefeitura, "Colégio Municipal de Vera Cruz", True),
                         (prefeitura, "Centro de Atendimento Educacional Especializado Dr Nicandro Moreira de Macedo"),
                         (prefeitura, "Centro Municipal de Educação Infantil de Cacha Pregos"),
-                        (prefeitura, "Colégio Municipal Telma Régis de Andrade"),
-                        (prefeitura, "Colégio Municipal Geralda Maria da Conceição"),
+                        (prefeitura, "Colégio Municipal Telma Régis de Andrade", True),
+                        (prefeitura, "Colégio Municipal Geralda Maria da Conceição", True),
                         (prefeitura, "Colégio Municipal Jarbas Passarinho"),
-                        (prefeitura, "Colégio Municipal Luiz Eduardo Magalhães"),
-                        (prefeitura, "Colégio Municipal Professora Daulia Angélica de Souza Santos"),
+                        (prefeitura, "Colégio Municipal Luiz Eduardo Magalhães", True),
+                        (prefeitura, "Colégio Municipal Professora Daulia Angélica de Souza Santos", True),
                         (prefeitura, "Creche de Jiribatuba"),
                         (prefeitura, "Creche Escola Municipal Educandário Tio Aurélio"),
                         (prefeitura, "Creche Escola Municipal Elza Galvão"),
@@ -211,7 +211,7 @@ def iniciar_registros():
                         (prefeitura, "Escola Municipal Gezilda Alves de Souza"),
                         (prefeitura, "Escola Municipal Guilherme Franco Guimarães"),
                         (prefeitura, "Escola Municipal Hilton Rodrigues"),
-                        (prefeitura, "Escola Municipal João José de Macedo"),
+                        (prefeitura, "Escola Municipal João José de Macedo", True),
                         (prefeitura, "Escola Municipal Joaquim Barreto de Araújo"),
                         (prefeitura, "Escola Municipal Juvenal Galvão"),
                         (prefeitura, "Escola Municipal Margarida Moreira"),
@@ -224,13 +224,13 @@ def iniciar_registros():
                         (prefeitura, "Escola Narciso Francisco de Pinho"),
                         (prefeitura, "Escola Sede Social do Riachinho"),
                         (prefeitura, "Escola Voluntárias Sociais da Bahia"),
-                        (prefeitura, "Ginásio Municipal Estelita Eusébia Santiago dos Santos")
+                        (prefeitura, "Ginásio Municipal Estelita Eusébia Santiago dos Santos", True)
                     ]
 
                 
                 # Criar as escolas
                 escolas_criadas = Escola.objects.bulk_create(
-                    [Escola(prefeitura=p, nome_escola=n) for p, n in escolas]
+                    [Escola(prefeitura=p, nome_escola=n, fund2 = t ) for p, n, t in escolas]
                 )
                 print(f"Escolas criadas: {[escola.nome_escola for escola in escolas_criadas]}")
 

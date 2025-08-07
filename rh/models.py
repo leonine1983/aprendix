@@ -269,7 +269,7 @@ class Escola(models.Model):
     fund2 = models.BooleanField(default=False, verbose_name="Escola de séries finais")
 
     class Meta:
-        ordering = ['nome_escola']
+        ordering = ['-fund2','nome_escola']
 
     def __str__(self):
         return self.nome_escola
