@@ -41,7 +41,7 @@ class Aluno_documentoUpadate_form(forms.ModelForm):
     
     class Meta:
         model = Alunos
-        fields = ['aluno', 'CPF', 'RG', 'RG_emissao', 'RG_UF', 'orgao_emissor', 'cartao_nacional_saude_cns', 'nis', 'inep',
+        fields = ['aluno', 'CPF', 'RG', 'RG_emissao', 'RG_UF', 'orgao_emissor', 'nome_mae', 'CPF_mae', 'tel_celular_mae', 'nome_pai', 'tel_celular_pai', 'senha',  'cartao_nacional_saude_cns', 'nis', 'inep',
                 'estado_civil', 'tipo_certidao', 'numero_certidao', 'livro', 'folha', 'termo', 'emissao', 'distrito_certidao', 'cartorio', 'comarca', 'cartorio_uf',
                 'justificativa_falta_documento', 'local_diferenciado', 'obito', 'data_obito'  ]    
         
@@ -95,6 +95,12 @@ class Aluno_documentoUpadate_form(forms.ModelForm):
         label='INEP do Aluno',
         widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
         required=False
+    )
+    login_aluno  = forms.CharField(
+        label='Login de acesso do aluno',
+        widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 bg-transparent text-info col m-2 rounded-1'}),
+        required=False,
+        disabled=True
     )
     estado_civil = forms.ChoiceField(
         label='Estado Civil',
