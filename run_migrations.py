@@ -9,10 +9,10 @@ APPS = [
     "admin_acessos",
     "rh",
     "controle_estoque",
-    "gestao_escolar",
-    "docsGestao_Escolar",
+    "gestao_escolar",    
     "modulo_professor",
-    "modulo_aluno"
+    "modulo_aluno",
+    "docsGestao_Escolar",
 ]
 
 # Nome do arquivo de log

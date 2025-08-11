@@ -106,10 +106,8 @@
             <td >{{n.situacao}}</td>
             <td >{{n.data_matricula}}</td>
             <td>
-              <a href="{% url 'Gestao_Escolar:historico_escolar' n.id %}" title="Impressão de histórico escolar">   
-                  <div style="margin-bottom:0.9rem">
-                    <img src="{% static 'svg/boletim_aluno.svg' %}" alt="mdo" class="pt-1 pb-1">
-                  </div>   
+              <a href="{% url 'Gestao_Escolar:historico_escolar' n.id %}" title="Impressão de histórico escolar" class='text-primary'>   
+                  <i class="fa-solid fa-clipboard-user"></i>  
                   <span>Histórico Escolar</span>
                 </a> 
             </td>
