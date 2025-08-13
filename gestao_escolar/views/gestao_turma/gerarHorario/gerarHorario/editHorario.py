@@ -5,13 +5,14 @@ from django.views.generic import UpdateView
 from django.urls import reverse_lazy
 from django import forms
 from gestao_escolar.models import Turmas, Horario, TurmaDisciplina, Periodo
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 class HorarioForm(forms.ModelForm):
     class Meta:
         model = Horario
         fields = ['segunda', 'terca', 'quarta', 'quinta', 'sexta']
 
-class HorarioUpdateView(UpdateView):
+class HorarioUpdateView(LoginRequiredMixin, UpdateView):
     model = Horario
     form_class = HorarioForm
     template_name = 'Escola/inicio.html'
@@ -72,7 +73,7 @@ class HorarioUpdateView(UpdateView):
                     errors.append(
                         f'O limite diário de {turma_disciplina.quant_aulas_dia}\
                               aulas para {turma_disciplina.disciplina.nome.upper()}\
-                                  com o professor {turma_disciplina.professor.nome.encaminhamento.contratado.nome.upper()}\
+                                  com o professor {turma_disciplina.professor.encaminhamento.contratado.upper()}\
                                       em {dia} foi atingido. Se precisar acrescentar mais aulas para esse professor, \
                                         vá em GRADES DE DISCIPLINAS e aumente a quantidade de "Aulas Dia" dessa disciplina com esse professor.'
                     )
@@ -87,7 +88,7 @@ class HorarioUpdateView(UpdateView):
                 if total_aulas_semana >= turma_disciplina.quant_aulas_semana:
                     errors.append(
                         f'O limite semanal de {turma_disciplina.quant_aulas_semana} aulas para {turma_disciplina.disciplina.nome.upper()}\
-                              com o professor {turma_disciplina.professor.nome.encaminhamento.contratado.nome.upper()} foi atingido.\
+                              com o professor {turma_disciplina.professor.encaminhamento.contratado} foi atingido.\
                                 Se precisar acrescentar mais aulas para esse professor, \
                                         vá em GRADES DE DISCIPLINAS e aumente a quantidade de "Aulas por Semana" dessa disciplina com esse professor.'
                     )                
