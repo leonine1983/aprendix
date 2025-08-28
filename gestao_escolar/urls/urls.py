@@ -13,6 +13,7 @@ urlpatterns = [
     path('', include('gestao_escolar.urls.escolas')),
     path('dowload/', include('gestao_escolar.urls.download')),   
     path('', include('gestao_escolar.urls.pessoas')),   
+    path('', include('gestao_escolar.urls.migracao_exportacao')),   
     
 
     # Turmas

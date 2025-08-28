@@ -24,3 +24,4 @@ from .gestao_turma.planoAula import *
 from .bairro_E_cidade_dinamicos import *
 from .tutorial_e_donwload import *
 #from .ferramentas import *
+from .migracao_exportacao import *
