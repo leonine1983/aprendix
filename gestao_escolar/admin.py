@@ -1,6 +1,8 @@
 from django.contrib import admin
 from .models import *
 
+class TurmasAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'escola', 'ano_letivo', 'turma_concluida')
 # Register your models here.
 #admin.site.register(AnoLetivo)
 admin.site.register(Cargo)
@@ -10,7 +12,7 @@ admin.site.register(Alunos)
 admin.site.register(Compatibilidade_EducaCenso)
 admin.site.register(GrauEscolar)
 admin.site.register(Serie_Escolar)
-admin.site.register(Turmas)
+admin.site.register(Turmas, TurmasAdmin)
 admin.site.register(Disciplina)
 admin.site.register(TurmaDisciplina)
 admin.site.register(Remanejamento)
@@ -34,3 +36,4 @@ admin.site.register(MatriculasOnline)
 admin.site.register(Trimestre)
 admin.site.register(ParecerDescritivo)
 admin.site.register(AlunoUser)
+

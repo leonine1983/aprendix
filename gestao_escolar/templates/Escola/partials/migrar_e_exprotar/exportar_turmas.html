@@ -1,0 +1,72 @@
+{% include "Escola/partials/modal_partials/modal_top.html" %}
+      <section>
+        <h2> {{sub_title_context}}</h2>  
+         
+      </section>  
+      {% block content %}
+      <div class="w-100 py-5">
+        <div class="d-flex flex-column flex-lg-row gap-4 align-items-start">   
+            <!-- Destaque Ano Letivo Atual -->
+            <div class="card shadow-sm border-2 border-dark bg-warning-subtle text-dark text-center p-4 flex-fill">
+                <div class="fw-bold fs-4">📅 Ano Letivo Atual</div>
+                <div class="display-5 fw-bold">
+                    {{ request.session.anoLetivo_nome }}
+                </div>
+            </div>       
+
+            <!-- Formulário -->
+            <form method="post" class="card p-4 shadow-sm flex-fill">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="escola" class="form-label">Selecione a Escola:</label>
+                    <select name="escola" id="escola" class="form-select" required>
+                        <option value="">-- Escolha --</option>
+                        {% for escola in escolas %}
+                            <option value="{{ escola.id }}">{{ escola }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    {% if not request.session.anoLetivo_nome == anos.ano %}                    
+                        <label for="ano_origem" class="form-label">Ano de Origem:</label>
+                        <select name="ano_origem" id="ano_origem" class="form-select" required>
+                            <option value="">-- Escolha --</option>
+                            <option value="{{ anos.id }}">{{ anos }}</option>                        
+                        </select> 
+                    {% else %}
+                        <div class="alert alert-info">
+                            👉 Ainda não há um ano letivo posterior a {{ request.session.anoLetivo_nome }}.<br>
+                            Antes de prosseguir, é necessário criar um novo ano letivo para que a exportação das turmas seja possível.<br>
+                            Após a criação, retorne à opção <strong>Exportação de Turmas</strong> para concluir o processo.
+                        </div>
+                        {% url "Gestao_Escolar:cria_ano" as editar_url %}
+                        {% include "Escola/components/linkCriar.html" with link=editar_url title="Criar Ano Letivo" %}
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    Exportar Turmas
+                </button>
+            </form>        
+        </div>      
+    </div>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    </div>
+</div>
+{% include "Escola/partials/utils/dragDrop.html" %}

@@ -4,58 +4,76 @@ from gestao_escolar.models import Turmas
 from rh.models import Ano, Escola
 
 def exportar_turmas(request):
+    escola = request.session['escola_id']
     if request.method == "POST":
-        escola_id = request.POST.get("escola")
-        ano_origem = request.POST.get("ano_origem")
+        escola_id = escola
+        ano_destino = request.POST.get("ano_origem")        
 
         escola = get_object_or_404(Escola, id=escola_id)
 
-        # Recupera o ano de origem
-        ano_letivo_origem = get_object_or_404(Ano, ano=ano_origem)
+        # Recupera na sessão o ano letivo atual
+        anoAtual = request.session['anoLetivo_nome']
+        anoAnterior = get_object_or_404(Ano, ano = anoAtual)
 
-        # Calcula o ano de destino
-        ano_destino_str = str(int(ano_origem) + 1)
-
-        # Cria o ano destino se não existir
-        ano_letivo_destino, created = Ano.objects.get_or_create(
-            ano=ano_destino_str,
-            defaults={"prefeitura": escola.prefeitura}  # mantém vínculo
-        )
+        # Recupera o ano de destino
+        ano_letivo_destino = get_object_or_404(Ano, id=ano_destino)
 
         # Recupera turmas do ano de origem
-        turmas_origem = Turmas.objects.filter(escola=escola, ano_letivo=ano_letivo_origem)
+        turmas_origem = Turmas.objects.filter(escola=escola, ano_letivo=anoAnterior)
+        print(f'turmas anterior {turmas_origem}')
+
+        # Recupera turmas do ano de destino        
+        turmas_destino = Turmas.objects.filter(escola=escola, ano_letivo=ano_letivo_destino)
+        print(f'turmas destino {turmas_destino}')           
 
         if not turmas_origem.exists():
             messages.warning(request, "Nenhuma turma encontrada para exportar.")
-            return redirect("exportar_turmas")
+            return redirect("Gestao_Escolar:exportar_turmas")
 
         # Prepara novas turmas
-        novas_turmas = []
-        for turma in turmas_origem:
-            novas_turmas.append(
-                Turmas(
-                    nome=turma.nome,
-                    descritivo_turma=turma.descritivo_turma,
-                    escola=turma.escola,
-                    ano_letivo=ano_letivo_destino,
-                    serie=turma.serie,
-                    turno=turma.turno,
-                    turma_multiserie=turma.turma_multiserie,
-                    turma_concluida=False,
-                    quantidade_vagas=turma.quantidade_vagas,
-                    vagas_disponiveis=turma.quantidade_vagas,
+        if not turmas_destino:
+            print(f'tem turmas')
+            novas_turmas = []
+            for turma in turmas_origem:
+                novas_turmas.append(
+                    Turmas(
+                        nome=turma.nome,
+                        descritivo_turma=turma.descritivo_turma,
+                        escola=turma.escola,
+                        ano_letivo=ano_letivo_destino,
+                        serie=turma.serie,
+                        turno=turma.turno,
+                        turma_multiserie=turma.turma_multiserie,
+                        turma_concluida=False,
+                        quantidade_vagas=turma.quantidade_vagas,
+                        vagas_disponiveis=turma.quantidade_vagas,
+                    )
                 )
+
+            Turmas.objects.bulk_create(novas_turmas)
+
+            messages.success(
+                request,
+                f"Turmas do ano {anoAnterior} exportadas com sucesso para {ano_letivo_destino}!"
+            )
+        else:
+            messages.warning(
+                request,
+                f"⚠️ Já existem turmas cadastradas no ano letivo {ano_letivo_destino.ano} da escola {escola}. "
+                f"Verifique esse ano letivo para confirmar se as turmas já foram criadas ou exportadas anteriormente."
             )
 
-        Turmas.objects.bulk_create(novas_turmas)
-
-        messages.success(
-            request,
-            f"Turmas do ano {ano_origem} exportadas com sucesso para {ano_destino_str}!"
-        )
-        return redirect("exportar_turmas")
+        return redirect("Gestao_Escolar:exportar_turmas")
 
     # Renderiza formulário
-    escolas = Escola.objects.all()
-    anos = Ano.objects.all().order_by("-ano")
-    return render(request, "turmas/exportar_turmas.html", {"escolas": escolas, "anos": anos})
+    escolas = Escola.objects.filter(id = escola)    
+    anos = Ano.objects.all().order_by("-ano").first()
+    explica = 'Este recurso permite duplicar todas as turmas de um ano letivo para o ano seguinte, garantindo a continuidade da organização escolar. Caso o próximo ano letivo ainda não exista, será criar um novo ano letivo antes da exportação'
+
+
+    return render(request, "Escola/inicio.html", {
+        "escolas": escolas, 
+        "anos": anos,
+        'titulo_page':'Exportar Turmas',  
+        'sub_title_context':explica,     
+        'conteudo_page':'exportar Turmas'    })
