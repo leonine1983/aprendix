@@ -3,7 +3,6 @@ from .models import *
 
 class TurmasAdmin(admin.ModelAdmin):
     list_display = ('nome', 'escola', 'ano_letivo', 'turma_concluida')
-# Register your models here.
 #admin.site.register(AnoLetivo)
 admin.site.register(Cargo)
 admin.site.register(Profissionais)

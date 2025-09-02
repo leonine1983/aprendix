@@ -85,17 +85,19 @@
                             <th class="text-uppercase text-center">Notas de Recuperação do Aluno </th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {% for disciplina_nome, form in forms_dict.items %}        
-                        <tr class="win11-form-group">
-                            <td class="win11-form-field">{{ forloop.counter }}</td>
-                            <td class="win11-form-field">{{ disciplina_nome }}</td>
-                            <td class="win11-form-field">
-                                {{ form.recuperacao_final }}
-                                {% for error in form.notas.errors %}
-                                    <span class="error">{{ error }}</span>
-                        </tr>
-                        <input type="hidden" name="{{ form.prefix }}-disciplina" value="{{ disciplina_nome }}">
+                   <tbody>
+                        {% for disciplina_nome, form in forms_dict.items %}
+                            <tr class="win11-form-group">
+                                <td class="win11-form-field">{{ forloop.counter }}</td>
+                                <td class="win11-form-field">{{ disciplina_nome }}</td>
+                                <td class="win11-form-field">
+                                    {{ form.recuperacao_final }}
+                                    {% for error in form.notas.errors %}
+                                        <span class="error">{{ error }}</span>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            <input type="hidden" name="{{ form.prefix }}-disciplina" value="{{ disciplina_nome }}">
                         {% endfor %}
                     </tbody>
                 </table>
