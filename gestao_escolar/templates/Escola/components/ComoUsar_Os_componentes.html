@@ -10,10 +10,9 @@
     - label  → Texto exibido no botão (opcional; padrão: "Editar")
 
   💡 Exemplo de uso dentro de um loop for:
-  
     {% url 'Gestao_Escolar:decreto-update' d.id as editar_url %}
     {% include "Escola/components/linkEditar.html" with link=editar_url title="Editar decreto" %}
-  
+
   🔒 Importante:
     - Você deve capturar a URL com `{% url ... as var %}` e passar como argumento.
     - Este componente deve ser incluído **dentro de um loop** quando for usado com objetos iteráveis (como `d` no exemplo).

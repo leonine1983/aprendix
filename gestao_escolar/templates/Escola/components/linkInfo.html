@@ -1,0 +1,26 @@
+<!--linkEditar.html-->
+<a href="{{ link }}" 
+   class="btn btn-sm d-flex align-items-center gap-1 btn-outline-warning-custom" 
+   title="{{ title }}">
+    <i class="fa-solid fa-circle-info"></i>
+
+    <span class="d-none d-md-inline">
+        {% if label %}{{ label }}{% else %}Editar{% endif %}
+    </span>
+</a>
+
+<style>
+/* Estilo customizado para o botão amarelo */
+.btn-outline-warning-custom {
+    border: 1px solid #ffc107;   /* Amarelo padrão do Bootstrap */
+    color: #856404 !important;             /* Amarelo-escuro/marrom (legível) */
+    background-color: transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-warning-custom:hover {
+    background-color: #ffc107;  /* Amarelo cheio */
+    color: #212529;            /* Texto escuro para contraste */
+}
+</style>
+
