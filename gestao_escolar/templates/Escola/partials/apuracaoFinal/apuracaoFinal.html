@@ -158,12 +158,19 @@
                                         <td>
                                             {% if not m.gestao_turmas_related.first.trimestre.final == 'False' %}
                                                 {% if m.gestao_turmas_related.first.aprovado %}
-                                                    Aprovado
+                                                    Aprovado rrr
                                                 {% else %}
-                                                    {% if m.gestao_turmas_related.first.conselho_classe %}
+                                                    {% if m.aprovado_conselho %}
                                                         Aprovado pelo conselho
                                                     {% else %}
-                                                        Retido
+                                                        <!--Se o aluno for aprovado na recuperação-->    
+                                                        {% if m.aprovado_recupera %}
+                                                            Aprovado 
+                                                            {% else %}
+                                                            Reprovado
+                                                        {% endif %}
+                                                    
+                                                        
                                                     {% endif %}
                                                 {% endif %}
                                             {% else %}

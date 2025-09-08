@@ -1,4 +1,4 @@
-from rh.models import Escola
+from rh.models import Escola, Ano
 from gestao_escolar.models import Matriculas, Turmas
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -13,11 +13,16 @@ class View_turmas_Grade(LoginRequiredMixin, ListView ):
     template_name = 'Escola/inicio.html'
 
     def get_queryset(self):
+        escola = self.request.session['escola_id']
+        ano = self.request.session['anoLetivo_nome']
+        anoLetivo = Ano.objects.get(ano= ano)
+        escolaSeleciona = Escola.objects.get(id = escola)
+
         buscar_turma = self.request.GET.get ('busca-turma')
         if buscar_turma:
-            turmas = Turmas.objects.filter(Q(nome__icontains = buscar_turma))
+            turmas = Turmas.objects.filter(nome__icontains = buscar_turma, escola = escolaSeleciona, ano_letivo = anoLetivo)
         else:
-            turmas = Turmas.objects.all()
+            turmas = Turmas.objects.filter(escola = escolaSeleciona, ano_letivo = anoLetivo)
 
         return turmas
 

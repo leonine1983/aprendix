@@ -485,6 +485,7 @@ class Matriculas(models.Model):
     obervacao = RichTextUploadingField(null=True, blank=True)    
     calcula_media = models.BooleanField(default=True, null=True, blank=True)
     # Are de aprovacao do aluno no ano letivo
+    aprovado = models.BooleanField(default=False)
     aprovado_conselho = models.BooleanField(default=False)
     aprovado_recupera = models.BooleanField(default=False)
     naoFoi_a_recupera = models.BooleanField(default=False)

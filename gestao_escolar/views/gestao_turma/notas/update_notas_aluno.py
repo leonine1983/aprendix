@@ -2,9 +2,10 @@ import smtplib
 from email.message import EmailMessage
 from django.shortcuts import render
 from gestao_escolar.models import Trimestre, Matriculas, TurmaDisciplina, GestaoTurmas
+from django.contrib.auth.decorators import login_required
 
 
-
+@login_required
 def gestao_turmas_update_view(request, pk):
     matriculas = Matriculas.objects.filter(turma=pk)
     trimestres = Trimestre.objects.all()

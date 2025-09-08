@@ -19,6 +19,7 @@ class AprovaConselho(LoginRequiredMixin, View):
 
             if g.media_final == 5.0:  # Garantindo que a mensagem é enviada após a aprovação
                 aluno.aprovado_conselho = True
+                aluno.aprovado_recupera = False
                 aluno.save()
                 messages.success(request, f"O aluno {g.aluno} acaba de ser aprovado pelo Conselho de Classe na disciplina {g.grade.disciplina}. A média final dele será 5,0")
 
