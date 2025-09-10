@@ -2,7 +2,7 @@ from django.urls import path, include
 from gestao_escolar.views.GE_pasta_escola import *
 from gestao_escolar.views.pasta_session import *
 from gestao_escolar.views import *
-from gestao_escolar.views.views import   Pagina_inicio
+from gestao_escolar.views.views import  Pagina_inicio
 #from dal import autocomplete
 
 app_name = "Gestao_Escolar"
@@ -130,6 +130,7 @@ urlpatterns = [
     path('gestao_turmas/<int:aluno_id>/<int:trimestre_id>/', create_or_update_gestao_turmas, name='create_or_update_gestao_turmas'),
     path('gestao_turmas/recuperaFinal/<int:aluno_id>/<int:trimestre_id>/', create_or_update_gestao_turmas_recupera, name='recuperaFinal'),
     path('gestao_turmas/media/<int:aluno_id>/', create_or_update_Media_turmas, name='create_or_update_media_turmas'),
+    path("notas/<int:matricula>/<int:grade>/<int:trimestre>/<str:nota>/", notas_usa_dialog, name="notas_usa_dialog" ),
     
     # Notas Trimestre
     path('criar-gestao-turma/parecer/<int:turma_id>/', gestao_turmas_parecer, name='criaParecer'), 
