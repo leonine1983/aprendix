@@ -87,9 +87,14 @@
                                                                                 <span class="text-primary">
                                                                         {% endif %}
                                                                             <!--Atualizar notas-->
-                                                                            <button id="abrirDialog_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}" class="btn btn-sm btn-outline-primary  m-1"
->
-                                                                                 {{ gestao_turma.notas }}
+                                                                            <button style='' id="abrirDialog_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}" class="btn btn-sm btn-outline-primary  m-1"
+>                                   
+                                                                                    {% if gestao_turma.notas %}
+                                                                                        {{ gestao_turma.notas }}
+                                                                                        {% else %}
+                                                                                        not
+                                                                                    {% endif %}
+
                                                                             </button>
                                                                             {% include "Escola/partials/gestao_turmas/notas_partials/dialog_se_aprovado_conselho/dialog_Notas.html" %}  
                                                                             <!--End-->
