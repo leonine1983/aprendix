@@ -25,8 +25,10 @@ def notas_usa_dialog(request, matricula, grade, trimestre, nota):
             "profissional_resp": profissional_resp
         }
     )
-    messages.success(request, "Nota do aluno, atualizada com sucesso")
+    # Para garantir uma unica mensagem por nota salva
+    messages.set_level(request, messages.constants.SUCCESS)
+    messages.success(request, f"Nota do aluno {aluno} para o {trimestre}º TRIMESTRE, atualizada com sucesso")
 
-    return redirect("Gestao_Escolar:gestao_turmas_update", pk=matricula)
+    return redirect("Gestao_Escolar:gestao_turmas_update", pk=aluno.turma.pk)
 
 
