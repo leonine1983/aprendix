@@ -10,6 +10,7 @@ from django.contrib import messages
 
 
 # Essa view lida com a seleção da escola e armazena os dados na sessão
+"""
 @login_required
 def Seleciona_escola(request, pk):
     # Recupera a escola com base no id fornecido
@@ -39,5 +40,38 @@ def Seleciona_escola(request, pk):
     
     
     # Redireciona a pagina
+    messages.success(request, "Escola selecionada com sucesso!")
+    return redirect(reverse('Gestao_Escolar:GE_anoLetivo'))"""
+
+@login_required
+def Seleciona_escola(request, pk):
+    # Recupera a escola com base no id fornecido
+    escola = Escola.objects.get(pk=pk)    
+    request.session['escola_id'] = escola.id        
+    request.session['escola_nome'] = escola.nome_escola
+
+    # Guarda só os IDs
+    nomeclatura = NomeclaturaJanelas.objects.latest('id')
+    prefeitura = Prefeitura.objects.get(pk=1)   
+    
+    request.session['nomeclatura_id'] = nomeclatura.id
+    request.session['prefeitura_id'] = prefeitura.id
+    
+    # Evita salvar o queryset direto
+    matriculas_painel = list(
+        Turmas.objects.filter(escola=escola).values_list("id", flat=True)
+    )
+    request.session['matriculas_painel_ids'] = matriculas_painel
+    
+    # Dia e mês
+    request.session['dia'] = datetime.now().day    
+    meses = [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ]
+    mes_atual = datetime.now().month
+    request.session['mes'] = meses[mes_atual - 1]
+    
+    # Mensagem e redirecionamento
     messages.success(request, "Escola selecionada com sucesso!")
     return redirect(reverse('Gestao_Escolar:GE_anoLetivo'))
