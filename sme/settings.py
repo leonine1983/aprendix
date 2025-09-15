@@ -252,8 +252,8 @@ LOGIN_URL = 'admin_acessos:login_create'
 
 # CONFIRGURAÇAÕ PARA O CONTEIGER.CLOUD
 # Conteiger
-PORT = config('PORT', cast=int, default=8000)
-HOST = config('HOST', default='0.0.0.0')
+#PORT = config('PORT', cast=int, default=8000)
+#HOST = config('HOST', default='0.0.0.0')
 
 
 
