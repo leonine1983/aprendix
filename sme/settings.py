@@ -215,7 +215,7 @@ SESSION_ENGINE =   'django.contrib.sessions.backends.cache'
 
 
 # 3º Define o tempo de sessão para 1 hora (3600 segundos)
-SESSION_COOKIE_AGE = 3600
+#SESSION_COOKIE_AGE = 3600
 LOGIN_URL = 'admin_acessos:login_create'
 
 
