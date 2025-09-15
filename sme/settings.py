@@ -201,7 +201,9 @@ MESSAGE_TAGS = {
 
 # 1º define o mecanismo de armazenamento de sessão para 'django.contrib.sessions.backends.cache' ou
 # o 'django.contrib.sessions.backends.db' conforme a preferência. Foi escolhido armazenamento em cache
-SESSION_ENGINE =   'django.contrib.sessions.backends.cache'
+#SESSION_ENGINE =   'django.contrib.sessions.backends.cache'
+#SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
 
 # Segurança dos cookies em produção (HTTPS)
 #SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', cast=bool)
@@ -211,11 +213,38 @@ SESSION_ENGINE =   'django.contrib.sessions.backends.cache'
 
 #SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
+# ===============================
+# CONFIGURAÇÕES DE SESSÃO E COOKIES
+# ===============================
+
+# Armazena sessões no banco de dados (persistente e seguro em produção)
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+# Tempo de expiração da sessão (1 hora)
+SESSION_COOKIE_AGE = 3600
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# Cookies de sessão e CSRF seguros (ative se estiver em HTTPS)
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# Evita acesso do JavaScript ao cookie da sessão
+SESSION_COOKIE_HTTPONLY = True
+
+# Restringe envio de cookies para o mesmo site
+SESSION_COOKIE_SAMESITE = "Strict"
+
+# URL de login
+LOGIN_URL = 'admin_acessos:login_create'
+
+
 
 
 
 # 3º Define o tempo de sessão para 1 hora (3600 segundos)
-#SESSION_COOKIE_AGE = 3600
+SESSION_COOKIE_AGE = 3600  # 1 hora
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
 LOGIN_URL = 'admin_acessos:login_create'
 
 
