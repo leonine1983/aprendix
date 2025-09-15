@@ -205,11 +205,11 @@ SESSION_ENGINE =   'django.contrib.sessions.backends.cache'
 
 # Segurança dos cookies em produção (HTTPS)
 SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', cast=bool)
-SESSION_COOKIE_HTTPONLY = config('SESSION_COOKIE_HTTPONLY', cast=bool)
+#SESSION_COOKIE_HTTPONLY = config('SESSION_COOKIE_HTTPONLY', cast=bool)
 SESSION_COOKIE_SAMESITE = config('SESSION_COOKIE_SAMESITE', default='Strict')
-CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', cast=bool)
+#CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', cast=bool)
 
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+#SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 
 
