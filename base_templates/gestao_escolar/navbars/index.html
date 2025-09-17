@@ -208,6 +208,7 @@
           <li><a href='{% url "Gestao_Escolar:GE_inicio" %}'><img src="{% static 'school.png' %}" width='30px' alt=""><sup class="txt-p-nav "></sup> Alternar entre Escolas</a>
           {% if user.is_superuser %}
             <li><a href='{% url "Gestao_Escolar:CreateEscola" %}'><i class="fa-duotone fa-solid fa-school-flag txt-p-nav me-2 fs-4"></i> Criar nova Escola (Super User)</a></li>
+            <li><a href='{% url "Gestao_Escolar:notificacao" %}'><i class="fa-duotone fa-solid fa-school-flag txt-p-nav me-2 fs-4"></i> Notificações (Super User)</a></li>
           {% endif %}
           <li><a href='{% url "admin_acessos:CreateUsers" %}'><i class="fa-duotone fa-solid fa-users"></i> Criar novo usuário </a></li>       
         </ul>

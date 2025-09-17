@@ -297,17 +297,49 @@ def marcar_notificacao_como_lida(request):
     except AtualizacaoNotificacao.DoesNotExist:
         return JsonResponse({'status': 'erro', 'mensagem': 'Notificação não encontrada'}, status=400)
 
-"""
-@require_POST
-@login_required
-def marcar_notificacao_como_lida(request):
-    notificacao_id = request.POST.get('id')
-    try:
-        notificacao = AtualizacaoNotificacao.objects.get(id=notificacao_id, user=request.user)
-        notificacao.lida = True
-        notificacao.save()
-        return JsonResponse({'status': 'ok'})
-    except AtualizacaoNotificacao.DoesNotExist:
-        return JsonResponse({'status': 'erro', 'mensagem': 'Notificação não encontrada'}, status=404)
 
-"""
+
+from django.views.generic import FormView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
+from django.contrib import messages
+from .models import AtualizacaoNotificacao
+from .forms import NotificacaoForm
+from django.contrib.auth.models import User
+
+class EnviarNotificacaoView(LoginRequiredMixin, FormView):
+    template_name = 'notificacao/enviar.html'
+    form_class = NotificacaoForm
+    success_url = '/notificacoes/'
+
+    def form_valid(self, form):
+        titulo = form.cleaned_data['titulo']
+        mensagem = form.cleaned_data['mensagem']
+        tipo = form.cleaned_data['tipo']
+        user = form.cleaned_data['user']
+
+        if user:
+            # Notificação para usuário específico
+            AtualizacaoNotificacao.objects.create(
+                user=user,
+                titulo=titulo,
+                mensagem=mensagem,
+                tipo=tipo
+            )
+            messages.success(self.request, f"Notificação enviada para {user.username}.")
+        else:
+            # Notificação para todos os usuários
+            users = User.objects.all()
+            notificacoes = [
+                AtualizacaoNotificacao(
+                    user=u,
+                    titulo=titulo,
+                    mensagem=mensagem,
+                    tipo=tipo
+                ) for u in users
+            ]
+            AtualizacaoNotificacao.objects.bulk_create(notificacoes)
+            messages.success(self.request, "Notificação enviada para todos os usuários.")
+
+        return super().form_valid(form)
+

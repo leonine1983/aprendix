@@ -1,21 +1,31 @@
 
-
 from django import forms
-from .views import *
-from ckeditor.fields import RichTextField
+from .models import MessageUser
+from ckeditor.widgets import CKEditorWidget
 
 class MessageUserForm(forms.ModelForm):
-    class Meta:        
-        model = message_user
-        fields = ['user', 'assunto', 'messagem']  # Mantenha 'messagem' se esse é o nome real no modelo
+    class Meta:
+        model = MessageUser
+        fields = ['destinatario', 'assunto', 'mensagem']
         widgets = {
-            'remetente': forms.HiddenInput,
-            'messagem': RichTextField()
+            'mensagem': CKEditorWidget(),
         }
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
-        super(MessageUserForm, self).__init__(*args, **kwargs)
-        
-        if user:
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+        if self.request:
             self.fields['remetente'].initial = self.request.user
+
+
+
+from django.contrib.auth.models import User
+from .models import AtualizacaoNotificacao
+from ckeditor.widgets import CKEditorWidget
+
+class NotificacaoForm(forms.Form):
+    titulo = forms.CharField(max_length=200, label="Título")
+    mensagem = forms.CharField(widget=CKEditorWidget(), required=False, label="Mensagem")
+    tipo = forms.ChoiceField(choices=AtualizacaoNotificacao.TIPO_CHOICES, label="Tipo de Notificação")
+    user = forms.ModelChoiceField(queryset=User.objects.all(), required=False, label="Usuário (opcional, deixa em branco para todos)")
+
