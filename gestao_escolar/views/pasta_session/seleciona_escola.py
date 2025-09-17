@@ -12,7 +12,7 @@ from django.contrib import messages
 # Essa view lida com a seleção da escola e armazena os dados na sessão
 """
 @login_required
-def Seleciona_escola(request, pk):
+def Seleciona_escolas(request, pk):
     # Recupera a escola com base no id fornecido
     escola = Escola.objects.get(pk = pk)    
     request.session['escola_id'] = escola.id        

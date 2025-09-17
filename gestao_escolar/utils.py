@@ -148,7 +148,7 @@ def processar_dados(request, ano, escola_id):
     coordenador = Decreto.objects.filter(destino=local_destino, profissao__nome_profissao='Coordenador Escolar', Decreto_decretoAtivo__ano_ativo__id=ano.id).last()
     secretario = Decreto.objects.filter(destino=local_destino, profissao__nome_profissao='Secretária escolar', Decreto_decretoAtivo__ano_ativo__id=ano.id).last()
     
-    request.session['diretor'] = diretor
-    request.session['vice_diretor'] = vice_diretor
-    request.session['coordenador'] = coordenador
-    request.session['secretario'] = secretario
+    #request.session['diretor'] = diretor
+    #request.session['vice_diretor'] = vice_diretor
+    #request.session['coordenador'] = coordenador
+    #request.session['secretario'] = secretario
