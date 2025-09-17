@@ -130,14 +130,14 @@
                 {
                     intro: "<div class='alert-info p-2 ' style='margin-top:-3rem'><img width='50' src='{% static 'logo.png' %}' /><strong>Bem-vindo ao Aprendix!</strong></div><div class='border border-info p-3 text-info fs-6'>Com o Aprendix, cada tarefa é uma oportunidade de aprender e transformar a gestão escolar em algo simples e poderoso</div>"
                 },
-                {% if not request.session.diretor %}
+                {% if not diretor %}
                 {
                     element: document.querySelector('#link-diretor'),
                     intro: "<div class='alert-info p-2 text-uppercase' style='margin-top:-3rem '>Decreto do Diretor</div><div class='border border-info p-3 text-info fs-6'>Repare que o nome da secretária ainda não está definido para o Ano Letivo atual. No lugar, aparece a mensagem: <b class='fs-6 text-primary'>“Ainda não definido para o Ano Letivo atual”</b>. Clique aqui para adicionar o decreto do diretor da escola.</div>",
                     position: 'bottom'
                 },
                 {% endif %}
-                {% if not request.session.secretario %} 
+                {% if not secretario %} 
                 {
                     element: document.querySelector('#link-secretaria'),
                     intro: "<div class='alert-info p-2 text-uppercase' style='margin-top:-3rem '>Decreto da Secretária</div><div class='border border-info p-3 text-info fs-6'>Repare que o nome da secretária ainda não está definido para o Ano Letivo atual. No lugar, aparece a mensagem: <b class='fs-6 text-primary'>“Ainda não definido para o Ano Letivo atual”</b>. Clique aqui para adicionar o decreto da secretária da escola.</div>",

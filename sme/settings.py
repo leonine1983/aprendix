@@ -12,7 +12,6 @@ SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG',  cast=bool)
-print(f'o debub é : {DEBUG}')
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default='*')
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', cast=Csv())
 
@@ -198,21 +197,7 @@ MESSAGE_TAGS = {
     constants.ERROR: 'alert-danger',
 }
 
-# DEFINIÇÕES DE SEGURANÇA PARA SESSÕES. 
 
-# 1º define o mecanismo de armazenamento de sessão para 'django.contrib.sessions.backends.cache' ou
-# o 'django.contrib.sessions.backends.db' conforme a preferência. Foi escolhido armazenamento em cache
-#SESSION_ENGINE =   'django.contrib.sessions.backends.cache'
-#SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-
-
-# Segurança dos cookies em produção (HTTPS)
-#SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', cast=bool)
-#SESSION_COOKIE_HTTPONLY = config('SESSION_COOKIE_HTTPONLY', cast=bool)
-#SESSION_COOKIE_SAMESITE = config('SESSION_COOKIE_SAMESITE', default='Strict')
-#CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', cast=bool)
-
-#SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 # ===============================
 # CONFIGURAÇÕES DE SESSÃO E COOKIES
@@ -238,22 +223,11 @@ SESSION_COOKIE_SAMESITE = "Strict"
 # URL de login
 LOGIN_URL = 'admin_acessos:login_create'
 
-
-
-
-
 # 3º Define o tempo de sessão para 1 hora (3600 segundos)
 SESSION_COOKIE_AGE = 3600  # 1 hora
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 LOGIN_URL = 'admin_acessos:login_create'
 
-
-
-
-# CONFIRGURAÇAÕ PARA O CONTEIGER.CLOUD
-# Conteiger
-#PORT = config('PORT', cast=int, default=8000)
-#HOST = config('HOST', default='0.0.0.0')
 
 
