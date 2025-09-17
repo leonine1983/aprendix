@@ -82,12 +82,12 @@
 
 <h1 class="text-uppercase txt-p fs-5 p-0 m-0"><span class='fica-oculto_em_mobile'>{{request.session.escola_nome}} - </span><span  class="esc_sigla" title='{{request.session.escola_nome}}'>{{request.session.escola_nome_query.sigla_escola}}</span>  </h1>
 <p class="m-0 p-0 fs-6">Diretor 
-    {{  request.session.diretor}}
+    {{  diretor}}
     <span class='fica-oculto_em_mobile'>
-        {% if request.session.diretor %}
-        {% if request.session.diretor.ano_decreto.id != request.session.anoLetivo_id %}
+        {% if diretor %} 
+        {% if diretor.ano_decreto.id != request.session.anoLetivo_id %}
             | Extendido para
-            {% for n in request.session.diretor.Decreto_decretoAtivo.all %}            
+            {% for n in diretor.Decreto_decretoAtivo.all %}            
                 {% if n.ano_ativo.id == request.session.anoLetivo_id %}
                     {{n.ano_ativo}}
                 {% endif %}
@@ -103,11 +103,11 @@
 </p>
 
 <p class="m-0 p-0 fs-6">Secretário(a) 
-    {% if request.session.secretario %} 
-        {{ request.session.secretario }}
-        {% if request.session.secretario.ano_decreto.id != request.session.anoLetivo_id %}
+    {% if secretario %} 
+        {{ secretario }}
+        {% if secretario.ano_decreto.id != request.session.anoLetivo_id %}
             | Extendido para
-            {% for n in request.session.secretario.Decreto_decretoAtivo.all %}            
+            {% for n in secretario.Decreto_decretoAtivo.all %}            
                 {% if n.ano_ativo.id == request.session.anoLetivo_id %}
                     {{n.ano_ativo}}
                 {% endif %}

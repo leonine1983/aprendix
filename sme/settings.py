@@ -257,26 +257,3 @@ LOGIN_URL = 'admin_acessos:login_create'
 #HOST = config('HOST', default='0.0.0.0')
 
 
-
-# Log do sistema
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {
-        "file": {
-            "level": "DEBUG",
-            "class": "logging.FileHandler",
-            "filename": os.path.join(BASE_DIR, "django.log"),
-        },
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["file"],
-            "level": "DEBUG",
-            "propagate": True,
-        },
-    },
-}

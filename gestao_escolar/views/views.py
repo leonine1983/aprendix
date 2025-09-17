@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from gestao_escolar.models import *
 from django.views.generic import TemplateView
 from rh.models import Escola, Encaminhamentos
-from gestao_escolar.models import Alunos, Turmas, EscolaMatriculaOnline
+from gestao_escolar.models import Alunos, Turmas
 from admin_acessos.models import AtualizacaoNotificacao
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -12,6 +12,7 @@ from django.db.models import Count
 from django import forms
 from gestao_escolar.models import MatriculasOnline
 from django.contrib import messages
+from .contexto_dados_escolares import get_contexto_escola
 
 class MatriculasOnlineForm(forms.ModelForm):
     class Meta:
@@ -53,14 +54,19 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
 
 
     def get_context_data(self, **kwargs):
+
+        ano = self.request.session['anoLetivo_id']        
+        escola_id = self.request.session['escola_id']  
+           
         user = self.request.user
+
         context = super().get_context_data(**kwargs)
         context['titulo_page'] = 'Selecione o ano letivo'
         context['svg'] = '<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="..."/></svg>'
         context['now'] = datetime.now()
         context['conteudo_page'] = 'info_escola'
         context['notifica'] = AtualizacaoNotificacao.objects.filter(user = user, lida=False)
-        # Carrega as informações do diretor para a pagina inicial para ativar o modal       
+        context = get_contexto_escola(ano, escola_id)  
 
         # Obter a escola do banco de dados
         sessao_escola = self.request.session['escola_id']
@@ -105,6 +111,7 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
         # Exibir matrícula pública
         matPublica = MatriculasOnline.objects.filter(serie__escola__escola__id=escola.id, serie__escola__ativo=True)
         context['escolaMatriculaOnline'] = matPublica if matPublica else {}
+        
 
         return context
 
