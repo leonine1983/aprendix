@@ -306,6 +306,7 @@ from django.contrib import messages
 from .models import AtualizacaoNotificacao
 from .forms import NotificacaoForm
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 class EnviarNotificacaoView(LoginRequiredMixin, FormView):
     template_name = 'Escola/inicio.html'
@@ -314,10 +315,24 @@ class EnviarNotificacaoView(LoginRequiredMixin, FormView):
     success_url = reverse_lazy('admin_acessos:notificacao') 
 
     def get_context_data(self, **kwargs):
+        notifica_query = AtualizacaoNotificacao.objects.all().order_by("-id")
+        paginato = Paginator(notifica_query, 8)
+        page = self.request.GET.get('page')
+
+        try:
+            notifica = paginato.page(page)
+        except PageNotAnInteger:
+            notifica = paginato.page(1)
+        except EmptyPage:
+            notifica = paginato.page(paginato.num_pages)
+
         context = super().get_context_data(**kwargs)
+        context['notifica'] = notifica    
         context['conteudo_page'] = 'EnviaNotifica'     
+        context['titulo_page'] = 'Enviar notificações'      
         return context
-    
+
+        
 
     def form_valid(self, form):
         titulo = form.cleaned_data['titulo']

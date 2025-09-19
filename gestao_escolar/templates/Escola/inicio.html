@@ -358,6 +358,11 @@
         {% include 'Escola/impressos/historico_escolar.html' %}
     {% endif %}  
 
+    <!--Notificação do sistema-->
+    {% if  conteudo_page == 'EnviaNotifica'   %}
+        {% include 'Admin_Acessos/notifica_e_msg/notifica.html' %}
+    {% endif %} 
+    
     <!-- Apuraçao final -->
      {% if  conteudo_page == 'SelecinaTurmaApuração'  %}
         {% include 'Escola/partials/apuracaoFinal/apuracaoFinalTurmas.html' %}
