@@ -78,49 +78,95 @@
         }
       }
 
+
     </style>
 
 <h1 class="text-uppercase txt-p fs-5 p-0 m-0"><span class='fica-oculto_em_mobile'>{{request.session.escola_nome}} - </span><span  class="esc_sigla" title='{{request.session.escola_nome}}'>{{request.session.escola_nome_query.sigla_escola}}</span>  </h1>
-<p class="m-0 p-0 fs-6">Diretor 
-    {{  diretor}}
-    <span class='fica-oculto_em_mobile'>
-        {% if diretor %} 
-        {% if diretor.ano_decreto.id != request.session.anoLetivo_id %}
-            | Extendido para
-            {% for n in diretor.Decreto_decretoAtivo.all %}            
-                {% if n.ano_ativo.id == request.session.anoLetivo_id %}
-                    {{n.ano_ativo}}
+<div class="d-flex">
+    <div class="col pr-0">
+        <p class="m-0 p-0 fs-8">Diretor 
+            {{  diretor}}
+            <span class='fica-oculto_em_mobile'>
+                {% if diretor %} 
+                {% if diretor.ano_decreto.id != request.session.anoLetivo_id %}
+                    | Extendido para
+                    {% for n in diretor.Decreto_decretoAtivo.all %}            
+                        {% if n.ano_ativo.id == request.session.anoLetivo_id %}
+                            {{n.ano_ativo}}
+                        {% endif %}
+                    {% endfor %} 
                 {% endif %}
-            {% endfor %} 
-        {% endif %}
-        {% else %}
-        <a href="{% url 'Gestao_Escolar:decreto-create' %}" 
-        id="link-diretor"
-        data-intro="Clique aqui para começar a usar o sistema e criar seu primeiro decreto."
-        data-step="2"><span title='Vá em decretos e EXTENDA o decreto do último Diretor ou Cadastre um novo de decreto de Diretor'>(Ainda não definido para o Ano Letivo atual)</span></a>  
-    {% endif %}
-    </span>
-</p>
+                {% else %}
+                <a href="{% url 'Gestao_Escolar:decreto-create' %}" 
+                id="link-diretor"
+                data-intro="Clique aqui para começar a usar o sistema e criar seu primeiro decreto."
+                data-step="2"><span title='Vá em decretos e EXTENDA o decreto do último Diretor ou Cadastre um novo de decreto de Diretor'>(Ainda não definido para o Ano Letivo atual)</span></a>  
+            {% endif %}
+            </span>
+        </p>
 
-<p class="m-0 p-0 fs-6">Secretário(a) 
-    {% if secretario %} 
-        {{ secretario }}
-        {% if secretario.ano_decreto.id != request.session.anoLetivo_id %}
-            | Extendido para
-            {% for n in secretario.Decreto_decretoAtivo.all %}            
-                {% if n.ano_ativo.id == request.session.anoLetivo_id %}
-                    {{n.ano_ativo}}
+        <p class="m-0 p-0 fs-8">Secretário(a) 
+            {% if secretario %} 
+                {{ secretario }}
+                {% if secretario.ano_decreto.id != request.session.anoLetivo_id %}
+                    | Extendido para
+                    {% for n in secretario.Decreto_decretoAtivo.all %}            
+                        {% if n.ano_ativo.id == request.session.anoLetivo_id %}
+                            {{n.ano_ativo}}
+                        {% endif %}
+                    {% endfor %} 
                 {% endif %}
-            {% endfor %} 
-        {% endif %}
-        {% else %}
-        <a href="{% url 'Gestao_Escolar:decreto-create' %}"
-        id="link-secretaria"
-        data-intro="Clique aqui para começar a usar o sistema e criar seu primeiro decreto."
-        data-step="3"><span title='Vá em decretos e EXTENDA o decreto do último secretário ou Cadastre um novo de decreto de secretário'>(Ainda não definido para o Ano Letivo atual)</span></a>        
-    {% endif %}
-</p>
-<p class="m-0 p-0 fs-6"><i class="fa-solid fa-calendar-days "></i> Ano Letivo: {{request.session.anoLetivo_nome}}</p>
+                {% else %}
+                <a href="{% url 'Gestao_Escolar:decreto-create' %}"
+                id="link-secretaria"
+                data-intro="Clique aqui para começar a usar o sistema e criar seu primeiro decreto."
+                data-step="3"><span title='Vá em decretos e EXTENDA o decreto do último secretário ou Cadastre um novo de decreto de secretário'>(Sem definição neste ano letivo)</span></a>        
+            {% endif %}
+        </p>
+        <p class="m-0 p-0 fs-8"><i class="fa-solid fa-calendar-days "></i> Ano Letivo: {{request.session.anoLetivo_nome}}</p>
+    </div>
+    <div class="col pl-0">
+        <p class="m-0 p-0 fs-8">Vice-Diretor
+            {{ vice_diretor}}
+            <span class='fica-oculto_em_mobile'>
+                {% if vice_diretor %} 
+                    {% if vice_diretor.ano_decreto.id != request.session.anoLetivo_id %}
+                        | Extendido para
+                        {% for n in vice_diretor.Decreto_decretoAtivo.all %}            
+                            {% if n.ano_ativo.id == request.session.anoLetivo_id %}
+                                {{n.ano_ativo}}
+                            {% endif %}
+                        {% endfor %} 
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'Gestao_Escolar:decreto-create' %}" 
+                    id="link-diretor"
+                    data-intro="Clique aqui para começar a usar o sistema e criar seu primeiro decreto."
+                    data-step="4"><span title='Vá em decretos e EXTENDA o decreto do último Diretor ou Cadastre um novo de decreto de Diretor'>(Sem definição neste ano letivo)</span></a>  
+                {% endif %}
+            </span>
+        </p>
+
+        <p class="m-0 p-0 fs-8">Coord. Pedagógico
+            {% if coordenador %} 
+                {{ coordenador }}
+                {% if coordenador.ano_decreto.id != request.session.anoLetivo_id %}
+                    | Extendido para
+                    {% for n in coordenador.Decreto_decretoAtivo.all %}            
+                        {% if n.ano_ativo.id == request.session.anoLetivo_id %}
+                            {{n.ano_ativo}}
+                        {% endif %}
+                    {% endfor %} 
+                {% endif %}
+                {% else %}
+                <a href="{% url 'Gestao_Escolar:decreto-create' %}"
+                id="link-secretaria"
+                data-intro="Clique aqui para começar a usar o sistema e criar seu primeiro decreto."
+                data-step="5"><span title='Vá em decretos e EXTENDA o decreto do último secretário ou Cadastre um novo de decreto de secretário'>(Sem definição neste ano letivo)</span></a>        
+            {% endif %}
+        </p>
+    </div>
+</div>
 
 
 <script>

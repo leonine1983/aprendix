@@ -33,7 +33,8 @@ urlpatterns = [
 
     # Notificação
      path('notificacao/lida/', marcar_notificacao_como_lida, name='notificacao_lida'),
-     path('notificacao/', EnviarNotificacaoView, name='notificacao'),
+     path("notificacao/", EnviarNotificacaoView.as_view(), name="notificacao")
+
 ]
 
 

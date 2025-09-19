@@ -308,9 +308,16 @@ from .forms import NotificacaoForm
 from django.contrib.auth.models import User
 
 class EnviarNotificacaoView(LoginRequiredMixin, FormView):
-    template_name = 'notificacao/enviar.html'
+    template_name = 'Escola/inicio.html'
     form_class = NotificacaoForm
     success_url = '/notificacoes/'
+    success_url = reverse_lazy('admin_acessos:notificacao') 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['conteudo_page'] = 'EnviaNotifica'     
+        return context
+    
 
     def form_valid(self, form):
         titulo = form.cleaned_data['titulo']
