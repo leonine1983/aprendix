@@ -165,6 +165,22 @@
     
         <button type="submit" class="btn btn-win11-primary btn-lg">Próxima Etapa</button>
     </form>
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% for field in form %}
+    {% for error in field.errors %}
+        <div class="alert alert-danger">
+            <strong>{{ field.label }}:</strong> {{ error }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
     
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

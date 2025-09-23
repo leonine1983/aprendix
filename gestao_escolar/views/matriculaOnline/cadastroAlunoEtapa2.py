@@ -16,9 +16,10 @@ def cadastro_aluno_etapa2(request, aluno_id):
             aluno.tel_celular_aluno = form.cleaned_data['tel_celular_aluno']
             aluno.sexo = form.cleaned_data['sexo']
             aluno.rua = form.cleaned_data['rua']
-            aluno.bairro = form.cleaned_data['bairro']
+            bairro = form.cleaned_data['bairro']
+            aluno.bairro = bairro.nome_bairro
             aluno.cidade = form.cleaned_data['cidade']
-            aluno.estado = form.cleaned_data['estado']
+            #aluno.estado = form.cleaned_data['estado']
             aluno.cartao_nacional_saude_cns = form.cleaned_data['cartao_nacional_saude_cns']
             aluno.nis = form.cleaned_data['nis']
 

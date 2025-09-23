@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
-from gestao_escolar.models import Alunos, MatriculasOnline, EscolaMatriculaOnline, SerieOnline, Matriculas
-from rh.models import Escola
+from gestao_escolar.models import Alunos, MatriculasOnline, EscolaMatriculaOnline, SerieOnline, Matriculas, Turmas
+from rh.models import Escola, Bairro, Ano
+from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -10,11 +11,12 @@ from .impugarMatricula_form import *
 @login_required
 def matricular_aluno(request, aluno_id):
     aluno = Alunos.objects.get(id=aluno_id)
-    aluno_bairro = aluno.bairro.id
+    aluno_bairro = aluno.bairro
+    bairro = get_object_or_404(Bairro, nome_bairro = aluno_bairro)
     escola_bairro = EscolaMatriculaOnline.objects.filter(
     Q(ativo = True) &
-    Q(escola__related_dadosEscola__bairro__id=aluno_bairro) |
-    Q(escola__related_dadosEscola__bairro_atendEscola__id=aluno_bairro)
+    Q(escola__related_dadosEscola__bairro__id=bairro.id) |
+    Q(escola__related_dadosEscola__bairro_atendEscola__id=bairro.id)
     )    
    
     return render(request, 'Escola/matriculaOnline/matricular_aluno.html', {'aluno': aluno, "escola":escola_bairro})
@@ -97,42 +99,67 @@ def matricula_confirma_impugna(request, mat_id):
 class MatriculasOnlineFormConfirmada(ModelForm):  # Usando ModelForm diretamente
     class Meta:
         model = Matriculas
-        fields = ['turma','aluno']
+        fields = ['turma','aluno']       
+    
+    def __init__(self, *args, **kwargs):
+        turma_queryset = kwargs.pop('turma_queryset', None) 
+        aluno_query = kwargs.pop('aluno_query', None)
+        super().__init__(*args, **kwargs)
+        if turma_queryset is not None:
+            self.fields['turma'].queryset = turma_queryset 
+
+        if aluno_query is not None:
+            self.fields['aluno'].queryset = aluno_query       
 
 
-from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 
+from django.shortcuts import render, get_object_or_404, redirect
+
 @login_required
 def matricula_confirmada(request, mat_id):
-    # Obtém a matrícula pelo ID (com `get_object_or_404`, se preferir, para simplificar)
-    matricula = get_object_or_404(MatriculasOnline, id=mat_id)
+    # Obtém a matrícula online
+    matricula_online = get_object_or_404(MatriculasOnline, id=mat_id)
     
-    # Verifica se o formulário foi enviado via POST
+    aluno_queryset = Alunos.objects.filter(id=matricula_online.aluno.id)
+    turma_queryset = Turmas.objects.filter(
+        serie=matricula_online.serie.serie,
+        ano_letivo=matricula_online.serie.escola.ano_letivo       
+    )  
+
     if request.method == 'POST':
-        # Instancia o formulário com os dados POST, passando a instância de MatriculasOnline
-        form = MatriculasOnlineFormConfirmada(request.POST, instance=matricula)
+        form = MatriculasOnlineFormConfirmada(request.POST, instance=matricula_online)
         
-        # Verifica se o formulário é válido
         if form.is_valid():
-            # Salva a matrícula após associar o aluno e os dados da matrícula
-            form.save()
+            # Cria nova instância de Matriculas a partir do form
+            matricula_nova = Matriculas.objects.create(
+                aluno=form.cleaned_data['aluno'],
+                turma=form.cleaned_data['turma']
+            )
+            print(f' a matriucl : {matricula_nova} {matricula_nova.turma}')
 
-            # Após salvar, redireciona para uma página de sucesso ou de confirmação
-            return HttpResponseRedirect('Escola/matriculaOnline/matricula_sucesso/recusada.html')
+            # Marca a matrícula online como confirmada
+            matricula_online.confirma = True
+            matricula_online.save()
+
+            return redirect('Gestao_Escolar:GE_Escola_Matricula_create', matricula_nova.turma.id)
         else:
-            # Se o formulário não for válido, renderiza o template novamente com o formulário
-            return render(request, 'Escola/matriculaOnline/matricula_sucesso/sucesso.html', {'form': form, 'matricula': matricula})
+            return render(request, 'Escola/matriculaOnline/matricula_sucesso/sucesso.html', {
+                'form': form,
+                'matricula': matricula_online
+            })
     else:
-        # Instancia o formulário com a matrícula existente para GET (preenchido com os dados)
-        form = MatriculasOnlineFormConfirmada(instance=matricula)
+        form = MatriculasOnlineFormConfirmada(
+            instance=matricula_online,
+            turma_queryset=turma_queryset,
+            aluno_query=aluno_queryset
+        )
 
-    # Renderiza o template com o formulário para o usuário
-    return render(request, 'Escola/matriculaOnline/matricula_sucesso/confirma.html', {
+    return render(request, 'Escola/inicio.html', {
         'form': form,
-        'matricula': matricula,
+        'matricula': matricula_online,
         'conteudo_page': "Add Series Online",
+        'title_page': "Seleciona séries para matrícula online",
         'titulo_page': "Seleciona séries para matrícula online",
     })
-

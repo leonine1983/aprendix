@@ -212,18 +212,18 @@ class MatriculaOnline_etapa3(forms.ModelForm):
         label='Estado que emitiu o RG',
         queryset = Uf_Unidade_Federativa.objects.all(),
         widget=forms.Select(attrs={'class': ' form-control'}),
-        required=False   
+        required=True   
     )     
     naturalidade  = forms.ModelChoiceField(
         label='Cidade onde o aluno nasceu',
         queryset = Cidade.objects.all(),
         widget=forms.Select(attrs={'class': ' form-control'}),
-        required=False,
+        required=True,
     )  
     estado_naturalidade = forms.ModelChoiceField(
         queryset = Uf_Unidade_Federativa.objects.all(),
         widget=forms.Select(attrs={'class': 'form-control'}),
-        required=False,
+        required=True,
     ) 
     pais_origem =  forms.ModelChoiceField(
         queryset=Pais_origem.objects.all(),

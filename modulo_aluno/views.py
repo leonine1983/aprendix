@@ -7,7 +7,7 @@ from gestao_escolar.models import MatriculasOnline
 @login_required
 def home_aluno(request):
     userAluno = request.user.userAluno_related
-    request.session['alunoUser'] = userAluno
+    request.session['alunoUser'] = userAluno.id
 
     aluno = userAluno.aluno.id
 

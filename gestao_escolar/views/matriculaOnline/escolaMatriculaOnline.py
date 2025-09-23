@@ -14,15 +14,13 @@ class EscolaMatriculaOnlineForm(forms.ModelForm):
         model = EscolaMatriculaOnline
         fields = ['ano_letivo', 'data_inicio', 'data_fim', 'ativo']
 
-    # Campo 'ano_letivo' - supondo que seja um campo relacionado a um modelo 'Ano'
     ano_letivo = forms.ModelChoiceField(
-        queryset=AnoLetivo.objects.all(),  # Seleciona todos os objetos do modelo Ano
+        queryset=AnoLetivo.objects.none(),  # inicializa vazio
         widget=forms.Select(attrs={'class': 'form-class'}),
-        required=True,  # Campo obrigatório (se necessário)
+        required=True,
         label='Ano Letivo'
     )
 
-    # Campo 'data_inicio' - Data de início
     data_inicio = forms.DateField(
         widget=forms.DateInput(
             attrs={
@@ -31,11 +29,10 @@ class EscolaMatriculaOnlineForm(forms.ModelForm):
                 'placeholder': 'DD/MM/YYYY'
             }
         ),
-        input_formats=['%Y-%m-%d'],  # Formato de entrada da data
-        required=True  # Campo obrigatório
+        input_formats=['%Y-%m-%d'],
+        required=True
     )
 
-    # Campo 'data_fim' - Data de fim
     data_fim = forms.DateField(
         widget=forms.DateInput(
             attrs={
@@ -44,29 +41,38 @@ class EscolaMatriculaOnlineForm(forms.ModelForm):
                 'placeholder': 'DD/MM/YYYY'
             }
         ),
-        input_formats=['%Y-%m-%d'],  # Formato de entrada da data
-        required=True  # Campo obrigatório
+        input_formats=['%Y-%m-%d'],
+        required=True
     )
 
-    # Campo 'ativo' - Campo Booleano (Ativo/Desativo)
     ativo = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={'class': 'form-class'}),
-        required=False,  # Não obrigatório (se necessário)
-        initial=True,  # Definindo como True por padrão (se necessário)
+        required=False,
+        initial=True,
         label='Ativo'
     )
+
+    def __init__(self, *args, **kwargs):
+        ano_atual = kwargs.pop("ano_atual", None)  # recebo o ano_atual da view
+        super().__init__(*args, **kwargs)
+
+        if ano_atual:
+            # só mostra anos posteriores ao atual
+            self.fields['ano_letivo'].queryset = AnoLetivo.objects.filter(ano__gt=ano_atual)
+        else:
+            # fallback se não tiver ano atual
+            self.fields['ano_letivo'].queryset = AnoLetivo.objects.all()
 
     def clean(self):
         cleaned_data = super().clean()
         data_inicio = cleaned_data.get('data_inicio')
         data_fim = cleaned_data.get('data_fim')
 
-        # Verificar se a data_fim é posterior à data_inicio
-        if data_inicio and data_fim:
-            if data_fim < data_inicio:
-                raise forms.ValidationError('A data de término não pode ser anterior à data de início.')
+        if data_inicio and data_fim and data_fim < data_inicio:
+            raise forms.ValidationError('A data de término não pode ser anterior à data de início.')
 
         return cleaned_data
+
 
 
 from django import forms
@@ -75,13 +81,56 @@ class SerieOnlineForm(forms.ModelForm):
         model = SerieOnline
         fields = [ 'serie', 'turno', 'quantidade_vagas']
 
+@login_required
+def adicionar_escola(request):
+    anol = request.session.get('anoLetivo_nome', None)  
+    ano = None
+    if anol:
+        try:
+            ano = AnoLetivo.objects.get(ano=anol).ano
+        except AnoLetivo.DoesNotExist:
+            ano = None
+
+    if request.method == 'POST':
+        form = EscolaMatriculaOnlineForm(request.POST, ano_atual=ano)
+        if form.is_valid():
+            escola = Escola.objects.get(id=request.session['escola_id'])
+            ultimo_registro = EscolaMatriculaOnline.objects.filter(escola=escola, ativo=True).last()
+            if ultimo_registro:
+                ultimo_registro.ativo = False
+                ultimo_registro.save()
+
+            nova_matricula = form.save(commit=False)
+            nova_matricula.escola = escola
+            nova_matricula.ativo = True
+            nova_matricula.save()
+
+            messages.success(request, "🎉 Período de matrícula online definido com sucesso! 🚀")
+            return redirect('Gestao_Escolar:adicionar_escola')
+    else:
+        form = EscolaMatriculaOnlineForm(ano_atual=ano)
+
+    return render(request, 'Escola/inicio.html', {
+        'form': form,
+        'conteudo_page': "Add Matricula Online",
+        'titulo_page': "Definição de Período de Matrícula Online",
+        'EscolaMatriculaOnline': EscolaMatriculaOnline.objects.filter(escola=request.session['escola_id'])
+    })
 
 
 
-
+"""
 # Adicionar nova escola de matrícula online
 @login_required
 def adicionar_escola(request):
+    #pega o ano letivo atual que esta na sessão
+    anol = request.session.get('anoLetivo_nome', 'Ano letivo não definido')
+    ano = AnoLetivo.objects.get(ano = anol)
+    print(f"anto atual : {ano}")
+
+    
+
+
     if request.method == 'POST':
         form = EscolaMatriculaOnlineForm(request.POST)
         if form.is_valid():
@@ -114,7 +163,7 @@ def adicionar_escola(request):
         'conteudo_page': "Add Matricula Online",
         'titulo_page': "Definição de Período de Matrícula Online",
         'EscolaMatriculaOnline': EscolaMatriculaOnline.objects.filter(escola=request.session['escola_id'])
-    })
+    })"""
 
 
 # Editar escola de matrícula online

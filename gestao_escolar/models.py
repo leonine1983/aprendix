@@ -161,12 +161,12 @@ class Alunos(models.Model):
     #estado = models.ForeignKey(Uf_Unidade_Federativa, related_name="estado_relatec",verbose_name='Estado onde vive', null=True, on_delete=models.CASCADE)
 
     # Modificando os campos de endereço para usar CharField em vez de ForeignKey
-    estado = models.CharField(max_length=2, null=True, verbose_name='Estado onde vive')
+    estado = models.CharField(max_length=10, null=True, verbose_name='Estado onde vive')
     cidade = models.CharField(max_length=100, null=True, verbose_name='Cidade onde vive')
     bairro = models.CharField(max_length=100, null=True, verbose_name='Bairro onde vive')
     
     # Campos de naturalidade
-    estado_naturalidade = models.CharField(max_length=2, null=True, verbose_name='Estado onde nasceu')
+    estado_naturalidade = models.CharField(max_length=10, null=True, verbose_name='Estado onde nasceu')
     cidade_naturalidade = models.CharField(max_length=100, null=True, verbose_name='Cidade onde nasceu')
 
     #naturalidade = models.ForeignKey(Cidade, null=True, on_delete=models.CASCADE, related_name="related_naturalidade", verbose_name='Cidade onde nasceu')

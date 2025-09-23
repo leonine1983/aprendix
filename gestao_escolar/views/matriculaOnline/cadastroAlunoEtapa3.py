@@ -20,7 +20,10 @@ def cadastro_aluno_etapa3(request, aluno_id):
             aluno.RG_emissao = form.cleaned_data['RG_emissao']
             aluno.RG_UF = form.cleaned_data['RG_UF']
             aluno.naturalidade = form.cleaned_data['naturalidade']
-            aluno.estado_naturalidade = form.cleaned_data['estado_naturalidade']
+
+            estadoNaturalidade = form.cleaned_data['estado_naturalidade']
+            aluno.estado_naturalidade = estadoNaturalidade.estado
+
             aluno.nacionalidade = form.cleaned_data['nacionalidade']
             aluno.aluno_exterior = form.cleaned_data['aluno_exterior']
             aluno.pais_origem = form.cleaned_data['pais_origem'] 
