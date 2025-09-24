@@ -20,58 +20,57 @@
         <button type="button" class="close" data-dismiss="modal">&times;</button>        
       </div>        
       <div class="modal-body shadow-sm bg-light-subtle"> 
-            <h4 class="mb-3 text-primary">
-              Selecione a turma em que o aluno será matriculado
-            </h4>
-            <p class="text-muted">
-              Abaixo estão os dados de pré-matrícula do aluno para sua referência. 
-              Caso seja necessário buscar mais informações, você pode utilizar o número de celular para consultá-lo sobre sua matrícula.
-            </p>
+        <h4 class="mb-3 text-primary">
+          Selecione a turma em que o aluno será matriculado
+        </h4>
+        <p class="text-muted">
+          Abaixo estão os dados de pré-matrícula do aluno para sua referência. 
+          Caso seja necessário buscar mais informações, você pode utilizar o número de celular para consultá-lo sobre sua matrícula.
+        </p>
 
-            <div class="container">
-  <div class="row row-cols-1 row-cols-md-2 g-3">
-    <div class="col">
-      <ul class="list-group mb-4">
-        <li class="list-group-item">
-          <strong>Nome:</strong> <b class="text-uppercase">{{ matricula.aluno.nome_completo }}</b>
-        </li>
-        <li class="list-group-item">
-          <strong>Idade:</strong> <b class="text-uppercase">{{ matricula.aluno.idade }}</b>
-        </li>
-        <li class="list-group-item">
-          <strong>Bairro:</strong> {{ matricula.aluno.bairro }}
-        </li>
-        <li class="list-group-item">
-          <strong>Série:</strong> {{ matricula.serie }}
-        </li>
-      </ul>
-    </div>
+        <div class="container">
+          <div class="row row-cols-1 row-cols-md-2 g-3">
+            <div class="col">
+              <ul class="list-group mb-4">
+                <li class="list-group-item">
+                  <strong>Nome:</strong> <b class="text-uppercase">{{ matricula.aluno.nome_completo }}</b>
+                </li>
+                <li class="list-group-item">
+                  <strong>Idade:</strong> <b class="text-uppercase">{{ matricula.aluno.idade }}</b>
+                </li>
+                <li class="list-group-item">
+                  <strong>Bairro:</strong> {{ matricula.aluno.bairro }}
+                </li>
+                <li class="list-group-item">
+                  <strong>Série:</strong> {{ matricula.serie }}
+                </li>
+              </ul>
+            </div>
 
-    <div class="col">
-      <ul class="list-group mb-4">
-        <li class="list-group-item">
-          <strong>Nome da mãe:</strong> <b class="text-uppercase">{{ matricula.aluno.nome_mae }}</b>
-        </li>
-        <li class="list-group-item d-flex align-items-center">
-          <strong class="me-2">Telefone Mãe:</strong>
-          <i class="fa-brands fa-whatsapp text-success me-2"></i>
-          <a href="tel:{{ matricula.aluno.tel_celular_mae }}" class="text-decoration-none text-dark">
-            {{ matricula.aluno.tel_celular_mae }}
-          </a>
-        </li>
-        <li class="list-group-item d-flex align-items-center">
-          <strong class="me-2">Telefone do Aluno:</strong>
-          <i class="fa-brands fa-whatsapp text-success me-2"></i>
-          <a href="tel:{{ matricula.aluno.tel_celular_aluno }}" class="text-decoration-none text-dark">
-            {{ matricula.aluno.tel_celular_aluno }}
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-
+            <div class="col">
+              <ul class="list-group mb-4">
+                <li class="list-group-item">
+                  <strong>Nome da mãe:</strong> <b class="text-uppercase">{{ matricula.aluno.nome_mae }}</b>
+                </li>
+                <li class="list-group-item d-flex align-items-center">
+                  <strong class="me-2">Telefone Mãe:</strong>
+                  <i class="fa-brands fa-whatsapp text-success me-2"></i>
+                  <a href="tel:{{ matricula.aluno.tel_celular_mae }}" class="text-decoration-none text-dark">
+                    {{ matricula.aluno.tel_celular_mae }}
+                  </a>
+                </li>
+                <li class="list-group-item d-flex align-items-center">
+                  <strong class="me-2">Telefone do Aluno:</strong>
+                  <i class="fa-brands fa-whatsapp text-success me-2"></i>
+                  <a href="tel:{{ matricula.aluno.tel_celular_aluno }}" class="text-decoration-none text-dark">
+                    {{ matricula.aluno.tel_celular_aluno }}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
         <div class="tab-pane fade show active " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0"> 
           <form method="post" >
             {{ form.non_field_errors }}

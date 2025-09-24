@@ -118,55 +118,8 @@ def adicionar_escola(request):
     })
 
 
-
-"""
-# Adicionar nova escola de matrícula online
-@login_required
-def adicionar_escola(request):
-    #pega o ano letivo atual que esta na sessão
-    anol = request.session.get('anoLetivo_nome', 'Ano letivo não definido')
-    ano = AnoLetivo.objects.get(ano = anol)
-    print(f"anto atual : {ano}")
-
-    
-
-
-    if request.method == 'POST':
-        form = EscolaMatriculaOnlineForm(request.POST)
-        if form.is_valid():
-            escola = Escola.objects.get(id=request.session['escola_id'])
-            
-            # Verifica se já existe algum registro ativo para essa escola
-            ultimo_registro = EscolaMatriculaOnline.objects.filter(escola=escola, ativo=True).last()
-            if ultimo_registro:
-                # Se existir, muda o 'ativo' do último registro para False
-                ultimo_registro.ativo = False
-                ultimo_registro.save()
-
-            # Antes de salvar o formulário, atribuímos a escola
-            nova_matricula = form.save(commit=False)  # Não salva imediatamente
-            nova_matricula.escola = escola  # Atribui a escola
-            nova_matricula.ativo = True  # Define o novo registro como ativo
-            nova_matricula.save()  # Agora sim, salva a instância no banco
-
-            messages.success(
-                request, 
-                "🎉 Período de matrícula online definido com sucesso! 🚀 A escola está pronta para receber novas matrículas via internet."
-            )
-
-            return redirect('Gestao_Escolar:adicionar_escola')
-    else:
-        form = EscolaMatriculaOnlineForm()
-
-    return render(request, 'Escola/inicio.html', {
-        'form': form,
-        'conteudo_page': "Add Matricula Online",
-        'titulo_page': "Definição de Período de Matrícula Online",
-        'EscolaMatriculaOnline': EscolaMatriculaOnline.objects.filter(escola=request.session['escola_id'])
-    })"""
-
-
 # Editar escola de matrícula online
+@login_required
 def editar_escola(request, pk):
     escola = get_object_or_404(EscolaMatriculaOnline, pk=pk)
     if request.method == 'POST':
@@ -179,6 +132,7 @@ def editar_escola(request, pk):
     return render(request, 'escolas/editar_escola.html', {'form': form})
 
 # Deletar escola de matrícula online
+@login_required
 def deletar_escola(request, pk):
     escola = get_object_or_404(EscolaMatriculaOnline, pk=pk)
     escola.delete()
@@ -231,6 +185,7 @@ def deletar_serie(request, pk):
 
 
 # Editar série online
+@login_required
 def editar_serie(request, pk):
     serie = get_object_or_404(SerieOnline, pk=pk)
     if request.method == 'POST':
