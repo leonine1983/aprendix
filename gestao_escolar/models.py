@@ -336,8 +336,8 @@ class EscolaMatriculaOnline(models.Model):
 
 
 class SerieOnline(models.Model):
-    escola = models.ForeignKey(EscolaMatriculaOnline, related_name='seriesOnlineRelated', on_delete=models.CASCADE)    
-    serie =  models.ForeignKey(Serie_Escolar, on_delete=models.CASCADE)
+    escola = models.ForeignKey(EscolaMatriculaOnline, related_name='escolaOnlineRelated', on_delete=models.CASCADE)    
+    serie =  models.ForeignKey(Serie_Escolar, related_name='seriesOnlineRelated', on_delete=models.CASCADE)
     turno = models.CharField(choices=turno, null=False, default=1, max_length=12)                
     quantidade_vagas = models.IntegerField(default=36) 
     vagas_disponiveis = models.IntegerField(null=True)    

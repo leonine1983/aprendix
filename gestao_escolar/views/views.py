@@ -8,11 +8,11 @@ from admin_acessos.models import AtualizacaoNotificacao
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 import plotly.graph_objects as go
-from django.db.models import Count
 from django import forms
 from gestao_escolar.models import MatriculasOnline
 from django.contrib import messages
 from .contexto_dados_escolares import get_contexto_escola
+from django.db.models import Count, Q
 
 class MatriculasOnlineForm(forms.ModelForm):
     class Meta:
@@ -69,8 +69,7 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
         context = get_contexto_escola(ano, escola_id)  
 
         # Obter a escola do banco de dados
-        sessao_escola = self.request.session['escola_id']
-        escola = Escola.objects.get(id=sessao_escola)
+        escola = Escola.objects.get(id=escola_id)
         context['contexto'] = escola
 
         # Carregar o formulário de matrícula com dados existentes, se houver
@@ -108,9 +107,39 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
         graph_html = fig.to_html(full_html=False)
         context['graph'] = graph_html
 
-        # Exibir matrícula pública
+        # ***************************************************************
+        # Exibir matrícula pública **************************************
+        # ***************************************************************
         matPublica = MatriculasOnline.objects.filter(serie__escola__escola__id=escola.id, serie__escola__ativo=True)
+        # Verifica se existe pelo menos uma matrícula com confirma=False        
+        tem_pendente = matPublica.filter(confirma=False).exists()
         context['escolaMatriculaOnline'] = matPublica if matPublica else {}
+        context['tem_pendente'] = tem_pendente
+
+       
+        # Busca as turmas do ano letivo posterior
+        turmas_proximo_existem = turmas_proximo_ano = Turmas.objects.filter(
+            ano_letivo__gt=ano,
+            escola=escola
+        ).first()
+        context['turmas_proximo_existem'] = turmas_proximo_ano
+
+
+        turmas_proximo_ano = Turmas.objects.filter(
+            ano_letivo__gt=ano,
+            escola=escola
+        ).annotate(
+            total_confirmados_online=Count(
+                'serie__seriesOnlineRelated__related_serie_matricula',
+                filter=Q(serie__seriesOnlineRelated__related_serie_matricula__confirma=True)
+            ),
+            total_online=Count('serie__seriesOnlineRelated__related_serie_matricula')
+        )
+        context['turmas_proximo_ano'] = turmas_proximo_ano
+
+                
+        
+
         
 
         return context
