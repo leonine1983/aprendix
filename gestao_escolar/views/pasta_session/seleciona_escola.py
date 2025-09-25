@@ -58,10 +58,10 @@ def Seleciona_escola(request, pk):
     request.session['prefeitura_id'] = prefeitura.id
     
     # Evita salvar o queryset direto
-    matriculas_painel = list(
-        Turmas.objects.filter(escola=escola).values_list("id", flat=True)
-    )
-    request.session['matriculas_painel_ids'] = matriculas_painel
+    #matriculas_painel = list(
+     #   Turmas.objects.filter(escola=escola).values_list("id", flat=True)
+    #)
+    #request.session['matriculas_painel_ids'] = matriculas_painel
     
     # Dia e mês
     request.session['dia'] = datetime.now().day    

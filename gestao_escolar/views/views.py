@@ -31,6 +31,7 @@ class MatriculasOnlineForm(forms.ModelForm):
                                          " ser confirmada e, em seguida, descreva o motivo no campo abaixo. ")
 
     
+from gestao_escolar.utils import processar_dados
 
 class Pagina_inicio(LoginRequiredMixin, TemplateView):
     model = Escola
@@ -51,13 +52,18 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
         if 'escola_id' not in request.session:
             return redirect('Gestao_Escolar:GE_inicio')
         return super().dispatch(request, *args, **kwargs)
-
-
+    
     def get_context_data(self, **kwargs):
+        """
+        Monta o contexto para a página de início da escola, incluindo informações
+        de matrículas, turmas, gráficos e notificações.
+        """
 
-        ano = self.request.session['anoLetivo_id']        
-        escola_id = self.request.session['escola_id']  
-           
+        # =====================================================
+        # 1️⃣ Dados de sessão e usuário
+        # =====================================================
+        ano = self.request.session.get('anoLetivo_id')
+        escola_id = self.request.session.get('escola_id')
         user = self.request.user
 
         context = super().get_context_data(**kwargs)
@@ -65,70 +71,72 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
         context['svg'] = '<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="..."/></svg>'
         context['now'] = datetime.now()
         context['conteudo_page'] = 'info_escola'
-        context['notifica'] = AtualizacaoNotificacao.objects.filter(user = user, lida=False)
-        context = get_contexto_escola(ano, escola_id)  
+        
+        # Notificações não lidas para o usuário
+        context['notifica'] = AtualizacaoNotificacao.objects.filter(user=user, lida=False)
+        context['EnviaNotifica'] = AtualizacaoNotificacao.objects.filter(user=user, lida=False)
 
-        # Obter a escola do banco de dados
+        # =====================================================
+        # 2️⃣ Informações da escola
+        # =====================================================
+        context.update(get_contexto_escola(ano, escola_id))
         escola = Escola.objects.get(id=escola_id)
         context['contexto'] = escola
 
-        # Carregar o formulário de matrícula com dados existentes, se houver
+        # =====================================================
+        # 3️⃣ Formulário de matrícula (novo ou existente)
+        # =====================================================
         matricula_id = self.request.GET.get('matricula_id')
         if matricula_id:
             try:
                 matricula = MatriculasOnline.objects.get(id=matricula_id)
-                form = MatriculasOnlineForm(instance=matricula)  # Carrega os dados da matrícula existente
-                context['form'] = form
+                context['form'] = MatriculasOnlineForm(instance=matricula)
             except MatriculasOnline.DoesNotExist:
                 messages.error(self.request, 'Matrícula não encontrada.')
-                context['form'] = MatriculasOnlineForm()  # Caso não exista matrícula, exibe um formulário vazio
+                context['form'] = MatriculasOnlineForm()
         else:
-            matricula = MatriculasOnline.objects.filter(serie__escola__ativo = True)
-            context['form'] = MatriculasOnlineForm()  # Formulário vazio para nova matrícula
+            context['form'] = MatriculasOnlineForm()
 
-        # Carregar os alunos e encaminhamentos
+        # =====================================================
+        # 4️⃣ Dados auxiliares: alunos e encaminhamentos
+        # =====================================================
         context['condicional_aluno'] = Alunos.objects.all()
         context['condicional_professor'] = Encaminhamentos.objects.all()
-
-        # Informações para a área de ajuda
         context['page_ajuda'] = "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional."
 
-        # Carregar turmas e gerar gráfico de matrícula
-        turmas = Turmas.objects.prefetch_related('related_matricula_turma').filter(escola=escola, ano_letivo=self.request.session['anoLetivo_id'])
+        # =====================================================
+        # 5️⃣ Turmas e gráfico de matrícula
+        # =====================================================
+        turmas = Turmas.objects.prefetch_related('related_matricula_turma').filter(
+            escola=escola, ano_letivo=ano
+        )
         context['condicional_turma'] = turmas
-        
+
         turma_counts = turmas.annotate(num_matriculas=Count('related_matricula_turma'))
-        a = [f'{t.nome} {t.descritivo_turma.upper()}' for t in turma_counts]
-        b = [t.num_matriculas for t in turma_counts]
+        nomes_turmas = [f'{t.nome} {t.descritivo_turma.upper()}' for t in turma_counts]
+        matriculas_turmas = [t.num_matriculas for t in turma_counts]
         cores = ['orange', 'green', 'red', 'blue', 'purple', 'cyan', 'magenta', 'yellow', 'black', 'pink', 'brown', 'gray', 'lime', 'teal', 'indigo']
-        
-        fig = go.Figure(data=go.Bar(x=a, y=b, marker_color=cores))
+
+        fig = go.Figure(data=go.Bar(x=nomes_turmas, y=matriculas_turmas, marker_color=cores))
         fig.update_layout(title='Gráfico das Turmas', xaxis_title='Turmas', yaxis_title='Número de Matrículas')
-        graph_html = fig.to_html(full_html=False)
-        context['graph'] = graph_html
+        context['graph'] = fig.to_html(full_html=False)
 
-        # ***************************************************************
-        # Exibir matrícula pública **************************************
-        # ***************************************************************
-        matPublica = MatriculasOnline.objects.filter(serie__escola__escola__id=escola.id, serie__escola__ativo=True)
-        # Verifica se existe pelo menos uma matrícula com confirma=False        
-        tem_pendente = matPublica.filter(confirma=False).exists()
+        # =====================================================
+        # 6️⃣ Matrículas públicas
+        # =====================================================
+        matPublica = MatriculasOnline.objects.filter(
+            serie__escola__escola__id=escola.id, serie__escola__ativo=True
+        )
         context['escolaMatriculaOnline'] = matPublica if matPublica else {}
-        context['tem_pendente'] = tem_pendente
+        context['tem_pendente'] = matPublica.filter(confirma=False).exists()
 
-       
-        # Busca as turmas do ano letivo posterior
-        turmas_proximo_existem = turmas_proximo_ano = Turmas.objects.filter(
-            ano_letivo__gt=ano,
-            escola=escola
-        ).first()
+        # =====================================================
+        # 7️⃣ Turmas do próximo ano letivo
+        # =====================================================
+        turmas_proximo_ano = Turmas.objects.filter(ano_letivo__gt=ano, escola=escola).first()
         context['turmas_proximo_existem'] = turmas_proximo_ano
 
-
-        turmas_proximo_ano = Turmas.objects.filter(
-            ano_letivo__gt=ano,
-            escola=escola
-        ).annotate(
+        turmas_proximo_ano = Turmas.objects.filter(ano_letivo__gt=ano, escola=escola).annotate(
             total_confirmados_online=Count(
                 'serie__seriesOnlineRelated__related_serie_matricula',
                 filter=Q(serie__seriesOnlineRelated__related_serie_matricula__confirma=True)
@@ -137,12 +145,90 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
         )
         context['turmas_proximo_ano'] = turmas_proximo_ano
 
-                
-        
+        # =====================================================
+        # 8️⃣ Processamento de dados de matrículas (função externa)
+        # =====================================================
+        processar_dados(self.request, ano=ano, escola_id=escola_id)
+        dados = processar_dados(self.request, ano, escola_id)
+        context['matriculas_all'] = dados.get("matriculas_all", [])
+        context['totais_vagas_disponiveis_total'] = dados.get("totais_vagas_disponiveis_total", {})
 
-        
+        # =====================================================
+        # 9️⃣ Resumo detalhado de matrículas por turma
+        # =====================================================
+        matriculas_all = []
+        totais_vagas_disponiveis_total = {
+            'total_autistas': 0,
+            'total_masculino': 0,
+            'total_feminino': 0,
+            'total_brancos': 0,
+            'total_pardos': 0,
+            'total_negros': 0,
+            'total_amarelos': 0,
+            'total_indigena': 0,
+            'total_nDeclarados': 0,
+            'total_pp': 0,
+            'total_p': 0,
+            'total_m': 0,
+            'total_g': 0,
+            'gg': 0,
+            'total_turmas': 0,
+            'total_vagas': 0,
+            'total_matriculas': 0,
+            'vagas_disponiveis_total': 0,
+        }
+
+        turmas = Turmas.objects.filter(escola=escola, ano_letivo=ano)
+        turmas_info = []
+        totais = totais_vagas_disponiveis_total.copy()
+
+        for turma in turmas:
+            # Estatísticas de alunos
+            alunos_especiais = {
+                'autistas': turma.related_matricula_turma.filter(aluno__espectro_autista=True).count(),
+                'masculino': turma.related_matricula_turma.filter(aluno__sexo__nome='Masculino').count(),
+                'feminino': turma.related_matricula_turma.filter(aluno__sexo__nome='Feminino').count(),
+                'brancos': turma.related_matricula_turma.filter(aluno__etnia__nome='Branca').count(),
+                'pardos': turma.related_matricula_turma.filter(aluno__etnia__nome='Parda').count(),
+                'negros': turma.related_matricula_turma.filter(aluno__etnia__nome='Negra').count(),
+                'amarelos': turma.related_matricula_turma.filter(aluno__etnia__nome='Amarela').count(),
+                'indigenas': turma.related_matricula_turma.filter(aluno__etnia__nome='Indigena').count(),
+                'nDeclarados': turma.related_matricula_turma.filter(aluno__etnia__nome='Não declarado').count(),
+                'PP': turma.related_matricula_turma.filter(camisa_tamanho__nome='PP').count(),
+                'P': turma.related_matricula_turma.filter(camisa_tamanho__nome='P').count(),
+                'M': turma.related_matricula_turma.filter(camisa_tamanho__nome='M').count(),
+                'G': turma.related_matricula_turma.filter(camisa_tamanho__nome='G').count(),
+                'GG': turma.related_matricula_turma.filter(camisa_tamanho__nome='GG').count(),
+            }
+
+            # Atualiza totais gerais
+            for k, v in alunos_especiais.items():
+                key = f'total_{k.lower()}' if 'total_' + k.lower() in totais else k.lower()
+                if key in totais:
+                    totais[key] += v
+
+            totais['total_turmas'] += 1
+            totais['total_vagas'] += turma.quantidade_vagas
+            totais['total_matriculas'] += turma.related_matricula_turma.count()
+            totais['vagas_disponiveis_total'] = totais['total_vagas'] - totais['total_matriculas']
+
+            # Adiciona dados da turma
+            turmas_info.append({
+                'nome': turma.nome,
+                'descritivo_turma': turma.descritivo_turma,
+                'matriculas': turma.related_matricula_turma.count(),
+                'quantidade_vagas': turma.quantidade_vagas,
+                'vagas_disponiveis': turma.vagas_disponiveis or turma.quantidade_vagas,
+                **alunos_especiais
+            })
+
+        context["matriculas_all"] = turmas_info
+        context["vagas_disponiveis_total"] = totais
 
         return context
+
+    
+
 
     def post(self, request, *args, **kwargs):
         if 'matricula_id' in request.POST:

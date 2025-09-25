@@ -76,18 +76,19 @@
                         <table class="win11-table">
                             <thead>
                                 <tr>
-                                    <th>Turmas</th>
+                                    <th>Turmas   </th>
                                     <th>Alunos matriculados</th>
                                     <th>Limite de Vagas</th>
                                     <th>Vagas disponíveis</th>
-                                    <th>Autistas</th>
+                                    <th>Autistas </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for turma in request.session.matriculas_all %}
+                                
+                                {% for turma in matriculas_all %}
                                 <tr>
                                     <td>{{ turma.nome }} <span class='text-uppercase'>{{ turma.descritivo_turma }}</span></td>
-                                    <td>{{ turma.matriculas }}</td>
+                                    <td>{{ turma.matriculas }} </td>
                                     <td>{{ turma.quantidade_vagas }}</td>
                                     <td>{{ turma.vagas_disponiveis }}</td>
                                     <td>{{ turma.autistas }}</td>
@@ -97,10 +98,10 @@
                                 <!-- Linha de Totais -->
                                 <tr class='bg-success-subtle text-black fs-2'>
                                     <td><strong>Total</strong></td>
-                                    <td>{{ request.session.totais.total_matriculas }}</td>
-                                    <td>{{ request.session.totais.total_vagas }}</td>
-                                    <td>{{ request.session.totais.vagas_disponiveis_total }}</td>
-                                    <td>{{ request.session.totais.total_autistas }}</td>
+                                    <td>{{ vagas_disponiveis_total.total_matriculas }}</td>
+                                    <td>{{ vagas_disponiveis_total.total_vagas }}</td>
+                                    <td>{{ vagas_disponiveis_total.vagas_disponiveis_total }}</td>
+                                    <td>{{ vagas_disponiveis_total.total_autistas }}</td>
                                 </tr>
                             </tbody>
                         </table>
