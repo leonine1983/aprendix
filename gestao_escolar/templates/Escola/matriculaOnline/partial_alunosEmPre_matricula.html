@@ -1,87 +1,8 @@
 {% load static %}
 <style>
-    #openDialog_matriculaOnline {
-        position: fixed; /* Fixa o elemento na tela */
-        top: 25%; /* 30% do topo da tela */
-        right: 1%; /* Alinha o elemento à direita */
-        z-index: 9999; /* Garante que o elemento fique sobre todos os outros */
-        background-color: rgba(148, 190, 127, 0.9); /* Fundo alaranjado semi-transparente */
-        padding: 10px; /* Espaçamento interno */
-        color: rgb(36, 1, 1); /* Cor do texto */
-        border-radius: 5px; /* Bordas arredondadas */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombras para profundidade */
-        
-        /* Animação de pulsação */
-        animation: pulse 2s infinite; /* Aplique a animação de pulsação */
-    }
-    
-    /* Efeito de pulsação (aumentar de tamanho) */
-    @keyframes pulse {
-        0% {
-            transform: scale(1); /* Tamanho normal */
-        }
-        50% {
-            transform: scale(1.1); /* Aumenta 10% do tamanho */
-        }
-        100% {
-            transform: scale(1); /* Volta ao tamanho original */
-        }
-    }
-    
-    /* Efeito de piscar (opacidade) */
-    @keyframes blink {
-        0% {
-            opacity: 1; /* Visível */
-        }
-        50% {
-            opacity: 0; /* Invisível */
-        }
-        100% {
-            opacity: 1; /* Visível novamente */
-        }
-    }
-    
-    /* Aplicar animação de piscar */
-    #openDialog_matriculaOnline.blink {
-        animation: blink 1s infinite; /* Animação de piscar */
-    }
-    
-.imgMatricula {
-    position: absolute; /* Posiciona a imagem acima do botão */
-    top: -90px; /* Ajusta a distância entre a imagem e o botão, pode ser ajustado */
-    width: 100px; /* Tamanho da imagem (ajuste conforme necessário) */
-    height: auto; /* Mantém a proporção da imagem */
-    left:1%;
-}
- #cke_id_pendecia div div, #cke_id_pendecia div , #cke_id_pendecia {
-    padding: 0!important;
-}
-label{
-    text-transform: none!important;
-}
-#form_pendencia {
-    position: relative;
-    padding-top: 30px; /* Adicionando um padding para garantir que o texto não sobreponha o conteúdo */
-    border: 1px solid #ddd; /* Bordas para a div */
-    border-radius: 8px; /* Arredondando as bordas da div para um visual mais suave */
-    margin-top: 5rem!important;
-}
-
-#form_pendencia::before {
-    content: "Use o formulário abaixo para sinalizar que a matrícula não pode ser confirmada";
-    position: absolute;
-    top: -15px; /* Posicionando o texto ligeiramente acima da borda superior */
-    left: 10px; /* Colocando o texto um pouco afastado da borda esquerda */
-    right: 10px; /* Garantindo que o texto não ultrapasse a borda direita */
-    background-color: #af48f3; /* Fundo leve para destacar o texto */
-    padding: 8px 12px; /* Espaçamento interno para o texto */
-    color: #eee7e7; /* Cor do texto */
-    font-size: 14px; /* Tamanho de fonte adequado */
-    border-radius: 8px 8px 0 0; /* Arredondando os cantos superiores para combinar com a borda da div */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Adicionando sombra para dar um destaque */
-}
-
+#openDialog_matriculaOnline{position:fixed;top:25%;right:1%;z-index:9999;background:rgba(148,190,127,.9);padding:10px;color:#240101;border-radius:5px;box-shadow:0 4px 8px rgba(0,0,0,.3);animation:pulse 2s infinite}@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}@keyframes blink{0%{opacity:1}50%{opacity:0}100%{opacity:1}}#openDialog_matriculaOnline.blink{animation:blink 1s infinite}.imgMatricula{position:absolute;top:-90px;width:100px;height:auto;left:1%}#cke_id_pendecia div div,#cke_id_pendecia div,#cke_id_pendecia{padding:0!important}label{text-transform:none!important}#form_pendencia{position:relative;padding-top:30px;border:1px solid #ddd;border-radius:8px;margin-top:5rem!important}#form_pendencia::before{content:"Use o formulário abaixo para sinalizar que a matrícula não pode ser confirmada";position:absolute;top:-15px;left:10px;right:10px;background:#af48f3;padding:8px 12px;color:#eee7e7;font-size:14px;border-radius:8px 8px 0 0;box-shadow:0 2px 5px rgba(0,0,0,.1)}
 </style>
+
 
     {% if escolaMatriculaOnline|length >= 1 %}
         {% if tem_pendente %}
@@ -114,7 +35,7 @@ label{
                                 <th scope="col">Série</th>
                                 <th scope="col">Aluno</th>
                                 <th scope="col">Data da Matrícula</th>
-                                <th scope="col">Remanejamento</th>
+                                <th scope="col">Documentação</th>
                                 <th>Situação</th>
                             </tr>                    
                         </thead>
@@ -135,7 +56,11 @@ label{
                                             <span class='fw-bold text-secondary'>Matricula com Incosistências:</span></br>
                                             {{e.pendecia|safe}}
                                             {% else %}
-                                            Aguardando..
+                                            {% if e.confirma %}
+                                                <spam class='text-success'>Matricula confirmada <i class="fa-solid fa-circle-check"></i></span>
+                                                {% else %}
+                                                Aguardando
+                                            {% endif %}
                                         {% endif %}
                                     </td>
                                 </tr>                                    

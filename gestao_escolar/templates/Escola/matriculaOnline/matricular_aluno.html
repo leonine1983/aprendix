@@ -110,7 +110,7 @@
                             <td>{{e}}</td>
                             <td>{{e.ano_letivo}}</td>
                             <td>
-                            {% for s in e.seriesOnlineRelated.all  %}
+                            {% for s in e.escolaOnlineRelated.all  %}
                                 <div><a href="{% url 'Gestao_Escolar:matricular_alunoSerie' aluno_id=aluno.id serie_id=s.id %}">{{s}}</a></div>                                
                             {% endfor %}
                             </td>

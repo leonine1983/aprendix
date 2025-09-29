@@ -18,7 +18,8 @@
       <div class="modal-header">          
         <h4 class="modal-title  fs-6"><span class="ml-5 fs-3 "><img src="{% static 'svg/matriOn.svg' %}" alt=""> {{titulo_page}}</span></h4>        
         <button type="button" class="close" data-dismiss="modal">&times;</button>        
-      </div>        
+      </div>  
+      {% if Adiciona_serieTurma %}
       <div class="modal-body shadow-sm bg-light-subtle"> 
         <h4 class="mb-3 text-primary">
           Selecione a turma em que o aluno será matriculado
@@ -50,7 +51,7 @@
             <div class="col">
               <ul class="list-group mb-4">
                 <li class="list-group-item">
-                  <strong>Nome da mãe:</strong> <b class="text-uppercase">{{ matricula.aluno.nome_mae }}</b>
+                  <strong>Nome da mãe:   </strong> <b class="text-uppercase">{{ matricula.aluno.nome_mae }}</b>
                 </li>
                 <li class="list-group-item d-flex align-items-center">
                   <strong class="me-2">Telefone Mãe:</strong>
@@ -70,6 +71,28 @@
             </div>
           </div>
         </div>
+        {% else %}
+        <div class="alert alert-info shadow-lg p-4 rounded">
+          <h4 class="alert-heading">📌 Tela de Seleção de Séries para Matrícula Online</h4>
+          <p>
+            Nesta tela, o usuário pode <strong>cadastrar séries</strong> disponíveis para matrícula online em uma escola.  
+            O formulário é simples e direto, contendo os seguintes campos:
+          </p>
+          <ul>
+            <li><strong>Série:</strong> permite selecionar a série escolar desejada para abertura de vagas.</li>
+            <li><strong>Turno:</strong> define o período de funcionamento da turma (por exemplo: Matutino, Vespertino, Noturno).</li>
+            <li><strong>Quantidade de Vagas:</strong> informa quantas vagas estarão disponíveis para os alunos.</li>
+          </ul>
+          <p>
+            Após preencher os campos, basta clicar no botão azul 
+            <strong>“Adicionar série para matrícula online”</strong> para salvar a configuração.
+          </p>
+          <hr>
+          <p class="mb-0">
+            ⚡ Essa funcionalidade garante que a escola organize suas turmas de forma prática, rápida e acessível.
+          </p>
+        </div>
+        {% endif %}      
         
         <div class="tab-pane fade show active " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0"> 
           <form method="post" >

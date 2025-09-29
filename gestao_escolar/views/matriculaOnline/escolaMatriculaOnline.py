@@ -84,6 +84,7 @@ class SerieOnlineForm(forms.ModelForm):
 @login_required
 def adicionar_escola(request):
     anol = request.session.get('anoLetivo_nome', None)  
+    escola = Escola.objects.get(id=request.session['escola_id'])
     ano = None
     if anol:
         try:
@@ -94,7 +95,7 @@ def adicionar_escola(request):
     if request.method == 'POST':
         form = EscolaMatriculaOnlineForm(request.POST, ano_atual=ano)
         if form.is_valid():
-            escola = Escola.objects.get(id=request.session['escola_id'])
+            
             ultimo_registro = EscolaMatriculaOnline.objects.filter(escola=escola, ativo=True).last()
             if ultimo_registro:
                 ultimo_registro.ativo = False
@@ -109,6 +110,7 @@ def adicionar_escola(request):
             return redirect('Gestao_Escolar:adicionar_escola')
     else:
         form = EscolaMatriculaOnlineForm(ano_atual=ano)
+
 
     return render(request, 'Escola/inicio.html', {
         'form': form,
@@ -163,8 +165,9 @@ def adicionar_serie(request, pk):
     else:
         form = SerieOnlineForm()
     return render(request, 'Escola/inicio.html', {
-        'form': form,
+        'form': form,        
         'conteudo_page': "Add Series Online",
+        'Adiciona_serieTurma': "Add_SeriesTurmas",
         'titulo_page': "Seleciona séries para matrícula online",
     })
 

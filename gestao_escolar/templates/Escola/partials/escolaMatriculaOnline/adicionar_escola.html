@@ -74,7 +74,8 @@
                   <th>Escola</th>
                   <th>Ano letivo p/Mat Online </th>
                   <th colspan="3">Periodo aberto para matricula</th>
-                  <th colspan="2">Séries</th>
+                  <th >Séries</th>
+                  <th colspan="2">Ação</th>
                 </tr>
               </thead>
               <tbody>
@@ -105,8 +106,7 @@
                     <td>{{e.escola}} </td>
                     <td>{{e.ano_letivo}}</td>
                     <td>{{e.data_inicio}}</td>
-                    <td>{{e.data_fim}}</td>
-                    <td>Edit</td>
+                    <td>{{e.data_fim}}</td>                    
                     <td>
                       {% for s in e.seriesOnlineRelated.all %}
                         <div class='li_series text-start alert-secondary p-2 m-2 fs-6'>                          
@@ -131,6 +131,18 @@
                           <br>
                         </div>
                       {% endfor %}
+                    </td>
+                    <td>
+                      {% for s  in e.escolaOnlineRelated.all %}
+                        <p class='p-0 m-0 text-start'>
+                          {{s.serie}} | {{s.turno}} | {{s.vagas_disponiveis}} disponivéis | 
+                          <a href="{% url 'Gestao_Escolar:editar_serie' s.id %}"><i class="fa-solid fa-pen-to-square text-primary ml-2 mr-2" title="Editar {{s.serie}}"></i></a> 
+                          <a href="{% url 'Gestao_Escolar:deletar_serie' s.id %}"><i class="fa-solid fa-trash text-danger" title="Excluí {{s.serie}}"></i></a>                        
+                        </p>
+                      {% endfor %}
+                    </td>
+                    <td>
+                      <a href="{% url 'Gestao_Escolar:editar_escola' e.id %}">Edit</a>
                     </td>
                     <td><a href="{% url 'Gestao_Escolar:adicionar_serie' e.id %}">Add</a></td>
                   </tr>
