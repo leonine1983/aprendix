@@ -8,11 +8,11 @@ from rh.models import Escola, Decreto, Ano
 
 def processar_dados(request, ano, escola_id):
     # buscar objeto do ano letivo
-    ano = Ano.objects.get(id=ano)
+    ano_obj = Ano.objects.get(id=ano)
 
     # salvar ano letivo na sessão
-    request.session['anoLetivo_id'] = ano.id
-    request.session['anoLetivo_nome'] = str(ano.ano)
+    request.session['anoLetivo_id'] = ano_obj.id
+    request.session['anoLetivo_nome'] = ano_obj.ano
 
     # valores padrão caso não haja matriculas
     matriculas_all = []
