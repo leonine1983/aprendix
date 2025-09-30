@@ -65,31 +65,37 @@ def finaliza_matricular_aluno(request, aluno_id, serie_id):
     )
 
 
-
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
 @login_required
 def matricula_confirma_impugna(request, mat_id):
-    try:
-        # Retrieve the MatriculasOnline instance using the mat_id
-        matricula = MatriculasOnline.objects.get(id=mat_id)
-    except MatriculasOnline.DoesNotExist:
-        messages.error(request, "Matrícula não encontrada.")
-        return redirect('some_error_page')  # Or another page where you handle errors
+    matricula = get_object_or_404(MatriculasOnline, id=mat_id)
 
-    # Pass the instance of MatriculasOnline to the form
-    form = MatriculasOnlineForm(instance=matricula)
+    if request.method == "POST":
+        form = MatriculasOnlineForm(request.POST, instance=matricula)
+        if form.is_valid():
+            # Marca como impugnada sempre que salvar
+            matricula = form.save(commit=False)
+            matricula.impugnar = True
+            if not matricula.pendecia:  # se não tiver pendência preenchida
+                matricula.pendecia = "Matrícula impugnada por falta de documentos."
+            matricula.save()
 
-    # You might not need aluno_id if it's just a reference to the same MatriculasOnline object
-    aluno_id = matricula.id
+            messages.warning(request, "A matrícula foi marcada como impugnada.")
+            return redirect('Gestao_Escolar:matricular_aluno', aluno_id=matricula.id)
+        else:
+            messages.error(request, "Erro ao salvar a matrícula.")
+    else:
+        form = MatriculasOnlineForm(instance=matricula)
 
     return render(request, 'Escola/inicio.html', {
-        'aluno_id': aluno_id,
+        'aluno_id': matricula.id,
         'matricula': matricula,
         'form': form,
-
         'titulo_page': "Análise de Solicitação de Matrícula por Meio da Matrícula Pública (Matrícula Online)",
         'sub_titulo_page': "Utilize os botões abaixo para aprovar a solicitação de matrícula do aluno ou para impugná-la devido à falta de documentos.",
-        'btn_bg' : "btn-success",
-        'conteudo_page' : 'impugnarConfirmar'
+        'btn_bg': "btn-success",
+        'conteudo_page': 'impugnarConfirmar'
     })
 
 
