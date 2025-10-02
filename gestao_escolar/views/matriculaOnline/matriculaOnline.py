@@ -23,6 +23,7 @@ def matricular_aluno(request, aluno_id):
 
 
 # Cria a Pre_matricula do aluno online
+# Cria a Pre_matricula do aluno online
 @login_required
 def finaliza_matricular_aluno(request, aluno_id, serie_id):
     try:
@@ -30,15 +31,18 @@ def finaliza_matricular_aluno(request, aluno_id, serie_id):
         serie = SerieOnline.objects.get(id=serie_id)
     except Alunos.DoesNotExist:
         messages.error(request, "Aluno não encontrado.")
-        return redirect('Gestao_Escolar:matricular_aluno', {'aluno_id':aluno_id})  # Substitua com a URL de erro desejada
+        return redirect('Gestao_Escolar:matricular_aluno', aluno_id=aluno_id)
     except SerieOnline.DoesNotExist:
         messages.error(request, "Série não encontrada.")
-        return redirect('Gestao_Escolar:matricular_aluno', {'aluno_id':aluno_id})  # Substitua com a URL de erro desejada
+        return redirect('Gestao_Escolar:matricular_aluno', aluno_id=aluno_id)
 
-    # Verifica se o aluno já está matriculado na série
-    if MatriculasOnline.objects.filter(aluno=aluno, serie=serie).exists():
-        messages.warning(request, "Este aluno já está matriculado nesta série.")
-        return redirect('Gestao_Escolar:matricular_aluno', {'aluno_id':aluno_id})  # Substitua com a URL de erro desejada
+    # Verifica se o aluno já possui matrícula no mesmo ano letivo
+    if MatriculasOnline.objects.filter(
+        aluno=aluno,
+        serie__escola__ano_letivo=serie.escola.ano_letivo
+    ).exists():
+        messages.warning(request, f"Este aluno já possui uma matrícula no ano letivo de {serie.escola.ano_letivo}.")
+        return redirect('Gestao_Escolar:matricular_aluno', aluno_id=aluno_id)
 
     try:
         # Criação do registro de matrícula
@@ -49,13 +53,12 @@ def finaliza_matricular_aluno(request, aluno_id, serie_id):
         messages.success(
             request,
             f"Parabéns! A pré-matrícula do aluno {aluno} na {serie} foi realizada com sucesso! "
-            f"Agora, é só esperar a confirmação da escola para que a matrícula seja efetivada, "
-            f"e o aluno possa começar a sua jornada no ano letivo de {serie.escola.ano_letivo}, "
-            f"na incrível {serie.escola.escola}. Vamos juntos rumo ao sucesso acadêmico!"
+            f"Agora, é só esperar a confirmação da escola para que a matrícula seja efetivada. "
+            
         )
     except Exception as e:
         messages.error(request, f"Ocorreu um erro ao realizar a matrícula: {e}")
-        return redirect('Gestao_Escolar:matricular_aluno', {'aluno_id':aluno_id})  # Substitua com a URL de erro desejada
+        return redirect('Gestao_Escolar:matricular_aluno', aluno_id=aluno_id)
 
     # Redirecionamento para a página de confirmação
     return render(
@@ -63,6 +66,7 @@ def finaliza_matricular_aluno(request, aluno_id, serie_id):
         'Escola/matriculaOnline/matricula_confirmada.html',
         {'aluno': aluno, 'serie': serie}
     )
+
 
 
 from django.shortcuts import get_object_or_404, redirect

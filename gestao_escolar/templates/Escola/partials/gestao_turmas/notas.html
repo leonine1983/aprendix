@@ -75,7 +75,31 @@
                                         <td>{{ forloop.counter }}</td>
                                         <td class="col-3">{{ aluno.aluno }}</td>
                                         {% for disciplina in disciplinas %}
-                                            <td class="text-center td-com-botao" style="width: 55px;background-color: rgb(233, 240, 240) !important;color: rgb(4, 45, 82);">
+                                        <!-- Lançamento de notas por disciplina -->
+                                            <td class="text-center td-com-botao" style="width: 55px;background-color: rgb(233, 240, 240) !important;color: rgb(4, 45, 82);">                                                
+                                                
+                                                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                
                                                 {% for gestao_turma in aluno.gestao_turmas_related.all %}
                                                     {% if gestao_turma.grade == disciplina %}
                                                         {% if gestao_turma.trimestre_id == t.id %}
@@ -116,7 +140,9 @@
                                                         {% endif %}
                                                     {% endif %}
                                                 {% endfor %}                                                                                                    
-                                            </td>    
+                                            </td> 
+                                        <!-- END Lançamento de notas por disciplina -->  
+
                                             <td class="text-center " style="width: 55px;background-color: rgb(235, 223, 230) !important;color: rgb(4, 45, 82);">
                                                 {% for gestao_turma in aluno.gestao_turmas_related.all %}
                                                     {% if gestao_turma.grade == disciplina %}

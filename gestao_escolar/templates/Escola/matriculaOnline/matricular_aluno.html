@@ -45,6 +45,77 @@
       border-color: #388E3C; /* Verde mais forte quando o usuário passa o mouse */
     }
 
+
+    
+/* Estilo do dialog */
+#confirmDialog {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  padding: 24px;
+  max-width: 480px;
+  width: 90%;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Título */
+#confirmDialog p {
+  font-size: 0.8rem;
+  margin-bottom: 12px;
+  color: #212529;
+}
+
+/* Destaque série e turno */
+#confirmDialog .serie {
+  color: #0d6efd; /* azul Bootstrap */
+  font-weight: 700;
+}
+#confirmDialog .turno {
+  color: #198754; /* verde Bootstrap */
+  font-weight: 700;
+}
+
+/* Texto auxiliar */
+#confirmDialog .info {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-bottom: 20px;
+}
+
+/* Botões */
+#confirmDialog menu {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+#confirmDialog .btn-cancel {
+  background: #f8f9fa;
+  color: #495057;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+#confirmDialog .btn-cancel:hover {
+  background: #e2e6ea;
+}
+
+#confirmDialog .btn-confirm {
+  background: #0d6efd;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+#confirmDialog .btn-confirm:hover {
+  background: #0b5ed7;
+}
 </style>
 <link rel="stylesheet" href="{% static 'global/css/form_win11.css' %}">
 <div class="container p-4 bg-light text-muted " style=" color: #fff; border-radius: 8px; width:95vw; margin-top:5rem!important">
@@ -111,7 +182,63 @@
                             <td>{{e.ano_letivo}}</td>
                             <td>
                             {% for s in e.escolaOnlineRelated.all  %}
-                                <div><a href="{% url 'Gestao_Escolar:matricular_alunoSerie' aluno_id=aluno.id serie_id=s.id %}">{{s}}</a></div>                                
+                                <!--<div><a class='text-decoration-none' href="{% url 'Gestao_Escolar:matricular_alunoSerie' aluno_id=aluno.id serie_id=s.id %}">{{s}} {{s.turno}}</a></div> -->
+                                
+                                <a class="text-decoration-none matricula-link d-block"
+                                        data-serie="{{s}}"
+                                        data-turno="{{s.turno}}"
+                                        data-url="{% url 'Gestao_Escolar:matricular_alunoSerie' aluno_id=aluno.id serie_id=s.id %}">
+                                        {{s}} {{s.turno}}
+                                        </a>
+
+                                        <!-- Dialog HTML -->
+                                        <dialog id="confirmDialog_{{s.id}}">
+                                            <form method="dialog">
+                                                <p id="dialogMessage_{{s.id}}"></p>
+                                                <menu>
+                                                <button value="cancel" class="btn btn-secondary">Cancelar</button>
+                                                <button value="confirm" class="btn btn-primary">Confirmar</button>
+                                                </menu>
+                                            </form>
+                                        </dialog>
+
+                                        <script>
+                                        document.addEventListener("DOMContentLoaded", () => {
+                                            const dialog = document.getElementById("confirmDialog_{{s.id}}");
+                                            const dialogMessage = document.getElementById("dialogMessage_{{s.id}}");
+
+                                            document.querySelectorAll(".matricula-link").forEach(link => {
+                                            link.addEventListener("click", (event) => {
+                                                event.preventDefault(); // evita carregar a página direto
+
+                                                const serie = link.dataset.serie;
+                                                const turno = link.dataset.turno;
+                                                const url = link.dataset.url;
+
+                                                // Exemplo simples: aqui você pode usar idade do aluno via template
+                                                const idadeAluno = {{ userAluno.aluno.idade|default:0 }};  
+
+                                                let mensagem = `Tem certeza que deseja matricular o aluno na série ${serie}, turno ${turno}?`;
+                                                
+                                                // Exemplo de regra baseada na idade
+                                                if (idadeAluno < 12 && turno === "Noturno") {
+                                                mensagem += "\n⚠ Atenção: Pela idade do aluno, o turno noturno pode não ser o mais indicado.";
+                                                }
+
+                                                dialogMessage.textContent = mensagem;
+                                                dialog.showModal();
+
+                                                dialog.addEventListener("close", () => {
+                                                if (dialog.returnValue === "confirm") {
+                                                    window.location.href = url;
+                                                }
+                                                }, { once: true });
+                                            });
+                                            });
+                                        });
+                                        </script>
+                                
+
                             {% endfor %}
                             </td>
                         </tr>
