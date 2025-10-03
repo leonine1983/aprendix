@@ -719,7 +719,6 @@ class GestaoTurmas(models.Model):
     def __str__(self):
         return self.aluno.aluno.nome_completo
     
-
     def save(self, *args, **kwargs):
         from modulo_professor.models import ComposicaoNotas
         from django.utils.timezone import now        
@@ -770,7 +769,18 @@ class GestaoTurmas(models.Model):
             if final_turma:
                 # Evita recursão: atualiza diretamente com .update()
                 GestaoTurmas.objects.filter(pk=final_turma.pk).update(faltas_total=total_faltas)  
+    
+    class Meta:
+            constraints = [
+                models.UniqueConstraint(
+                    fields=['aluno', 'grade', 'trimestre'],
+                    name='unique_gestao_turmas'
+                )
+            ]
 
+
+
+        
     
 class ParecerDescritivo(models.Model):
     matricula = models.ForeignKey(Matriculas, blank=True, on_delete=models.CASCADE, related_name='pareceres_aluno')
