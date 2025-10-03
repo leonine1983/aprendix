@@ -446,8 +446,13 @@ class TurmaDisciplina(models.Model):
     carga_horaria_anual = models.IntegerField(null=True)
     limite_faltas = models.IntegerField(null=True)
 
+    
+
     def __str__(self):
         return f'{self.disciplina.nome} - {self.professor.encaminhamento}'
+    
+
+
 
 
 escola_fora = {
@@ -844,3 +849,65 @@ class DiaSemana(models.Model):
 
     def __str__(self):
         return self.nome_dia
+
+# signals.py (ou no final do models.py, mas recomendo signals.py)
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .models import TurmaDisciplina, GestaoTurmas, Matriculas, Trimestre
+
+@receiver(post_save, sender=TurmaDisciplina)
+def cria_registros_gestao_turmas(sender, instance, created, **kwargs):
+    if created:  # Só quando criar a TurmaDisciplina
+        alunos = Matriculas.objects.filter(turma=instance.turma)
+        trimestres = Trimestre.objects.filter(final=False)
+
+        for matricula in alunos:
+            for trimestre in trimestres:
+                if not GestaoTurmas.objects.filter(
+                    aluno=matricula,
+                    grade=instance,
+                    trimestre=trimestre
+                ).exists():
+                    GestaoTurmas.objects.create(
+                        aluno=matricula,
+                        grade=instance,
+                        trimestre=trimestre,
+                        notas=0,
+                        faltas=0
+                    )
+
+
+# signals.py
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .models import Matriculas, TurmaDisciplina, GestaoTurmas, Trimestre
+
+@receiver(post_save, sender=Matriculas)
+def cria_registros_para_matricula(sender, instance, created, **kwargs):
+    """
+    Quando cria uma nova matrícula, gera registros em GestaoTurmas
+    para todas as disciplinas já existentes na turma e trimestres ativos.
+    """
+    if created:
+        # Todas as disciplinas da turma do aluno
+        grades = TurmaDisciplina.objects.filter(turma=instance.turma)
+        # Trimestres que ainda não são finais
+        trimestres = Trimestre.objects.filter(final=False)
+
+        for grade in grades:
+            for trimestre in trimestres:
+                exists = GestaoTurmas.objects.filter(
+                    aluno=instance,
+                    grade=grade,
+                    trimestre=trimestre
+                ).exists()
+
+                if not exists:
+                    GestaoTurmas.objects.create(
+                        aluno=instance,
+                        grade=grade,
+                        trimestre=trimestre,
+                        notas=0,
+                        faltas=0
+                    )
+

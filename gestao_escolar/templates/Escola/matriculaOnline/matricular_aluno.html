@@ -177,14 +177,14 @@
                     </thead>
                     <tbody>
                         {% for e in escola %}
-                        <tr>
+                        <tr class = 'align-middle'>
                             <td>{{e}}</td>
                             <td>{{e.ano_letivo}}</td>
-                            <td>
+                            <td >
                             {% for s in e.escolaOnlineRelated.all  %}
                                 <!--<div><a class='text-decoration-none' href="{% url 'Gestao_Escolar:matricular_alunoSerie' aluno_id=aluno.id serie_id=s.id %}">{{s}} {{s.turno}}</a></div> -->
                                 
-                                <a class="text-decoration-none matricula-link d-block"
+                                <a class="btn btn-sm m-1 btn-primary text-decoration-none matricula-link d-block"
                                         data-serie="{{s}}"
                                         data-turno="{{s.turno}}"
                                         data-url="{% url 'Gestao_Escolar:matricular_alunoSerie' aluno_id=aluno.id serie_id=s.id %}">

@@ -77,29 +77,7 @@
                                         {% for disciplina in disciplinas %}
                                         <!-- Lançamento de notas por disciplina -->
                                             <td class="text-center td-com-botao" style="width: 55px;background-color: rgb(233, 240, 240) !important;color: rgb(4, 45, 82);">                                                
-                                                
-                                                
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                
+                                                                               
                                                 {% for gestao_turma in aluno.gestao_turmas_related.all %}
                                                     {% if gestao_turma.grade == disciplina %}
                                                         {% if gestao_turma.trimestre_id == t.id %}

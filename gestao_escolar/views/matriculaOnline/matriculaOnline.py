@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from gestao_escolar.models import Alunos, MatriculasOnline, EscolaMatriculaOnline, SerieOnline, Matriculas, Turmas
+from gestao_escolar.models import Alunos, MatriculasOnline, EscolaMatriculaOnline, SerieOnline, Matriculas, Turmas, GestaoTurmas
+
 from rh.models import Escola, Bairro, Ano
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
@@ -148,8 +149,18 @@ def matricula_confirmada(request, mat_id):
                 turma=form.cleaned_data['turma']
             )
             print(f' a matriucl : {matricula_nova} {matricula_nova.turma}')
-
+            """
             # Marca a matrícula online como confirmada
+            matricula_em_gestaoTurmas =  Matriculas.objects.get(id=matricula_nova.id)
+            if matricula_em_gestaoTurmas:
+                GestaoTurmas.objects.get_or_create(
+                    aluno = matricula_em_gestaoTurmas
+                )
+                messages.info(request, f"O aluno {matricula_nova} foi inserido em gestao de turmas")
+
+                """
+            
+
             matricula_online.confirma = True
             matricula_online.save()
 
