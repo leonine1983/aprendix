@@ -1,149 +1,131 @@
+<!-- Estilos -->
 <style>
-    dialog {
-      border: none;
-      border-radius: 1rem;
-      padding: 0;
-      max-width: 500px;
-      width: 90%;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-      opacity: 0;
-      transform: translateY(-20px);
-      transition: all 0.4s ease;
-      z-index:1000
-    }
+  dialog {
+    border: none;
+    border-radius: 1rem;
+    padding: 0;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.4s ease;
+    z-index: 1000;
+  }
 
-    dialog[open] {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  dialog[open] {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
-    .dialog-header {
-      background: #0d6efd;
-      color: white;
-      padding: 1rem;
-      border-radius: 1rem 1rem 0 0;
-    }
+  .dialog-header-notas {
+    background: #0d6efd;
+    color: white;
+    padding: 1rem;
+    border-radius: 1rem 1rem 0 0;
+  }
 
-    .dialog-body {
-      padding: 1rem;
-    }
+  .dialog-body {
+    padding: 1rem;
+  }
 
-    .dialog-footer {
-      padding: 0.75rem 1rem;
-      text-align: right;
-      border-top: 1px solid #ddd;
-      border-radius: 0 0 1rem 1rem;
-    }
-    .text{
-        font-size: 0.50rem;
-        border: 0.1rem solid blue;
-        width: 100%;
-    }
-   
-  </style>
-  
+  .dialog-footer {
+    padding: 0.75rem 1rem;
+    text-align: right;
+    border-top: 1px solid #ddd;
+    border-radius: 0 0 1rem 1rem;
+  }
 
-<dialog id="meuDialog_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}">
-  <div class="dialog-header">
+  .text {
+    font-size: 0.85rem;
+    width: 100%;
+  }
+</style>
+
+<!-- Dialog -->
+<dialog id="meudialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}">
+  <div class="dialog-header-notas">
     <h5 class="mb-0 text-light">{{gestao_turma.grade}} - {{gestao_turma.trimestre}}</h5>
   </div>
   <div class="dialog-body">
-      <p>
-          <i class="fa-solid fa-pen-to-square me-1"></i>
-          Lance ou atualize a nota do aluno para o 
-          <span class="text-uppercase">{{gestao_turma.trimestre}}</span>.
-      </p>
+    <p>
+      <i class="fa-solid fa-pen-to-square me-1"></i>
+      Lance ou atualize a nota do aluno para o 
+      <span class="text-uppercase">{{gestao_turma.trimestre}}</span>.
+    </p>
 
-      <input id="notaAluno_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}" 
-       type="number" 
-       class="form-control" 
-       placeholder="{{ gestao_turma.notas }}"
-       min="0"
-       max="10"
-       step="0.1">
-
-
-    
+    <input 
+      id="notaAluno_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}" 
+      type="number" 
+      class="form-control" 
+      placeholder="{{ gestao_turma.notas }}"
+      min="0"
+      max="10"
+      step="0.1">
   </div>
+
   <div class="dialog-footer flex gap-2">
-    <button type="button" 
-            id="fecharDialog_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}" 
-            class="btn btn-secondary">Fechar</button>
-    <button type="button" 
-            class="btn btn-primary salvar-nota" 
-            data-aluno="{{aluno.id}}" 
-            data-grade="{{gestao_turma.grade.id}}" 
-            data-trimestre="{{gestao_turma.trimestre_id}}">Salvar Notas</button>
+    <button 
+      type="button" 
+      id="fechardialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}" 
+      class="btn btn-secondary">
+      Fechar
+    </button>
+    <button 
+      type="button" 
+      class="btn btn-primary salvar-nota" 
+      data-aluno="{{aluno.id}}" 
+      data-grade="{{gestao_turma.grade.id}}" 
+      data-trimestre="{{gestao_turma.trimestre_id}}">
+      Salvar Notas
+    </button>
   </div>
 </dialog>
 
+<!-- Script: Salvar Nota -->
+<script>
+  document.querySelectorAll('.salvar-nota').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const alunoId = this.dataset.aluno;
+      const gradeId = this.dataset.grade;
+      const trimestreId = this.dataset.trimestre;
 
-<!--
-  <dialog id="meuDialog_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}">
-    <div class="dialog-header">
-      <h5 class="mb-0 text-light">{{gestao_turma.grade}} - {{gestao_turma.trimestre}}</h5>
-    </div>
-    <div class="dialog-body">
-        <p>
-            <i class="fa-solid fa-pen-to-square me-1"></i>
-            Lance ou atualize a nota do aluno para o 
-            <span class="text-uppercase">{{gestao_turma.trimestre}}</span>.
-        </p>
+      const input = document.getElementById(`notaAluno_${alunoId}_${gradeId}_${trimestreId}`);
+      let nota = parseFloat(input.value);
 
-        <a class='text-primary' href="{% url "Gestao_Escolar:notas_usa_dialog" aluno.id gestao_turma.grade.id gestao_turma.trimestre_id 9.2 %}">  
-            <input id="notaAluno" type="text" class="form-control" placeholder="{{ gestao_turma.notas }}">
-        </a>
-      
-    </div>
-    <div class="dialog-footer flex gap-2">
-      <button id="fecharDialog_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}" class="btn btn-secondary">Fechar</button>
-      <button id="fecharDialog_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}" class="btn btn-secondary">Salvar Notas</button>
-    </div>
-  </dialog>-->
-  <script>
-    document.querySelectorAll('.salvar-nota').forEach(btn => {
-  btn.addEventListener('click', function() {
-    const alunoId = this.dataset.aluno;
-    const gradeId = this.dataset.grade;
-    const trimestreId = this.dataset.trimestre;
+      if (isNaN(nota)) {
+        alert("Digite uma nota válida!");
+        input.focus();
+        return;
+      }
 
-    const input = document.getElementById(`notaAluno_${alunoId}_${gradeId}_${trimestreId}`);
-    let nota = parseFloat(input.value);
+      // Garante que o valor está entre 0 e 10
+      if (nota < 0) nota = 0;
+      if (nota > 10) nota = 10;
 
-    if (isNaN(nota)) {
-      alert("Digite uma nota válida!");
-      input.focus();
-      return;
-    }
+      // Redireciona para a URL Django
+      const url = `{% url "Gestao_Escolar:notas_usa_dialog" aluno.id gestao_turma.grade.id gestao_turma.trimestre_id "VALOR_NOTA" %}`   
 
-    // Limita o valor para o intervalo 0 a 10
-    if (nota < 0) nota = 0;
-    if (nota > 10) nota = 10;
-
-    // Redireciona para a URL do Django com a nota inserida
-    const url = `{% url "Gestao_Escolar:notas_usa_dialog" 0 0 0 "VALOR_NOTA" %}`
-      .replace('0', alunoId)
-      .replace('0', gradeId)
-      .replace('0', trimestreId)
-      .replace('VALOR_NOTA', encodeURIComponent(nota));
-
-    window.location.href = url;
+    });
   });
-});
+</script>
 
-  </script>
+<!-- Script: Abertura e Fechamento do Dialog -->
+<script>
+  const dialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}} = 
+    document.getElementById('meudialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}');
 
+  const abrirBtn_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}} = 
+    document.getElementById('abrirdialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}');
 
-  <script>
-    const dialog_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}} = document.getElementById('meuDialog_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}');
-    const abrirBtn_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}} = document.getElementById('abrirDialog_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}');
-    const fecharBtn_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}} = document.getElementById('fecharDialog_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}');
+  const fecharBtn_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}} = 
+    document.getElementById('fechardialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}');
 
-    abrirBtn_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}.addEventListener('click', () => {
-      dialog_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}.show(); // não modal
-    });
+  abrirBtn_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}.addEventListener('click', () => {
+    dialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}.showModal(); 
+  });
 
-    fecharBtn_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}.addEventListener('click', () => {
-      dialog_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}.close();
-    });
-  </script>
+  fecharBtn_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}.addEventListener('click', () => {
+    dialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}.close();
+  });
+</script>

@@ -131,6 +131,7 @@ urlpatterns = [
     path('gestao_turmas/recuperaFinal/<int:aluno_id>/<int:trimestre_id>/', create_or_update_gestao_turmas_recupera, name='recuperaFinal'),
     path('gestao_turmas/media/<int:aluno_id>/', create_or_update_Media_turmas, name='create_or_update_media_turmas'),
     path("notas/<int:matricula>/<int:grade>/<int:trimestre>/<str:nota>/", notas_usa_dialog, name="notas_usa_dialog" ),
+    path("notas/<int:matricula>/<int:grade>/<int:trimestre>/<str:falta>/", faltas_usa_dialog, name="faltas_usa_dialog" ),
     
     # Notas Trimestre
     path('criar-gestao-turma/parecer/<int:turma_id>/', gestao_turmas_parecer, name='criaParecer'), 

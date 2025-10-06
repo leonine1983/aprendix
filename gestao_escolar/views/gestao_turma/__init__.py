@@ -7,6 +7,7 @@ from .list_disciplina import *
 from .detail_GRADE_turmas import *
 
 from .notas import *
+from .faltas import *
 from .gerarHorario import *
 from .conselhoClasse import *
 from .parecerDescritivo import *
