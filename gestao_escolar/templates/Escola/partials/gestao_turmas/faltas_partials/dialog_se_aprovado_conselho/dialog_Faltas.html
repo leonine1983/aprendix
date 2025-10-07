@@ -64,8 +64,7 @@
        max="200"
        step="1" 
        oninput="this.value = this.value.replace(/[^0-9]/g, '');">
-
-  </div>
+    </div>
 
   <div class="dialog-footer flex gap-2">
     <button type="button"
@@ -90,7 +89,7 @@ document.querySelectorAll('.salvar-falta').forEach(btn => {
     const alunoId = this.dataset.aluno;
     const gradeId = this.dataset.grade;
     const trimestreId = this.dataset.trimestre;
-    const input = document.getElementById(`faltasAluno_${alunoId}_${gradeId}_${trimestreId}`);
+    const input = document.getElementById(`faltasAluno_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}`);
     const falta = input.value.trim();
 
     // 🔹 validação: só aceita inteiros
@@ -99,13 +98,8 @@ document.querySelectorAll('.salvar-falta').forEach(btn => {
       input.focus();
       return;
     }
-
-    const url = `{% url "Gestao_Escolar:faltas_usa_dialog" "ALUNO" "GRADE" "TRI" "VALOR_FALTA" %}`
-      .replace("ALUNO", alunoId)
-      .replace("GRADE", gradeId)
-      .replace("TRI", trimestreId)
-      .replace("VALOR_FALTA", encodeURIComponent(falta));
-
+    const url = `{% url "Gestao_Escolar:notas_usa_dialog" aluno.id gestao_turma.grade.id gestao_turma.trimestre_id "VALOR_FALTA" %}`   
+    
     window.location.href = url;
   });
 });

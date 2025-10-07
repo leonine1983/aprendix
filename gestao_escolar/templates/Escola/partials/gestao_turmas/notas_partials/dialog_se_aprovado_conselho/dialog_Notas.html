@@ -43,7 +43,7 @@
 </style>
 
 <!-- Dialog -->
-<dialog id="meudialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}">
+<dialog id="meudialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}">
   <div class="dialog-header-notas">
     <h5 class="mb-0 text-light">{{gestao_turma.grade}} - {{gestao_turma.trimestre}}</h5>
   </div>
@@ -55,7 +55,7 @@
     </p>
 
     <input 
-      id="notaAluno_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}" 
+      id="notaAluno_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}" 
       type="number" 
       class="form-control" 
       placeholder="{{ gestao_turma.notas }}"
@@ -67,7 +67,7 @@
   <div class="dialog-footer flex gap-2">
     <button 
       type="button" 
-      id="fechardialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}" 
+      id="fechardialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}" 
       class="btn btn-secondary">
       Fechar
     </button>
@@ -76,7 +76,7 @@
       class="btn btn-primary salvar-nota" 
       data-aluno="{{aluno.id}}" 
       data-grade="{{gestao_turma.grade.id}}" 
-      data-trimestre="{{gestao_turma.trimestre_id}}">
+      data-trimestre="{{gestao_turma.trimestre.id}}">
       Salvar Notas
     </button>
   </div>
@@ -89,26 +89,30 @@
       const alunoId = this.dataset.aluno;
       const gradeId = this.dataset.grade;
       const trimestreId = this.dataset.trimestre;
+      console.log("Trimestre clicado:", trimestreId);
 
-      const input = document.getElementById(`notaAluno_${alunoId}_${gradeId}_${trimestreId}`);
-      let nota = parseFloat(input.value);
+      const notaInput = document.getElementById(`notaAluno_${alunoId}_${gradeId}_${trimestreId}`);
+      const nota = parseFloat(notaInput.value);
 
       if (isNaN(nota)) {
         alert("Digite uma nota válida!");
-        input.focus();
+        notaInput.focus();
         return;
       }
 
-      // Garante que o valor está entre 0 e 10
-      if (nota < 0) nota = 0;
-      if (nota > 10) nota = 10;
+      const valorNota = Math.min(Math.max(nota, 0), 10);
 
-      // Redireciona para a URL Django
-      const url = `{% url "Gestao_Escolar:notas_usa_dialog" aluno.id gestao_turma.grade.id gestao_turma.trimestre_id "VALOR_NOTA" %}`   
-
+      // ✅ Monta a URL dinamicamente (sem travar o trimestre)
+      const urlBase = "{% url 'Gestao_Escolar:notas_usa_dialog' 0 0 0 0 %}";
+      const url = urlBase
+        .replace('/0/0/0/0/', `/${alunoId}/${gradeId}/${trimestreId}/${valorNota}/`);
+        window.location.href = url;
     });
   });
 </script>
+
+
+
 
 <!-- Script: Abertura e Fechamento do Dialog -->
 <script>

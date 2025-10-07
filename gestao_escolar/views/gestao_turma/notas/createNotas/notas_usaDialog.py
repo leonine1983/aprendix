@@ -13,7 +13,8 @@ def notas_usa_dialog(request, matricula, grade, trimestre, nota):
     aluno = get_object_or_404(Matriculas, pk=matricula)
     disciplina = get_object_or_404(TurmaDisciplina, pk=grade)
     trimestre_nota = get_object_or_404(Trimestre, pk=trimestre)
-    profissional_resp = f'{request.user}'
+    profissional_resp = f'{request.user}'   
+    print(f" a nota do aluno é vindo do form {nota} ") 
 
     # Atualiza se já existir, cria se não existir
     gestao_turma, created = GestaoTurmas.objects.update_or_create(
@@ -25,6 +26,8 @@ def notas_usa_dialog(request, matricula, grade, trimestre, nota):
             "profissional_resp": profissional_resp
         }
     )
+    print(f" a nota do aluno é {gestao_turma.notas}, {gestao_turma.aluno} e {gestao_turma.trimestre} ")
+
     # Para garantir uma unica mensagem por nota salva
     messages.set_level(request, messages.constants.SUCCESS)
     messages.success(request, f"Nota do aluno {aluno} para o {trimestre}º TRIMESTRE, atualizada com sucesso")
