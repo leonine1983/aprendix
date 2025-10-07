@@ -129,18 +129,16 @@
                                                     {% if gestao_turma.grade == disciplina %}
                                                         {% if gestao_turma.trimestre_id == t.id %}
 
-                                                            <button style='' id="abrirDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}" class="btn btn-sm btn-outline-primary  m-1">                                 
-                                                                {% if gestao_turma.faltas is not None %}
-                                                                    <!-- Nº de faltas do aluno por disciplinas-->
-                                                                    {{ gestao_turma.faltas}}
-                                                                    {% else %}
-                                                                        <!-- Se existir faltas do aluno na resultado final, as faltas serão
-                                                                        exibidas, caso contrário, ficará em branco-->
-                                                                        {% if gestao_turma.faltas_total %}
-                                                                            {{gestao_turma.faltas_total}}                                                                       
-                                                                        {% endif %} 
-                                                                {% endif %}
-                                                            </button>
+
+                                                            <button 
+  id="abrirDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}" 
+  class="btn btn-sm btn-outline-primary m-1">
+  {% if gestao_turma.faltas is not None %}
+    {{ gestao_turma.faltas }}
+  {% elif gestao_turma.faltas_total %}
+    {{ gestao_turma.faltas_total }}
+  {% endif %}
+</button>
                                                             {% include "Escola/partials/gestao_turmas/faltas_partials/dialog_se_aprovado_conselho/dialog_Faltas.html" %}  
                                                             <!--End-->                                                                    
                                                         {% endif %}  

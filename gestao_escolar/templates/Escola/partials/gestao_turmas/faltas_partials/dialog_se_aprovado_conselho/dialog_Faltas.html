@@ -1,3 +1,7 @@
+<!-- Botão: abrir diálogo -->
+
+
+<!-- Estilos -->
 <style>
   dialog {
     border: none;
@@ -11,38 +15,29 @@
     transition: all 0.4s ease;
     z-index: 1000;
   }
-
   dialog[open] {
     opacity: 1;
     transform: translateY(0);
   }
-
   .dialog-header {
     background: #fd0da1ff;
     color: white;
     padding: 1rem;
     border-radius: 1rem 1rem 0 0;
   }
-
   .dialog-body {
     padding: 1rem;
   }
-
   .dialog-footer {
     padding: 0.75rem 1rem;
     text-align: right;
     border-top: 1px solid #ddd;
     border-radius: 0 0 1rem 1rem;
   }
-
-  .text {
-    font-size: 0.50rem;
-    border: 0.1rem solid blue;
-    width: 100%;
-  }
 </style>
 
-<dialog id="meuDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}">
+<!-- Diálogo -->
+<dialog id="meuDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}">
   <div class="dialog-header">
     <h5 class="mb-0 text-light">
       FALTAS: {{gestao_turma.grade}} - {{gestao_turma.trimestre}}
@@ -52,44 +47,59 @@
   <div class="dialog-body">
     <p>
       <i class="fa-solid fa-pen-to-square me-1"></i>
-      Lance ou atualize as <b>FALTAS</b> do aluno para o
+      Lance ou atualize as <b>faltas</b> do aluno para o 
       <span class="text-uppercase">{{gestao_turma.trimestre}}</span>.
     </p>
 
-    <input id="faltasAluno_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}"
-       type="number"
-       class="form-control"
-       placeholder="{{ gestao_turma.faltas }}"
-       min="0"
-       max="200"
-       step="1" 
-       oninput="this.value = this.value.replace(/[^0-9]/g, '');">
-    </div>
+    <input 
+      id="faltasAluno_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}"
+      type="number"
+      class="form-control"
+      placeholder="{{ gestao_turma.faltas }}"
+      min="0"
+      max="200"
+      step="1"
+      oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+  </div>
 
   <div class="dialog-footer flex gap-2">
-    <button type="button"
-            id="fecharDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}"
-            class="btn btn-secondary">
+    <button 
+      type="button"
+      id="fecharDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}"
+      class="btn btn-secondary">
       Fechar
     </button>
 
-    <button type="button"
-            class="btn btn-primary salvar-falta"
-            data-aluno="{{aluno.id}}"
-            data-grade="{{gestao_turma.grade.id}}"
-            data-trimestre="{{gestao_turma.trimestre_id}}">
+    <button 
+      type="button"
+      class="btn btn-primary salvar-falta"
+      data-aluno="{{aluno.id}}"
+      data-grade="{{gestao_turma.grade.id}}"
+      data-trimestre="{{gestao_turma.trimestre.id}}">
       Salvar faltas
     </button>
   </div>
 </dialog>
 
+<!-- Script: abrir/fechar diálogo -->
+<script>
+const dialogF = document.getElementById('meuDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}');
+const abrirF = document.getElementById('abrirDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}');
+const fecharF = document.getElementById('fecharDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}');
+
+abrirF.addEventListener('click', () => dialogF.show());
+fecharF.addEventListener('click', () => dialogF.close());
+</script>
+
+<!-- Script: salvar faltas -->
 <script>
 document.querySelectorAll('.salvar-falta').forEach(btn => {
   btn.addEventListener('click', function() {
     const alunoId = this.dataset.aluno;
     const gradeId = this.dataset.grade;
     const trimestreId = this.dataset.trimestre;
-    const input = document.getElementById(`faltasAluno_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}`);
+
+    const input = document.getElementById(`faltasAluno_${alunoId}_${gradeId}_${trimestreId}`);
     const falta = input.value.trim();
 
     // 🔹 validação: só aceita inteiros
@@ -98,19 +108,12 @@ document.querySelectorAll('.salvar-falta').forEach(btn => {
       input.focus();
       return;
     }
-    const url = `{% url "Gestao_Escolar:notas_usa_dialog" aluno.id gestao_turma.grade.id gestao_turma.trimestre_id "VALOR_FALTA" %}`   
-    
+
+    // 🔹 Monta a URL dinamicamente (sem travar o trimestre)
+    const url = `/Gestao_Escolar/faltas_usa_dialog/${alunoId}/${gradeId}/${trimestreId}/${falta}/`;
+
+    // Redireciona para a rota Django
     window.location.href = url;
   });
 });
-
-</script>
-
-<script>
-const dialog = document.getElementById('meuDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}');
-const abrirBtn = document.getElementById('abrirDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}');
-const fecharBtn = document.getElementById('fecharDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}');
-
-abrirBtn.addEventListener('click', () => dialog.show());
-fecharBtn.addEventListener('click', () => dialog.close());
 </script>
