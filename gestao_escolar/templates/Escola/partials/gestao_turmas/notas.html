@@ -91,6 +91,8 @@
                                                                             <!-- Atualizar notas -->    
                                                                                                
                                                                             {% if not aluno.aprovado_conselho %}  
+                                                                            <!--Verifica se o aluno passou pelo conselhor, se ainda não passou e edição ou inserimento de 
+                                                                            notas esta ativa-->
                                                                                 <button 
                                                                                 id="abrirdialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}" 
                                                                                 class="btn btn-sm btn-outline-primary m-1">                                 
@@ -102,6 +104,7 @@
                                                                                 </button>
                                                                                 {% include "Escola/partials/gestao_turmas/notas_partials/dialog_se_aprovado_conselho/dialog_Notas.html" %}
                                                                                 {% else %}
+                                                                                <!--Caso contrário, as notas não poderão ser alteradas-->
                                                                                     {% if gestao_turma.notas %}
                                                                                         {{ gestao_turma.notas }}
                                                                                     {% endif %}
@@ -134,18 +137,27 @@
                                                 {% for gestao_turma in aluno.gestao_turmas_related.all %}
                                                     {% if gestao_turma.grade == disciplina %}
                                                         {% if gestao_turma.trimestre_id == t.id %}
-                                                           <!-- Botão: abrir diálogo faltas-->
-                                                            <button 
-                                                            id="abrirDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}" 
-                                                            class="btn btn-sm btn-outline-danger m-1 abrir-dialog-faltas">
-                                                            {% if gestao_turma.faltas is not None %}
-                                                                {{ gestao_turma.faltas }}
-                                                            {% elif gestao_turma.faltas_total %}
-                                                                {{ gestao_turma.faltas_total }}
-                                                            {% endif %}
-                                                            </button>
-                                                            {% include "Escola/partials/gestao_turmas/faltas_partials/dialog_se_aprovado_conselho/dialog_Faltas.html" %}  
-                                                            <!--End-->                                                                    
+                                                            {% if not aluno.aprovado_conselho %}  
+                                                                <!--Verifica se o aluno passou pelo conselhor, se ainda não passou e edição ou inserimento de 
+                                                                notas esta ativa-->
+                                                                <!-- Botão: abrir diálogo faltas-->
+                                                                    {% if gestao_turma.faltas is not None %}
+                                                                        <button 
+                                                                        id="abrirDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}" 
+                                                                        class="btn btn-sm btn-outline-danger m-1 abrir-dialog-faltas">
+                                                                            {{ gestao_turma.faltas }}     
+                                                                        </button>
+                                                                        {% include "Escola/partials/gestao_turmas/faltas_partials/dialog_se_aprovado_conselho/dialog_Faltas.html" %}  
+                                                                        {% else %}
+                                                                            {{ gestao_turma.faltas_total }}  
+                                                                    {% endif %}
+                                                                <!--End--> 
+                                                                {% else %}
+                                                                {% if gestao_turma.faltas is not None %}
+                                                                        {{ gestao_turma.faltas }}
+                                                                    {% elif gestao_turma.faltas_total %}
+                                                                        {{ gestao_turma.faltas_total }}                                                               {% endif %}
+                                                            {% endif %}                                                                  
                                                         {% endif %} 
                                                     {% endif %}
                                                 {% endfor %}
