@@ -1,5 +1,51 @@
-<!-- Botão: abrir diálogo -->
 
+
+<!-- Diálogo -->
+<dialog 
+  id="meuDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}" 
+  class="dialog-faltas">
+  <div class="dialog-header">
+    <h5 class="mb-0 text-light">
+      FALTAS: {{gestao_turma.grade}} - {{gestao_turma.trimestre}}
+    </h5>
+  </div>
+
+  <div class="dialog-body">
+    <p>
+      <i class="fa-solid fa-pen-to-square me-1"></i>
+      Lance ou atualize as <b>faltas</b> do aluno para o 
+      <span class="text-uppercase">{{gestao_turma.trimestre}}</span>.
+    </p>
+
+    <input 
+      id="faltasAluno_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}"
+      type="number"
+      class="form-control"
+      placeholder="{{ gestao_turma.faltas }}"
+      min="0"
+      max="200"
+      step="1"
+      oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+  </div>
+
+  <div class="dialog-footer flex gap-2">
+    <button 
+      type="button"
+      id="fecharDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}"
+      class="btn btn-secondary fechar-dialog-faltas">
+      Fechar
+    </button>
+
+    <button 
+      type="button"
+      class="btn btn-primary salvar-falta"
+      data-aluno="{{aluno.id}}"
+      data-grade="{{gestao_turma.grade.id}}"
+      data-trimestre="{{gestao_turma.trimestre.id}}">
+      Salvar faltas
+    </button>
+  </div>
+</dialog>
 
 <!-- Estilos -->
 <style>
@@ -36,59 +82,22 @@
   }
 </style>
 
-<!-- Diálogo -->
-<dialog id="meuDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}">
-  <div class="dialog-header">
-    <h5 class="mb-0 text-light">
-      FALTAS: {{gestao_turma.grade}} - {{gestao_turma.trimestre}}
-    </h5>
-  </div>
-
-  <div class="dialog-body">
-    <p>
-      <i class="fa-solid fa-pen-to-square me-1"></i>
-      Lance ou atualize as <b>faltas</b> do aluno para o 
-      <span class="text-uppercase">{{gestao_turma.trimestre}}</span>.
-    </p>
-
-    <input 
-      id="faltasAluno_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}"
-      type="number"
-      class="form-control"
-      placeholder="{{ gestao_turma.faltas }}"
-      min="0"
-      max="200"
-      step="1"
-      oninput="this.value = this.value.replace(/[^0-9]/g, '');">
-  </div>
-
-  <div class="dialog-footer flex gap-2">
-    <button 
-      type="button"
-      id="fecharDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}"
-      class="btn btn-secondary">
-      Fechar
-    </button>
-
-    <button 
-      type="button"
-      class="btn btn-primary salvar-falta"
-      data-aluno="{{aluno.id}}"
-      data-grade="{{gestao_turma.grade.id}}"
-      data-trimestre="{{gestao_turma.trimestre.id}}">
-      Salvar faltas
-    </button>
-  </div>
-</dialog>
-
-<!-- Script: abrir/fechar diálogo -->
+<!-- Script: controle de todos os diálogos -->
 <script>
-const dialogF = document.getElementById('meuDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}');
-const abrirF = document.getElementById('abrirDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}');
-const fecharF = document.getElementById('fecharDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}');
+document.querySelectorAll('.abrir-dialog-faltas').forEach(botaoAbrir => {
+  const ids = botaoAbrir.id.split('_'); // ['abrirDialog','faltas', aluno, grade, trimestre]
+  const alunoId = ids[2];
+  const gradeId = ids[3];
+  const trimestreId = ids[4];
 
-abrirF.addEventListener('click', () => dialogF.show());
-fecharF.addEventListener('click', () => dialogF.close());
+  const dialog = document.getElementById(`meuDialog_faltas_${alunoId}_${gradeId}_${trimestreId}`);
+  const fechar = document.getElementById(`fecharDialog_faltas_${alunoId}_${gradeId}_${trimestreId}`);
+
+  if (dialog && fechar) {
+    botaoAbrir.addEventListener('click', () => dialog.show());
+    fechar.addEventListener('click', () => dialog.close());
+  }
+});
 </script>
 
 <!-- Script: salvar faltas -->
@@ -109,10 +118,10 @@ document.querySelectorAll('.salvar-falta').forEach(btn => {
       return;
     }
 
-    // 🔹 Monta a URL dinamicamente (sem travar o trimestre)
-    const url = `/Gestao_Escolar/faltas_usa_dialog/${alunoId}/${gradeId}/${trimestreId}/${falta}/`;
+    // 🔹 Monta URL dinamicamente com namespace Django
+    const urlBase = "{% url 'Gestao_Escolar:faltas_usa_dialog' 0 0 0 'FALTAS' %}";
+    const url = urlBase.replace('/0/0/0/FALTAS/', `/${alunoId}/${gradeId}/${trimestreId}/${falta}/`);
 
-    // Redireciona para a rota Django
     window.location.href = url;
   });
 });
