@@ -13,7 +13,8 @@ from gestao_escolar.models import MatriculasOnline
 from django.contrib import messages
 from .contexto_dados_escolares import get_contexto_escola
 from django.db.models import Count, Q
-from gestao_escolar.views.gestao_turma.faltas import busca_ativa
+from gestao_escolar.views.gestao_turma.faltas.busca_ativa import obter_alunos_risco_evasao
+
 
 class MatriculasOnlineForm(forms.ModelForm):
     class Meta:
