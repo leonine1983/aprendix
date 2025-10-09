@@ -73,4 +73,3 @@ def gestao_turmas_update_view(request, pk):
     }
        
     return render(request, 'Escola/inicio.html', context)
-

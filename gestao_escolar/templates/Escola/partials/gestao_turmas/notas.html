@@ -35,25 +35,21 @@
                         <table class="win11-table mt-5">
                             <thead>
                                 <tr>
-                                    <th rowspan="2">Nº</th>
+                                    <th rowspan="2" class='col-1'>Nº</th>
                                     <th rowspan="2">Alunos</th>
                                     {% for d in disciplinas %}
                                         {% if t.final %}
-                                            <th colspan="3" style="background-color: rgb(146, 161, 161) !important;color: rgb(2, 40, 73);">{{d.disciplina}}</th>
+                                            <th colspan="3" style="background-color: rgb(146, 161, 161) !important;color: rgb(2, 40, 73);">{{d.disciplina}} {{t}}</th>
                                             {% else %}
-                                                <th colspan="2" style="background-color: rgb(146, 161, 161) !important;color: rgb(2, 40, 73);">{{d.disciplina}}</th>
+                                                <th colspan="2" style="background-color: rgb(146, 161, 161) !important;color: rgb(2, 40, 73);">{{d.disciplina}}</br> {{t}}</th>
                                         {% endif %}
                                     {% endfor %}
                                     {% if t.final %}
                                         <th rowspan="2" >Situação do aluno na Final</th>
                                         <th rowspan='2'>Situação Recuperação</th>
-                                        <th rowspan="2">Media anterior ao Conselho {{aluno.gestao_turmas_related.last.aprovado}}</th>   
-                                        <th colspan="2">ação</th> 
-                                        {% else %}  
+                                        <th rowspan="2">Media anterior ao Conselho {{aluno.gestao_turmas_related.last.aprovado}}</th>  
                                         <th rowspan="2">ação</th>                                                                        
                                     {% endif %}
-                                    
-                                    
                                 </tr>
                                 <tr>
                                     {% for disciplina in disciplinas %}
@@ -97,7 +93,7 @@
                                                                                 id="abrirdialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}" 
                                                                                 class="btn btn-sm btn-outline-primary m-1">                                 
                                                                                 {% if gestao_turma.notas %}
-                                                                                    {{ gestao_turma.notas }}
+                                                                                    <span class=' {% if gestao_turma.notas < 5 %} text-danger {% endif %}'>{{ gestao_turma.notas }}</span>
                                                                                 {% else %}
                                                                                     not
                                                                                 {% endif %}
@@ -113,7 +109,7 @@
                                                                         </span>                                                               
                                                                     {% else %}
                                                                 {% endif %} 
-                                                                {% else %} 
+                                                            {% else %}
                                                                 {% if gestao_turma.media_final is not None  %}                                                                        
                                                                     {% if gestao_turma.media_final < 5  %}
                                                                         <span class="text-danger">
@@ -239,20 +235,7 @@
                                                         
                                                     {% else %}
                                                 {% endif %}
-                                            </td>                                            
-                                            {% else %}
-                                                <td>
-                                                    {% for aFinal in aluno.gestao_turmas_related.all  %}
-                                                        {% if aFinal.trimestre.final %}
-                                                            {% if aFinal.conselho_classe %}
-                                                                <!-- Caso o aluno tenha sido aprovado pelo conselho  --> 
-                                                                    {% url '#' as editar_url %}
-                                                                    {% include "Escola/components/linkInfo.html" with link=editar_url title="O aluno foi aprovado pelo Conselho de Classe. Não é mais possível realizar novos lançamentos de notas." label="Aprovado Conselho" %}                                                                                                                              
-                                                                {% else %}                                                                   
-                                                             {% endif %}
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </td>                                                       
+                                            </td>                                                
                                         {% endif %}                                                                                
                                         
                                     </tr>

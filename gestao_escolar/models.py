@@ -718,7 +718,7 @@ class GestaoTurmas(models.Model):
 
     def __str__(self):
         return self.aluno.aluno.nome_completo
-    
+    """
     def save(self, *args, **kwargs):
         from modulo_professor.models import ComposicaoNotas
         from django.utils.timezone import now        
@@ -769,15 +769,80 @@ class GestaoTurmas(models.Model):
             if final_turma:
                 # Evita recursão: atualiza diretamente com .update()
                 GestaoTurmas.objects.filter(pk=final_turma.pk).update(faltas_total=total_faltas)  
-    
-    class Meta:
-            constraints = [
-                models.UniqueConstraint(
-                    fields=['aluno', 'grade', 'trimestre'],
-                    name='unique_gestao_turmas'
-                )
-            ]
+    """    
 
+    def save(self, *args, **kwargs):
+        from django.db.models import Avg, Sum
+        from modulo_professor.models import ComposicaoNotas
+
+        # Evita loop infinito
+        if getattr(self, '_atualizando_por_composicao', False):
+            super().save(*args, **kwargs)
+            return
+
+        super().save(*args, **kwargs)
+
+        # Atualiza ComposicaoNotas se houver nota
+        if self.notas is not None:
+            comp_nota, created = ComposicaoNotas.objects.get_or_create(
+                aluno=self.aluno,
+                grade=self.grade,
+                trimestre=self.trimestre,
+                defaults={'nota_final': self.notas}
+            )
+            mensagem = f"Nota atualizada por {self.profissional_resp}"
+            if not created:
+                comp_nota.nota_final = self.notas
+                comp_nota.anotacoes = f"{comp_nota.anotacoes}\n{mensagem}" if comp_nota.anotacoes else mensagem
+            else:
+                comp_nota.anotacoes = mensagem
+            comp_nota._atualizando_por_gestao = True
+            comp_nota.save()
+
+        # Calcula média de todos os trimestres que NÃO são finais
+        media = GestaoTurmas.objects.filter(
+            aluno=self.aluno,
+            grade=self.grade,
+            trimestre__final=False,
+            notas__isnull=False
+        ).aggregate(media=Avg('notas'))['media'] or 0
+
+        # Atualiza todos os registros do mesmo aluno/grade sem disparar save()
+        GestaoTurmas.objects.filter(
+            aluno=self.aluno,
+            grade=self.grade
+        ).update(media_final=media)
+
+        # Atualiza faltas total do trimestre final (sem chamar save()!)
+        total_faltas = GestaoTurmas.objects.filter(
+            aluno=self.aluno,
+            grade=self.grade,
+            trimestre__final=False
+        ).aggregate(total=Sum('faltas'))['total'] or 0
+
+        # Cria ou atualiza o trimestre final
+        final_turma = GestaoTurmas.objects.filter(
+            aluno=self.aluno,
+            grade=self.grade,
+            trimestre__final=True
+        ).first()
+
+        if final_turma:
+            GestaoTurmas.objects.filter(pk=final_turma.pk).update(
+                media_final=media,
+                faltas_total=total_faltas
+            )
+        else:
+            # Se não existir, criamos sem chamar save() do self
+            Trimestre_final = Trimestre.objects.filter(final=True).first()
+            if Trimestre_final:
+                GestaoTurmas.objects.create(
+                    aluno=self.aluno,
+                    grade=self.grade,
+                    trimestre=Trimestre_final,
+                    media_final=media,
+                    faltas_total=total_faltas
+                )
 
 
         
