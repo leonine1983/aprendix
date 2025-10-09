@@ -13,6 +13,7 @@ from gestao_escolar.models import MatriculasOnline
 from django.contrib import messages
 from .contexto_dados_escolares import get_contexto_escola
 from django.db.models import Count, Q
+from gestao_escolar.views.gestao_turma.faltas import busca_ativa
 
 class MatriculasOnlineForm(forms.ModelForm):
     class Meta:
@@ -224,6 +225,12 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
 
         context["matriculas_all"] = turmas_info
         context["vagas_disponiveis_total"] = totais
+
+        # Chama a função que retorna o contexto dos alunos em risco
+        contexto_risco = obter_alunos_risco_evasao(self.request)
+
+        # Atualiza o contexto da view com os dados retornados pela função
+        context.update(contexto_risco)
 
         return context
 
