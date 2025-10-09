@@ -113,6 +113,135 @@
             </div>
             
         </div>
+
+
+
+
+
+
+
+        
+
+
+    
+{% if not alunos_em_risco %}
+<!-- Botão estilizado -->
+<button id="btnBuscaAtiva" style="
+    position: fixed;
+    top: 20px;
+    right: 50%;
+    z-index: 2000;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+">
+    Mostrar alunos em busca ativa
+</button>
+
+<!-- Painel flutuante com transição suave -->
+<div id="divBuscaAtiva" style="
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow-y: auto;
+    background-color: rgba(0,0,0,0.8);
+    color: #fff;
+    padding: 40px;
+    z-index: 1999;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+">
+    <div style="
+        background-color: #f8f9fa;
+        color: #000;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 90%;
+        margin: auto;
+    ">
+        <h1>{{ title }}</h1>
+        <p>{{ descricao }}</p>
+
+        <table class="table table-bordered">
+            <tr>
+                <th>Aluno</th>
+                <th>Turma</th>
+                <th>Disciplina</th>
+                <th>Faltas</th>
+                <th>Carga Horária</th>
+                <th>% Faltas</th>
+                <th>Notas</th>
+            </tr>
+            {% for aluno in alunos_em_risco %}
+            <tr>
+                <td>{{ aluno.aluno }}</td>
+                <td>{{ aluno.turma }}</td>
+                <td>{{ aluno.disciplina }}</td>
+                <td>{{ aluno.faltas }}</td>
+                <td>{{ aluno.carga_horaria_anual }}</td>
+                <td>{{ aluno.percentual_faltas }}%</td>
+                <td>{{ aluno.notas }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnBuscaAtiva = document.getElementById('btnBuscaAtiva');
+    const divBuscaAtiva = document.getElementById('divBuscaAtiva');
+
+    btnBuscaAtiva.addEventListener('click', function() {
+        if (divBuscaAtiva.style.display === 'none' || divBuscaAtiva.style.display === '') {
+            divBuscaAtiva.style.display = 'block';
+            setTimeout(() => divBuscaAtiva.style.opacity = 1, 10); // suaviza a transição
+            btnBuscaAtiva.textContent = 'Ocultar alunos em busca ativa';
+        } else {
+            divBuscaAtiva.style.opacity = 0;
+            setTimeout(() => divBuscaAtiva.style.display = 'none', 500); // aguarda a transição
+            btnBuscaAtiva.textContent = 'Mostrar alunos em busca ativa';
+        }
+    });
+
+    // Botão hover efeito
+    btnBuscaAtiva.addEventListener('mouseover', () => {
+        btnBuscaAtiva.style.backgroundColor = '#0056b3';
+        btnBuscaAtiva.style.boxShadow = '0 6px 8px rgba(0,0,0,0.3)';
+    });
+    btnBuscaAtiva.addEventListener('mouseout', () => {
+        btnBuscaAtiva.style.backgroundColor = '#007bff';
+        btnBuscaAtiva.style.boxShadow = '0 4px 6px rgba(0,0,0,0.2)';
+    });
+});
+</script>
+{% endif %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     {% if  conteudo_page == 'create_users'  %}
         {% include 'Escola/partials/usuarios/createUsers.html' %}
@@ -469,5 +598,17 @@ var datepickersList = datepickers.map(function (el) {
 
 
     <canvas id="c"></canvas>
+
+
+
+
+
+
+
+
+
+
+
+    
 {% endblock script_footer %} 
 {% endblock main %}
