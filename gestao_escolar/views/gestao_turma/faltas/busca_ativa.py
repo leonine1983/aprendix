@@ -22,12 +22,12 @@ def obter_alunos_risco_evasao(request):
             'descricao': "Ano letivo ou escola não definidos na sessão.",
             'alunos_em_risco': []
         }
-
+    
     # Buscar alunos matriculados no ano e na escola
     matriculas = Matriculas.objects.filter(
         turma__ano_letivo_id=ano,
         turma__escola_id=escola_id
-    ).select_related('turma', 'aluno')
+    ).select_related('turma', 'aluno')    
 
     alunos_em_risco = []
 
@@ -36,23 +36,35 @@ def obter_alunos_risco_evasao(request):
             aluno=matricula,
             grade__turma=matricula.turma
         ).select_related('grade', 'grade__disciplina', 'trimestre')
+        
 
-        for registro in gestao_turmas:
-            if not registro.faltas_total or not registro.grade.carga_horaria_anual:
-                continue  # Ignora registros sem dados suficientes
+        for registro in gestao_turmas:  
 
-            percentual_faltas = (registro.faltas_total / registro.grade.carga_horaria_anual) * 100
+            if not registro.faltas or not registro.grade.carga_horaria_anual:                
+                continue  # Ignora registros sem dados suficientes                 
+            
+            if not registro.faltas_total or not registro.grade.carga_horaria_anual:                
+                continue  # Ignora registros sem dados suficientes            
 
-            if percentual_faltas >= 15:  # Alerta de risco
+            percentual_faltas = (registro.faltas / registro.grade.carga_horaria_anual) * 100
+            print(f'o percentual de faltas de ({registro.faltas} / {registro.grade.carga_horaria_anual}) * 100 = {percentual_faltas} ')
+            percentual_faltas_total = (registro.faltas_total / registro.grade.carga_horaria_anual) * 100
+
+            if percentual_faltas >= 15:  # Alerta de risco                
                 alunos_em_risco.append({
+                    'matricula_id': matricula.id,
                     'aluno': matricula.aluno.nome_completo,
-                    'turma': matricula.turma.nome,
+                    'turma': matricula.turma,
                     'disciplina': registro.grade.disciplina.nome,
-                    'faltas': registro.faltas_total,
+                    'faltas': registro.faltas,
+                    'percentual_faltas': round(percentual_faltas,2),
+                    'faltas_total': registro.faltas_total,
+                    'trimestre': registro.trimestre,
                     'carga_horaria_anual': registro.grade.carga_horaria_anual,
-                    'percentual_faltas': round(percentual_faltas, 2),
+                    'percentual_faltas_anual': round(percentual_faltas_total, 2),
                     'notas': registro.notas
                 })
+                
 
     contexto = {
         'title': "Alunos em risco de evasão escolar",

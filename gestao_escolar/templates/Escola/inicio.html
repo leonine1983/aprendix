@@ -124,24 +124,39 @@
 
 
     
-{% if not alunos_em_risco %}
+{% if alunos_em_risco %}
 <!-- Botão estilizado -->
 <button id="btnBuscaAtiva" style="
     position: fixed;
-    top: 20px;
-    right: 50%;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 2000;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
+    width: 280px;
+    height: 70px;
+    background: rgba(160, 160, 160, 0.1);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #f5f5f5;
+    border-bottom-left-radius: 50%;
+    border-bottom-right-radius: 50%;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.3),
+                0 4px 10px rgba(0,0,0,0.4);
     cursor: pointer;
-    font-size: 14px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    transition: all 0.3s ease;
+    font-family: 'Segoe UI', sans-serif;
+    transition: all 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 ">
-    Mostrar alunos em busca ativa
+    <div style="display:flex; align-items:center; gap:8px; font-size:18px; font-weight:600;">
+        ⚠️ <span>Risco de Evasão</span>
+    </div>
+    <small style="font-size:12px; font-weight:400; color:#e0e0e0;">Fazer busca ativa </small>
 </button>
 
 <!-- Painel flutuante com transição suave -->
@@ -170,29 +185,59 @@
     ">
         <h1>{{ title }}</h1>
         <p>{{ descricao }}</p>
+<style>
+.table tr[data-cor="par"] {
+  background-color: #f5b3b3ff;
+}
+.table tr[data-cor="impar"] {
+  background-color: #e0e0e0;
+}
+.table tr:hover {
+  background-color: #d0d0d0;
+}
+</style>
+<table class="table table-bordered">
+  <tr style="background-color: #ccc;">
+    <th>Aluno</th>
+    <th>Turma</th>
+    <th>Disciplina</th>
+    <th>Trimestre</th>
+    <th>Faltas </br> Trimestral</th>
+    <th>% Faltas </br> Trimestral</th>
+    <th>Faltas</br> Anual</th>
+    <th>% Faltas </br> Anual</th>
+    <th>Carga Horária </br>Disciplina</th>    
+    <th>Notas</th>
+  </tr>
 
-        <table class="table table-bordered">
-            <tr>
-                <th>Aluno</th>
-                <th>Turma</th>
-                <th>Disciplina</th>
-                <th>Faltas</th>
-                <th>Carga Horária</th>
-                <th>% Faltas</th>
-                <th>Notas</th>
-            </tr>
-            {% for aluno in alunos_em_risco %}
-            <tr>
-                <td>{{ aluno.aluno }}</td>
-                <td>{{ aluno.turma }}</td>
-                <td>{{ aluno.disciplina }}</td>
-                <td>{{ aluno.faltas }}</td>
-                <td>{{ aluno.carga_horaria_anual }}</td>
-                <td>{{ aluno.percentual_faltas }}%</td>
-                <td>{{ aluno.notas }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+  {% regroup alunos_em_risco by matricula_id as grupos_alunos %}
+  
+  {% for grupo in grupos_alunos %}
+    {% cycle 'par' 'impar' as cor %}
+    {% for aluno in grupo.list %}
+      <tr data-cor="{{ cor }}">
+        <td>{{ aluno.aluno }}</td>
+        <td>{{ aluno.turma }}</td>
+        <td>{{ aluno.disciplina }}</td>
+        <td>{{ aluno.trimestre }}</td>
+        <td>{{ aluno.faltas }}</td>
+        <td>{{ aluno.percentual_faltas }}%</td>
+
+        {% if forloop.first %}
+            <!-- Mesclando as colunas anuais com alinhamento vertical -->
+            <td rowspan="{{ grupo.list|length }}" style="text-align:center; vertical-align: middle;">{{ aluno.faltas_total }}</td>
+            <td rowspan="{{ grupo.list|length }}" style="text-align:center; vertical-align: middle;">{{ aluno.percentual_faltas_anual }}%</td>
+            <td rowspan="{{ grupo.list|length }}" style="text-align:center; vertical-align: middle;">{{ aluno.carga_horaria_anual }} horas aula</td>
+        {% endif %}
+
+
+        <td>{{ aluno.notas }}</td>
+      </tr>
+    {% endfor %}
+  {% endfor %}
+</table>
+
+
     </div>
 </div>
 

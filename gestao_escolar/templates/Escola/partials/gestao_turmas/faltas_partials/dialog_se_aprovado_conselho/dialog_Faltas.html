@@ -113,8 +113,13 @@ document.querySelectorAll('.salvar-falta').forEach(btn => {
 
     // 🔹 validação: só aceita inteiros
     if (!/^\d+$/.test(falta)) {
-      alert("Digite um número inteiro válido para as faltas.");
-      input.focus();
+      // Usa confirm() em vez de alert(), para permitir Cancelar
+      const confirmar = confirm("⚠️ Digite um número inteiro válido para as faltas.\n\nClique em OK para tentar novamente ou Cancelar para sair.");
+      if (confirmar) {
+        input.focus();
+      } else {
+        input.value = ""; // limpa o campo se quiser
+      }
       return;
     }
 
@@ -126,3 +131,4 @@ document.querySelectorAll('.salvar-falta').forEach(btn => {
   });
 });
 </script>
+
