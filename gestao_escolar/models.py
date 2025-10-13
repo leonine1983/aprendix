@@ -715,6 +715,7 @@ class GestaoTurmas(models.Model):
     conselho_classe = models.BooleanField(default=False)
 
     aprovado = models.BooleanField(default=False)
+    reprovado_faltas = models.BooleanField(default=False)
 
     def __str__(self):
         return self.aluno.aluno.nome_completo
@@ -808,17 +809,28 @@ class GestaoTurmas(models.Model):
             notas__isnull=False
         ).aggregate(media=Avg('notas'))['media'] or 0
 
-        # 🔹 Calcula total de faltas de todos os trimestres não finais
+        # 🔹 Calcula total de faltas em todos os trimestres
         total_faltas = GestaoTurmas.objects.filter(
             aluno=self.aluno,
             grade=self.grade
         ).aggregate(total=Sum('faltas'))['total'] or 0
 
-        # 🔹 Atualiza média e total de faltas em TODOS os trimestres do mesmo aluno/grade
+        # 🔹 Atualiza média e total de faltas em todos os registros do aluno/grade
         GestaoTurmas.objects.filter(
             aluno=self.aluno,
             grade=self.grade
         ).update(media_final=media, faltas_total=total_faltas)
+
+        # 🔹 Reprovação automática por faltas
+        if self.grade and self.grade.carga_horaria_anual:
+            limite_faltas = self.grade.carga_horaria_anual * 0.25  # 25% do total
+            reprovado = total_faltas >= limite_faltas
+
+            # Atualiza o campo reprovado_faltas em todos os registros do aluno/grade
+            GestaoTurmas.objects.filter(
+                aluno=self.aluno,
+                grade=self.grade
+            ).update(reprovado_faltas=reprovado)
 
         # 🔹 Garante que o trimestre final exista
         final_turma = GestaoTurmas.objects.filter(
@@ -828,18 +840,16 @@ class GestaoTurmas(models.Model):
         ).first()
 
         if not final_turma:
-            Trimestre_final = Trimestre.objects.filter(final=True).first()
-            if Trimestre_final:
+            trimestre_final = Trimestre.objects.filter(final=True).first()
+            if trimestre_final:
                 GestaoTurmas.objects.create(
                     aluno=self.aluno,
                     grade=self.grade,
-                    trimestre=Trimestre_final,
+                    trimestre=trimestre_final,
                     media_final=media,
-                    faltas_total=total_faltas
+                    faltas_total=total_faltas,
+                    reprovado_faltas=reprovado  # já cria com o valor correto
                 )
-
-
-
         
     
 class ParecerDescritivo(models.Model):

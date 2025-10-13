@@ -141,7 +141,7 @@
                                                                         <button 
                                                                         id="abrirDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}" 
                                                                         class="btn btn-sm btn-outline-danger m-1 abrir-dialog-faltas">
-                                                                            {{ gestao_turma.faltas }}     
+                                                                            {{ gestao_turma.faltas }}  
                                                                         </button>
                                                                         {% include "Escola/partials/gestao_turmas/faltas_partials/dialog_se_aprovado_conselho/dialog_Faltas.html" %}  
                                                                         {% else %}
@@ -150,9 +150,10 @@
                                                                 <!--End--> 
                                                                 {% else %}
                                                                 {% if gestao_turma.faltas is not None %}
-                                                                        {{ gestao_turma.faltas }}
+                                                                        {{ gestao_turma.faltas }} 
                                                                     {% elif gestao_turma.faltas_total %}
-                                                                        {{ gestao_turma.faltas_total }}                                                               {% endif %}
+                                                                        {{ gestao_turma.faltas_total }}                                                              
+                                                                {% endif %}
                                                             {% endif %}                                                                  
                                                         {% endif %} 
                                                     {% endif %}
