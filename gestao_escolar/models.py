@@ -493,7 +493,7 @@ class Matriculas(models.Model):
     aprovado = models.BooleanField(default=False)
     aprovado_conselho = models.BooleanField(default=False)
     aprovado_recupera = models.BooleanField(default=False)
-    naoFoi_a_recupera = models.BooleanField(default=False)
+    foi_a_recupera = models.BooleanField(default=False)
     
 
     @receiver(post_save)
@@ -716,61 +716,11 @@ class GestaoTurmas(models.Model):
 
     aprovado = models.BooleanField(default=False)
     reprovado_faltas = models.BooleanField(default=False)
+    reprovado_faltas_disciplina = models.CharField(max_length=200, null=True)
 
     def __str__(self):
         return self.aluno.aluno.nome_completo
-    """
-    def save(self, *args, **kwargs):
-        from modulo_professor.models import ComposicaoNotas
-        from django.utils.timezone import now        
-        from django.db.models import Sum
-
-        # 🔁 FLAG: Verifica se o salvamento está sendo feito por ComposicaoNotas.
-        # Se sim, salva normalmente sem voltar a atualizar ComposicaoNotas.
-        if getattr(self, '_atualizando_por_composicao', False):
-            super().save(*args, **kwargs)
-            return
-
-        super().save(*args, **kwargs)
-
-        # Atualiza ou cria o registro correspondente em ComposicaoNotas
-        if self.notas is not None:
-            comp_nota, created = ComposicaoNotas.objects.get_or_create(
-                aluno=self.aluno,
-                grade=self.grade,
-                trimestre=self.trimestre,
-                defaults={'nota_final': self.notas}
-            )
-
-            mensagem = f"<div class='d-block p-1 bg-info m-1 rounded-1'>Nota inserida pela Gestão de Turmas pelo usuário {self.profissional_resp} em {now().strftime('%d/%m/%Y %H:%M')}</div>"
-            if not created:
-                comp_nota.nota_final = self.notas
-                comp_nota.anotacoes = f"{comp_nota.anotacoes}\n{mensagem}" if comp_nota.anotacoes else mensagem
-            else:
-                comp_nota.anotacoes = mensagem
-
-            # 🔁 FLAG: Indica que o salvamento está sendo disparado por Gestão de Turmas
-            comp_nota._atualizando_por_gestao = True
-            comp_nota.save()
-
-             # ✅ Calcula o total de faltas dos trimestres com final=False
-            total_faltas = GestaoTurmas.objects.filter(
-                aluno=self.aluno,
-                grade=self.grade,
-                trimestre__final=False
-            ).aggregate(total=Sum('faltas'))['total'] or 0
-
-            # ✅ Atualiza o campo faltas_total do registro com trimestre final=True
-            final_turma = GestaoTurmas.objects.filter(
-                aluno=self.aluno,
-                grade=self.grade,
-                trimestre__final=True
-            ).first()
-
-            if final_turma:
-                # Evita recursão: atualiza diretamente com .update()
-                GestaoTurmas.objects.filter(pk=final_turma.pk).update(faltas_total=total_faltas)  
-    """    
+    
 
     def save(self, *args, **kwargs):
         from django.db.models import Avg, Sum
@@ -832,24 +782,35 @@ class GestaoTurmas(models.Model):
                 grade=self.grade
             ).update(reprovado_faltas=reprovado)
 
-        # 🔹 Garante que o trimestre final exista
-        final_turma = GestaoTurmas.objects.filter(
-            aluno=self.aluno,
-            grade=self.grade,
-            trimestre__final=True
-        ).first()
+            # 🔸 Atualiza lista de disciplinas reprovadas por faltas
+            # Busca todas as disciplinas em que o aluno ultrapassou o limite de faltas
+            from django.db.models import F
 
-        if not final_turma:
-            trimestre_final = Trimestre.objects.filter(final=True).first()
-            if trimestre_final:
-                GestaoTurmas.objects.create(
+            disciplinas_reprovadas = (
+                GestaoTurmas.objects
+                .filter(
                     aluno=self.aluno,
-                    grade=self.grade,
-                    trimestre=trimestre_final,
-                    media_final=media,
-                    faltas_total=total_faltas,
-                    reprovado_faltas=reprovado  # já cria com o valor correto
+                    grade__turma=self.grade.turma,  # todas as disciplinas da mesma turma
                 )
+                .values('grade__disciplina__nome', 'grade__carga_horaria_anual')
+                .annotate(total_faltas=Sum('faltas'))
+            )
+
+            # Monta lista com nomes das disciplinas em que excedeu o limite
+            disciplinas_reprovadas_nomes = []
+            for d in disciplinas_reprovadas:
+                limite = d['grade__carga_horaria_anual'] * 0.25 if d['grade__carga_horaria_anual'] else 0
+                if d['total_faltas'] and d['total_faltas'] >= limite:
+                    disciplinas_reprovadas_nomes.append(d['grade__disciplina__nome'])
+
+            disciplinas_texto = ', '.join(sorted(set(disciplinas_reprovadas_nomes))) if disciplinas_reprovadas_nomes else None
+
+            # Aplica em todos os registros do aluno dessa matrícula
+            GestaoTurmas.objects.filter(
+                aluno=self.aluno,
+                grade__turma=self.grade.turma
+            ).update(reprovado_faltas_disciplina=disciplinas_texto)
+
         
     
 class ParecerDescritivo(models.Model):

@@ -168,6 +168,7 @@
                                         {% endfor %}    
                                         {% if t.final %} 
                                             {% if not aluno.aprovado_conselho %}
+                                                
                                                 {% if aluno.gestao_turmas_related.last.aprovado  %}
                                                     <td class='bg-primary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado</td>
                                                     {% else %}                                                                                                           

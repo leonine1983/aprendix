@@ -46,9 +46,11 @@ class GestaoTurmasAdmin(admin.ModelAdmin):
         'get_turma',
         'get_disciplina',
         'get_professor',
+        'trimestre',
         'notas',
         'faltas',
         'faltas_total',
+        'reprovado_faltas_disciplina',
         'media_final',
     )
     list_filter = ('trimestre__ano_letivo', 'grade__turma__nome')
