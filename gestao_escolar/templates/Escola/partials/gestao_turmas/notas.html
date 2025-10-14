@@ -5,6 +5,47 @@
 {% endblock script_head %} 
 {% include "Escola/partials/modal_partials/modal_top.html" %}
 
+<style>
+  .tab-content {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-width: 2px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+
+  /* Cores leves e harmônicas */
+  .tab-content-1 {
+    background-color: #e6f7ff;
+    border-color: #91d5ff;
+  }
+
+  .tab-content-2 {
+    background-color: #fff7e6;
+    border-color: #ffd591;
+  }
+
+  .tab-content-3 {
+    background-color: #f9f0ff;
+    border-color: #d3adf7;
+  }
+
+  .tab-content-4 {
+    background-color: #f6ffed;
+    border-color: #686b66b2;
+  }
+
+  .tab-content-5 {
+    background-color: #fff0f6;
+    border-color: #ffadd2;
+  }
+
+  /* Opcional: hover leve */
+  .tab-content:hover {
+    filter: brightness(0.97);
+  }
+</style>
+
 
           <div>
             <a href="{% url 'Gestao_Escolar:NotasAluno_one_create' matriculas.0.turma.id  %}" rel="noopener noreferrer" class="btn btn-primary btn-sm">Voltar a secção anterior</a>
@@ -17,16 +58,49 @@
                 
             {% endfor %}
 
-          
-
-
-
-        
+                  
             <ul>
                 {% for t in trimestre %}         
-                    <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography">   
+                    <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography border ">   
                         {% include "Escola/partials/mensagens.html" %}
-                        {% if t.final %}
+                        
+                        {% if not t.final %}
+
+                        <div class=" mt-3 border-0 ">
+                            <div class="card-body py-3">
+                                <!-- 🔹 Cabeçalho explicativo -->
+                                <div class="mb-3">
+                                <h5 class="text-primary mb-2">
+                                    <i class="bi bi-journal-check me-2"></i>Área de Lançamento de Notas e Faltas - {{t}}
+                                </h5>
+                                <p class="text-muted mb-0" style="font-size: 0.95rem;">
+                                    Nesta seção, os professores realizam o registro das notas e faltas dos alunos em cada trimestre. 
+                                    Os dados inseridos aqui são utilizados para calcular médias, frequência anual e possíveis reprovações por faltas.
+                                </p>
+                                </div>
+
+                                <hr class="my-3">
+
+                                <!-- 🔹 Legenda inferior -->
+                                <div class="bg-light rounded p-3 border">
+                                    <h6 class="text-secondary mb-2">
+                                        <i class="bi bi-info-circle me-1"></i>Legenda
+                                    </h6>
+                                    <ul class="list-unstyled mb-0 small text-secondary">
+                                        <li><strong>N+{{t.id}}T</strong>: Nota do <strong>{{t}}</strong></li>
+                                        <li><strong>F+{{t.id}}</strong>: Faltas do <strong>{{t}}</strong></li>
+                                        <li><strong>MA</strong>: Média Final do aluno</li>
+                                        <li><strong>FA</strong>: Faltas Anuais (soma de todos os trimestres)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            </div>
+
+
+
+
+
+                        {% else %}
                         <div class="alert alert-info" role="alert">
                             <h2>Área de Resultados Finais</h2>
                             Nessa área você pode verifica a situação acadêmica do aluno, que indica se ele foi aprovado ou reprovado. Essa seção inclui a <strong>Nota do Conselho de Classe</strong>, que reflete a avaliação geral, e a <strong>Nota de Recuperação</strong>, caso o aluno não tenha atingido a média necessária. Essas informações são essenciais para acompanhar o desempenho e as oportunidades de melhoria.
@@ -53,8 +127,21 @@
                                 </tr>
                                 <tr>
                                     {% for disciplina in disciplinas %}
-                                    <th style="background-color: rgb(146, 161, 161) !important;color:black;">notas</th>
-                                    <th style="background-color: rgb(218, 176, 201) !important;color: rgb(4, 45, 82);">faltas</th>
+                                    <th style="background-color: rgb(146, 161, 161) !important;color:black; fonte-size:0.3rem">
+                                        {% if not t.final %} 
+                                            N+{{t.id}}T
+                                            {% else %}
+                                            MA
+                                        {% endif %} 
+                                    </th>
+                                    <th style="background-color: rgb(218, 176, 201) !important;color: rgb(4, 45, 82);">
+                                        {% if not t.final %} 
+                                            F+{{t.id}}T
+                                            {% else %}
+                                            FA
+                                        {% endif %} 
+                                        
+                                    </th>
                                         {% if t.final %}
                                             <th style="background-color: rgb(218, 176, 201) !important;color: rgb(4, 45, 82);">recu</th>
                                         {% endif %}
@@ -93,15 +180,7 @@
                                                                                 id="abrirdialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}" 
                                                                                 class="btn btn-sm btn-outline-primary m-1">                                 
                                                                                 {% if gestao_turma.notas %}
-                                                                                    <span class=' {% if gestao_turma.notas < 5 %} text-danger {% endif %}'>{{ gestao_turma.notas }}
-
-                                                                                        --
-
-                                                                                        {{ gestao_turma.reprovado_faltas  }}
-
-
-
-                                                                                    </span>
+                                                                                    <span class=' {% if gestao_turma.notas < 5 %} text-danger {% endif %}'>{{ gestao_turma.notas }}</span>
                                                                                 {% else %}
                                                                                     not
                                                                                 {% endif %}
@@ -140,7 +219,7 @@
                                         <!-- FALTAS POR DISCIPLINA -->
                                             <td class="text-center " style="width: 55px;background-color: rgb(235, 223, 230) !important;color: rgb(4, 45, 82);">
                                                 {% for gestao_turma in aluno.gestao_turmas_related.all %}
-                                                    {% if gestao_turma.reprovado_faltas %}
+                                                    
                                                         {% if gestao_turma.grade == disciplina %}
                                                             {% if gestao_turma.trimestre_id == t.id %}
                                                                 {% if not aluno.aprovado_conselho %}  
@@ -148,16 +227,23 @@
                                                                     notas esta ativa-->
                                                                     <!-- Botão: abrir diálogo faltas-->
                                                                         {% if gestao_turma.faltas is not None %}
-                                                                            <button 
-                                                                            id="abrirDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}" 
-                                                                            class="btn btn-sm btn-outline-danger m-1 abrir-dialog-faltas">
-                                                                                {{ gestao_turma.faltas }}  
-                                                                            </button>
-                                                                            {% include "Escola/partials/gestao_turmas/faltas_partials/dialog_se_aprovado_conselho/dialog_Faltas.html" %}  
-                                                                            {% else %}
-                                                                                {{ gestao_turma.faltas_total }}  
+                                                                            <!--Verifica se são um dos 3 trimestres-->
+                                                                            {% if not t.final %} 
+                                                                                <button 
+                                                                                id="abrirDialog_faltas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre.id}}" 
+                                                                                class="btn btn-sm btn-outline-danger m-1 abrir-dialog-faltas">
+                                                                                    {{ gestao_turma.faltas }} 
+                                                                                </button>
+                                                                                {% include "Escola/partials/gestao_turmas/faltas_partials/dialog_se_aprovado_conselho/dialog_Faltas.html" %}  
+                                                                            {% endif %}
                                                                         {% endif %}
                                                                     <!--End--> 
+                                                                    <!-- Se for o resultado final exibe somente o total de faltas-->
+                                                                        {% if t.final %} 
+                                                                            {{ gestao_turma.faltas_total }} 
+                                                                        {% endif %}  
+                                                                    <!--End-->                                                                      
+                                                                    
                                                                     {% else %}
                                                                     {% if gestao_turma.faltas is not None %}
                                                                             {{ gestao_turma.faltas }} 
@@ -167,7 +253,6 @@
                                                                 {% endif %}                                                                  
                                                             {% endif %} 
                                                         {% endif %}
-                                                    {% endif %}
                                                 {% endfor %}
                                             </td> 
                                             <!-- END Lançamento de FALTAS por disciplina -->  
@@ -217,8 +302,9 @@
                                                 {% endif %}
                                                 {% else %}
                                                 <!-- Se o aluno foi reprovado por faltas-->
-                                                <td class='bg-danger-subtle text-dark ' colspan='6'> Reprovado por Faltas em: ({{aluno.gestao_turmas_related.last.reprovado_faltas_disciplina }}) </td>  
+                                                <td class='bg-danger-subtle text-dark ' colspan='6'> Reprovado por Faltas em: ({{aluno.gestao_turmas_related.last.reprovado_faltas_disciplina }})</td>  
                                             {% endif %}
+
                                             <!-- Verifica se o aluno foi reprovado por faltas -->
                                             {% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}
                                                 {% if aluno.foi_a_recupera %}
@@ -241,30 +327,37 @@
                                                 <!-- Se o aluno foi reprovado por faltas, não exibe o TD-->                                                
                                             {% endif %}
                                             
-                                            <td class='text-black'>
-                                                <!-- Exibe as notas apos aprovação no conselho de classe-->
-                                                {% if aluno.aprovado_conselho %}                                                 
-                                                    {% include "Escola/partials/gestao_turmas/notas_partials/dialog_se_aprovado_conselho/dialog_aprovado_conselho.html" %}
-                                                {% endif %}                                                                                                   
-                                            </td>
+                                            <!-- Verifica se o aluno ñao perdeu por faltas-->
+                                            {% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}
+                                                <!-- Exibe o botão para lançar as notas de recuperação final -->
+                                                    <td class='text-black'>
+                                                        <!-- Exibe as notas apos aprovação no conselho de classe-->
+                                                        {% if aluno.aprovado_conselho %}                                                 
+                                                            {% include "Escola/partials/gestao_turmas/notas_partials/dialog_se_aprovado_conselho/dialog_aprovado_conselho.html" %}
+                                                        {% endif %}                                                                                                   
+                                                    </td>
+                                            {% endif %}
                                             
-                                            <td>
-                                                <!-- BOTÃO NOTAS DE RECUPERAÇÃO *********************************** -->
-                                                    <!-- Verifica se o aluno ñao perdeu por faltas-->
-                                                    {% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}
-                                                        <!-- Exibe o botão para lançar as notas de recuperação final -->
-                                                        {% if not aluno.gestao_turmas_related.last.aprovado  %}
-                                                            <a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:recuperaFinal' aluno.id t.id %}">Recuperação</a>
-                                                        {% endif %}
-                                                        {% else %}
-                                                        <!-- Se o aluno foi reprovado por faltas, não exibe o TD-->
-                                                    {% endif %}
-                                                <!--END BOTÃO NOTAS DE RECUPERAÇÃO ******************************** -->
-                                            </td>
-
-                                            <td>
+                                            
+                                            <!-- BOTÃO NOTAS DE RECUPERAÇÃO *********************************** -->
                                                 <!-- Verifica se o aluno ñao perdeu por faltas-->
-                                                {% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}    
+                                                {% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}
+                                                <td>
+                                                    <!-- Exibe o botão para lançar as notas de recuperação final -->
+                                                    {% if not aluno.gestao_turmas_related.last.aprovado  %}
+                                                        <a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:recuperaFinal' aluno.id t.id %}">Recuperação</a>
+                                                    {% endif %}
+                                                    {% else %}
+                                                    <!-- Se o aluno foi reprovado por faltas, não exibe o TD-->
+                                                </td>
+                                                {% endif %}
+                                            <!--END BOTÃO NOTAS DE RECUPERAÇÃO ******************************** -->
+                                            
+
+                                            
+                                                <!-- Verifica se o aluno ñao perdeu por faltas-->
+                                                {% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}  
+                                                <td>  
                                                     {% if not aluno.naoFoi_a_recupera %}                                                    
                                                         <!-- BOTÃO NOTAS DE CONSELHO DE CLASSE *********************************** -->                                                  
                                                             {% if not aluno.aprovado_recupera %}                                                   
@@ -279,8 +372,8 @@
                                                     {% endif %}
                                                     {% else %}
                                                     <!-- Se o aluno foi reprovado por faltas, não exibe o TD-->
-                                                {% endif %}
-                                            </td>                                                
+                                                </td> 
+                                                {% endif %}                                                                                           
                                         {% endif %}                                                                                
                                         
                                     </tr>
