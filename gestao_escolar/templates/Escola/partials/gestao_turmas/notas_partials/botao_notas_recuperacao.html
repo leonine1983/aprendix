@@ -1,0 +1,13 @@
+<!-- Verifica se o aluno ñao perdeu por faltas-->
+{% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}
+<td>
+    {% if not aluno.aprovado_conselho %}  
+        <!-- Exibe o botão para lançar as notas de recuperação final -->
+        {% if not aluno.gestao_turmas_related.last.aprovado  %}
+            <a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:recuperaFinal' aluno.id t.id %}">Recuperação</a>
+        {% endif %}
+        {% else %}
+    {% endif %}
+    <!-- Se o aluno foi reprovado por faltas, não exibe o TD-->
+</td>
+{% endif %}

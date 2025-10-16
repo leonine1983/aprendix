@@ -772,31 +772,24 @@ class GestaoTurmas(models.Model):
         ).update(media_final=media, faltas_total=total_faltas)
 
         # 🔹 Reprovação automática por faltas
+        # 🔹 Reprovação automática por faltas
         if self.grade and self.grade.carga_horaria_anual:
             limite_faltas = self.grade.carga_horaria_anual * 0.25  # 25% do total
             reprovado = total_faltas >= limite_faltas
 
-            # Atualiza o campo reprovado_faltas em todos os registros do aluno/grade
-            GestaoTurmas.objects.filter(
-                aluno=self.aluno,
-                grade=self.grade
-            ).update(reprovado_faltas=reprovado)
+            from django.db.models import Sum
 
-            # 🔸 Atualiza lista de disciplinas reprovadas por faltas
-            # Busca todas as disciplinas em que o aluno ultrapassou o limite de faltas
-            from django.db.models import F
-
+            # 🔸 Atualiza lista de disciplinas reprovadas por faltas (todas da turma)
             disciplinas_reprovadas = (
                 GestaoTurmas.objects
                 .filter(
                     aluno=self.aluno,
-                    grade__turma=self.grade.turma,  # todas as disciplinas da mesma turma
+                    grade__turma=self.grade.turma,
                 )
                 .values('grade__disciplina__nome', 'grade__carga_horaria_anual')
                 .annotate(total_faltas=Sum('faltas'))
             )
 
-            # Monta lista com nomes das disciplinas em que excedeu o limite
             disciplinas_reprovadas_nomes = []
             for d in disciplinas_reprovadas:
                 limite = d['grade__carga_horaria_anual'] * 0.25 if d['grade__carga_horaria_anual'] else 0
@@ -805,13 +798,33 @@ class GestaoTurmas(models.Model):
 
             disciplinas_texto = ', '.join(sorted(set(disciplinas_reprovadas_nomes))) if disciplinas_reprovadas_nomes else None
 
-            # Aplica em todos os registros do aluno dessa matrícula
+            # 🔹 Atualiza o campo reprovado_faltas em todos os trimestres da turma do aluno
             GestaoTurmas.objects.filter(
                 aluno=self.aluno,
                 grade__turma=self.grade.turma
-            ).update(reprovado_faltas_disciplina=disciplinas_texto)
+            ).update(reprovado_faltas=reprovado)
 
-        
+            # 🔹 Se total_faltas for menor que o limite, limpa ou atualiza as disciplinas reprovadas
+            if not reprovado:
+                # Se ainda existirem outras disciplinas acima do limite, mantém apenas elas
+                GestaoTurmas.objects.filter(
+                    aluno=self.aluno,
+                    grade__turma=self.grade.turma
+                ).update(
+                    reprovado_faltas=False,
+                    reprovado_faltas_disciplina=disciplinas_texto
+                )
+            else:
+                # Caso contrário, marca reprovação e atualiza lista de disciplinas
+                GestaoTurmas.objects.filter(
+                    aluno=self.aluno,
+                    grade__turma=self.grade.turma
+                ).update(
+                    reprovado_faltas=True,
+                    reprovado_faltas_disciplina=disciplinas_texto
+                )
+
+                
     
 class ParecerDescritivo(models.Model):
     matricula = models.ForeignKey(Matriculas, blank=True, on_delete=models.CASCADE, related_name='pareceres_aluno')

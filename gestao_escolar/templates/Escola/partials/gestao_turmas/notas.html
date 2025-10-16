@@ -61,14 +61,12 @@
                   
             <ul>
                 {% for t in trimestre %}         
-                    <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography border ">   
-                        {% include "Escola/partials/mensagens.html" %}
-                        
+                    <li class="tab-content {% if t.id == 1 %}tab-content-first {% else %}tab-content-{{ t.id }}{% endif %}  typography border ">  
                         {% if not t.final %}
-
-                        <div class=" mt-3 border-0 ">
+                        <div class=" mt-3 border-0 position-relative ">
+                            <h1 class='float-end shadow-sm p-2 m-2 text-uppercase'>{{t}}</h1>
                             <div class="card-body py-3">
-                                <!-- 🔹 Cabeçalho explicativo -->
+                                <!-- 🔹 Cabeçalho explicativo -->                                 
                                 <div class="mb-3">
                                 <h5 class="text-primary mb-2">
                                     <i class="bi bi-journal-check me-2"></i>Área de Lançamento de Notas e Faltas - {{t}}
@@ -94,14 +92,11 @@
                                     </ul>
                                 </div>
                             </div>
-                            </div>
-
-
-
-
+                        </div>
 
                         {% else %}
-                        <div class="alert alert-info" role="alert">
+                        <div class="alert alert-info position-relative" role="alert">
+                            <h1 class='float-end shadow-sm p-2 m-2 text-uppercase'>Resultado {{t}}</h1>
                             <h2>Área de Resultados Finais</h2>
                             Nessa área você pode verifica a situação acadêmica do aluno, que indica se ele foi aprovado ou reprovado. Essa seção inclui a <strong>Nota do Conselho de Classe</strong>, que reflete a avaliação geral, e a <strong>Nota de Recuperação</strong>, caso o aluno não tenha atingido a média necessária. Essas informações são essenciais para acompanhar o desempenho e as oportunidades de melhoria.
                         </div>                        
@@ -122,7 +117,7 @@
                                         <th rowspan="2" >Situação do aluno na Final</th>
                                         <th rowspan='2'>Situação Recuperação</th>
                                         <th rowspan="2">Media anterior ao Conselho {{aluno.gestao_turmas_related.last.aprovado}}</th>  
-                                        <th rowspan="2">ação</th>                                                                        
+                                        <th colspan='3'>ação</th>                                                                        
                                     {% endif %}
                                 </tr>
                                 <tr>
@@ -280,14 +275,16 @@
                                                     <!-- Verifica se o aluno teve notas suficientes para ser aprovado -->
                                                     {% if aluno.gestao_turmas_related.last.aprovado  %}
                                                         <td class='bg-primary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado</td>
-                                                        {% else %}                                                                                                           
-                                                            {% if aluno.aprovado_recupera %} 
-                                                                <!-- Se o aluno for aprovado pela Recuperação-->                                                                                        
-                                                                <td class='bg-primary-subtle '><i class="fa-solid fa-face-smile-wink"></i> Aprovado</td>  
-                                                                {% else %}
-                                                                <!-- Se o aluno foi reprovado na recuperação -->
-                                                                <td class='bg-danger-subtle '><i class="fa-solid fa-face-sad-cry"></i> Reprovado recuperação</td>  
-                                                            {% endif %}                                                
+                                                        {% else %}  
+                                                                                                                                                              
+                                                                {% if aluno.aprovado_recupera %} 
+                                                                    <!-- Se o aluno for aprovado pela Recuperação-->                                                                                        
+                                                                    <td class='bg-primary-subtle '><i class="fa-solid fa-face-smile-wink"></i> Aprovado</td>  
+                                                                    {% else %}
+                                                                    <!-- Se o aluno foi reprovado na recuperação -->
+                                                                    <td class='bg-danger-subtle '><i class="fa-solid fa-face-sad-cry"></i> Reprovado recuperação</td>  
+                                                                {% endif %}     
+                                                                                                    
                                                     {% endif %}                                                  
                                                     {% else %}
                                                     <td class='bg-secondary-subtle'>
@@ -306,7 +303,7 @@
                                             {% endif %}
 
                                             <!-- Verifica se o aluno foi reprovado por faltas -->
-                                            {% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}
+                                            {% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}ffffffffffffff
                                                 {% if aluno.foi_a_recupera %}
                                                     <!-- Se o aluno for para recuperação -->
                                                     {% if aluno.aprovado_recupera %}
@@ -336,44 +333,14 @@
                                                             {% include "Escola/partials/gestao_turmas/notas_partials/dialog_se_aprovado_conselho/dialog_aprovado_conselho.html" %}
                                                         {% endif %}                                                                                                   
                                                     </td>
-                                            {% endif %}
+                                            {% endif %}                                            
                                             
-                                            
-                                            <!-- BOTÃO NOTAS DE RECUPERAÇÃO *********************************** -->
-                                                <!-- Verifica se o aluno ñao perdeu por faltas-->
-                                                {% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}
-                                                <td>
-                                                    <!-- Exibe o botão para lançar as notas de recuperação final -->
-                                                    {% if not aluno.gestao_turmas_related.last.aprovado  %}
-                                                        <a class="btn win11-button fs-8" href="{% url 'Gestao_Escolar:recuperaFinal' aluno.id t.id %}">Recuperação</a>
-                                                    {% endif %}
-                                                    {% else %}
-                                                    <!-- Se o aluno foi reprovado por faltas, não exibe o TD-->
-                                                </td>
-                                                {% endif %}
-                                            <!--END BOTÃO NOTAS DE RECUPERAÇÃO ******************************** -->
-                                            
+                                            <!-- BOTÃO NOTAS DE RECUPERAÇÃO *********************************** -->                                                
+                                                {% include "Escola/partials/gestao_turmas/notas_partials/botao_notas_recuperacao.html" %}                                                
 
-                                            
-                                                <!-- Verifica se o aluno ñao perdeu por faltas-->
-                                                {% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}  
-                                                <td>  
-                                                    {% if not aluno.naoFoi_a_recupera %}                                                    
-                                                        <!-- BOTÃO NOTAS DE CONSELHO DE CLASSE *********************************** -->                                                  
-                                                            {% if not aluno.aprovado_recupera %}                                                   
-                                                                <a href="" ><a class='text-black btn btn-sm btn-success ' href="{% url 'Gestao_Escolar:aprovaConselho' aluno.pk %}" title='Aprovar aluno pelo conselho'><i class="fa-sharp fa-thin fa-thumbs-up"></i></a>                                                        
-                                                                <!-- Só é exibido quando o aluno for aprovado pelo conselho -->
-                                                                {% if aluno.aprovado_conselho %}                                                   
-                                                                <a href="" ><a class='text-black btn btn-sm btn-danger ' href="{% url 'Gestao_Escolar:aprovaConselhoCancela' aluno.pk %}" title='Aprovar aluno pelo conselho'><i class="fa-sharp fa-thin fa-thumbs-up"></i></a>                                                        
-                                                                {% endif %}                                                        
-                                                            {% endif %}  
-                                                        <!-- END BOTÃO NOTAS DE CONSELHO DE CLASSE ******************************** -->                                                        
-                                                        {% else %}                                                    
-                                                    {% endif %}
-                                                    {% else %}
-                                                    <!-- Se o aluno foi reprovado por faltas, não exibe o TD-->
-                                                </td> 
-                                                {% endif %}                                                                                           
+                                            <!-- BOTÃO NOTAS DE CONSELHO DE CLASSE *********************************** -->  
+                                                {% include "Escola/partials/gestao_turmas/notas_partials/botao_conselho_classe.html" %}                                            
+                                                                                                                                       
                                         {% endif %}                                                                                
                                         
                                     </tr>

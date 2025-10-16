@@ -1,0 +1,30 @@
+<!-- Verifica se o aluno ñao perdeu por faltas-->
+{% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}  
+<td>
+    {% if not aluno.gestao_turmas_related.last.aprovado %}
+        {% if not aluno.naoFoi_a_recupera %}                                                    
+            <!-- BOTÃO NOTAS DE CONSELHO DE CLASSE *********************************** -->                                                  
+                {% if not aluno.aprovado_recupera %}  
+                    {% if not aluno.aprovado_conselho %}                                                     
+                        <a class="text-black btn btn-sm btn-success" 
+                        href="{% url 'Gestao_Escolar:aprovaConselho' aluno.pk %}" 
+                        title="Aprovar aluno no conselho de classe">
+                        <i class="fa-sharp fa-thin fa-thumbs-up"></i>
+                        </a>                                                        
+                    {% else %}                                                                             
+                        <a class="text-black btn btn-sm btn-danger" 
+                        href="{% url 'Gestao_Escolar:aprovaConselhoCancela' aluno.pk %}" 
+                        title="Cancelar aprovação no conselho de classe">
+                        <i class="fa-sharp fa-thin fa-thumbs-up"></i>
+                        </a>                                                        
+                    {% endif %}                                                        
+                {% endif %}
+
+            <!-- END BOTÃO NOTAS DE CONSELHO DE CLASSE ******************************** -->                                                        
+            {% else %}                                                    
+        {% endif %}
+    {% endif %}
+    {% else %}
+    <!-- Se o aluno foi reprovado por faltas, não exibe o TD-->
+</td> 
+{% endif %}    
