@@ -493,6 +493,7 @@ class Matriculas(models.Model):
     aprovado = models.BooleanField(default=False)
     aprovado_conselho = models.BooleanField(default=False)
     aprovado_recupera = models.BooleanField(default=False)
+    reprovado_recupera = models.BooleanField(default=False)
     foi_a_recupera = models.BooleanField(default=False)
     
 

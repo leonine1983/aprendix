@@ -276,15 +276,15 @@
                                                     {% if aluno.gestao_turmas_related.last.aprovado  %}
                                                         <td class='bg-primary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado</td>
                                                         {% else %}  
-                                                                                                                                                              
+                                                            {% if aluno.foi_a_recupera %}                                                                                                                                                              
                                                                 {% if aluno.aprovado_recupera %} 
                                                                     <!-- Se o aluno for aprovado pela Recuperação-->                                                                                        
                                                                     <td class='bg-primary-subtle '><i class="fa-solid fa-face-smile-wink"></i> Aprovado</td>  
                                                                     {% else %}
                                                                     <!-- Se o aluno foi reprovado na recuperação -->
-                                                                    <td class='bg-danger-subtle '><i class="fa-solid fa-face-sad-cry"></i> Reprovado recuperação</td>  
+                                                                    <td class='bg-info-subtle '><i class="fa-solid fa-face-sad-cry"></i> Na Recuperação</td>  
                                                                 {% endif %}     
-                                                                                                    
+                                                            {% endif %}                                                                                                         
                                                     {% endif %}                                                  
                                                     {% else %}
                                                     <td class='bg-secondary-subtle'>
@@ -303,7 +303,7 @@
                                             {% endif %}
 
                                             <!-- Verifica se o aluno foi reprovado por faltas -->
-                                            {% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}ffffffffffffff
+                                            {% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}
                                                 {% if aluno.foi_a_recupera %}
                                                     <!-- Se o aluno for para recuperação -->
                                                     {% if aluno.aprovado_recupera %}

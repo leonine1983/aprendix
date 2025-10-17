@@ -45,24 +45,29 @@ def create_or_update_gestao_turmas_recupera(request, aluno_id, trimestre_id):
                 # Armazenar a nota de recuperação
                 notas_recupera.append(form.instance.recuperacao_final)
 
-                # Verificar se todas as notas são maiores que 5  
-                print(f"olha o texto {notas_recupera}")   
-                try: 
-                    if all(nota >= 5 for nota in notas_recupera):
+                try:
+                    notas_validas = [nota for nota in notas_recupera if nota is not None]
+
+                    if notas_validas and all(nota >= 5 for nota in notas_validas):
                         status = "Aprovado na recuperação"
                         aluno.aprovado_recupera = True
+                        aluno.reprovado_recupera = False
                         aluno.naoFoi_a_recupera = False
-                    else:
+                    elif notas_validas:
                         status = "Reprovado na recuperação"
                         aluno.aprovado_recupera = False
+                        aluno.reprovado_recupera = True
                         aluno.naoFoi_a_recupera = False
+                    else:
+                        status = "Sem notas de recuperação"
+                        aluno.aprovado_recupera = False
+                        aluno.reprovado_recupera = False
+                        aluno.naoFoi_a_recupera = True
+
                     aluno.save()
                 except Exception as e:
-                    status = "Indefinido"
-                    aluno.naoFoi_a_recupera = True
-                    aluno.aprovado_recupera = False
-                    aluno.save()
-                    print(f"Erro ao verificar notas {e}")
+                    print(f"Erro ao verificar notas: {e}")
+
 
         success_message = f"Notas de Recuperação do aluno {aluno.aluno} foram atualizadas com sucesso! Status: {status}"
         messages.info(request, success_message)        
@@ -73,13 +78,36 @@ def create_or_update_gestao_turmas_recupera(request, aluno_id, trimestre_id):
         for disciplina in disciplinas:
             gestao_turma, created = GestaoTurmas.objects.get_or_create(aluno=aluno, trimestre=trimestre, grade=disciplina)
             initial_data = {'nota': gestao_turma.recuperacao_final} if gestao_turma else None
-            forms_dict[disciplina.disciplina] = GestaoTurmasForm(instance=gestao_turma, prefix=disciplina.disciplina, initial=initial_data)
+            forms_dict[disciplina.disciplina] = {
+                'form': GestaoTurmasForm(instance=gestao_turma, prefix=disciplina.disciplina, initial=initial_data),
+                'media_final': gestao_turma.media_final  # <-- adiciona o valor aqui
+            }
+
+    """
+    context = {
+        'forms_dict': forms_dict,
+        'aluno': aluno,
+        'trimestre': trimestre,
+        'conteudo_page': "Gestão Turmas - Notas Recupera Update",
+    }"""
+
+    # calcular média geral (recuperacao_final)
+    medias = GestaoTurmas.objects.filter(aluno=aluno).values_list('recuperacao_final', flat=True)
+    media_final_aluno = None
+    if medias:
+        # filtra notas não nulas
+        notas_validas = [m for m in medias if m is not None]
+        if notas_validas:
+            media_final_aluno = sum(notas_validas) / len(notas_validas)
 
     context = {
         'forms_dict': forms_dict,
         'aluno': aluno,
         'trimestre': trimestre,
         'conteudo_page': "Gestão Turmas - Notas Recupera Update",
+        'media_final_aluno': media_final_aluno,  # <-- adicionado
     }
 
-    return render(request, 'Escola/inicio.html', context)
+
+    return render(request, 'Escola/inicio.html', context)  
+    

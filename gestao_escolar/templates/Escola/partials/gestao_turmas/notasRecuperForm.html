@@ -79,28 +79,38 @@
                 <h1>Lançamento de <b>Recuperação</b> do aluno | {{ trimestre }}</h1>
                 <table class='win11-table'>
                     <thead class="bg-p-5">
-                        <tr>
-                            <th># </th>        
+                        <tr>       
                             <th class="text-uppercase text-center">{{ request.session.nomeclatura.nome_diciplina }}</th>
                             <th class="text-uppercase text-center">Notas de Recuperação do Aluno </th>
                         </tr>
                     </thead>
                    <tbody>
-                        {% for disciplina_nome, form in forms_dict.items %}
-                            <tr class="win11-form-group">
-                                <td class="win11-form-field">{{ forloop.counter }}</td>
-                                <td class="win11-form-field">{{ disciplina_nome }}</td>
-                                <td class="win11-form-field">
-                                    {{ form.recuperacao_final }}
-                                    {% for error in form.notas.errors %}
-                                        <span class="error">{{ error }}</span>
+                        {% for disciplina_nome, form_data in forms_dict.items %}
+                            {% if form_data.media_final < 5 %}
+                                <tr class="win11-form-group">
+                                    <td class="win11-form-field">{{ disciplina_nome }}</td>
+                                    <td class="win11-form-field d-flex align-items-center gap-2">
+                                    {{ form_data.form.recuperacao_final }}
+                                    <small class="ms-2 text-danger col-6">(Média final: {{ form_data.media_final|floatformat:2 }})</small>
+
+                                    {% for error in form_data.form.notas.errors %}
+                                        <span class="text-danger ms-2">{{ error }}</span>
                                     {% endfor %}
-                                </td>
-                            </tr>
-                            <input type="hidden" name="{{ form.prefix }}-disciplina" value="{{ disciplina_nome }}">
+                                    </td>
+
+                                </tr>
+                                <input type="hidden" name="{{ form_data.form.prefix }}-disciplina" value="{{ disciplina_nome }}">
+                            {% endif %}
+
                         {% endfor %}
+
                     </tbody>
                 </table>
+                <button type="submit" class="btn btn-success d-flex align-items-center gap-2">
+                    <i class="bi bi-check-circle"></i>
+                    Salvar alterações
+                </button>
+
             </form>
             
       
