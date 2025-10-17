@@ -58,15 +58,12 @@
 
 </style>
 
+{% include "Escola/partials/modal_partials/modal_top.html" %}
 
 
 
 
 
-<div class="modal fade" id="modal_escola"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    
-    <div class="modal-dialog w-100">
-        <div class="modal-content bg-secondary-subtle">
             <div class="modal-header w-100">
                 <div class="mx-5 border-bottom ">
                     <p class="m-0 p-0 h3 text-uppercase"><i style="font-size: 1.65rem;" class="fs-4 fa-solid fa-users-gear"></i> {{ aluno}}</p>                
@@ -106,10 +103,18 @@
 
                     </tbody>
                 </table>
-                <button type="submit" class="btn btn-success d-flex align-items-center gap-2">
-                    <i class="bi bi-check-circle"></i>
-                    Salvar alterações
-                </button>
+                <section class="d-flex w-75 justify-content-center align-items-center gap-3">
+                    <section>
+                        {% url 'Gestao_Escolar:gestao_turmas_update' aluno.turma.id as editar_url %}
+                        {% include 'Escola/components/linkCancelar.html' with link=editar_url title="Voltar para nota" %}                        
+                    </section>
+                    
+                    <button type="submit" class="btn btn-success d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle"></i>
+                        Salvar alterações
+                    </button>
+                </section>
+
 
             </form>
             
