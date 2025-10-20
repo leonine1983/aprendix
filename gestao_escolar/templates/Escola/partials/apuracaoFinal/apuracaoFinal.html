@@ -130,13 +130,22 @@
                         <div style="text-align: center; font-weight: bolder;">
                             <h4>Ata de notas da Turma {{ matriculas.0.turma }}</h4>
                         </div>
-                        <div class='d-flex'>
+                        <div class='d-flex g-1'>                            
                             <button onclick="printTable()" class="m-2">Imprimir</button>
-                            {% url 'Gestao_Escolar:ConcluirTurmas' matriculas.0.turma.id as editar_url %}
-                            {% include "Escola/components/linkConfirmar.html" with link=editar_url title="Concluir Turmas" label="Concluir Turma"  %}
-                        </div>
+                                {% if not matriculas.0.turma.turma_concluida %}
+                                    {% url 'Gestao_Escolar:ConcluirTurmas' matriculas.0.turma.id as editar_url %}
+                                    {% include "Escola/components/linkConfirmar.html" with link=editar_url title="Concluir Turmas" label="Concluir Turma"  %}
+                                {% else %}
+                                    {% url 'Gestao_Escolar:DesconcluirTurmas' matriculas.0.turma.id as editar_url %}
+                                    {% include "Escola/components/linkConfirmar.html" with link=editar_url title="Concluir Turmas" label="Reabrir Turma"  %}
+                                {% endif %}
 
-                   
+                            <div class='d-flex  ml-1 p-1 pt-2 rounded-2 border border-info '>
+                                {% if matriculas.0.turma.turma_concluida %}
+                                    <i class="fa-solid fa-check text-success fs-2 mr-1"></i><span> Turma Concluída</span>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
 
                     <div id="tabela-alunos">
@@ -152,7 +161,7 @@
                                 <tr>
                                     {% for d in disciplinas %}
                                         <th>Média</th>
-                                        <th>Faltas</th>s
+                                        <th>Faltas</th>
                                     {% endfor %}
                                 </tr>
                             </thead>

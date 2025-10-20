@@ -210,11 +210,8 @@ urlpatterns = [
 
     
     # Conclui turmas
-    path('gestao_escolar/turmas/concluir/<int:pk>',ConcluirTurmas.as_view(), name='ConcluirTurmas'),  
-
-
-
-    
+    path('gestao_escolar/turmas/concluir/<int:pk>',ConcluirTurmas.as_view(), name='ConcluirTurmas'),
+    path('gestao_escolar/turmas/desconcluir/<int:pk>',DesconcluirTurmas.as_view(), name='DesconcluirTurmas'),        
     
 ] 
 

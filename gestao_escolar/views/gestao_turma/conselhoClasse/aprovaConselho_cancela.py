@@ -52,6 +52,8 @@ class ConcluirTurmas(LoginRequiredMixin, View):
                 aluno_n_concluido.append(a)
 
         if aluno_concluido:
+            turmas.turma_concluida = True
+            turmas.save()
             messages.success(self.request, "Turma concluída com sucesso. A partir deste momento, não será mais possível realizar alterações.")
         else:
             nomes = aluno_n_concluido
@@ -65,6 +67,15 @@ class ConcluirTurmas(LoginRequiredMixin, View):
 
         return redirect('Gestao_Escolar:apuracaoSelec', turmas.id)
 
+class DesconcluirTurmas(LoginRequiredMixin, View):
+    
+    def get(self, request, pk):
+        turmas = Turmas.objects.get(pk = pk)
+        turmas.turma_concluida = False
+        turmas.save()
+            
+        messages.info(self.request, "Turma reaberta. A partir deste momento, é possível realizar alterações.")   
+        return redirect('Gestao_Escolar:apuracaoSelec', turmas.id)
 
 
 
