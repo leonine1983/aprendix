@@ -101,7 +101,13 @@
                             Nessa área você pode verifica a situação acadêmica do aluno, que indica se ele foi aprovado ou reprovado. Essa seção inclui a <strong>Nota do Conselho de Classe</strong>, que reflete a avaliação geral, e a <strong>Nota de Recuperação</strong>, caso o aluno não tenha atingido a média necessária. Essas informações são essenciais para acompanhar o desempenho e as oportunidades de melhoria.
                         </div>                        
                         {% endif %} 
-                        <table class="win11-table mt-5">
+                        <div class='d-flex justify-content-end'>
+                            <div class='text-dark col-3'>
+                                {% url 'Gestao_Escolar:apuracaoSelec' matriculas.0.turma.id  as editar_url %}
+                                {% include "Escola/components/linkConfirmar.html" with link=editar_url title="Editar decreto" label="Clique para acessar a Apuração Final e a Finalização das Turmas" %}
+                            </div>
+                        </div>
+                        <table class="win11-table ">
                             <thead>
                                 <tr>
                                     <th rowspan="2" class='col-1'>Nº</th>
@@ -168,7 +174,7 @@
                                                                         {% endif %}
                                                                             <!-- Atualizar notas -->    
                                                                                                
-                                                                            {% if not aluno.aprovado_conselho %}  
+                                                                            {% if not aluno.aprovado_conselho and not aluno.reprovado_conselho  %}  
                                                                             <!--Verifica se o aluno passou pelo conselhor, se ainda não passou e edição ou inserimento de 
                                                                             notas esta ativa-->
                                                                                 <button 
@@ -217,7 +223,7 @@
                                                     
                                                         {% if gestao_turma.grade == disciplina %}
                                                             {% if gestao_turma.trimestre_id == t.id %}
-                                                                {% if not aluno.aprovado_conselho %}  
+                                                                {% if not aluno.aprovado_conselho and not aluno.reprovado_conselho %}  
                                                                     <!--Verifica se o aluno passou pelo conselhor, se ainda não passou e edição ou inserimento de 
                                                                     notas esta ativa-->
                                                                     <!-- Botão: abrir diálogo faltas-->
@@ -271,7 +277,7 @@
                                             <!-- Verifica se o aluno foi reprovado por faltas -->
                                             {% if not aluno.gestao_turmas_related.last.reprovado_faltas %}
                                                 <!-- Verifica se o aluno foi aprovado pelo conselhor de classe-->
-                                                {% if not aluno.aprovado_conselho %}
+                                                {% if not aluno.aprovado_conselho and not aluno.reprovado_conselho  %}
                                                     <!-- Verifica se o aluno teve notas suficientes para ser aprovado -->
                                                     {% if aluno.gestao_turmas_related.last.aprovado  %}
                                                         <td class='bg-primary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado</td>
@@ -280,22 +286,41 @@
                                                                 {% if aluno.aprovado_recupera %} 
                                                                     <!-- Se o aluno for aprovado pela Recuperação-->                                                                                        
                                                                     <td class='bg-primary-subtle '><i class="fa-solid fa-face-smile-wink"></i> Aprovado</td>  
+                                                                    {% elif aluno.reprovado_recupera %}                                                                        
+                                                                        <!-- Se o aluno foi reprovado na recuperação -->
+                                                                        {% if aluno.reprovado_conselho %}
+                                                                            <td class='bg-danger-subtle '><i class="fa-solid fa-face-sad-cry"></i> Repr. C. de Classe </td>
+                                                                            {% else %}
+                                                                            <td class='bg-warning-subtle '><i class="fa-solid fa-face-sad-cry"></i> Aguard. C. Classe </td>
+                                                                        {% endif %}  
                                                                     {% else %}
                                                                     <!-- Se o aluno foi reprovado na recuperação -->
-                                                                    <td class='bg-info-subtle '><i class="fa-solid fa-face-sad-cry"></i> Na Recuperação</td>  
+                                                                    <td class='bg-info-subtle '><i class="fa-solid fa-face-sad-cry"></i> Na Recuperação </td>  
                                                                 {% endif %}     
                                                             {% endif %}                                                                                                         
                                                     {% endif %}                                                  
-                                                    {% else %}
-                                                    <td class='bg-secondary-subtle'>
-                                                        {% if not aluno.aprovado_recupera %}
-                                                            <!-- Se aprovado pelo conselho -->
-                                                            <i class="fa-solid fa-face-smile-beam"></i> Aprovado conselho
+                                                    {% else %}                                                    
+                                                        {% if not aluno.aprovado_recupera %}                                                            
+                                                            {% if aluno.aprovado_conselho %}
+                                                                <td class='bg-secondary-subtle'>
+                                                                    <!-- Se aprovado pelo conselho -->
+                                                                    <i class="fa-solid fa-face-smile-beam"></i> Aprovado conselho
+                                                                </td>
+                                                            {% endif %}
+
+                                                            {% if  aluno.reprovado_conselho  %}
+                                                                <!-- Se reprovado pelo conselho -->
+                                                                <td class='bg-danger-subtle'>
+                                                                    <i class="fa-solid fa-face-smile-beam "></i> Repr. C. de Classe
+                                                                </td>
+                                                            {% endif %}
+
                                                             {% else %}
                                                             <!-- Aprovado pela Recuperação -->
-                                                            Aprovado Recuperação
-                                                        {% endif %}
-                                                    </td>                                                
+                                                                <td class='bg-warning-subtle'>
+                                                                    Aprovado Recuperação
+                                                                </td>   
+                                                        {% endif %}                                                                                                 
                                                 {% endif %}
                                                 {% else %}
                                                 <!-- Se o aluno foi reprovado por faltas-->
@@ -311,11 +336,14 @@
                                                         <td class='bg-primary-subtle'>
                                                             Aprov. Rec
                                                         </td>
-                                                        {% else %}
+                                                        {% elif aluno.reprovado_recupera %}
                                                         <!-- Se reprovado na recuperaçao -->
                                                             <td class='bg-danger-subtle'>
-                                                                Repr. na Rec                                        
-                                                            </td>   
+                                                                Repr. na Rec                       
+                                                            </td>  
+                                                        {% else %}
+                                                              <!-- Se o aluno foi reprovado na recuperação -->
+                                                                <td class='bg-info-subtle '><i class="fa-solid fa-face-sad-cry"></i> Na Recuperação</td>  
                                                     {% endif %}                                                
                                                     {% else %}
                                                     <!-- Se o aluno não foi a recuperação, exibe vazio -->

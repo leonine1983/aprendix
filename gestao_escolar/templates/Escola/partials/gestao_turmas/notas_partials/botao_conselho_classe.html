@@ -1,21 +1,27 @@
 <!-- Verifica se o aluno ñao perdeu por faltas-->
 {% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}  
-<td>
+<td class='d-flex gap-1 align-itens-center'>
     {% if not aluno.gestao_turmas_related.last.aprovado %}
         {% if not aluno.naoFoi_a_recupera %}                                                    
-            <!-- BOTÃO NOTAS DE CONSELHO DE CLASSE *********************************** -->                                                  
+            <!-- BOTÃO NOTAS DE CONSELHO DE CLASSE *********************************** -->                                         
                 {% if not aluno.aprovado_recupera %}  
-                    {% if not aluno.aprovado_conselho %}                                                     
+                    {% if not aluno.aprovado_conselho and not aluno.reprovado_conselho %} 
                         <a class="text-black btn btn-sm btn-success" 
                         href="{% url 'Gestao_Escolar:aprovaConselho' aluno.pk %}" 
                         title="Aprovar aluno no conselho de classe">
                         <i class="fa-sharp fa-thin fa-thumbs-up"></i>
-                        </a>                                                        
-                    {% else %}                                                                             
+                        </a>       
                         <a class="text-black btn btn-sm btn-danger" 
+                        href="{% url 'Gestao_Escolar:reprovaConselho' aluno.pk %}" 
+                        title="Reprovar aluno no conselho de classe">
+                        <i class="fa-sharp  fa-thumbs-up fa-rotate-180"></i>
+                        </a>  
+                        
+                    {% else %}                                                                             
+                        <a class="text-black btn btn-sm btn-warning" 
                         href="{% url 'Gestao_Escolar:aprovaConselhoCancela' aluno.pk %}" 
-                        title="Cancelar aprovação no conselho de classe">
-                        <i class="fa-sharp fa-thin fa-thumbs-up"></i>
+                        title="Cancelar resultado do conselho de classe">
+                        <i class="fa-solid fa-octagon-check"></i>
                         </a>                                                        
                     {% endif %}                                                        
                 {% endif %}

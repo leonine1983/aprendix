@@ -113,6 +113,9 @@ urlpatterns = [
     # Conselho de classe 
     path('gestao_escolar/Gestao_Turmas/aluno/conselhoClasse/<int:pk>',AprovaConselho.as_view(), name='aprovaConselho'),  
     path('gestao_escolar/Gestao_Turmas/aluno/conselhoClasse_cancela/<int:pk>',AprovaConselhoCancela.as_view(), name='aprovaConselhoCancela'),  
+    path('gestao_escolar/Gestao_Turmas/aluno/conselhoClasse_reprovado/<int:pk>',ReprovaConselho.as_view(), name='reprovaConselho'),  
+
+    
 
     # Plano de Aula
     path('relatorio/plano/<int:plano_id>/', relatorio_plano_aula_frequencia, name='relatorio_plano_aula'),
@@ -206,6 +209,9 @@ urlpatterns = [
     path('apuracaoFinal/selecionaTurma/<int:turma_id>', selecionaTurmaSelecionada, name='apuracaoSelec'),
 
     
+    # Conclui turmas
+    path('gestao_escolar/turmas/concluir/<int:pk>',ConcluirTurmas.as_view(), name='ConcluirTurmas'),  
+
 
 
     

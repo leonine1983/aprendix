@@ -9,19 +9,30 @@
 
 <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active pl-4 pr-4" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">  
-        <p style="margin-bottom: 16px; font-size: 15px; line-height: 1.6; color: #444;" class="m-2">
-            Este documento apresenta a <strong>tabela com as médias finais dos alunos por disciplina</strong>, acompanhadas do <strong>total de faltas acumuladas</strong> ao longo do período letivo. Ao final de cada linha, é indicada a <strong>situação final do aluno</strong>, que pode ser:
-            <ul style="margin-top: 8px; padding-left: 20px;">
-                <li><strong>Aprovado</strong> – alcançou média e frequência mínimas exigidas;</li>
-                <li><strong>Aprovado pelo conselho</strong> – aprovado por decisão do conselho de classe;</li>
-                <li><strong>Retido</strong> – não atingiu os critérios de aprovação;</li>
-                <li><strong>Em andamento</strong> – turma ainda em processo de avaliação.</li>
-            </ul>
-        </p>            
+        <div class='d-flex gap-1'>
+            <div class="alert alert-info">
+                Este documento apresenta a <strong>tabela com as médias finais dos alunos por disciplina</strong>, acompanhadas do <strong>total de faltas acumuladas</strong> ao longo do período letivo. Ao final de cada linha, é indicada a <strong>situação final do aluno</strong>, que pode ser:
+                <ul style="margin-top: 8px; padding-left: 20px;">
+                    <li><strong>Aprovado</strong> – alcançou média e frequência mínimas exigidas;</li>
+                    <li><strong>Aprovado pelo conselho</strong> – aprovado por decisão do conselho de classe;</li>
+                    <li><strong>Retido</strong> – não atingiu os critérios de aprovação;</li>
+                    <li><strong>Em andamento</strong> – turma ainda em processo de avaliação.</li>
+                </ul>
+            </div>
+
+            <div class="alert alert-warning" role="alert"> 
+                <h5 class="alert-heading"><i class="fa-solid fa-triangle-exclamation me-2"></i>Atenção!</h5> 
+                <p> Após verificar todas as informações e registros dos alunos, é necessário <strong>concluir a turma</strong>. </p> 
+                <ul class="mb-2"> 
+                    <li><strong>Proteger os lançamentos</strong> de notas e frequências contra alterações indevidas.</li> 
+                    <li><strong>Liberar os alunos</strong> para matrícula no próximo ano letivo.</li> 
+                </ul> 
+                <p class="mb-0"> Certifique-se de que todos os dados estejam corretos antes de concluir a turma, pois essa ação finaliza oficialmente o período atual. </p> 
+            </div>
+        </div>   
 
         <div class="">
             <div class="card-body">
-
                 <style>
                     @media print {
                         @page {
@@ -54,7 +65,6 @@
 
                     /* Estilo Windows 12 para tela */
                     #ata_notas {
-                        margin: 30px auto;
                         background: #f5f7fa;
                         border-radius: 16px;
                         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
@@ -120,7 +130,13 @@
                         <div style="text-align: center; font-weight: bolder;">
                             <h4>Ata de notas da Turma {{ matriculas.0.turma }}</h4>
                         </div>
-                        <button onclick="printTable()" class="m-2">Imprimir</button>
+                        <div class='d-flex'>
+                            <button onclick="printTable()" class="m-2">Imprimir</button>
+                            {% url 'Gestao_Escolar:ConcluirTurmas' matriculas.0.turma.id as editar_url %}
+                            {% include "Escola/components/linkConfirmar.html" with link=editar_url title="Concluir Turmas" label="Concluir Turma"  %}
+                        </div>
+
+                   
                     </div>
 
                     <div id="tabela-alunos">
@@ -136,7 +152,7 @@
                                 <tr>
                                     {% for d in disciplinas %}
                                         <th>Média</th>
-                                        <th>Faltas</th>
+                                        <th>Faltas</th>s
                                     {% endfor %}
                                 </tr>
                             </thead>
@@ -158,7 +174,7 @@
                                         <td>
                                             {% if not m.gestao_turmas_related.first.trimestre.final == 'False' %}
                                                 {% if m.gestao_turmas_related.first.aprovado %}
-                                                    Aprovado rrr
+                                                    Aprovado 
                                                 {% else %}
                                                     {% if m.aprovado_conselho %}
                                                         Aprovado pelo conselho
