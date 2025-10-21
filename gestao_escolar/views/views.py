@@ -201,6 +201,9 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
                 'M': turma.related_matricula_turma.filter(camisa_tamanho__nome='M').count(),
                 'G': turma.related_matricula_turma.filter(camisa_tamanho__nome='G').count(),
                 'GG': turma.related_matricula_turma.filter(camisa_tamanho__nome='GG').count(),
+                'concluida': turma.turma_concluida,
+                
+                
             }
 
             # Atualiza totais gerais
@@ -219,6 +222,7 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
                 'nome': turma.nome,
                 'descritivo_turma': turma.descritivo_turma,
                 'matriculas': turma.related_matricula_turma.count(),
+          
                 'quantidade_vagas': turma.quantidade_vagas,
                 'vagas_disponiveis': turma.vagas_disponiveis or turma.quantidade_vagas,
                 **alunos_especiais
@@ -226,6 +230,10 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
 
         context["matriculas_all"] = turmas_info
         context["vagas_disponiveis_total"] = totais
+
+        # ✅ Conta quantas turmas já foram concluídas
+        total_concluidas = turmas.filter(turma_concluida=True).count()
+        context['total_concluidas'] = total_concluidas
 
         # Chama a função que retorna o contexto dos alunos em risco
         contexto_risco = obter_alunos_risco_evasao(self.request)

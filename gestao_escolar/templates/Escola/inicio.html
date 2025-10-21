@@ -66,8 +66,9 @@
                         <table class="win11-table">
                             <thead>
                                 <tr>
-                                    <th>Turmas   </th>
+                                    <th>Turmas   </th>                                    
                                     <th>Alunos matriculados</th>
+                                    <th>Concluída</th>
                                     <th>Limite de Vagas</th>
                                     <th>Vagas disponíveis</th>
                                     <th>Autistas </th>
@@ -78,7 +79,8 @@
                                 {% for turma in matriculas_all %}
                                 <tr>
                                     <td>{{ turma.nome }} <span class='text-uppercase'>{{ turma.descritivo_turma }}</span></td>
-                                    <td>{{ turma.matriculas }} </td>
+                                    <td>{{ turma.matriculas }} </td>                                    
+                                    <td>{% if turma.concluida %}<i class="fa-solid fa-check text-success"></i>{% endif %} </td>
                                     <td>{{ turma.quantidade_vagas }}</td>
                                     <td>{{ turma.vagas_disponiveis }}</td>
                                     <td>{{ turma.autistas }}</td>
@@ -89,6 +91,7 @@
                                 <tr class='bg-success-subtle text-black fs-2'>
                                     <td><strong>Total</strong></td>
                                     <td>{{ vagas_disponiveis_total.total_matriculas }}</td>
+                                    <td> {{ total_concluidas}}</td>
                                     <td>{{ vagas_disponiveis_total.total_vagas }}</td>
                                     <td>{{ vagas_disponiveis_total.vagas_disponiveis_total }}</td>
                                     <td>{{ vagas_disponiveis_total.total_autistas }}</td>

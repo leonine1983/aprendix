@@ -5,6 +5,7 @@ from django.db.models import Q
 from gestao_escolar.views.alunos.partials_alunos.alunos_form import Alunos_form
 from django.contrib import messages
 
+
 def pesquisar_aluno(request):
     form = Alunos_form(request.POST or None)
 
@@ -31,3 +32,5 @@ def pesquisar_aluno(request):
  
 
     return render(request, 'Escola/matriculaOnline/pesquisar_aluno.html', {'form':form})
+
+

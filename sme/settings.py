@@ -178,6 +178,7 @@ X_FRAME_OPTIONS = 'DENY'
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
+"""
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
@@ -185,7 +186,27 @@ EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT', cast=int)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL') """
+# Configurações de e-mail Outlook
+# settings.py
+
+# 1. Backend: Fixo
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# 2. Credenciais do Mailtrap Sandbox (Use os seus valores REAIS para Username e Password!)
+
+
+
+# 4. Email Remetente
+#DEFAULT_FROM_EMAIL = 'AprendiX <naoresponda@exemplo.com>'
+
+
+# Looking to send emails in production? Check out our Email API/SMTP product!
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_HOST_USER = '3223e2a1b4735a'
+EMAIL_HOST_PASSWORD = '3dfc60cbe83e53'
+EMAIL_PORT = '2525'
+
 
 
 # Message settings
