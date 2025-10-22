@@ -9,6 +9,12 @@ class Config_plataforma(models.Model):
     rh_Ativo = models.BooleanField(default=False)
     nome_sistema = models.CharField(max_length=100, default='SME Aprendix')
     versao = models.CharField(max_length=10, default='1.0.0')
+    dominio = models.CharField(max_length=15, default='aprendix.cauans-solutions.ic')
+    emailApp = models.CharField(max_length=15, default='cauans.technology@gmail.com')
+    senhaApp=models.CharField(max_length=15, default='yvnu lwgx fydm mmcf')
+
+    def __str__(self):
+        return f'{self.nome_sistema} {self.versao}'
 
 
 class Uf_Unidade_Federativa(models.Model):

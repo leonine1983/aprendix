@@ -19,3 +19,5 @@ admin.site.register(Vinculo_empregaticio)
 admin.site.register(Encaminhamentos)
 admin.site.register(Feriado)
 
+admin.site.register(Config_plataforma)
+
