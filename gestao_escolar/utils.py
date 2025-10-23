@@ -117,3 +117,38 @@ def processar_dados(request, ano, escola_id):
         "matriculas_all": matriculas_all,
         "totais_vagas_disponiveis_total": totais_vagas_disponiveis_total
     }
+
+
+from django.core.mail import send_mail
+from django.conf import settings
+
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
+def enviaEmail(assunto, template_html, contexto, email_destino):
+    """
+    Envia um e-mail HTML com template renderizado.
+    - assunto: Assunto do e-mail
+    - template_html: caminho do template (ex: 'emails/matricula_confirmada.html')
+    - contexto: dicionário com dados para o template
+    - email_destino: destinatário ou lista de e-mails
+    """
+    # Renderiza o HTML do template
+    html_message = render_to_string(template_html, contexto)
+
+    # Gera uma versão texto puro (para fallback)
+    plain_message = strip_tags(html_message)
+
+    # Garante que o destino seja uma lista
+    if isinstance(email_destino, str):
+        email_destino = [email_destino]
+
+    send_mail(
+        subject=assunto,
+        message=plain_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=email_destino,
+        html_message=html_message,
+        fail_silently=False,
+    )
+

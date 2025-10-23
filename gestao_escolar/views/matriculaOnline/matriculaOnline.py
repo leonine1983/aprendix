@@ -8,6 +8,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .impugarMatricula_form import *
 
+from ...utils import enviaEmail
+
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from rh.models import Config_plataforma, Prefeitura
+
+
+
 
 @login_required
 def matricular_aluno(request, aluno_id):
@@ -127,49 +135,80 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 
 from django.shortcuts import render, get_object_or_404, redirect
-
 @login_required
 def matricula_confirmada(request, mat_id):
-    # Obtém a matrícula online
     matricula_online = get_object_or_404(MatriculasOnline, id=mat_id)
     
     aluno_queryset = Alunos.objects.filter(id=matricula_online.aluno.id)
     turma_queryset = Turmas.objects.filter(
         serie=matricula_online.serie.serie,
-        ano_letivo=matricula_online.serie.escola.ano_letivo       
-    )  
+        ano_letivo=matricula_online.serie.escola.ano_letivo
+    )
 
     if request.method == 'POST':
         form = MatriculasOnlineFormConfirmada(request.POST, instance=matricula_online)
-        
+
         if form.is_valid():
-            # Cria nova instância de Matriculas a partir do form
             matricula_nova = Matriculas.objects.create(
                 aluno=form.cleaned_data['aluno'],
                 turma=form.cleaned_data['turma']
             )
-            print(f' a matriucl : {matricula_nova} {matricula_nova.turma}')
-            """
-            # Marca a matrícula online como confirmada
-            matricula_em_gestaoTurmas =  Matriculas.objects.get(id=matricula_nova.id)
-            if matricula_em_gestaoTurmas:
-                GestaoTurmas.objects.get_or_create(
-                    aluno = matricula_em_gestaoTurmas
-                )
-                messages.info(request, f"O aluno {matricula_nova} foi inserido em gestao de turmas")
 
-                """
-            
-
+            nome_sistema = Config_plataforma.objects.all().last()
+            prefeitura = Prefeitura.objects.get(id=1)
             matricula_online.confirma = True
             matricula_online.save()
 
+            try:
+                assunto = f"Confirmação de Matrícula do aluno - {matricula_nova.aluno}"
+                mensagem = (
+                    f"<p>Olá {str(matricula_nova.aluno).upper()},</p>\n\n"
+                    f"<p>Seja bem-vindo(a) à {matricula_nova.turma.escola}! 🎉</p>\n\n"
+                    f"<p>Sua matrícula foi confirmada com sucesso no {matricula_nova.turma} "
+                    f"para o ano letivo de {matricula_nova.turma.ano_letivo}.</p>\n\n"
+                    f"<p>Aqui estão seus dados de acesso:</p>\n"
+                    f"<ul><li>Usuário: {matricula_nova.aluno.login_aluno}</li>\n"
+                    f"<li>Senha: {matricula_nova.aluno.senha}</li></ul>\n\n"
+                    f"<p>Se tiver qualquer dúvida, procure a secretaria da {matricula_nova.turma.escola}.</p>\n\n"
+                    f"<p>Um ótimo início de ano letivo!</p>\n\n"
+                    f"<p>Com carinho,<br>Equipe {nome_sistema}</p>"
+                )
+
+                contexto = {
+                    'prefeitura': prefeitura.nome,
+                    'pessoa_publica': prefeitura.pessoa_publica,
+                    'brasao': prefeitura.brasao,
+                    'pastaAdnistrativa': prefeitura.instituto,
+                    'endereco': prefeitura.endereco,
+                    'cidade': prefeitura.cidade,
+                    'estado': prefeitura.estado,
+                    'aluno': matricula_nova.aluno,
+                    'login': matricula_nova.aluno.login_aluno,
+                    'senha': matricula_nova.aluno.senha,
+                    'mensagem': mensagem,
+                    'nome_sistema': nome_sistema,
+                    'dominio': nome_sistema.dominio
+                }
+
+                enviaEmail(
+                    assunto=assunto,
+                    template_html='Escola/emails/confirma_cadastro.html',
+                    contexto=contexto,
+                    email_destino=matricula_nova.aluno.email,
+                )
+                messages.success(request, f"E-mail de confirmação enviado para {matricula_nova.aluno.email}.")
+
+            except Exception as e:
+                messages.error(request, f"Erro ao enviar o e-mail: {e}")
+
             return redirect('Gestao_Escolar:GE_Escola_Matricula_create', matricula_nova.turma.id)
+
         else:
             return render(request, 'Escola/matriculaOnline/matricula_sucesso/sucesso.html', {
                 'form': form,
                 'matricula': matricula_online
             })
+
     else:
         form = MatriculasOnlineFormConfirmada(
             instance=matricula_online,

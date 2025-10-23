@@ -518,10 +518,6 @@ class Matriculas(models.Model):
                     trimestre = Trimestre.objects.get(id = tri.id)
                 )
 
-
-  
-
-
     class Meta:
         ordering = ['aluno']
 
