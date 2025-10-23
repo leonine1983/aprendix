@@ -9,7 +9,7 @@ from django.conf import settings
 
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from rh.models import Config_plataforma
+from rh.models import Config_plataforma, Prefeitura
 
 def enviaEmail(assunto, template_html, contexto, email_destino):
     """
@@ -84,6 +84,8 @@ def cadastro_aluno_etapa1(request, nome, mae, cpf):
 
         # Envio do e-mail de confirmação
         nome_sistema = Config_plataforma.objects.all().last()
+        prefeitura = Prefeitura.objects.get(id=1)
+
         try:
             assunto = f"Cadastro concluído - {nome_completo}"
             mensagem = (
@@ -98,7 +100,14 @@ def cadastro_aluno_etapa1(request, nome, mae, cpf):
                 f"<p>Com carinho,\n Equipe {nome_sistema}</p>"                
             )
 
-            contexto = {
+            contexto = {                
+                'prefeitura':prefeitura.nome,
+                'pessoa_publica':prefeitura.pessoa_publica,
+                'brasao':prefeitura.brasao,
+                'pastaAdnistrativa':prefeitura.instituto,
+                'endereco':prefeitura.endereco,
+                'cidade':prefeitura.cidade,
+                'estado':prefeitura.estado,
                 'aluno': aluno,
                 'login':login,
                 'senha':senha,

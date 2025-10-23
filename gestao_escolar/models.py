@@ -9,6 +9,11 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from django.db import connection
 from django.db.utils import OperationalError
 
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.conf import settings
+
+
 
 class Cargo(models.Model):
     nome = models.CharField(max_length=30)
@@ -449,10 +454,7 @@ class TurmaDisciplina(models.Model):
     
 
     def __str__(self):
-        return f'{self.disciplina.nome} - {self.professor.encaminhamento}'
-    
-
-
+        return f'{self.disciplina.nome} - {self.professor.encaminhamento}'   
 
 
 escola_fora = {
@@ -515,6 +517,9 @@ class Matriculas(models.Model):
                     matricula = Matriculas.objects.get(id=instance.id),
                     trimestre = Trimestre.objects.get(id = tri.id)
                 )
+
+
+  
 
 
     class Meta:
