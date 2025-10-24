@@ -1,1 +1,510 @@
 {% extends "modulo_aluno/base.html" %}
+{% load static %}
+
+{% block main %}
+{% if matricula_atual %}
+  <!-- ======== Conteúdo principal (grid responsiva) ======== -->
+  <main class="mt-4" role="main">
+    <div class="row g-4">
+      
+      <!-- Próximas aulas -->
+      <section class="col-12 col-lg-4">
+        <div class="card h-100 card-hover">
+          <div class="card-body">
+            <h3 class="card-title h6 mb-3">📚 Próximas aulas</h3>
+            <ul class="list-unstyled mb-0">
+              {% for aula in proximas_aulas %}
+                <li class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                  <div class="small">{{ aula.disciplina }}</div>
+                  <div class="small text-muted">{{ aula.horario }}</div>
+                </li>
+              {% empty %}
+                <li class="text-muted small">Nenhuma aula programada.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Avisos -->
+      <section class="col-12 col-lg-4">
+        <div class="card h-100 card-hover">
+          <div class="card-body d-flex flex-column">
+            <h3 class="card-title h6 mb-3">📢 Avisos</h3>
+            <div class="overflow-auto" style="max-height:180px;">
+              {% for aviso in avisos %}
+                <div class="mb-3">
+                  <div class="small fw-semibold">{{ aviso.titulo }}</div>
+                  <div class="small text-muted">{{ aviso.data|date:"d/m/Y" }}</div>
+                  <p class="mb-0 small">{{ aviso.texto }}</p>
+                </div>
+              {% empty %}
+                <p class="text-muted small">Sem avisos.</p>
+              {% endfor %}
+            </div>
+            <div class="mt-auto pt-3">
+              <a href="#" class="btn btn-sm btn-outline-primary w-100">Ver todos os avisos</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Atalhos / KPIs -->
+      <section class="col-12 col-lg-4">
+        <div class="card h-100 card-hover">
+          <div class="card-body">
+            <h3 class="card-title h6 mb-3">⚡ Atalhos</h3>
+            <div class="d-grid gap-2 mb-3">
+              <a href="#" class="btn btn-primary btn-sm">Notas</a>
+              <a href="#" class="btn btn-outline-primary btn-sm">Frequência</a>
+              <a href="#" class="btn btn-outline-primary btn-sm">Material da Turma</a>
+              <a href="#" class="btn btn-outline-secondary btn-sm">Contato Professores</a>
+            </div>
+
+            <hr class="my-2">
+
+            <div class="d-flex justify-content-between small text-muted">
+              <div>Nota média</div>
+              <div class="fw-bold">8.4</div>
+            </div>
+            <div class="d-flex justify-content-between small text-muted">
+              <div>Frequência</div>
+              <div class="fw-bold">92%</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Tabs para conteúdo mais extenso -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card card-hover">
+          <div class="card-body">
+            
+            <ul class="nav nav-tabs mb-3" id="alunoTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="materiais-tab" data-bs-toggle="tab" data-bs-target="#materiais" type="button" role="tab">Materiais</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tarefas-tab" data-bs-toggle="tab" data-bs-target="#tarefas" type="button" role="tab">Tarefas</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="calendario-tab" data-bs-toggle="tab" data-bs-target="#calendario" type="button" role="tab">Calendário</button>
+              </li>
+            </ul>
+
+            <div class="tab-content">
+              
+              <!-- Materiais -->
+              <div class="tab-pane fade show active" id="materiais" role="tabpanel">
+                <div class="row gy-2">
+                  {% for material in materiais %}
+                    <div class="col-12 col-md-6">
+                      <div class="border rounded p-2 small">
+                        <div class="fw-semibold">{{ material.titulo }}</div>
+                        <div class="text-muted small">{{ material.descricao|truncatechars:80 }}</div>
+                      </div>
+                    </div>
+                  {% empty %}
+                    <p class="text-muted small">Nenhum material disponível.</p>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- Tarefas -->
+              <div class="tab-pane fade" id="tarefas" role="tabpanel">
+                <p class="small text-muted mb-0">Tarefas recentes aparecerão aqui.</p>
+              </div>
+
+              <!-- Calendário -->
+              <div class="tab-pane fade" id="calendario" role="tabpanel">
+                <p class="small text-muted mb-0">Calendário com eventos e provas.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bootstrap JS (bundle com Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  {% else %}
+    {% if not aluno_matricula_online is not None %}
+        <div class="text-center">
+            <div class="container mt-1">
+                <div class="card text-center">
+
+                
+                    <!-- Cabeçalho -->
+                    <div class="card-header">                
+                        <div>
+                            <div class="d-flex justify-content-center align-items-center min-vh-75 bg-light">
+                                <div class="container">
+                                    <div class="card shadow-lg border-0 mx-auto" style="max-width: 600px; border-radius: 16px;">
+                                    <div class="card-body text-center p-3">
+                                        <div class="card-body text-center p-5">
+                                        <!-- Logo do município -->
+                                        {% if prefeitura.brasao %}
+                                        <img src="{{prefeitura.brasao.url}}" alt="{{prefeitura}}" height="100" class="mb-3">
+                                        {% else %}
+                                        <img src="https://placehold.co/150x100?text=Logo+da+Prefeitura" alt="Adicione o logo da sua prefeitura">
+                                        {% endif %}                             
+
+                                        <h3 class="fw-bold text-primary mb-3">Bem-vindo(a) ao Portal de Matrículas!</h3>
+                                        <p class="text-muted mb-4 fs-6">
+                                            Aqui você poderá realizar sua <strong>pré-matrícula</strong> em uma escola do município para o atual ano letivo. 
+                                            Para garantir que tudo ocorra corretamente, é essencial que seus dados estejam atualizados.
+                                        </p>
+
+                                        <div class="alert alert-info text-start shadow-sm" role="alert" style="border-radius: 10px;">
+                                            <i class="bi bi-info-circle-fill me-2 text-primary"></i>
+                                            Clique no botão abaixo para acessar a página de <strong>atualização de cadastro</strong>. 
+                                            Somente após atualizar seus dados será possível concluir a pré-matrícula.
+                                        </div>
+
+                                        <a href="{% url 'Gestao_Escolar:cadastro_aluno_etapa2' request.user.userAluno_related.aluno.id %}"
+                                        class="btn btn-primary btn-lg px-5 py-3 mt-3 shadow-sm"
+                                        style="border-radius: 12px; font-weight: 600;">
+                                            <i class="bi bi-person-lines-fill me-2"></i> Atualizar Cadastro
+                                        </a>
+
+                                        <p class="text-secondary mt-4 mb-0 small">
+                                            Após atualizar suas informações, retorne a esta página para continuar sua pré-matrícula. 
+                                            Se precisar de ajuda, consulte a equipe da secretaria da escola.
+                                        </p>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            {% else %}
+
+                <style>
+                    #id_login_aluno, #id_senha{
+                        background-color: rgb(248, 124, 200)!important;
+                    }
+                    .form-section-title {
+                    font-size: 1.2rem;
+                    color: #333;
+                    margin-top: 20px;
+                    margin-bottom: 10px;
+                }
+
+                .form-group {
+                    margin-bottom: 15px;
+                }
+
+                /* Estilo geral para o select */
+                    #id_espectro_autista{
+                    padding: 10px;
+                    font-size: 16px;
+                    font-family: Arial, sans-serif;
+                    border-radius: 8px;
+                    border: 2px solid #4CAF50; /* Cor suave mas chamativa */
+                    background-color: #f9f9f9; /* Fundo suave */
+                    transition: all 0.3s ease; /* Transição suave para interações */
+                    outline: none;
+                    }
+
+                    /* Efeito de foco - quando o usuário clica no campo */
+                    #id_espectro_autista:focus {
+                    border-color: #2196F3; /* Azul vibrante para indicar foco */
+                    box-shadow: 0 0 8px rgba(33, 150, 243, 0.5); /* Sombra sutil */
+                    }
+
+                    /* Estilo das opções no select */
+                    #id_espectro_autista option {
+                    padding: 10px;
+                    font-size: 16px;
+                    }
+
+                    /* Hover para melhorar a interação */
+                    #id_espectro_autista:hover {
+                    border-color: #388E3C; /* Verde mais forte quando o usuário passa o mouse */
+                    }
+
+
+                    
+                /* Estilo do dialog */
+                #confirmDialog {
+                border: none;
+                border-radius: 16px;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+                padding: 24px;
+                max-width: 480px;
+                width: 90%;
+                font-family: 'Segoe UI', sans-serif;
+                }
+
+                /* Título */
+                #confirmDialog p {
+                font-size: 0.8rem;
+                margin-bottom: 12px;
+                color: #212529;
+                }
+
+                /* Destaque série e turno */
+                #confirmDialog .serie {
+                color: #0d6efd; /* azul Bootstrap */
+                font-weight: 700;
+                }
+                #confirmDialog .turno {
+                color: #198754; /* verde Bootstrap */
+                font-weight: 700;
+                }
+
+                /* Texto auxiliar */
+                #confirmDialog .info {
+                font-size: 0.875rem;
+                color: #6c757d;
+                margin-bottom: 20px;
+                }
+
+                /* Botões */
+                #confirmDialog menu {
+                display: flex;
+                justify-content: flex-end;
+                gap: 12px;
+                }
+
+                #confirmDialog .btn-cancel {
+                background: #f8f9fa;
+                color: #495057;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 500;
+                }
+
+                #confirmDialog .btn-cancel:hover {
+                background: #e2e6ea;
+                }
+
+                #confirmDialog .btn-confirm {
+                background: #0d6efd;
+                color: #fff;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 500;
+                }
+
+                #confirmDialog .btn-confirm:hover {
+                background: #0b5ed7;
+                }
+                </style>
+                <link rel="stylesheet" href="{% static 'global/css/form_win11.css' %}">
+                <div class="container p-4 bg-light text-muted " style=" color: #fff; border-radius: 8px; width:95vw; margin-top:5rem!important">
+                    <div class="container border-bottom" >
+                        <!-- Container para centralizar o conteúdo e garantir responsividade -->
+                        <div class="row align-items-center">
+                            <!-- Linha para organizar os elementos em colunas -->
+                            {% if prefeitura.brasao %}
+                                        <img src="{{prefeitura.brasao.url}}" alt="{{prefeitura}}"  class="mb-3 w-25" >
+                                        {% else %}
+                                        <img src="https://placehold.co/100x100?text=Logo+da+Prefeitura" alt="Adicione o logo da sua prefeitura">
+                                        {% endif %}   
+                            <div class="col">
+                                <!-- Coluna que ocupa 12 espaços na tela pequena -->
+                                <a class="nav-link btn border w-100 text-center" title="Atualizar Data de Nascimento | NIS | CNS" href="{% url 'Gestao_Escolar:cadastro_aluno_etapa2' request.user.userAluno_related.aluno.id %}">
+                                    <span class="fs-6">Data de Nascimento | NIS | CNS</span>
+                                </a>
+                                <!-- Usar w-100 para o link ocupar toda a largura da coluna e text-center para centralizar o texto -->
+                            </div>
+                            <div class="col">
+                                <!-- Coluna que ocupa 12 espaços na tela pequena -->
+                                <a class="nav-link btn border w-100 text-center" title="Atualizar Data de Nascimento | NIS | CNS" href="{% url 'Gestao_Escolar:cadastro_aluno_etapa2' request.user.userAluno_related.aluno.id %}">
+                                    <span class="fs-6">Data de Nascimento | NIS | CNS</span>
+                                </a>
+                                <!-- Usar w-100 para o link ocupar toda a largura da coluna e text-center para centralizar o texto -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container mt-1 ">
+                        <!-- Mensagem de aviso -->
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            <h2 class="text-center">🎉 Bem-vindo à Área de Matrícula Online do Aluno! 🎓</h2>
+                            <p class="mt-3">
+                                É um prazer ter você aqui! Estamos comprometidos em ajudar a dar início a uma nova etapa educacional para o seu filho. 🌟<br>
+                                Para começar, basta selecionar a escola que melhor atende à sua localização e às necessidades da sua família. 🏫✨<br>
+                                Nosso objetivo é tornar esse processo simples, rápido e acolhedor, garantindo que o futuro educacional do seu filho comece com o pé direito. 🚀
+                            </p>
+                        </div>        
+                    </div>
+
+                    <div class="container mt-4">
+                        <div class="alert alert-info" role="alert">
+                            <strong>Seleção da Escola</strong>
+                            <p>Com base no bairro onde o aluno reside, as escolas disponíveis para a sua localidade estão listadas abaixo. Por favor, selecione a escola conforme a série escolar em que o aluno se encontra. Isso garantirá que o aluno seja matriculado na instituição mais adequada à sua série e localização, facilitando o acesso e o acompanhamento educacional.</p>
+                        </div>
+                    
+                        <div class="card">
+                            <div class="card-header">
+                                Escolas Disponíveis
+                            </div>
+                            <div class="card-body">
+                                <h2 class='h2 fs-5'>Aluno: <span class='text-capitalize'>{{alunoM}}</span> | Bairro: <span class='text-capitalize'>{{alunoM.bairro}}</span></h2>
+                                <link rel="stylesheet" href="{% static 'global/css/table_win11.css' %}">
+                                <table class="table table-bordered win11-table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Escolas</th>
+                                            <th>Ano Letivo</th>
+                                            <th>Series Disponíveis</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for e in escola_bairro %}
+                                        <tr class = 'align-middle'>
+                                            <td>{{e}}</td>
+                                            <td>{{e.ano_letivo}}</td>
+                                            <td >
+                                            {% for s in e.escolaOnlineRelated.all  %}                               
+                                                <a class="btn btn-sm m-1 btn-primary text-decoration-none matricula-link d-block"
+                                                        data-serie="{{s}}"
+                                                        data-turno="{{s.turno}}"
+                                                        data-url="{% url 'Gestao_Escolar:matricular_alunoSerie' aluno_id=alunoM.id serie_id=s.id %}">
+                                                        {{s}} {{s.turno}}
+                                                        </a>
+
+                                                        <!-- Dialog HTML -->
+                                                        <dialog id="confirmDialog_{{s.id}}">
+                                                            <form method="dialog">
+                                                                <p id="dialogMessage_{{s.id}}"></p>
+                                                                <menu>
+                                                                <button value="cancel" class="btn btn-secondary">Cancelar</button>
+                                                                <button value="confirm" class="btn btn-primary">Confirmar</button>
+                                                                </menu>
+                                                            </form>
+                                                        </dialog>
+
+                                                        <script>
+                                                        document.addEventListener("DOMContentLoaded", () => {
+                                                            const dialog = document.getElementById("confirmDialog_{{s.id}}");
+                                                            const dialogMessage = document.getElementById("dialogMessage_{{s.id}}");
+
+                                                            document.querySelectorAll(".matricula-link").forEach(link => {
+                                                            link.addEventListener("click", (event) => {
+                                                                event.preventDefault(); // evita carregar a página direto
+
+                                                                const serie = link.dataset.serie;
+                                                                const turno = link.dataset.turno;
+                                                                const url = link.dataset.url;
+
+                                                                // Exemplo simples: aqui você pode usar idade do aluno via template
+                                                                const idadeAluno = {{ userAluno.aluno.idade|default:0 }};  
+
+                                                                let mensagem = `Tem certeza que deseja matricular o aluno na série ${serie}, turno ${turno}?`;
+                                                                
+                                                                // Exemplo de regra baseada na idade
+                                                                if (idadeAluno < 12 && turno === "Noturno") {
+                                                                mensagem += "\n⚠ Atenção: Pela idade do aluno, o turno noturno pode não ser o mais indicado.";
+                                                                }
+
+                                                                dialogMessage.textContent = mensagem;
+                                                                dialog.showModal();
+
+                                                                dialog.addEventListener("close", () => {
+                                                                if (dialog.returnValue === "confirm") {
+                                                                    window.location.href = url;
+                                                                }
+                                                                }, { once: true });
+                                                            });
+                                                            });
+                                                        });
+                                                        </script>
+                                                
+
+                                            {% endfor %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>  
+                </div>
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.9/jquery.inputmask.min.js" integrity="sha512-F5Ul1uuyFlGnIT1dk2c4kB4DBdi5wnBJjVhL7gQlGh46Xn0VhvD8kgxLtjdZ5YN83gybk/aASUAlpdoWUjRR3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+                <script>
+                    $(document).ready(function() {
+                        // Aplicando a máscara de CPF (xxx.xxx.xxx-xx)
+                        $('#id_tel_celular_mae').inputmask('(99) 9 9999 9999');        
+                        $('#id_tel_celular_pai').inputmask('(99) 9 9999 9999');        
+                        
+                        // Aplicando a máscara de NIS (xxxxxxxxxxxxxxx)
+                        $('#id_nis').inputmask('999.99999.999');
+
+                        // Aplicando mascara no NIS
+                        $('#id_cartao_nacional_saude_cns').inputmask('999.9999.9999.9999');
+                    });
+                </script>
+
+            {% endif %}
+            
+
+
+
+
+
+
+
+
+
+
+
+            <!-- Corpo -->
+            <div class="card-body">
+                <table class="win11-table m-3">
+                    <thead>
+                        <tr>
+                        <th>Escola</th>
+                        <th>Ano Letivo</th>
+                        <th>Pré-Matrícula (Série)</th>
+                        <th>Situação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in aluno %}
+                        <tr>
+                            <td>{{ a.serie.escola }}</td>
+                            <td>{{ a.serie.escola.ano_letivo }}</td>
+                            <td>{{ a.serie }}</td>
+                            <td>
+                            {% if a.confirma %}
+                                <p class="text-success mb-0">
+                                Sua matrícula foi confirmada com sucesso.
+                                <br>Em breve, os dados da sua turma estarão disponíveis neste App.
+                                </p>
+                            {% endif %}
+
+                            {% if a.impugnar %}
+                                <h5 class="text-danger mt-2">A matrícula do aluno foi recusada pelos motivos abaixo:</h5>
+                                <b class="fs-5 text-dark">{{ a.pendecia|safe }}</b>
+                            {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Rodapé -->
+            <div class="card-footer text-muted fs-5">
+                Se tiver dúvidas, entre em contato com a secretaria da Escola.
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endif %}   
+{% endblock main %}

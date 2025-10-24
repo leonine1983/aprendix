@@ -13,13 +13,15 @@ from ...utils import enviaEmail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from rh.models import Config_plataforma, Prefeitura
+from gestao_escolar.models import MatriculasOnline
 
 
 
 
 @login_required
 def matricular_aluno(request, aluno_id):
-    aluno = Alunos.objects.get(id=aluno_id)
+    """    aluno = Alunos.objects.get(id=aluno_id)
+    # Verifica se o aluno fez a matricula online anteriormente     
     aluno_bairro = aluno.bairro
     bairro = get_object_or_404(Bairro, nome_bairro = aluno_bairro)
     escola_bairro = EscolaMatriculaOnline.objects.filter(
@@ -27,8 +29,11 @@ def matricular_aluno(request, aluno_id):
     Q(escola__related_dadosEscola__bairro__id=bairro.id) |
     Q(escola__related_dadosEscola__bairro_atendEscola__id=bairro.id)
     )    
+    aluno_matricula_online = MatriculasOnline.objects.filter(aluno = aluno, confirma = False)
    
-    return render(request, 'Escola/matriculaOnline/matricular_aluno.html', {'aluno': aluno, "escola":escola_bairro})
+    #return render(request, 'Escola/matriculaOnline/matricular_aluno.html', {'aluno': aluno, "escola":escola_bairro}) """
+    return redirect('modulo_aluno:homeAluno')
+    
 
 
 # Cria a Pre_matricula do aluno online
