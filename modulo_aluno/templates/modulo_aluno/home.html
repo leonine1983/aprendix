@@ -132,7 +132,7 @@
   <!-- Bootstrap JS (bundle com Popper) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   {% else %}
-    {% if not aluno_matricula_online is not None %}
+    {% if aluno_matricula_online is not None %}
         <div class="text-center">
             <div class="container mt-1">
                 <div class="card text-center">
@@ -159,22 +159,24 @@
                                             Para garantir que tudo ocorra corretamente, é essencial que seus dados estejam atualizados.
                                         </p>
 
-                                        <div class="alert alert-info text-start shadow-sm" role="alert" style="border-radius: 10px;">
-                                            <i class="bi bi-info-circle-fill me-2 text-primary"></i>
-                                            Clique no botão abaixo para acessar a página de <strong>atualização de cadastro</strong>. 
-                                            Somente após atualizar seus dados será possível concluir a pré-matrícula.
-                                        </div>
+                                        {% if not aluno_matricula_online is not None %}
+                                          <div class="alert alert-info text-start shadow-sm" role="alert" style="border-radius: 10px;">
+                                              <i class="bi bi-info-circle-fill me-2 text-primary"></i>
+                                              Clique no botão abaixo para acessar a página de <strong>atualização de cadastro</strong>. 
+                                              Somente após atualizar seus dados será possível concluir a pré-matrícula.
+                                          </div>
 
-                                        <a href="{% url 'Gestao_Escolar:cadastro_aluno_etapa2' request.user.userAluno_related.aluno.id %}"
-                                        class="btn btn-primary btn-lg px-5 py-3 mt-3 shadow-sm"
-                                        style="border-radius: 12px; font-weight: 600;">
-                                            <i class="bi bi-person-lines-fill me-2"></i> Atualizar Cadastro
-                                        </a>
+                                          <a href="{% url 'Gestao_Escolar:cadastro_aluno_etapa2' request.user.userAluno_related.aluno.id %}"
+                                          class="btn btn-primary btn-lg px-5 py-3 mt-3 shadow-sm"
+                                          style="border-radius: 12px; font-weight: 600;">
+                                              <i class="bi bi-person-lines-fill me-2"></i> Atualizar Cadastro
+                                          </a>
 
-                                        <p class="text-secondary mt-4 mb-0 small">
-                                            Após atualizar suas informações, retorne a esta página para continuar sua pré-matrícula. 
-                                            Se precisar de ajuda, consulte a equipe da secretaria da escola.
-                                        </p>
+                                          <p class="text-secondary mt-4 mb-0 small">
+                                              Após atualizar suas informações, retorne a esta página para continuar sua pré-matrícula. 
+                                              Se precisar de ajuda, consulte a equipe da secretaria da escola.
+                                          </p>
+                                        {% endif %}
                                     </div>
 
 
