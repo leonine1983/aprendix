@@ -100,7 +100,7 @@ def matricula_confirma_impugna(request, mat_id):
             matricula.save()
 
             messages.warning(request, "A matrícula foi marcada como impugnada.")
-            return redirect('Gestao_Escolar:matricular_aluno', aluno_id=matricula.id)
+            return redirect('Gestao_Escolar:GE_Escola_inicio')
         else:
             messages.error(request, "Erro ao salvar a matrícula.")
     else:

@@ -1,0 +1,67 @@
+<!-- Dialog Frequência -->
+<dialog id="dialogFrequencia" class="rounded shadow-lg border-0" style="max-width:700px; width:90%;">
+  <div class="p-3 border-bottom bg-success-subtle d-flex justify-content-between align-items-center rounded-top">
+    <h5 class="m-0 text-success fw-bold">Frequência do Aluno</h5>
+    <button id="fecharFrequencia" class="btn-close"></button>
+  </div>
+
+  <div class="p-3" style="max-height:70vh; overflow-y:auto;">
+    {% if dados_disciplinas %}
+      {% for disciplina, registros in dados_disciplinas.items %}
+        <div class="mb-4">
+          <h6 class="fw-semibold text-success">{{ disciplina }}</h6>
+          <div class="table-responsive">
+            <table class="table table-sm table-bordered align-middle">
+              <thead class="table-success text-center">
+                <tr>
+                  <th>Trimestre</th>
+                  <th>Faltas</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in registros %}
+                  <tr>
+                    <td class="text-center">{{ item.trimestre }}</td>
+                    <td class="text-center fw-semibold text-success">
+                      {{ item.faltas|default:"-" }}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-muted text-center">Nenhuma informação de frequência disponível.</p>
+    {% endif %}
+  </div>
+
+  <div class="p-3 border-top text-end">
+    <button class="btn btn-outline-success btn-sm" id="fecharFrequencia2">Fechar</button>
+  </div>
+</dialog>
+
+<script>
+  const dialogFrequencia = document.getElementById('dialogFrequencia');
+  const abrirFrequencia = document.getElementById('abrirFrequencia');
+  const fecharFrequencia = document.getElementById('fecharFrequencia');
+  const fecharFrequencia2 = document.getElementById('fecharFrequencia2');
+
+  abrirFrequencia.addEventListener('click', () => dialogFrequencia.showModal());
+  fecharFrequencia.addEventListener('click', () => dialogFrequencia.close());
+  fecharFrequencia2.addEventListener('click', () => dialogFrequencia.close());
+
+  // Fechar ao clicar fora
+  dialogFrequencia.addEventListener('click', e => {
+    const bounds = dialogFrequencia.getBoundingClientRect();
+    if (
+      e.clientX < bounds.left ||
+      e.clientX > bounds.right ||
+      e.clientY < bounds.top ||
+      e.clientY > bounds.bottom
+    ) {
+      dialogFrequencia.close();
+    }
+  });
+</script>

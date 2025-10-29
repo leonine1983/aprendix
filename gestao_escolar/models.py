@@ -449,7 +449,7 @@ class TurmaDisciplina(models.Model):
     auxiliar_classe = models.ForeignKey(Encaminhamentos, related_name='auxiliarClasse_related',on_delete=models.PROTECT, null=True, blank=True)
 
     carga_horaria_anual = models.IntegerField(null=True)
-    limite_faltas = models.IntegerField(null=True)
+    # limite_faltas = models.IntegerField(null=True)
 
     
 

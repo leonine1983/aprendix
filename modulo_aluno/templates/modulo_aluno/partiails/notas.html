@@ -1,0 +1,67 @@
+<!-- Dialog Notas -->
+<dialog id="dialogNotas" class="rounded shadow-lg border-0" style="max-width:700px; width:90%;">
+  <div class="p-3 border-bottom bg-success-subtle d-flex justify-content-between align-items-center rounded-top">
+    <h5 class="m-0 text-success fw-bold">Notas do Aluno</h5>
+    <button id="fecharNotas" class="btn-close"></button>
+  </div>
+
+  <div class="p-3" style="max-height:70vh; overflow-y:auto;">
+    {% if dados_disciplinas %}
+      {% for disciplina, registros in dados_disciplinas.items %}
+        <div class="mb-4">
+          <h6 class="fw-semibold text-success">{{ disciplina }}</h6>
+          <div class="table-responsive">
+            <table class="table table-sm table-bordered align-middle">
+              <thead class="table-success text-center">
+                <tr>
+                  <th>Trimestre</th>
+                  <th>Nota</th>
+                  <th>Parecer</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in registros %}
+                  <tr>
+                    <td class="text-center">{{ item.trimestre }}</td>
+                    <td class="text-center fw-semibold text-success">{{ item.nota|default:"-" }}</td>
+                    <td class="small">{{ item.parecer }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-muted text-center">Nenhuma nota disponível.</p>
+    {% endif %}
+  </div>
+
+  <div class="p-3 border-top text-end">
+    <button class="btn btn-outline-success btn-sm" id="fecharNotas2">Fechar</button>
+  </div>
+</dialog>
+
+<script>
+  const dialogNotas = document.getElementById('dialogNotas');
+  const abrirNotas = document.getElementById('abrirNotas');
+  const fecharNotas = document.getElementById('fecharNotas');
+  const fecharNotas2 = document.getElementById('fecharNotas2');
+
+  abrirNotas.addEventListener('click', () => dialogNotas.showModal());
+  fecharNotas.addEventListener('click', () => dialogNotas.close());
+  fecharNotas2.addEventListener('click', () => dialogNotas.close());
+
+  // Fechar ao clicar fora
+  dialogNotas.addEventListener('click', e => {
+    const bounds = dialogNotas.getBoundingClientRect();
+    if (
+      e.clientX < bounds.left ||
+      e.clientX > bounds.right ||
+      e.clientY < bounds.top ||
+      e.clientY > bounds.bottom
+    ) {
+      dialogNotas.close();
+    }
+  });
+</script>

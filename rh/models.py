@@ -173,7 +173,8 @@ class Pessoas(models.Model):
     idade= models.CharField(max_length=9, null=True, blank=True)
     nome_profissao = models.ForeignKey(Profissao, null=True, blank=True, verbose_name='Profissão', on_delete=models.CASCADE)    
     cpf = models.CharField(max_length=30, null=True, verbose_name='CPF')
-    rg= models.CharField(max_length=30, null=True, verbose_name='RG')     
+    rg= models.CharField(max_length=30, null=True, verbose_name='Nº Tel.:')     
+    telefone = models.CharField(max_length=30, null=True, verbose_name='RG')     
     estado= models.ForeignKey(Uf_Unidade_Federativa, null=True, blank=True, verbose_name='Estado', on_delete=models.CASCADE)    
     cidade = models.ForeignKey(Cidade, on_delete=models.CASCADE, related_name='pessoas_cidade_related', null=True, verbose_name='Cidade')
     bairro = models.ForeignKey(Bairro, on_delete=models.CASCADE, related_name='pessoas_bairro_related', null=True, verbose_name='Bairro')  
@@ -272,7 +273,7 @@ class Escola(models.Model):
     author_created = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da criação')
     atualizado_em = models.DateTimeField(auto_now=True, verbose_name='Data da Última Atualização')
     author_atualiza = models.CharField(max_length=50, null=True, blank=True, verbose_name='Autor da atualização')
-    fund2 = models.BooleanField(default=False, verbose_name="Escola de séries finais")
+    fund2 = models.BooleanField(default=False, verbose_name="Escola de séries finais")    
 
     class Meta:
         ordering = ['-fund2','nome_escola']
