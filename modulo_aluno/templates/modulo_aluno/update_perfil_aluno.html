@@ -1,0 +1,334 @@
+{% extends "modulo_aluno/base.html" %}
+{% load static %}
+
+{% block main %}
+<div class="container py-5">
+  <div class="card shadow-lg border-0 rounded-4">
+    <div class="card-header bg-success text-white text-center py-3 rounded-top-4">
+      <h4 class="mb-0">Atualizar Perfil do Aluno</h4>
+      <small class="text-light">Mantenha seus dados sempre atualizados</small>
+    </div>
+
+    <div class="card-body p-4">
+      <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- Navegação por categorias -->
+        <ul class="nav nav-tabs mb-4" id="perfilTabs" role="tablist">
+          <li class="nav-item">
+            <button class="nav-link active" type="button" data-bs-target="#dados">Dados Pessoais</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" type="button" data-bs-target="#endereco">Endereço</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" type="button" data-bs-target="#familia">Família</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" type="button" data-bs-target="#saude">Saúde</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" type="button" data-bs-target="#documentos">Documentos</button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="perfilTabsContent">
+          <!-- DADOS PESSOAIS -->
+          <div class="tab-pane fade show active" id="dados">
+            <div class="row g-3">
+              <div class="col-md-4">
+                {{ form.nome_completo.label_tag }} {{ form.nome_completo }}
+                {% for error in form.nome_completo.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-4">
+                {{ form.nome_social.label_tag }} {{ form.nome_social }}
+                {% for error in form.nome_social.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>              
+
+              <div class="col-md-4">
+                {{ form.data_nascimento.label_tag }} {{ form.data_nascimento }}
+                {% for error in form.data_nascimento.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-4">
+                {{ form.sexo.label_tag }} {{ form.sexo }}
+                {% for error in form.sexo.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-4">
+                {{ form.lateralidade.label_tag }} {{ form.lateralidade }}
+                {% for error in form.lateralidade.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-4">
+                {{ form.email.label_tag }} {{ form.email }}
+                {% for error in form.email.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-4">
+                {{ form.tel_celular_aluno.label_tag }} {{ form.tel_celular_aluno }}
+                {% for error in form.tel_celular_aluno.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-4 text-center p-3 bg-secondary-light shadow m-2 shadow-sm">
+                <img style="width:150px; height:150px; object-fit: cover; border-radius:50%; border:2px solid #198754;" src="{{ request.user.userAluno_related.aluno.foto_aluno.url }}" alt=""></br>
+                {{ form.foto_aluno.label_tag }} {{ form.foto_aluno }}
+                {% for error in form.foto_aluno.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+
+              <div class="col-md-3 text-center p-3 bg-secondary-light shadow m-2 shadow-sm">
+                <div >
+                    Login de acesso do aluno: <b class='fs-3'>{{ request.user.userAluno_related.aluno.login_aluno }}</b><br>
+                    {{ form.senha.label_tag }} {{ form.senha }}
+                    {% for error in form.senha.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div >
+                    <label for="id_senha_repeat">Repita a senha</label>
+                    <input type="password" id="id_senha_repeat" name="senha_repeat" class="form-control" placeholder="Repita a senha" required>
+                    <div id="senha_repeat_error" class="text-danger small"></div>
+                </div>
+
+                <div class="col-md-4 mt-2">
+                    <input type="checkbox" id="show_password"> Exibir senha
+                </div>
+
+                    <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        const form = document.querySelector('form');
+                        const senha = document.getElementById('id_senha');
+                        const senhaRepeat = document.getElementById('id_senha_repeat');
+                        const errorDiv = document.getElementById('senha_repeat_error');
+                        const showPasswordCheckbox = document.getElementById('show_password');
+
+                        // Validação de senhas
+                        form.addEventListener('submit', function(e) {
+                            errorDiv.textContent = '';
+                            if (senha.value !== senhaRepeat.value) {
+                                e.preventDefault();
+                                errorDiv.textContent = 'As senhas não coincidem!';
+                                senhaRepeat.focus();
+                            }
+                        });
+
+                        // Toggle exibir senha
+                        showPasswordCheckbox.addEventListener('change', function() {
+                            const type = this.checked ? 'text' : 'password';
+                            senha.type = type;
+                            senhaRepeat.type = type;
+                        });
+                    });
+                    </script>
+              </div>
+
+
+            </div>
+          </div>
+
+          <!-- ENDEREÇO -->
+          <div class="tab-pane fade" id="endereco">
+            <div class="row g-3">
+              <div class="col-md-4">
+                {{ form.estado.label_tag }} {{ form.estado }}
+                {% for error in form.estado.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-4">
+                {{ form.cidade.label_tag }} {{ form.cidade }}
+                {% for error in form.cidade.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-4">
+                {{ form.bairro.label_tag }} {{ form.bairro }}
+                {% for error in form.bairro.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-12">
+                {{ form.rua.label_tag }} {{ form.rua }}
+                {% for error in form.rua.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- FAMÍLIA -->
+          <div class="tab-pane fade" id="familia">
+            <div class="row g-3">
+              <div class="col-md-6">
+                {{ form.nome_mae.label_tag }} {{ form.nome_mae }}
+                {% for error in form.nome_mae.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-3">
+                {{ form.tel_celular_mae.label_tag }} {{ form.tel_celular_mae }}
+                {% for error in form.tel_celular_mae.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-3">
+                {{ form.CPF_mae.label_tag }} {{ form.CPF_mae }}
+                {% for error in form.CPF_mae.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                {{ form.nome_pai.label_tag }} {{ form.nome_pai }}
+                {% for error in form.nome_pai.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-3">
+                {{ form.tel_celular_pai.label_tag }} {{ form.tel_celular_pai }}
+                {% for error in form.tel_celular_pai.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-3">
+                {{ form.aluno_exterior.label_tag }} {{ form.aluno_exterior }}
+                {% for error in form.aluno_exterior.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- SAÚDE -->
+          <div class="tab-pane fade" id="saude">
+            <div class="row g-3">
+              <div class="col-md-6">
+                {{ form.deficiencia_aluno.label_tag }} {{ form.deficiencia_aluno }}
+                {% for error in form.deficiencia_aluno.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-3">
+                {{ form.tipo_sanguineo.label_tag }} {{ form.tipo_sanguineo }}
+                {% for error in form.tipo_sanguineo.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-3">
+                {{ form.vacina_covid_19.label_tag }} {{ form.vacina_covid_19 }}
+                {% for error in form.vacina_covid_19.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                {{ form.dose_vacina_covid_19.label_tag }} {{ form.dose_vacina_covid_19 }}
+                {% for error in form.dose_vacina_covid_19.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                {{ form.espectro_autista.label_tag }} {{ form.espectro_autista }}
+                {% for error in form.espectro_autista.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                {{ form.documento_espectro_autista.label_tag }} {{ form.documento_espectro_autista }}
+                {% for error in form.documento_espectro_autista.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- DOCUMENTOS -->
+          <div class="tab-pane fade" id="documentos">
+            <div class="row g-3">
+              <div class="col-md-4">
+                {{ form.RG.label_tag }} {{ form.RG }}
+                {% for error in form.RG.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-4">
+                {{ form.CPF.label_tag }} {{ form.CPF }}
+                {% for error in form.CPF.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-4">
+                {{ form.orgao_emissor.label_tag }} {{ form.orgao_emissor }}
+                {% for error in form.orgao_emissor.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                {{ form.tipo_certidao.label_tag }} {{ form.tipo_certidao }}
+                {% for error in form.tipo_certidao.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                {{ form.numero_certidao.label_tag }} {{ form.numero_certidao }}
+                {% for error in form.numero_certidao.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-end mt-4">
+          <button type="submit" class="btn btn-success btn-lg px-4">
+            <i class="bi bi-save"></i> Salvar Alterações
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .nav-tabs .nav-link.active {
+    background-color: #198754 !important;
+    color: white !important;
+    border: none;
+  }
+  .form-control, select {
+    border-radius: 0.5rem;
+  }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const tabButtons = document.querySelectorAll('#perfilTabs button');
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('show', 'active'));
+            this.classList.add('active');
+            const target = this.getAttribute('data-bs-target');
+            const pane = document.querySelector(target);
+            pane.classList.add('show', 'active');
+        });
+    });
+});
+</script>
+{% endblock %}

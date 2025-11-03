@@ -97,3 +97,33 @@ def home_aluno(request):
     }
 
     return render(request, 'modulo_aluno/home.html', contexto)
+
+
+
+
+# views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from gestao_escolar.models import Alunos
+from .forms import AlunoPerfilForm
+
+@login_required
+def update_perfil_aluno(request):
+    aluno_logado = request.user.userAluno_related.aluno.id
+    aluno = get_object_or_404(Alunos, id=aluno_logado)  # vincula ao usuário logado
+
+    if request.method == 'POST':
+        form = AlunoPerfilForm(request.POST, request.FILES, instance=aluno)
+        if form.is_valid():
+            updated_aluno = form.save()
+            print("Atualizado:", updated_aluno.nome_completo)
+            messages.success(request, 'Seu perfil foi atualizado com sucesso!')
+            return redirect('update_perfil_aluno')
+        else:
+            print(form.errors)
+    else:
+        form = AlunoPerfilForm(instance=aluno)  # <<<< aqui define o form para GET
+
+    return render(request, 'modulo_aluno/update_perfil_aluno.html', {'form': form, 'aluno': aluno})
+

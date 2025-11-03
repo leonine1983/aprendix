@@ -159,14 +159,26 @@
                     <a class="btn btn-success rounded-2 px-3 py-1 fw-semibold" href="#">Início</a>
                 </li>
                 <li class="nav-item">
-                    <a class="btn btn-success rounded-2 px-3 py-1 fw-semibold" href="#">Meu perfil</a>
+                    <a class="btn btn-success rounded-2 px-3 py-1 fw-semibold" href="{% url 'modulo_aluno:update_perfil_aluno' %}" >Meu perfil</a>
                 </li>    
                 <li class="nav-item d-flex align-items-center gap-3 px-3 py-1 rounded-4 glass-user">
-                    <div class="user-avatar position-relative">
-                        <img src="{% static 'rogerio.jpg' %}" alt="Foto do usuário" title="{{ request.user.first_name }}">
+                    <div class="user-avatar position-relative">    
+                        <a href="{% url 'modulo_aluno:update_perfil_aluno' %}">
+                            {% if request.user.userAluno_related.aluno.foto_aluno %}
+                                    <img src="{{ request.user.userAluno_related.aluno.foto_aluno.url }}"
+                                        alt="Foto do aluno"
+                                        class="rounded-circle border"
+                                        width="100">
+                            {% else %}
+                                <img src="{% static 'img/default-user.png' %}"
+                                    alt="Foto padrão"
+                                    class="rounded-circle border"
+                                    width="100">
+                            {% endif %}
+                        </a>    
                     </div>
                     <div class="d-flex flex-column align-items-start">
-                        <span class="fw-semibold text-dark small mb-1">{{ request.user.first_name }}</span>
+                        <span class="fw-semibold text-dark small mb-1 text-capitalize">{{ request.user.userAluno_related.aluno }}</span>
                         <form method="post" action="{% url 'admin_acessos:logout' %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-sm btn-logout px-3 py-1 fw-semibold">
