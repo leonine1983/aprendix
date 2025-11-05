@@ -140,7 +140,26 @@
             }
         }
 
-    </style>
+    </style>  
+
+
+    <link defer="" media="all" onload="this.media='all'" rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v7.1.0/css/fontawesome.css">
+    <noscript>
+    <link
+        rel="stylesheet"
+        href="https://site-assets.fontawesome.com/releases/v7.1.0/css/fontawesome.css"
+    >
+    </noscript>  
+
+    
+    <link defer="" media="all" onload="this.media='all'" rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v7.1.0/css/solid.css">
+    <noscript>
+    <link
+        rel="stylesheet"
+        href="https://site-assets.fontawesome.com/releases/v7.1.0/css/solid.css"
+    >
+    </noscript>
+
 </head>
 <body class="bg-p-1">
     <!-- Navbar -->
@@ -156,10 +175,10 @@
         <div class="collapse navbar-collapse justify-content-end" id="navbarMenu">
             <ul class="navbar-nav  gap-lg-3">
                 <li class="nav-item">
-                    <a class="btn btn-success rounded-2 px-3 py-1 fw-semibold" href="#">Início</a>
+                    <a class="btn btn-primary rounded-2 px-3 py-1 fw-semibold" href="{% url 'modulo_aluno:homeAluno' %}"><i class="fa-solid fa-house-user"></i> Início</a>
                 </li>
                 <li class="nav-item">
-                    <a class="btn btn-success rounded-2 px-3 py-1 fw-semibold" href="{% url 'modulo_aluno:update_perfil_aluno' %}" >Meu perfil</a>
+                    <a class="btn btn-primary rounded-2 px-3 py-1 fw-semibold" href="{% url 'modulo_aluno:update_perfil_aluno' %}" ><i class="fa-solid fa-person-sign"></i> Meu perfil</a>
                 </li>    
                 <li class="nav-item d-flex align-items-center gap-3 px-3 py-1 rounded-4 glass-user">
                     <div class="user-avatar position-relative">    

@@ -42,18 +42,27 @@
           <!-- DADOS PESSOAIS -->
           <div class="tab-pane fade show active" id="dados">
             <div class="row g-3">
+              <div class="alert alert-info rounded-3 shadow-sm mt-3" role="alert">
+                <i class="bi bi-person-fill me-2"></i>
+                <strong>Importante:</strong> Caso seja informado um <strong>nome social</strong>, todos os registros e comunicações da escola 
+                passarão a utilizar esse nome. Entretanto, para documentos oficiais e situações que exigem o 
+                <strong>nome de registro</strong> (como históricos e certidões), o nome completo continuará sendo utilizado.
+              </div>
+
               <div class="col-md-4">
                 {{ form.nome_completo.label_tag }} {{ form.nome_completo }}
                 {% for error in form.nome_completo.errors %}
                   <div class="text-danger small">{{ error }}</div>
                 {% endfor %}
               </div>
+
               <div class="col-md-4">
                 {{ form.nome_social.label_tag }} {{ form.nome_social }}
                 {% for error in form.nome_social.errors %}
                   <div class="text-danger small">{{ error }}</div>
                 {% endfor %}
-              </div>              
+              </div>
+          
 
               <div class="col-md-4">
                 {{ form.data_nascimento.label_tag }} {{ form.data_nascimento }}
@@ -95,20 +104,16 @@
 
               <div class="col-md-3 text-center p-3 bg-secondary-light shadow m-2 shadow-sm">
                 <div >
-                    Login de acesso do aluno: <b class='fs-3'>{{ request.user.userAluno_related.aluno.login_aluno }}</b><br>
+                    Login de acesso do aluno: <b class='fs-3'>{{ request.user.userAluno_related.aluno.login_aluno }}</b><br></br>
                     {{ form.senha.label_tag }} {{ form.senha }}
                     {% for error in form.senha.errors %}
                         <div class="text-danger small">{{ error }}</div>
                     {% endfor %}
-                </div>
 
-                <div >
-                    <label for="id_senha_repeat">Repita a senha</label>
-                    <input type="password" id="id_senha_repeat" name="senha_repeat" class="form-control" placeholder="Repita a senha" required>
-                    <div id="senha_repeat_error" class="text-danger small"></div>
-                </div>
-
-                <div class="col-md-4 mt-2">
+                    {{ form.senha_repeat.label_tag }} {{ form.senha_repeat }}
+                    {% for error in form.senha_repeat.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
                     <input type="checkbox" id="show_password"> Exibir senha
                 </div>
 
@@ -147,30 +152,46 @@
           <!-- ENDEREÇO -->
           <div class="tab-pane fade" id="endereco">
             <div class="row g-3">
-              <div class="col-md-4">
-                {{ form.estado.label_tag }} {{ form.estado }}
-                {% for error in form.estado.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
+
+
+
+
+
+
+
+
+              <div class="alert alert-info rounded-3 shadow-sm mt-3" role="alert">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                <strong>Atenção:</strong> Para alterar os dados de endereço, é necessário comparecer presencialmente à escola 
+                com um <strong>comprovante de residência</strong> atualizado que confirme o local onde o aluno está morando.
               </div>
-              <div class="col-md-4">
-                {{ form.cidade.label_tag }} {{ form.cidade }}
-                {% for error in form.cidade.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
-              <div class="col-md-4">
-                {{ form.bairro.label_tag }} {{ form.bairro }}
-                {% for error in form.bairro.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
-              <div class="col-md-12">
-                {{ form.rua.label_tag }} {{ form.rua }}
-                {% for error in form.rua.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
+
+              <div class="row g-3">
+                <div class="col-md-4">
+                  {{ form.estado.label_tag }} {{ form.estado }}
+                  {% for error in form.estado.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                <div class="col-md-4">
+                  {{ form.cidade.label_tag }} {{ form.cidade }}
+                  {% for error in form.cidade.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                <div class="col-md-4">
+                  {{ form.bairro.label_tag }} {{ form.bairro }}
+                  {% for error in form.bairro.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                <div class="col-md-12">
+                  {{ form.rua.label_tag }} {{ form.rua }}
+                  {% for error in form.rua.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>              
             </div>
           </div>
 

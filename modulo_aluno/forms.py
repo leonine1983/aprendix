@@ -1,8 +1,6 @@
 from django import forms
 from gestao_escolar.models import Alunos
 
-
-
 class AlunoPerfilForm(forms.ModelForm):
     senha = forms.CharField(
         label="Senha",
@@ -21,10 +19,23 @@ class AlunoPerfilForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        # Campos opcionais
         self.fields['sexo'].required = False
         self.fields['etnia'].required = False
         self.fields['nacionalidade'].required = False
         self.fields['cartorio_uf'].required = False
+
+        # 🔒 Deixa o campo bairro desativado
+        if 'bairro' in self.fields:
+            self.fields['bairro'].widget.attrs['disabled'] = True
+            self.fields['bairro'].widget.attrs['class'] = 'form-control'
+            self.fields['cidade'].widget.attrs['disabled'] = True
+            self.fields['cidade'].widget.attrs['class'] = 'form-control'
+            self.fields['estado'].widget.attrs['disabled'] = True
+            self.fields['estado'].widget.attrs['class'] = 'form-control'
+            self.fields['rua'].widget.attrs['disabled'] = True
+            self.fields['rua'].widget.attrs['class'] = 'form-control'
 
     def clean(self):
         cleaned_data = super().clean()

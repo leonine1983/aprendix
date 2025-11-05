@@ -107,11 +107,13 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from gestao_escolar.models import Alunos
 from .forms import AlunoPerfilForm
+from gestao_escolar.models import Bairro
 
 @login_required
 def update_perfil_aluno(request):
     aluno_logado = request.user.userAluno_related.aluno.id
     aluno = get_object_or_404(Alunos, id=aluno_logado)  # vincula ao usuário logado
+    print (f"Bairro: {aluno.bairro}")
 
     if request.method == 'POST':
         form = AlunoPerfilForm(request.POST, request.FILES, instance=aluno)
@@ -119,11 +121,11 @@ def update_perfil_aluno(request):
             updated_aluno = form.save()
             print("Atualizado:", updated_aluno.nome_completo)
             messages.success(request, 'Seu perfil foi atualizado com sucesso!')
-            return redirect('update_perfil_aluno')
+            return redirect('modulo_aluno:update_perfil_aluno')
         else:
             print(form.errors)
     else:
-        form = AlunoPerfilForm(instance=aluno)  # <<<< aqui define o form para GET
+        form = AlunoPerfilForm(instance=aluno) 
 
     return render(request, 'modulo_aluno/update_perfil_aluno.html', {'form': form, 'aluno': aluno})
 
