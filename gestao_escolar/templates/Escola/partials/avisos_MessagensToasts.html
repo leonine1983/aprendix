@@ -1,0 +1,57 @@
+<style>
+@keyframes slideUp {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+    </style>
+
+{% if messages %}
+<div id="global-toast-wrapper"
+     aria-live="polite" aria-atomic="true"
+     class="position-fixed end-0 p-3"
+     style="
+        bottom: 10vh;   /* 🔥 10% da altura da tela */
+        right: 5%;
+        z-index: 99999;
+        pointer-events: none;
+        width: 100%;
+        max-width: 420px;
+     ">
+  <div class="toast-container d-flex flex-column align-items-end w-100">
+    {% for message in messages %}
+      <div class="toast text-white border-0 shadow-lg mb-3 fade show"
+           role="alert" aria-live="assertive" aria-atomic="true"
+           style="pointer-events: auto;
+                  {% if message.tags == 'success' %}background-color:#198754;
+                  {% elif message.tags == 'error' %}background-color:#dc3545;
+                  {% elif message.tags == 'warning' %}background-color:#ffc107; color:#000;
+                  {% else %}background-color:#0dcaf0;{% endif %}">
+        <div class="d-flex">
+          <div class="toast-body fw-semibold">
+            {{ message }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                  data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const toastElements = document.querySelectorAll('.toast');
+    toastElements.forEach(toastEl => {
+      const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+      toast.show();
+    });
+  });
+</script>

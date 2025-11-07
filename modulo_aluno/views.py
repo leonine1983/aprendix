@@ -112,15 +112,14 @@ from gestao_escolar.models import Bairro
 @login_required
 def update_perfil_aluno(request):
     aluno_logado = request.user.userAluno_related.aluno.id
-    aluno = get_object_or_404(Alunos, id=aluno_logado)  # vincula ao usuário logado
-    print (f"Bairro: {aluno.bairro}")
-
+    aluno = get_object_or_404(Alunos, id=aluno_logado)  
+ 
     if request.method == 'POST':
         form = AlunoPerfilForm(request.POST, request.FILES, instance=aluno)
-        if form.is_valid():
-            updated_aluno = form.save()
-            print("Atualizado:", updated_aluno.nome_completo)
-            messages.success(request, 'Seu perfil foi atualizado com sucesso!')
+        if form.is_valid():            
+            form.save()
+            messages.success(request, 'Seu perfil foi atualizado com sucesso!') 
+            print("esta aqui")          
             return redirect('modulo_aluno:update_perfil_aluno')
         else:
             print(form.errors)

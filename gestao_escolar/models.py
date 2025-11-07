@@ -166,9 +166,10 @@ class Alunos(models.Model):
     #estado = models.ForeignKey(Uf_Unidade_Federativa, related_name="estado_relatec",verbose_name='Estado onde vive', null=True, on_delete=models.CASCADE)
 
     # Modificando os campos de endereço para usar CharField em vez de ForeignKey
-    estado = models.CharField(max_length=10, null=True, verbose_name='Estado onde vive')
-    cidade = models.CharField(max_length=100, null=True, verbose_name='Cidade onde vive')
-    bairro = models.CharField(max_length=100, null=True, verbose_name='Bairro onde vive')
+    estado = models.CharField(max_length=10, null=True, blank=True, verbose_name='Estado onde vive')
+    cidade = models.CharField(max_length=100, null=True, blank=True, verbose_name='Cidade onde vive')
+    bairro = models.CharField(max_length=100, null=True, blank=True, verbose_name='Bairro onde vive')
+
     
     # Campos de naturalidade
     estado_naturalidade = models.CharField(max_length=10, null=True, verbose_name='Estado onde nasceu')
@@ -239,6 +240,52 @@ class Alunos(models.Model):
     local_diferenciado = models.CharField(max_length=2, choices=choice_justifica_falta_document, null=True, blank=True, verbose_name='Local Diferenciado')
     obito = models.BooleanField(null=True, blank=True,default=False)
     data_obito = models.DateField(null=True, blank=True)
+
+    # Controle de alteraçao
+    criado_por = models.CharField(max_length=100, null=True, blank=True)
+    data_create = models.DateField(null=True,  blank=True, auto_now_add=True)
+    alterado_por = models.TextField(null=True, blank=True)
+    data_alteracaoCadastro = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        print("principio")
+        usuario = getattr(self, '_usuario_logado', None)
+
+        if self.pk and usuario:
+            data_atual = timezone.now().strftime("%d/%m/%Y %H:%M")
+            novo_registro = f"{usuario} - {data_atual}"
+            if self.alterado_por:
+                self.alterado_por += f"\n{novo_registro}"
+                print("esta aqui se alterado")
+            else:
+                self.alterado_por = novo_registro
+                print("esta aqui se não alterado")
+
+        # 🔸 Chame SEMPRE o save real
+        super().save(*args, **kwargs)
+
+
+
+
+    """
+     def save(self, *args, **kwargs):
+        # Captura o usuário, se for passado pelo contexto
+        usuario = getattr(self, '_usuario_logado', None)
+
+        # Registra log apenas se for uma atualização e houver usuário
+        if self.pk and usuario:
+            data_atual = timezone.now().strftime("%d/%m/%Y %H:%M")
+            novo_registro = f"{usuario} - {data_atual}"
+            if self.alterado_por:
+                self.alterado_por += f"\n{novo_registro}"
+            else:
+                self.alterado_por = novo_registro
+
+        super().save(*args, **kwargs)
+    
+    """
+
+
 
 
     def e_aniversario_hoje(self):

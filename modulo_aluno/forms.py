@@ -21,21 +21,15 @@ class AlunoPerfilForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         
         # Campos opcionais
-        self.fields['sexo'].required = False
-        self.fields['etnia'].required = False
-        self.fields['nacionalidade'].required = False
-        self.fields['cartorio_uf'].required = False
-
-        # 🔒 Deixa o campo bairro desativado
-        if 'bairro' in self.fields:
-            self.fields['bairro'].widget.attrs['disabled'] = True
-            self.fields['bairro'].widget.attrs['class'] = 'form-control'
-            self.fields['cidade'].widget.attrs['disabled'] = True
-            self.fields['cidade'].widget.attrs['class'] = 'form-control'
-            self.fields['estado'].widget.attrs['disabled'] = True
-            self.fields['estado'].widget.attrs['class'] = 'form-control'
-            self.fields['rua'].widget.attrs['disabled'] = True
-            self.fields['rua'].widget.attrs['class'] = 'form-control'
+        opcionais = [
+            'sexo', 'etnia', 'nacionalidade', 'cartorio_uf',
+            'rua', 'bairro', 'cidade', 'estado',
+            'estado_naturalidade', 'cidade_naturalidade'
+        ]
+        for campo in opcionais:
+            if campo in self.fields:
+                self.fields[campo].required = False
+                self.fields[campo].widget.attrs['class'] = 'form-control'
 
     def clean(self):
         cleaned_data = super().clean()
@@ -44,3 +38,22 @@ class AlunoPerfilForm(forms.ModelForm):
 
         if senha and senha != senha_repeat:
             self.add_error('senha_repeat', "As senhas não coincidem.")
+        return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        original = Alunos.objects.get(pk=self.instance.pk)
+
+        # Ignora campos auxiliares
+        ignored_fields = ['senha', 'senha_repeat']
+
+        for field, value in self.cleaned_data.items():
+            if field in ignored_fields:
+                continue  # Ignora campos que não existem no model
+            
+            if value in [None, '', [], {}]:
+                setattr(instance, field, getattr(original, field))
+
+        if commit:
+            instance.save()
+        return instance
