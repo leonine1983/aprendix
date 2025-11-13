@@ -10,14 +10,13 @@ from rh.models import Escola
 @login_required
 def home_professor(request):
     userProfessor = request.user.related_vinculoUserPessoa
-    request.session['professorUser'] = userProfessor
+    request.session['professorUser'] =str(userProfessor)
     pessoa = userProfessor.pessoa.id   
 
     trimestre = request.GET.get('trimestre')
     busca = request.GET.get('disciplina')   
 
-    trimestreALL = Trimestre.objects.all()
-    request.session['trimestres'] = trimestreALL
+    trimestreALL = Trimestre.objects.all()    
     
     if busca:
         request.session['escola']        
@@ -58,7 +57,7 @@ def home_professor(request):
 
     # Pesquisa se existe matrícula feita do aluno
     professorGrade = TurmaDisciplina.objects.filter(professor__encaminhamento__contratado__id=pessoa)
-    request.session['turmaDisciplina'] = professorGrade
+    #request.session['turmaDisciplina'] = professorGrade
     ano = AnoLetivo.objects.all()
 
     # GRÁFICO 1: Faltas por mês (considerando disciplina do professor)
@@ -107,6 +106,8 @@ def home_professor(request):
         'grade': grade,
         'anoLetivo': ano,
 
+        'trimestres': trimestreALL,
+
         # Dados dos gráficos
         'faltas_labels': faltas_labels,
         'faltas_values': faltas_values,
@@ -124,8 +125,8 @@ def home_sessaoIniciada(request):
     ano_id = request.POST.get('ano')
 
     # Armazena os valor na sessao
-    request.session['escola'] = Escola.objects.get(pk=escola)
-    request.session['anoLetivo'] = AnoLetivo.objects.get(pk=ano_id)    
+    request.session['escola'] = str(Escola.objects.get(pk=escola))
+    request.session['anoLetivo'] =str(AnoLetivo.objects.get(pk=ano_id))
 
     escolaSession = request.session['escola'] 
     anoSession = request.session['anoLetivo']
