@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -5,6 +6,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Painel do Professor • Atualizado</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static "global/css/geral_styler.css" %}">
+<link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+
 <style>
   :root{
     --bg:#f5f7fb; --card:#fff; --primary:#3b82f6; --accent:#10b981; --muted:#64748b;
@@ -30,8 +34,39 @@
   .sidebar.left {left:0}
   .sidebar.right {right:0}
   .sidebar h3{color:var(--primary); margin-bottom:12px}
-  .sidebar a{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;color:#1f2937;text-decoration:none;margin-bottom:6px}
-  .sidebar a:hover{background:#eef7ff;color:var(--primary)}
+  .sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+
+    border: 0.1rem solid #d1d5db;
+    border-radius: 10px;
+
+    font-size: 0.85rem;
+    color: #1f2937;
+    text-decoration: none;
+
+    background: linear-gradient(135deg, #ffffff, #f1f5f9);
+    transition: all 0.25s ease;
+}
+
+/* Hover moderno */
+.sidebar a:hover {
+    background: linear-gradient(135deg, #e0f2fe, #dbeafe);
+    border-color: #3b82f6;
+    color: #1e40af;
+    transform: translateX(3px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Foco acessível */
+.sidebar a:focus {
+    outline: 3px solid #3b82f6;
+    outline-offset: 2px;
+}
+
 
   /* ORELHINHAS (mobile) */
   .ear {position:fixed; top:140px; width:42px; height:64px; display:none; align-items:center; justify-content:center; color:#fff; background:var(--primary); border-radius:0 10px 10px 0; z-index:90; box-shadow:var(--shadow); cursor:pointer}
@@ -85,20 +120,51 @@
   .muted{color:var(--muted);font-size:0.95rem}
   .flex{display:flex;align-items:center;gap:8px}
   .hr{height:1px;background:#f1f5ff;margin:10px 0;border-radius:2px}
+
+  .bg-p-1 {
+            --s: 50px;
+            --c: #b0c4de;
+            --_s: calc(2*var(--s)) calc(2*var(--s));
+            --_g: 35.36% 35.36% at;
+            --_c: #0000 66%,#889fbd3d  68% 70%,#0000 72%;
+            background: 
+              radial-gradient(var(--_g) 100% 25%,var(--_c)) var(--s) var(--s)/var(--_s), 
+              radial-gradient(var(--_g) 0 75%,var(--_c)) var(--s) var(--s)/var(--_s), 
+              radial-gradient(var(--_g) 100% 25%,var(--_c)) 0 0/var(--_s), 
+              radial-gradient(var(--_g) 0 75%,var(--_c)) 0 0/var(--_s), 
+              repeating-conic-gradient(var(--c) 0 25%,#0000 0 50%) 0 0/var(--_s), 
+              radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
+            background-attachment: fixed;
+        }
 </style>
 </head>
-<body>
+<body class='bg-p-1'>
+ 
 
   <!-- NAVBAR -->
-  <header>
-    <div class="nav-left">
-      <div class="brand">AVA • Painel</div>
-      <div class="search muted">🔎 Buscar — atalhos, turmas, tarefas...</div>
+  <header  style='box-shadow:0.1rem 0.1rem 0.8rem 0.2rem #11111156; background: rgba(255, 255, 255, 0.397);'>
+    <div class="nav-left ">
+      <img src="{% static 'logo.png' %}" alt="Logo" width="36" height="36" class="me-2 rounded-3">
+            <span>Aprendix</span>
+      <!--<div class="search muted">🔎 Buscar — atalhos, turmas, tarefas...</div>-->
     </div>
     <div class="nav-right">
-      <div class="flex muted">Olá, <strong>Prof. Ana</strong></div>
-      <img src="https://i.pravatar.cc/100?img=5" alt="Perfil">
-      <button class="logout">Sair</button>
+      <div class="flex muted">Olá, <strong>Prof. {{request.user.first_name}}</strong> </div>
+      {% if request.user.related_vinculoUserPessoa.pessoa.foto %}
+        <img src="{{request.user.related_vinculoUserPessoa.pessoa.foto.url}}" alt="Perfil">
+        {% else %}
+          {% if request.user.related_vinculoUserPessoa.pessoa.sexo.nome == 'Masculino (cisgênero)' %}
+            <img src="{% static "man.png" %}" alt="Perfil">
+            {% else %}
+              <img src="{% static 'woman.png' %}" alt="Perfil">
+          {% endif %}
+      {% endif %}
+      <form method="post" action="{% url 'admin_acessos:logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-logout px-3 py-1 fw-semibold">
+              <i class="bi bi-box-arrow-right me-1"></i> Sair
+          </button>
+      </form>
     </div>
   </header>
 
@@ -112,83 +178,19 @@
     <div class="hr"></div>
     <div class="muted">Coordenação • Ferramentas</div>
   </nav>
+  {% include "modulo_professor/partial_base/sidebar_alunos.html" %}
 
-  <nav class="sidebar right" id="sidebar-right">
-    <h3>🎓 Gestão Aluno</h3>
-    <a href="#"><span>📝</span> Lançar Notas</a>
-    <a href="#"><span>📅</span> Faltas</a>
-    <a href="#"><span>💰</span> Educoin</a>
-    <a href="#"><span>🗒️</span> Parecer Descritivo</a>
-    <div class="hr"></div>
-    <div class="muted">Gestão do aluno</div>
-  </nav>
+  
 
   <!-- ORELHAS MOBILE -->
   <div class="ear" id="ear-left" style="left:0"><span>PROF</span></div>
   <div class="ear right" id="ear-right" style="right:0"><span>ALUN</span></div>
 
   <!-- MAIN -->
-  <main>
-    <!-- Planning / Kanban -->
-    <section class="planning">
-      <div class="planning-header">
-        <div><h3>Planejamento de Atividades</h3><div class="muted">Organize com método Kanban</div></div>
-        <div class="flex">
-          <button class="btn" id="btn-add-board">+ Novo Planejamento</button>
-          <button class="btn" id="btn-add-task" style="background:#0ea5a3">+ Tarefa Rápida</button>
-        </div>
-      </div>
-
-      <div class="boards" id="boardsContainer">
-        <!-- default board will be created by script if none exists -->
-      </div>
-    </section>
-
-    <!-- MURAL -->
-    <section class="mural">
-      <div class="mural-header">
-        <div><h3>Mural Multidisciplinar</h3><div class="muted">Avisos e postagens</div></div>
-        <div class="flex">
-          <button id="btn-new-post" class="btn" style="background:#06b6d4">Nova postagem</button>
-          <button id="btn-toggle-mural" class="btn" style="background:#94a3b8">Ocultar</button>
-        </div>
-      </div>
-
-      <div class="mural-posts" id="muralPosts">
-        <!-- initial posts -->
-        <article class="post">
-          <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80" alt="">
-          <div class="cap">Projeto Ciência Viva — Turma 7º ano apresentou experimentos.</div>
-          <div class="post-actions">
-            <button onclick="toggleCommentsSection(this)">💬 Comentários</button>
-            <button onclick="likePost(this)">👍 Curtir</button>
-          </div>
-          <div class="comment-section">
-            <div class="comment-row">
-              <input type="text" placeholder="Escreva um comentário...">
-              <button onclick="publishComment(this)">Publicar</button>
-            </div>
-            <div class="comments-list"></div>
-          </div>
-        </article>
-
-        <article class="post">
-          <img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=1200&q=80" alt="">
-          <div class="cap">Semana da Computação — inscrição aberta.</div>
-          <div class="post-actions">
-            <button onclick="toggleCommentsSection(this)">💬 Comentários</button>
-            <button onclick="likePost(this)">👍 Curtir</button>
-          </div>
-          <div class="comment-section">
-            <div class="comment-row">
-              <input type="text" placeholder="Escreva um comentário...">
-              <button onclick="publishComment(this)">Publicar</button>
-            </div>
-            <div class="comments-list"></div>
-          </div>
-        </article>
-      </div>
-    </section>
+  <main class='bg-p-1'>
+    {% block main %}
+      
+    {% endblock main %}
   </main>
 
   <!-- CHAT: open button + chat box -->
@@ -458,5 +460,10 @@ document.addEventListener('keydown', e=>{
   }
 });
 </script>
+<!--Mensagens e toastes
+    {% include "Escola/partials/avisos_MessagensToasts.html" %}-->
+    {% include "Escola/partials/mensagens.html" %}
+
+
 </body>
 </html>

@@ -1,57 +1,144 @@
-<style>
-@keyframes slideUp {
-  0% {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-    </style>
-
 {% if messages %}
-<div id="global-toast-wrapper"
-     aria-live="polite" aria-atomic="true"
-     class="position-fixed end-0 p-3"
-     style="
-        bottom: 10vh;   /* 🔥 10% da altura da tela */
-        right: 5%;
-        z-index: 99999;
-        pointer-events: none;
-        width: 100%;
-        max-width: 420px;
-     ">
-  <div class="toast-container d-flex flex-column align-items-end w-100">
+<!-- Bootstrap CSS (garanta que exista apenas 1 inclusão no head; se já tiver, pode remover esta linha) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+  /* wrapper posição */
+  #global-toast-wrapper {
+    position: fixed;
+    right: 5%;
+    bottom: 10vh;
+    z-index: 12000;
+    pointer-events: none;
+  }
+
+  /* container controlado */
+  #global-toast-wrapper .toast-container {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  /* toast base - mais específico que .toast do bootstrap */
+  .toast.toast-custom {
+    pointer-events: auto;
+    width: 100%;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-weight: 600;
+    color: #fff;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* entrada */
+    animation: toast-slide-up .36s ease-out;
+  }
+
+  /* entrada / saída */
+  @keyframes toast-slide-up { from { transform: translateY(18px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+  @keyframes toast-fade-out { from { opacity: 1; transform: translateY(0) } to { opacity: 0; transform: translateY(18px) } }
+
+  /* CORES com alta especificidade */
+  .toast.toast-custom.toast-success { background-color: #198754 !important; color: #fff !important; border-left: 4px solid rgba(0,0,0,0.08); }
+  .toast.toast-custom.toast-error   { background-color: #dc3545 !important; color: #fff !important; border-left: 4px solid rgba(0,0,0,0.08); }
+  .toast.toast-custom.toast-warning { background-color: #ffc107 !important; color: #000 !important; border-left: 4px solid rgba(0,0,0,0.06); }
+  .toast.toast-custom.toast-info    { background-color: #0dcaf0 !important; color: #fff !important; border-left: 4px solid rgba(0,0,0,0.06); }
+
+  /* mobile full-width behavior */
+  @media (max-width: 768px) {
+    #global-toast-wrapper { left: 0 !important; right: 0 !important; bottom: 5vh; padding: 0 12px; }
+    #global-toast-wrapper .toast-container { max-width: 100% !important; align-items: center; }
+    .toast.toast-custom { width: 100% !important; }
+  }
+
+  /* escondendo qualquer background do .toast padrão do bootstrap apenas se necessário
+     (mas aqui não forçamos transparent; em vez disso garantimos nossa cor específica) */
+  .toast { background: transparent; border: 0; box-shadow: none; padding: 0; }
+</style>
+
+<div id="global-toast-wrapper" aria-live="polite" aria-atomic="true">
+  <div class="toast-container">
     {% for message in messages %}
-      <div class="toast text-white border-0 shadow-lg mb-3 fade show"
-           role="alert" aria-live="assertive" aria-atomic="true"
-           style="pointer-events: auto;
-                  {% if message.tags == 'success' %}background-color:#198754;
-                  {% elif message.tags == 'error' %}background-color:#dc3545;
-                  {% elif message.tags == 'warning' %}background-color:#ffc107; color:#000;
-                  {% else %}background-color:#0dcaf0;{% endif %}">
-        <div class="d-flex">
-          <div class="toast-body fw-semibold">
-            {{ message }}
-          </div>
-          <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                  data-bs-dismiss="toast" aria-label="Close"></button>
+      {# Mantenha classes em uma linha para evitar quebras estranhas #}
+      <div
+        class="toast toast-custom {% if 'success' in message.tags %}toast-success{% elif 'error' in message.tags %}toast-error{% elif 'warning' in message.tags %}toast-warning{% else %}toast-info{% endif %} fade"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+        data-bs-delay="4000"
+      >
+        <div class="toast-body" style="flex:1; padding-right:12px;">
+          {{ message|safe }}
         </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Fechar"></button>
       </div>
     {% endfor %}
   </div>
 </div>
-{% endif %}
+
+<!-- Bootstrap JS (bundle) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const toastElements = document.querySelectorAll('.toast');
-    toastElements.forEach(toastEl => {
-      const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
-      toast.show();
+document.addEventListener('DOMContentLoaded', function () {
+  const toastEls = document.querySelectorAll('#global-toast-wrapper .toast');
+
+  toastEls.forEach((el) => {
+    // inicializa com delay vindo do data-bs-delay se existir
+    const bsDelay = parseInt(el.getAttribute('data-bs-delay')) || 4000;
+    const toast = new bootstrap.Toast(el, { delay: bsDelay });
+
+    // quando o Bootstrap emitir 'hidden', aplicamos animação e removemos do DOM
+    el.addEventListener('hidden.bs.toast', () => {
+      // se já estiver com animação de saída, só remove
+      if (!el.classList.contains('removing')) {
+        el.classList.add('removing');
+        el.style.animation = 'toast-fade-out .36s forwards';
+        setTimeout(() => { el.remove(); }, 360);
+      }
     });
+
+    // para garantir: antes de mostrar, removemos classes de fade/hidden para evitar conflitos
+    el.classList.remove('show');
+    // mostrar
+    toast.show();
   });
+});
+</script>
+{% endif %}
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  document.querySelectorAll('.toast').forEach((toastEl) => {
+
+    const toast = new bootstrap.Toast(toastEl);
+    toast.show();
+
+    // Tempo para sumir (4s + animação)
+    setTimeout(() => {
+      toastEl.style.animation = "toast-fade-out 0.4s forwards";
+
+      // Após animação → remove da tela
+      setTimeout(() => {
+        toast.hide();
+      }, 400);
+
+    }, 4000); // delay de exibição normal
+
+  });
+
+});
 </script>

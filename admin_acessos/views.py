@@ -27,7 +27,7 @@ class CreateLoginView(LoginView):
         return super().form_invalid(form)
 
     def get_success_url(self):
-        name = self.request.user.username.capitalize()
+        name = f'{self.request.user.first_name.capitalize()} {self.request.user.last_name.capitalize()}'
         mensagens_boas_vindas = [
             f'Sabe {name}, \'A educação é a arma mais poderosa que você pode usar para mudar o mundo.\' - Nelson Mandela',
             f'{name}, \'O sucesso é ir de fracasso em fracasso sem perder o entusiasmo.\' - Winston Churchill',
