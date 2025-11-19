@@ -216,8 +216,27 @@ def historico_faltas_view(request, matricula_id):
 def selecionaTurma(request):
     userProfessor = request.user.related_vinculoUserPessoa
     pessoa = userProfessor.pessoa.id  
-    professorGrade = TurmaDisciplina.objects.filter(professor__encaminhamento__contratado__id=pessoa)
-    return render(request, 'modulo_professor/partial/presenca/selecionaTurma.html', {'pessoa':professorGrade})
+    ano_letivo = request.session.get('anoLetivo', 'Não encontrado')
+
+    professorGrade = TurmaDisciplina.objects.filter(
+        professor__encaminhamento__contratado__id=pessoa,
+        turma__ano_letivo__ano = ano_letivo
+    )
+
+    grade_turma = []
+    for p in professorGrade:
+        turma_obj = p.turma
+        if turma_obj.id not in [t['id'] for t in grade_turma]:  
+            grade_turma.append({
+                'id': turma_obj.id,
+                'nome': turma_obj.nome if hasattr(turma_obj, 'nome') else str(turma_obj)
+            })
+
+    return render(request, 'modulo_professor/partial/presenca/selecionaTurma.html', {
+        'pessoa': professorGrade,
+        'anoLetivo': ano_letivo,
+        'grade_turma': grade_turma
+    })
 
 
 # PRESENÇA POR DISCIPLINA

@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render, get_object_or_404
 from collections import defaultdict
 from rh.models import Escola
+from django.db.models import Q
 
 
 @login_required
@@ -12,6 +13,16 @@ def home_professor(request):
     userProfessor = request.user.related_vinculoUserPessoa
     request.session['professorUser'] =str(userProfessor)
     pessoa = userProfessor.pessoa.id   
+
+    # Seleciona as escolas que o professor vinculo e envia as opções para o template
+    escola = TurmaDisciplina.objects.filter(professor__encaminhamento__contratado__id=pessoa)
+    escolas = []
+    for e in escola:
+        nome = e.turma.escola   
+        if nome not in escolas:      
+            escolas.append(nome) 
+
+
 
     trimestre = request.GET.get('trimestre')
     busca = request.GET.get('disciplina')   
@@ -105,6 +116,7 @@ def home_professor(request):
         'trimestre_choice': trimestre_choice,
         'grade': grade,
         'anoLetivo': ano,
+        'escolas':escolas,
 
         'trimestres': trimestreALL,
 
@@ -122,14 +134,19 @@ def home_professor(request):
 @login_required
 def home_sessaoIniciada(request):
     escola = request.POST.get('escola')
-    ano_id = request.POST.get('ano')
+    ano = request.POST.get('ano_letivo')
 
     # Armazena os valor na sessao
-    request.session['escola'] = str(Escola.objects.get(pk=escola))
-    request.session['anoLetivo'] =str(AnoLetivo.objects.get(pk=ano_id))
+    request.session['escola'] = str(Escola.objects.get(nome_escola=escola))
+    request.session['anoLetivo'] =str(AnoLetivo.objects.get(ano=ano))
+  
 
     escolaSession = request.session['escola'] 
     anoSession = request.session['anoLetivo']
 
-    messages.success(request, f"A escola {escolaSession} foi iniciada com sucesso para o ano letivo de {anoSession}✨")       
+    messages.success(
+    request,
+    f"Bem-vindo, professor! A sessão do colégio {escolaSession} já está ativa para o ano letivo de {anoSession}. Vamos começar? 🚀"
+)
+ 
     return redirect("modulo_professor:homeProfessor")
