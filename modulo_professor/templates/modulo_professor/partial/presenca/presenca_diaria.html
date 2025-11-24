@@ -1,74 +1,258 @@
 {% extends "modulo_professor/base.html" %}
-
 {% block main %}
+
+<style>
+/* ---------- TEMA GLOBAL ---------- */
+:root {
+    --primary: #1e40af;
+    --primary-light: #3b82f6;
+    --primary-gradient: linear-gradient(135deg, #1e40af, #3b82f6);
+
+    --glass-bg: rgba(255,255,255,0.75);
+    --glass-border: rgba(255,255,255,0.4);
+
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-600: #475569;
+
+    --success: #16a34a;
+    --danger: #dc2626;
+}
+
+/* CONTAINER GERAL */
+.card-main {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 28px;
+    border: 1px solid var(--gray-200);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.05);
+    animation: fadeIn .45s ease;
+}
+
+/* ANIMAÇÃO */
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(8px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+/* BOTÃO VOLTAR */
+.btn-back {
+    background: var(--gray-100);
+    border-radius: 10px;
+    border: 1px solid var(--gray-300);
+    transition: .25s ease;
+    font-weight: 500;
+}
+.btn-back:hover {
+    background: var(--gray-200);
+}
+
+/* LISTA DE ALUNOS */
+.student-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--gray-50);
+    margin-bottom: 10px;
+    border: 1px solid var(--gray-200);
+    transition: .25s ease;
+}
+.student-row:hover {
+    background: #ffffff;
+    border-color: var(--primary);
+    transform: translateX(4px);
+}
+
+/* NOME DO ALUNO */
+.student-name {
+    font-weight: 600;
+    color: var(--gray-600);
+}
+
+/* CHIP DE PRESENÇA */
+.presenca-chip {
+    padding: 5px 14px;
+    border-radius: 30px;
+    font-size: .8rem;
+    font-weight: 600;
+}
+.presente {
+    background: var(--success);
+    color: white;
+}
+.faltou {
+    background: var(--danger);
+    color: white;
+}
+
+/* CHECKBOX MODERNO */
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* RESPONSIVO */
+@media (max-width: 576px) {
+    .student-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+/* ================= DATA MODERNA ================= */
+.date-card {
+    padding: 16px 20px;
+    border-radius: 16px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: .25s ease;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+}
+.date-card:hover {
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.25);
+    transform: translateY(-2px);
+}
+.date-card i {
+    font-size: 2rem;
+    color: var(--primary-light);
+}
+.input-date-ultra {
+    border: none;
+    background: transparent;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary);
+    padding: 6px 4px;
+    outline: none;
+    width: 100%;
+}
+.input-date-ultra:focus {
+    color: var(--primary-light);
+}
+.btn-today {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: .9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+}
+.btn-today:hover {
+    background: #1e3a8a;
+}
+</style>
+
 <div class="container my-4">
-  <div class="bg-white rounded-4 shadow-sm p-4">
-    
-    <!-- Cabeçalho -->
-    <div class="d-flex flex-wrap align-items-center mb-4">
-      <h1 class="me-3 mb-0">{{ grade.turma }}</h1>
-      <span class="fs-5 text-muted">{{ grade }}</span>
-    </div>
-     <a class='btn btn-light no-visible-mobile' href="{% url 'modulo_professor:selecionaTurmaFalta' %}"><i class="fa-solid fa-angles-left"></i> Voltar</a>
+  <div class="card-main">
 
-    <!-- Alerta informativo -->
-    <div class="alert alert-info">
-      <h5 class="alert-heading">Registro de Frequência DIÁRIA dos Alunos</h5>
-      <p>Utilize o formulário abaixo para registrar a presença dos alunos da turma <strong>{{ grade.turma }}</strong>.</p>
-      <p>Selecione a data desejada e marque os alunos que estiveram presentes. Os não marcados serão considerados ausentes.</p> 
+    <!-- CABEÇALHO -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">
+                <i class="fa-solid fa-chalkboard-user text-primary"></i> {{ grade.turma }}
+            </h2>
+            <span class="text-muted fs-5">{{ grade }}</span>
+        </div>
+        <a class="btn btn-back" href="{% url 'modulo_professor:selecionaTurmaFalta' %}">
+            <i class="fa-solid fa-angles-left"></i> Voltar
+        </a>
     </div>
 
-    <!-- Formulário de presença -->
+    <!-- ALERTA -->
+    <div class="alert alert-info shadow-sm">
+        <h5 class="fw-bold"><i class="fa-solid fa-calendar-check"></i> Registro de Presença Diária</h5>
+        <p>Selecione a data e marque os alunos que estiveram presentes.</p>
+        <p class="mb-0">Os alunos não marcados serão automaticamente considerados <strong>ausentes</strong>.</p>
+    </div>
+
+    <!-- FORMULÁRIO -->
     <form method="post" class="mt-4">
       {% csrf_token %}
-      <div class="mb-3">
-        <label for="data" class="form-label fw-semibold">Data da Aula</label>
-        <input type="date" name="data" id="data" class="form-control" value="{{ today|date:'Y-m-d' }}" required>
+
+      <!-- DATA -->
+      <label class="form-label fw-semibold mb-2">
+          <i class="fa-solid fa-calendar-day"></i> Data da Aula
+      </label>
+      <div class="date-card mb-4">
+          <i class="fa-solid fa-calendar-days"></i>
+          <input type="date"
+                 id="data"
+                 name="data"
+                 class="input-date-ultra"
+                 value="{{ today|date:'Y-m-d' }}"
+                 required>
+          <button type="button" class="btn-today" id="btnHoje">Hoje</button>
       </div>
 
-      <h2 class="h5 mt-4 mb-3">Alunos da Turma  <a href="{% url 'modulo_professor:lista_presenca_diaria' turma.id today %}" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-eye"></i> Ver Frequência do dia </a></h2>
-      <div class="list-group mb-3">
+      <!-- LISTA DE ALUNOS -->
+      <h4 class="fw-bold mt-4 mb-3"><i class="fa-solid fa-users"></i> Lista de Alunos</h4>
+      <div class="mb-3">
         {% for matricula in matriculas %}
-          <label class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <input type="checkbox"
-                     class="form-check-input me-2 aluno-checkbox"
-                     name="presentes"
-                     value="{{ matricula.id }}"
-                     id="checkbox-{{ matricula.id }}"
-                     checked>
-              <span class="aluno-nome" data-id="{{ matricula.id }}">{{ matricula.aluno.nome_completo }}</span>
-              <span class="text-danger fw-bold ms-2 d-none" id="falta-{{ matricula.id }}">[Faltou]</span>
-            </div>
-            <a href="{% url 'modulo_professor:historico_faltas' matricula.id %}" class="btn btn-sm btn-outline-primary">Ver histórico</a>
-          </label>
+        <div class="student-row">
+            <section class="d-flex align-items-center gap-3" style='padding:0.5rem; vertical-align: middle;'>
+                <input type="checkbox"
+                       class="form-check-input aluno-checkbox"
+                       name="presentes"
+                       value="{{ matricula.id }}"
+                       id="checkbox-{{ matricula.id }}"
+                       checked>
+                <span class="student-name">{{ matricula.aluno.nome_completo }}</span>
+            </section>
+            <span id="chip-{{ matricula.id }}" class="presenca-chip presente">Presente</span>
+        </div>
         {% endfor %}
       </div>
 
-      <button type="submit" class="btn btn-success w-100 py-2 fw-bold">
-        Salvar Presenças
+      <button type="submit" class="btn btn-success w-100 py-2 fw-bold shadow-sm">
+        <i class="fa-solid fa-floppy-disk"></i> Salvar Presenças
       </button>
 
       {% if erro %}
-        <div class="alert alert-danger mt-3" role="alert">
-          {{ erro }}
-        </div>
+      <div class="alert alert-danger mt-3" role="alert">{{ erro }}</div>
       {% endif %}
     </form>
+
   </div>
 </div>
 
+<!-- SCRIPT -->
 <script>
-  document.querySelectorAll('.aluno-checkbox').forEach(function(checkbox) {
-    checkbox.addEventListener('change', function() {
-      const id = this.value;
-      const faltaLabel = document.getElementById('falta-' + id);
-      if (this.checked) {
-        faltaLabel.classList.add('d-none');
-      } else {
-        faltaLabel.classList.remove('d-none');
-      }
+document.querySelectorAll('.aluno-checkbox').forEach(cb => {
+    cb.addEventListener('change', function () {
+        const chip = document.getElementById('chip-' + this.value);
+        if (this.checked) {
+            chip.textContent = "Presente";
+            chip.classList.remove('faltou');
+            chip.classList.add('presente');
+        } else {
+            chip.textContent = "Ausente";
+            chip.classList.remove('presente');
+            chip.classList.add('faltou');
+        }
     });
-  });
+});
+
+// BOTÃO HOJE
+document.getElementById("btnHoje").addEventListener("click", function() {
+    const hoje = new Date();
+    const yyyy = hoje.getFullYear();
+    const mm = String(hoje.getMonth() + 1).padStart(2, "0");
+    const dd = String(hoje.getDate()).padStart(2, "0");
+    document.getElementById("data").value = `${yyyy}-${mm}-${dd}`;
+});
 </script>
+
 {% endblock main %}

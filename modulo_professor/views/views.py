@@ -131,6 +131,7 @@ def atualizaRecuperaFinal(request, pk, grade):
 
 # PRESENÇA ------------------------------------------------------------------
 # PRESENÇA DIÁRIA ------------------------
+"""
 @login_required
 def registrar_presenca_diaria_view(request, turma_id):
     turma = get_object_or_404(Turmas, id=turma_id)
@@ -165,7 +166,56 @@ def registrar_presenca_diaria_view(request, turma_id):
         'matriculas': matriculas,
         'turma': turma,
         'today': date.today()
+    })"""
+
+from datetime import date, datetime, timedelta
+from calendar import monthrange
+from django.http import JsonResponse
+from django.contrib import messages
+from django.shortcuts import render, get_object_or_404, redirect
+from datetime import date, datetime
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def registrar_presenca_diaria_view(request, turma_id):
+    turma = get_object_or_404(Turmas, id=turma_id)
+    matriculas = Matriculas.objects.filter(turma=turma)
+    today = date.today()
+
+    if request.method == 'POST':
+        data_presenca_str = request.POST.get('data')
+        try:
+            data_presenca = datetime.strptime(data_presenca_str, '%Y-%m-%d').date()
+        except ValueError:
+            return render(request, 'modulo_professor/partial/presenca/presenca_diaria.html', {
+                'matriculas': matriculas,
+                'turma': turma,
+                'today': today,
+                'erro': 'Data inválida. Use o formato yyyy-mm-dd.'
+            })
+
+        alunos_presentes_ids = request.POST.getlist('presentes')
+        for matricula in matriculas:
+            presente = str(matricula.id) in alunos_presentes_ids
+            Presenca.objects.update_or_create(
+                matricula=matricula,
+                data=data_presenca,
+                turma_disciplina=None,
+                aula_numero=None,
+                defaults={'presente': presente, 'controle_diario': True}
+            )
+
+        # ✅ Adiciona mensagem de sucesso
+        messages.success(request, f"Presenças registradas com sucesso para {data_presenca.strftime('%d/%m/%Y')}!")
+
+        return redirect('modulo_professor:lista_presenca_diaria', turma.id, data_presenca.strftime('%Y-%m-%d'))
+
+    return render(request, 'modulo_professor/partial/presenca/presenca_diaria.html', {
+        'matriculas': matriculas,
+        'turma': turma,
+        'today': today
     })
+
 
 
 @login_required
@@ -212,6 +262,7 @@ def historico_faltas_view(request, matricula_id):
 
 
 # PRESENÇA POR AULA
+"""
 @login_required
 def selecionaTurma(request):
     userProfessor = request.user.related_vinculoUserPessoa
@@ -236,7 +287,39 @@ def selecionaTurma(request):
         'pessoa': professorGrade,
         'anoLetivo': ano_letivo,
         'grade_turma': grade_turma
+    })"""
+
+@login_required
+def selecionaTurma(request):
+    userProfessor = request.user.related_vinculoUserPessoa
+    pessoa = userProfessor.pessoa.id  
+    ano_letivo = request.session.get('anoLetivo', 'Não encontrado')
+
+    professorGrade = TurmaDisciplina.objects.filter(
+        professor__encaminhamento__contratado__id=pessoa,
+        turma__ano_letivo__ano=ano_letivo
+    )
+
+    turmas = []
+    turmas_ids = set()  # para evitar duplicatas
+
+    for t in professorGrade:
+        turma_id = t.turma.id
+        turma = t.turma        
+        
+        if turma_id not in turmas_ids:
+            turmas.append([turma_id, turma])
+            turmas_ids.add(turma_id)
+        
+      
+
+    return render(request, 'modulo_professor/partial/presenca/selecionaTurma.html', {
+        'pessoa': professorGrade,
+        'anoLetivo': ano_letivo,
+        'grade_turma': turmas
     })
+
+
 
 
 # PRESENÇA POR DISCIPLINA

@@ -1,87 +1,259 @@
 {% extends "modulo_professor/base.html" %}
 
-{% block main %}  
-<div class="imprimir bg-white rounded-4 shadow p-4">
-    <div class="mb-4 border-bottom pb-2">
-        <section class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2">
-            <h1 class="me-3 h3 fw-semibold text-primary">{{ grade.turma }}</h1>
-            <span class="fs-6 text-muted">{{ grade }}</span>
-        </section>
+{% block main %}
+<style>
+/* ---------- TEMA ---------- */
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --gray-light: #f8fafc;
+    --gray-medium: #6b7280;
+    --gray-dark: #374151;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --card-shadow: rgba(0, 0, 0, 0.05);
+    --border-radius: 1rem;
+    --transition: 0.3s ease;
+    --font-base: 'Inter', sans-serif;
+}
+
+/* ---------- RESET ---------- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-base);
+}
+
+/* ---------- CONTAINER PRINCIPAL ---------- */
+.imprimir {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 2rem auto;
+    box-shadow: 0 4px 12px var(--card-shadow);
+    transition: transform var(--transition);
+}
+.imprimir:hover {
+    transform: translateY(-2px);
+}
+
+/* ---------- CABEÇALHO ---------- */
+.header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+.header h1 {
+    font-weight: 700;
+    color: var(--primary);
+    margin-right: 1rem;
+    font-size: 1.8rem;
+}
+.header span {
+    font-size: 1rem;
+    color: var(--gray-medium);
+}
+
+/* ---------- ALERT INFO ---------- */
+.alert-info-custom {
+    background: #e0f2fe;
+    color: var(--primary-dark);
+    border-radius: var(--border-radius);
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.95rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+/* ---------- FORM ---------- */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+.form-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.form-group label {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: var(--gray-dark);
+}
+.form-group input, 
+.form-group select {
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--border-radius);
+    border: 1px solid #d1d5db;
+    font-size: 1rem;
+    transition: border var(--transition), box-shadow var(--transition);
+}
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+.form-text {
+    font-size: 0.8rem;
+    color: var(--gray-medium);
+    margin-top: 0.25rem;
+}
+
+/* ---------- LISTA DE ALUNOS ---------- */
+.students-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+.student-card {
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    background: var(--gray-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 6px var(--card-shadow);
+    transition: transform var(--transition), background var(--transition);
+}
+.student-card:hover {
+    transform: translateY(-2px);
+    background: #f1f5f9;
+}
+.student-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.student-info input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+.student-info label {
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--gray-dark);
+}
+
+/* ---------- STATUS BADGE ---------- */
+.status-badge {
+    border-radius: 50%;
+    width: 2.4rem;
+    height: 2.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: white;
+    transition: background var(--transition);
+}
+.bg-success { background-color: var(--success); }
+.bg-danger { background-color: var(--danger); }
+
+/* ---------- BOTÃO SALVAR ---------- */
+.btn-save {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background var(--transition), transform 0.2s ease;
+    align-self: start;
+}
+.btn-save:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+/* ---------- RESPONSIVO ---------- */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+    }
+}
+</style>
+
+<div class="imprimir">
+    <!-- CABEÇALHO -->
+    <div class="header">
+        <h1>{{ grade.turma }}</h1>
+        <span>{{ grade }}</span>
     </div>
 
-    <h2 class="h4 mb-3 text-dark">Registrar Presença por Aula</h2>
-    <div class="alert alert-info border-0 rounded-3 shadow-sm small">
-        <div><i class="bi bi-journal-text me-2"></i>{{ turma_disciplina }}</div>
-        <div><i class="bi bi-building me-2"></i>{{ request.session.escola }}</div>
-    </div>
-<form method="post" class="needs-validation" novalidate>
-    {% csrf_token %}
-    <div class="row g-3">
-        <div class="col-md-4">
-            {{ form.data.label_tag }}
-            {{ form.data }}
-        </div>
-        <div class="col-md-4">
-            {{ form.trimestre.label_tag }}
-            {{ form.trimestre }}
-        </div>
-        <div class="col-md-4">
-            {{ form.aula_numero.label_tag }}
-            {{ form.aula_numero }}
-            <div class="form-text">Ex: 1 = primeira aula do dia</div>
-        </div>
+    <h2>Registrar Presença por Aula</h2>
+
+    <div class="alert-info-custom">
+        <div><i class="bi bi-journal-text"></i> {{ turma_disciplina }}</div>
+        <div><i class="bi bi-building"></i> {{ request.session.escola }}</div>
     </div>
 
-    <hr class="my-4">
-
-    <h3 class="h5 mb-3">Lista de Alunos</h3>
-    <div class="row gy-3">
-        {% for matricula in matriculas %}
-            <div class="col-md-6 col-lg-4">
-                <div class="border rounded-3 p-3 bg-light d-flex align-items-center justify-content-between">
-                    <div class="form-check form-switch mb-0">
-                        <input
-                            class="form-check-input" 
-                            type="checkbox" 
-                            name="presentes" 
-                            value="{{ matricula.id }}" 
-                            id="presente-{{ matricula.id }}" 
-                            checked>
-                        <label class="form-check-label ms-2" for="presente-{{ matricula.id }}">
-                            {{ matricula.aluno.nome_completo }}
-                        </label>
-                    </div>
-                    <span class="badge bg-success px-3 py-1" id="status-{{ matricula.id }}">P</span>
-                </div>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="form-row">
+            <div class="form-group">
+                {{ form.data.label_tag }}
+                {{ form.data }}
             </div>
-        {% endfor %}
-    </div>
+            <div class="form-group">
+                {{ form.trimestre.label_tag }}
+                {{ form.trimestre }}
+            </div>
+            <div class="form-group">
+                {{ form.aula_numero.label_tag }}
+                {{ form.aula_numero }}
+                <div class="form-text">Ex: 1 = primeira aula do dia</div>
+            </div>
+        </div>
 
-    <div class="mt-5">
-        <button type="submit" class="btn btn-primary btn-lg w-100 w-md-auto shadow-sm">
-            <i class="bi bi-save me-2"></i>Salvar Presença
-        </button>
-    </div>
-</form>
+        <h3>Lista de Alunos</h3>
+        <div class="students-grid">
+            {% for matricula in matriculas %}
+            <div class="student-card">
+                <div class="student-info">
+                    <input type="checkbox" id="presente-{{ matricula.id }}" name="presentes" value="{{ matricula.id }}" checked>
+                    <label for="presente-{{ matricula.id }}">{{ matricula.aluno.nome_completo }}</label>
+                </div>
+                <span class="status-badge bg-success" id="status-{{ matricula.id }}">P</span>
+            </div>
+            {% endfor %}
+        </div>
 
+        <button type="submit" class="btn-save">Salvar Presença</button>
+    </form>
+</div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('input[type="checkbox"][name="presentes"]').forEach((checkbox) => {
-            const statusSpan = document.getElementById(`status-${checkbox.value}`);
-
-            checkbox.addEventListener('change', () => {
-                if (checkbox.checked) {
-                    statusSpan.textContent = 'P';
-                    statusSpan.classList.remove('bg-danger');
-                    statusSpan.classList.add('bg-success');
-                } else {
-                    statusSpan.textContent = 'F';
-                    statusSpan.classList.remove('bg-success');
-                    statusSpan.classList.add('bg-danger');
-                }
-            });
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input[type="checkbox"][name="presentes"]').forEach((checkbox) => {
+        const statusSpan = document.getElementById(`status-${checkbox.value}`);
+        checkbox.addEventListener('change', () => {
+            if (checkbox.checked) {
+                statusSpan.textContent = 'P';
+                statusSpan.classList.remove('bg-danger');
+                statusSpan.classList.add('bg-success');
+            } else {
+                statusSpan.textContent = 'F';
+                statusSpan.classList.remove('bg-success');
+                statusSpan.classList.add('bg-danger');
+            }
         });
     });
+});
 </script>
 {% endblock main %}

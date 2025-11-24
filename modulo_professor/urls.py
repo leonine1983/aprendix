@@ -11,6 +11,7 @@ urlpatterns = [
     path('/presenca/diaria/seleciona/', selecionaTurma, name='selecionaTurmaFalta'),
     path('/presenca/diaria/<int:turma_id>/', registrar_presenca_diaria_view, name='presenca_diaria'),
     path('/turma/<int:turma_id>/presencas/<str:data_str>/', lista_presenca_diaria_view, name='lista_presenca_diaria'),
+    
 
     path('/faltas/<int:matricula_id>/', historico_faltas_view, name='historico_faltas'),
 
