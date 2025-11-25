@@ -197,6 +197,7 @@
 .nav-right {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 1rem;
   animation: fadeInRight 0.8s ease;
   justify-content: center;
@@ -260,31 +261,34 @@
 .nav-toggle:hover {
   transform: scale(1.2);
 }
-
 /* MENU MOBILE */
 @media (max-width: 768px) {
   .nav-right {
-    position: absolute;
+    position: fixed;           /* fixo e sem vazar */
     top: 75px;
     right: 0;
 
-    background: var(--bg-blur);
+    background: rgba(255,255,255,0.55);
     backdrop-filter: blur(16px);
 
     padding: 1.4rem;
     border-radius: 0 0 0 18px;
     box-shadow: -3px 3px 12px rgba(0,0,0,0.25);
 
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.4rem;
+    width: 220px;             /* largura do menu */
+    height: auto;
 
-    transform: translateX(130%);
+    flex-direction: column;
+    gap: 1rem;
+    align-items:center;
+
+    transform: translateX(110%); /* 100% oculto */
     transition: transform .35s ease;
+    z-index: 999;
   }
 
   body.nav-open .nav-right {
-    transform: translateX(0);
+    transform: translateX(0); /* aparece */
   }
 
   .nav-toggle {
@@ -771,6 +775,25 @@ document.addEventListener('keydown', e=>{
       document.getElementById("modalAuto").style.display = "none";
   }
 </script>
+
+
+<script>
+document.addEventListener("click", function (e) {
+  const menu = document.querySelector(".nav-right");
+  const toggle = document.querySelector(".nav-toggle");
+
+  // Se clicou no botão, deixa o toggle funcionar sozinho
+  if (toggle.contains(e.target)) return;
+
+  // Se o menu está aberto e clicou fora — fecha
+  if (document.body.classList.contains("nav-open") &&
+      !menu.contains(e.target)) {
+    document.body.classList.remove("nav-open");
+  }
+});
+</script>
+
+
 
 </body>
 </html>
