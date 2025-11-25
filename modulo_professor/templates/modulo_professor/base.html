@@ -135,37 +135,208 @@
               radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
             background-attachment: fixed;
         }
+
+        .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  width: 100%;
+  padding: 0.8rem 1.5rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 3px 20px rgba(0,0,0,0.12);
+
+  animation: slideDown 0.6s ease;
+}
+
+/* animação ao carregar */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* esquerdo */
+.nav-left {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;   /* ocupa tudo */
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-15px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  transition: transform .25s;
+}
+
+.logo:hover {
+  transform: rotate(6deg) scale(1.07);
+}
+
+.brand {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* direito */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  animation: fadeInRight 0.8s ease;
+  justify-content: center;
+  background-color: whitesmoke!important;
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(15px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.icon-btn svg {
+  transition: .25s ease;
+}
+
+.icon-btn:hover svg {
+  transform: translateY(-3px) scale(1.1);
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  object-fit: cover;
+  transition: transform .25s ease;
+}
+
+.avatar:hover {
+  transform: scale(1.07);
+}
+
+/* botão logout */
+.btn-logout {
+  background: #9b830d;
+  color: white;
+  border: none;
+  padding: 0.45rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .25s, background .25s;
+}
+
+.btn-logout:hover {
+  background: #7e6b0b;
+  transform: translateY(-3px);
+}
+
+/* mobile button */
+.nav-toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: var(--text);
+  transition: .3s;
+}
+
+.nav-toggle:hover {
+  transform: scale(1.2);
+}
+
+/* MENU MOBILE */
+@media (max-width: 768px) {
+  .nav-right {
+    position: absolute;
+    top: 75px;
+    right: 0;
+
+    background: var(--bg-blur);
+    backdrop-filter: blur(16px);
+
+    padding: 1.4rem;
+    border-radius: 0 0 0 18px;
+    box-shadow: -3px 3px 12px rgba(0,0,0,0.25);
+
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.4rem;
+
+    transform: translateX(130%);
+    transition: transform .35s ease;
+  }
+
+  body.nav-open .nav-right {
+    transform: translateX(0);
+  }
+
+  .nav-toggle {
+    display: block;
+  }
+}
+
 </style>
 </head>
 <body class='bg-p-1'>
  
 
   <!-- NAVBAR -->
-  <header  style='box-shadow:0.1rem 0.1rem 0.8rem 0.2rem #11111156; background: rgba(255, 255, 255, 0.397);'>
-    <div class="nav-left ">
-      <img src="{% static 'logo.png' %}" alt="Logo" width="36" height="36" class="me-2 rounded-3">
-            <span>Aprendix</span>
-      <!--<div class="search muted">🔎 Buscar — atalhos, turmas, tarefas...</div>-->
+  <header class="app-header">
+  <div class="nav-left">
+    <div>
+      <img src="{% static 'logo.png' %}" alt="Logo" class="logo">
+      <span class="brand">Aprendix</span>
     </div>
-    <div class="nav-right">
-      <div class="flex muted">Olá, <strong>Prof. {{request.user.first_name}}</strong> </div>
-      {% if request.user.related_vinculoUserPessoa.pessoa.foto %}
-        <img src="{{request.user.related_vinculoUserPessoa.pessoa.foto.url}}" alt="Perfil">
-        {% else %}
-          {% if request.user.related_vinculoUserPessoa.pessoa.sexo.nome == 'Masculino (cisgênero)' %}
-            <img src="{% static "man.png" %}" alt="Perfil">
-            {% else %}
-              <img src="{% static 'woman.png' %}" alt="Perfil">
-          {% endif %}
+    <a href="{% url 'modulo_professor:homeProfessor' %}" class="icon-btn">
+      <!-- Seu SVG -->
+      <svg fill="#9b830d" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="35px" viewBox="0 0 495.398 495.398" xml:space="preserve" stroke="#9b830d" stroke-width="0.00495398"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <g> <path d="M487.083,225.514l-75.08-75.08V63.704c0-15.682-12.708-28.391-28.413-28.391c-15.669,0-28.377,12.709-28.377,28.391 v29.941L299.31,37.74c-27.639-27.624-75.694-27.575-103.27,0.05L8.312,225.514c-11.082,11.104-11.082,29.071,0,40.158 c11.087,11.101,29.089,11.101,40.172,0l187.71-187.729c6.115-6.083,16.893-6.083,22.976-0.018l187.742,187.747 c5.567,5.551,12.825,8.312,20.081,8.312c7.271,0,14.541-2.764,20.091-8.312C498.17,254.586,498.17,236.619,487.083,225.514z"></path> <path d="M257.561,131.836c-5.454-5.451-14.285-5.451-19.723,0L72.712,296.913c-2.607,2.606-4.085,6.164-4.085,9.877v120.401 c0,28.253,22.908,51.16,51.16,51.16h81.754v-126.61h92.299v126.61h81.755c28.251,0,51.159-22.907,51.159-51.159V306.79 c0-3.713-1.465-7.271-4.085-9.877L257.561,131.836z"></path> </g> </g> </g> </g></svg>
+    </a>
+  </div>
+
+  <div class="nav-right">   
+
+    <div class="greeting">Olá, <strong>Prof. {{request.user.first_name}}</strong></div>
+
+    {% if request.user.related_vinculoUserPessoa.pessoa.foto %}
+      <img src="{{request.user.related_vinculoUserPessoa.pessoa.foto.url}}" alt="Perfil" class="avatar">
+    {% else %}
+      {% if request.user.related_vinculoUserPessoa.pessoa.sexo.nome == 'Masculino (cisgênero)' %}
+        <img src="{% static 'man.png' %}" alt="Perfil" class="avatar">
+      {% else %}
+        <img src="{% static 'woman.png' %}" alt="Perfil" class="avatar">
       {% endif %}
-      <form method="post" action="{% url 'admin_acessos:logout' %}">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-sm btn-logout px-3 py-1 fw-semibold">
-              <i class="bi bi-box-arrow-right me-1"></i> Sair
-          </button>
-      </form>
-    </div>
-  </header>
+    {% endif %}
+
+    <form method="post" action="{% url 'admin_acessos:logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn-logout">
+        <i class="bi bi-box-arrow-right"></i> Sair
+      </button>
+    </form>
+  </div>
+
+  <button class="nav-toggle" onclick="document.body.classList.toggle('nav-open')">
+    ☰
+  </button>
+</header>
+
 
   <!-- SIDE BARS -->
   <nav class="sidebar left" id="sidebar-left">
