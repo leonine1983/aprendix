@@ -68,7 +68,73 @@
 
 
   /* ORELHINHAS (mobile) */
-  .ear {position:fixed; top:140px; width:42px; height:64px; display:none; align-items:center; justify-content:center; color:#fff; background:var(--primary); border-radius:0 10px 10px 0; z-index:90; box-shadow:var(--shadow); cursor:pointer}
+ 
+.ear {
+  position: fixed;
+  top: 50%;                        /* meio da tela */
+  transform: translateY(-50%);     /* centraliza verticalmente */
+
+  width: 30px;
+  height: 300px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #610303;
+  font-weight: 700;
+  font-size: 0.9rem;
+
+  background: rgba(255, 255, 255, 0.18);   /* vidro */
+  backdrop-filter: blur(14px) saturate(180%); 
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+
+  border-radius: 14px 0 0 14px;    /* versão esquerda */
+  border: 1px solid rgba(255, 255, 255, 0.35);
+
+  z-index: 120;
+
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+
+  transition: transform .25s ease, 
+              background .25s ease,
+              box-shadow .25s ease;
+
+  display: none; /* continua oculto no desktop */
+}
+
+/* Ear do lado direito */
+.ear.right {
+  right: 0;
+  border-radius: 0 14px 14px 0;
+}
+
+/* Hover com efeito mais futurista */
+.ear:hover {
+  background: rgba(255, 255, 255, 0.28);
+  transform: translateY(-50%) scale(1.07);
+  box-shadow: 0 10px 36px rgba(0,0,0,0.32);
+}
+
+/* Texto vertical */
+.ear span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  letter-spacing: 2px;
+  text-shadow: 0 0 6px rgba(255,255,255,0.65);
+}
+
+
+
+
+
+
+
+
+
+
+
   .ear.right { right:0; border-radius:10px 0 0 10px }
   .ear span{writing-mode:vertical-rl; transform:rotate(180deg); font-weight:700}
 
@@ -357,8 +423,8 @@
   
 
   <!-- ORELHAS MOBILE -->
-  <div class="ear" id="ear-left" style="left:0"><span>PROF</span></div>
-  <div class="ear right" id="ear-right" style="right:0"><span>ALUN</span></div>
+  <div class="ear" id="ear-left" style="left:0"><span>Planejamento Docente</span></div>
+  <div class="ear right" id="ear-right" style="right:0"><span>Registros do Aluno </span></div>
 
   <!-- MAIN -->
   <main class='bg-p-1'>

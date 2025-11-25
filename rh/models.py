@@ -9,9 +9,9 @@ class Config_plataforma(models.Model):
     rh_Ativo = models.BooleanField(default=False)
     nome_sistema = models.CharField(max_length=100, default='SME Aprendix')
     versao = models.CharField(max_length=10, default='1.0.0')
-    dominio = models.CharField(max_length=15, default='aprendix.cauans-solutions.ic')
-    emailApp = models.CharField(max_length=15, default='cauans.technology@gmail.com')
-    senhaApp=models.CharField(max_length=15, default='yvnu lwgx fydm mmcf')
+    dominio = models.CharField(max_length=150, default='aprendix.cauans-solutions.ic')
+    emailApp = models.CharField(max_length=150, default='cauans.technology@gmail.com')
+    senhaApp=models.CharField(max_length=150, default='yvnu lwgx fydm mmcf')
 
     def __str__(self):
         return f'{self.nome_sistema} {self.versao}'
@@ -265,8 +265,8 @@ class UserPessoas(models.Model):
 
 class Escola(models.Model):
     prefeitura = models.ForeignKey(Prefeitura, on_delete=models.PROTECT, verbose_name='Nome da Instituição Responsável')
-    nome_escola = models.CharField(max_length=60, verbose_name='Nome da Escola ou Departamento')
-    sigla_escola = models.CharField(max_length=60, verbose_name='Sigla da escola', null=True)
+    nome_escola = models.CharField(max_length=150, verbose_name='Nome da Escola ou Departamento')
+    sigla_escola = models.CharField(max_length=10, verbose_name='Sigla da escola', null=True)
     endereco_escola = models.CharField(max_length=100, null=True, blank=True, verbose_name='Endereço')
     telefone_escola = models.CharField(max_length=30, null=True, blank=True, verbose_name='Telefone')
     created = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')    

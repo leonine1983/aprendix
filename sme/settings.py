@@ -76,25 +76,32 @@ TEMPLATES = [
 WSGI_APPLICATION = 'sme.wsgi.application'
 
 # DATABASE ------------------------------------------------------
+# DATABASE ------------------------------------------------------
 DB_SQLITE = config('DB_SQLITE', default=False, cast=bool)
+
 if DB_SQLITE:
+    # Banco SQLite
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+
 else:
+    # Banco PostgreSQL
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('DB_NAME', default='aprendix'),
+            'NAME': config('DB_NAME'),
             'USER': config('DB_USER'),
             'PASSWORD': config('DB_PASSWORD'),
             'HOST': config('DB_HOST', default='localhost'),
             'PORT': config('DB_PORT', default='5432'),
         }
     }
+# END DATABASE ----------------------------------------------------
+
 # END DATABASE ----------------------------------------------------
 
 

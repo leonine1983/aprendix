@@ -40,7 +40,7 @@ class Pais_origem(models.Model):
     
 
 class Deficiencia_aluno(models.Model):
-    nome = models.CharField(max_length=30)  
+    nome = models.CharField(max_length=100)  
     def __str__(self):
         return self.nome
     
@@ -135,7 +135,7 @@ class Alunos(models.Model):
         verbose_name='Nome completo do aluno*'
     )
     nome_social = models.CharField(
-        max_length=30,
+        max_length=100,
         null=True,
         blank=True,
         default='',
@@ -160,7 +160,7 @@ class Alunos(models.Model):
     tel_celular_aluno = models.CharField(max_length=30, null=False,  verbose_name='Nº de telefone do aluno*')    
     email = models.EmailField(max_length=200, null=False, verbose_name='Email*')
     # Endereço do aluno
-    rua = models.CharField(max_length=30, null=False, default='Av., Rua, Travessa')
+    rua = models.CharField(max_length=100, null=False, default='Av., Rua, Travessa')
     #bairro = models.ForeignKey(Bairro, null=True, on_delete=models.CASCADE)    
     #cidade = models.ForeignKey(Cidade, null=True, on_delete=models.CASCADE)   
     #estado = models.ForeignKey(Uf_Unidade_Federativa, related_name="estado_relatec",verbose_name='Estado onde vive', null=True, on_delete=models.CASCADE)

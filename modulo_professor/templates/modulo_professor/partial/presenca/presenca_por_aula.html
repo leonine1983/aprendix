@@ -202,6 +202,7 @@ form {
         <div><i class="bi bi-journal-text"></i> {{ turma_disciplina }}</div>
         <div><i class="bi bi-building"></i> {{ request.session.escola }}</div>
     </div>
+    
 
     <form method="post" novalidate>
         {% csrf_token %}
@@ -221,8 +222,10 @@ form {
             </div>
         </div>
 
+        <hr>
+
         <h3>Lista de Alunos</h3>
-        <div class="students-grid">
+        <div class="students-grid" style="background-color: #9218882f; padding: 1rem; box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;">
             {% for matricula in matriculas %}
             <div class="student-card">
                 <div class="student-info">

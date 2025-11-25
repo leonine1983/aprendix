@@ -121,7 +121,7 @@ class Pessoa_form(forms.ModelForm):
 
     def generate_login(self):
         while True:
-            letra = random.choice(string.ascii_lowercase)
+            letra = "prof"
             numero = ''.join(random.choices(string.digits, k=5))  # Corrected the digits
             login = f'{letra}-{numero}'
             if not Pessoas.objects.filter(login_professor=login).exists():
