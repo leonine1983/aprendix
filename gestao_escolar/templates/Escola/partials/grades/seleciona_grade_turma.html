@@ -60,6 +60,7 @@
           <th scope="col">Série</th>
           <th scope="col">Turno</th>
           <th scope="col">Ano</th>             
+          <th scope="col">Quant. Alunos</th>
           <th scope="col" class='text-center'>Ação</th>           
         </tr>
       </thead>
@@ -71,6 +72,7 @@
           <td >{{n.serie}}</td>
           <td >{{n.turno}}</td>
           <td >{{n.ano_letivo}}</td>
+          <td >{{n.related_matricula_turma.all|length}}</td>
           <td class='text-center'><a class="btn btn-sm btn-success" href="{% url 'Gestao_Escolar:Grades_create' n.pk %} ">Criar Grade de disciplinas  <i class="fa-duotone fa-chart-network"></i></a></td>
           
         </tr>                    
@@ -86,8 +88,8 @@
           <th>Ico</th>
           <th scope="col">Disciplina</th>
           <th scope="col">Professor</th>
-          <th scope="col">Carga Horária Anual</th>
-          <th scope="col">Limite de Faltas</th>             
+          <th scope="col">Carga Horária Anual</th>            
+          <th scope="col">Quant. Alunos</th>       
           <th scope="col" class="text-center">Ação</th>           
         </tr> 
       </thead>  
@@ -98,7 +100,7 @@
           <td class='text-align'>{{n.disciplina}}</td>                    
           <td class='text-align text-capitalize '>{{n.professor}}</td>
           <td class='text-align'>{{n.carga_horaria_anual}}</td>
-          <td class='text-align'>{{n.limite_faltas}}</td>
+          <td class='text-align'>{{n.turma.related_matricula_turma.all|length}}</td>
           <td class='text-align d-flex text-center gap-2 c'><a href="{% url "Gestao_Escolar:Grades_update" n.pk %}" class='btn btn-primary'>Editar</a><a href="{% url 'Gestao_Escolar:Grades_delete' n.pk %}" class='btn btn-danger'>Excluir</a> </td>   
         </tr>    
       {% endfor %}  

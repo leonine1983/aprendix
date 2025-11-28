@@ -43,11 +43,12 @@ class Diciplina_Grade_form (forms.ModelForm):
     carga_horaria_anual= forms.CharField(
         label='Carga horária anual da disciplina:',
         widget=forms.NumberInput(attrs={'class': ' border border-info p-1 pb-1 text-info m-2 rounded-1 '}),
-    )    
+    )  
+    """  
     limite_faltas= forms.CharField(
         label='Atribua o número máximo de faltas que o aluno pode ter na disciplina e não ser reprovado:',
         widget=forms.NumberInput(attrs={'class': 'border border-info p-1 pb-1  text-info m-2 rounded-1'}),
-    )  
+    )  """
 
     def __init__(self, *args, **kwargs):
             query_turma = kwargs.pop('turmas_query', None)
@@ -66,7 +67,7 @@ class Diciplina_Grade_form (forms.ModelForm):
 
     class Meta:
         model = TurmaDisciplina
-        fields =['turma', 'disciplina', 'professor', 'carga_horaria_anual', 'limite_faltas']
+        fields =['turma', 'disciplina', 'professor', 'carga_horaria_anual']
 
 
 

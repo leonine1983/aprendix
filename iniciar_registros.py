@@ -274,13 +274,17 @@ def iniciar_registros():
             Pais_origem.objects.bulk_create([Pais_origem(nome=pais) for pais in paises])
             print('País de origem criado com sucesso!!!')
                 
-        if not GrauEscolar.objects.exists():
-            graus = ['Etapa Creche', 'Ensino Fundamental I (Séries Iniciais)', 'Ensino Fundamental II (Séries Finais)' ]
+        if not  GrauEscolar.objects.exists():
+            graus = [
+                'Etapa Creche',
+                'Ensino Fundamental I (Séries Iniciais)',
+                'Ensino Fundamental II (Séries Finais)'
+            ]
+
             for g in graus:
-                GrauEscolar.objects.create(
-                    nome = g
-                )
-            print('GrauEscolar criado com sucesso!!!')
+                GrauEscolar.objects.get_or_create(nome=g)
+
+            print('GrauEscolar criado/verificado com sucesso!')
 
         if not Compatibilidade_EducaCenso.objects.exists():
             nivel = [

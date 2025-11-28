@@ -351,7 +351,7 @@ class Compatibilidade_EducaCenso(models.Model):
 
 
 class GrauEscolar(models.Model):
-    nome = models.CharField(max_length=30, verbose_name="Grau/Nível Escolar")
+    nome = models.CharField(max_length=100, verbose_name="Grau/Nível Escolar")
 
     def __str__(self):
         return self.nome
