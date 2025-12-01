@@ -13,6 +13,7 @@ class MeuFormulario(forms.Form):
         max_length=100,        
         widget=forms.TextInput(attrs={'class': 'form-control border border-info p-3 pb-3 text-info col m-2 rounded-1'}))
 
+
 class AlunosEcontred(LoginRequiredMixin,TemplateView):    
     template_name = 'Escola/inicio.html'       
 

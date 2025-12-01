@@ -179,8 +179,6 @@ class Alunos(models.Model):
     #estado_naturalidade = models.ForeignKey(Uf_Unidade_Federativa, related_name="estado_nascimento",verbose_name='Estado onde nasceu', null=True, on_delete=models.CASCADE)
     nacionalidade = models.ForeignKey(Nacionalidade, on_delete=models.CASCADE, default=1, verbose_name='Nacionalidade*')
 
-
-
     # Informações Paternas e Maternas
     nome_mae = models.CharField(max_length=120, null=False, default='', verbose_name='Nome da Mãe*')
     CPF_mae = models.CharField(max_length=14, null=True, blank=True, default='000.000.000-00')   
@@ -256,37 +254,11 @@ class Alunos(models.Model):
             novo_registro = f"{usuario} - {data_atual}"
             if self.alterado_por:
                 self.alterado_por += f"\n{novo_registro}"
-                print("esta aqui se alterado")
             else:
                 self.alterado_por = novo_registro
-                print("esta aqui se não alterado")
 
         # 🔸 Chame SEMPRE o save real
         super().save(*args, **kwargs)
-
-
-
-
-    """
-     def save(self, *args, **kwargs):
-        # Captura o usuário, se for passado pelo contexto
-        usuario = getattr(self, '_usuario_logado', None)
-
-        # Registra log apenas se for uma atualização e houver usuário
-        if self.pk and usuario:
-            data_atual = timezone.now().strftime("%d/%m/%Y %H:%M")
-            novo_registro = f"{usuario} - {data_atual}"
-            if self.alterado_por:
-                self.alterado_por += f"\n{novo_registro}"
-            else:
-                self.alterado_por = novo_registro
-
-        super().save(*args, **kwargs)
-    
-    """
-
-
-
 
     def e_aniversario_hoje(self):
         hoje = datetime.now().date()
@@ -296,6 +268,7 @@ class Alunos(models.Model):
 
     def __str__(self):
         return self.nome_completo 
+    
     
 class AlunoUser(models.Model):
     aluno = models.OneToOneField(Alunos, null=True, on_delete=models.CASCADE, related_name='alunoUser_related',  verbose_name='Aluno Usuario*:')

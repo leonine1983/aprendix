@@ -36,8 +36,7 @@ class CreateAlunosConfirma(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     def form_valid(self, form):
         form.nome_completo = self.cleaned_data.get('nome_completo').upper()
         form.nome_mae = self.cleaned_data.get('nome_mae').upper()
-        return super().form_valid(form)
-    
+        return super().form_valid(form)    
 
     def get_context_data(self, **kwargs):        
         context = super().get_context_data(**kwargs)        

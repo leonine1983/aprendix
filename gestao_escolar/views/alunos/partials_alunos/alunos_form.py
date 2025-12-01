@@ -162,19 +162,8 @@ class Aluno_documento_form(forms.ModelForm):
         # Remove o aluno_create dos kwargs antes de chamar o super()
         self.aluno_create = kwargs.pop('aluno_create', None)
         super().__init__(*args, **kwargs)
-        """
-        if not self.instance.login_aluno:
-            self.fields['login_aluno'].initial = self.generate_login()
-            self.fields['senha'].initial = "12345678"
-        
-        if self.aluno_create is not None:
-            self.fields['aluno'].queryset = self.aluno_create
-            self.fields['aluno'].initial = self.aluno_create.first()    
-            self.fields['login_aluno'].initial = self.generate_login()           
-            self.fields['senha'].initial = "12345678"
-        """
-
-         # Garante login e senha iniciais se não existirem
+         
+        # Garante login e senha iniciais se não existirem
         if not self.instance.login_aluno:
             self.fields['login_aluno'].initial = self.generate_login()
         else:
@@ -225,8 +214,8 @@ class Aluno_documento_form(forms.ModelForm):
     
     def generate_login(self):
         while True:
-            letra = random.choice(string.ascii_lowercase)
+            letra = "aluno"
             numero = ''.join(random.choices(string.digits + string.digits, k=5))
-            login = f'{letra}/{numero}'
+            login = f'{letra}-{numero}'
             if not Alunos.objects.filter(login_aluno=login).exists():
                 return login

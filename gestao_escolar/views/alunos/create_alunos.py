@@ -26,9 +26,7 @@ class Create_Alunos(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         busca_nome = self.request.GET.get('busca-aluno', '').strip()
         if busca_nome:
             return Alunos.objects.filter(nome_completo__icontains=busca_nome)
-        return Alunos.objects.all()
-
-    
+        return Alunos.objects.all()    
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -53,29 +51,6 @@ class Create_Alunos(LoginRequiredMixin, SuccessMessageMixin, CreateView):
             'page_ajuda': "<div class='m-2'><b>Nessa área, definimos todos os dados para a celebração do contrato com o profissional.",
         })
         return context
-
-    """
-    def form_valid(self, form):
-        nome_completo = form.cleaned_data.get('nome_completo', '').strip()
-        nome_mae = form.cleaned_data.get('nome_mae', '').strip()
-
-        if Alunos.objects.filter(
-            nome_completo__icontains=nome_completo,
-            nome_mae__icontains=nome_mae
-        ).exists():
-            return redirect(
-                'Gestao_Escolar:alunos_encontred',
-                nome_completo=nome_completo,
-                nome_mae=nome_mae
-            )
-
-        user = self.request.user
-        nome_usuario = f'{user.first_name} {user.last_name}'.strip() or user.username
-        form.instance.res_cadastro = nome_usuario
-        form.instance.nome_completo = nome_completo.upper()
-        form.instance.nome_mae = nome_mae.upper()
-
-        return super().form_valid(form)"""
     
     def form_valid(self, form):
         nome_completo = form.cleaned_data.get('nome_completo', '').strip()
