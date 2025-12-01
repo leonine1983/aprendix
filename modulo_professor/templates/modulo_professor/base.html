@@ -2,720 +2,250 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Painel do Professor • Atualizado</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
-
-<style>
-  :root{
-    --bg:#f5f7fb; --card:#fff; --primary:#3b82f6; --accent:#10b981; --muted:#64748b;
-    --radius:12px; --shadow: 0 6px 20px rgba(2,6,23,0.06);
-  }
-  *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;margin:0;padding:0}
-  body{background:var(--bg); color:#111; min-height:100vh; display:flex; flex-direction:column;}
-
-  /* NAVBAR */
-  header {
-    height:64px; background:var(--card); display:flex; align-items:center; justify-content:space-between;
-    padding:0 20px; box-shadow:var(--shadow); position:fixed; top:0; left:0; right:0; z-index:80;
-  }
-  .nav-left {display:flex; align-items:center; gap:12px;}
-  .brand {font-weight:700; color:var(--primary); font-size:1.05rem}
-  .search {background:#f2f6fb;padding:8px 12px;border-radius:10px;color:var(--muted);border:1px solid #e9f0ff}
-  .nav-right {display:flex; align-items:center; gap:12px;}
-  .nav-right img{width:40px;height:40px;border-radius:50%;object-fit:cover}
-  .nav-right .logout{background:var(--primary);color:#fff;border:none;padding:8px 10px;border-radius:10px;cursor:pointer}
-
-  /* SIDE BARS */
-  .sidebar {position:fixed; top:64px; bottom:0; width:240px; background:var(--card); padding:18px; box-shadow:var(--shadow); overflow:auto; transition:transform .28s ease; z-index:70}
-  .sidebar.left {left:0}
-  .sidebar.right {right:0}
-  .sidebar h3{color:var(--primary); margin-bottom:12px}
-  .sidebar a {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
-    margin-bottom: 8px;
-
-    border: 0.1rem solid #d1d5db;
-    border-radius: 10px;
-
-    font-size: 0.85rem;
-    color: #1f2937;
-    text-decoration: none;
-
-    background: linear-gradient(135deg, #ffffff, #f1f5f9);
-    transition: all 0.25s ease;
-}
-
-/* Hover moderno */
-.sidebar a:hover {
-    background: linear-gradient(135deg, #e0f2fe, #dbeafe);
-    border-color: #3b82f6;
-    color: #1e40af;
-    transform: translateX(3px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-/* Foco acessível */
-.sidebar a:focus {
-    outline: 3px solid #3b82f6;
-    outline-offset: 2px;
-}
-
-
-  /* ORELHINHAS (mobile) */
- 
-.ear {
-  position: fixed;
-  top: 50%;                        /* meio da tela */
-  transform: translateY(-50%);     /* centraliza verticalmente */
-
-  width: 30px;
-  height: 300px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: #610303;
-  font-weight: 700;
-  font-size: 0.9rem;
-
-  background: rgba(255, 255, 255, 0.18);   /* vidro */
-  backdrop-filter: blur(14px) saturate(180%); 
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-
-  border-radius: 14px 0 0 14px;    /* versão esquerda */
-  border: 1px solid rgba(255, 255, 255, 0.35);
-
-  z-index: 120;
-
-  cursor: pointer;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-
-  transition: transform .25s ease, 
-              background .25s ease,
-              box-shadow .25s ease;
-
-  display: none; /* continua oculto no desktop */
-}
-
-/* Ear do lado direito */
-.ear.right {
-  right: 0;
-  border-radius: 0 14px 14px 0;
-}
-
-/* Hover com efeito mais futurista */
-.ear:hover {
-  background: rgba(255, 255, 255, 0.28);
-  transform: translateY(-50%) scale(1.07);
-  box-shadow: 0 10px 36px rgba(0,0,0,0.32);
-}
-
-/* Texto vertical */
-.ear span {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  letter-spacing: 2px;
-  text-shadow: 0 0 6px rgba(255,255,255,0.65);
-}
-
-
-
-
-
-
-
-
-
-
-
-  .ear.right { right:0; border-radius:10px 0 0 10px }
-  .ear span{writing-mode:vertical-rl; transform:rotate(180deg); font-weight:700}
-
-  /* MAIN AREA */
-  main{margin-top:84px; margin-left:260px; margin-right:260px; padding:20px; overflow:auto; min-height:calc(100vh - 84px);}
-  @media(max-width:980px){
-    .sidebar.left{transform:translateX(-102%)} .sidebar.right{transform:translateX(102%)}
-    .ear{display:flex} main{margin-left:14px;margin-right:14px;padding:14px}
-    .nav-right .logout{display:none}
-  }
-
-  /* MURAL */
-  .mural {background:var(--card); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); margin-bottom:18px}
-  .mural-header{display:flex;justify-content:space-between;align-items:center}
-  .mural-posts{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-top:12px}
-  .post{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 6px 18px rgba(2,6,23,0.05)}
-  .post img{width:100%;height:180px;object-fit:cover;display:block}
-  .post .cap{padding:10px;font-size:0.95rem}
-  .post .post-actions{display:flex;gap:8px;padding:10px;border-top:1px solid #f1f5f9}
-  .post .post-actions button{background:none;border:0;cursor:pointer;color:var(--primary);font-weight:600}
-  .comment-section{display:none;padding:10px;border-top:1px solid #f1f5f9}
-  .comment-row{display:flex;gap:8px;margin-bottom:8px}
-  .comment-row input{flex:1;padding:8px;border-radius:8px;border:1px solid #e6eef8}
-  .comments-list p{margin:6px 0;padding:6px;background:#f8fafc;border-radius:6px;font-size:0.9rem}
-
-  /* PLANEJAMENTO / KANBAN */
-  .planning {background:var(--card); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); margin-bottom:18px}
-  .planning-header{display:flex;justify-content:space-between;align-items:center}
-  .btn{background:var(--primary); color:#fff; border:0; padding:8px 12px; border-radius:10px; cursor:pointer}
-  .boards{display:flex; gap:14px; margin-top:14px; align-items:flex-start; overflow:auto; padding-bottom:8px}
-  .board{min-width:320px;background:#f9fbff;padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(2,6,23,0.03)}
-  .board h4{margin:0 0 8px 0;color:var(--primary);display:flex;align-items:center;justify-content:space-between}
-  .board .controls{margin-bottom:8px}
-  .columns{display:flex;gap:10px}
-  .column{min-height:120px;padding:8px;border-radius:8px;background:#fff;width:280px;box-shadow:inset 0 0 0 1px #f1f6ff}
-  .task{background:#fff;padding:10px;border-radius:8px;margin-bottom:8px;box-shadow:0 2px 8px rgba(2,6,23,0.04);cursor:grab}
-  .task.dragging{opacity:0.6;transform:scale(.995)}
-  .column.drag-over{outline:3px dashed #dbeeff}
-
-  /* CHAT */
-  .chat-open-btn{position:fixed; right:22px; bottom:22px; width:56px;height:56px;border-radius:50%;background:var(--primary);color:#fff;border:0;box-shadow:var(--shadow); cursor:pointer;z-index:90;font-size:20px}
-  .chat-box{position:fixed; right:22px; bottom:90px; width:340px; max-height:70vh; background:var(--card); border-radius:12px; display:flex; flex-direction:column; overflow:hidden; z-index:90}
-  .chat-header{background:var(--primary); color:#fff; padding:10px; display:flex; justify-content:space-between; align-items:center; cursor:pointer}
-  .chat-messages{padding:10px; overflow:auto; flex:1; background:#fcfeff}
-  .chat-input{display:flex;border-top:1px solid #eef3ff}
-  .chat-input input{flex:1;padding:10px;border:none;outline:none}
-  .chat-input button{background:var(--accent);color:#fff;border:none;padding:0 14px;cursor:pointer}
-  .muted{color:var(--muted);font-size:0.95rem}
-  .flex{display:flex;align-items:center;gap:8px}
-  .hr{height:1px;background:#f1f5ff;margin:10px 0;border-radius:2px}
-
-  .bg-p-1 {
-            --s: 50px;
-            --c: #b0c4de;
-            --_s: calc(2*var(--s)) calc(2*var(--s));
-            --_g: 35.36% 35.36% at;
-            --_c: #0000 66%,#889fbd3d  68% 70%,#0000 72%;
-            background: 
-              radial-gradient(var(--_g) 100% 25%,var(--_c)) var(--s) var(--s)/var(--_s), 
-              radial-gradient(var(--_g) 0 75%,var(--_c)) var(--s) var(--s)/var(--_s), 
-              radial-gradient(var(--_g) 100% 25%,var(--_c)) 0 0/var(--_s), 
-              radial-gradient(var(--_g) 0 75%,var(--_c)) 0 0/var(--_s), 
-              repeating-conic-gradient(var(--c) 0 25%,#0000 0 50%) 0 0/var(--_s), 
-              radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
-            background-attachment: fixed;
-        }
-
-        .app-header {
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  width: 100%;
-  padding: 0.8rem 1.5rem;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-
-  background: rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 3px 20px rgba(0,0,0,0.12);
-
-  animation: slideDown 0.6s ease;
-}
-
-/* animação ao carregar */
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* esquerdo */
-.nav-left {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex: 1;   /* ocupa tudo */
-}
-
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateX(-15px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-.logo {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  transition: transform .25s;
-}
-
-.logo:hover {
-  transform: rotate(6deg) scale(1.07);
-}
-
-.brand {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-/* direito */
-.nav-right {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  animation: fadeInRight 0.8s ease;
-  justify-content: center;
-  background-color: whitesmoke!important;
-}
-
-@keyframes fadeInRight {
-  from { opacity: 0; transform: translateX(15px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-.icon-btn svg {
-  transition: .25s ease;
-}
-
-.icon-btn:hover svg {
-  transform: translateY(-3px) scale(1.1);
-}
-
-.avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 2px solid var(--border);
-  object-fit: cover;
-  transition: transform .25s ease;
-}
-
-.avatar:hover {
-  transform: scale(1.07);
-}
-
-/* botão logout */
-.btn-logout {
-  background: #9b830d;
-  color: white;
-  border: none;
-  padding: 0.45rem 1rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform .25s, background .25s;
-}
-
-.btn-logout:hover {
-  background: #7e6b0b;
-  transform: translateY(-3px);
-}
-
-/* mobile button */
-.nav-toggle {
-  display: none;
-  background: transparent;
-  border: none;
-  font-size: 1.8rem;
-  cursor: pointer;
-  color: var(--text);
-  transition: .3s;
-}
-
-.nav-toggle:hover {
-  transform: scale(1.2);
-}
-/* MENU MOBILE */
-@media (max-width: 768px) {
-  .nav-right {
-    position: fixed;           /* fixo e sem vazar */
-    top: 75px;
-    right: 0;
-
-    background: rgba(255,255,255,0.55);
-    backdrop-filter: blur(16px);
-
-    padding: 1.4rem;
-    border-radius: 0 0 0 18px;
-    box-shadow: -3px 3px 12px rgba(0,0,0,0.25);
-
-    width: 220px;             /* largura do menu */
-    height: auto;
-
-    flex-direction: column;
-    gap: 1rem;
-    align-items:center;
-
-    transform: translateX(110%); /* 100% oculto */
-    transition: transform .35s ease;
-    z-index: 999;
-  }
-
-  body.nav-open .nav-right {
-    transform: translateX(0); /* aparece */
-  }
-
-  .nav-toggle {
-    display: block;
-  }
-}
-
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Painel do Professor • Atualizado</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#fff;
+      --primary:#3b82f6;
+      --accent:#10b981;
+      --muted:#64748b;
+      --radius:12px;
+      --shadow: 0 6px 20px rgba(2,6,23,0.06);
+      --glass: rgba(255,255,255,0.45);
+    }
+
+    /* Reset / Base */
+    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;margin:0;padding:0}
+    html,body{height:100%}
+    body{background:var(--bg); color:#111; min-height:100vh; display:flex; flex-direction:column; -webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+
+    /* APP LAYOUT */
+    header.app-header{
+      height:64px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 20px;
+      position:fixed;
+      top:0; left:0; right:0;
+      z-index:120;
+      background:var(--card);
+      box-shadow:var(--shadow);
+    }
+    .nav-left, .nav-right { display:flex; align-items:center; gap:12px }
+    .nav-left .brand { font-weight:700; color:var(--primary); font-size:1.05rem; margin-left:8px }
+    .logo { width:38px; height:38px; border-radius:10px; display:inline-block; object-fit:cover }
+    .icon-btn { display:inline-flex; align-items:center; gap:8px }
+
+    .nav-right { gap:10px }
+    .greeting { font-size:0.95rem; color:#0f172a }
+    .avatar { width:42px; height:42px; border-radius:50%; object-fit:cover; border:2px solid rgba(0,0,0,0.05) }
+    .btn-logout { background:#9b830d; color:#fff; border:0; padding:8px 10px; border-radius:8px; font-weight:600; cursor:pointer }
+
+    .nav-toggle { display:none; background:transparent; border:0; font-size:1.6rem; cursor:pointer }
+
+    /* SIDEBARS */
+    .sidebar {
+      position:fixed; top:64px; bottom:0; width:240px; padding:18px;
+      background:var(--card); box-shadow:var(--shadow); overflow:auto; transition:transform .28s ease; z-index:90;
+    }
+    .sidebar.left { left:0 }
+    .sidebar.right { right:0 }
+    .sidebar h3{ color:var(--primary); margin-bottom:12px }
+    .sidebar a{ display:flex; align-items:center; gap:8px; padding:10px 12px; margin-bottom:8px; border-radius:10px; font-size:.9rem; color:#1f2937; border:1px solid #e6e9ef; background:linear-gradient(135deg,#fff,#f7fafc); transition:all .22s }
+    .sidebar a:hover { transform:translateX(3px); border-color:var(--primary); box-shadow:0 4px 12px rgba(0,0,0,0.06) }
+    .muted{ color:var(--muted); font-size:0.9rem }
+
+    /* EARS (mobile quick toggles) */
+    .ear {
+      position:fixed; top:50%; transform:translateY(-50%); width:36px; height:220px; display:none;
+      align-items:center; justify-content:center; background:rgba(255,255,255,0.18); backdrop-filter:blur(12px) saturate(150%);
+      border-radius:14px; border:1px solid rgba(255,255,255,0.35); z-index:110; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,0.18);
+    }
+    .ear span { writing-mode:vertical-rl; transform:rotate(180deg); font-weight:700; font-size:.85rem; color:#111 }
+    .ear.right{ right:0; border-radius:14px 0 0 14px }
+    .ear.left{ left:0; border-radius:0 14px 14px 0 }
+
+    /* MAIN area - reserves space for sidebars */
+    main{
+      margin-top:84px;
+      margin-left:260px;
+      margin-right:260px;
+      padding:20px;
+      min-height:calc(100vh - 84px);
+      overflow:auto;
+    }
+
+    /* MURAL */
+    .mural{ background:var(--card); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); margin-bottom:18px }
+    .mural-posts{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-top:12px }
+    .post{ background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 6px 18px rgba(2,6,23,0.05) }
+    .post img{ width:100%; height:180px; object-fit:cover; display:block }
+    .post .cap{ padding:10px; font-size:0.95rem }
+    .post .post-actions{ display:flex; gap:8px; padding:10px; border-top:1px solid #f1f5f9 }
+    .post .post-actions button{ background:none; border:0; cursor:pointer; color:var(--primary); font-weight:600 }
+
+    /* KANBAN */
+    .planning { background:var(--card); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); margin-bottom:18px }
+    .boards{ display:flex; gap:14px; margin-top:14px; align-items:flex-start; overflow:auto; padding-bottom:8px }
+    .board{ min-width:320px; background:#f9fbff; padding:12px; border-radius:10px; box-shadow:0 6px 18px rgba(2,6,23,0.03) }
+    .columns{ display:flex; gap:10px }
+    .column{ min-height:120px; padding:8px; border-radius:8px; background:#fff; width:280px }
+    .task{ background:#fff; padding:10px; border-radius:8px; margin-bottom:8px; cursor:grab; box-shadow:0 2px 8px rgba(2,6,23,0.04) }
+
+    /* CHAT */
+    .chat-open-btn{ position:fixed; right:22px; bottom:22px; width:56px; height:56px; border-radius:50%; background:var(--primary); color:#fff; border:0; box-shadow:var(--shadow); cursor:pointer; z-index:95; font-size:20px }
+    .chat-box{ position:fixed; right:22px; bottom:90px; width:340px; max-height:70vh; background:var(--card); border-radius:12px; display:flex; flex-direction:column; overflow:hidden; z-index:95; box-shadow:0 10px 30px rgba(0,0,0,0.12) }
+    .chat-header{ background:var(--primary); color:#fff; padding:10px; display:flex; justify-content:space-between; align-items:center }
+    .chat-messages{ padding:10px; overflow:auto; flex:1; background:#fcfeff }
+    .chat-input{ display:flex; border-top:1px solid #eef3ff }
+    .chat-input input{ flex:1; padding:10px; border:none; outline:none }
+    .chat-input button{ background:var(--accent); color:#fff; border:none; padding:0 14px; cursor:pointer }
+
+    /* MODAL */
+    .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.55); display:flex; align-items:center; justify-content:center; backdrop-filter:blur(3px); z-index:3000 }
+    .modal-box{ background:#ffffffdd; padding:28px; width:90%; max-width:500px; border-radius:18px; box-shadow:0 10px 30px #0003 }
+    .modal-title{ font-size:1.4rem; margin-bottom:8px; color:#2563eb; font-weight:700 }
+    .modal-input{ width:100%; padding:10px; margin-bottom:16px; border-radius:10px; border:1px solid #d1d5db; background:#f9fafb }
+
+    /* Helpers */
+    .hr{ height:1px; background:#f1f5ff; margin:10px 0; border-radius:2px }
+    .muted{ color:var(--muted) }
+
+    /* RESPONSIVE */
+    @media (max-width: 980px) {
+      .sidebar.left{ transform:translateX(-102%) }
+      .sidebar.right{ transform:translateX(102%) }
+      .ear{ display:flex }
+      main{ margin: 84px 14px 20px 14px; padding:14px }
+    
+    }
+    @media (max-width: 768px){
+      .nav-toggle{ display:block }
+      .nav-right {
+        position: fixed; top:75px; right:0; background:var(--glass); backdrop-filter: blur(12px);
+        padding:1.2rem; border-radius:0 0 0 18px; width:220px; flex-direction:column; transform:translateX(110%); transition:transform .35s; z-index:999;
+      }
+   
+
+      body.nav-open .nav-right{ transform:translateX(0) }
+    }
+
+    /* small accessibility focus */
+    :focus{ outline: 3px solid rgba(59,130,246,0.18); outline-offset:2px }
+  </style>
 </head>
-<body class='bg-p-1'>
- 
 
-  <!-- NAVBAR -->
-  <header class="app-header">
-  <div class="nav-left">
-    <div>
-      <img src="{% static 'logo.png' %}" alt="Logo" class="logo">
-      <span class="brand">Aprendix</span>
+<body class="bg-p-1">
+  <!-- HEADER / NAV -->
+  <header class="app-header" role="banner">
+    <div class="nav-left" aria-label="Navegação principal">
+      <div style="display:flex;align-items:center;gap:8px">
+        <img src="{% static 'logo.png' %}" alt="Logo Aprendix" class="logo">
+        <span class="brand">Aprendix</span>
+      </div>
+
+      <a href="{% url 'modulo_professor:homeProfessor' %}" class="icon-btn" title="Ir ao início" aria-label="Início">
+        <!-- house SVG preserved -->
+        <svg fill="#9b830d" width="35" viewBox="0 0 495.398 495.398" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M487.083,225.514l-75.08-75.08V63.704c0-15.682-12.708-28.391-28.413-28.391c-15.669,0-28.377,12.709-28.377,28.391 v29.941L299.31,37.74c-27.639-27.624-75.694-27.575-103.27,0.05L8.312,225.514c-11.082,11.104-11.082,29.071,0,40.158 c11.087,11.101,29.089,11.101,40.172,0l187.71-187.729c6.115-6.083,16.893-6.083,22.976-0.018l187.742,187.747 c5.567,5.551,12.825,8.312,20.081,8.312c7.271,0,14.541-2.764,20.091-8.312C498.17,254.586,498.17,236.619,487.083,225.514z"/>
+          <path d="M257.561,131.836c-5.454-5.451-14.285-5.451-19.723,0L72.712,296.913c-2.607,2.606-4.085,6.164-4.085,9.877v120.401 c0,28.253,22.908,51.16,51.16,51.16h81.754v-126.61h92.299v126.61h81.755c28.251,0,51.159-22.907,51.159-51.159V306.79 c0-3.713-1.465-7.271-4.085-9.877L257.561,131.836z"/>
+        </svg>
+      </a>
     </div>
-    <a href="{% url 'modulo_professor:homeProfessor' %}" class="icon-btn">
-      <!-- Seu SVG -->
-      <svg fill="#9b830d" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="35px" viewBox="0 0 495.398 495.398" xml:space="preserve" stroke="#9b830d" stroke-width="0.00495398"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <g> <path d="M487.083,225.514l-75.08-75.08V63.704c0-15.682-12.708-28.391-28.413-28.391c-15.669,0-28.377,12.709-28.377,28.391 v29.941L299.31,37.74c-27.639-27.624-75.694-27.575-103.27,0.05L8.312,225.514c-11.082,11.104-11.082,29.071,0,40.158 c11.087,11.101,29.089,11.101,40.172,0l187.71-187.729c6.115-6.083,16.893-6.083,22.976-0.018l187.742,187.747 c5.567,5.551,12.825,8.312,20.081,8.312c7.271,0,14.541-2.764,20.091-8.312C498.17,254.586,498.17,236.619,487.083,225.514z"></path> <path d="M257.561,131.836c-5.454-5.451-14.285-5.451-19.723,0L72.712,296.913c-2.607,2.606-4.085,6.164-4.085,9.877v120.401 c0,28.253,22.908,51.16,51.16,51.16h81.754v-126.61h92.299v126.61h81.755c28.251,0,51.159-22.907,51.159-51.159V306.79 c0-3.713-1.465-7.271-4.085-9.877L257.561,131.836z"></path> </g> </g> </g> </g></svg>
-    </a>
-  </div>
 
-  <div class="nav-right">   
+    <div class="nav-right" role="navigation" aria-label="Ações do usuário">
+      <div class="greeting" aria-live="polite">Olá, <strong>Prof. {{ request.user.first_name }}</strong></div>
 
-    <div class="greeting">Olá, <strong>Prof. {{request.user.first_name}}</strong></div>
-
-    {% if request.user.related_vinculoUserPessoa.pessoa.foto %}
-      <img src="{{request.user.related_vinculoUserPessoa.pessoa.foto.url}}" alt="Perfil" class="avatar">
-    {% else %}
-      {% if request.user.related_vinculoUserPessoa.pessoa.sexo.nome == 'Masculino (cisgênero)' %}
-        <img src="{% static 'man.png' %}" alt="Perfil" class="avatar">
+      {% if request.user.related_vinculoUserPessoa.pessoa.foto %}
+        <img src="{{ request.user.related_vinculoUserPessoa.pessoa.foto.url }}" alt="Foto de perfil" class="avatar">
       {% else %}
-        <img src="{% static 'woman.png' %}" alt="Perfil" class="avatar">
+        {% if request.user.related_vinculoUserPessoa.pessoa.sexo.nome == 'Masculino (cisgênero)' %}
+          <img src="{% static 'man.png' %}" alt="Avatar masculino" class="avatar">
+        {% else %}
+          <img src="{% static 'woman.png' %}" alt="Avatar feminino" class="avatar">
+        {% endif %}
       {% endif %}
-    {% endif %}
 
-    <form method="post" action="{% url 'admin_acessos:logout' %}">
-      {% csrf_token %}
-      <button type="submit" class="btn-logout">
-        <i class="bi bi-box-arrow-right"></i> Sair
-      </button>
-    </form>
-  </div>
+      <form method="post" action="{% url 'admin_acessos:logout' %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit" class="btn-logout" title="Sair">Sair</button>
+      </form>
 
-  <button class="nav-toggle" onclick="document.body.classList.toggle('nav-open')">
-    ☰
-  </button>
-</header>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="mobileMenu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    </div>
+  </header>
 
-
-  <!-- SIDE BARS -->
-  <nav class="sidebar left" id="sidebar-left">
+  <!-- LEFT SIDEBAR -->
+  <nav class="sidebar left" id="sidebar-left" aria-label="Barra lateral esquerda">
     <h3>📘 Gestão Professor</h3>
     <a href="#"><span>📚</span> Planos de Aula</a>
     <a href="#"><span>🔁</span> Sequência Didática</a>
     <a href="#"><span>💻</span> Trilha BNCC (Computação)</a>
     <a href="#"><span>🧩</span> Projetos</a>
-    <div class="hr"></div>
+    <div class="hr" role="separator"></div>
     <div class="muted">Coordenação • Ferramentas</div>
   </nav>
+
+  <!-- RIGHT SIDEBAR: included partial (kept as include) OR fallback empty container for scripts -->
   {% include "modulo_professor/partial_base/sidebar_alunos.html" %}
+  <!-- If include doesn't provide #sidebar-right, create safe fallback -->
+  <div id="sidebar-right" style="display:none" aria-hidden="true"></div>
 
-  
+  <!-- MOBILE EARS -->
+  <div class="ear left" id="ear-left" style="left:0" role="button" aria-label="Abrir planejamento"><span>Planejamento Docente</span></div>
+  <div class="ear right" id="ear-right" style="right:0" role="button" aria-label="Abrir registros"><span>Registros do Aluno</span></div>
 
-  <!-- ORELHAS MOBILE -->
-  <div class="ear" id="ear-left" style="left:0"><span>Planejamento Docente</span></div>
-  <div class="ear right" id="ear-right" style="right:0"><span>Registros do Aluno </span></div>
-
-  <!-- MAIN -->
-  <main class='bg-p-1'>
+  <!-- MAIN CONTENT -->
+  <main class="bg-p-1" role="main">
     {% block main %}
-      
+    <!--
+      Conteúdo principal é injetado aqui. Mantive o bloco vazio para compatibilidade com seus templates existentes.
+      Se precisar, posso inserir um exemplo de mural / kanban HTML estático aqui.
+    -->
     {% endblock main %}
   </main>
 
-  <!-- CHAT: open button + chat box -->
-  <button class="chat-open-btn" id="chatOpen">💬</button>
+  <!-- CHAT -->
+  <button class="chat-open-btn" id="chatOpen" aria-haspopup="dialog" aria-controls="chatBox">💬</button>
 
-  <div class="chat-box" id="chatBox" style="display:none">
+  <div class="chat-box" id="chatBox" style="display:none" role="dialog" aria-label="Chat">
     <div class="chat-header" id="chatHeader">
       <div>Chat (Alunos / Coordenação)</div>
       <div>
-        <button id="btn-minimize" style="background:transparent;border:0;color:#fff;cursor:pointer">_</button>
-        <button id="btn-close-chat" style="background:transparent;border:0;color:#fff;cursor:pointer">✖</button>
+        <button id="btn-minimize" aria-label="Minimizar chat" style="background:transparent;border:0;color:#fff;cursor:pointer">_</button>
+        <button id="btn-close-chat" aria-label="Fechar chat" style="background:transparent;border:0;color:#fff;cursor:pointer">✖</button>
       </div>
     </div>
-    <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
+    <div class="chat-messages" id="chatMessages" aria-live="polite" tabindex="0"></div>
     <div class="chat-input">
-      <input id="chatInput" placeholder="Digite uma mensagem..." />
-      <button id="sendChat">Enviar</button>
+      <input id="chatInput" placeholder="Digite uma mensagem..." aria-label="Mensagem do chat" />
+      <button id="sendChat" aria-label="Enviar mensagem">Enviar</button>
     </div>
   </div>
 
-<script>
-/* ----------------------
-   UTILIDADES / ESCAPE
-   ---------------------- */
-function escapeHtml(unsafe){
-  return String(unsafe).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
-}
+  <!-- TOASTS / MESSAGES PARTIALS -->
+  <!-- Mensagens e toasts -->
+  {% include "Escola/partials/mensagens.html" %}
 
-/* ----------------------
-   Sidebars & ears (mobile)
-   ---------------------- */
-const sidebarLeft = document.getElementById('sidebar-left');
-const sidebarRight = document.getElementById('sidebar-right');
-const earLeft = document.getElementById('ear-left');
-const earRight = document.getElementById('ear-right');
-
-function toggleSidebarMobile(side){
-  if(window.innerWidth > 980) return;
-  const el = side === 'left' ? sidebarLeft : sidebarRight;
-  const isOpen = el.style.transform === 'translateX(0px)' || el.style.transform === 'translateX(0)';
-  el.style.transform = isOpen ? (side==='left' ? 'translateX(-102%)' : 'translateX(102%)') : 'translateX(0)';
-}
-earLeft.addEventListener('click', ()=> toggleSidebarMobile('left'));
-earRight.addEventListener('click', ()=> toggleSidebarMobile('right'));
-
-// close sidebars if clicking outside on mobile
-document.addEventListener('click', (e)=>{
-  if(window.innerWidth <= 980){
-    if(!sidebarLeft.contains(e.target) && !earLeft.contains(e.target)) sidebarLeft.style.transform = 'translateX(-102%)';
-    if(!sidebarRight.contains(e.target) && !earRight.contains(e.target)) sidebarRight.style.transform = 'translateX(102%)';
-  }
-});
-
-/* ----------------------
-   MURAL: add, toggle comments, publish comment
-   ---------------------- */
-const muralPosts = document.getElementById('muralPosts');
-document.getElementById('btn-toggle-mural').addEventListener('click', ()=>{
-  muralPosts.style.display = muralPosts.style.display === 'none' ? '' : 'none';
-  document.getElementById('btn-toggle-mural').textContent = muralPosts.style.display === 'none' ? 'Mostrar' : 'Ocultar';
-});
-document.getElementById('btn-new-post').addEventListener('click', ()=>{
-  const caption = prompt('Texto da postagem:');
-  if(!caption) return;
-  const imgURL = prompt('URL da imagem (opcional):');
-  const post = document.createElement('article');
-  post.className = 'post';
-  const src = imgURL && imgURL.trim() ? imgURL : 'https://picsum.photos/800/480?random='+Date.now();
-  post.innerHTML = `
-    <img src="${escapeHtml(src)}" alt="">
-    <div class="cap">${escapeHtml(caption)}</div>
-    <div class="post-actions">
-      <button onclick="toggleCommentsSection(this)">💬 Comentários</button>
-      <button onclick="likePost(this)">👍 Curtir</button>
-    </div>
-    <div class="comment-section">
-      <div class="comment-row">
-        <input type="text" placeholder="Escreva um comentário...">
-        <button onclick="publishComment(this)">Publicar</button>
-      </div>
-      <div class="comments-list"></div>
-    </div>`;
-  muralPosts.prepend(post);
-});
-function toggleCommentsSection(btn){
-  const section = btn.closest('.post').querySelector('.comment-section');
-  section.style.display = section.style.display === 'block' ? 'none' : 'block';
-}
-function publishComment(btn){
-  const row = btn.closest('.comment-row');
-  const input = row.querySelector('input');
-  const list = btn.closest('.post').querySelector('.comments-list');
-  const text = input.value.trim();
-  if(!text) return;
-  const p = document.createElement('p');
-  p.textContent = `Você: ${text}`;
-  list.appendChild(p);
-  input.value = '';
-  // scroll to bottom of comments list
-  list.scrollTop = list.scrollHeight;
-}
-function likePost(btn){
-  // simple visual feedback (could be expanded to counters)
-  btn.textContent = btn.textContent.includes('✓') ? '👍 Curtir' : '👍 Curtir ✓';
-}
-
-/* ----------------------
-   KANBAN: create boards/tasks + robust DnD
-   ---------------------- */
-const boardsContainer = document.getElementById('boardsContainer');
-
-let dragged = null;
-function createTaskElement(text){
-  const el = document.createElement('div');
-  el.className = 'task';
-  el.draggable = true;
-  el.textContent = text;
-  addDnDToTask(el);
-  return el;
-}
-function addDnDToTask(task){
-  task.addEventListener('dragstart', ()=> {
-    dragged = task;
-    task.classList.add('dragging');
-  });
-  task.addEventListener('dragend', ()=> {
-    task.classList.remove('dragging');
-    dragged = null;
-  });
-}
-function activateColumn(column){
-  column.addEventListener('dragover', e=>{
-    e.preventDefault();
-    column.classList.add('drag-over');
-    const after = getDragAfterElement(column, e.clientY);
-    if(!dragged) return;
-    if(after == null) column.appendChild(dragged);
-    else column.insertBefore(dragged, after);
-  });
-  column.addEventListener('dragleave', ()=> column.classList.remove('drag-over'));
-  column.addEventListener('drop', e=>{
-    e.preventDefault();
-    column.classList.remove('drag-over');
-  });
-}
-function getDragAfterElement(container, y){
-  const draggableElements = [...container.querySelectorAll('.task:not(.dragging)')];
-  return draggableElements.reduce((closest, child)=>{
-    const box = child.getBoundingClientRect();
-    const offset = y - box.top - box.height/2;
-    if(offset < 0 && offset > closest.offset) return { offset: offset, element: child };
-    else return closest;
-  }, { offset: Number.NEGATIVE_INFINITY }).element;
-}
-
-/* Create board UI + handlers */
-function createBoard(name){
-  const board = document.createElement('div');
-  board.className = 'board';
-  board.dataset.boardId = 'board-' + Date.now();
-  board.innerHTML = `
-    <h4>${escapeHtml(name)} <button data-delete-board style="background:transparent;border:0;color:#ff4d4f;cursor:pointer">Excluir</button></h4>
-    <div class="controls"><button data-add-task class="btn" style="background:#fff;color:var(--primary);border:1px solid #e6f0ff">+ Nova tarefa</button></div>
-    <div class="columns">
-      <div class="column" data-status="todo"></div>
-      <div class="column" data-status="doing"></div>
-      <div class="column" data-status="done"></div>
-    </div>`;
-  boardsContainer.appendChild(board);
-
-  // initialize column DnD
-  board.querySelectorAll('.column').forEach(activateColumn);
-  // add task handler
-  board.querySelector('[data-add-task]').addEventListener('click', ()=>{
-    const text = prompt('Descrição da nova tarefa:');
-    if(!text) return;
-    const todo = board.querySelector('.column[data-status="todo"]');
-    todo.appendChild(createTaskElement(text));
-  });
-  // delete board handler
-  board.querySelector('[data-delete-board]').addEventListener('click', ()=>{
-    if(confirm('Excluir este planejamento?')) board.remove();
-  });
-  // seed default tasks if empty
-  const todoCol = board.querySelector('.column[data-status="todo"]');
-  if(todoCol.children.length === 0){
-    todoCol.appendChild(createTaskElement('Preparar Aula de Ciências'));
-    todoCol.appendChild(createTaskElement('Criar Atividade de Matemática'));
-  }
-}
-
-/* Buttons for creating boards / quick tasks */
-document.getElementById('btn-add-board').addEventListener('click', ()=>{
-  const name = prompt('Nome do novo planejamento:');
-  if(!name) return;
-  createBoard(name);
-});
-document.getElementById('btn-add-task').addEventListener('click', ()=>{
-  const text = prompt('Tarefa rápida (irá para "A Fazer" do primeiro planejamento):');
-  if(!text) return;
-  const firstBoard = document.querySelector('.board');
-  if(!firstBoard){ alert('Crie um planejamento primeiro.'); return; }
-  const todo = firstBoard.querySelector('.column[data-status="todo"]');
-  todo.appendChild(createTaskElement(text));
-});
-
-/* Initialize with a default board if none exists */
-if(document.querySelectorAll('.board').length === 0){
-  createBoard('Planejamento Inicial');
-} else {
-  // if markup had boards, initialize them
-  document.querySelectorAll('.board').forEach(b=>{
-    b.querySelectorAll('.column').forEach(activateColumn);
-    b.querySelectorAll('.task').forEach(addDnDToTask);
-  });
-}
-
-/* ----------------------
-   CHAT functionality
-   ---------------------- */
-const chatOpenBtn = document.getElementById('chatOpen');
-const chatBox = document.getElementById('chatBox');
-const chatMessages = document.getElementById('chatMessages');
-const chatInput = document.getElementById('chatInput');
-const sendChatBtn = document.getElementById('sendChat');
-const btnMinimize = document.getElementById('btn-minimize');
-const btnCloseChat = document.getElementById('btn-close-chat');
-
-function openChat(){ chatBox.style.display = 'flex'; chatOpenBtn.style.display = 'none'; scrollChatToBottom(); }
-function closeChat(){ chatBox.style.display = 'none'; chatOpenBtn.style.display = 'block'; }
-function minimizeChat(){
-  const body = chatBox.querySelector('.chat-messages');
-  const input = chatBox.querySelector('.chat-input');
-  if(body.style.display === 'none'){ body.style.display = ''; input.style.display = 'flex'; }
-  else { body.style.display = 'none'; input.style.display = 'none'; }
-}
-chatOpenBtn.addEventListener('click', openChat);
-btnCloseChat.addEventListener('click', closeChat);
-btnMinimize.addEventListener('click', minimizeChat);
-document.getElementById('chatHeader').addEventListener('dblclick', minimizeChat);
-
-function sendChat(){
-  const text = chatInput.value.trim();
-  if(!text) return;
-  appendChatMessage('Você', text);
-  chatInput.value = '';
-  // demo response
-  setTimeout(()=> appendChatMessage('Coordenação', 'Recebido — verificarei e retorno.'), 700);
-}
-sendChatBtn.addEventListener('click', sendChat);
-chatInput.addEventListener('keydown', e=> { if(e.key === 'Enter') sendChat(); });
-
-function appendChatMessage(author, text){
-  const el = document.createElement('div');
-  el.style.marginBottom = '8px';
-  el.innerHTML = `<strong>${escapeHtml(author)}:</strong> ${escapeHtml(text)} <div class="muted" style="font-size:11px">${new Date().toLocaleTimeString()}</div>`;
-  chatMessages.appendChild(el);
-  scrollChatToBottom();
-}
-function scrollChatToBottom(){ chatMessages.scrollTop = chatMessages.scrollHeight; }
-
-/* Accessibility: hide sidebars/chat on Escape (mobile) */
-document.addEventListener('keydown', e=>{
-  if(e.key === 'Escape'){
-    if(window.innerWidth <= 980){ sidebarLeft.style.transform = 'translateX(-102%)'; sidebarRight.style.transform = 'translateX(102%)'; }
-    closeChat();
-  }
-});
-</script>
-<!--Mensagens e toastes
-    {% include "Escola/partials/avisos_MessagensToasts.html" %}-->
-    {% include "Escola/partials/mensagens.html" %}
-
-
-{% if not request.session.anoLetivo %}
-<div id="modalAuto" class="modal-overlay" style="display:none;">
-  <div class="modal-box">      
-    <h2 class="modal-title">👋 Bem-vindo, Professor {{ request.user.first_name }}!</h2>
-    <p class="modal-subtitle">
+  <!-- MODAL ANO LETIVO (exibe somente se sessão não tiver anoLetivo) -->
+  {% if not request.session.anoLetivo %}
+  <div id="modalAuto" class="modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-box">
+      <h2 id="modalTitle" class="modal-title">👋 Bem-vindo, Professor {{ request.user.first_name }}!</h2>
+      <p class="modal-subtitle">
         Antes de continuar, selecione o <strong>Ano Letivo</strong> e a <strong>Escola</strong> onde deseja trabalhar.
-    </p>
-    <form id="modalForm" method="POST" action="{% url 'modulo_professor:sessaoEscola' %}">
-        {% csrf_token %}
+      </p>
 
-        <!-- Seleção da Escola -->
+      <form id="modalForm" method="POST" action="{% url 'modulo_professor:sessaoEscola' %}">
+        {% csrf_token %}
         <label class="modal-label">Escola:</label>
         <select class="modal-input" name="escola" required>
             <option value="">Selecione...</option>
@@ -724,7 +254,6 @@ document.addEventListener('keydown', e=>{
             {% endfor %}
         </select>
 
-        <!-- Seleção do Ano Letivo -->
         <label class="modal-label">Ano Letivo:</label>
         <select class="modal-input" name="ano_letivo" required>
             <option value="">Selecione...</option>
@@ -734,132 +263,306 @@ document.addEventListener('keydown', e=>{
         </select>
 
         <button type="submit" class="modal-btn">Continuar</button>
-    </form>
+      </form>
+    </div>
   </div>
-</div>
-{% endif %}
+  {% endif %}
 
-<style>
-/* Fundo do modal */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(3px);
-    z-index: 3000;
-}
+  <!-- SCRIPTS -->
+  <script>
+  /* Defensive utility functions */
+  function q(id){ return document.getElementById(id) }
+  function $(sel, ctx=document){ return ctx.querySelector(sel) }
+  function $all(sel, ctx=document){ return Array.from(ctx.querySelectorAll(sel)) }
 
-/* Caixa do modal */
-.modal-box {
-    background: #ffffffdd;
-    backdrop-filter: blur(6px);
-    padding: 28px;
-    width: 90%;
-    max-width: 500px;
-    border-radius: 18px;
-    box-shadow: 0 10px 30px #0003;
-    animation: showModal .3s ease-out;
-}
+  function escapeHtml(unsafe){
+    return String(unsafe).replace(/[&<>"']/g, function(m){
+      return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]);
+    });
+  }
 
-/* Animação */
-@keyframes showModal {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
+  /* Elements (may be populated by included templates) */
+  const sidebarLeft = q('sidebar-left');
+  let sidebarRight = q('sidebar-right'); // may be provided by include
+  const earLeft = q('ear-left');
+  const earRight = q('ear-right');
 
-.modal-title {
-    font-size: 1.4rem;
-    margin-bottom: 8px;
-    color: #2563eb;
-    font-weight: 700;
-}
+  // ensure sidebarRight exists (fallback)
+  if(!sidebarRight){
+    sidebarRight = document.createElement('nav');
+    sidebarRight.id = 'sidebar-right';
+    sidebarRight.className = 'sidebar right';
+    sidebarRight.style.display = 'none';
+    document.body.appendChild(sidebarRight);
+  }
 
-.modal-subtitle {
-    font-size: 0.95rem;
-    margin-bottom: 20px;
-    color: #4b5563;
-}
+  /* Toggle sidebars (mobile ears) */
+  function toggleSidebarMobile(side){
+    if(window.innerWidth > 980) return;
+    const el = side === 'left' ? sidebarLeft : sidebarRight;
+    if(!el) return;
+    const isOpen = el.style.transform === 'translateX(0px)' || el.style.transform === 'translateX(0)';
+    el.style.transform = isOpen ? (side==='left' ? 'translateX(-102%)' : 'translateX(102%)') : 'translateX(0)';
+  }
+  if(earLeft) earLeft.addEventListener('click', ()=> toggleSidebarMobile('left'));
+  if(earRight) earRight.addEventListener('click', ()=> toggleSidebarMobile('right'));
 
-.modal-label {
-    font-size: 0.85rem;
-    color: #374151;
-    margin-bottom: 4px;
-    display: block;
-    font-weight: 600;
-}
-
-.modal-input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 16px;
-    border-radius: 10px;
-    border: 1px solid #d1d5db;
-    background: #f9fafb;
-    outline: none;
-    transition: 0.2s;
-}
-
-.modal-input:focus {
-    border-color: #2563eb;
-    background: #fff;
-    box-shadow: 0 0 0 3px #93c5fd55;
-}
-
-.modal-btn {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    background: #2563eb;
-    color: white;
-    font-size: 1rem;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: 0.2s;
-    font-weight: 600;
-}
-
-.modal-btn:hover {
-    background: #1d4ed8;
-    transform: translateY(-2px);
-}
-</style>
-
-
-
-
-
-
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-      document.getElementById("modalAuto").style.display = "flex";
+  // close sidebars if clicking outside on mobile (defensive)
+  document.addEventListener('click', (e)=>{
+    if(window.innerWidth <= 980){
+      if(sidebarLeft && !sidebarLeft.contains(e.target) && earLeft && !earLeft.contains(e.target)) sidebarLeft.style.transform = 'translateX(-102%)';
+      if(sidebarRight && !sidebarRight.contains(e.target) && earRight && !earRight.contains(e.target)) sidebarRight.style.transform = 'translateX(102%)';
+    }
   });
 
-  function fecharModal() {
-      document.getElementById("modalAuto").style.display = "none";
+  /* MURAL: feature-safe initialization */
+  const muralPosts = q('muralPosts'); // if page provides mural container
+  const btnToggleMural = q('btn-toggle-mural');
+  const btnNewPost = q('btn-new-post');
+
+  if(btnToggleMural && muralPosts){
+    btnToggleMural.addEventListener('click', ()=>{
+      muralPosts.style.display = muralPosts.style.display === 'none' ? '' : 'none';
+      btnToggleMural.textContent = muralPosts.style.display === 'none' ? 'Mostrar' : 'Ocultar';
+    });
   }
-</script>
 
-
-<script>
-document.addEventListener("click", function (e) {
-  const menu = document.querySelector(".nav-right");
-  const toggle = document.querySelector(".nav-toggle");
-
-  // Se clicou no botão, deixa o toggle funcionar sozinho
-  if (toggle.contains(e.target)) return;
-
-  // Se o menu está aberto e clicou fora — fecha
-  if (document.body.classList.contains("nav-open") &&
-      !menu.contains(e.target)) {
-    document.body.classList.remove("nav-open");
+  if(btnNewPost && muralPosts){
+    btnNewPost.addEventListener('click', ()=>{
+      const caption = prompt('Texto da postagem:');
+      if(!caption) return;
+      const imgURL = prompt('URL da imagem (opcional):');
+      const post = document.createElement('article');
+      post.className = 'post';
+      const src = imgURL && imgURL.trim() ? imgURL : 'https://picsum.photos/800/480?random='+Date.now();
+      post.innerHTML = `
+        <img src="${escapeHtml(src)}" alt="">
+        <div class="cap">${escapeHtml(caption)}</div>
+        <div class="post-actions">
+          <button type="button" onclick="toggleCommentsSection(this)">💬 Comentários</button>
+          <button type="button" onclick="likePost(this)">👍 Curtir</button>
+        </div>
+        <div class="comment-section">
+          <div class="comment-row">
+            <input type="text" placeholder="Escreva um comentário...">
+            <button type="button" onclick="publishComment(this)">Publicar</button>
+          </div>
+          <div class="comments-list"></div>
+        </div>`;
+      muralPosts.prepend(post);
+    });
   }
-});
-</script>
 
+  // comment helpers (global, kept for inline onclick usage)
+  window.toggleCommentsSection = function(btn){
+    const section = btn.closest('.post')?.querySelector('.comment-section');
+    if(!section) return;
+    section.style.display = section.style.display === 'block' ? 'none' : 'block';
+  };
+  window.publishComment = function(btn){
+    const row = btn.closest('.comment-row');
+    if(!row) return;
+    const input = row.querySelector('input');
+    const list = btn.closest('.post')?.querySelector('.comments-list');
+    const text = input && input.value.trim();
+    if(!text) return;
+    const p = document.createElement('p');
+    p.textContent = `Você: ${text}`;
+    list.appendChild(p);
+    input.value = '';
+    list.scrollTop = list.scrollHeight;
+  };
+  window.likePost = function(btn){
+    btn.textContent = btn.textContent.includes('✓') ? '👍 Curtir' : '👍 Curtir ✓';
+  };
 
+  /* KANBAN: defensive initialization */
+  const boardsContainer = q('boardsContainer');
+  let dragged = null;
 
+  function createTaskElement(text){
+    const el = document.createElement('div');
+    el.className = 'task';
+    el.draggable = true;
+    el.textContent = text;
+    addDnDToTask(el);
+    return el;
+  }
+  function addDnDToTask(task){
+    task.addEventListener('dragstart', ()=> {
+      dragged = task;
+      task.classList.add('dragging');
+    });
+    task.addEventListener('dragend', ()=> {
+      task.classList.remove('dragging');
+      dragged = null;
+    });
+  }
+  function activateColumn(column){
+    column.addEventListener('dragover', e=>{
+      e.preventDefault();
+      column.classList.add('drag-over');
+      const after = getDragAfterElement(column, e.clientY);
+      if(!dragged) return;
+      if(after == null) column.appendChild(dragged);
+      else column.insertBefore(dragged, after);
+    });
+    column.addEventListener('dragleave', ()=> column.classList.remove('drag-over'));
+    column.addEventListener('drop', e=>{
+      e.preventDefault();
+      column.classList.remove('drag-over');
+    });
+  }
+  function getDragAfterElement(container, y){
+    const draggableElements = [...container.querySelectorAll('.task:not(.dragging)')];
+    return draggableElements.reduce((closest, child)=>{
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height/2;
+      if(offset < 0 && offset > closest.offset) return { offset: offset, element: child };
+      else return closest;
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+  }
+
+  function createBoard(name){
+    if(!boardsContainer) return;
+    const board = document.createElement('div');
+    board.className = 'board';
+    board.dataset.boardId = 'board-' + Date.now();
+    board.innerHTML = `
+      <h4 style="display:flex;align-items:center;justify-content:space-between">${escapeHtml(name)} <button data-delete-board style="background:transparent;border:0;color:#ff4d4f;cursor:pointer">Excluir</button></h4>
+      <div class="controls"><button data-add-task class="btn" style="background:#fff;color:var(--primary);border:1px solid #e6f0ff">+ Nova tarefa</button></div>
+      <div class="columns">
+        <div class="column" data-status="todo"></div>
+        <div class="column" data-status="doing"></div>
+        <div class="column" data-status="done"></div>
+      </div>`;
+    boardsContainer.appendChild(board);
+
+    board.querySelectorAll('.column').forEach(activateColumn);
+    board.querySelector('[data-add-task]').addEventListener('click', ()=>{
+      const text = prompt('Descrição da nova tarefa:');
+      if(!text) return;
+      const todo = board.querySelector('.column[data-status="todo"]');
+      todo.appendChild(createTaskElement(text));
+    });
+    board.querySelector('[data-delete-board]').addEventListener('click', ()=>{
+      if(confirm('Excluir este planejamento?')) board.remove();
+    });
+
+    const todoCol = board.querySelector('.column[data-status="todo"]');
+    if(todoCol.children.length === 0){
+      todoCol.appendChild(createTaskElement('Preparar Aula de Ciências'));
+      todoCol.appendChild(createTaskElement('Criar Atividade de Matemática'));
+    }
+  }
+
+  // Buttons add board / add task - only if exist in DOM
+  const btnAddBoard = q('btn-add-board');
+  const btnAddTask = q('btn-add-task');
+
+  if(btnAddBoard){
+    btnAddBoard.addEventListener('click', ()=>{
+      const name = prompt('Nome do novo planejamento:');
+      if(!name) return;
+      createBoard(name);
+    });
+  }
+  if(btnAddTask){
+    btnAddTask.addEventListener('click', ()=>{
+      const text = prompt('Tarefa rápida (irá para "A Fazer" do primeiro planejamento):');
+      if(!text) return;
+      const firstBoard = document.querySelector('.board');
+      if(!firstBoard){ alert('Crie um planejamento primeiro.'); return; }
+      const todo = firstBoard.querySelector('.column[data-status="todo"]');
+      todo.appendChild(createTaskElement(text));
+    });
+  }
+
+  // initialize boards if container exists
+  if(boardsContainer){
+    if(document.querySelectorAll('.board').length === 0){
+      createBoard('Planejamento Inicial');
+    } else {
+      document.querySelectorAll('.board').forEach(b=>{
+        b.querySelectorAll('.column').forEach(activateColumn);
+        b.querySelectorAll('.task').forEach(addDnDToTask);
+      });
+    }
+  }
+
+  /* CHAT functionality */
+  const chatOpenBtn = q('chatOpen');
+  const chatBox = q('chatBox');
+  const chatMessages = q('chatMessages');
+  const chatInput = q('chatInput');
+  const sendChatBtn = q('sendChat');
+  const btnMinimize = q('btn-minimize');
+  const btnCloseChat = q('btn-close-chat');
+
+  function openChat(){ if(!chatBox || !chatOpenBtn) return; chatBox.style.display = 'flex'; chatOpenBtn.style.display = 'none'; scrollChatToBottom(); }
+  function closeChat(){ if(!chatBox || !chatOpenBtn) return; chatBox.style.display = 'none'; chatOpenBtn.style.display = 'block'; }
+  function minimizeChat(){
+    if(!chatBox) return;
+    const body = chatBox.querySelector('.chat-messages');
+    const input = chatBox.querySelector('.chat-input');
+    if(!body || !input) return;
+    if(body.style.display === 'none'){ body.style.display = ''; input.style.display = 'flex'; }
+    else { body.style.display = 'none'; input.style.display = 'none'; }
+  }
+  if(chatOpenBtn) chatOpenBtn.addEventListener('click', openChat);
+  if(btnCloseChat) btnCloseChat.addEventListener('click', closeChat);
+  if(btnMinimize) btnMinimize.addEventListener('click', minimizeChat);
+  if(q('chatHeader')) q('chatHeader').addEventListener('dblclick', minimizeChat);
+
+  function sendChat(){
+    if(!chatInput || !chatMessages) return;
+    const text = chatInput.value.trim();
+    if(!text) return;
+    appendChatMessage('Você', text);
+    chatInput.value = '';
+    setTimeout(()=> appendChatMessage('Coordenação', 'Recebido — verificarei e retorno.'), 700);
+  }
+  if(sendChatBtn) sendChatBtn.addEventListener('click', sendChat);
+  if(chatInput) chatInput.addEventListener('keydown', e=> { if(e.key === 'Enter') sendChat(); });
+
+  function appendChatMessage(author, text){
+    if(!chatMessages) return;
+    const el = document.createElement('div');
+    el.style.marginBottom = '8px';
+    el.innerHTML = `<strong>${escapeHtml(author)}:</strong> ${escapeHtml(text)} <div class="muted" style="font-size:11px">${new Date().toLocaleTimeString()}</div>`;
+    chatMessages.appendChild(el);
+    scrollChatToBottom();
+  }
+  function scrollChatToBottom(){ if(chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight; }
+
+  /* Accessibility: hide sidebars/chat on Escape (mobile) */
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape'){
+      if(window.innerWidth <= 980){
+        if(sidebarLeft) sidebarLeft.style.transform = 'translateX(-102%)';
+        if(sidebarRight) sidebarRight.style.transform = 'translateX(102%)';
+      }
+      closeChat();
+    }
+  });
+
+  /* Modal auto-open (if present) */
+  document.addEventListener("DOMContentLoaded", function() {
+    const modal = q('modalAuto');
+    if(modal) modal.style.display = 'flex';
+  });
+
+  /* Nav-right close when clicking outside (mobile) */
+  document.addEventListener("click", function (e) {
+    const menu = document.querySelector(".nav-right");
+    const toggle = document.querySelector(".nav-toggle");
+    if(!toggle || !menu) return;
+    if (toggle.contains(e.target)) return;
+    if (document.body.classList.contains("nav-open") &&
+        !menu.contains(e.target)) {
+      document.body.classList.remove("nav-open");
+    }
+  });
+  </script>
 </body>
 </html>
