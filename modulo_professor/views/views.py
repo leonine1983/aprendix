@@ -789,3 +789,49 @@ def aulas_do_dia(request):
         'data_hoje': hoje,
     })
 
+
+
+
+
+@login_required
+def selecionaTurmaNotas(request):
+    userProfessor = request.user.related_vinculoUserPessoa
+    pessoa = userProfessor.pessoa.id  
+    ano_letivo = request.session.get('anoLetivo', 'Não encontrado')
+
+    professorGrade = TurmaDisciplina.objects.filter(
+        professor__encaminhamento__contratado__id=pessoa,
+        turma__ano_letivo__ano=ano_letivo
+    )
+
+    turmas = []
+    turmas_ids = set()  # para evitar duplicatas
+
+    for t in professorGrade:
+        turma_id = t.turma.id
+        turma = t.turma
+        grade = t.id        
+        
+        if turma_id not in turmas_ids:
+            turmas.append([turma_id, turma, grade])
+            turmas_ids.add(turma_id)
+        
+    
+
+    return render(request, 'modulo_professor/partial/notas/selecionaTurmaNotas.html', {
+        'pessoa': professorGrade,
+        'anoLetivo': ano_letivo,
+        'grade_turma': turmas
+    })
+
+
+@login_required
+def selecionaAlunosNotas(request, turma_id, grade):
+    matricula = Matriculas.objects.filter(turma__id = turma_id)   
+    trimetre = Trimestre.objects.filter(final=False)
+
+    return render(request, 'modulo_professor/partial/notas/alunosNotas.html', {
+        'matriculas': matricula,
+        'grade': grade,
+        'trimetre':trimetre
+    })

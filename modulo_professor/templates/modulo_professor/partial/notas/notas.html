@@ -1,36 +1,133 @@
 {% extends "modulo_professor/base.html" %}
 
-{% block main %}  
+{% block main %}
 
-    <div  class='imprimir bg-light rounded-3 shadow '>
-        <div class="p-2 shadow shadown-sm ">
-            <section class='d-flex '><h1>{{grade.turma}} </h1> | {{grade}}</section>
-            <section class='fs-3 mx-5 text-center '><h2>Composiçao de notas do aluno</h2> {{aluno}}</section>
-            <section class='fs-3 mx-5 text-center '> </section>
-        </div>
-        <div class="d-flex justify-content-between w-50 m-auto mt-4 mb-5">         
+<style>
+/* Container principal */
+.imprimir {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease-in-out;
+}
 
-            <form method="post">
-                <div class="d-flex">
-                    {% csrf_token %}
-                    <div class="row border">
-                        {% for field in form %}
-                            <div class="col-12 col-md-6 col-lg-4 p-3">
-                                {{ field.label_tag }}
-                                {{ field }}
-                                {% if field.errors %}
-                                    <div class="text-danger">
-                                        {{ field.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-                    </div>            
-                </div>
-                <button type="submit" class="btn btn-primary mb-3 mt-3">Lançar Notas</button>
-            </form>
-        </div>
+/* Header da composição de notas */
+.imprimir > div:first-child {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.imprimir h1 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: #333;
+    margin-right: 15px;
+}
+
+.imprimir h2 {
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #555;
+    margin-top: 10px;
+}
+
+/* Formulário moderno */
+form {
+    width: 100%;
+}
+
+form .row.border {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    transition: all 0.3s ease-in-out;
+}
+
+form .row.border:hover {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+form .col-12.col-md-6.col-lg-4 {
+    margin-bottom: 15px;
+}
+
+form label {
+    font-weight: 500;
+    color: #444;
+}
+
+form input, form select, form textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+form input:focus, form select:focus, form textarea:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 8px rgba(78, 115, 223, 0.2);
+    outline: none;
+}
+
+/* Botão moderno */
+.btn-primary {
+    background: linear-gradient(135deg, #4e73df, #1cc88a);
+    border: none;
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(78, 115, 223, 0.3);
+}
+</style>
+
+<div class='imprimir'>
+    <div class="p-2">
+        <section class='d-flex align-items-center'>
+            <h1>{{grade.turma}}</h1> | {{grade}}
+        </section>
+        <section class='fs-3 mx-5 text-center mt-2'>
+            <h2>Composição de notas do aluno</h2> 
+            {{aluno}}
+        </section>
     </div>
 
+    <div class="d-flex justify-content-center mt-4 mb-5">
+        <form method="post">
+            <div class="d-flex">
+                {% csrf_token %}
+                <div class="row border g-3">
+                    {% for field in form %}
+                        <div class="col-12 col-md-6 col-lg-4">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger mt-1">
+                                    {{ field.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>            
+            </div>
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary">Lançar Notas</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 {% endblock main %}

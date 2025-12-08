@@ -1,0 +1,187 @@
+{% extends "modulo_professor/base.html" %}
+
+
+
+{% block main %}
+
+<style>
+/* ---------- Tema Geral ---------- */
+
+:root {
+    --primary-500: #2563eb;
+    --primary-600: #1d4ed8;
+    --primary-100: #eff6ff;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-700: #334155;
+    --success-500: #16a34a;
+}
+
+/* Container */
+.imprimir {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid var(--gray-200);
+    animation: fadeIn .45s ease;
+}
+
+/* Fade-in suave */
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(8px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+/* Botão voltar */
+.btn-voltar {
+    border-radius: 10px;
+    font-weight: 500;
+    transition: .25s ease;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-300);
+    color:brown
+}
+
+.btn-voltar i {
+    margin-right: 6px;
+}
+
+.btn-voltar:hover {
+    background: var(--gray-200);
+    border-color: var(--gray-700);
+}
+
+/* Alerta */
+.alert-modern {
+    border-radius: 12px;
+    background: var(--primary-100);
+    border: 1px solid #bfdbfe;
+}
+
+/* ---------- Lista de Turmas ---------- */
+
+.turma-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 20px;
+    border-radius: 14px;
+    background: #ffffff;
+    margin-bottom: 12px;
+    border: 1px solid var(--gray-200);
+    text-decoration: none;
+    transition: 0.28s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+}
+
+.turma-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary-500);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+    background: #fcfdff;
+}
+
+.turma-icon {
+    width: 52px;
+    height: 52px;
+    background: var(--primary-100);
+    border-radius: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.7rem;
+    color: var(--primary-600);
+}
+
+.turma-info strong {
+    font-size: 1.1rem;
+    color: var(--gray-700);
+}
+
+.turma-info small {
+    color: #64748b;
+}
+
+.btn-acessar {
+    margin-left: auto;
+    background: var(--primary-500);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    transition: .25s ease;
+}
+
+.turma-card:hover .btn-acessar {
+    background: var(--primary-600);
+}
+.p-2{padding: 2rem;}
+/* Animação suave */
+@media (max-width: 576px) {
+    .turma-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .btn-acessar {
+        width: 100%;
+    }
+}
+</style>
+
+<div class="imprimir shadow">
+
+    <!-- Botão Voltar -->
+    <div class="d-flex justify-content-start">
+        <a class="btn btn-voltar shadow-sm y" href="{% url 'modulo_professor:homeProfessor' %}">
+            <i class="fa-solid fa-chevron-left"></i>
+            Voltar
+        </a>
+    </div>
+
+    <!-- ALERTA -->
+    <div class="alert alert-modern mt-4 shadow-sm p-2">
+        <h5 class="alert-heading mb-2 fw-bold">
+            <i class="fa-solid fa-clipboard-list"></i> Registro de Notas
+        </h5>
+        <p class="mb-2">Clique em uma turma para registrar as notas dos alunos.</p>
+        <small class="text-muted">Em caso de dúvidas, procure a coordenação pedagógica.</small>
+    </div>
+
+    <h3 class="mt-4 mb-3 fw-bold" style="color: var(--primary-600);">
+        <i class="fa-solid fa-users-gear"></i> Selecione a Turma
+    </h3>
+
+    <!-- LISTA DE TURMAS -->
+    {% if grade_turma %}
+        {% for turma_id, turma, grade in grade_turma %}
+        
+            <a href="{% url 'modulo_professor:selecionaAlunosNotas' turma_id grade %}"
+               class="turma-card">
+
+                <div class="turma-icon">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+
+                <div class="turma-info">
+                    <strong>{{ turma|default:turma }}</strong><br>
+                    <small><i class="fa-solid fa-calendar"></i> Ano Letivo: {{ anoLetivo }}</small>
+                </div>
+
+                <span class="btn-acessar shadow-sm">
+                    Acessar <i class="fa-solid fa-arrow-right"></i>
+                </span>
+            </a>
+
+        {% endfor %}
+    {% else %}
+        <p class="text-muted mt-3">Nenhuma turma encontrada.</p>
+    {% endif %}
+
+</div>
+
+{% endblock main %}
+

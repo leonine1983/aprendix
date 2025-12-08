@@ -1,0 +1,196 @@
+{% extends "modulo_professor/base.html" %}
+
+{% block main %}
+
+<style>
+/* Grid dos cards */
+.matriculas-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+    padding-bottom: 10px;
+}
+
+/* Paleta de cores para os cards */
+.matricula-modern.color-0 { background: #e3f2fd; color: #222; }
+.matricula-modern.color-1 { background: #e8f5e9; color: #222; }
+.matricula-modern.color-2 { background: #fff3e0; color: #222; }
+.matricula-modern.color-3 { background: #f3e5f5; color: #222; }
+
+.matricula-modern {
+    border-radius: 18px;
+    padding: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.07);
+    border: 1px solid #f0f0f0;
+    transition: 0.25s ease;
+}
+
+.matricula-modern:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 32px rgba(0,0,0,0.10);
+}
+
+/* Header do card com flexbox */
+.matricula-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.matricula-header-left {
+    display: flex;
+    align-items: center;
+}
+
+.matricula-header .icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #3a6df0, #6a9bff);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 20px;
+}
+
+.matricula-header h3 {
+    font-size: 19px;
+    font-weight: 700;
+    margin-left: 10px;
+    color: #1f1f1f;
+}
+
+/* Botão Lançar Notas */
+.btn-lancar-notas {
+    background: #3a6df0;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.btn-lancar-notas:hover {
+    background: #2b54c1;
+}
+
+/* Itens do card */
+.matricula-item {
+    background: rgba(255,255,255,0.22);
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.25);
+    margin-bottom: 14px;
+}
+
+.matricula-item .label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+}
+
+.matricula-item .value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #222;
+    margin-top: 2px;
+}
+
+/* Responsivo: botão passa para baixo em telas pequenas */
+@media (max-width: 480px) {
+    .matricula-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+</style>
+
+<div>
+    <h3 style="font-weight:700; color:#1f1f1f; margin-bottom:8px;">
+        <i class="fa-solid fa-clipboard-list"></i> Lançamento de Notas
+    </h3>
+    <p style="margin:0; color:#333;">
+        Nesta tela você visualiza todas as matrículas registradas. 
+        Para acessar a janela de <strong>composição de notas</strong> de cada aluno, 
+        clique em um dos botões correspondentes ao <strong>trimestre específico</strong> desejado. 
+        Cada botão abrirá o formulário de notas referente àquele período.
+    </p>
+</div>
+
+
+<div class="matriculas-wrapper">
+
+    {% for matricula in matriculas %}
+        {# Alternância de cores usando módulo do índice do loop #}
+        {% with color_class=forloop.counter0|divisibleby:4|yesno:"color-0,color-1,color-2,color-3" %}
+        <div class="matricula-modern {{ color_class }}">
+
+            <div class="matricula-header">
+                <div class="matricula-header-left">
+                    <div class="icon"><i class="fa-solid fa-id-card"></i></div>
+                    <h3>{{ matricula.cod_matricula }}</h3>
+                </div>
+                <div>
+                {% for t in trimetre %}
+                    <a href="{% url "modulo_professor:criaNotasComposicao" matricula.id grade t.id %}" class="btn-lancar-notas">{{t}}</a>
+                {% endfor %}
+                </div>
+            </div>
+
+            <div class="matricula-item">
+                <div class="label">Aluno</div>
+                <div class="value">{{ matricula.aluno }}</div>
+            </div>
+
+            <div class="matricula-item">
+                <div class="label">Turma</div>
+                <div class="value">{{ matricula.turma }}</div>
+            </div>
+
+            <div class="matricula-item">
+                <div class="label">Data da Matrícula</div>
+                <div class="value">{{ matricula.data_matricula|date:"d/m/Y" }}</div>
+            </div>
+
+            {% if matricula.serie_multiseriada %}
+            <div class="matricula-item">
+                <div class="label">Série Multisseriada</div>
+                <div class="value">{{ matricula.serie_multiseriada }}</div>
+            </div>
+            {% endif %}
+
+            {% if matricula.data_afastamento_inicio %}
+            <div class="matricula-item">
+                <div class="label">Afastamento (Início)</div>
+                <div class="value">{{ matricula.data_afastamento_inicio|date:"d/m/Y" }}</div>
+            </div>
+            {% endif %}
+
+            {% if matricula.data_afastamento_fim %}
+            <div class="matricula-item">
+                <div class="label">Afastamento (Fim)</div>
+                <div class="value">{{ matricula.data_afastamento_fim|date:"d/m/Y" }}</div>
+            </div>
+            {% endif %}
+
+            {% if matricula.motivo_afastamento %}
+            <div class="matricula-item">
+                <div class="label">Motivo do Afastamento</div>
+                <div class="value">{{ matricula.motivo_afastamento }}</div>
+            </div>
+            {% endif %}
+
+        </div>
+        {% endwith %}
+    {% endfor %}
+
+</div>
+
+{% endblock main %}
