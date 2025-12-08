@@ -829,9 +829,11 @@ def selecionaTurmaNotas(request):
 def selecionaAlunosNotas(request, turma_id, grade):
     matricula = Matriculas.objects.filter(turma__id = turma_id)   
     trimetre = Trimestre.objects.filter(final=False)
+    compoemNotas = ComposicaoNotas.objects.filter(grade__id = grade)
 
     return render(request, 'modulo_professor/partial/notas/alunosNotas.html', {
         'matriculas': matricula,
         'grade': grade,
-        'trimetre':trimetre
+        'trimetre':trimetre,
+        'compoeNotas':compoemNotas
     })

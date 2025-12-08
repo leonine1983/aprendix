@@ -125,6 +125,116 @@
 </div>
 
 
+
+
+
+
+
+
+
+<div class="nota-composicao">
+    <h2>Composição da Nota Final</h2>
+    <div class="nota-item prova">
+        <span>Prova</span>
+        <div class="barra"><div class="preenchimento" style="width:50%"></div></div>
+        <span class="percentual">50%</span>
+    </div>
+    <div class="nota-item trabalho">
+        <span>Trabalho</span>
+        <div class="barra"><div class="preenchimento" style="width:20%"></div></div>
+        <span class="percentual">20%</span>
+    </div>
+    <div class="nota-item participacao">
+        <span>Participação</span>
+        <div class="barra"><div class="preenchimento" style="width:15%"></div></div>
+        <span class="percentual">15%</span>
+    </div>
+    <div class="nota-item tarefas">
+        <span>Tarefas</span>
+        <div class="barra"><div class="preenchimento" style="width:15%"></div></div>
+        <span class="percentual">15%</span>
+    </div>
+</div>
+
+<style>
+.nota-composicao {
+    max-width: 500px;
+    margin: 20px auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.nota-composicao h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #343a40;
+}
+
+.nota-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.nota-item span:first-child {
+    width: 100px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.barra {
+    flex: 1;
+    height: 20px;
+    background: #e9ecef;
+    border-radius: 10px;
+    margin: 0 10px;
+    overflow: hidden;
+}
+
+.preenchimento {
+    height: 100%;
+    border-radius: 10px;
+}
+
+.nota-item.prova .preenchimento {
+    background-color: #0d6efd; /* azul */
+}
+
+.nota-item.trabalho .preenchimento {
+    background-color: #198754; /* verde */
+}
+
+.nota-item.participacao .preenchimento {
+    background-color: #ffc107; /* amarelo */
+}
+
+.nota-item.tarefas .preenchimento {
+    background-color: #dc3545; /* vermelho */
+}
+
+.percentual {
+    width: 40px;
+    text-align: right;
+    font-weight: 500;
+    color: #495057;
+}
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
 <div class="matriculas-wrapper">
 
     {% for matricula in matriculas %}
@@ -185,10 +295,118 @@
                 <div class="label">Motivo do Afastamento</div>
                 <div class="value">{{ matricula.motivo_afastamento }}</div>
             </div>
+
             {% endif %}
+           
+
+
+
+            
+<div class="table-responsive">
+    <table class="table table-modern table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Trimestre</th>
+                <th>Prova</th>
+                <th>Trabalho</th>
+                <th>Participação</th>
+                <th>Tarefas</th>
+                <th>Nota Final</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for t in trimetre %}
+            {% for c in compoeNotas %}
+                {% if t.id == c.trimestre.id and c.aluno.id == matricula.id %}
+                    <tr>
+                        <td>{{ c.trimestre|default_if_none:"" }}</td>
+                        <td>{{ c.prova|default_if_none:"" }}</td>
+                        <td>{{ c.trabalho|default_if_none:"" }}</td>
+                        <td>{{ c.participacao|default_if_none:"" }}</td>
+                        <td>{{ c.tarefas|default_if_none:"" }}</td>
+                        <td class="nota-final">{{ c.nota_final|default_if_none:"" }}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+.table-modern {
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+    font-family: 'Segoe UI', sans-serif;
+    width: 100%;
+    min-width: 600px; /* garante mínimo em telas grandes */
+}
+.table-modern thead th {
+    background-color: #f0f4f8;
+    color: #333;
+    font-weight: 600;
+    border-bottom: none;
+    text-align: center;
+}
+.table-modern tbody tr {
+    background-color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.table-modern tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+}
+.table-modern td, .table-modern th {
+    vertical-align: middle;
+    padding: 12px 10px;
+    border-top: none;
+    border-bottom: none;
+    text-align: center;
+    word-wrap: break-word;
+}
+.nota-final {
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+    border-radius: 8px;
+    text-align: center;
+    min-width: 60px;
+}
+
+/* Responsividade: ajusta tabela em telas pequenas */
+@media (max-width: 768px) {
+    .table-modern thead {
+        display: none; /* esconde cabeçalho para celular */
+    }
+    .table-modern tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .table-modern tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 12px;
+        text-align: right;
+    }
+    .table-modern tbody td::before {
+        content: attr(data-label);
+        flex: 1;
+        font-weight: 600;
+        text-align: left;
+        color: #555;
+    }
+}
+</style>
+
+
+
+
+
 
         </div>
-        {% endwith %}
+        {% endwith %}        
     {% endfor %}
 
 </div>

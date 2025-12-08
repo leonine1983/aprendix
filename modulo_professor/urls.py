@@ -7,9 +7,7 @@ urlpatterns = [
     path('/sessao/', home_sessaoIniciada, name='sessaoEscola'),
 
     path('turmas/notas/seleciona/', selecionaTurmaNotas, name='selecionaTurmaNotas'),
-    path('alunos/notas/seleciona/<int:turma_id>/<int:grade>', selecionaAlunosNotas, name='selecionaAlunosNotas'),
-
-    
+    path('alunos/notas/seleciona/<int:turma_id>/<int:grade>', selecionaAlunosNotas, name='selecionaAlunosNotas'),    
     path('/notas/criar/<int:aluno>/<int:grade>/<int:trimestre>', criaNotasComposicao, name='criaNotasComposicao'),
     path('/recuperacao-final/<int:pk>/<int:grade>/', atualizaRecuperaFinal, name='atualiza_recuperacao_final'),
 
