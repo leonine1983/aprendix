@@ -824,10 +824,16 @@ def selecionaTurmaNotas(request):
         'grade_turma': turmas
     })
 
-
+from django.db.models import Q
 @login_required
 def selecionaAlunosNotas(request, turma_id, grade):
-    matricula = Matriculas.objects.filter(turma__id = turma_id)   
+    aluno = request.GET.get('pesquisa_aluno')
+    if aluno:
+        matricula = Matriculas.objects.filter(
+            Q(turma__id = turma_id, aluno__nome_completo__icontains=aluno)|
+            Q(turma__id = turma_id, aluno__nome_social__icontains=aluno))   
+    else:
+        matricula = Matriculas.objects.filter(turma__id = turma_id)   
     trimetre = Trimestre.objects.filter(final=False)
     compoemNotas = ComposicaoNotas.objects.filter(grade__id = grade)
 

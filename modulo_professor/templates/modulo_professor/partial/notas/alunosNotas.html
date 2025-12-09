@@ -1,26 +1,37 @@
 {% extends "modulo_professor/base.html" %}
-{% block main %}
 {% load meus_filtros %}
 
+{% block main %}
+
 <style>
-/* Grid dos cards */
+/* =================================
+   ESTILOS GERAIS/LAYOUT
+   ================================= */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+* {
+    box-sizing: border-box;
+}
+
+/* Grid dos cards de Matrícula */
 .matriculas-wrapper {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 10px;
-    margin-top: 10px;
-    padding-bottom: 10px;
+    gap: 15px;
+    margin-top: 20px;
+    padding-bottom: 20px;
 }
 
 /* Paleta de cores para os cards */
-.matricula-modern.color-0 { background: #e3f2fd; color: #222; }
-.matricula-modern.color-1 { background: #e8f5e9; color: #222; }
-.matricula-modern.color-2 { background: #fff3e0; color: #222; }
-.matricula-modern.color-3 { background: #f3e5f5; color: #222; }
+.matricula-modern.color-0 { background: #e3f2fd; color: #222; } /* Azul claro */
+.matricula-modern.color-1 { background: #e8f5e9; color: #222; } /* Verde claro */
+.matricula-modern.color-2 { background: #fff3e0; color: #222; } /* Amarelo claro */
+.matricula-modern.color-3 { background: #f3e5f5; color: #222; } /* Roxo claro */
 
 .matricula-modern {
     border-radius: 18px;
-    padding: 12px;
+    padding: 15px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.07);
     border: 1px solid #f0f0f0;
     transition: 0.25s ease;
@@ -36,7 +47,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
 }
 
 .matricula-header-left {
@@ -61,6 +72,7 @@
     font-weight: 700;
     margin-left: 10px;
     color: #1f1f1f;
+    margin: 0 0 0 10px; /* Resetando margens adicionais */
 }
 
 /* Botão Lançar Notas */
@@ -73,6 +85,8 @@
     font-weight: 600;
     text-decoration: none;
     transition: 0.2s ease;
+    margin-left: 5px; /* Espaço entre botões de trimestre */
+    display: inline-block;
 }
 
 .btn-lancar-notas:hover {
@@ -81,28 +95,27 @@
 
 /* Itens do card */
 .matricula-item {
-    background: rgba(255,255,255,0.22);
+    background: rgba(0, 0, 0, 0.05); /* Usando um cinza mais neutro */
     padding: 10px;
     border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.25);
-    margin-bottom: 14px;
+    margin-bottom: 8px;
+    border: 1px solid transparent;
 }
 
-.matricula-item .label {
+.matricula-item .titulo {
     font-size: 12px;
-    font-weight: 600;
     color: #555;
     text-transform: uppercase;
+    margin-bottom: 2px;
 }
 
 .matricula-item .value {
     font-size: 15px;
     font-weight: 600;
     color: #222;
-    margin-top: 2px;
 }
 
-/* Responsivo: botão passa para baixo em telas pequenas */
+/* Responsivo para o header do card */
 @media (max-width: 480px) {
     .matricula-header {
         flex-direction: column;
@@ -110,57 +123,13 @@
         gap: 8px;
     }
 }
-</style>
 
-<div>
-    <h3 style="font-weight:700; color:#1f1f1f; margin-bottom:8px;">
-        <i class="fa-solid fa-clipboard-list"></i> Lançamento de Notas
-    </h3>
-    <p style="margin:0; color:#333;">
-        Nesta tela você visualiza todas as matrículas registradas. 
-        Para acessar a janela de <strong>composição de notas</strong> de cada aluno, 
-        clique em um dos botões correspondentes ao <strong>trimestre específico</strong> desejado. 
-        Cada botão abrirá o formulário de notas referente àquele período.
-    </p>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="nota-composicao">
-    <h2>Composição da Nota Final</h2>
-    <div class="nota-item prova">
-        <span>Prova</span>
-        <div class="barra"><div class="preenchimento" style="width:50%"></div></div>
-        <span class="percentual">50%</span>
-    </div>
-    <div class="nota-item trabalho">
-        <span>Trabalho</span>
-        <div class="barra"><div class="preenchimento" style="width:20%"></div></div>
-        <span class="percentual">20%</span>
-    </div>
-    <div class="nota-item participacao">
-        <span>Participação</span>
-        <div class="barra"><div class="preenchimento" style="width:15%"></div></div>
-        <span class="percentual">15%</span>
-    </div>
-    <div class="nota-item tarefas">
-        <span>Tarefas</span>
-        <div class="barra"><div class="preenchimento" style="width:15%"></div></div>
-        <span class="percentual">15%</span>
-    </div>
-</div>
-
-<style>
+/* =================================
+   ESTILOS COMPOSIÇÃO DE NOTAS (GERAL)
+   ================================= */
 .nota-composicao {
     max-width: 500px;
-    margin: 20px auto;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 20px 0;
     background: #f8f9fa;
     padding: 20px;
     border-radius: 12px;
@@ -171,6 +140,7 @@
     text-align: center;
     margin-bottom: 20px;
     color: #343a40;
+    font-size: 1.5rem;
 }
 
 .nota-item {
@@ -199,21 +169,11 @@
     border-radius: 10px;
 }
 
-.nota-item.prova .preenchimento {
-    background-color: #0d6efd; /* azul */
-}
-
-.nota-item.trabalho .preenchimento {
-    background-color: #198754; /* verde */
-}
-
-.nota-item.participacao .preenchimento {
-    background-color: #ffc107; /* amarelo */
-}
-
-.nota-item.tarefas .preenchimento {
-    background-color: #dc3545; /* vermelho */
-}
+/* Cores das barras */
+.nota-item.prova .preenchimento { background-color: #0d6efd; } /* azul */
+.nota-item.trabalho .preenchimento { background-color: #198754; } /* verde */
+.nota-item.participacao .preenchimento { background-color: #ffc107; } /* amarelo */
+.nota-item.tarefas .preenchimento { background-color: #dc3545; } /* vermelho */
 
 .percentual {
     width: 40px;
@@ -221,19 +181,1065 @@
     font-weight: 500;
     color: #495057;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**/
+.pcss3t {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: none;
+	font-size: 0;
+	text-align: left;
+}
+.pcss3t > input {
+	position: absolute;
+	left: -9999px;
+}
+.pcss3t > label {
+	position: relative;
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: none;
+	cursor: pointer;
+	transition: all 0.1s;
+	-o-transition: all 0.1s;	
+	-ms-transition: all 0.1s;	
+	-moz-transition: all 0.1s;	
+	-webkit-transition: all 0.1s;
+}
+.pcss3t > label i {
+	display: block;
+	float: left;
+	margin: 16px 8px 0 -2px;
+	padding: 0;
+	border: 0;
+	outline: none;
+	font-family: FontAwesome;
+	font-style: normal;
+	font-size: 17px;
+}
+.pcss3t > input:checked + label {
+	cursor: default;
+}
+.pcss3t > ul {
+	list-style: none;
+	position: relative;
+	display: block;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: none;
+	font-size: 13px;
+}
+.pcss3t > ul > li {
+	position: absolute;
+	width: 100%;
+	overflow: auto;
+	padding: 30px 40px 40px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	opacity: 0;
+	transition: all 0.5s;
+	-o-transition: all 0.5s;	
+	-ms-transition: all 0.5s;	
+	-moz-transition: all 0.5s;	
+	-webkit-transition: all 0.5s;
+}
+.pcss3t > .tab-content-first:checked ~ ul .tab-content-first,
+.pcss3t > .tab-content-2:checked ~ ul .tab-content-2,
+.pcss3t > .tab-content-3:checked ~ ul .tab-content-3,
+.pcss3t > .tab-content-4:checked ~ ul .tab-content-4,
+.pcss3t > .tab-content-5:checked ~ ul .tab-content-5,
+.pcss3t > .tab-content-6:checked ~ ul .tab-content-6,
+.pcss3t > .tab-content-7:checked ~ ul .tab-content-7,
+.pcss3t > .tab-content-8:checked ~ ul .tab-content-8,
+.pcss3t > .tab-content-9:checked ~ ul .tab-content-9,
+.pcss3t > .tab-content-last:checked ~ ul .tab-content-last {
+	z-index: 1;
+	top: 0;
+	left: 0;
+	opacity: 1;
+	-webkit-transform: scale(1,1);
+	-webkit-transform: rotate(0deg);
+}
+
+
+/*----------------------------------------------------------------------------*/
+/*                                 EXTENSIONS                                 */
+/*----------------------------------------------------------------------------*/
+
+/**/
+/* auto height */
+/**/
+.pcss3t-height-auto > ul {
+	height: auto !important;
+}
+.pcss3t-height-auto > ul > li {
+	position: static;
+	display: none;
+	height: auto !important;
+}
+.pcss3t-height-auto > .tab-content-first:checked ~ ul .tab-content-first,
+.pcss3t-height-auto > .tab-content-2:checked ~ ul .tab-content-2,
+.pcss3t-height-auto > .tab-content-3:checked ~ ul .tab-content-3,
+.pcss3t-height-auto > .tab-content-4:checked ~ ul .tab-content-4,
+.pcss3t-height-auto > .tab-content-5:checked ~ ul .tab-content-5,
+.pcss3t-height-auto > .tab-content-last:checked ~ ul .tab-content-last {
+	display: block;
+}
+
+
+/**/
+/* grid */
+/**/
+.pcss3t .grid-row {
+	margin-top: 20px;
+}
+.pcss3t .grid-row:after {
+	content: '';
+	display: table;
+	clear: both;
+}
+.pcss3t .grid-row:first-child {
+	margin-top: 0;
+}
+.pcss3t .grid-col {
+	display: block;
+	float: left;
+	margin-left: 2%;
+}
+.pcss3t .grid-col:first-child {
+	margin-left: 0;
+}
+.pcss3t .grid-col .inner {
+	padding: 10px 0;
+	border-radius: 5px;
+	background: #f2f2f2;
+	text-align: center;
+}
+.pcss3t .grid-col-1 {
+	width: 15%;
+}
+.pcss3t .grid-col-2 {
+	width: 32%;
+}
+.pcss3t .grid-col-3 {
+	width: 49%;
+}
+.pcss3t .grid-col-4 {
+	width: 66%;
+}
+.pcss3t .grid-col-5 {
+	width: 83%;
+}
+.pcss3t .grid-col-offset-1 {
+	margin-left: 19%;
+}
+.pcss3t .grid-col-offset-1:first-child  {
+	margin-left: 17%;
+}
+.pcss3t .grid-col-offset-2 {
+	margin-left: 36%;	
+}
+.pcss3t .grid-col-offset-2:first-child {
+	margin-left: 34%;
+}
+.pcss3t .grid-col-offset-3 {
+	margin-left: 53%;
+}
+.pcss3t .grid-col-offset-3:first-child {
+	margin-left: 51%;
+}
+.pcss3t .grid-col-offset-4 {
+	margin-left: 70%;
+}
+.pcss3t .grid-col-offset-4:first-child {
+	margin-left: 68%;
+}
+.pcss3t .grid-col-offset-5:first-child {
+	margin-left: 85%;
+}
+
+
+/**/
+/* typography */
+/**/
+.pcss3t .typography {
+	color: #666;
+}
+.pcss3t .typography h1,
+.pcss3t .typography h2,
+.pcss3t .typography h3,
+.pcss3t .typography h4,
+.pcss3t .typography h5,
+.pcss3t .typography h6 {
+	margin: 40px 0 0 0;
+	padding: 0;
+	font-family: Gabriela, Georgia, serif;
+	text-align: left;
+	color: #333;
+}
+.pcss3t .typography h1 {
+	font-size: 40px;
+	line-height: 60px;
+	text-shadow: 3px 3px rgba(0,0,0,0.1);
+}
+.pcss3t .typography h2 {
+	font-size: 32px;
+	line-height: 48px;
+	text-shadow: 2px 2px rgba(0,0,0,0.1);
+}
+.pcss3t .typography h3 {
+	font-size: 26px;
+	line-height: 38px;
+	text-shadow: 1px 1px rgba(0,0,0,0.1);
+}
+.pcss3t .typography h4 {
+	font-size: 20px;
+	line-height: 30px;
+}
+.pcss3t .typography h5 {
+	font-size: 15px;
+	line-height: 23px;
+	text-transform: uppercase;
+}
+.pcss3t .typography h6 {
+	font-size: 13px;
+	line-height: 20px;
+	font-weight: 700;
+	text-transform: uppercase;
+}
+.pcss3t .typography p {
+	margin: 20px 0 0 0;
+	padding: 0;
+	line-height: 20px;
+	text-align: left;
+}
+.pcss3t .typography ul,
+.pcss3t .typography ol {
+	list-style: none;
+	margin: 20px 0 0 0;
+	padding: 0;
+}
+.pcss3t .typography li {
+	position: relative;
+	margin-top: 5px;
+	padding-left: 20px;
+}
+.pcss3t .typography li ul,
+.pcss3t .typography li ol {
+	margin-top: 5px;
+}
+.pcss3t .typography ul li:before {
+	content: '';
+	position: absolute;
+	top: 8px;
+	left: 0;
+	width: 6px;
+	height: 4px;
+	background: #404040;
+}
+.pcss3t .typography ol {
+	counter-reset: list1;
+}
+.pcss3t .typography ol > li:before {
+	counter-increment:list1;
+	content: counter(list1)'.';
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+.pcss3t .typography a {
+	text-decoration: underline;
+	color: #1889e6;
+}
+.pcss3t .typography a:hover {
+	text-decoration: none;
+}
+.pcss3t .typography .pic {
+	padding: 4px;
+	border: 1px dotted #ccc;
+}
+.pcss3t .typography .pic img {
+	display: block;
+}
+.pcss3t .typography .pic-right {
+	float: right;
+	margin: 0 0 10px 20px;
+}
+.pcss3t .typography .link {
+	text-decoration: underline;
+	color: #1889e6;
+	cursor: pointer;
+}
+.pcss3t .typography .link:hover {
+	text-decoration: none;
+}
+.pcss3t .typography h1:first-child,
+.pcss3t .typography h2:first-child,
+.pcss3t .typography h3:first-child,
+.pcss3t .typography h4:first-child,
+.pcss3t .typography h5:first-child,
+.pcss3t .typography h6:first-child,
+.pcss3t .typography p:first-child {
+	margin-top: 0;
+}
+.pcss3t .typography .text-center {
+	text-align: center;
+}
+.pcss3t .typography .text-right {
+	text-align: right;
+}
+
+
+/**/
+/* steps */
+/**/
+.pcss3t-steps > label {
+	cursor: default;
+}
+
+
+/**/
+/* animation effects */
+/**/
+.pcss3t-effect-scale > ul > li {
+	-webkit-transform: scale(0.1,0.1);
+}
+.pcss3t-effect-rotate  > ul > li {
+	-webkit-transform: rotate(180deg);
+}
+.pcss3t-effect-slide-top > ul > li {
+	top: -40px;
+}
+.pcss3t-effect-slide-right > ul > li {
+	left: 80px;
+}
+.pcss3t-effect-slide-bottom > ul > li {
+	top: 40px;
+}
+.pcss3t-effect-slide-left > ul > li {
+	left: -80px;
+}
+
+
+
+/*----------------------------------------------------------------------------*/
+/*                                   LAYOUTS                                  */
+/*----------------------------------------------------------------------------*/
+
+/**/
+/* top right */
+/**/
+.pcss3t-layout-top-right {
+	text-align: right;
+}
+
+
+/**/
+/* top center */
+/**/
+.pcss3t-layout-top-center {
+	text-align: center;
+}
+
+
+/**/
+/* top combi */
+/**/
+.pcss3t > .right {
+	float: right;
+}
+
+
+
+/*----------------------------------------------------------------------------*/
+/*                                    ICONS                                   */
+/*----------------------------------------------------------------------------*/
+
+/**/
+/* icons positions */
+/**/
+.pcss3t-icons-top > label {
+	text-align: center;
+}
+.pcss3t-icons-top > label i {
+	float: none;
+	margin: 0 auto -10px;
+	padding-top: 17px;
+	font-size: 23px;
+	line-height: 23px;
+	text-align: center;
+}
+.pcss3t-icons-right > label i {
+	float: right;
+	margin: 0 -2px 0 8px;
+}
+.pcss3t-icons-bottom > label {
+	text-align: center;
+}
+.pcss3t-icons-bottom > label i {
+	float: none;
+	margin: -10px auto 0;
+	padding-bottom: 17px;
+	font-size: 23px;
+	line-height: 23px;
+	text-align: center;
+}
+.pcss3t-icons-only > label i {
+	float: none;
+	margin: 0 auto;
+	font-size: 23px;
+}
+
+
+/**/
+/* font awesome */
+/**/
+@font-face
+{
+	font-family: 'FontAwesome';
+	src: url('../fonts/fontawesome-webfont.eot?v=3.0.1');
+	src: url('../fonts/fontawesome-webfont.eot?#iefix&v=3.0.1') format('embedded-opentype'),
+	url('../fonts/fontawesome-webfont.woff?v=3.0.1') format('woff'),
+	url('../fonts/fontawesome-webfont.ttf?v=3.0.1') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+.icon-glass:before {content: '\f000';}
+.icon-music:before {content: '\f001';}
+.icon-search:before {content: '\f002';}
+.icon-envelope:before {content: '\f003';}
+.icon-heart:before {content: '\f004';}
+.icon-star:before {content: '\f005';}
+.icon-star-empty:before {content: '\f006';}
+.icon-user:before {content: '\f007';}
+.icon-film:before {content: '\f008';}
+.icon-th-large:before {content: '\f009';}
+.icon-th:before {content: '\f00a';}
+.icon-th-list:before {content: '\f00b';}
+.icon-ok:before {content: '\f00c';}
+.icon-remove:before {content: '\f00d';}
+.icon-zoom-in:before {content: '\f00e';}
+.icon-zoom-out:before {content: '\f010';}
+.icon-off:before {content: '\f011';}
+.icon-signal:before {content: '\f012';}
+.icon-cog:before {content: '\f013';}
+.icon-trash:before {content: '\f014';}
+.icon-home:before {content: '\f015';}
+.icon-file:before {content: '\f016';}
+.icon-time:before {content: '\f017';}
+.icon-road:before {content: '\f018';}
+.icon-download-alt:before {content: '\f019';}
+.icon-download:before {content: '\f01a';}
+.icon-upload:before {content: '\f01b';}
+.icon-inbox:before {content: '\f01c';}
+.icon-play-circle:before {content: '\f01d';}
+.icon-repeat:before {content: '\f01e';}
+.icon-refresh:before {content: '\f021';}
+.icon-list-alt:before {content: '\f022';}
+.icon-lock:before {content: '\f023';}
+.icon-flag:before {content: '\f024';}
+.icon-headphones:before {content: '\f025';}
+.icon-volume-off:before {content: '\f026';}
+.icon-volume-down:before {content: '\f027';}
+.icon-volume-up:before {content: '\f028';}
+.icon-qrcode:before {content: '\f029';}
+.icon-barcode:before {content: '\f02a';}
+.icon-tag:before {content: '\f02b';}
+.icon-tags:before {content: '\f02c';}
+.icon-book:before {content: '\f02d';}
+.icon-bookmark:before {content: '\f02e';}
+.icon-print:before {content: '\f02f';}
+.icon-camera:before {content: '\f030';}
+.icon-font:before {content: '\f031';}
+.icon-bold:before {content: '\f032';}
+.icon-italic:before {content: '\f033';}
+.icon-text-height:before {content: '\f034';}
+.icon-text-width:before {content: '\f035';}
+.icon-align-left:before {content: '\f036';}
+.icon-align-center:before {content: '\f037';}
+.icon-align-right:before {content: '\f038';}
+.icon-align-justify:before {content: '\f039';}
+.icon-list:before {content: '\f03a';}
+.icon-indent-left:before {content: '\f03b';}
+.icon-indent-right:before {content: '\f03c';}
+.icon-facetime-video:before  {content: '\f03d';}
+.icon-picture:before {content: '\f03e';}
+.icon-pencil:before {content: '\f040';}
+.icon-map-marker:before {content: '\f041';}
+.icon-adjust:before {content: '\f042';}
+.icon-tint:before {content: '\f043';}
+.icon-edit:before {content: '\f044';}
+.icon-share:before {content: '\f045';}
+.icon-check:before {content: '\f046';}
+.icon-move:before {content: '\f047';}
+.icon-step-backward:before {content: '\f048';}
+.icon-fast-backward:before {content: '\f049';}
+.icon-backward:before {content: '\f04a'; position: relative;	left: -2px;}
+.icon-play:before {content: '\f04b'; position: relative; left: 1px;}
+.icon-pause:before {content: '\f04c';}
+.icon-stop:before {content: '\f04d';}
+.icon-forward:before {content: '\f04e'; position: relative;	left: 2px;}
+.icon-fast-forward:before {content: '\f050';}
+.icon-step-forward:before {content: '\f051';}
+.icon-eject:before {content: '\f052';}
+.icon-chevron-left:before {content: '\f053';}
+.icon-chevron-right:before {content: '\f054';}
+.icon-plus-sign:before {content: '\f055';}
+.icon-minus-sign:before {content: '\f056';}
+.icon-remove-sign:before {content: '\f057';}
+.icon-ok-sign:before {content: '\f058';}
+.icon-question-sign:before {content: '\f059';}
+.icon-info-sign:before {content: '\f05a';}
+.icon-screenshot:before {content: '\f05b';}
+.icon-remove-circle:before {content: '\f05c';}
+.icon-ok-circle:before {content: '\f05d';}
+.icon-ban-circle:before {content: '\f05e';}
+.icon-arrow-left:before {content: '\f060';}
+.icon-arrow-right:before {content: '\f061';}
+.icon-arrow-up:before {content: '\f062';}
+.icon-arrow-down:before {content: '\f063';}
+.icon-share-alt:before {content: '\f064';}
+.icon-resize-full:before {content: '\f065';}
+.icon-resize-small:before {content: '\f066';}
+.icon-plus:before {content: '\f067';}
+.icon-minus:before {content: '\f068';}
+.icon-asterisk:before {content: '\f069';}
+.icon-exclamation-sign:before {content: '\f06a';}
+.icon-gift:before {content: '\f06b';}
+.icon-leaf:before {content: '\f06c';}
+.icon-fire:before {content: '\f06d';}
+.icon-eye-open:before {content: '\f06e';}
+.icon-eye-close:before {content: '\f070';}
+.icon-warning-sign:before {content: '\f071';}
+.icon-plane:before {content: '\f072';}
+.icon-calendar:before {content: '\f073';}
+.icon-random:before {content: '\f074';}
+.icon-comment:before {content: '\f075';}
+.icon-magnet:before {content: '\f076';}
+.icon-chevron-up:before {content: '\f077';}
+.icon-chevron-down:before {content: '\f078';}
+.icon-retweet:before {content: '\f079';}
+.icon-shopping-cart:before {content: '\f07a';}
+.icon-folder-close:before {content: '\f07b';}
+.icon-folder-open:before {content: '\f07c';}
+.icon-resize-vertical:before {content: '\f07d';}
+.icon-resize-horizontal:before {content: '\f07e';}
+.icon-bar-chart:before {content: '\f080';}
+.icon-twitter-sign:before {content: '\f081';}
+.icon-facebook-sign:before {content: '\f082';}
+.icon-camera-retro:before {content: '\f083';}
+.icon-key:before {content: '\f084';}
+.icon-cogs:before {content: '\f085';}
+.icon-comments:before {content: '\f086';}
+.icon-thumbs-up:before {content: '\f087';}
+.icon-thumbs-down:before {content: '\f088';}
+.icon-star-half:before {content: '\f089';}
+.icon-heart-empty:before {content: '\f08a';}
+.icon-signout:before {content: '\f08b';}
+.icon-linkedin-sign:before {content: '\f08c';}
+.icon-pushpin:before {content: '\f08d';}
+.icon-external-link:before {content: '\f08e';}
+.icon-signin:before {content: '\f090';}
+.icon-trophy:before {content: '\f091';}
+.icon-github-sign:before {content: '\f092';}
+.icon-upload-alt:before {content: '\f093';}
+.icon-lemon:before {content: '\f094';}
+.icon-phone:before {content: '\f095';}
+.icon-check-empty:before {content: '\f096';}
+.icon-bookmark-empty:before {content: '\f097';}
+.icon-phone-sign:before {content: '\f098';}
+.icon-twitter:before {content: '\f099';}
+.icon-facebook:before {content: '\f09a';}
+.icon-github:before {content: '\f09b';}
+.icon-unlock:before {content: '\f09c';}
+.icon-credit-card:before {content: '\f09d';}
+.icon-rss:before {content: '\f09e';}
+.icon-hdd:before {content: '\f0a0';}
+.icon-bullhorn:before {content: '\f0a1';}
+.icon-bell:before {content: '\f0a2';}
+.icon-certificate:before {content: '\f0a3';}
+.icon-hand-right:before {content: '\f0a4';}
+.icon-hand-left:before {content: '\f0a5';}
+.icon-hand-up:before {content: '\f0a6';}
+.icon-hand-down:before {content: '\f0a7';}
+.icon-circle-arrow-left:before {content: '\f0a8';}
+.icon-circle-arrow-right:before {content: '\f0a9';}
+.icon-circle-arrow-up:before {content: '\f0aa';}
+.icon-circle-arrow-down:before {content: '\f0ab';}
+.icon-globe:before {content: '\f0ac';}
+.icon-wrench:before {content: '\f0ad';}
+.icon-tasks:before {content: '\f0ae';}
+.icon-filter:before {content: '\f0b0';}
+.icon-briefcase:before {content: '\f0b1';}
+.icon-fullscreen:before {content: '\f0b2';}
+.icon-group:before {content: '\f0c0';}
+.icon-link:before {content: '\f0c1';}
+.icon-cloud:before {content: '\f0c2';}
+.icon-beaker:before {content: '\f0c3';}
+.icon-cut:before {content: '\f0c4';}
+.icon-copy:before {content: '\f0c5';}
+.icon-paper-clip:before {content: '\f0c6';}
+.icon-save:before {content: '\f0c7';}
+.icon-sign-blank:before {content: '\f0c8';}
+.icon-reorder:before {content: '\f0c9';}
+.icon-list-ul:before {content: '\f0ca';}
+.icon-list-ol:before {content: '\f0cb';}
+.icon-strikethrough:before {content: '\f0cc';}
+.icon-underline:before {content: '\f0cd';}
+.icon-table:before {content: '\f0ce';}
+.icon-magic:before {content: '\f0d0';}
+.icon-truck:before {content: '\f0d1';}
+.icon-pinterest:before {content: '\f0d2';}
+.icon-pinterest-sign:before {content: '\f0d3';}
+.icon-google-plus-sign:before {content: '\f0d4';}
+.icon-google-plus:before {content: '\f0d5';}
+.icon-money:before {content: '\f0d6';}
+.icon-caret-down:before {content: '\f0d7';}
+.icon-caret-up:before {content: '\f0d8';}
+.icon-caret-left:before {content: '\f0d9';}
+.icon-caret-right:before {content: '\f0da';}
+.icon-columns:before {content: '\f0db';}
+.icon-sort:before {content: '\f0dc';}
+.icon-sort-down:before {content: '\f0dd';}
+.icon-sort-up:before {content: '\f0de';}
+.icon-envelope-alt:before {content: '\f0e0';}
+.icon-linkedin:before {content: '\f0e1';}
+.icon-undo:before {content: '\f0e2';}
+.icon-legal:before {content: '\f0e3';}
+.icon-dashboard:before {content: '\f0e4';}
+.icon-comment-alt:before {content: '\f0e5';}
+.icon-comments-alt:before {content: '\f0e6';}
+.icon-bolt:before {content: '\f0e7';}
+.icon-sitemap:before {content: '\f0e8';}
+.icon-umbrella:before {content: '\f0e9';}
+.icon-paste:before {content: '\f0ea';}
+.icon-lightbulb:before {content: '\f0eb';}
+.icon-exchange:before {content: '\f0ec';}
+.icon-cloud-download:before {content: '\f0ed';}
+.icon-cloud-upload:before {content: '\f0ee';}
+.icon-user-md:before {content: '\f0f0';}
+.icon-stethoscope:before {content: '\f0f1';}
+.icon-suitcase:before {content: '\f0f2';}
+.icon-bell-alt:before {content: '\f0f3';}
+.icon-coffee:before {content: '\f0f4';}
+.icon-food:before {content: '\f0f5';}
+.icon-file-alt:before {content: '\f0f6';}
+.icon-building:before {content: '\f0f7';}
+.icon-hospital:before {content: '\f0f8';}
+.icon-ambulance:before {content: '\f0f9';}
+.icon-medkit:before {content: '\f0fa';}
+.icon-fighter-jet:before {content: '\f0fb';}
+.icon-beer:before {content: '\f0fc';}
+.icon-h-sign:before {content: '\f0fd';}
+.icon-plus-sign-alt:before {content: '\f0fe';}
+.icon-double-angle-left:before {content: '\f100';}
+.icon-double-angle-right:before {content: '\f101';}
+.icon-double-angle-up:before {content: '\f102';}
+.icon-double-angle-down:before {content: '\f103';}
+.icon-angle-left:before {content: '\f104';}
+.icon-angle-right:before {content: '\f105';}
+.icon-angle-up:before {content: '\f106';}
+.icon-angle-down:before {content: '\f107';}
+.icon-desktop:before {content: '\f108';}
+.icon-laptop:before {content: '\f109';}
+.icon-tablet:before {content: '\f10a';}
+.icon-mobile-phone:before {content: '\f10b';}
+.icon-circle-blank:before {content: '\f10c';}
+.icon-quote-left:before {content: '\f10d';}
+.icon-quote-right:before {content: '\f10e';}
+.icon-spinner:before {content: '\f110';}
+.icon-circle:before {content: '\f111';}
+.icon-reply:before {content: '\f112';}
+.icon-github-alt:before {content: '\f113';}
+.icon-folder-close-alt:before {content: '\f114';}
+.icon-folder-open-alt:before {content: '\f115';}
+
+
+
+/*----------------------------------------------------------------------------*/
+/*                               RESPONSIVENESS                               */
+/*----------------------------------------------------------------------------*/
+
+/**/
+/* pad */
+/**/
+@media screen and (max-width: 980px) {
+	
+}
+
+
+/**/
+/* phone */
+/**/
+@media screen and (max-width: 767px) {
+	.pcss3t > label {
+		display: block;
+	}
+	.pcss3t > .right {
+		float: none;
+	}
+}
+
+
+
+/*----------------------------------------------------------------------------*/
+/*                                   THEMES                                   */
+/*----------------------------------------------------------------------------*/
+
+/**/
+/* default */
+/**/
+.pcss3t > label {	
+	padding: 0 20px;
+	background: #e5e5e5;
+	font-size: 13px;
+	line-height: 49px;
+}
+.pcss3t > label:hover {
+	background: #f2f2f2;
+}
+.pcss3t > input:checked + label {
+	background: #fff;
+}
+.pcss3t > ul {
+	background: #fff;
+	text-align: left;
+}
+.pcss3t-steps > label:hover {
+	background: #e5e5e5;	
+}
+
+
+/**/
+/* theme 1 */
+/**/
+.pcss3t-theme-1 > label {
+	margin: 0 5px 5px 0;
+	border-radius: 5px;
+	background: #fff;
+	box-shadow: 0 2px rgba(0,0,0,0.2);
+	color: #808080;
+	opacity: 0.8;
+}
+.pcss3t-theme-1 > label:hover {
+	background: #fff;
+	opacity: 1;
+}
+.pcss3t-theme-1 > input:checked + label {
+	margin-bottom: 0;
+	padding-bottom: 5px;
+	border-bottom-right-radius: 0;
+	border-bottom-left-radius: 0;
+	color: #2b82d9;
+	opacity: 1;
+}
+.pcss3t-theme-1 > ul {
+	border-radius: 5px;
+	box-shadow: 0 3px rgba(0,0,0,0.2);
+}
+.pcss3t-theme-1 > .tab-content-first:checked ~ ul {
+	border-top-left-radius: 0;
+}
+@media screen and (max-width: 767px) {
+	.pcss3t-theme-1 > label {
+		margin-right: 0;
+	}
+	.pcss3t-theme-1 > input:checked + label {
+		margin-bottom: 5px;
+		padding-bottom: 0;
+		border-radius: 5px;
+	}
+	.pcss3t-theme-1 > .tab-content-first:checked ~ ul {
+		border-top-left-radius: 5px;
+	}
+}
+
+
+/**/
+/* theme 2 */
+/**/
+.pcss3t-theme-2 {
+	padding: 5px;
+	background: rgba(0,0,0,0.2);
+}
+.pcss3t-theme-2 > label {
+	margin-right: 0;
+	margin-bottom: 0;
+	background: none;
+	border-radius: 0;
+	text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+	color: #fff;
+	opacity: 1;
+}
+.pcss3t-theme-2 > label:hover {
+	background: rgba(255,255,255,0.2);
+}
+.pcss3t-theme-2 > input:checked + label {
+	padding-bottom: 0;
+	background: #fff;
+	background: linear-gradient(to bottom, #e5e5e5 0%, #ffffff 100%);
+	background: -o-linear-gradient(top, #e5e5e5 0%, #ffffff 100%);
+	background: -ms-linear-gradient(top, #e5e5e5 0%, #ffffff 100%);
+	background: -moz-linear-gradient(top, #e5e5e5 0%, #ffffff 100%);
+	background: -webkit-linear-gradient(top, #e5e5e5 0%, #ffffff 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#e5e5e5', endColorstr='#ffffff', GradientType=0);
+	text-shadow: 1px 1px 1px rgba(255,255,255,0.5);
+	color: #822bd9;
+}
+.pcss3t-theme-2 > ul {
+	margin: 0 -5px -5px;
+	border-radius: 0;
+	box-shadow: none;
+}
+@media screen and (max-width: 767px) {
+	.pcss3t-theme-2 > ul {
+		margin-top: 5px;
+	}
+}
+
+
+/**/
+/* theme 3 */
+/**/
+.pcss3t-theme-3 {
+	background: rgba(0,0,0,0.8);	
+}
+.pcss3t-theme-3 > label {
+	background: none;
+	border-right: 1px dotted rgba(255,255,255,0.5);
+	text-align: center;
+	color: #fff;
+	opacity: 0.6;
+}
+.pcss3t-theme-3 > label:hover {
+	background: none;
+	color: #d9d92b;
+	opacity: 0.8;
+}
+.pcss3t-theme-3 > input:checked + label {
+	background: #d9d92b;
+	color: #000;
+	opacity: 1;
+}
+.pcss3t-theme-3 > ul {
+	border-top: 4px solid #d9d92b;
+	border-bottom: 4px solid #d9d92b;
+	border-radius: 0;
+	box-shadow: none;
+}
+
+
+/**/
+/* theme 4 */
+/**/
+.pcss3t-theme-4 > label {
+	margin: 0 10px 10px 0;
+	border-radius: 5px;
+	background: #78c5fd;
+	background: linear-gradient(to bottom, #78c5fd 0%, #2c8fdd 100%);
+	background: -o-linear-gradient(top, #78c5fd 0%, #2c8fdd 100%);
+	background: -ms-linear-gradient(top, #78c5fd 0%, #2c8fdd 100%);
+	background: -moz-linear-gradient(top, #78c5fd 0%, #2c8fdd 100%);
+	background: -webkit-linear-gradient(top, #78c5fd 0%, #2c8fdd 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#78c5fd', endColorstr='#2c8fdd', GradientType=0);
+	box-shadow: inset 0 1px rgba(255,255,255,0.5), 0 1px rgba(0,0,0,0.5);
+	line-height: 39px;
+	text-shadow: 0 1px rgba(0,0,0,0.5);
+	color: #fff;
+}
+.pcss3t-theme-4 > label:hover {
+	background: #90cffc;
+	background: linear-gradient(to bottom, #90cffc 0%, #439bde 100%);
+	background: -o-linear-gradient(top, #90cffc 0%, #439bde 100%);
+	background: -ms-linear-gradient(top, #90cffc 0%, #439bde 100%);
+	background: -moz-linear-gradient(top, #90cffc 0%, #439bde 100%);
+	background: -webkit-linear-gradient(top, #90cffc 0%, #439bde 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#90cffc', endColorstr='#439bde', GradientType=0);
+}
+.pcss3t-theme-4 > input:checked + label {
+	top: 1px;
+	background: #5f9dc9;
+	background: linear-gradient(to bottom, #5f9dc9 0%, #2270ab 100%);
+	background: -o-linear-gradient(top, #5f9dc9 0%, #2270ab 100%);
+	background: -ms-linear-gradient(top, #5f9dc9 0%, #2270ab 100%);
+	background: -moz-linear-gradient(top, #5f9dc9 0%, #2270ab 100%);
+	background: -webkit-linear-gradient(top, #5f9dc9 0%, #2270ab 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#5f9dc9', endColorstr='#2270ab', GradientType=0);
+	box-shadow: inset 0 1px 1px rgba(0,0,0,0.5), 0 1px rgba(255,255,255,0.5);
+	text-shadow: none;
+}
+.pcss3t-theme-4 > ul {
+	border-radius: 5px;
+	box-shadow: 0 2px 2px rgba(0,0,0,0.3);
+}
+@media screen and (max-width: 767px) {
+	.pcss3t-theme-4 > label {
+		margin-right: 0;
+	}
+}
+
+
+/**/
+/* theme 5 */
+/**/
+.pcss3t-theme-5 {
+	padding: 15px;
+	border-radius: 5px;
+	background: #ad6395;
+	background: linear-gradient(to right, #ad6395 0%, #a163ad 100%);
+	background: -o-linear-gradient(left, #ad6395 0%, #a163ad 100%);
+	background: -ms-linear-gradient(left, #ad6395 0%, #a163ad 100%);
+	background: -moz-linear-gradient(left, #ad6395 0%, #a163ad 100%);
+	background: -webkit-linear-gradient(left, #ad6395 0%, #a163ad 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#5f9dc9', endColorstr='#a163ad', GradientType=1);
+}
+.pcss3t-theme-5 > label {
+	margin-right: 10px;
+	margin-bottom: 15px;
+	background: none;
+	border-radius: 5px;
+	text-align: center;
+	color: #fff;
+	opacity: 1;
+}
+.pcss3t-theme-5 > label:hover {
+	background: rgba(255,255,255,0.15);
+}
+.pcss3t-theme-5 > input:checked + label {
+	background: rgba(255,255,255,0.3);
+	color: #000;
+}
+.pcss3t-theme-5 > input:checked + label:after {
+	content: '';
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	margin-top: 10px;
+	margin-left: -6px;
+	border-right: 6px solid transparent;
+	border-bottom: 6px solid #fff;
+	border-left: 6px solid transparent;
+}
+.pcss3t-theme-5 > ul {
+	margin: 0 -15px -15px;
+	border-radius: 0 0 5px 5px;
+	box-shadow: none;
+}
+@media screen and (max-width: 767px) {
+	.pcss3t-theme-5 > input:checked + label:after {
+		display: none;
+	}
+}
+
+
+/*----------------------------------------------------------------------------*/
+/*                               CUSTOMIZATION                                */
+/*----------------------------------------------------------------------------*/
+
+/**/
+/* height */
+/**/
+.pcss3t > ul,
+.pcss3t > ul > li {
+	height: 370px;
+}
+
+
+
+
+
+
+
+
+
+
 </style>
 
+<div>
+    <h3 style="font-weight:700; color:#1f1f1f; margin-bottom:8px;">
+        <i class="fa-solid fa-clipboard-list"></i> Lançamento de Notas do <b style='font-size:1.5rem'>{% if matriculas %}{{matriculas.0.turma}}{% endif %}</b>
+        <hr>
+    </h3>
+    <p style="margin:0; color:#333;">
+        Nesta tela você visualiza todas as matrículas registradas.
+        Para acessar a janela de <strong>composição de notas</strong> de cada aluno,
+        clique em um dos botões correspondentes ao <strong>trimestre específico</strong> desejado.
+        Cada botão abrirá o formulário de notas referente àquele período.
+    </p>
+</div>
 
+<form style="display: inline-block; margin: 10px 0; max-width: 300px;">
+    <input
+        type="search"
+        name='pesquisa_aluno'
+        placeholder="Pesquisar aluno..."
+        style="
+            /* Layout e Visual */
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 16px;
 
+            /* Efeito de Foco */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        "
+        onfocus="this.style.borderColor='#007bff'; this.style.boxShadow='0 0 5px rgba(0, 123, 255, 0.5)';"
+        onblur="this.style.borderColor='#ccc'; this.style.boxShadow='none';"
+    />
+</form>
 
-
-
-
-
-
-
-
-
+<div class="nota-composicao">
+    <h2>Composição da Nota Final</h2>
+    <div class="nota-item prova">
+        <span>Prova</span>
+        <div class="barra"><div class="preenchimento" style="width:50%"></div></div>
+        <span class="percentual">50%</span>
+    </div>
+    <div class="nota-item trabalho">
+        <span>Trabalho</span>
+        <div class="barra"><div class="preenchimento" style="width:20%"></div></div>
+        <span class="percentual">20%</span>
+    </div>
+    <div class="nota-item participacao">
+        <span>Participação</span>
+        <div class="barra"><div class="preenchimento" style="width:15%"></div></div>
+        <span class="percentual">15%</span>
+    </div>
+    <div class="nota-item tarefas">
+        <span>Tarefas</span>
+        <div class="barra"><div class="preenchimento" style="width:15%"></div></div>
+        <span class="percentual">15%</span>
+    </div>
+</div>
 
 <div class="matriculas-wrapper">
 
@@ -255,435 +1261,220 @@
             </div>
 
             <div class="matricula-item">
-                <div class="label">Aluno</div>
+                <div class="titulo">Aluno</div>
                 <div class="value">{{ matricula.aluno }}</div>
             </div>
 
             <div class="matricula-item">
-                <div class="label">Turma</div>
+                <div class="titulo">Turma</div>
                 <div class="value">{{ matricula.turma }}</div>
             </div>
 
             <div class="matricula-item">
-                <div class="label">Data da Matrícula</div>
+                <div class="titulo">Data da Matrícula</div>
                 <div class="value">{{ matricula.data_matricula|date:"d/m/Y" }}</div>
             </div>
 
             {% if matricula.serie_multiseriada %}
             <div class="matricula-item">
-                <div class="label">Série Multisseriada</div>
+                <div class="titulo">Série Multisseriada</div>
                 <div class="value">{{ matricula.serie_multiseriada }}</div>
             </div>
             {% endif %}
 
             {% if matricula.data_afastamento_inicio %}
             <div class="matricula-item">
-                <div class="label">Afastamento (Início)</div>
+                <div class="titulo">Afastamento (Início)</div>
                 <div class="value">{{ matricula.data_afastamento_inicio|date:"d/m/Y" }}</div>
             </div>
             {% endif %}
 
             {% if matricula.data_afastamento_fim %}
             <div class="matricula-item">
-                <div class="label">Afastamento (Fim)</div>
+                <div class="titulo">Afastamento (Fim)</div>
                 <div class="value">{{ matricula.data_afastamento_fim|date:"d/m/Y" }}</div>
             </div>
             {% endif %}
 
             {% if matricula.motivo_afastamento %}
             <div class="matricula-item">
-                <div class="label">Motivo do Afastamento</div>
+                <div class="titulo">Motivo do Afastamento</div>
                 <div class="value">{{ matricula.motivo_afastamento }}</div>
             </div>
-
             {% endif %}
-           
 
 
-
-
-
-
-    <style>
-    @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,700,700i');
-    @import url('https://fonts.googleapis.com/css?family=Bree+Serif');
-    * {
-    box-sizing: border-box;
-    }
-
-    @media (min-width: 600px) {
-
-    }
-    h1 {
-    margin: 0;
-    font-family: 'Bree Serif', serif;
-    font-size: 36px;
-    }
-    p {
-    margin-top: 20px;
-    margin-bottom: 0;
-    padding: 0;
-    font-size: 20px;
-    line-height: 1.5;
-    }
-    .tabs {
-    display: flex;
-    flex-wrap: wrap;
-    max-width: 700px;
-    background: #e5e5e5;
-    box-shadow: 0 48px 80px -32px rgba(0,0,0,0.3);
-    }
-    .input {
-    position: absolute;
-    opacity: 0;
-    }
-    .label {
-    width: 100%;
-    padding: 20px 30px;
-    background: #e5e5e5;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 18px;
-    color: #7f7f7f;
-    transition: background 0.1s, color 0.1s;
-    }
-    .label:hover {
-    background: #d8d8d8;
-    }
-    .label:active {
-    background: #ccc;
-    }
-    .input:focus + .label {
-    z-index: 1;
-    }
-    .input:checked + .label {
-    background: #fff;
-    color: #000;
-    }
-    @media (min-width: 600px) {
-    .label {
-        width: auto;
-    }
-    }
-    .panel {
-    display: none;
-    padding: 20px 30px 30px;
-    background: #fff;
-    }
-    @media (min-width: 600px) {
-    .panel {
-        order: 99;
-    }
-    }
-    .input:checked + .label + .panel {
-    display: block;
-    }
-
-
-
-    .panel {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 6px 25px rgba(0,0,0,0.08);
-    margin-bottom: 30px;
-    transition: all 0.3s ease;
-    width: 100%;
-}
-
-.panel:hover {
-    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-}
-
-/* H1: Disciplina + Trimestre */
-.panel h1 {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #1a1a1a;
-    margin-bottom: 8px;
-    line-height: 1.2;
-}
-
-.panel h1 small {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #6c757d;
-    margin-left: 6px;
-}
-
-/* H2: Professor */
-.panel h2 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 6px;
-}
-
-.panel h2 b {
-    color: #343a40;
-    text-transform: capitalize;
-}
-
-/* H3: Aluno */
-.panel h3 {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: #6c757d;
-    margin-bottom: 4px;
-}
-
-/* H4: Turma */
-.panel h4 {
-    font-size: 1rem;
-    font-weight: 400;
-    color: #868e96;
-    margin-bottom: 15px;
-}
-
-/* Lista moderna */
-.panel ul {
-    list-style: none;
-    padding: 0;
-    margin-top: 15px;
-}
-
-.panel ul li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #f7f7f7;
-    padding: 12px 15px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    font-size: 0.95rem;
-    border-left: 4px solid #4a90e2;
-    transition: 0.2s;
-}
-
-.panel ul li b {
-    font-weight: 600;
-    color: #495057;
-}
-
-/* Destaque na Nota Final */
-.panel ul li.nota-final {
-    border-left-color: #28a745;
-    background: #e9f7ef;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #155724;
-}
-
-.destaque-alerta {
-    background-color: #e0f7fa; 
-    color: #006064; 
-    padding: 15px; 
-    margin: 20px 0; 
-    border-left: 5px solid #00acc1; 
-    border-radius: 4px; 
-    font-family: Arial, sans-serif;
-    font-size: 1.1em;
-    line-height: 1.4;
-}
-/* Responsividade */
-@media (max-width: 600px) {
-    .panel {
-        padding: 20px;
-    }
-    .panel ul li {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 5px;
-    }
-}
-    </style>              
-{% for t in trimetre %}
-    <div class="tabs">
-        <input class="input" name="tabs" type="radio" id="tab-{{t.id}}-{{matricula}}" checked="checked"/>
-        <label class="label" for="tab-{{t.id}}-{{matricula}}"> <b style='text-transform: uppercase;'>{{t}}</b> <small>Composição de notas</small></label>
-   
-
-
-
-
-<!-- Painel que você já possui -->
-<div class="panel" id="painel-impressao">            
-    <h1>{{ matricula.compoeNotaAlunos_related.first.grade.disciplina }}  
-        <small>— {{ t }}</small>
-    </h1>
-    <h2>Professor: <b style="text-transform: capitalize;">{{ matricula.compoeNotaAlunos_related.first.grade.professor.encaminhamento }}</b></h2>
-    <h3>Aluno: {{ matricula }}</h3>
-    <h4>Turma: {{ matricula.turma }}</h4>
-
-    {% for c in compoeNotas %}
-        {% if t.id == c.trimestre.id and c.aluno.id == matricula.id %}
-            <ul>
-                <li><b>Prova (50%)</b> {{ c.prova|default_if_none:"" }}</li>
-                <li><b>Trabalho (20%)</b> {{ c.trabalho|default_if_none:""|floatformat:2 }}</li>
-                <li><b>Participação (15%)</b> {{ c.participacao|default_if_none:"" }}</li>
-                <li><b>Tarefas (15%)</b> {{ c.tarefas|default_if_none:"" }}</li>
+			<div class="pcss3t pcss3t-effect-scale pcss3t-theme-1">
                 
-           <li style="margin-bottom: 15px; font-family: Arial, sans-serif;">
-
-                <span style="font-weight: 600; font-size: 1rem; color: #343a40;">Cálculo da Composição:</span>
-
-                {% with prova_50=c.prova|multiplica:0.5 %}
-                {% with trabalho_20=c.trabalho|multiplica:0.2 %}
-                {% with participacao_15=c.participacao|multiplica:0.15 %}
-                {% with tarefas_15=c.tarefas|multiplica:0.15 %}
-
-                <ul style="list-style:none; padding:0; margin:10px 0 5px 0;">
-                    <li style="background:#e3f2fd; padding:8px 12px; border-radius:8px; margin-bottom:5px;">
-                        <b>Prova (50%)</b>: {{ c.prova|default_if_none:"0" }} × 50% = 
-                        <strong style="color:#0d6efd;">{{ prova_50|floatformat:2 }}</strong>
-                    </li>
-                    <li style="background:#e8f5e9; padding:8px 12px; border-radius:8px; margin-bottom:5px;">
-                        <b>Trabalho (20%)</b>: {{ c.trabalho|default_if_none:"0"}} × 20% = 
-                        <strong style="color:#198754;">{{ trabalho_20|floatformat:2 }}</strong>
-                    </li>
-                    <li style="background:#fff3e0; padding:8px 12px; border-radius:8px; margin-bottom:5px;">
-                        <b>Participação (15%)</b>: {{ c.participacao|default_if_none:"0" }} × 15% = 
-                        <strong style="color:#ffc107;">{{ participacao_15|floatformat:2 }}</strong>
-                    </li>
-                    <li style="background:#f8d7da; padding:8px 12px; border-radius:8px; margin-bottom:5px;">
-                        <b>Tarefas (15%)</b>: {{ c.tarefas|default_if_none:"0" }} × 15% = 
-                        <strong style="color:#dc3545;">{{ tarefas_15|floatformat:2 }}</strong>
-                    </li>
-                    <li>
-                        {% with nota_final_=prova_50|soma_float:trabalho_20|soma_float:participacao_15|soma_float:tarefas_15 %}
-                    <p style="
-                        background-color: #d1ecf1; 
-                        padding: 12px 15px; 
-                        border-radius: 10px; 
-                        border-left: 5px solid #0c5460; 
-                        font-weight: 700; 
-                        color: #0c5460;
-                        max-width: 350px;
-                        line-height: 1.4;
-                        text-align: center;
+            {% for t in trimetre %}
+				<input type="radio" name="pcss3t" {% if forloop.first %} checked {% endif %}  id="tab{{t.id}}"class="
+                    {% if forloop.first %}tab-content-first{% endif %}
+                    {% if forloop.last %}tab-content-last{% else %}tab-content-{{forloop.counter}}{% endif %}
                     ">
-                        Nota Final <sup><small>(Composição de notas)</small></sup> <strong>{{ nota_final_|floatformat:2 }}</strong>
-                    </p>
-                    {% endwith %}
+				<label for="tab{{t.id}}"><i class="icon-bolt"></i>{{t}}</label>
+            {% endfor %}
+				
+				
+				<ul>
+					<li class="tab-content tab-content-first typography">
+						<h1>Nikola Tesla</h1>
+						<p>Serbian-American inventor, electrical engineer, mechanical engineer, physicist, and futurist best known for his contributions to the design of the modern alternating current (AC) electrical supply system.</p>
+						<p>Tesla started working in the telephony and electrical fields before emigrating to the United States in 1884 to work for Thomas Edison. He soon struck out on his own with financial backers, setting up laboratories/companies to develop a range of electrical devices. His patented AC induction motor and transformer were licensed by George Westinghouse, who also hired Tesla as a consultant to help develop an alternating current system. Tesla is also known for his high-voltage, high-frequency power experiments in New York and Colorado Springs which included patented devices and theoretical work used in the invention of radio communication, for his X-ray experiments, and for his ill-fated attempt at intercontinental wireless transmission in his unfinished Wardenclyffe Tower project.</p>
+						<p class="text-right"><em>Find out more about Nikola Tesla from <a href="http://en.wikipedia.org/wiki/Nikola_Tesla" target="_blank">Wikipedia</a>.</em></p>
+					</li>
+					
+					<li class="tab-content tab-content-2 typography">
+						<h1>Leonardo da Vinci</h1>
+						<p>Italian Renaissance polymath: painter, sculptor, architect, musician, mathematician, engineer, inventor, anatomist, geologist, cartographer, botanist, and writer. His genius, perhaps more than that of any other figure, epitomized the Renaissance humanist ideal. Leonardo has often been described as the archetype of the Renaissance Man, a man of "unquenchable curiosity" and "feverishly inventive imagination". He is widely considered to be one of the greatest painters of all time and perhaps the most diversely talented person ever to have lived. According to art historian Helen Gardner, the scope and depth of his interests were without precedent and "his mind and personality seem to us superhuman, the man himself mysterious and remote". Marco Rosci states that while there is much speculation about Leonardo, his vision of the world is essentially logical rather than mysterious, and that the empirical methods he employed were unusual for his time.</p>
+						<p class="text-right"><em>Find out more about Leonardo da Vinci from <a href="http://en.wikipedia.org/wiki/Leonardo_da_Vinci" target="_blank">Wikipedia</a>.</em></p>
+					</li>
+					
+					<li class="tab-content tab-content-3 typography">
+						<h1>Albert Einstein</h1>
+						<p>German-born theoretical physicist who developed the general theory of relativity, one of the two pillars of modern physics (alongside quantum mechanics). While best known for his mass–energy equivalence formula E = mc2 (which has been dubbed "the world's most famous equation"), he received the 1921 Nobel Prize in Physics "for his services to theoretical physics, and especially for his discovery of the law of the photoelectric effect". The latter was pivotal in establishing quantum theory.</p>
+						<p>Near the beginning of his career, Einstein thought that Newtonian mechanics was no longer enough to reconcile the laws of classical mechanics with the laws of the electromagnetic field. This led to the development of his special theory of relativity. He realized, however, that the principle of relativity could also be extended to gravitational fields, and with his subsequent theory of gravitation in 1916, he published a paper on the general theory of relativity.</p>
+						<p class="text-right"><em>Find out more about Albert Einstein from <a href="http://en.wikipedia.org/wiki/Albert_Einstein" target="_blank">Wikipedia</a>.</em></p>				
+					</li>
+					
+					<li class="tab-content tab-content-last typography">
+						<div class="typography">
+							<h1>Isaac Newton</h1>
+							<p>English physicist and mathematician who is widely regarded as one of the most influential scientists of all time and as a key figure in the scientific revolution. His book Philosophiæ Naturalis Principia Mathematica ("Mathematical Principles of Natural Philosophy"), first published in 1687, laid the foundations for most of classical mechanics. Newton also made seminal contributions to optics and shares credit with Gottfried Leibniz for the invention of the infinitesimal calculus.</p>
+							<p>Newton's Principia formulated the laws of motion and universal gravitation that dominated scientists' view of the physical universe for the next three centuries. It also demonstrated that the motion of objects on the Earth and that of celestial bodies could be described by the same principles. By deriving Kepler's laws of planetary motion from his mathematical description of gravity, Newton removed the last doubts about the validity of the heliocentric model of the cosmos.</p>
+						<p class="text-right"><em>Find out more about Isaac Newton from <a href="http://en.wikipedia.org/wiki/Isaac_Newton" target="_blank">Wikipedia</a>.</em></p>		
+						</div>
+					</li>
+				</ul>
+			</div>
+			<!--/ tabs -->
 
-                    </li>
-                </ul>   
-                {% endwith %}
-                {% endwith %}
-                {% endwith %}
-                {% endwith %}
-            </li> 
-        </li>
-        <div class="destaque-alerta">
-            Se a **Nota Final** apresenta um valor, mas a **Composição de Notas** (os detalhes das atividades) está zerada, isso significa que a nota foi inserida diretamente via ambiente administrativo, ignorando a composição. No entanto, se o professor decidir preencher a composição das notas, o sistema **automaticamente recalculará e atualizará** o valor da Nota Final, substituindo a nota inserida anteriormente pelo ambiente administrativo.
+
+
+
+
+            {% for t in trimetre %}
+
+                <div class="tabs">
+                    {# Ativa a primeira aba por padrão para cada matrícula #}
+                    <input class="input" name="tabs-{{ matricula.id }}" type="radio" id="tab-{{t.id}}-{{matricula.id}}" {% if forloop.first %}checked="checked"{% endif %}/>
+                    <label class="label" for="tab-{{t.id}}-{{matricula.id}}">
+                        <b style='text-transform: uppercase;'>{{t}}</b> <small></small>
+                    </label>
+
+                    <div class="panel">                        
+                        <h1>{{ matricula }}</h1>
+                        <h2>
+                            {% if matricula.compoeNotaAlunos_related.first %}
+                                {{ matricula.compoeNotaAlunos_related.first.grade.disciplina }}
+                            {% endif %}
+                            <small>— {{ t }}</small>
+                        </h2>
+                        <h3>Professor:
+                            <b style="text-transform: capitalize;">
+                                {% if matricula.compoeNotaAlunos_related.first %}
+                                    {{ matricula.compoeNotaAlunos_related.first.grade.professor.encaminhamento }}
+                                {% endif %}
+                            </b>
+                        </h3>
+                        
+                        <h4>Turma: {{ matricula.turma }}</h4>
+
+                        {% for c in compoeNotas %}
+                            {% if t.id == c.trimestre.id and c.aluno.id == matricula.id %}
+                                <ul>
+                                    <li><b>Prova (50%)</b> {{ c.prova|default_if_none:"-" }}</li>
+                                    <li><b>Trabalho (20%)</b> {{ c.trabalho|default_if_none:"-"|floatformat:2 }}</li>
+                                    <li><b>Participação (15%)</b> {{ c.participacao|default_if_none:"-" }}</li>
+                                    <li><b>Tarefas (15%)</b> {{ c.tarefas|default_if_none:"-" }}</li>
+
+                                    <li style="margin-bottom: 15px; background: none; border-left: none; padding: 0;">
+
+                                        <span style="font-weight: 600; font-size: 1rem; color: #343a40; display: block; margin-bottom: 10px;">Cálculo da Composição:</span>
+
+                                        {% with prova_50=c.prova|multiplica:0.5 %}
+                                        {% with trabalho_20=c.trabalho|multiplica:0.2 %}
+                                        {% with participacao_15=c.participacao|multiplica:0.15 %}
+                                        {% with tarefas_15=c.tarefas|multiplica:0.15 %}
+
+                                        <ul style="list-style:none; padding:0; margin:10px 0 5px 0;">
+                                            <li style="background:#e3f2fd; padding:8px 12px; border-radius:8px; margin-bottom:5px; border-left: 4px solid #0d6efd;">
+                                                <b>Prova (50%)</b>: {{ c.prova|default_if_none:"0" }} × 50% =
+                                                <strong style="color:#0d6efd;">{{ prova_50|floatformat:2 }}</strong>
+                                            </li>
+                                            <li style="background:#e8f5e9; padding:8px 12px; border-radius:8px; margin-bottom:5px; border-left: 4px solid #198754;">
+                                                <b>Trabalho (20%)</b>: {{ c.trabalho|default_if_none:"0"}} × 20% =
+                                                <strong style="color:#198754;">{{ trabalho_20|floatformat:2 }}</strong>
+                                            </li>
+                                            <li style="background:#fff3e0; padding:8px 12px; border-radius:8px; margin-bottom:5px; border-left: 4px solid #ffc107;">
+                                                <b>Participação (15%)</b>: {{ c.participacao|default_if_none:"0" }} × 15% =
+                                                <strong style="color:#ffc107;">{{ participacao_15|floatformat:2 }}</strong>
+                                            </li>
+                                            <li style="background:#f8d7da; padding:8px 12px; border-radius:8px; margin-bottom:5px; border-left: 4px solid #dc3545;">
+                                                <b>Tarefas (15%)</b>: {{ c.tarefas|default_if_none:"0" }} × 15% =
+                                                <strong style="color:#dc3545;">{{ tarefas_15|floatformat:2 }}</strong>
+                                            </li>
+                                            <li style="background: none; border-left: none; padding: 0;">
+                                                {% with nota_final_=prova_50|soma_float:trabalho_20|soma_float:participacao_15|soma_float:tarefas_15 %}
+                                                <p style="
+                                                    background-color: #d1ecf1;
+                                                    padding: 12px 15px;
+                                                    border-radius: 10px;
+                                                    border-left: 5px solid #0c5460;
+                                                    font-weight: 700;
+                                                    color: #0c5460;
+                                                    max-width: 350px;
+                                                    line-height: 1.4;
+                                                    text-align: center;
+                                                    margin-top: 15px;
+                                                ">
+                                                    Nota Final <sup><small>(Composição de notas)</small></sup> <strong>{{ nota_final_|floatformat:2 }}</strong>
+                                                </p>
+                                                {% endwith %}
+                                            </li>
+                                        </ul>
+                                        {% endwith %}
+                                        {% endwith %}
+                                        {% endwith %}
+                                        {% endwith %}
+                                    </li>
+                                </ul>
+
+                                <div class="destaque-alerta">
+                                    Se a **Nota Final** apresenta um valor, mas a **Composição de Notas** (os detalhes das atividades) está zerada, isso significa que a nota foi inserida diretamente via ambiente administrativo, ignorando a composição. No entanto, se o professor decidir preencher a composição das notas, o sistema **automaticamente recalculará e atualizará** o valor da Nota Final, substituindo a nota inserida anteriormente pelo ambiente administrativo.
+                                </div>
+
+                                <ul>
+                                    <li class="nota-final"><b>Nota Final</b> {{ c.nota_final|default_if_none:"-" }}</li>
+                                </ul>
+
+                                <div class="box-prova-paralela">
+                                    <h3><strong>Prova paralela</strong>?</h3>
+                                    <ul style="list-style:none; padding:0; margin:0; color:#495057;">
+                                        <li>
+                                            <span style="color:#0d6efd;">&#10148;</span>
+                                            <span><strong>Segunda chance:</strong> Para alunos que perderam a prova ou desejam melhorar a nota.</span>
+                                        </li>
+                                        <li>
+                                            <span style="color:#198754;">&#10148;</span>
+                                            <span><strong>Avaliação complementar:</strong> Ajuda a reforçar a nota final de quem teve desempenho insuficiente.</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <p class="nota-paralela-info">
+                                    Nota da Prova Paralela:
+                                    <strong style='color:#2b54c1'>{{ c.prova_paralela|default_if_none:"O aluno não precisou realizar a prova paralela neste trimestre." }}</strong>
+                                </p>
+
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                </div>
+            {% endfor %}
+
         </div>
-        <li class="nota-final"><b>Nota Final</b> {{ c.nota_final|default_if_none:"" }}</li>
-    </ul>
-
-            <div style="background:#f8f9fa; padding:20px; border-radius:12px; max-width:600px; font-family:Arial, sans-serif; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-                <h3 style="color:#343a40; margin-bottom:15px;"><strong>Prova paralela</strong>?</h3>
-                <ul style="list-style:none; padding:0; margin:0; color:#495057;">
-                    <li style="margin-bottom:10px; display:flex; align-items:flex-start;">
-                        <span style="color:#0d6efd; font-weight:bold; margin-right:8px;">&#10148;</span>
-                        <span><strong>Segunda chance:</strong> Para alunos que perderam a prova ou desejam melhorar a nota.</span>
-                    </li>
-                    <li style="margin-bottom:10px; display:flex; align-items:flex-start;">
-                        <span style="color:#198754; font-weight:bold; margin-right:8px;">&#10148;</span>
-                        <span><strong>Avaliação complementar:</strong> Ajuda a reforçar a nota final de quem teve desempenho insuficiente.</span>
-                    </li>
-                </ul>
-            </div>
-
-            <p style="
-                background-color: #f0f8ff; 
-                padding: 12px 15px; 
-                border-radius: 10px; 
-                border-left: 5px solid #0d6efd; 
-                color: #041630ff; 
-                font-weight: 600;
-                max-width: 600px;
-                line-height: 1.4;
-            ">
-                Nota da Prova Paralela:
-                <strong style='color:#2b54c1'>{{ c.prova_paralela|default_if_none:"O aluno não precisou realizar a prova paralela neste trimestre." }}</strong> 
-            </p>
-
-        {% endif %}
-    {% endfor %}
-</div>
-
-
-
-
-<div class="panel">            
-
-    <h1>
-        {{ matricula.compoeNotaAlunos_related.first.grade.disciplina }}  
-        <small>— {{ t }}</small>
-    </h1>
-
-    <h2>Professor: 
-        <b style="text-transform: capitalize;">
-            {{ matricula.compoeNotaAlunos_related.first.grade.professor.encaminhamento }}
-        </b>
-    </h2>
-
-    <h3>Aluno: {{ matricula }}</h3>
-    <h4>Turma: {{ matricula.turma }}</h4>
-
-    {% for c in compoeNotas %}
-        {% if t.id == c.trimestre.id and c.aluno.id == matricula.id %}
-            
-            <ul>
-                <li><b>Prova (50%)</b> {{ c.prova|default_if_none:"" }}</li>
-                <li><b>Trabalho (20%)</b> {{ c.trabalho|default_if_none:"" }}</li>
-                <li><b>Participação (15%)</b> {{ c.participacao|default_if_none:"" }}</li>
-                <li><b>Tarefas (15%)</b> {{ c.tarefas|default_if_none:"" }}</li>
-                <li class="nota-final"><b>Nota Final</b> {{ c.nota_final|default_if_none:"" }}</li>
-            </ul>
-
-            <div style="background:#f8f9fa; padding:20px; border-radius:12px; max-width:600px; font-family:Arial, sans-serif; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-    <h3 style="color:#343a40; margin-bottom:15px;"><strong>Prova paralela</strong>?</h3>
-    <ul style="list-style:none; padding:0; margin:0; color:#495057;">
-        <li style="margin-bottom:10px; display:flex; align-items:flex-start;">
-            <span style="color:#0d6efd; font-weight:bold; margin-right:8px;">&#10148;</span>
-            <span><strong>Segunda chance:</strong> Para alunos que perderam a prova ou desejam melhorar a nota.</span>
-        </li>
-        <li style="margin-bottom:10px; display:flex; align-items:flex-start;">
-            <span style="color:#198754; font-weight:bold; margin-right:8px;">&#10148;</span>
-            <span><strong>Avaliação complementar:</strong> Ajuda a reforçar a nota final de quem teve desempenho insuficiente.</span>
-        </li>
-    </ul>
-</div>
-
-<p style="
-    background-color: #f0f8ff; 
-    padding: 12px 15px; 
-    border-radius: 10px; 
-    border-left: 5px solid #0d6efd; 
-    color: #041630ff; 
-    font-weight: 600;
-    max-width: 600px;
-    line-height: 1.4;
-">
-    Nota da Prova Paralela:
-    <strong style='color:#2b54c1'>{{ c.prova_paralela|default_if_none:"O aluno não precisou realizar a prova paralela neste trimestre." }}</strong> 
-</p>
-
-        {% endif %}
-    {% endfor %}
-
-</div>
-
-    </div>
-{% endfor %}
-
-
-
-
-
-        </div>
-        {% endwith %}        
+        {% endwith %}
     {% endfor %}
 
 </div>
