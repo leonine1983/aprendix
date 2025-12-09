@@ -219,3 +219,20 @@ def get_item_perfilAluno(lista, index):
         return lista[int(index)]
     except (IndexError, ValueError, TypeError):
         return None
+
+
+@register.filter
+def multiplica(valor, fator):
+    """Multiplica o valor pelo fator"""
+    try:
+        return float(valor) * float(fator)
+    except (ValueError, TypeError):
+        return 0
+    
+@register.filter
+def soma_float(value, arg):
+    """Adiciona o argumento ao valor, garantindo que ambos sejam floats."""
+    try:
+        return float(value) + float(arg)
+    except (ValueError, TypeError):
+        return value

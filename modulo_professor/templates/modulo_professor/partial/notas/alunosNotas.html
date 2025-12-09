@@ -1,6 +1,6 @@
 {% extends "modulo_professor/base.html" %}
-
 {% block main %}
+{% load meus_filtros %}
 
 <style>
 /* Grid dos cards */
@@ -301,105 +301,382 @@
 
 
 
-            
-<div class="table-responsive">
-    <table class="table table-modern table-hover align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>Trimestre</th>
-                <th>Prova</th>
-                <th>Trabalho</th>
-                <th>Participação</th>
-                <th>Tarefas</th>
-                <th>Nota Final</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for t in trimetre %}
-            {% for c in compoeNotas %}
-                {% if t.id == c.trimestre.id and c.aluno.id == matricula.id %}
-                    <tr>
-                        <td>{{ c.trimestre|default_if_none:"" }}</td>
-                        <td>{{ c.prova|default_if_none:"" }}</td>
-                        <td>{{ c.trabalho|default_if_none:"" }}</td>
-                        <td>{{ c.participacao|default_if_none:"" }}</td>
-                        <td>{{ c.tarefas|default_if_none:"" }}</td>
-                        <td class="nota-final">{{ c.nota_final|default_if_none:"" }}</td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-        {% endfor %}
-        </tbody>
-    </table>
+
+
+
+    <style>
+    @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,700,700i');
+    @import url('https://fonts.googleapis.com/css?family=Bree+Serif');
+    * {
+    box-sizing: border-box;
+    }
+
+    @media (min-width: 600px) {
+
+    }
+    h1 {
+    margin: 0;
+    font-family: 'Bree Serif', serif;
+    font-size: 36px;
+    }
+    p {
+    margin-top: 20px;
+    margin-bottom: 0;
+    padding: 0;
+    font-size: 20px;
+    line-height: 1.5;
+    }
+    .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 700px;
+    background: #e5e5e5;
+    box-shadow: 0 48px 80px -32px rgba(0,0,0,0.3);
+    }
+    .input {
+    position: absolute;
+    opacity: 0;
+    }
+    .label {
+    width: 100%;
+    padding: 20px 30px;
+    background: #e5e5e5;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 18px;
+    color: #7f7f7f;
+    transition: background 0.1s, color 0.1s;
+    }
+    .label:hover {
+    background: #d8d8d8;
+    }
+    .label:active {
+    background: #ccc;
+    }
+    .input:focus + .label {
+    z-index: 1;
+    }
+    .input:checked + .label {
+    background: #fff;
+    color: #000;
+    }
+    @media (min-width: 600px) {
+    .label {
+        width: auto;
+    }
+    }
+    .panel {
+    display: none;
+    padding: 20px 30px 30px;
+    background: #fff;
+    }
+    @media (min-width: 600px) {
+    .panel {
+        order: 99;
+    }
+    }
+    .input:checked + .label + .panel {
+    display: block;
+    }
+
+
+
+    .panel {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.panel:hover {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+/* H1: Disciplina + Trimestre */
+.panel h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+
+.panel h1 small {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #6c757d;
+    margin-left: 6px;
+}
+
+/* H2: Professor */
+.panel h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 6px;
+}
+
+.panel h2 b {
+    color: #343a40;
+    text-transform: capitalize;
+}
+
+/* H3: Aluno */
+.panel h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #6c757d;
+    margin-bottom: 4px;
+}
+
+/* H4: Turma */
+.panel h4 {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #868e96;
+    margin-bottom: 15px;
+}
+
+/* Lista moderna */
+.panel ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+.panel ul li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f7f7f7;
+    padding: 12px 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    border-left: 4px solid #4a90e2;
+    transition: 0.2s;
+}
+
+.panel ul li b {
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Destaque na Nota Final */
+.panel ul li.nota-final {
+    border-left-color: #28a745;
+    background: #e9f7ef;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #155724;
+}
+
+.destaque-alerta {
+    background-color: #e0f7fa; 
+    color: #006064; 
+    padding: 15px; 
+    margin: 20px 0; 
+    border-left: 5px solid #00acc1; 
+    border-radius: 4px; 
+    font-family: Arial, sans-serif;
+    font-size: 1.1em;
+    line-height: 1.4;
+}
+/* Responsividade */
+@media (max-width: 600px) {
+    .panel {
+        padding: 20px;
+    }
+    .panel ul li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}
+    </style>              
+{% for t in trimetre %}
+    <div class="tabs">
+        <input class="input" name="tabs" type="radio" id="tab-{{t.id}}-{{matricula}}" checked="checked"/>
+        <label class="label" for="tab-{{t.id}}-{{matricula}}"> <b style='text-transform: uppercase;'>{{t}}</b> <small>Composição de notas</small></label>
+   
+
+
+
+
+<!-- Painel que você já possui -->
+<div class="panel" id="painel-impressao">            
+    <h1>{{ matricula.compoeNotaAlunos_related.first.grade.disciplina }}  
+        <small>— {{ t }}</small>
+    </h1>
+    <h2>Professor: <b style="text-transform: capitalize;">{{ matricula.compoeNotaAlunos_related.first.grade.professor.encaminhamento }}</b></h2>
+    <h3>Aluno: {{ matricula }}</h3>
+    <h4>Turma: {{ matricula.turma }}</h4>
+
+    {% for c in compoeNotas %}
+        {% if t.id == c.trimestre.id and c.aluno.id == matricula.id %}
+            <ul>
+                <li><b>Prova (50%)</b> {{ c.prova|default_if_none:"" }}</li>
+                <li><b>Trabalho (20%)</b> {{ c.trabalho|default_if_none:""|floatformat:2 }}</li>
+                <li><b>Participação (15%)</b> {{ c.participacao|default_if_none:"" }}</li>
+                <li><b>Tarefas (15%)</b> {{ c.tarefas|default_if_none:"" }}</li>
+                
+           <li style="margin-bottom: 15px; font-family: Arial, sans-serif;">
+
+                <span style="font-weight: 600; font-size: 1rem; color: #343a40;">Cálculo da Composição:</span>
+
+                {% with prova_50=c.prova|multiplica:0.5 %}
+                {% with trabalho_20=c.trabalho|multiplica:0.2 %}
+                {% with participacao_15=c.participacao|multiplica:0.15 %}
+                {% with tarefas_15=c.tarefas|multiplica:0.15 %}
+
+                <ul style="list-style:none; padding:0; margin:10px 0 5px 0;">
+                    <li style="background:#e3f2fd; padding:8px 12px; border-radius:8px; margin-bottom:5px;">
+                        <b>Prova (50%)</b>: {{ c.prova|default_if_none:"0" }} × 50% = 
+                        <strong style="color:#0d6efd;">{{ prova_50|floatformat:2 }}</strong>
+                    </li>
+                    <li style="background:#e8f5e9; padding:8px 12px; border-radius:8px; margin-bottom:5px;">
+                        <b>Trabalho (20%)</b>: {{ c.trabalho|default_if_none:"0"}} × 20% = 
+                        <strong style="color:#198754;">{{ trabalho_20|floatformat:2 }}</strong>
+                    </li>
+                    <li style="background:#fff3e0; padding:8px 12px; border-radius:8px; margin-bottom:5px;">
+                        <b>Participação (15%)</b>: {{ c.participacao|default_if_none:"0" }} × 15% = 
+                        <strong style="color:#ffc107;">{{ participacao_15|floatformat:2 }}</strong>
+                    </li>
+                    <li style="background:#f8d7da; padding:8px 12px; border-radius:8px; margin-bottom:5px;">
+                        <b>Tarefas (15%)</b>: {{ c.tarefas|default_if_none:"0" }} × 15% = 
+                        <strong style="color:#dc3545;">{{ tarefas_15|floatformat:2 }}</strong>
+                    </li>
+                    <li>
+                        {% with nota_final_=prova_50|soma_float:trabalho_20|soma_float:participacao_15|soma_float:tarefas_15 %}
+                    <p style="
+                        background-color: #d1ecf1; 
+                        padding: 12px 15px; 
+                        border-radius: 10px; 
+                        border-left: 5px solid #0c5460; 
+                        font-weight: 700; 
+                        color: #0c5460;
+                        max-width: 350px;
+                        line-height: 1.4;
+                        text-align: center;
+                    ">
+                        Nota Final <sup><small>(Composição de notas)</small></sup> <strong>{{ nota_final_|floatformat:2 }}</strong>
+                    </p>
+                    {% endwith %}
+
+                    </li>
+                </ul>   
+                {% endwith %}
+                {% endwith %}
+                {% endwith %}
+                {% endwith %}
+            </li> 
+        </li>
+        <div class="destaque-alerta">
+            Se a **Nota Final** apresenta um valor, mas a **Composição de Notas** (os detalhes das atividades) está zerada, isso significa que a nota foi inserida diretamente via ambiente administrativo, ignorando a composição. No entanto, se o professor decidir preencher a composição das notas, o sistema **automaticamente recalculará e atualizará** o valor da Nota Final, substituindo a nota inserida anteriormente pelo ambiente administrativo.
+        </div>
+        <li class="nota-final"><b>Nota Final</b> {{ c.nota_final|default_if_none:"" }}</li>
+    </ul>
+
+            <div style="background:#f8f9fa; padding:20px; border-radius:12px; max-width:600px; font-family:Arial, sans-serif; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                <h3 style="color:#343a40; margin-bottom:15px;"><strong>Prova paralela</strong>?</h3>
+                <ul style="list-style:none; padding:0; margin:0; color:#495057;">
+                    <li style="margin-bottom:10px; display:flex; align-items:flex-start;">
+                        <span style="color:#0d6efd; font-weight:bold; margin-right:8px;">&#10148;</span>
+                        <span><strong>Segunda chance:</strong> Para alunos que perderam a prova ou desejam melhorar a nota.</span>
+                    </li>
+                    <li style="margin-bottom:10px; display:flex; align-items:flex-start;">
+                        <span style="color:#198754; font-weight:bold; margin-right:8px;">&#10148;</span>
+                        <span><strong>Avaliação complementar:</strong> Ajuda a reforçar a nota final de quem teve desempenho insuficiente.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <p style="
+                background-color: #f0f8ff; 
+                padding: 12px 15px; 
+                border-radius: 10px; 
+                border-left: 5px solid #0d6efd; 
+                color: #041630ff; 
+                font-weight: 600;
+                max-width: 600px;
+                line-height: 1.4;
+            ">
+                Nota da Prova Paralela:
+                <strong style='color:#2b54c1'>{{ c.prova_paralela|default_if_none:"O aluno não precisou realizar a prova paralela neste trimestre." }}</strong> 
+            </p>
+
+        {% endif %}
+    {% endfor %}
 </div>
 
-<style>
-.table-modern {
-    border-collapse: separate;
-    border-spacing: 0 0.5rem;
-    font-family: 'Segoe UI', sans-serif;
-    width: 100%;
-    min-width: 600px; /* garante mínimo em telas grandes */
-}
-.table-modern thead th {
-    background-color: #f0f4f8;
-    color: #333;
+
+
+
+<div class="panel">            
+
+    <h1>
+        {{ matricula.compoeNotaAlunos_related.first.grade.disciplina }}  
+        <small>— {{ t }}</small>
+    </h1>
+
+    <h2>Professor: 
+        <b style="text-transform: capitalize;">
+            {{ matricula.compoeNotaAlunos_related.first.grade.professor.encaminhamento }}
+        </b>
+    </h2>
+
+    <h3>Aluno: {{ matricula }}</h3>
+    <h4>Turma: {{ matricula.turma }}</h4>
+
+    {% for c in compoeNotas %}
+        {% if t.id == c.trimestre.id and c.aluno.id == matricula.id %}
+            
+            <ul>
+                <li><b>Prova (50%)</b> {{ c.prova|default_if_none:"" }}</li>
+                <li><b>Trabalho (20%)</b> {{ c.trabalho|default_if_none:"" }}</li>
+                <li><b>Participação (15%)</b> {{ c.participacao|default_if_none:"" }}</li>
+                <li><b>Tarefas (15%)</b> {{ c.tarefas|default_if_none:"" }}</li>
+                <li class="nota-final"><b>Nota Final</b> {{ c.nota_final|default_if_none:"" }}</li>
+            </ul>
+
+            <div style="background:#f8f9fa; padding:20px; border-radius:12px; max-width:600px; font-family:Arial, sans-serif; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    <h3 style="color:#343a40; margin-bottom:15px;"><strong>Prova paralela</strong>?</h3>
+    <ul style="list-style:none; padding:0; margin:0; color:#495057;">
+        <li style="margin-bottom:10px; display:flex; align-items:flex-start;">
+            <span style="color:#0d6efd; font-weight:bold; margin-right:8px;">&#10148;</span>
+            <span><strong>Segunda chance:</strong> Para alunos que perderam a prova ou desejam melhorar a nota.</span>
+        </li>
+        <li style="margin-bottom:10px; display:flex; align-items:flex-start;">
+            <span style="color:#198754; font-weight:bold; margin-right:8px;">&#10148;</span>
+            <span><strong>Avaliação complementar:</strong> Ajuda a reforçar a nota final de quem teve desempenho insuficiente.</span>
+        </li>
+    </ul>
+</div>
+
+<p style="
+    background-color: #f0f8ff; 
+    padding: 12px 15px; 
+    border-radius: 10px; 
+    border-left: 5px solid #0d6efd; 
+    color: #041630ff; 
     font-weight: 600;
-    border-bottom: none;
-    text-align: center;
-}
-.table-modern tbody tr {
-    background-color: #ffffff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.table-modern tbody tr:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.12);
-}
-.table-modern td, .table-modern th {
-    vertical-align: middle;
-    padding: 12px 10px;
-    border-top: none;
-    border-bottom: none;
-    text-align: center;
-    word-wrap: break-word;
-}
-.nota-final {
-    font-weight: bold;
-    color: #fff;
-    background: linear-gradient(90deg, #4facfe, #00f2fe);
-    border-radius: 8px;
-    text-align: center;
-    min-width: 60px;
-}
+    max-width: 600px;
+    line-height: 1.4;
+">
+    Nota da Prova Paralela:
+    <strong style='color:#2b54c1'>{{ c.prova_paralela|default_if_none:"O aluno não precisou realizar a prova paralela neste trimestre." }}</strong> 
+</p>
 
-/* Responsividade: ajusta tabela em telas pequenas */
-@media (max-width: 768px) {
-    .table-modern thead {
-        display: none; /* esconde cabeçalho para celular */
-    }
-    .table-modern tbody tr {
-        display: block;
-        margin-bottom: 1rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    }
-    .table-modern tbody td {
-        display: flex;
-        justify-content: space-between;
-        padding: 8px 12px;
-        text-align: right;
-    }
-    .table-modern tbody td::before {
-        content: attr(data-label);
-        flex: 1;
-        font-weight: 600;
-        text-align: left;
-        color: #555;
-    }
-}
-</style>
+        {% endif %}
+    {% endfor %}
 
+</div>
+
+    </div>
+{% endfor %}
 
 
 
