@@ -1,6 +1,34 @@
 {% extends "modulo_professor/base.html" %}
 
 {% block main %}  
+
+
+      <link defer="" media="all" onload="this.media='all'" rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v7.1.0/css/fontawesome.css">
+      <noscript>
+        <link
+          rel="stylesheet"
+          href="https://site-assets.fontawesome.com/releases/v7.1.0/css/fontawesome.css"
+        >
+      </noscript>     
+
+
+      <link defer="" media="all" onload="this.media='all'" rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v7.1.0/css/solid.css">
+      <noscript>
+        <link
+          rel="stylesheet"
+          href="https://site-assets.fontawesome.com/releases/v7.1.0/css/solid.css"
+        >
+      </noscript>
+
+
+
+
+
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap 5 JS (necessário para tabs/pills funcionarem) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <style>
   .tab-pane-custom {
     padding: 1.5rem;
@@ -62,8 +90,131 @@
     }
   }
 
+
+
+  /* Estilos para o bloco didático do Plano de Aula */
+.plan-intro{
+  display: flex;
+  gap: 1.25rem;
+  align-items: stretch;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,250,252,0.95));
+  border-left: 6px solid #2b7cff;
+  padding: 1.25rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(22, 31, 47, 0.06);
+  margin-bottom: 1.25rem;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* coluna esquerda: texto explicativo */
+.plan-intro-left{
+  flex: 1 1 60%;
+  min-width: 260px;
+}
+
+.plan-intro-left h2{
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #153c7a;
+}
+
+.plan-intro-left .lead{
+  margin: 0 0 0.75rem 0;
+  color: #3b4b63;
+  line-height: 1.45;
+  font-size: 0.9rem;
+}
+
+/* lista de instruções curtas */
+.plan-intro-left .howto{
+  margin: 0.25rem 0 0.75rem 0;
+  padding-left: 1.1rem;
+  color: #334155;
+  font-size: 0.9rem;
+}
+.plan-intro-left .howto li{
+  margin: 0.35rem 0;
+  list-style: disc;
+}
+
+/* nota complementar */
+.plan-intro-left .note{
+  font-size: 0.8rem;
+  color: #57606f;
+  background: rgba(43,124,255,0.03);
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(43,124,255,0.06);
+}
+
+/* coluna direita: info resumida (pills) */
+.plan-intro-right{
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.pill{
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  padding: 0.6rem;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(245,249,255,0.8));
+  border: 1px solid rgba(20,40,80,0.04);
+  box-shadow: 0 2px 6px rgba(18, 38, 77, 0.03);
+}
+
+.pill .icon{
+  font-size: 1rem;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(43,124,255,0.08);
+}
+
+.pill-title{
+  font-weight: 600;
+  color: #152a4a;
+  font-size: 0.95rem;
+}
+.pill-sub{
+  font-size: 0.85rem;
+  color: #566273;
+}
+
+/* responsividade */
+@media (max-width: 880px){
+  .plan-intro{
+    flex-direction: column;
+  }
+  .plan-intro-right{
+    width: 100%;
+    flex-direction: row;
+    gap: 0.6rem;
+  }
+  .pill{ flex: 1; }
+}
+ tr{
+  font-size: 0.8rem;  
+}
+tr th, tr td{
+  vertical-align: middle;
+  text-align: center;
+}
+
 </style>
-<div class="container my-5">
+
+
+
+<div class="container ">
   <div class="bg-light rounded-4 shadow p-4">
     <!-- Cabeçalho -->
     <div class="border-bottom pb-3 mb-4">
@@ -77,30 +228,73 @@
       </div>
     </div>
 
+    
+
+<!-- Coloque este bloco logo acima do formulário "Plano de Aula" -->
+<div class="plan-intro" role="region" aria-label="Introdução ao Plano de Aula">
+  <div class="plan-intro-left">
+    <h2>Olá, Professor <b class='text-uppercase'>{{ request.user.first_name|default:"Professor" }} 👋</b></h2>
+    <p class="lead">
+      Esta tela ajuda você a criar e organizar seus <strong>Planos de Aula</strong> de maneira clara e prática.
+      Preencha a turma, disciplina e o período; em seguida navegue pelas abas (Conteúdo, Objetivos, BNCC, Metodologia e Recursos)
+      para detalhar cada parte do plano.
+    </p>
+
+    <ul class="howto">
+      <li><strong>Dados iniciais:</strong> escolha turma/disciplina e defina o período.</li>
+      <li><strong>Conteúdo e objetivo:</strong> descreva o que será trabalhado e o propósito da aula.</li>
+      <li><strong>BNCC e habilidades:</strong> vincule competências e habilidades sempre que aplicável.</li>
+      <li><strong>Metodologia e recursos:</strong> registre estratégias e materiais para facilitar a execução.</li>
+    </ul>
+
+    <p class="note">
+      Ao salvar, seu plano ficará listado abaixo para consulta, edição ou impressão. Utilize o botão <em>Imprimir</em> quando precisar gerar a versão física.
+    </p>
+  </div>
+
+  <div class="plan-intro-right" aria-hidden="false">
+    <div class="pill">
+      <span class="icon">📘</span>
+      <div>
+        <div class="pill-title">Tempo estimado</div>
+        <div class="pill-sub">1–3 aulas (ajuste conforme necessidade)</div>
+      </div>
+    </div>
+
+    <div class="pill">
+      <span class="icon">🎯</span>
+      <div>
+        <div class="pill-title">Foco</div>
+        <div class="pill-sub">Clareza, sequência didática e evidência de aprendizagem</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
     <!-- Formulário -->
     <div class="row">
   <div class="col-md-3 mb-3">
-    <ul class="nav flex-column nav-pills tab-nav-custom" id="formTab" role="tablist" aria-orientation="vertical">
+    <ul class="nav flex-column nav-pills tab-nav-custom fs-6" id="formTab" role="tablist" aria-orientation="vertical">
       <li class="nav-item tab-style-1">
         <a class="nav-link active tab-color-1" id="tab1-tab" data-bs-toggle="pill" href="#tab1" role="tab">Dados Iniciais</a>
       </li>
       <li class="nav-item tab-style-2">
-        <a class="nav-link tab-color-2" id="tab2-tab" data-bs-toggle="pill" href="#tab2" role="tab">Conteúdo Planejado</a>
+        <a class="nav-link tab-color-2" id="tab2-tab" data-bs-toggle="pill" href="#tab2" role="tab">CONTEÚDO: <br><small>O assunto que será trabalhado</small> </a>
       </li>
       <li class="nav-item tab-style-3">
-        <a class="nav-link tab-color-3" id="tab3-tab" data-bs-toggle="pill" href="#tab3" role="tab">Objetivo Geral</a>
+        <a class="nav-link tab-color-3" id="tab3-tab" data-bs-toggle="pill" href="#tab3" role="tab">OBJETIVO: <br><small>O porquê de aplicar o conteúdo ao aluno</small></a>
       </li>
       <li class="nav-item tab-style-4">
-        <a class="nav-link tab-color-4" id="tab4-tab" data-bs-toggle="pill" href="#tab4" role="tab">Competências BNCC</a>
+        <a class="nav-link tab-color-4" id="tab4-tab" data-bs-toggle="pill" href="#tab4" role="tab">BNCC: <br><small>Competências e Habilidades da BNCC</small></a>
       </li>
-      <li class="nav-item tab-style-5">
-        <a class="nav-link tab-color-5" id="tab5-tab" data-bs-toggle="pill" href="#tab5" role="tab">Habilidades BNCC</a>
-      </li>
+      
       <li class="nav-item tab-style-6">
-        <a class="nav-link tab-color-6" id="tab6-tab" data-bs-toggle="pill" href="#tab6" role="tab">Metodologia</a>
+        <a class="nav-link tab-color-6" id="tab6-tab" data-bs-toggle="pill" href="#tab6" role="tab">METODOLOGIA: <br><small>Como a aula será conduzida</small></a>
       </li>
       <li class="nav-item tab-style-7">
-        <a class="nav-link tab-color-7" id="tab7-tab" data-bs-toggle="pill" href="#tab7" role="tab">Recursos Didáticos</a>
+        <a class="nav-link tab-color-7" id="tab7-tab" data-bs-toggle="pill" href="#tab7" role="tab">RECURSOS DIDÁTICOS: <br><small>Materiais e Tecnologias utilizados</small></a>
       </li>
     </ul>
   </div>
@@ -115,6 +309,10 @@
           <div class="mb-3">
             {{ form.turma_disciplina.label_tag }} {{ form.turma_disciplina }}
             {% if form.turma_disciplina.errors %}<div class="text-danger small">{{ form.turma_disciplina.errors }}</div>{% endif %}
+          </div>
+          <div class="mb-3">
+            {{ form.tema.label_tag }} {{ form.tema }}
+            {% if form.tema.errors %}<div class="text-danger small">{{ form.tema.errors }}</div>{% endif %}
           </div>
           <div class="mb-3">
             {{ form.data_inicio.label_tag }} {{ form.data_inicio }}
@@ -141,10 +339,7 @@
           {% if form.competencias_bncc.errors %}<div class="text-danger small">{{ form.competencias_bncc.errors }}</div>{% endif %}
         </div>
 
-        <div class="tab-pane fade tab-style tab-color-5" id="tab5" role="tabpanel">
-          {{ form.habilidades_bncc.label_tag }} {{ form.habilidades_bncc }}
-          {% if form.habilidades_bncc.errors %}<div class="text-danger small">{{ form.habilidades_bncc.errors }}</div>{% endif %}
-        </div>
+      
 
         <div class="tab-pane fade tab-style tab-color-6" id="tab6" role="tabpanel">
           {{ form.metodologia.label_tag }} {{ form.metodologia }}
@@ -174,13 +369,13 @@
         <table class="table table-striped table-bordered">
           <thead>
             <tr class="bg-secondary">
-              <th rowspan="2" class="align-middle text-center text-white">Turma Disciplina</th>
-              <th colspan="2" class="align-middle text-center text-white">Data Planejada</th>
-              <th rowspan="2" class="align-middle text-center text-white">Conteúdo Planejado</th>
-              <th rowspan="2" class="align-middle text-center text-white">Objetivo Geral</th>
-              <th rowspan="2" class="align-middle text-center text-white">Competências BNCC</th>
-              <th rowspan="2" class="align-middle text-center text-white">Habilidades BNCC</th>
-              <th rowspan="2" class="align-middle text-center text-white no-print">Ação</th>
+              <th rowspan="2" class="align-middle text-center ">Turma</th>
+              <th rowspan="2" class="align-middle text-center ">Turma Disciplina</th>
+              <th colspan="2" class="align-middle text-center ">Data Planejada</th>
+              <th rowspan="2" class="align-middle text-center ">Conteúdo Planejado</th>
+              <th rowspan="2" class="align-middle text-center ">Objetivo Geral</th>
+              <th rowspan="2" class="align-middle text-center ">BNCC</th>
+              <th rowspan="2" class="align-middle text-center  no-print">Ação</th>
               <!-- Adicione outras colunas se desejar -->
             </tr>
             <tr>
@@ -191,16 +386,34 @@
           <tbody>
             {% for plano in planos %}
             <tr>
-              <td>{{ plano.turma_disciplina }}</td>
+              <td>{{ plano.turma_disciplina.turma }}</td>
+              <td>{{ plano.turma_disciplina.disciplina }}</td>
               <td>{{ plano.data_inicio }}</td>
               <td>{{ plano.data_fim }}</td>
               <td>{{ plano.conteudo_planejado|truncatechars:50|safe }}</td>
               <td>{{ plano.objetivo_geral|truncatechars:50|safe }}</td>
               <td>{{ plano.competencias_bncc|truncatechars:50|safe }}</td>
-              <td>{{ plano.habilidades_bncc|truncatechars:50|safe }}</td>
               <td class='d-flex no-print'>
-                <a href="{% url 'modulo_professor:plano_de_aula_editar' plano.id %}" title="Editar plano de aula"><i class="fa-solid fa-file-pen text-primary mx-1"></i></a>
-                <a href="{% url 'modulo_professor:plano_de_aula_excluir' plano.id %}" title="Excluir plano de aula"><i class="fa-solid text-danger fa-trash"></i></a>
+                <a href="{% url 'modulo_professor:plano_de_aula_editar' plano.id %}" title="Editar plano de aula"><i class="fa-solid fa-file-pen text-primary mx-1"></i>
+                  
+                </a>
+                <a href="{% url 'modulo_professor:plano_de_aula_excluir' plano.id %}" title="Excluir plano de aula"><i class="fa-solid text-danger fa-trash"></i>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                </a>
               </td>
             </tr>
             {% endfor %}

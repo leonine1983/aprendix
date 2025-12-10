@@ -1,139 +1,107 @@
 {% extends "modulo_professor/base.html" %}
 {% load meus_filtros %}
 {% block main %}
-      <!-- Planning / Kanban -->
-    <section class="planning">
-      <div class="planning-header">
-        <div><h3>Planejamento de Atividades</h3><div class="muted">Organize com método Kanban</div></div>
-        <div class="flex">
-          <button class="btn" id="btn-add-board">+ Novo Planejamento</button>
-          <button class="btn" id="btn-add-task" style="background:#0ea5a3">+ Tarefa Rápida</button>
+
+<!-- MURAL -->
+<section class="mural">
+  <div class="mural-header d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h3>Mural Multidisciplinar</h3>
+      <div class="muted">Avisos e postagens</div>
+    </div>
+    <div class="d-flex gap-2">
+      <button id="btn-new-post" class="btn btn-info">Nova postagem</button>
+      <button id="btn-toggle-mural" class="btn btn-secondary">Ocultar</button>
+    </div>
+  </div>
+
+  <div class="mural-posts" id="muralPosts">
+    <!-- Postagem inicial -->
+    <article class="post">
+      <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80" alt="">
+      <div class="cap">Projeto Ciência Viva — Turma 7º ano apresentou experimentos.</div>
+      <div class="post-actions">
+        <button onclick="toggleCommentsSection(this)">💬 Comentários</button>
+        <button onclick="likePost(this)">👍 Curtir</button>
+      </div>
+      <div class="comment-section">
+        <div class="comment-row">
+          <input type="text" placeholder="Escreva um comentário...">
+          <button onclick="publishComment(this)">Publicar</button>
         </div>
+        <div class="comments-list"></div>
       </div>
+    </article>
 
-      <div class="boards" id="boardsContainer">
-        <!-- default board will be created by script if none exists -->
+    <article class="post">
+      <img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=1200&q=80" alt="">
+      <div class="cap">Semana da Computação — inscrição aberta.</div>
+      <div class="post-actions">
+        <button onclick="toggleCommentsSection(this)">💬 Comentários</button>
+        <button onclick="likePost(this)">👍 Curtir</button>
       </div>
-    </section>
-
-    <!-- MURAL -->
-    <section class="mural">
-      <div class="mural-header">
-        <div><h3>Mural Multidisciplinar</h3><div class="muted">Avisos e postagens</div></div>
-        <div class="flex">
-          <button id="btn-new-post" class="btn" style="background:#06b6d4">Nova postagem</button>
-          <button id="btn-toggle-mural" class="btn" style="background:#94a3b8">Ocultar</button>
+      <div class="comment-section">
+        <div class="comment-row">
+          <input type="text" placeholder="Escreva um comentário...">
+          <button onclick="publishComment(this)">Publicar</button>
         </div>
+        <div class="comments-list"></div>
       </div>
+    </article>
+  </div>
+</section>
 
-      <div class="mural-posts" id="muralPosts">
-        <!-- initial posts -->
-        <article class="post">
-          <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80" alt="">
-          <div class="cap">Projeto Ciência Viva — Turma 7º ano apresentou experimentos.</div>
-          <div class="post-actions">
-            <button onclick="toggleCommentsSection(this)">💬 Comentários</button>
-            <button onclick="likePost(this)">👍 Curtir</button>
-          </div>
-          <div class="comment-section">
-            <div class="comment-row">
-              <input type="text" placeholder="Escreva um comentário...">
-              <button onclick="publishComment(this)">Publicar</button>
-            </div>
-            <div class="comments-list"></div>
-          </div>
-        </article>
+<script>
+  function toggleCommentsSection(btn){
+    const section = btn.closest('.post')?.querySelector('.comment-section');
+    if(section) section.style.display = section.style.display === 'block' ? 'none' : 'block';
+  }
 
-        <article class="post">
-          <img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=1200&q=80" alt="">
-          <div class="cap">Semana da Computação — inscrição aberta.</div>
-          <div class="post-actions">
-            <button onclick="toggleCommentsSection(this)">💬 Comentários</button>
-            <button onclick="likePost(this)">👍 Curtir</button>
-          </div>
-          <div class="comment-section">
-            <div class="comment-row">
-              <input type="text" placeholder="Escreva um comentário...">
-              <button onclick="publishComment(this)">Publicar</button>
-            </div>
-            <div class="comments-list"></div>
-          </div>
-        </article>
+  function publishComment(btn){
+    const row = btn.closest('.comment-row');
+    if(!row) return;
+    const input = row.querySelector('input');
+    const list = btn.closest('.post')?.querySelector('.comments-list');
+    const text = input?.value.trim();
+    if(!text) return;
+    const p = document.createElement('p');
+    p.textContent = `Você: ${text}`;
+    list.appendChild(p);
+    input.value = '';
+    list.scrollTop = list.scrollHeight;
+  }
+
+  function likePost(btn){
+    btn.textContent = btn.textContent.includes('✓') ? '👍 Curtir' : '👍 Curtir ✓';
+  }
+
+  document.getElementById('btn-toggle-mural')?.addEventListener('click', ()=>{
+    const posts = document.getElementById('muralPosts');
+    posts.style.display = posts.style.display === 'none' ? '' : 'none';
+  });
+
+  document.getElementById('btn-new-post')?.addEventListener('click', ()=>{
+    const caption = prompt('Texto da postagem:');
+    if(!caption) return;
+    const imgURL = prompt('URL da imagem (opcional):') || 'https://picsum.photos/800/480?random=' + Date.now();
+    const post = document.createElement('article');
+    post.className = 'post';
+    post.innerHTML = `
+      <img src="${imgURL}" alt="">
+      <div class="cap">${caption}</div>
+      <div class="post-actions">
+        <button onclick="toggleCommentsSection(this)">💬 Comentários</button>
+        <button onclick="likePost(this)">👍 Curtir</button>
       </div>
-    </section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-    {% endblock main %}
+      <div class="comment-section">
+        <div class="comment-row">
+          <input type="text" placeholder="Escreva um comentário...">
+          <button onclick="publishComment(this)">Publicar</button>
+        </div>
+        <div class="comments-list"></div>
+      </div>`;
+    document.getElementById('muralPosts').prepend(post);
+  });
+</script>
+
+{% endblock main %}

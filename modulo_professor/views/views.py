@@ -463,12 +463,12 @@ class PlanoDeAulaForm(forms.ModelForm):
         model = PlanoDeAula
         fields = '__all__'
         widgets = {
+            'tema': forms.TextInput(attrs={'class': 'form-control'}),
             'data_inicio': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'data_fim': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'conteudo_planejado': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
             'objetivo_geral': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-            'competencias_bncc': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
-            'habilidades_bncc': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
+            'competencias_bncc': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),          
             'metodologia': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
             'recursos_didaticos': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
         }
@@ -479,6 +479,7 @@ class PlanoDeAulaForm(forms.ModelForm):
 
         if request:
             escola = request.session.get('escola')
+            print(f'escola no form {escola}')
             user = request.user
 
             try:
@@ -494,14 +495,14 @@ class PlanoDeAulaForm(forms.ModelForm):
                 ).distinct()
 
             except UserPessoas.DoesNotExist:
-                self.fields['turma_disciplina'].queryset = TurmaDisciplina.objects.none()
+                self.fields['turma_disciplina'].queryset = TurmaDisciplina.objects.none() 
 
 
 
 
 from django.db.models import Q
 from modulo_professor.models import TurmaDisciplina
-from rh.models import UserPessoas, Encaminhamentos
+from rh.models import UserPessoas, Encaminhamentos, Escola
 
 from django.contrib import messages
 from django.db.models import Q
@@ -518,14 +519,18 @@ class PlanoDeAulaCreateView(LoginRequiredMixin, CreateView):
     template_name = 'modulo_professor/partial/diario/planoAula/createPlano.html'
     success_url = reverse_lazy('modulo_professor:plano_de_aula_criar')  # redireciona para mesma view
 
+    print('estou aqui')
+    """
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
-        return kwargs
+        return kwargs """
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        escola = self.request.session.get('escola')
+        escola = self.request.session.get('escola')        
+        escola_id = Escola.objects.get(nome_escola=escola)
+
         usuario = self.request.user
         pessoa = get_object_or_404(UserPessoas, user = usuario)
 
@@ -534,11 +539,13 @@ class PlanoDeAulaCreateView(LoginRequiredMixin, CreateView):
                 pessoa = UserPessoas.objects.get(user=usuario).pessoa
             except UserPessoas.DoesNotExist:
                 pessoa = None
+            
+            print(f"pessoa e : {pessoa.id}")
 
             if pessoa:
                 planos = PlanoDeAula.objects.filter(
                     turma_disciplina__professor__encaminhamento__contratado__id=pessoa.id,
-                    turma_disciplina__turma__escola__id=escola.id
+                    turma_disciplina__turma__escola__id=escola_id.id
                 ).distinct()
             else:
                 planos = PlanoDeAula.objects.none()
@@ -607,11 +614,9 @@ class PlanoDeAulaDeleteView(LoginRequiredMixin, DeleteView):
 class AulaDadaForm(forms.ModelForm):
     class Meta:
         model = AulaDada
-        fields = ['plano', 'turma_disciplina', 'aula_numero','data', 'hora_inicio', 'hora_fim', 'conteudo_dado', 'observacoes']
+        fields = ['plano', 'turma_disciplina', 'aula_numero','data',  'conteudo_dado', 'observacoes']
         widgets = {
             'data': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'hora_inicio': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
-            'hora_fim': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -620,6 +625,7 @@ class AulaDadaForm(forms.ModelForm):
 
         if request:
             escola = request.session.get('escola')
+            escola_id = Escola.objects.get(nome_escola=escola)
             user = request.user
 
             try:
@@ -631,7 +637,7 @@ class AulaDadaForm(forms.ModelForm):
                     Q(professo2__in=encaminhamentos) |
                     Q(reserva_tecnica__in=encaminhamentos) |
                     Q(auxiliar_classe__in=encaminhamentos),
-                    turma__escola=escola
+                    turma__escola=escola_id.id
                 ).distinct()
 
                 self.fields['turma_disciplina'].queryset = turmas_do_professor
@@ -666,8 +672,10 @@ class AulaDadaCreateView(LoginRequiredMixin, CreateView, SuccessMessageMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         escola = self.request.session.get('escola')
+        escola_id = Escola.objects.get(nome_escola=escola)
         usuario = self.request.user
         pessoa = get_object_or_404(UserPessoas, user = usuario)
+        print('estou aqui')
 
         if escola and usuario:
             try:
@@ -678,7 +686,7 @@ class AulaDadaCreateView(LoginRequiredMixin, CreateView, SuccessMessageMixin):
             if pessoa:
                 planos = AulaDada.objects.filter(
                     plano__turma_disciplina__professor__encaminhamento__contratado__id=pessoa.id,
-                    turma_disciplina__turma__escola__id=escola.id
+                    turma_disciplina__turma__escola__id=escola_id.id
                 ).distinct().order_by('-id')
             else:
                 planos = AulaDada.objects.none()

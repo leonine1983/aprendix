@@ -143,25 +143,22 @@ class PlanoDeAula(models.Model):
     )
 
     conteudo_planejado = RichTextUploadingField(
-        verbose_name="Conteúdo Planejado"
+        verbose_name="Conteúdo: o assunto que será trabalhado"
     )
     objetivo_geral = RichTextUploadingField(
-        verbose_name="Objetivo Geral"
+        verbose_name="Objetivo da Aula"
     )
     competencias_bncc = RichTextUploadingField(
-        verbose_name="Competências da BNCC",
-        help_text="Informe os códigos e descrições das competências segundo a BNCC"
+        verbose_name="BNCC",
+        help_text="Competências e Habilidades da BNCC"
     )
-    habilidades_bncc = RichTextUploadingField(
-        verbose_name="Habilidades da BNCC",
-        help_text="Informe os códigos e descrições das habilidades segundo a BNCC"
-    )
+    
     metodologia = RichTextUploadingField(
-        verbose_name="Metodologia",
+        verbose_name="Metodologia: Estratégias de Ensino",
         blank=True, null=True
     )
     recursos_didaticos = RichTextUploadingField(
-        verbose_name="Recursos Didáticos",
+        verbose_name="Recursos Didáticos: Materiais e Tecnologias utilizados",
         blank=True, null=True
     )
 
@@ -200,16 +197,20 @@ class AulaDada(models.Model):
         verbose_name="Disciplina",
         help_text="Selecione a combinação de turma e disciplina a que esta aula pertence."
         )
-
+    
     data = models.DateField(
         verbose_name="Data da Aula",
         help_text="Informe a data em que a aula foi ministrada."
     )
+    """
 
     hora_inicio = models.TimeField(
         verbose_name="Horário de Início",
         help_text="Informe o horário de início da aula."
     )
+    hora_fim = models.TimeField()
+    
+    """
 
     aula_numero = models.PositiveSmallIntegerField(
         blank=True,
@@ -217,8 +218,7 @@ class AulaDada(models.Model):
         verbose_name="Número da Aula",
         help_text="Informe se esta é a 1ª, 2ª ou 3ª aula do dia."
     )
-
-    hora_fim = models.TimeField()
+    
     
     conteudo_dado = RichTextUploadingField(
         verbose_name="Conteúdo Ministrado",

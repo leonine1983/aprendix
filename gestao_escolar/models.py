@@ -474,7 +474,7 @@ class TurmaDisciplina(models.Model):
     
 
     def __str__(self):
-        return f'{self.disciplina.nome} - {self.professor.encaminhamento}'   
+        return f'{self.turma} - {self.disciplina.nome} - {self.professor.encaminhamento} '   
 
 
 escola_fora = {

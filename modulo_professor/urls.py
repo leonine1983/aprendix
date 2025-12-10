@@ -30,16 +30,16 @@ urlpatterns = [
     path('/aluno/<int:pk>/trimestre/<int:trimestre>/', alunoGestaoTurmasParecer, name='aluno_parecer'),
 
     # Diario de classe
-    path('planos-de-aula/novo/', PlanoDeAulaCreateView.as_view(), name='plano_de_aula_criar'),
+    path('/planos-de-aula/novo/', PlanoDeAulaCreateView.as_view(), name='plano_de_aula_criar'),
     path('planos-de-aula/<int:pk>/editar/', PlanoDeAulaUpdateView.as_view(), name='plano_de_aula_editar'),
     path('planos-de-aula/<int:pk>/excluir/', PlanoDeAulaDeleteView.as_view(), name='plano_de_aula_excluir'),
     path('aulas-do-dia/', aulas_do_dia, name='aulas_do_dia'),
 
     # AULA DIA
-    path('aulas/nova/', AulaDadaCreateView.as_view(), name='aula_dada_criar'),
-    path('aulas/<int:pk>/', AulaDadaDetailView.as_view(), name='aula_dada_detalhe'),
-    path('aulas/<int:pk>/anexo/', AnexoAulaCreateView.as_view(), name='anexo_aula_criar'),
-    path('aula/<int:aula_id>/', detalhar_aula, name='detalhar_aula'),
+    path('/aulas/nova/', AulaDadaCreateView.as_view(), name='aula_dada_criar'),
+    path('/aulas/<int:pk>/', AulaDadaDetailView.as_view(), name='aula_dada_detalhe'),
+    path('/aulas/<int:pk>/anexo/', AnexoAulaCreateView.as_view(), name='anexo_aula_criar'),
+    path('/aula/<int:aula_id>/', detalhar_aula, name='detalhar_aula'),
 
     # Calendário
     path('horario/professor/<int:turma_disciplina_id>', dias_de_aula_professor, name='dias_de_aula_professor'),
