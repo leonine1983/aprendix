@@ -181,6 +181,53 @@ body {
     font-weight: 500;
     color: #495057;
 }
+
+
+
+.trimestre-box {
+    border: 1px solid #ff9f43; /* cor laranja da borda */
+    border-radius: 12px;
+    padding: 20px 15px 10px 15px;
+    position: relative;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.trimestre-box-title {
+    position: absolute;
+    top: -12px;
+    left: 15px;
+    background: #ff9f43; /* mesma cor da borda */
+    color: #fff;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.trimestre-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.btn-trimestre {
+    background: #d1d1d1; /* cinza moderno */
+    color: #222;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.btn-trimestre:hover {
+    background: #bcbcbc; /* hover levemente mais escuro */
+}
+
 </style>
 
 <div>
@@ -253,11 +300,16 @@ body {
                     <div class="icon"><i class="fa-solid fa-id-card"></i></div>
                     <h3>{{ matricula.cod_matricula }}</h3>
                 </div>
-                <div>
-                {% for t in trimetre %}
-                    <a href="{% url "modulo_professor:criaNotasComposicao" matricula.id grade t.id %}" class="btn-lancar-notas">{{t}}</a>
-                {% endfor %}
-                </div>
+                <div class="trimestre-box">
+					<div class="trimestre-box-title">Inserir Notas</div>
+					<div class="trimestre-buttons">
+						{% for t in trimetre %}
+							<a href="{% url 'modulo_professor:criaNotasComposicao' matricula.id grade t.id %}" 
+							class="btn-lancar-notas">{{ t }}</a>
+						{% endfor %}
+					</div>
+				</div>
+
             </div>
 
             <div class="matricula-item">
