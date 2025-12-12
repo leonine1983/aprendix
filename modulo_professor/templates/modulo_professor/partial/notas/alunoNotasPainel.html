@@ -241,7 +241,7 @@
             <ul>
                 <li class="nota-final" style='scale: 1.3;border: 0.1rem solid orchid; padding: 0.5rem; margin: 2rem 0; width: 80%;'><b>Nota Final</b> {{ c.nota_final|default_if_none:"-" }}</li>
             </ul>
-
+            {% if c.prova_paralela %}
             <div class="box-prova-paralela">
                 <h3><strong>Prova paralela</strong>?</h3>
                 <ul style="list-style:none; padding:0; margin:0; color:#495057;">
@@ -254,12 +254,12 @@
                         <span><strong>Avaliação complementar:</strong> Ajuda a reforçar a nota final de quem teve desempenho insuficiente.</span>
                     </li>
                 </ul>
-            </div>
-
+            </div>  
             <p class="nota-paralela-info">
                 Nota da Prova Paralela:
                 <strong style='color:#2b54c1'>{{ c.prova_paralela|default_if_none:"O aluno não precisou realizar a prova paralela neste trimestre." }}</strong>
             </p>
+            {% endif %}
 
         {% endif %}
     {% endfor %}
