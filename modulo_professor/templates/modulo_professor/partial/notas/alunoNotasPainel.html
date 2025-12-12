@@ -1,0 +1,320 @@
+{% load meus_filtros %}
+<style>
+    :root {
+        --w11-bg: rgba(255,255,255,0.65);
+        --w11-blur: blur(18px);
+        --w11-border: rgba(255,255,255,0.45);
+        --w11-primary: #2563eb;
+        --w11-primary-light: #e3edff;
+        --radius-small: 6px;   /* <<< menos circular */
+        --radius-content: 14px;
+        --transition: .25s ease;
+        --text: #3a3a3a;
+    }
+	/* ------------------------ */
+/* TITULOS PADRÃO (h-tags)  */
+/* ------------------------ */
+
+.win11-tabs h1,
+.win11-tabs h2,
+.win11-tabs h3,
+.win11-tabs h4,
+.win11-tabs h5,
+.win11-tabs h6 {
+    font-family: "Segoe UI", Calibri, sans-serif;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 12px 0;
+    letter-spacing: -0.3px;
+}
+
+/* Hierarquia visual profissional */
+.win11-tabs h1 { font-size: 1.25rem; }
+.win11-tabs h2 { font-size: 1.20rem; }
+.win11-tabs h3 { font-size: 1.15rem; }
+.win11-tabs h4 { font-size: 1.10rem; }
+.win11-tabs h5 { font-size: 1.05rem; }
+.win11-tabs h6 { font-size: 0.95rem; }
+
+/* Ajuste mobile */
+@media (max-width: 600px) {
+    .win11-tabs h1 { font-size: 1.15rem; }
+    .win11-tabs h2 { font-size: 1.10rem; }
+    .win11-tabs h3 { font-size: 1.5rem; }
+}
+
+
+    .win11-tabs {
+        max-width: 850px;
+        margin: 30px auto;
+        padding: 20px;
+        backdrop-filter: var(--w11-blur);
+        background: var(--w11-bg);
+        border-radius: var(--radius-content);
+        border: 1px solid var(--w11-border);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    /* NAVIGATION */
+    .win11-nav {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 20px;
+    }
+
+    .win11-btn {
+        flex: 1;
+        padding: 11px 14px;
+        background: rgba(255,255,255,0.35);
+        backdrop-filter: var(--w11-blur);
+        border-radius: var(--radius-small); /* <<< mais retangular */
+        border: 1px solid rgba(255,255,255,0.3);
+        cursor: pointer;
+        font-size: 14.5px;
+        color: var(--text);
+        transition: var(--transition);
+    }
+
+    .win11-btn:hover {
+        background: var(--w11-primary-light);
+    }
+
+    .win11-btn.active {
+        background: var(--w11-primary);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* CONTENT */
+    .win11-content {
+        display: none;
+        padding: 22px;
+        background: rgba(255,255,255,0.55);
+        backdrop-filter: var(--w11-blur);
+        border-radius: var(--radius-content);
+        border: 1px solid rgba(255,255,255,0.45);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        animation: fadeW11 .35s ease;
+    }
+
+    .win11-content.active {
+        display: block;
+    }
+
+    @keyframes fadeW11 {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+        .win11-nav {
+            flex-direction: column;
+        }
+    }
+	.print-area {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+}
+
+.print-area {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.print-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(90, 90, 90, 0.35); /* Cinza translúcido moderno */
+    color: #2a2a2a;
+    padding: 8px 16px;
+    font-size: 14px;
+    border: 1px solid rgba(120, 120, 120, 0.4);
+    backdrop-filter: var(--w11-blur);
+    border-radius: var(--radius-small);
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+.print-btn:hover {
+    background: rgba(70, 70, 70, 0.45);
+    color: white;
+}
+@media print {
+    .win11-content button {
+        display: none !important;
+    }
+
+
+    .print-btn,
+    .print-area {
+        display: none !important;
+    }
+}
+</style>
+<div class="panel">                        
+    <h1>{{ matricula }}</h1>
+    <h2>
+        {% if matricula.compoeNotaAlunos_related.first %}
+            {{ matricula.compoeNotaAlunos_related.first.grade.disciplina }}
+        {% endif %}
+        <small>— {{ t }}</small>
+    </h2>
+    <h3>Professor:
+        <b style="text-transform: capitalize;">
+            {% if matricula.compoeNotaAlunos_related.first %}
+                {{ matricula.compoeNotaAlunos_related.first.grade.professor.encaminhamento }}
+            {% endif %}
+        </b>
+    </h3>
+    
+    <h4>Turma: {{ matricula.turma }}</h4>
+
+    {% for c in compoeNotas %}
+        {% if t.id == c.trimestre.id and c.aluno.id == matricula.id %}
+            <ul>
+                <li><b>Prova (50%)</b> {{ c.prova|default_if_none:"-" }}</li>
+                <li><b>Trabalho (20%)</b> {{ c.trabalho|default_if_none:"-"|floatformat:2 }}</li>
+                <li><b>Participação (15%)</b> {{ c.participacao|default_if_none:"-" }}</li>
+                <li><b>Tarefas (15%)</b> {{ c.tarefas|default_if_none:"-" }}</li>
+
+                <li style="margin-bottom: 15px; background: none; border-left: none; padding: 0;">
+
+                    <span style="font-weight: 600; font-size: 1rem; color: #343a40; display: block; margin-bottom: 10px;">Cálculo da Composição:</span>
+
+                    {% with prova_50=c.prova|multiplica:0.5 %}
+                    {% with trabalho_20=c.trabalho|multiplica:0.2 %}
+                    {% with participacao_15=c.participacao|multiplica:0.15 %}
+                    {% with tarefas_15=c.tarefas|multiplica:0.15 %}
+
+                    <ul style="list-style:none; padding:0; margin:10px 0 5px 0;">
+                        <li style="background:#e3f2fd; padding:8px 12px; border-radius:8px; margin-bottom:5px; border-left: 4px solid #0d6efd;">
+                            <b>Prova (50%)</b>: {{ c.prova|default_if_none:"0" }} × 50% =
+                            <strong style="color:#0d6efd;">{{ prova_50|floatformat:2 }}</strong>
+                        </li>
+                        <li style="background:#e8f5e9; padding:8px 12px; border-radius:8px; margin-bottom:5px; border-left: 4px solid #198754;">
+                            <b>Trabalho (20%)</b>: {{ c.trabalho|default_if_none:"0"}} × 20% =
+                            <strong style="color:#198754;">{{ trabalho_20|floatformat:2 }}</strong>
+                        </li>
+                        <li style="background:#fff3e0; padding:8px 12px; border-radius:8px; margin-bottom:5px; border-left: 4px solid #ffc107;">
+                            <b>Participação (15%)</b>: {{ c.participacao|default_if_none:"0" }} × 15% =
+                            <strong style="color:#ffc107;">{{ participacao_15|floatformat:2 }}</strong>
+                        </li>
+                        <li style="background:#f8d7da; padding:8px 12px; border-radius:8px; margin-bottom:5px; border-left: 4px solid #dc3545;">
+                            <b>Tarefas (15%)</b>: {{ c.tarefas|default_if_none:"0" }} × 15% =
+                            <strong style="color:#dc3545;">{{ tarefas_15|floatformat:2 }}</strong>
+                        </li>
+                        <li style="background: none; border-left: none; padding: 0;">
+                            {% with nota_final_=prova_50|soma_float:trabalho_20|soma_float:participacao_15|soma_float:tarefas_15 %}
+                            <p style="
+                                background-color: #d1ecf1;
+                                padding: 12px 15px;
+                                border-radius: 10px;
+                                border-left: 5px solid #0c5460;
+                                font-weight: 700;
+                                color: #0c5460;
+                                max-width: 350px;
+                                line-height: 1.4;
+                                text-align: center;
+                                margin-top: 15px;
+                            ">
+                                Nota Final <sup><small>(Composição de notas)</small></sup> <strong>{{ nota_final_|floatformat:2 }}</strong>
+                            </p>
+                            {% endwith %}
+                        </li>
+                    </ul>
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                </li>
+            </ul>
+
+            <div class="destaque-alerta">
+                Se a **Nota Final** apresenta um valor, mas a **Composição de Notas** (os detalhes das atividades) está zerada, isso significa que a nota foi inserida diretamente via ambiente administrativo, ignorando a composição. No entanto, se o professor decidir preencher a composição das notas, o sistema **automaticamente recalculará e atualizará** o valor da Nota Final, substituindo a nota inserida anteriormente pelo ambiente administrativo.
+            </div>
+
+            <ul>
+                <li class="nota-final" style='scale: 1.3;border: 0.1rem solid orchid; padding: 0.5rem; margin: 2rem 0; width: 80%;'><b>Nota Final</b> {{ c.nota_final|default_if_none:"-" }}</li>
+            </ul>
+
+            <div class="box-prova-paralela">
+                <h3><strong>Prova paralela</strong>?</h3>
+                <ul style="list-style:none; padding:0; margin:0; color:#495057;">
+                    <li>
+                        <span style="color:#0d6efd;">&#10148;</span>
+                        <span><strong>Segunda chance:</strong> Para alunos que perderam a prova ou desejam melhorar a nota.</span>
+                    </li>
+                    <li>
+                        <span style="color:#198754;">&#10148;</span>
+                        <span><strong>Avaliação complementar:</strong> Ajuda a reforçar a nota final de quem teve desempenho insuficiente.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <p class="nota-paralela-info">
+                Nota da Prova Paralela:
+                <strong style='color:#2b54c1'>{{ c.prova_paralela|default_if_none:"O aluno não precisou realizar a prova paralela neste trimestre." }}</strong>
+            </p>
+
+        {% endif %}
+    {% endfor %}
+</div>
+<script>
+document.querySelectorAll(".win11-tabs").forEach(tabs => {
+
+    const btns = tabs.querySelectorAll(".win11-btn");
+    const contents = tabs.querySelectorAll(".win11-content");
+
+    btns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const target = btn.dataset.target;
+
+            btns.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            contents.forEach(c => c.classList.remove("active"));
+            tabs.querySelector("#" + target).classList.add("active");
+        });
+    });
+
+});
+</script>
+<script>
+function printCurrentTab(btn) {
+    // encontra o container da aba (div.win11-content)
+    const content = btn.closest(".win11-content");
+    if (!content) return;
+
+    const html = content.innerHTML;
+
+    const w = window.open("", "_blank");
+    w.document.write(`
+        <html>
+        <head>
+            <title>Impressão</title>
+            <style>
+                ${[...document.styleSheets]
+                    .map(s => {
+                        try { return [...s.cssRules].map(r => r.cssText).join(" "); }
+                        catch { return ""; }
+                    })
+                    .join(" ")
+                }
+            </style>
+        </head>
+        <body>${html}</body>
+        </html>
+    `);
+
+    w.document.close();
+    setTimeout(() => w.print(), 200);
+}
+</script>
+
+
+        
