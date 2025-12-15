@@ -60,6 +60,12 @@ urlpatterns = [
     name='excluir_kanban'
     ),
 
+    path(
+    "kanban/minimizar/",
+    alternar_minimizacao_kanban,
+    name="kanban-minimizar"
+),
+
 
 
     

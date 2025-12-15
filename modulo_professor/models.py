@@ -270,6 +270,10 @@ class PlanejamentoKanban(models.Model):
     )
     titulo = models.CharField(max_length=100)
     criado_em = models.DateTimeField(auto_now_add=True)
+    minimizado = models.BooleanField(
+        default=False,
+        verbose_name="Planejamento minimizado para o professor"
+    )
 
 
     def criar_colunas_padrao(self):

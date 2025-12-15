@@ -85,6 +85,37 @@
   margin-bottom:10px;
 }
 
+
+
+.board-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.btn-minimize{
+  background:#eef2ff;
+  border:1px solid var(--border);
+  color:var(--primary);
+  font-size:.8rem;
+  padding:6px 12px;
+  border-radius:10px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.btn-minimize:hover{
+  background:#e0e7ff;
+}
+
+.kanban-hidden{
+  display:none;
+}
+
+
+
+
 /* COLUMNS */
 .columns{
   display:grid;
@@ -168,7 +199,7 @@
     <span class="page-class">— {{ turma_disciplina.turma }}</span>
   </h1>
   <div class="page-school">
-    {{ turma_disciplina.turma.escola }}
+    {{ turma_disciplina.turma.escola }} - {{ turma_disciplina.turma.ano_letivo }}
   </div>
 </div>
 
@@ -195,56 +226,68 @@
     {% for kanban in kanbans %}
     <div class="board" data-board-id="{{ kanban.id }}">
 
-      <h4>{{ kanban.titulo }}</h4>
+  <div class="board-header">
+    <h4>{{ kanban.titulo }}</h4>
+    <button class="btn-minimize"
+            data-kanban-id="{{ kanban.id }}">
+      {% if kanban.minimizado %}
+        📖 Mostrar planejamento
+      {% else %}
+        📕 Ocultar planejamento
+      {% endif %}
+    </button>
+  </div>
 
-      <div class="mb-3">
-        <button class="btn btn-sm btn-outline-primary me-2" data-add-task>
-          + Adicionar atividade
+  <div class="board-content {% if kanban.minimizado %}kanban-hidden{% endif %}">
+    <div class="mb-3">
+      <button class="btn btn-sm btn-outline-primary me-2" data-add-task>
+        + Adicionar atividade
+      </button>
+
+      <form method="post"
+            action="{% url 'modulo_professor:excluir_kanban' kanban.id %}"
+            onsubmit="return confirm('Tem certeza que deseja excluir este planejamento?')"
+            style="display:inline;">
+        {% csrf_token %}
+        <button class="btn btn-sm btn-outline-danger">
+          🗑️ Excluir planejamento
         </button>
-
-        <form method="post"
-              action="{% url 'modulo_professor:excluir_kanban' kanban.id %}"
-              onsubmit="return confirm('Tem certeza que deseja excluir este planejamento?')"
-              style="display:inline;">
-          {% csrf_token %}
-          <button class="btn btn-sm btn-outline-danger">
-            🗑️ Excluir planejamento
-          </button>
-        </form>
-      </div>
-
-      <div class="columns">
-        {% for coluna in kanban.colunas.all %}
-        <div class="column"
-             data-coluna-id="{{ coluna.id }}"
-             data-status="{{ coluna.status }}">
-
-          <div class="column-header {{ coluna.status }}">
-            {% if coluna.status == 'todo' %}
-              📒 Preparar as aulas
-              <small>O que ainda preciso planejar ou organizar</small>
-            {% elif coluna.status == 'doing' %}
-              🧑‍🏫 Aulas em andamento
-              <small>O que estou trabalhando com a turma</small>
-            {% elif coluna.status == 'done' %}
-              ✅ Conteúdos já trabalhados
-              <small>O que já foi finalizado em sala</small>
-            {% endif %}
-          </div>
-
-          <div class="column-body">
-            {% for tarefa in coluna.tarefas.all %}
-              <div class="task" draggable="true" data-tarefa-id="{{ tarefa.id }}">
-                {{ tarefa.descricao }}
-              </div>
-            {% endfor %}
-          </div>
-
-        </div>
-        {% endfor %}
-      </div>
-
+      </form>
     </div>
+
+    <div class="columns">
+      {% for coluna in kanban.colunas.all %}
+      <div class="column"
+           data-coluna-id="{{ coluna.id }}"
+           data-status="{{ coluna.status }}">
+
+        <div class="column-header {{ coluna.status }}">
+          {% if coluna.status == 'todo' %}
+            📒 Preparar as aulas
+            <small>O que ainda preciso planejar ou organizar</small>
+          {% elif coluna.status == 'doing' %}
+            🧑‍🏫 Aulas em andamento
+            <small>O que estou trabalhando com a turma</small>
+          {% elif coluna.status == 'done' %}
+            ✅ Conteúdos já trabalhados
+            <small>O que já foi finalizado em sala</small>
+          {% endif %}
+        </div>
+
+        <div class="column-body">
+          {% for tarefa in coluna.tarefas.all %}
+            <div class="task" draggable="true" data-tarefa-id="{{ tarefa.id }}">
+              {{ tarefa.descricao }}
+            </div>
+          {% endfor %}
+        </div>
+
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
     {% endfor %}
   </div>
 </div>
@@ -332,5 +375,33 @@ document.getElementById('btn-add-board').onclick=()=>{
   .then(()=>location.reload());
 };
 </script>
+
+<script>
+document.querySelectorAll(".btn-minimize").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const board = btn.closest(".board");
+    const content = board.querySelector(".board-content");
+
+    fetch("{% url 'modulo_professor:kanban-minimizar' %}",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "X-CSRFToken":"{{ csrf_token }}"
+      },
+      body:JSON.stringify({
+        kanban_id: btn.dataset.kanbanId
+      })
+    })
+    .then(r=>r.json())
+    .then(data=>{
+      content.classList.toggle("kanban-hidden", data.minimizado);
+      btn.textContent = data.minimizado
+        ? "📖 Mostrar planejamento"
+        : "📕 Ocultar planejamento";
+    });
+  });
+});
+</script>
+
 
 {% endblock main %}

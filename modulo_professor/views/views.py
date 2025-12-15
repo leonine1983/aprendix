@@ -899,3 +899,21 @@ def excluir_kanban(request, kanban_id):
 
     return redirect("modulo_professor:kanban_planejamento", kanban_id=kanban.id)
 
+
+@require_POST
+def alternar_minimizacao_kanban(request):
+    data = json.loads(request.body)
+
+    kanban = get_object_or_404(
+        PlanejamentoKanban,
+        id=data["kanban_id"]
+    )
+
+    kanban.minimizado = not kanban.minimizado
+    kanban.save(update_fields=["minimizado"])
+
+    return JsonResponse({
+        "minimizado": kanban.minimizado
+    })
+
+
