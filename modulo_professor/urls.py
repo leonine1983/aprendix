@@ -43,4 +43,24 @@ urlpatterns = [
 
     # Calendário
     path('horario/professor/<int:turma_disciplina_id>', dias_de_aula_professor, name='dias_de_aula_professor'),
+
+    # kABAN    
+    path('executaProjetos/kaban/turmas', turmasKabam, name='kabam-turmas'),
+    path(
+        "planejamento/<int:turma_disciplina_id>/",
+        views.kanban_planejamento,
+        name="planejamento-kabam"
+    ),
+    path("kanban/criar/", views.criar_kanban_ajax, name="kanban-criar"),
+    path("kanban/tarefa/criar/", views.criar_tarefa_ajax, name="tarefa-criar"),
+    path("kanban/tarefa/mover/", views.mover_tarefa, name="tarefa-mover"),
+    path(
+    'kanban/excluir/<int:kanban_id>/',
+    views.excluir_kanban,
+    name='excluir_kanban'
+    ),
+
+
+
+    
 ]

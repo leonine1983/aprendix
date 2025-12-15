@@ -131,43 +131,6 @@ def atualizaRecuperaFinal(request, pk, grade):
 
 # PRESENÇA ------------------------------------------------------------------
 # PRESENÇA DIÁRIA ------------------------
-"""
-@login_required
-def registrar_presenca_diaria_view(request, turma_id):
-    turma = get_object_or_404(Turmas, id=turma_id)
-    matriculas = Matriculas.objects.filter(turma=turma)
-
-    if request.method == 'POST':
-        data_presenca_str = request.POST.get('data')
-        try:
-            data_presenca = datetime.strptime(data_presenca_str, '%Y-%m-%d').date()
-        except ValueError:
-            return render(request, 'modulo_professor/partial/presenca/presenca_diaria.html', {
-                'matriculas': matriculas,
-                'turma': turma,
-                'today': date.today(),
-                'erro': 'Data inválida. Use o formato yyyy-mm-dd.'
-            })
-
-        alunos_presentes_ids = request.POST.getlist('presentes')
-        for matricula in matriculas:
-            presente = str(matricula.id) in alunos_presentes_ids
-            Presenca.objects.update_or_create(
-                matricula=matricula,
-                data=data_presenca,
-                turma_disciplina=None,
-                aula_numero=None,
-                defaults={'presente': presente, 'controle_diario': True}
-            )
-        return redirect('modulo_professor:lista_presenca_diaria', turma.id, data_presenca.strftime('%Y-%m-%d'))
-
-
-    return render(request, 'modulo_professor/partial/presenca/presenca_diaria.html', {
-        'matriculas': matriculas,
-        'turma': turma,
-        'today': date.today()
-    })"""
-
 from datetime import date, datetime, timedelta
 from calendar import monthrange
 from django.http import JsonResponse
@@ -175,6 +138,17 @@ from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from datetime import date, datetime
 from django.contrib.auth.decorators import login_required
+
+
+@login_required
+def turmasKabam(request):
+    userProfessor = request.user.related_vinculoUserPessoa
+    request.session['professorUser'] =str(userProfessor)
+    pessoa = userProfessor.pessoa.id  
+    turma = TurmaDisciplina.objects.filter(professor__encaminhamento__contratado = pessoa)
+
+    return render(request, 'modulo_professor/partial_base/kabam_turmas.html', {'turmas':turma})
+
 
 @login_required
 def registrar_presenca_diaria_view(request, turma_id):
@@ -262,33 +236,6 @@ def historico_faltas_view(request, matricula_id):
 
 
 # PRESENÇA POR AULA
-"""
-@login_required
-def selecionaTurma(request):
-    userProfessor = request.user.related_vinculoUserPessoa
-    pessoa = userProfessor.pessoa.id  
-    ano_letivo = request.session.get('anoLetivo', 'Não encontrado')
-
-    professorGrade = TurmaDisciplina.objects.filter(
-        professor__encaminhamento__contratado__id=pessoa,
-        turma__ano_letivo__ano = ano_letivo
-    )
-
-    grade_turma = []
-    for p in professorGrade:
-        turma_obj = p.turma
-        if turma_obj.id not in [t['id'] for t in grade_turma]:  
-            grade_turma.append({
-                'id': turma_obj.id,
-                'nome': turma_obj.nome if hasattr(turma_obj, 'nome') else str(turma_obj)
-            })
-
-    return render(request, 'modulo_professor/partial/presenca/selecionaTurma.html', {
-        'pessoa': professorGrade,
-        'anoLetivo': ano_letivo,
-        'grade_turma': grade_turma
-    })"""
-
 @login_required
 def selecionaTurma(request):
     userProfessor = request.user.related_vinculoUserPessoa
@@ -851,3 +798,104 @@ def selecionaAlunosNotas(request, turma_id, grade):
         'trimetre':trimetre,
         'compoeNotas':compoemNotas
     })
+
+
+# KABAM ------------------------------------
+# ------------------------------------------
+import json
+from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404
+from django.views.decorators.http import require_POST
+from ..models import PlanejamentoKanban, ColunaKanban, TarefaKanban
+
+def kanban_planejamento(request, turma_disciplina_id):
+    turma_disciplina = get_object_or_404(
+        TurmaDisciplina,
+        id=turma_disciplina_id
+    )
+
+    kanbans = (
+        PlanejamentoKanban.objects
+        .filter(turma_disciplina=turma_disciplina)
+        .prefetch_related('colunas__tarefas')
+    )
+
+    return render(
+        request,
+        "modulo_professor/partial_base/kaban.html",
+        {
+            "turma_disciplina": turma_disciplina,
+            "kanbans": kanbans
+        }
+    )
+
+
+@require_POST
+def criar_kanban_ajax(request):
+    data = json.loads(request.body)
+
+    kanban = PlanejamentoKanban.criar_kanban_completo(
+        turma_disciplina_id=data["turma_disciplina_id"],
+        titulo=data["titulo"]
+    )
+
+    return JsonResponse({
+        "id": kanban.id,
+        "titulo": kanban.titulo,
+        "colunas": [
+            {
+                "id": c.id,
+                "titulo": c.titulo,
+                "status": c.status
+            }
+            for c in kanban.colunas.all()
+        ]
+    })
+
+
+@require_POST
+def criar_tarefa_ajax(request):
+    data = json.loads(request.body)
+
+    coluna = get_object_or_404(ColunaKanban, id=data["coluna_id"])
+
+    tarefa = TarefaKanban.objects.create(
+        coluna=coluna,
+        descricao=data["descricao"]
+    )
+
+    return JsonResponse({
+        "id": tarefa.id,
+        "descricao": tarefa.descricao
+    })
+
+
+@require_POST
+def mover_tarefa(request):
+    data = json.loads(request.body)
+
+    tarefa = get_object_or_404(TarefaKanban, id=data["tarefa_id"])
+    nova_coluna = get_object_or_404(ColunaKanban, id=data["coluna_id"])
+
+    tarefa.coluna = nova_coluna
+    tarefa.save()
+
+    return JsonResponse({"ok": True})
+
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from modulo_professor.models import PlanejamentoKanban
+
+
+def excluir_kanban(request, kanban_id):
+    kanban = get_object_or_404(PlanejamentoKanban, id=kanban_id)
+    turma = kanban.turma_disciplina.turma.id
+
+    if request.method == "POST":
+        kanban.delete()
+        messages.success(request, f"Planejamento {kanban.titulo.upper()} excluído com sucesso.")
+        return redirect("modulo_professor:planejamento-kabam", turma_disciplina_id = turma)  # ajuste se necessário
+
+    return redirect("modulo_professor:kanban_planejamento", kanban_id=kanban.id)
+

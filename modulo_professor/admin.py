@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ComposicaoNotas
+from .models import ComposicaoNotas, PlanejamentoKanban, ColunaKanban
 from gestao_escolar.models import Presenca
 """
 admin.site.register(ComposicaoNotas)
@@ -7,3 +7,5 @@ admin.site.register(ComposicaoNotas)
 class FrequenciaAdmin(admin.ModelAdmin):
     list_display = ('matricula', 'data', 'presente')
 """
+admin.site.register(PlanejamentoKanban)
+admin.site.register(ColunaKanban)

@@ -253,3 +253,90 @@ class AnexoAula(models.Model):
 
     def __str__(self):
         return f'Anexo para aula {self.aula.id}'
+    
+
+
+
+# KABAM ---------------------------
+# models.py
+from django.db import models
+from gestao_escolar.models import TurmaDisciplina
+
+class PlanejamentoKanban(models.Model):
+    turma_disciplina = models.ForeignKey(
+        TurmaDisciplina,
+        on_delete=models.CASCADE,
+        related_name='kanbans'
+    )
+    titulo = models.CharField(max_length=100)
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+
+    def criar_colunas_padrao(self):
+        if self.colunas.exists():
+            return
+
+        ColunaKanban.objects.bulk_create([
+            ColunaKanban(
+                kanban=self,
+                titulo='A Fazer',
+                status='todo'
+            ),
+            ColunaKanban(
+                kanban=self,
+                titulo='Em Execução',
+                status='doing'
+            ),
+            ColunaKanban(
+                kanban=self,
+                titulo='Concluído',
+                status='done'
+            ),
+        ])
+
+    
+
+
+    @classmethod
+    def criar_kanban_completo(cls, turma_disciplina_id, titulo):
+        kanban = cls.objects.create(
+            turma_disciplina_id=turma_disciplina_id,
+            titulo=titulo
+        )
+        kanban.criar_colunas_padrao()
+        return kanban
+
+    def __str__(self):
+        return self.titulo
+
+
+class ColunaKanban(models.Model):
+    STATUS_CHOICES = (
+        ('todo', 'A Fazer'),
+        ('doing', 'Em Execução'),
+        ('done', 'Concluído'),
+    )
+
+    kanban = models.ForeignKey(
+        PlanejamentoKanban,
+        on_delete=models.CASCADE,
+        related_name='colunas'
+    )
+    titulo = models.CharField(max_length=50)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
+
+    def __str__(self):
+        return self.titulo
+
+
+class TarefaKanban(models.Model):
+    coluna = models.ForeignKey(
+        ColunaKanban,
+        on_delete=models.CASCADE,
+        related_name='tarefas'
+    )
+    descricao = models.CharField(max_length=255)
+    ordem = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.descricao

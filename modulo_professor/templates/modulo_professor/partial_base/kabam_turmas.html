@@ -1,0 +1,107 @@
+{% extends "modulo_professor/base.html" %}
+{% block main %}
+
+<style>
+    .kabam-wrapper {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.kabam-header {
+    margin-bottom: 2rem;
+}
+
+.kabam-header h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.kabam-header p {
+    color: #6b7280;
+    max-width: 600px;
+    line-height: 1.5;
+}
+
+.kabam-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.kabam-card {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+}
+
+.kabam-card:hover {
+    transform: translateY(-4px);
+    border-color: #2563eb;
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15);
+}
+
+.kabam-card-content h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.3rem;
+}
+
+.kabam-card-content span {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.kabam-card:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+}
+
+/* Mobile refinements */
+@media (max-width: 480px) {
+    .kabam-wrapper {
+        padding: 1.2rem;
+    }
+
+    .kabam-header h1 {
+        font-size: 1.5rem;
+    }
+}
+
+</style>
+
+<section class="kabam-wrapper">
+    <header class="kabam-header">
+        <h1>Selecione a Turma</h1>
+        <p>
+            Escolha a turma para aplicar o método <strong>KaBAM</strong> 
+            no desenvolvimento de projetos ou atividades.
+        </p>
+    </header>
+
+    <div class="kabam-grid">
+        {% for t in turmas %}
+            <a 
+               href="{% url 'modulo_professor:planejamento-kabam' t.id %}" 
+               class="kabam-card"
+               aria-label="Selecionar turma {{ t.turma }}"
+            >
+                <div class="kabam-card-content">
+                    <h2>{{ t.turma }}</h2>
+                    <span>{{ t.turma.escola }}</span>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock main %}
