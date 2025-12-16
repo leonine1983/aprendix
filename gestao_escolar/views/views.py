@@ -173,7 +173,7 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
             'total_p': 0,
             'total_m': 0,
             'total_g': 0,
-            'gg': 0,
+            'total_gg': 0,
             'total_turmas': 0,
             'total_vagas': 0,
             'total_matriculas': 0,

@@ -676,11 +676,7 @@ class AnexoAulaCreateView(CreateView):
         return reverse_lazy('modulo_professor:aula_dada_detalhe', kwargs={'pk': self.kwargs['pk']})
 
 
-
-
-
-
-
+@login_required
 def detalhar_aula(request, aula_id):
     aula = get_object_or_404(AulaDada, id=aula_id)
 
@@ -705,14 +701,7 @@ def detalhar_aula(request, aula_id):
 
 
 
-
-
-
-
-
-
-
-
+@login_required
 
 def aulas_do_dia(request):
     hoje = timezone.now().date()
@@ -808,6 +797,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_POST
 from ..models import PlanejamentoKanban, ColunaKanban, TarefaKanban
 
+@login_required
 def kanban_planejamento(request, turma_disciplina_id):
     turma_disciplina = get_object_or_404(
         TurmaDisciplina,
@@ -830,6 +820,7 @@ def kanban_planejamento(request, turma_disciplina_id):
     )
 
 
+@login_required
 @require_POST
 def criar_kanban_ajax(request):
     data = json.loads(request.body)
@@ -853,6 +844,7 @@ def criar_kanban_ajax(request):
     })
 
 
+@login_required
 @require_POST
 def criar_tarefa_ajax(request):
     data = json.loads(request.body)
@@ -869,7 +861,7 @@ def criar_tarefa_ajax(request):
         "descricao": tarefa.descricao
     })
 
-
+@login_required
 @require_POST
 def mover_tarefa(request):
     data = json.loads(request.body)
@@ -887,7 +879,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from modulo_professor.models import PlanejamentoKanban
 
-
+@login_required
 def excluir_kanban(request, kanban_id):
     kanban = get_object_or_404(PlanejamentoKanban, id=kanban_id)
     turma = kanban.turma_disciplina.turma.id
@@ -900,6 +892,7 @@ def excluir_kanban(request, kanban_id):
     return redirect("modulo_professor:kanban_planejamento", kanban_id=kanban.id)
 
 
+@login_required
 @require_POST
 def alternar_minimizacao_kanban(request):
     data = json.loads(request.body)

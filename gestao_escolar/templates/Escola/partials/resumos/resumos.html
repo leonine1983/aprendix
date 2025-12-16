@@ -23,7 +23,7 @@
         </h4>
         <!-- tabela gênero -->
         <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle text-center">
+            <table class="table table-bordered table-hover align-middle text-center win11-table ">
                 <thead class="table-light">
                     <tr>
                         <th rowspan="2">Turmas</th>
@@ -35,17 +35,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for turma in request.session.matriculas_all %}
+                    {% for turma in matriculas_all %}
                     <tr>
-                        <td>{{ turma.nome }} <span class="text-muted text-uppercase">({{ turma.descritivo_turma }})</span></td>
+                        <td>{{ turma.nome }} <span class="text-muted">({{ turma.descritivo_turma }})</span></td>
                         <td>{{ turma.masculino }}</td>
                         <td>{{ turma.feminino }}</td>
                     </tr>
                     {% endfor %}
                     <tr class="table-success fw-bold">
                         <td>Total</td>
-                        <td>{{ request.session.totais.total_masculino }}</td>
-                        <td>{{ request.session.totais.total_feminino }}</td>
+                        <td>{{ vagas_disponiveis_total.total_masculino }}</td>
+                        <td>{{ vagas_disponiveis_total.total_feminino }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -72,25 +72,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for turma in request.session.matriculas_all %}
+                    {% for turma in matriculas_all %}
                     <tr>
-                        <td>{{ turma.nome }} <span class="text-muted text-uppercase">({{ turma.descritivo_turma }})</span></td>
-                        <td>{{ turma.brancos }}</td>
-                        <td>{{ turma.pardos }}</td>
-                        <td>{{ turma.negros }}</td>
-                        <td>{{ turma.amarelos }}</td>
-                        <td>{{ turma.indigenas }}</td>
-                        <td>{{ turma.nDeclarados }}</td>
+                        <td>{{ turma.nome }} <span class="text-muted">({{ turma.descritivo_turma }})</span></td>
+                        <td>{{ turma.PP }}</td>
+                        <td>{{ turma.P }}</td>
+                        <td>{{ turma.M }}</td>
+                        <td>{{ turma.G }}</td>
+                        <td>{{ turma.GG }}</td>
                     </tr>
                     {% endfor %}
+
                     <tr class="table-success fw-bold">
                         <td>Total</td>
-                        <td>{{ request.session.totais.total_brancos }}</td>
-                        <td>{{ request.session.totais.total_pardos }}</td>
-                        <td>{{ request.session.totais.total_negros }}</td>
-                        <td>{{ request.session.totais.total_amarelos }}</td>
-                        <td>{{ request.session.totais.total_indigenas }}</td>
-                        <td>{{ request.session.totais.total_nDeclarados }}</td>
+                        <td>{{ vagas_disponiveis_total.total_pp }}</td>
+                        <td>{{ vagas_disponiveis_total.total_p }}</td>
+                        <td>{{ vagas_disponiveis_total.total_m }}</td>
+                        <td>{{ vagas_disponiveis_total.total_g }}</td>
+                        <td>{{ vagas_disponiveis_total.total_gg }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -116,7 +115,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for turma in request.session.matriculas_all %}
+                    {% for turma in matriculas_all %}
                     <tr>
                         <td>{{ turma.nome }} <span class="text-muted text-uppercase">({{ turma.descritivo_turma }})</span></td>
                         <td>{{ turma.alunosPP }}</td>
@@ -140,8 +139,10 @@
 
         <!-- Lateralidade -->
         <h4 class="alert alert-info mt-5 d-flex align-items-center">
-            <i class="fa-solid fa-hand-pointer me-2"></i> Lateralidade – {{request.session.anoLetivo_nome}}
+            <i class="fa-solid fa-hand-pointer me-2"></i>
+            Lateralidade – {{ request.session.anoLetivo_nome }}
         </h4>
+
         <div class="table-responsive">
             <table class="table table-bordered table-hover align-middle text-center">
                 <thead class="table-light">
@@ -155,24 +156,40 @@
                         <th>Ambidestros</th>
                     </tr>
                 </thead>
+
                 <tbody>
-                    {% for turma in request.session.turma_lateralidade %}
-                    <tr>
-                        <td>{{ turma.nome }} <span class="text-muted text-uppercase">({{ turma.descritivo }})</span></td>
-                        <td>{{ turma.destros }}</td>
-                        <td>{{ turma.canhotos }}</td>
-                        <td>{{ turma.ambidestros }}</td>
-                    </tr>
-                    {% endfor %}
-                    <tr class="table-success fw-bold">
-                        <td>Total</td>
-                        <td>{{ request.session.totais_lateralidade.destros }}</td>
-                        <td>{{ request.session.totais_lateralidade.canhotos }}</td>
-                        <td>{{ request.session.totais_lateralidade.ambidestros }}</td>
-                    </tr>
+                    {% if request.session.turma_lateralidade %}
+                        {% for turma in request.session.turma_lateralidade %}
+                        <tr>
+                            <td>
+                                {{ turma.nome }}
+                                <span class="text-muted text-uppercase">
+                                    ({{ turma.descritivo }})
+                                </span>
+                            </td>
+                            <td>{{ turma.destros }}</td>
+                            <td>{{ turma.canhotos }}</td>
+                            <td>{{ turma.ambidestros }}</td>
+                        </tr>
+                        {% endfor %}
+
+                        <tr class="table-success fw-bold">
+                            <td>Total</td>
+                            <td>{{ request.session.totais_lateralidade.destros }}</td>
+                            <td>{{ request.session.totais_lateralidade.canhotos }}</td>
+                            <td>{{ request.session.totais_lateralidade.ambidestros }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-muted fst-italic">
+                                Nenhum dado de lateralidade disponível para o ano letivo selecionado.
+                            </td>
+                        </tr>
+                    {% endif %}
                 </tbody>
             </table>
         </div>
+
 
         <!-- Botões -->
         <div class="d-flex justify-content-between mt-5">

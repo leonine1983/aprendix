@@ -10,7 +10,6 @@
     <link href="{% static 'global/css/geral_styler.css' %}" rel="stylesheet">
     <link href="{% static 'global/css/modals.css' %}" rel="stylesheet">
     <link href="{% static 'global/css/table_win11.css' %}" rel="stylesheet">
-    <link href="{% static 'global/css/table_win11.css' %}" rel="stylesheet" media="print">   
 
     <style>
         .anime-h{height: 5rem !important;}
@@ -43,254 +42,226 @@
     </style>
 {% endblock script_head %} 
 {% block main %}
-<div class="shadow-sm p-3 mb-3  w-100 bg-light " >
-    {% if messages %}                
-        {% include 'Escola/partials/mensagens.html' %}          
-    {% endif %}
-    <div class='p-4 h5 ' style='margin:-2.5rem -1rem 0 -1rem'></div>   
-        {% if escolaMatriculaOnline %}
-            {% include "Escola/matriculaOnline/partial_alunosEmPre_matricula.html" %}
+    <div class="shadow-sm p-3 mb-3  w-100 bg-light " >
+        {% if messages %}                
+            {% include 'Escola/partials/mensagens.html' %}          
         {% endif %}
-        <div class=" rounded-top-2  bg-body-tertiary " style='margin:-1.2rem 0rem 1rem 0rem !important'>
-            <div class='mb-2'>
-                {% include 'gestao_escolar/navbars/index.html' %} 
-            </div>
+        <div class='p-4 h5 ' style='margin:-2.5rem -1rem 0 -1rem'></div>   
+            {% if escolaMatriculaOnline %}
+                {% include "Escola/matriculaOnline/partial_alunosEmPre_matricula.html" %}
+            {% endif %}
+            <div class=" rounded-top-2  bg-body-tertiary " style='margin:-1.2rem 0rem 1rem 0rem !important'>
+                <div class='mb-2'>
+                    {% include 'gestao_escolar/navbars/index.html' %} 
+                </div>
 
-            <div class="cards-container">
-                <!-- Primeiro Card -->
-                <div class="card">
-                    <div class="card-header bg-info text-light text-uppercase">
-                        {% include "Escola/partials/resumos/resumos.html" %}
+                <div class="cards-container">
+                    <!-- Primeiro Card -->
+                    <div class="card">
+                        <div class="card-header bg-info text-light text-uppercase">
+                            {% include "Escola/partials/resumos/resumos.html" %}
+                        </div>
+                        <div class="card-body">
+                            <table class="win11-table">
+                                <thead>
+                                    <tr>
+                                        <th>Turmas   </th>                                    
+                                        <th>Alunos matriculados</th>
+                                        <th>Concluída</th>
+                                        <th>Limite de Vagas</th>
+                                        <th>Vagas disponíveis</th>
+                                        <th>Autistas </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    {% for turma in matriculas_all %}
+                                    <tr>
+                                        <td>{{ turma.nome }} <span class='text-uppercase'>{{ turma.descritivo_turma }}</span></td>
+                                        <td>{{ turma.matriculas }} </td>                                    
+                                        <td>{% if turma.concluida %}<i class="fa-solid fa-check text-success"></i>{% endif %} </td>
+                                        <td>{{ turma.quantidade_vagas }}</td>
+                                        <td>{{ turma.vagas_disponiveis }}</td>
+                                        <td>{{ turma.autistas }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    
+                                    <!-- Linha de Totais -->
+                                    <tr class='bg-success-subtle text-black fs-2'>
+                                        <td><strong>Total</strong></td>
+                                        <td>{{ vagas_disponiveis_total.total_matriculas }}</td>
+                                        <td> {{ total_concluidas}}</td>
+                                        <td>{{ vagas_disponiveis_total.total_vagas }}</td>
+                                        <td>{{ vagas_disponiveis_total.vagas_disponiveis_total }}</td>
+                                        <td>{{ vagas_disponiveis_total.total_autistas }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <table class="win11-table">
-                            <thead>
-                                <tr>
-                                    <th>Turmas   </th>                                    
-                                    <th>Alunos matriculados</th>
-                                    <th>Concluída</th>
-                                    <th>Limite de Vagas</th>
-                                    <th>Vagas disponíveis</th>
-                                    <th>Autistas </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                
-                                {% for turma in matriculas_all %}
-                                <tr>
-                                    <td>{{ turma.nome }} <span class='text-uppercase'>{{ turma.descritivo_turma }}</span></td>
-                                    <td>{{ turma.matriculas }} </td>                                    
-                                    <td>{% if turma.concluida %}<i class="fa-solid fa-check text-success"></i>{% endif %} </td>
-                                    <td>{{ turma.quantidade_vagas }}</td>
-                                    <td>{{ turma.vagas_disponiveis }}</td>
-                                    <td>{{ turma.autistas }}</td>
-                                </tr>
-                                {% endfor %}
-                                
-                                <!-- Linha de Totais -->
-                                <tr class='bg-success-subtle text-black fs-2'>
-                                    <td><strong>Total</strong></td>
-                                    <td>{{ vagas_disponiveis_total.total_matriculas }}</td>
-                                    <td> {{ total_concluidas}}</td>
-                                    <td>{{ vagas_disponiveis_total.total_vagas }}</td>
-                                    <td>{{ vagas_disponiveis_total.vagas_disponiveis_total }}</td>
-                                    <td>{{ vagas_disponiveis_total.total_autistas }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    
+                    <!-- Segundo Card -->
+                    <div class="card">
+                        <div class="card-header bg-danger-subtle text-light text-start text-uppercase">
+                            <i class="fa-duotone fa-solid fa-chart-simple"></i> Gráficos
+                        </div>
+                        <div class="card-body">
+                        </div>
+                        <div class="card-footer text-muted">
+                            {{ graph|safe }}
+                            <p>Data e horário do acesso: {{ now }}</p>
+                        </div>                   
                     </div>
                 </div>
                 
-                <!-- Segundo Card -->
-                <div class="card">
-                    <div class="card-header bg-danger-subtle text-light text-start text-uppercase">
-                        <i class="fa-duotone fa-solid fa-chart-simple"></i> Gráficos
-                    </div>
-                    <div class="card-body">
-                    </div>
-                    <div class="card-footer text-muted">
-                        {{ graph|safe }}
-                        <p>Data e horário do acesso: {{ now }}</p>
-                    </div>                   
-                </div>
             </div>
-            
-        </div>
-
-
-
-
-
-
-
         
+            {% if alunos_em_risco %}
+            <!-- Botão estilizado -->
+            <button id="btnBuscaAtiva" style="
+                position: fixed;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 2000;
+                width: 280px;
+                height: 70px;
+                background: rgba(160, 160, 160, 0.1);
+                backdrop-filter: blur(6px);
+                border: 1px solid rgba(255,255,255,0.3);
+                color: #f5f5f5;
+                border-bottom-left-radius: 50%;
+                border-bottom-right-radius: 50%;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+                box-shadow: inset 0 1px 2px rgba(255,255,255,0.3),
+                            0 4px 10px rgba(0,0,0,0.4);
+                cursor: pointer;
+                font-family: 'Segoe UI', sans-serif;
+                transition: all 0.4s ease;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            ">
+                <div style="display:flex; align-items:center; gap:8px; font-size:18px; font-weight:600;">
+                    ⚠️ <span>Risco de Evasão</span>
+                </div>
+                <small style="font-size:12px; font-weight:400; color:#e0e0e0;">Fazer busca ativa </small>
+            </button>
+
+            <!-- Painel flutuante com transição suave -->
+            <div id="divBuscaAtiva" style="
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                overflow-y: auto;
+                background-color: rgba(0,0,0,0.8);
+                color: #fff;
+                padding: 40px;
+                z-index: 1999;
+                opacity: 0;
+                transition: opacity 0.5s ease;
+            ">
+                <div style="
+                    background-color: #f8f9fa;
+                    color: #000;
+                    padding: 20px;
+                    border-radius: 10px;
+                    max-width: 90%;
+                    margin: auto;
+                ">
+                    <h1>{{ title }}</h1>
+                    <p>{{ descricao }}</p>
+            <style>
+            .table tr[data-cor="par"] {
+            background-color: #f5b3b3ff;
+            }
+            .table tr[data-cor="impar"] {
+            background-color: #e0e0e0;
+            }
+            .table tr:hover {
+            background-color: #d0d0d0;
+            }
+            </style>
+            <table class="table table-bordered">
+            <tr style="background-color: #ccc;">
+                <th>Aluno</th>
+                <th>Turma</th>
+                <th>Disciplina</th>
+                <th>Trimestre</th>
+                <th>Faltas </br> Trimestral</th>
+                <th>% Faltas </br> Trimestral</th>
+                <th>Faltas</br> Anual</th>
+                <th>% Faltas </br> Anual</th>
+                <th>Carga Horária </br>Disciplina</th>    
+                <th>Notas</th>
+            </tr>
+
+            {% regroup alunos_em_risco by matricula_id as grupos_alunos %}
+            
+            {% for grupo in grupos_alunos %}
+                {% cycle 'par' 'impar' as cor %}
+                {% for aluno in grupo.list %}
+                <tr data-cor="{{ cor }}">
+                    <td>{{ aluno.aluno }}</td>
+                    <td>{{ aluno.turma }}</td>
+                    <td>{{ aluno.disciplina }}</td>
+                    <td>{{ aluno.trimestre }}</td>
+                    <td>{{ aluno.faltas }}</td>
+                    <td>{{ aluno.percentual_faltas }}%</td>
+
+                    {% if forloop.first %}
+                        <!-- Mesclando as colunas anuais com alinhamento vertical -->
+                        <td rowspan="{{ grupo.list|length }}" style="text-align:center; vertical-align: middle;">{{ aluno.faltas_total }}</td>
+                        <td rowspan="{{ grupo.list|length }}" style="text-align:center; vertical-align: middle;">{{ aluno.percentual_faltas_anual }}%</td>
+                        <td rowspan="{{ grupo.list|length }}" style="text-align:center; vertical-align: middle;">{{ aluno.carga_horaria_anual }} horas aula</td>
+                    {% endif %}
 
 
-    
-{% if alunos_em_risco %}
-<!-- Botão estilizado -->
-<button id="btnBuscaAtiva" style="
-    position: fixed;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2000;
-    width: 280px;
-    height: 70px;
-    background: rgba(160, 160, 160, 0.1);
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: #f5f5f5;
-    border-bottom-left-radius: 50%;
-    border-bottom-right-radius: 50%;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    box-shadow: inset 0 1px 2px rgba(255,255,255,0.3),
-                0 4px 10px rgba(0,0,0,0.4);
-    cursor: pointer;
-    font-family: 'Segoe UI', sans-serif;
-    transition: all 0.4s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-">
-    <div style="display:flex; align-items:center; gap:8px; font-size:18px; font-weight:600;">
-        ⚠️ <span>Risco de Evasão</span>
+                    <td>{{ aluno.notas }}</td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+            </table>
+        </div>
     </div>
-    <small style="font-size:12px; font-weight:400; color:#e0e0e0;">Fazer busca ativa </small>
-</button>
 
-<!-- Painel flutuante com transição suave -->
-<div id="divBuscaAtiva" style="
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow-y: auto;
-    background-color: rgba(0,0,0,0.8);
-    color: #fff;
-    padding: 40px;
-    z-index: 1999;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-">
-    <div style="
-        background-color: #f8f9fa;
-        color: #000;
-        padding: 20px;
-        border-radius: 10px;
-        max-width: 90%;
-        margin: auto;
-    ">
-        <h1>{{ title }}</h1>
-        <p>{{ descricao }}</p>
-<style>
-.table tr[data-cor="par"] {
-  background-color: #f5b3b3ff;
-}
-.table tr[data-cor="impar"] {
-  background-color: #e0e0e0;
-}
-.table tr:hover {
-  background-color: #d0d0d0;
-}
-</style>
-<table class="table table-bordered">
-  <tr style="background-color: #ccc;">
-    <th>Aluno</th>
-    <th>Turma</th>
-    <th>Disciplina</th>
-    <th>Trimestre</th>
-    <th>Faltas </br> Trimestral</th>
-    <th>% Faltas </br> Trimestral</th>
-    <th>Faltas</br> Anual</th>
-    <th>% Faltas </br> Anual</th>
-    <th>Carga Horária </br>Disciplina</th>    
-    <th>Notas</th>
-  </tr>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnBuscaAtiva = document.getElementById('btnBuscaAtiva');
+        const divBuscaAtiva = document.getElementById('divBuscaAtiva');
 
-  {% regroup alunos_em_risco by matricula_id as grupos_alunos %}
-  
-  {% for grupo in grupos_alunos %}
-    {% cycle 'par' 'impar' as cor %}
-    {% for aluno in grupo.list %}
-      <tr data-cor="{{ cor }}">
-        <td>{{ aluno.aluno }}</td>
-        <td>{{ aluno.turma }}</td>
-        <td>{{ aluno.disciplina }}</td>
-        <td>{{ aluno.trimestre }}</td>
-        <td>{{ aluno.faltas }}</td>
-        <td>{{ aluno.percentual_faltas }}%</td>
+        btnBuscaAtiva.addEventListener('click', function() {
+            if (divBuscaAtiva.style.display === 'none' || divBuscaAtiva.style.display === '') {
+                divBuscaAtiva.style.display = 'block';
+                setTimeout(() => divBuscaAtiva.style.opacity = 1, 10); // suaviza a transição
+                btnBuscaAtiva.textContent = 'Ocultar alunos em busca ativa';
+            } else {
+                divBuscaAtiva.style.opacity = 0;
+                setTimeout(() => divBuscaAtiva.style.display = 'none', 500); // aguarda a transição
+                btnBuscaAtiva.textContent = 'Mostrar alunos em busca ativa';
+            }
+        });
 
-        {% if forloop.first %}
-            <!-- Mesclando as colunas anuais com alinhamento vertical -->
-            <td rowspan="{{ grupo.list|length }}" style="text-align:center; vertical-align: middle;">{{ aluno.faltas_total }}</td>
-            <td rowspan="{{ grupo.list|length }}" style="text-align:center; vertical-align: middle;">{{ aluno.percentual_faltas_anual }}%</td>
-            <td rowspan="{{ grupo.list|length }}" style="text-align:center; vertical-align: middle;">{{ aluno.carga_horaria_anual }} horas aula</td>
-        {% endif %}
-
-
-        <td>{{ aluno.notas }}</td>
-      </tr>
-    {% endfor %}
-  {% endfor %}
-</table>
-
-
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const btnBuscaAtiva = document.getElementById('btnBuscaAtiva');
-    const divBuscaAtiva = document.getElementById('divBuscaAtiva');
-
-    btnBuscaAtiva.addEventListener('click', function() {
-        if (divBuscaAtiva.style.display === 'none' || divBuscaAtiva.style.display === '') {
-            divBuscaAtiva.style.display = 'block';
-            setTimeout(() => divBuscaAtiva.style.opacity = 1, 10); // suaviza a transição
-            btnBuscaAtiva.textContent = 'Ocultar alunos em busca ativa';
-        } else {
-            divBuscaAtiva.style.opacity = 0;
-            setTimeout(() => divBuscaAtiva.style.display = 'none', 500); // aguarda a transição
-            btnBuscaAtiva.textContent = 'Mostrar alunos em busca ativa';
-        }
+        // Botão hover efeito
+        btnBuscaAtiva.addEventListener('mouseover', () => {
+            btnBuscaAtiva.style.backgroundColor = '#0056b3';
+            btnBuscaAtiva.style.boxShadow = '0 6px 8px rgba(0,0,0,0.3)';
+        });
+        btnBuscaAtiva.addEventListener('mouseout', () => {
+            btnBuscaAtiva.style.backgroundColor = '#007bff';
+            btnBuscaAtiva.style.boxShadow = '0 4px 6px rgba(0,0,0,0.2)';
+        });
     });
-
-    // Botão hover efeito
-    btnBuscaAtiva.addEventListener('mouseover', () => {
-        btnBuscaAtiva.style.backgroundColor = '#0056b3';
-        btnBuscaAtiva.style.boxShadow = '0 6px 8px rgba(0,0,0,0.3)';
-    });
-    btnBuscaAtiva.addEventListener('mouseout', () => {
-        btnBuscaAtiva.style.backgroundColor = '#007bff';
-        btnBuscaAtiva.style.boxShadow = '0 4px 6px rgba(0,0,0,0.2)';
-    });
-});
-</script>
+    </script>
 {% endif %}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
+   
     {% if  conteudo_page == 'create_users'  %}
         {% include 'Escola/partials/usuarios/createUsers.html' %}
     {% endif %}
@@ -397,7 +368,6 @@ document.addEventListener('DOMContentLoaded', function() {
     {% if  conteudo_page ==  'Contrato Update_Delete' %}
         {% include 'Escola/partials/pessoasContrato/update_or_delete.html' %}
     {% endif %}
-
     
    
     <!--Decreto-->
@@ -436,6 +406,7 @@ document.addEventListener('DOMContentLoaded', function() {
     {% if  conteudo_page ==  "Gestão Turmas - Notas Aluno"   %}
         {% include 'Escola/partials/gestao_turmas/notas.html' %}
     {% endif %}  
+
     <!-- Parecer Descritivo do Aluno-->
     {% if  conteudo_page ==  "Gestão Turmas - Parecer"   %}
         {% include 'Escola/partials/gestao_turmas/parecer_descritivo/parecer.html' %}
@@ -480,6 +451,7 @@ document.addEventListener('DOMContentLoaded', function() {
     {% if  conteudo_page == "imprime_comprovante_matricula" %}
         {% include 'Escola/partials/impressos/impresso_comprovante_matricula.html' %}
     {% endif %}   
+
     <!--END Impressos **************-->
     {% if  conteudo_page == 'delete' %}
         {% include 'Escola/partials/seleciona_DELETE.html' %}
@@ -487,13 +459,15 @@ document.addEventListener('DOMContentLoaded', function() {
     {% if  conteudo_page == 'update' %}
         {% include 'Escola/partials/seleciona_UPDATE.html' %}
     {% endif %}   
+
     <!-- Bairros -->
     {% if  conteudo_page == 'Criar Bairros' %}
         {% include 'Escola/partials/bairros/seleciona_bairros.html' %}
     {% endif %}    
     {% if  conteudo_page == 'update_or_delete' %}
         {% include 'Escola/partials/bairros/update_or_delete.html' %}
-    {% endif %}     
+    {% endif %}  
+
     <!-- Cidade -->
     {% if  conteudo_page == 'Criar Cidade' %}
         {% include 'Escola/partials/cidade/seleciona_cidade.html' %}
@@ -541,8 +515,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     
 
-
-
     <!--Errors 400, 403, 404, 500-->
 
     {% if  conteudo_page == "500" %}    
@@ -560,29 +532,12 @@ document.addEventListener('DOMContentLoaded', function() {
         {% include 'Escola/matriculaOnline/confirmarOUimpuganar.html' %}
     {% endif %} 
     
-    
-    
-    
+        
     
     <!-- Condiciionais-->
     {% if 'escola_id' not in request.session %}
         {% include 'Escola/partials/seleciona_escola.html' %}        
-    {% endif %}
-    {% comment "se existir professor" %}
-    {% if not condicional_aluno.exists %}
-        {% include 'Escola/partials/verifica_sem_registros/n_aluno.html' %}
-    {% endif %}
-
-    
-    {% if not condicional_professor.exists %}
-        {% include 'Escola/partials/verifica_sem_registros/n_professor.html' %}
-    {% endif %}
-    
-
-    {% if not condicional_turma.exists %}    
-        {% include 'Escola/partials/verifica_sem_registros/n_turma.html' %}
     {% endif %} 
-    {% endcomment %}   
 
     
     <!-- MIGRAR, EXPORTAR, FINALIZAR ANO LETIVO -->
@@ -591,10 +546,6 @@ document.addEventListener('DOMContentLoaded', function() {
         {% include 'Escola/partials/migrar_e_exprotar/exportar_turmas.html' %}
     {% endif %} 
 </div>
-
-
-
-
 
 
 
@@ -642,23 +593,9 @@ var datepickersList = datepickers.map(function (el) {
         }
     }
 </script>  
-
-   <link rel="stylesheet" href="{% static 'global/css/happy birtday.css' %}" />
-    
-
-
-    <canvas id="c"></canvas>
-
-
-
-
-
-
-
-
-
-
-
+<!-- Parabens ao aniversariante -->
+<link rel="stylesheet" href="{% static 'global/css/happy birtday.css' %}" />  
+<canvas id="c"></canvas>
     
 {% endblock script_footer %} 
 {% endblock main %}
