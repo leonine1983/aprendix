@@ -126,7 +126,7 @@ def home_professor(request):
         'notas_labels': notas_labels,
         'notas_values': notas_values,
         # Mural
-        'posts':MuralPost.objects.all()
+        'posts':MuralPost.objects.all().order_by("-criado_em")
         
     })
 
