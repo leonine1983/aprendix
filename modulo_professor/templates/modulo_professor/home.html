@@ -2,106 +2,271 @@
 {% load meus_filtros %}
 {% block main %}
 
-<!-- MURAL -->
-<section class="mural">
-  <div class="mural-header d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <h3>Mural Multidisciplinar</h3>
-      <div class="muted">Avisos e postagens</div>
-    </div>
-    <div class="d-flex gap-2">
-      <button id="btn-new-post" class="btn btn-info">Nova postagem</button>
-      <button id="btn-toggle-mural" class="btn btn-secondary">Ocultar</button>
-    </div>
-  </div>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
-  <div class="mural-posts" id="muralPosts">
-    <!-- Postagem inicial -->
-    <article class="post">
-      <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80" alt="">
-      <div class="cap">Projeto Ciência Viva — Turma 7º ano apresentou experimentos.</div>
-      <div class="post-actions">
-        <button onclick="toggleCommentsSection(this)">💬 Comentários</button>
-        <button onclick="likePost(this)">👍 Curtir</button>
-      </div>
-      <div class="comment-section">
-        <div class="comment-row">
-          <input type="text" placeholder="Escreva um comentário...">
-          <button onclick="publishComment(this)">Publicar</button>
+<style>
+  /* ================= MATERIAL DESIGN TOKENS ================= */
+  :root {
+    --google-blue: #1a73e8;
+    --google-blue-hover: #1765cc;
+    --google-gray-bg: #f8f9fa;
+    --google-border: #dadce0;
+    --text-primary: #3c4043;
+    --text-secondary: #5f6368;
+    --white: #ffffff;
+    --radius-lg: 16px;
+    --radius-md: 8px;
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--google-gray-bg);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .mural-container {
+    max-width: 900px;
+    margin: 32px auto;
+    padding: 0 20px;
+  }
+
+  /* ================= HEADER & COMPOSER ================= */
+  .mural-header { margin-bottom: 32px; }
+  .mural-header h3 { font-size: 22px; font-weight: 400; margin-bottom: 24px; }
+
+  .composer-card {
+    background: var(--white);
+    border: 1px solid var(--google-border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    box-shadow: 0 1px 2px 0 rgba(60,64,67,.30);
+    transition: var(--transition);
+  }
+
+  .mural-form textarea {
+    border: none; resize: none; font-family: inherit; font-size: 15px;
+    outline: none; width: 100%; color: var(--text-primary);
+  }
+
+  .form-actions {
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid var(--google-border); padding-top: 12px;
+  }
+
+  /* ================= BOTÕES ================= */
+  .btn-google {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 24px; border-radius: 4px; font-weight: 500;
+    font-size: 14px; cursor: pointer; transition: var(--transition); border: none;
+  }
+  .btn-primary { background-color: var(--google-blue); color: white; }
+  .btn-ghost { background: transparent; color: var(--google-blue); border: 1px solid var(--google-border); }
+
+  /* ================= POST CARD ================= */
+  .post-card {
+    background: var(--white);
+    border: 1px solid var(--google-border);
+    border-radius: var(--radius-md);
+    margin-bottom: 24px;
+    overflow: hidden;
+    transition: var(--transition);
+  }
+
+  .post-header { padding: 16px; display: flex; align-items: center; gap: 12px; }
+  .author-avatar {
+    width: 40px; height: 40px; background: var(--google-blue);
+    color: white; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; font-weight: 500;
+  }
+  .author-info .name{text-transform: capitalize;}
+
+  .post-body { padding: 0 16px 16px 16px; font-size: 15px; line-height: 1.5; }
+  .post-image { width: 100%; max-height: 450px; object-fit: cover; }
+
+  /* ================= ACTIONS (LIKE/COMMENT) ================= */
+  .post-actions {
+    display: flex; gap: 12px; padding: 8px 16px;
+    border-top: 1px solid var(--google-border);
+  }
+
+  .btn-action {
+    background: none; border: none; display: flex; align-items: center;
+    gap: 6px; color: var(--text-secondary); font-size: 14px;
+    font-weight: 500; cursor: pointer; padding: 8px 12px;
+    border-radius: 4px; transition: var(--transition);
+  }
+
+  .btn-action:hover { background-color: #f1f3f4; }
+  .btn-action.active { color: #d93025; } /* Vermelho Google */
+  .btn-action.active .material-icons-outlined { font-variation-settings: 'FILL' 1; }
+
+  /* ================= COMMENTS ================= */
+  .comment-section {
+    padding: 16px; background: #fafafa; border-top: 1px solid var(--google-border);
+  }
+  .comment-item { margin-bottom: 8px; font-size: 13px; }
+  .comment-input-wrapper { display: flex; gap: 12px; margin-top: 12px; }
+  .comment-input-wrapper input {
+    flex: 1; padding: 8px 16px; border: 1px solid var(--google-border);
+    border-radius: 20px; outline: none;
+  }
+</style>
+
+<div class="mural-container">
+  <header class="mural-header">
+    <h3>Mural Multidisciplinar</h3>
+
+    {% if user.is_authenticated %}
+    <div class="composer-card">
+      <form method="post" action="{% url 'modulo_professor:criar_post' %}" enctype="multipart/form-data" class="mural-form">
+        {% csrf_token %}
+        <textarea name="conteudo" rows="2" placeholder="Compartilhe algo com a turma..." required></textarea>
+        <div class="form-actions">
+          <input type="file" name="imagem" id="file-upload" hidden>
+          <label for="file-upload" class="btn-google btn-ghost">
+            <span class="material-icons-outlined">image</span> Anexar Foto
+          </label>
+          <button class="btn-google btn-primary">Postar</button>
         </div>
-        <div class="comments-list"></div>
+      </form>
+    </div>
+    {% endif %}
+  </header>
+
+  <div class="mural-feed">
+    {% for post in posts %}
+    <article class="post-card">
+      <div class="post-header">
+        <div class="author-avatar">{{ post.autor.username|slice:":1"|upper }}</div>
+        <div class="author-info">
+          <span class="name"><b>{{ post.autor.get_full_name|default:post.autor.username }}</b></span><br>
+          <small class="text-secondary">{{ post.criado_em|date:"d/m/Y H:i" }}</small>
+        </div>
+      </div>
+
+      <div class="post-body">
+        <p>{{ post.conteudo }}</p>
+      </div>
+
+      {% if post.imagem %}
+      <img src="{{ post.imagem.url }}" class="post-image" alt="Post image">
+      {% endif %}
+
+      <div class="post-actions">
+        <button
+            class="btn-action {% if  request.user in post.curtidas.all %}active{% endif %}"
+            id="btn-like-{{ post.id }}"
+            onclick="likePostNew({{ post.id }})">
+            
+            <span class="material-icons-outlined">favorite</span>
+            <span id="like-count-{{ post.id }}">{{ post.total_curtidas }}</span>
+
+          </button>
+
+
+        <button class="btn-action" onclick="toggleComments({{ post.id }})">
+          <span class="material-icons-outlined">forum</span>
+          <span>{{ post.comentarios.count }}</span>
+        </button>
+      </div>
+
+      <div id="comments-{{ post.id }}" class="comment-section" style="display: none;">
+        <div id="comment-list-{{ post.id }}">
+          {% for c in post.comentarios.all %}
+          <div class="comment-item">
+            <b>{{ c.autor.username }}</b> {{ c.texto }}
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="comment-input-wrapper">
+          <input type="text" id="input-{{ post.id }}" placeholder="Escreva um comentário...">
+          <button class="btn-google btn-primary" style="padding: 6px 12px;" onclick="sendComment({{ post.id }})">
+            <span class="material-icons-outlined">send</span>
+          </button>
+        </div>
       </div>
     </article>
-
-    <article class="post">
-      <img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=1200&q=80" alt="">
-      <div class="cap">Semana da Computação — inscrição aberta.</div>
-      <div class="post-actions">
-        <button onclick="toggleCommentsSection(this)">💬 Comentários</button>
-        <button onclick="likePost(this)">👍 Curtir</button>
-      </div>
-      <div class="comment-section">
-        <div class="comment-row">
-          <input type="text" placeholder="Escreva um comentário...">
-          <button onclick="publishComment(this)">Publicar</button>
-        </div>
-        <div class="comments-list"></div>
-      </div>
-    </article>
+    {% empty %}
+    <p class="text-center text-secondary">Nenhuma postagem ainda.</p>
+    {% endfor %}
   </div>
-</section>
+</div>
 
 <script>
-  function toggleCommentsSection(btn){
-    const section = btn.closest('.post')?.querySelector('.comment-section');
-    if(section) section.style.display = section.style.display === 'block' ? 'none' : 'block';
+
+  function toggleComments(id) {
+    const el = document.getElementById(`comments-${id}`);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
   }
 
-  function publishComment(btn){
-    const row = btn.closest('.comment-row');
-    if(!row) return;
-    const input = row.querySelector('input');
-    const list = btn.closest('.post')?.querySelector('.comments-list');
-    const text = input?.value.trim();
-    if(!text) return;
-    const p = document.createElement('p');
-    p.textContent = `Você: ${text}`;
-    list.appendChild(p);
-    input.value = '';
-    list.scrollTop = list.scrollHeight;
+  function sendComment(postId) {
+    const input = document.getElementById(`input-${postId}`);
+    if (!input.value.trim()) return;
+
+    fetch("{% url 'modulo_professor:criar_comentario' 0 %}".replace('0', postId), {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: `texto=${encodeURIComponent(input.value)}`
+    })
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById(`comment-list-${postId}`);
+      container.insertAdjacentHTML('beforeend', `<div class="comment-item"><b>${data.autor}</b> ${data.texto}</div>`);
+      input.value = '';
+    });
   }
-
-  function likePost(btn){
-    btn.textContent = btn.textContent.includes('✓') ? '👍 Curtir' : '👍 Curtir ✓';
-  }
-
-  document.getElementById('btn-toggle-mural')?.addEventListener('click', ()=>{
-    const posts = document.getElementById('muralPosts');
-    posts.style.display = posts.style.display === 'none' ? '' : 'none';
-  });
-
-  document.getElementById('btn-new-post')?.addEventListener('click', ()=>{
-    const caption = prompt('Texto da postagem:');
-    if(!caption) return;
-    const imgURL = prompt('URL da imagem (opcional):') || 'https://picsum.photos/800/480?random=' + Date.now();
-    const post = document.createElement('article');
-    post.className = 'post';
-    post.innerHTML = `
-      <img src="${imgURL}" alt="">
-      <div class="cap">${caption}</div>
-      <div class="post-actions">
-        <button onclick="toggleCommentsSection(this)">💬 Comentários</button>
-        <button onclick="likePost(this)">👍 Curtir</button>
-      </div>
-      <div class="comment-section">
-        <div class="comment-row">
-          <input type="text" placeholder="Escreva um comentário...">
-          <button onclick="publishComment(this)">Publicar</button>
-        </div>
-        <div class="comments-list"></div>
-      </div>`;
-    document.getElementById('muralPosts').prepend(post);
-  });
 </script>
+
+
+
+<script>
+function likePostNew(postId) {
+    const url = "{% url 'modulo_professor:curtir_post' 0 %}".replace('0', postId);
+
+    fetch(url, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken"),
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Resposta inválida do servidor");
+        }
+        return response.json();
+    })
+    .then(data => {
+        const btn = document.getElementById(`btn-like-${postId}`);
+        const count = document.getElementById(`like-count-${postId}`);
+
+        btn.classList.toggle("active", data.curtiu);
+        count.textContent = data.total;
+    })
+    .catch(err => {
+        console.error("Erro no like:", err);
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    document.cookie.split(';').forEach(cookie => {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        }
+    });
+    return cookieValue;
+}
+</script>
+
+
 
 {% endblock main %}

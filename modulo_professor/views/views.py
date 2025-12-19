@@ -910,3 +910,86 @@ def alternar_minimizacao_kanban(request):
     })
 
 
+
+
+# Mural
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from ..models import MuralPost, MuralComentario
+
+
+@login_required
+def mural_view(request):
+    posts = MuralPost.objects.filter(ativo=True)
+    return render(request, 'modulo_professor/home.html', {'posts': posts})
+
+
+@login_required
+def criar_post(request):
+    if request.method == 'POST':
+        conteudo = request.POST.get('conteudo')
+        imagem = request.FILES.get('imagem')
+
+        if conteudo:
+            MuralPost.objects.create(
+                autor=request.user,
+                conteudo=conteudo,
+                imagem=imagem
+            )
+
+    return redirect('modulo_professor:lista')
+
+
+@login_required
+def criar_comentario(request, post_id):
+    if request.method == 'POST':
+        texto = request.POST.get('texto')
+        post = get_object_or_404(MuralPost, id=post_id)
+
+        if texto:
+            comentario = MuralComentario.objects.create(
+                post=post,
+                autor=request.user,
+                texto=texto
+            )
+
+            # Retorno AJAX
+            return JsonResponse({
+                'autor': comentario.autor.username,
+                'texto': comentario.texto
+            })
+
+    return JsonResponse({'erro': 'Comentário inválido'}, status=400)
+
+
+
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from ..models import MuralPost
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def curtir_post(request, post_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método inválido'}, status=405)
+
+    post = get_object_or_404(MuralPost, id=post_id)
+    user = request.user
+
+    if post.curtidas.filter(id=user.id).exists():
+        post.curtidas.remove(user)
+        curtiu = False
+    else:
+        post.curtidas.add(user)
+        curtiu = True
+
+    return JsonResponse({
+        'curtiu': curtiu,
+        'total': post.curtidas.count()
+    })

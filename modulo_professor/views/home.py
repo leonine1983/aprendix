@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from gestao_escolar.models import  TurmaDisciplina, AnoLetivo, GestaoTurmas, Trimestre, Matriculas, Presenca
-from modulo_professor.models import ComposicaoNotas
+from modulo_professor.models import ComposicaoNotas, MuralComentario, MuralPost
 from django.contrib import messages
 from django.shortcuts import redirect, render, get_object_or_404
 from collections import defaultdict
@@ -125,6 +125,9 @@ def home_professor(request):
         'faltas_values': faltas_values,
         'notas_labels': notas_labels,
         'notas_values': notas_values,
+        # Mural
+        'posts':MuralPost.objects.all()
+        
     })
 
 

@@ -3,8 +3,9 @@ from .views import *
 app_name = 'modulo_professor'
 
 urlpatterns = [
-    path('', home_professor, name='homeProfessor'),
+    path('home/', home_professor, name='homeProfessor'),
     path('/sessao/', home_sessaoIniciada, name='sessaoEscola'),
+    
 
     path('turmas/notas/seleciona/', selecionaTurmaNotas, name='selecionaTurmaNotas'),
     path('alunos/notas/seleciona/<int:turma_id>/<int:grade>', selecionaAlunosNotas, name='selecionaAlunosNotas'),    
@@ -65,6 +66,14 @@ urlpatterns = [
     alternar_minimizacao_kanban,
     name="kanban-minimizar"
 ),
+
+
+    # Mural
+    path('mural/', views.mural_view, name='lista'),
+    path('mural/novo/', views.criar_post, name='criar_post'),
+    path('mural/comentario/<int:post_id>/', views.criar_comentario, name='criar_comentario'),
+    path('mural/curtir/<int:post_id>/', curtir_post, name='curtir_post'),
+
 
 
 
