@@ -103,7 +103,8 @@ input[type=checkbox]{
             <th scope="col">Multiseriada</th>
             {% endif %}  
             <th scope="col">Síndrome de Down</th>
-            <th scope="col">Deficiência Física</th>        
+            <th scope="col">Deficiência Física</th>   
+            <th scope="col">Situação</th>       
             <th scope="col" class="text-center fw-bold">Ações</th>       
           </tr>
         </thead>
@@ -125,6 +126,9 @@ input[type=checkbox]{
             {% endif %}  
             <td class='text-align'>
               {{n.aluno.deficiencia_aluno}} 
+            </td>
+            <td class='text-align {% if n.situacao_na_turma  == "Desistente/Evasão Escolar" %}text-danger {% else %}text-primary{% endif %}'>
+              {{n.situacao_na_turma }} 
             </td>
 
             {% if serie_multi %}

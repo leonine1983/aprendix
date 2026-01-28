@@ -43,8 +43,7 @@ urlpatterns = [
 
     # Matriculas
     path('gestao_escolar/Matricula/all_classes', View_turmas_Matriculas.as_view(), name="GE_Escola_Matricula_Turmas_lista"), 
-    path('gestao_escolar/Matricula/create/<int:pk>', Create_Matriculas.as_view(), name="GE_Escola_Matricula_create"),  
-    path('gestao_escolar/Matricula/create/<int:pk>', Create_Matriculas.as_view(), name="GE_Escola_Matricula_create"),      
+    path('gestao_escolar/Matricula/create/<int:pk>', Create_Matriculas.as_view(), name="GE_Escola_Matricula_create"),       
     path('gestao_escolar/Matricula/all', List_Matriculas.as_view(), name="GE_Escola_Matricula_lista"),
     path('gestao_escolar/Matricula/imprime/<int:pk>', ViewDetailMatriculasTurma.as_view(), name="Matricula_turma"),    
     path('gestao_escolar/Matricula/comprovante/imprime/<int:pk>', ComprovanteMatricula.as_view(), name="Matricula_comprovante"),    

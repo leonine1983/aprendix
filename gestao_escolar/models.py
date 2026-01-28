@@ -504,9 +504,16 @@ class Matriculas(models.Model):
     data_matricula = models.DateField(auto_now=True)
     escolarizacao_fora = models.CharField(choices=escola_fora, default=1, max_length=1)
     serie_multiseriada = models.ForeignKey(Serie_Escolar, null=True, blank=True, on_delete=models.CASCADE)
+
+    # Informações de aluno ativo ou remanejado
+    situacao_na_turma = models.CharField(max_length=30, default="Ativo")
+    desistente = models.BooleanField(default=False)
+    transferido = models.BooleanField(default=False)
+    remanejado = models.BooleanField(default=False)
     data_afastamento_inicio = models.DateField(null=True)
-    data_afastamento_fim = models.DateField(null=True)
+    data_afastamento_fim = models.DateField(null=True)    
     motivo_afastamento = models.TextField(max_length=200, null=True)
+
     calcula_media = models.BooleanField(default=True, null=True, blank=True)
     profissional_matricula = models.ForeignKey(User, related_name='related_matricula_alunos', null=True, on_delete=models.CASCADE)
     obervacao = RichTextUploadingField(null=True, blank=True)    
@@ -559,6 +566,7 @@ class Remanejamento(models.Model):
     description = models.TextField(max_length=500, verbose_name="Descreva o motivo do Remanejamento. Ex.: Escola para onde o aluno será remanejado e o porquê.")    
     turmaAnterior = models.CharField(max_length=20, null=True, blank=True, verbose_name="Turma anterior")
     data = models.DateTimeField(auto_now_add=True)
+    profissional_q_remanejou = models.ForeignKey(User, related_name='related_remaneja_alunos', null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.tipo.nome

@@ -6,6 +6,46 @@
     background-color: rgba(0, 0, 0, 0.555);
 }
 
+
+.btn-close-window {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    padding: 0.6rem 1.2rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+
+    color: #fff;
+    background: linear-gradient(135deg, #6c757d, #495057);
+    border: none;
+    border-radius: 0.5rem;
+
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-close-window i {
+    font-size: 1.1rem;
+}
+
+.btn-close-window:hover {
+    background: linear-gradient(135deg, #495057, #343a40);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+.btn-close-window:active {
+    transform: scale(0.97);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-close-window:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(108, 117, 125, 0.4);
+}
 </style>
 {% load static %}
 <div class="modal  show" id="modal_escola">    
@@ -18,7 +58,16 @@
     {% endif %}
                   <h2 class="text-light">{{svg|safe}}{{ title_page|safe }} {{ titulo_page|safe }}</h2>   
                   <div class="d-flex justify-content-between gap-2">
-                    <span class="fechar btn btn-sm d-flex pt-3  btn-light" onclick="fecharModal()">&times; Fechar a janela</span>             
+                    <!--<span class="fechar btn btn-sm d-flex pt-3  btn-light" onclick="fecharModal()">&times; Fechar a janela</span>-->
+                     
+                        <form id="fecharJanela" method="post" action="{% url 'Gestao_Escolar:GE_Escola_inicio' %}">
+                            {% csrf_token %}
+                            <button id="fecharModal" type="submit" class="btn btn-close-window">                                
+                                <i class="fa-solid fa-xmark me-2"></i>
+                                Fechar janela
+                            </button>
+                        </form>
+ 
                         <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-secondary">
