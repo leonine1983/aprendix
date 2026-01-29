@@ -560,16 +560,27 @@ class TiposRemanejamentos(models.Model):
         return self.nome  
     
 
-class Remanejamento(models.Model):    
-    tipo = models.ForeignKey(TiposRemanejamentos, null=True, on_delete=models.CASCADE)    
-    aluno = models.ForeignKey(Matriculas, null=True, blank=True, on_delete=models.CASCADE)    
-    description = models.TextField(max_length=500, verbose_name="Descreva o motivo do Remanejamento. Ex.: Escola para onde o aluno será remanejado e o porquê.")    
-    turmaAnterior = models.CharField(max_length=20, null=True, blank=True, verbose_name="Turma anterior")
+class Remanejamento(models.Model):
+    tipo = models.ForeignKey(TiposRemanejamentos, null=True, on_delete=models.CASCADE)
+    aluno = models.ForeignKey(Matriculas, null=True, blank=True, on_delete=models.CASCADE)
+    description = models.TextField(max_length=500)
+    turma_anterior = models.ForeignKey(
+        Turmas,
+        null=True,
+        blank=True,
+        related_name='remanejamentos_origem',
+        on_delete=models.SET_NULL
+    )
+    turma_nova = models.ForeignKey(
+        Turmas,
+        null=True,
+        blank=True,
+        related_name='remanejamentos_destino',
+        on_delete=models.SET_NULL
+    )
     data = models.DateTimeField(auto_now_add=True)
-    profissional_q_remanejou = models.ForeignKey(User, related_name='related_remaneja_alunos', null=True, on_delete=models.CASCADE)
+    profissional_q_remanejou = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.tipo.nome
 
 
 class Trimestre(models.Model):

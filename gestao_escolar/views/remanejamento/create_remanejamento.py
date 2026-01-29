@@ -18,33 +18,70 @@ class Create_Remanejamento(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('Gestao_Escolar:GE_Escola_inicio')
     success_message = "Aluno remanejado com sucesso!"
 
+from django.contrib import messages
+from django.utils import timezone
+from django import forms
+
+class RemanejamentoForm(forms.ModelForm):
+    class Meta:
+        model = Remanejamento
+        fields = ['tipo', 'aluno', 'turma_nova', 'description']
+
+    def __init__(self, *args, **kwargs):
+        matricula_id = kwargs.pop('matricula_id', None)
+        super().__init__(*args, **kwargs)
+
+        if matricula_id:
+            self.fields['aluno'].queryset = Matriculas.objects.filter(pk=matricula_id)
+            self.fields['aluno'].initial = matricula_id
+
+
+class Create_Remanejamento(LoginRequiredMixin, CreateView):
+    model = Remanejamento
+    form_class = RemanejamentoForm
+    template_name = 'Escola/inicio.html'
+    success_url = reverse_lazy('Gestao_Escolar:GE_Escola_inicio')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['matricula_id'] = self.kwargs['pk']
+        return kwargs
+
     def form_valid(self, form):
         remanejamento = form.save(commit=False)
-
-        # Vincula o usuário logado
         remanejamento.profissional_q_remanejou = self.request.user
 
         matricula = remanejamento.aluno
-        tipo = remanejamento.tipo.nome  # ajuste se o campo for outro
+        tipo = remanejamento.tipo.nome
 
-        # Regra específica para Desistente/Evasão Escolar
-        if tipo == 'Desistente/Evasão Escolar':
-            matricula.situacao_na_turma = 'Desistente/Evasão Escolar'
-            matricula.desistente = True
+        # MUDANÇA DE TURMA
+        if tipo == 'Mudança de Turma':
+            # Guarda a turma anterior
+            remanejamento.turma_anterior = matricula.turma
+
+            # Atualiza matrícula
+            matricula.turma = remanejamento.turma_nova
+            matricula.remanejado = True
+            matricula.desistente = False
             matricula.transferido = False
-            matricula.remanejado = False
-            matricula.data_afastamento_inicio = timezone.now().date()
-            matricula.motivo_afastamento = remanejamento.description
+            matricula.situacao_na_turma = 'Remanejado'
             matricula.save()
 
+            remanejamento.save()
+
+            messages.success(
+                self.request,
+                "Aluno remanejado para nova turma com sucesso."
+            )
+
+            return super().form_valid(form)
+
+        # Continua fluxo normal para outros tipos
         remanejamento.save()
-
-        messages.success(
-            self.request,
-            "Aluno marcado como Desistente/Evasão Escolar com sucesso."
-        )
-
         return super().form_valid(form)
+
+
+
     def get_context_data(self, **kwargs):
         svg = '<i class="fa-sharp fa-regular fa-layer-plus"></i>'
         context = super().get_context_data(**kwargs)        

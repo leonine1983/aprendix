@@ -127,7 +127,16 @@ input[type=checkbox]{
             <td class='text-align'>
               {{n.aluno.deficiencia_aluno}} 
             </td>
-            <td class='text-align {% if n.situacao_na_turma  == "Desistente/Evasão Escolar" %}text-danger {% else %}text-primary{% endif %}'>
+            <td class='text-align
+
+            {% if n.situacao_na_turma == "Desistente/Evasão Escolar" %}
+                text-danger
+            {% elif n.situacao_na_turma == "Transferido" %}
+                text-success
+            {% else %}
+                text-primary
+            {% endif %}  
+            '>
               {{n.situacao_na_turma }} 
             </td>
 
