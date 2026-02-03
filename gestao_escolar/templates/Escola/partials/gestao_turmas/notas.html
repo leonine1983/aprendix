@@ -181,17 +181,24 @@
                                                                                 id="abrirdialog_notas_{{aluno.id}}_{{gestao_turma.grade.id}}_{{gestao_turma.trimestre_id}}" 
                                                                                 class="btn btn-sm btn-outline-primary m-1">                                 
                                                                                 {% if gestao_turma.notas %}
-                                                                                    <span class=' {% if gestao_turma.notas < 5 %} text-danger {% endif %}'>{{ gestao_turma.notas }}</span>
+
+                                                                                <!--CAMPOS DE NOTA - DIGITÁVEL-->
+                                                                                  <span class=' {% if gestao_turma.notas < 5 %} text-danger {% endif %}'>{{ gestao_turma.notas }}</span>
+                                                                                <!--END CAMPOS DE NOTA - DIGITÁVEL-->
+
                                                                                 {% else %}
                                                                                     not
                                                                                 {% endif %}
                                                                                 </button>
+
+                                                                                <!-- DIALOG NOTAS-->
                                                                                 {% include "Escola/partials/gestao_turmas/notas_partials/dialog_se_aprovado_conselho/dialog_Notas.html" %}
+                                                                                <!-- DIALOG NOTAS-->
+                                                                                 
                                                                                 {% else %}
                                                                                 <!--Caso contrário, as notas não poderão ser alteradas-->
                                                                                     {% if gestao_turma.notas %}
-                                                                                        {{ gestao_turma.notas }}
-                                                                                      
+                                                                                        {{ gestao_turma.notas }}                                                                                   
                                                                                     {% endif %}
                                                                             {% endif %}
 
@@ -279,13 +286,13 @@
                                                 <!-- Verifica se o aluno foi aprovado pelo conselhor de classe-->
                                                 {% if not aluno.aprovado_conselho and not aluno.reprovado_conselho  %}
                                                     <!-- Verifica se o aluno teve notas suficientes para ser aprovado -->
-                                                    {% if aluno.gestao_turmas_related.last.aprovado  %}
-                                                        <td class='bg-primary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado</td>
+                                                    {% if not aluno.gestao_turmas_related.last.aprovado  %}
+                                                        <td class='bg-primary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado   {{aluno.gestao_turmas_related.last.aprovado}}</td>
                                                         {% else %}  
                                                             {% if aluno.foi_a_recupera %}                                                                                                                                                              
                                                                 {% if aluno.aprovado_recupera %} 
                                                                     <!-- Se o aluno for aprovado pela Recuperação-->                                                                                        
-                                                                    <td class='bg-primary-subtle '><i class="fa-solid fa-face-smile-wink"></i> Aprovado</td>  
+                                                                    <td class='bg-primary-subtle '><i class="fa-solid fa-face-smile-wink"></i> Aprovado  </td>  
                                                                     {% elif aluno.reprovado_recupera %}                                                                        
                                                                         <!-- Se o aluno foi reprovado na recuperação -->
                                                                         {% if aluno.reprovado_conselho %}

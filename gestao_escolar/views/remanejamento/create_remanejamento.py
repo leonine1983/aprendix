@@ -64,7 +64,7 @@ class Create_Remanejamento(LoginRequiredMixin, CreateView):
             matricula.remanejado = True
             matricula.desistente = False
             matricula.transferido = False
-            matricula.situacao_na_turma = 'Remanejado'
+            matricula.situacao_na_turma = f'Remanejado do {remanejamento.turma_anterior}'
             matricula.save()
 
             remanejamento.save()

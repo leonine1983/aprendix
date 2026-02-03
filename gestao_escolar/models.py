@@ -763,7 +763,136 @@ class GestaoTurmas(models.Model):
     def __str__(self):
         return self.aluno.aluno.nome_completo
     
+    def save(self, *args, **kwargs):
+        from django.db.models import Avg, Sum
+        from modulo_professor.models import ComposicaoNotas
+        from gestao_escolar.models import GestaoTurmas, Trimestre
 
+        # 🔁 Evita loop infinito
+        if getattr(self, '_atualizando_por_composicao', False):
+            super().save(*args, **kwargs)
+            return
+
+        super().save(*args, **kwargs)
+
+        # 🔹 Sincroniza ComposicaoNotas
+        if self.notas is not None:
+            comp_nota, created = ComposicaoNotas.objects.get_or_create(
+                aluno=self.aluno,
+                grade=self.grade,
+                trimestre=self.trimestre,
+                defaults={'nota_final': self.notas}
+            )
+
+            mensagem = f"Nota atualizada por {self.profissional_resp}"
+            if not created:
+                comp_nota.nota_final = self.notas
+                comp_nota.anotacoes = (
+                    f"{comp_nota.anotacoes}\n{mensagem}"
+                    if comp_nota.anotacoes else mensagem
+                )
+            else:
+                comp_nota.anotacoes = mensagem
+
+            comp_nota._atualizando_por_gestao = True
+            comp_nota.save()
+
+        # ======================================================
+        # 🔹 CALCULA MÉDIA (somente trimestres não finais)
+        # ======================================================
+        media = GestaoTurmas.objects.filter(
+            aluno=self.aluno,
+            grade=self.grade,
+            trimestre__final=False,
+            notas__isnull=False
+        ).aggregate(media=Avg('notas'))['media']
+
+        if media is None:
+            return
+
+        # ======================================================
+        # 🔹 GARANTE EXISTÊNCIA DO TRIMESTRE FINAL
+        # 👉 ESSE É O TRECHO QUE FALTAVA
+        # ======================================================
+        trimestre_final = Trimestre.objects.filter(final=True).first()
+
+        if trimestre_final:
+            GestaoTurmas.objects.get_or_create(
+                aluno=self.aluno,
+                grade=self.grade,
+                trimestre=trimestre_final,
+                defaults={
+                    "profissional_resp": self.profissional_resp
+                }
+            )
+
+        # ======================================================
+        # 🔹 VERIFICA APROVAÇÃO DO ALUNO (POR DISCIPLINA)
+        # ======================================================
+        """
+        Regra:
+        - O aluno só é aprovado se TODAS as disciplinas
+        possuírem média final >= 5.00.
+        - Caso exista ao menos UMA disciplina com média < 5.00,
+        o aluno será marcado como NÃO aprovado.
+        """
+
+        from decimal import Decimal
+
+        # 🔹 Busca todas as médias finais do aluno no trimestre final
+        medias_finais = GestaoTurmas.objects.filter(
+            aluno=self.aluno,
+            trimestre__final=True,
+            media_final__isnull=False
+        ).values_list('media_final', flat=True)
+
+        # 🔹 Se não houver médias suficientes, não decide aprovação
+        if medias_finais.exists():
+
+            # 🔹 Verifica se alguma disciplina está abaixo da média mínima
+            possui_media_abaixo = any(
+                media < Decimal('5.00') for media in medias_finais
+            )
+
+            # 🔹 Atualiza o status de aprovação da matrícula
+            Matriculas.objects.filter(pk=self.aluno.pk).update(
+                aprovado=not possui_media_abaixo
+            )        
+
+
+        # ======================================================
+        # 🔹 CALCULA TOTAL DE FALTAS
+        # ======================================================
+        total_faltas = GestaoTurmas.objects.filter(
+            aluno=self.aluno,
+            grade=self.grade
+        ).aggregate(total=Sum('faltas'))['total'] or 0
+
+        # ======================================================
+        # 🔹 ATUALIZA TODOS OS REGISTROS (inclusive o final)
+        # ======================================================
+        GestaoTurmas.objects.filter(
+            aluno=self.aluno,
+            grade=self.grade
+        ).update(
+            media_final=media,
+            faltas_total=total_faltas
+        )
+
+        # ======================================================
+        # 🔹 REPROVAÇÃO AUTOMÁTICA POR FALTAS
+        # ======================================================
+        if self.grade and self.grade.carga_horaria_anual:
+            limite_faltas = self.grade.carga_horaria_anual * 0.25
+            reprovado = total_faltas >= limite_faltas
+
+            GestaoTurmas.objects.filter(
+                aluno=self.aluno,
+                grade__turma=self.grade.turma
+            ).update(reprovado_faltas=reprovado)
+
+    
+    """
     def save(self, *args, **kwargs):
         from django.db.models import Avg, Sum
         from modulo_professor.models import ComposicaoNotas
@@ -865,6 +994,7 @@ class GestaoTurmas(models.Model):
                     reprovado_faltas=True,
                     reprovado_faltas_disciplina=disciplinas_texto
                 )
+    """
 
                 
     

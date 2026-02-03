@@ -32,6 +32,20 @@
       display: none;
     }
 
+  .nav-section-title {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: #1e40af; /* azul institucional */
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 1.5rem;
+  padding-left: 0.75rem;
+  border-left: 3px solid #2563eb; /* destaque elegante */
+  pointer-events: none;
+}
+
+
+
   /* Quando a tela for 830px ou menor */
   @media (max-width: 1000px) {
     #sidebar-desktop {
@@ -75,6 +89,8 @@
         </a>
       </li>
       {% endif %}
+      <!-- cadastros -->
+      <li class="nav-section-title mt-4">Cadastros Institucionais</li>
       <li>
         <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_create' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Alunos" data-bs-toggle="tooltip" data-bs-placement="right">
           <i class="fa-sharp fa-solid fa-people fs-5 txt-p-nav me-2"></i>
@@ -87,34 +103,28 @@
           Cadastro de Turmas
         </a>
       </li>
-      <!--
-      <li>
-        <a href="{% url 'Gestao_Escolar:GE_Create_Professores' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Professores" data-bs-toggle="tooltip" data-bs-placement="right">
-          <i class="fs-5 fa-duotone fa-person-chalkboard txt-p-nav me-2"></i>
-          Cadastro de Profissionais
-        </a>
-      </li>
-      -->
       <li>
         <a href="{% url 'Gestao_Escolar:pessoas-create' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Professores" data-bs-toggle="tooltip" data-bs-placement="right">
           <i class="fs-5 fa-duotone fa-person-chalkboard txt-p-nav me-2"></i>
           Cadastro de Profissionais
         </a>
       </li>
+      <!-- Gerir o ano letivo-->
+      <li class="nav-section-title mt-4">Gestão Acadêmica</li>
       <li>
-        <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Matrícula" data-bs-toggle="tooltip" data-bs-placement="right">
+        <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="nav-link py-3 rounded-3 txt-p-nav" title=" Matrícular alunos nas turmas" data-bs-toggle="tooltip" data-bs-placement="right">
           <i class="fs-4 fa-solid fa-screen-users txt-p-nav me-2"></i>
-          Matrícula de alunos nas turmas
+          Matrículas
         </a>
       </li>
       <li>
-        <a href="{% url 'Gestao_Escolar:Grades_turmas' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Grade de Disciplinas" data-bs-toggle="tooltip" data-bs-placement="right">
+        <a href="{% url 'Gestao_Escolar:Grades_turmas' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Adiciona professor e disciplinas na turma" data-bs-toggle="tooltip" data-bs-placement="right">
           <i class="fs-4 fa-duotone fa-chart-network txt-p-nav me-2" style="font-size: 1.65rem;"></i>
           Grade de disciplinas
         </a>
       </li>
       <li>
-        <a href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Gestão das Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
+        <a href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}" class="nav-link py-3 rounded-3 txt-p-nav" title="Permite o registro e o acompanhamento de notas, frequência e indicadores de desempenho acadêmico dos alunos por turma." data-bs-toggle="tooltip" data-bs-placement="right">
           <i class="fs-4 fa-solid fa-users-gear txt-p-nav me-2" style="font-size: 1.65rem;"></i>
           Gestão de Turmas
         </a>

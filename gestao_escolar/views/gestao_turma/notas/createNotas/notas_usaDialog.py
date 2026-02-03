@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from gestao_escolar.models import GestaoTurmas, Matriculas, TurmaDisciplina, Trimestre
 
+"""
 @login_required
 def notas_usa_dialog(request, matricula, grade, trimestre, nota):    
     aluno = get_object_or_404(Matriculas, pk=matricula)
@@ -26,11 +27,35 @@ def notas_usa_dialog(request, matricula, grade, trimestre, nota):
             "profissional_resp": profissional_resp
         }
     )
-    print(f" a nota do aluno é {gestao_turma.notas}, {gestao_turma.aluno} e {gestao_turma.trimestre} ")
 
     # Para garantir uma unica mensagem por nota salva
     messages.set_level(request, messages.constants.SUCCESS)
     messages.success(request, f"Nota do aluno {aluno} para o {trimestre}º TRIMESTRE, atualizada com sucesso")
+
+    return redirect("Gestao_Escolar:gestao_turmas_update", pk=aluno.turma.pk)
+"""
+@login_required
+def notas_usa_dialog(request, matricula, grade, trimestre, nota):   
+    print('cheguei aqui no NOTAS_USA_DIALOG') 
+    aluno = get_object_or_404(Matriculas, pk=matricula)
+    disciplina = get_object_or_404(TurmaDisciplina, pk=grade)
+    trimestre_nota = get_object_or_404(Trimestre, pk=trimestre)
+
+    gestao_turma, created = GestaoTurmas.objects.get_or_create(
+        aluno=aluno,
+        grade=disciplina,
+        trimestre=trimestre_nota,
+    )
+
+    gestao_turma.notas = nota
+    gestao_turma.profissional_resp = str(request.user)
+    gestao_turma.save()  # 🔥 sempre chama o save
+
+    messages.success(
+        request,
+        f"Nota do aluno {aluno} para o {trimestre_nota}º trimestre "
+        f"{'lançada' if created else 'atualizada'} com sucesso"
+    )
 
     return redirect("Gestao_Escolar:gestao_turmas_update", pk=aluno.turma.pk)
 

@@ -9,6 +9,7 @@ from django.db.models import Sum
 @login_required
 def create_or_update_Media_turmas(request, aluno_id):
     # Recupera o aluno usando o ID fornecido; retorna 404 se não encontrado
+    print('nessa view')
     aluno = get_object_or_404(Matriculas, pk=aluno_id)
     
     # Filtra as disciplinas associadas à turma do aluno
