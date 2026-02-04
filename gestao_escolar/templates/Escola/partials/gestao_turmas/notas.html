@@ -172,8 +172,7 @@
                                                                         {% else %}
                                                                                 <span class="text-primary">
                                                                         {% endif %}
-                                                                            <!-- Atualizar notas -->    
-                                                                                               
+                                                                            <!-- Atualizar notas -->   
                                                                             {% if not aluno.aprovado_conselho and not aluno.reprovado_conselho  %}  
                                                                             <!--Verifica se o aluno passou pelo conselhor, se ainda não passou e edição ou inserimento de 
                                                                             notas esta ativa-->
@@ -286,8 +285,8 @@
                                                 <!-- Verifica se o aluno foi aprovado pelo conselhor de classe-->
                                                 {% if not aluno.aprovado_conselho and not aluno.reprovado_conselho  %}
                                                     <!-- Verifica se o aluno teve notas suficientes para ser aprovado -->
-                                                    {% if not aluno.gestao_turmas_related.last.aprovado  %}
-                                                        <td class='bg-primary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado   {{aluno.gestao_turmas_related.last.aprovado}}</td>
+                                                    {% if aluno.aprovado  %}
+                                                        <td class='bg-primary-subtle'><i class="fa-solid fa-face-smile-beam"></i> Aprovado</td>
                                                         {% else %}  
                                                             {% if aluno.foi_a_recupera %}                                                                                                                                                              
                                                                 {% if aluno.aprovado_recupera %} 

@@ -1,7 +1,7 @@
 <!-- Verifica se o aluno ñao perdeu por faltas-->
 {% if not  aluno.gestao_turmas_related.last.reprovado_faltas %}  
 <td class='d-flex gap-1 align-itens-center'>
-    {% if not aluno.gestao_turmas_related.last.aprovado %}
+    {% if not aluno.aprovado %}
         {% if not aluno.naoFoi_a_recupera %}                                                    
             <!-- BOTÃO NOTAS DE CONSELHO DE CLASSE *********************************** -->                                         
                 {% if not aluno.aprovado_recupera %}  

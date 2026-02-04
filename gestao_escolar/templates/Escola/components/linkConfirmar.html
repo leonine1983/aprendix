@@ -1,5 +1,73 @@
-<!--linkEditar.html-->
-<a href="{{ link }}" class="btn btn-sm btn-outline-warning d-flex align-items-center gap-1 text-dark bg-warning-subtle" title="{{ title }}">
+<!--linkConfirmar.html-->
+
+<style>
+/* ==============================
+   Botão Institucional (UX/UI)
+   ============================== */
+.btn-action-soft {
+    background-color: #EEF4FF;     /* Azul claro suave */
+    color: #0F172A;                /* Azul grafite bem escuro */
+    border: 1px solid #C7D2FE;
+    border-radius: 0.6rem;
+    font-weight: 500;
+    padding: 0.4rem 0.65rem;
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.12s ease;
+}
+
+/* Ícone acompanha o texto */
+.btn-action-soft i {
+    font-size: 0.85rem;
+    color: #0F172A;
+    opacity: 0.9;
+}
+
+/* Hover */
+.btn-action-soft:hover {
+    background-color: #E0E7FF;
+    color: #020617;               /* Ainda mais escuro no hover */
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18);
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+/* Active */
+.btn-action-soft:active {
+    background-color: #C7D2FE;
+    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.18);
+    transform: translateY(0);
+}
+
+/* Focus – acessibilidade */
+.btn-action-soft:focus-visible {
+    outline: none;
+    background-color: #DBEAFE;
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.45);
+}
+
+/* Disabled */
+.btn-action-soft.disabled,
+.btn-action-soft:disabled {
+    background-color: #F3F4F6;
+    color: #6B7280;
+    border-color: #E5E7EB;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/* Versão compacta */
+.btn-action-soft.btn-sm {
+    padding: 0.3rem 0.55rem;
+    font-size: 0.85rem;
+}
+
+</style>
+<a href="{{ link }}"
+   class="btn btn-sm btn-action-soft d-flex align-items-center gap-1"
+   title="{{ title }}">
     <i class="fa-solid fa-ban"></i>
-    <span class="d-none d-md-inline">{{ label|default:"Confimar" }}</span>
+    <span class="d-none d-md-inline text-dark">{{ label|default:"Confirmar" }}</span>
 </a>
