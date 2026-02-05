@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Digital da Educação | SME</title>
+
+<style>
+:root{
+    --bg: linear-gradient(135deg,#eef2f7,#dfe7ef);
+    --glass: rgba(255,255,255,.55);
+    --border: rgba(255,255,255,.35);
+    --text: #1f2933;
+    --muted:#5f6c7b;
+    --primary:#2563eb;
+    --shadow:0 30px 60px rgba(0,0,0,.15);
+}
+
+*{
+    box-sizing:border-box;
+    font-family:"Segoe UI",system-ui,sans-serif;
+    margin:0;
+}
+
+body{
+    background:var(--bg);
+    min-height:100vh;
+    padding:20px;
+    color:var(--text);
+    overflow-y:auto; /* 🔹 garante rolagem */
+}
+
+/* APP CONTAINER */
+.app{
+    width:100%;
+    max-width:1100px;
+    margin:0 auto;
+    background:var(--glass);
+    backdrop-filter:blur(20px);
+    border-radius:32px;
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
+    padding:40px 36px 36px;
+}
+
+/* HEADER */
+header{
+    text-align:center;
+    margin-bottom:36px;
+}
+
+header img{
+    max-width:300px;
+    width:100%;
+    margin-bottom:16px;
+    transition:.3s;
+}
+
+header h1{
+    font-size:1.8rem;
+    margin-bottom:10px;
+}
+
+header p{
+    max-width:760px;
+    margin:0 auto;
+    color:var(--muted);
+    line-height:1.6;
+}
+
+/* NAV */
+.nav{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin:36px 0 28px;
+    flex-wrap:wrap;
+}
+
+.nav button{
+    background:rgba(255,255,255,.7);
+    border:1px solid var(--border);
+    padding:10px 22px;
+    border-radius:14px;
+    cursor:pointer;
+    font-size:.95rem;
+    transition:.25s;
+}
+
+.nav button.active,
+.nav button:hover{
+    background:var(--primary);
+    color:#fff;
+}
+
+/* PAGES */
+.pages{
+    position:relative;
+    min-height:360px;
+    perspective:1200px;
+}
+
+/* PAGE */
+.page{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    transform:rotateY(90deg);
+    transition:.6s cubic-bezier(.4,.2,.2,1);
+}
+
+.page.active{
+    opacity:1;
+    transform:rotateY(0);
+    position:relative;
+}
+
+/* GRID */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:32px;
+    padding-bottom:20px;
+}
+
+/* CARD */
+.card{
+    background:rgba(255,255,255,.75);
+    border-radius:26px;
+    padding:42px 30px;
+    text-align:center;
+    box-shadow:0 25px 55px rgba(0,0,0,.12);
+    text-decoration:none;
+    color:inherit;
+    transition:.35s;
+    position:relative;
+}
+
+.card:hover{
+    transform:translateY(-10px) scale(1.02);
+}
+
+.icon{
+    font-size:4rem;
+    margin-bottom:16px;
+}
+
+/* TOOLTIP */
+.card::after{
+    content:attr(data-tip);
+    position:absolute;
+    bottom:120%;
+    left:50%;
+    transform:translateX(-50%);
+    background:#111827;
+    color:#fff;
+    padding:12px 16px;
+    border-radius:14px;
+    font-size:.85rem;
+    line-height:1.4;
+    width:260px;
+    opacity:0;
+    pointer-events:none;
+    transition:.3s;
+}
+
+.card:hover::after{
+    opacity:1;
+}
+
+/* CONTACT */
+.contact{
+    max-width:520px;
+    margin:0 auto;
+    text-align:center;
+}
+
+.contact p{
+    margin-bottom:20px;
+    color:var(--muted);
+}
+
+.contact input,
+.contact textarea{
+    width:100%;
+    padding:14px;
+    border-radius:14px;
+    border:1px solid #d1d5db;
+    margin-bottom:14px;
+    font-size:.95rem;
+}
+
+.contact button{
+    padding:14px 28px;
+    border:none;
+    border-radius:16px;
+    background:var(--primary);
+    color:#fff;
+    font-size:1rem;
+    cursor:pointer;
+}
+
+/* 📱 MOBILE AJUSTES CRÍTICOS */
+@media(max-width:600px){
+
+    header img{
+        max-width:200px; /* 🔹 logo menor no mobile */
+    }
+
+    header h1{
+        font-size:1.4rem;
+    }
+
+    .app{
+        padding:28px 20px 32px;
+        border-radius:26px;
+    }
+
+    .icon{
+        font-size:3.4rem;
+    }
+
+    
+
+    .pages{
+        perspective:none;      /* remove efeito 3D no mobile */
+        min-height:auto;
+    }
+
+    .page{
+        position:relative;     /* evita empurrar conteúdo para baixo */
+        transform:none !important;
+        opacity:1 !important;
+        display:none;          /* controla via JS */
+    }
+
+    .page.active{
+        display:block;
+    }
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+    <img src="logo-vera-cruz.png" alt="Prefeitura Municipal">
+    <h1>Portal Digital da Educação</h1>
+    <p>
+        Plataforma oficial da <strong>Secretaria Municipal da Educação</strong>,
+        desenvolvida para centralizar sistemas educacionais e administrativos,
+        oferecendo uma experiência moderna, acessível e eficiente para toda a comunidade escolar.
+    </p>
+</header>
+
+<nav class="nav">
+    <button class="active" onclick="openTab('servicos', this)">Serviços</button>
+    <button onclick="openTab('contato', this)">Contato</button>
+</nav>
+
+<section class="pages">
+
+    <div class="page active" id="servicos">
+        <div class="grid">
+
+            <a class="card" href="/aprendix"
+               data-tip="Plataforma para acompanhamento pedagógico, lançamento de notas, matrículas online e gestão escolar integrada.">
+                <div class="icon">🎓</div>
+                <h3>Aprendix</h3>
+                <p>Gestão pedagógica e acadêmica</p>
+            </a>
+
+            <a class="card" href="/sme-merenda"
+               data-tip="Sistema para controle da merenda escolar, cardápios nutricionais e distribuição de alimentos.">
+                <div class="icon">🍽️</div>
+                <h3>Merenda Escolar</h3>
+                <p>Nutrição e logística alimentar</p>
+            </a>
+
+            <a class="card" href="/sme-deposito"
+               data-tip="Gestão de materiais, patrimônio, estoque e distribuição interna da Secretaria.">
+                <div class="icon">🏢</div>
+                <h3>Depósito SME</h3>
+                <p>Controle de estoque e patrimônio</p>
+            </a>
+
+        </div>
+    </div>
+
+    <div class="page" id="contato">
+        <div class="contact">
+            <p>
+                Precisa de suporte ou tem alguma dúvida?
+                Entre em contato com a Secretaria Municipal da Educação.
+            </p>
+
+            <input type="text" placeholder="Nome">
+            <input type="email" placeholder="E-mail">
+            <textarea rows="4" placeholder="Mensagem"></textarea>
+            <button>Enviar</button>
+        </div>
+    </div>
+
+</section>
+
+</div>
+
+<script>
+function openTab(id, btn){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+}
+</script>
+
+</body>
+</html>
