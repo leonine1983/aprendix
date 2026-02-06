@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -248,7 +249,7 @@ header p{
 <div class="app">
 
 <header>
-    <img src="logo-vera-cruz.png" alt="Prefeitura Municipal">
+    <img src="{% static 'prefeitura.png' %}" alt="Prefeitura Municipal">
     <h1>Portal Digital da Educação</h1>
     <p>
         Plataforma oficial da <strong>Secretaria Municipal da Educação</strong>,
@@ -267,7 +268,7 @@ header p{
     <div class="page active" id="servicos">
         <div class="grid">
 
-            <a class="card" href="/aprendix"
+            <a class="card" href="{% url 'Gestao_Escolar:GE_inicio' %}"
                data-tip="Plataforma para acompanhamento pedagógico, lançamento de notas, matrículas online e gestão escolar integrada.">
                 <div class="icon">🎓</div>
                 <h3>Aprendix</h3>

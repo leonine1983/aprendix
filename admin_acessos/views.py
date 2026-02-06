@@ -1,4 +1,4 @@
-from django.shortcuts import  redirect, get_object_or_404
+from django.shortcuts import  redirect, get_object_or_404, render
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth import logout
 from django.contrib.auth.views import LoginView, LogoutView
@@ -14,6 +14,9 @@ from rh.models import Prefeitura
 
 # Login
 import random
+
+def startSme(request):
+    return render(request, 'Admin_Acessos/starSme.html')
 
 class CreateLoginView(LoginView):
     template_name = 'Admin_Acessos/index.html'

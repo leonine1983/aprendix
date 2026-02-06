@@ -1,0 +1,66 @@
+{% extends 'global/template.html' %}
+{% load static %}
+{% block css %}
+.modal-sheet .modal-dialog {
+    width: 380px;
+    transition: bottom .75s ease-in-out;
+  }
+  .modal-sheet .modal-footer {
+    padding-bottom: 2rem;
+  }
+
+{% endblock css %}
+{% block menu_horizontal %}
+<!--Menu horizontal Local-->
+{% include 'global/partials/breadcrumbs/index.html' %}
+
+{% endblock menu_horizontal %}
+{% block main %}
+<div class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalTour">
+    <h2 class='raleway'>{{svg|safe}} {{title}}</h2>
+      <div class="modal-content rounded-4 shadow">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nome da Escola ou Departamento</th>
+            <th scope="col">Endereço</th>            
+            <th scope="col">Telefone</th>
+            <th scope="col">AÇÕES</th>
+          </tr>
+          </thead>
+          <tbody>
+            {% for n in object_list %}
+          <tr>            
+            <th scope="row">{{n.pk}}</th>
+            <td>{{n.nome_escola}}</td>
+            <td>{{n.endereco_escola}}</td>
+            <td>{{n.telefone_escola}}</td>
+            <td class=''>
+              <a href="{% url 'controle_estoque:escolas_update' n.pk %}" class='pt-0' title='Editar'>
+                <span class="material-symbols-outlined  text-primary ">edit_square</span></a> 
+              <a href="{% url 'controle_estoque:escolas_delete' n.pk %}" title='Excluir'> 
+                <span class="material-symbols-outlined text-danger">delete</span>
+              </a></td>
+          </tr>  
+          {% endfor %}        
+          </tbody>
+        </table>        
+      </div>
+    
+  </div>
+{% endblock main %}
+{% block script %}
+
+      
+</script>
+
+ 
+<script>
+        // In your Javascript (external .js resource or <script> tag)
+    $(document).ready(function() {
+        $('#id_bairro').select2();
+        $('#id_rua').select2();
+    });
+</script>
+{% endblock script %}
