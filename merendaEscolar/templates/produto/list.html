@@ -1,0 +1,50 @@
+{% extends "estoque_base.html" %}
+
+{% block content %}
+<h2>Produtos</h2>
+
+<a href="{% url 'merendaEscolar:produto_create' %}" class="btn btn-primary mb-3">
+    Novo Produto
+</a>
+
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Categoria</th>
+                <th>Unidade</th>
+                <th>Código</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for produto in produtos %}
+            <tr>
+                <td>{{ produto.nome }}</td>
+                <td>{{ produto.categoria|default:"—" }}</td>
+                <td>{{ produto.unidade_medida.sigla }}</td>
+                <td>{{ produto.codigo }}</td>
+                <td>
+                    {% if produto.ativo %}
+                        <span class="badge bg-success">Ativo</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inativo</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'produto_update' produto.id %}" class="btn btn-sm btn-outline-secondary">
+                        Editar
+                    </a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="6">Nenhum produto cadastrado.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

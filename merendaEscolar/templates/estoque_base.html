@@ -1,383 +1,528 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>Controle de Estoque | Merenda Escolar</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Controle de Estoque | Merenda Escolar</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+    --verde-principal:#1F6F5C;
+    --verde-sidebar:#164E42;
+    --azul-principal:#4E73A8;
+    --azul-claro:#6FA8DC;
+    --dourado:#C89B3C;
+    --cinza-bg:#F4F6F8;
+    --branco:#fff;
+    --texto:#2E2E2E;
+}
 
-    <style>
-        :root {
-            --verde-principal: #1F6F5C;
-            --verde-sidebar: #164E42;
-            --azul-principal: #4E73A8;
-            --azul-claro: #6FA8DC;
-            --dourado: #C89B3C;
-            --cinza-bg: #F4F6F8;
-            --branco: #FFFFFF;
-            --texto: #2E2E2E;
-        }
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
+body{
+    background:var(--cinza-bg);
+    display:flex;
+    min-height:100vh;
+    overflow-x:hidden;
+}
 
-        body {
-            background: var(--cinza-bg);
-            display: flex;
-            min-height: 100vh;
-        }
+/* SIDEBAR */
+.sidebar{
+    width:260px;
+    background:linear-gradient(180deg,var(--verde-sidebar),var(--verde-principal));
+    color:#fff;
+    padding:25px 20px;
+    display:flex;
+    flex-direction:column;
+    transition:.3s;
+}
 
-        /* SIDEBAR */
-        .sidebar {
-            width: 260px;
-            background: linear-gradient(180deg, var(--verde-sidebar), var(--verde-principal));
-            color: var(--branco);
-            padding: 25px 20px;
-            display: flex;
-            flex-direction: column;
-        }
+.sidebar h2{
+    text-align:center;
+    margin-bottom:30px;
+}
 
-        .sidebar h2 {
-            font-size: 20px;
-            margin-bottom: 30px;
-            font-weight: 700;
-            text-align: center;
-        }
+.menu a{
+    color:#fff;
+    text-decoration:none;
+    padding:12px 15px;
+    border-radius:8px;
+    display:flex;
+    gap:12px;
+    margin-bottom:8px;
+}
 
-        .menu a {
-            text-decoration: none;
-            color: var(--branco);
-            padding: 12px 15px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: 0.3s;
-            font-weight: 500;
-        }
+.menu a:hover{background:rgba(255,255,255,.15);}
+.menu a.active{background:var(--azul-principal);}
 
-        .menu a:hover {
-            background: rgba(255,255,255,0.15);
-        }
+/* MAIN */
+.main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+}
 
-        .menu a.active {
-            background: var(--azul-principal);
-        }
+/* TOPBAR */
+.topbar{
+    background:#fff;
+    padding:15px 25px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
 
-        /* CONTEÚDO */
-        .main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
+.topbar-left{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
 
-        /* TOPBAR */
-        .topbar {
-            background: var(--branco);
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
+.menu-toggle{
+    display:none;
+    font-size:22px;
+    cursor:pointer;
+    color:var(--verde-principal);
+}
 
-        .topbar h1 {
-            font-size: 20px;
-            color: var(--verde-principal);
-        }
+.topbar h1{font-size:20px;color:var(--verde-principal);}
 
-        .topbar-icons {
-            display: flex;
-            gap: 20px;
-            font-size: 18px;
-            color: var(--texto);
-        }
+.topbar-icons{
+    display:flex;
+    gap:20px;
+    font-size:18px;
+}
 
-        .badge {
-            background: var(--dourado);
-            color: var(--branco);
-            font-size: 11px;
-            padding: 3px 7px;
-            border-radius: 50%;
-            position: relative;
-            top: -10px;
-            left: -10px;
-        }
+/* CONTENT */
+.content{padding:25px;}
 
-        /* DASHBOARD */
-        .content {
-            padding: 25px;
-        }
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+    margin-bottom:30px;
+}
 
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+.card{
+    background:#fff;
+    padding:20px;
+    border-radius:14px;
+    position:relative;
+    box-shadow:0 4px 12px rgba(0,0,0,.06);
+}
 
-        .card {
-            background: var(--branco);
-            padding: 20px;
-            border-radius: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            position: relative;
-        }
+.card p{font-size:26px;font-weight:700;color:var(--verde-principal);}
+.card i{position:absolute;right:20px;top:20px;font-size:28px;color:var(--azul-claro);}
 
-        .card h3 {
-            font-size: 14px;
-            color: #777;
-            margin-bottom: 8px;
-        }
+.table-container{
+    background:#fff;
+    padding:20px;
+    border-radius:14px;
+    overflow-x:auto;
+}
 
-        .card p {
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--verde-principal);
-        }
+/* OVERLAY */
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.4);
+    display:none;
+    z-index:998;
+}
 
-        .card i {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            font-size: 28px;
-            color: var(--azul-claro);
-            opacity: 0.8;
-        }
+.icon-wrapper {
+    position: relative;
+    cursor: pointer;
+}
 
-        /* TABELA */
-        .table-container {
-            background: var(--branco);
-            border-radius: 14px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            overflow-x: auto;
-        }
+.dropdown {
+    position: absolute;
+    top: 35px;
+    right: 0;
+    width: 260px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.15);
+    padding: 15px;
+    display: none;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+.dropdown.show {
+    display: block;
+}
 
-        thead {
-            background: var(--verde-principal);
-            color: var(--branco);
-        }
+.badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: var(--dourado);
+    color: #fff;
+    font-size: 11px;
+    padding: 3px 6px;
+    border-radius: 50%;
+}
 
-        th, td {
-            padding: 14px;
-            text-align: left;
-        }
+/* Container com controle de overflow */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
 
-        tbody tr:nth-child(even) {
-            background: #f9fbfc;
-        }
+/* Tabela base */
+.tabela-estoque {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Inter", Arial, sans-serif;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+}
 
-        .status {
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
+/* Cabeçalho */
+.tabela-estoque thead {
+  background-color: #1f2937; /* cinza institucional */
+}
 
-        .ok {
-            background: #E0F4EF;
-            color: var(--verde-principal);
-        }
+.tabela-estoque thead th {
+  color: #ffffff;
+  font-weight: 600;
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 0.95rem;
+}
 
-        .alerta {
-            background: #FFF3CD;
-            color: #856404;
-        }
+/* Corpo */
+.tabela-estoque tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.95rem;
+  color: #111827;
+}
 
-        /* DROPDOWN */
-        .icon-wrapper {
-            position: relative;
-            cursor: pointer;
-        }
+/* Hover acessível */
+.tabela-estoque tbody tr:hover {
+  background-color: #f9fafb;
+}
 
-        .dropdown {
-            position: absolute;
-            top: 40px;
-            right: 0;
-            width: 280px;
-            background: var(--branco);
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            padding: 15px;
-            display: none;
-            z-index: 1000;
-        }
+/* Status */
+.status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
 
-        .dropdown h4 {
-            font-size: 14px;
-            margin-bottom: 10px;
-            color: var(--verde-principal);
-        }
+.status.ok {
+  background-color: #dcfce7;
+  color: #166534;
+}
 
-        .dropdown ul {
-            list-style: none;
-        }
+.status.alerta {
+  background-color: #fef3c7;
+  color: #92400e;
+}
 
-        .dropdown ul li {
-            font-size: 13px;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            color: var(--texto);
-        }
+/* RESPONSIVO MOBILE */
+@media (max-width: 768px) {
+  .tabela-estoque thead {
+    display: none;
+  }
 
-        .dropdown ul li:last-child {
-            border-bottom: none;
-        }
+  .tabela-estoque,
+  .tabela-estoque tbody,
+  .tabela-estoque tr,
+  .tabela-estoque td {
+    display: block;
+    width: 100%;
+  }
 
-        .dropdown.show {
-            display: block;
-        }
+  .tabela-estoque tr {
+    margin-bottom: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px;
+  }
+
+  .tabela-estoque tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border: none;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .tabela-estoque tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #6b7280;
+    font-size: 0.8rem;
+  }
+
+  .tabela-estoque tbody td:last-child {
+    border-bottom: none;
+  }
+}
 
 
-        /* RESPONSIVO */
-        @media (max-width: 900px) {
-            .sidebar {
-                display: none;
-            }
-        }
-    </style>
+
+/* MOBILE */
+@media(max-width:900px){
+    .sidebar{
+        position:fixed;
+        left:0;
+        top:0;
+        height:100%;
+        z-index:999;
+        transform:translateX(-100%);
+    }
+
+    .sidebar.open{transform:translateX(0);}
+    .menu-toggle{display:block;}
+    .overlay.show{display:block;}
+}
+.dropdown {
+    z-index: 2000;
+}
+
+</style>
 </head>
+
 <body>
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
+
+
+<div class="overlay" id="overlay"></div>
+    <aside class="sidebar" id="sidebar">
         <h2>Merenda Escolar</h2>
+        <style>
+            /* Submenu Estoque Geral */
+            .submenu {
+                display: none;
+                flex-direction: column;
+                padding-left: 15px;
+                gap: 5px;
+                background:red;
+            }
 
+            .submenu a {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .submenu a:hover {
+                background: rgba(255,255,255,0.15);
+                border-radius: 8px;
+            }
+
+            .submenu-toggle {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 15px;
+                cursor: pointer;
+                border-radius: 8px;
+            }
+
+            .submenu-toggle:hover {
+                background: rgba(255,255,255,0.15);
+            }
+
+            /* Toggle ativo */
+            .submenu-toggle.active + .submenu {
+                display: flex;
+            }
+        </style>
         <nav class="menu">
-            <a href="#" class="active"><i class="fas fa-chart-line"></i> Dashboard</a>
-            <a href="#"><i class="fas fa-boxes-stacked"></i> Estoque Geral</a>
-            <a href="#"><i class="fas fa-school"></i> Envio para Escolas</a>
-            <a href="#"><i class="fas fa-truck"></i> Distribuição</a>
-            <a href="#"><i class="fas fa-bell"></i> Alertas</a>
-            <a href="#"><i class="fas fa-file-alt"></i> Relatórios</a>
-            <a href="#"><i class="fas fa-cog"></i> Configurações</a>
+            <!-- Dashboard -->
+            <a href="{% url 'merendaEscolar:merenda_inicio' %}" class="active">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </a>
+
+            <!-- Estoque Geral (Cantina) com submenu -->
+            <div class="submenu-wrapper">
+                <a href="#" class="submenu-toggle">
+                    <i class="fas fa-boxes-stacked"></i> Estoque Geral (Cantina)
+                    <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
+                </a>
+                <div class="submenu">
+                    <a href="{% url 'merendaEscolar:unidade_medida_list' %}">
+                        <i class="fas fa-balance-scale-left"></i> Unidades de Medida
+                    </a>
+                    <a href="{% url 'merendaEscolar:categoria_produto_list' %}">
+                        <i class="fas fa-layer-group"></i> Categorias de Produtos
+                    </a>
+                    <a href="{% url 'merendaEscolar:produto_list' %}">
+                        <i class="fas fa-box"></i> Produtos
+                    </a>
+                </div>
+            </div>
+
+            <!-- Links futuros (placeholders) -->
+            <a><i class="fas fa-school"></i> Envio para Escolas</a>
+            <a><i class="fas fa-truck"></i> Distribuição</a>
+            <a><i class="fas fa-bell"></i> Alertas</a>
+            <a><i class="fas fa-file-alt"></i> Relatórios</a>
+            <a><i class="fas fa-cog"></i> Configurações</a>
         </nav>
     </aside>
 
-    <!-- MAIN -->
-    <div class="main">
 
-        <!-- TOPBAR -->
-        <header class="topbar">
+</aside>
+
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <i class="fas fa-bars menu-toggle" id="menuToggle"></i>
             <h1>Controle de Estoque</h1>
-            <div class="topbar-icons">
-              <!-- NOTIFICAÇÕES -->
-              <div class="icon-wrapper" id="notifToggle">
-                  <i class="fas fa-bell"></i>
-                  <span class="badge">3</span>
+        </div>
+        <div class="topbar-icons">
 
-                  <div class="dropdown">
-                      <h4>Notificações</h4>
-                      <ul>
-                          <li>⚠️ Estoque baixo de Feijão</li>
-                          <li>📦 Novo envio para Escola João XXIII</li>
-                          <li>⏰ Produto próximo da validade</li>
-                      </ul>
-                  </div>
-              </div>
+        <!-- NOTIFICAÇÕES -->
+        <div class="icon-wrapper" id="notifToggle">
+            <i class="fas fa-bell"></i>
+            <span class="badge">3</span>
 
-              <!-- MENSAGENS -->
-              <div class="icon-wrapper" id="msgToggle">
-                  <i class="fas fa-envelope"></i>
-                  <span class="badge">2</span>
-
-                  <div class="dropdown">
-                      <h4>Mensagens</h4>
-                      <ul>
-                          <li>📩 Coordenação solicitou relatório</li>
-                          <li>📩 Confirmação de entrega</li>
-                      </ul>
-                  </div>
-              </div>
-
-              <i class="fas fa-user-circle"></i>
-          </div>
-
-        </header>
-
-        <!-- CONTENT -->
-        <section class="content">
-
-            <!-- CARDS -->
-            <div class="cards">
-                <div class="card">
-                    <h3>Itens em Estoque</h3>
-                    <p>1.248</p>
-                    <i class="fas fa-box"></i>
-                </div>
-
-                <div class="card">
-                    <h3>Escolas Atendidas</h3>
-                    <p>37</p>
-                    <i class="fas fa-school"></i>
-                </div>
-
-                <div class="card">
-                    <h3>Envios no Mês</h3>
-                    <p>82</p>
-                    <i class="fas fa-truck"></i>
-                </div>
-
-                <div class="card">
-                    <h3>Alertas Ativos</h3>
-                    <p>5</p>
-                    <i class="fas fa-bell"></i>
-                </div>
+            <div class="dropdown">
+                <h4>Notificações</h4>
+                <ul>
+                    <li>⚠️ Estoque baixo de Feijão</li>
+                    <li>📦 Novo envio para Escola João XXIII</li>
+                    <li>⏰ Produto próximo da validade</li>
+                </ul>
             </div>
+        </div>
 
-            <!-- TABELA -->
-            <div class="table-container">
-                <h3 style="margin-bottom: 15px;">Produtos em Estoque</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Produto</th>
-                            <th>Quantidade</th>
-                            <th>Validade</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Arroz</td>
-                            <td>520 kg</td>
-                            <td>10/2026</td>
-                            <td><span class="status ok">Adequado</span></td>
-                        </tr>
-                        <tr>
-                            <td>Feijão</td>
-                            <td>90 kg</td>
-                            <td>04/2026</td>
-                            <td><span class="status alerta">Baixo</span></td>
-                        </tr>
-                        <tr>
-                            <td>Macarrão</td>
-                            <td>310 kg</td>
-                            <td>08/2026</td>
-                            <td><span class="status ok">Adequado</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+        <!-- MENSAGENS -->
+        <div class="icon-wrapper" id="msgToggle">
+            <i class="fas fa-envelope"></i>
+            <span class="badge">2</span>
+
+            <div class="dropdown">
+                <h4>Mensagens</h4>
+                <ul>
+                    <li>📩 Coordenação solicitou relatório</li>
+                    <li>📩 Confirmação de entrega</li>
+                </ul>
             </div>
+        </div>
 
-        </section>
-    </div>
+        <!-- PERFIL DO USUÁRIO -->
+        <div class="icon-wrapper" id="userToggle">
+            <i class="fas fa-user-circle"></i>
+            <div class="dropdown">
+                <h4>Minha Conta</h4>
+                <ul>
+                    <li>👤 Meu Perfil</li>
+                    <li>🔑 Alterar Senha</li>
+                    <li>⚙️ Configurações</li>
+                    <li style="color:#c0392b;font-weight:600;">🚪 Sair</li>
+                </ul>
+            </div>
+        </div>
+   
+    </header>
+    <section class="content"> 
+        {% block content %}
+        
+        {% endblock content %}           
+    </section>
+</div>
+
+<script>
+const toggle = document.getElementById('menuToggle');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+
+toggle.onclick = () => {
+    sidebar.classList.add('open');
+    overlay.classList.add('show');
+};
+
+overlay.onclick = () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+};
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const notifToggle = document.getElementById("notifToggle");
+    const msgToggle   = document.getElementById("msgToggle");
+    const userToggle  = document.getElementById("userToggle");
+
+    const notifDropdown = notifToggle.querySelector(".dropdown");
+    const msgDropdown   = msgToggle.querySelector(".dropdown");
+    const userDropdown  = userToggle.querySelector(".dropdown");
+
+    function closeAll() {
+        notifDropdown.classList.remove("show");
+        msgDropdown.classList.remove("show");
+        userDropdown.classList.remove("show");
+    }
+
+    notifToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        closeAll();
+        notifDropdown.classList.toggle("show");
+    });
+
+    msgToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        closeAll();
+        msgDropdown.classList.toggle("show");
+    });
+
+    userToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        closeAll();
+        userDropdown.classList.toggle("show");
+    });
+
+    document.addEventListener("click", closeAll);
+});
+</script>
+
+<script>
+    // Submenu Estoque Geral
+const submenuToggles = document.querySelectorAll('.submenu-toggle');
+
+submenuToggles.forEach(toggle => {
+    toggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Fecha todos os submenus
+        document.querySelectorAll('.submenu').forEach(menu => {
+            if (menu !== toggle.nextElementSibling) {
+                menu.style.display = 'none';
+            }
+        });
+        // Alterna o submenu atual
+        const submenu = toggle.nextElementSibling;
+        submenu.style.display = submenu.style.display === 'flex' ? 'none' : 'flex';
+    });
+});
+
+</script>
+
+
 
 </body>
 </html>

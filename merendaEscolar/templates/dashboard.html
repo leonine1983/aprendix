@@ -1,0 +1,60 @@
+{% extends "estoque_base.html" %}
+{% block content %}
+<!-- CARDS --> 
+<div class="cards"> 
+    <div class="card"> 
+        <h3>Itens em Estoque</h3> 
+        <p>{{ total_itens_estoque }}</p>
+        <i class="fas fa-box"></i> 
+    </div> 
+    <div class="card"> 
+        <h3>Escolas Atendidas</h3> 
+        <p>{{ escolas_atendidas }}</p>
+        <i class="fas fa-school"></i> 
+    </div> 
+    <div class="card"> 
+        <h3>Envios no Mês</h3> 
+        <p>{{ envios_mes }}</p>
+        <i class="fas fa-truck"></i> 
+    </div> 
+    <div class="card"> 
+        <h3>Alertas Ativos</h3> 
+        <p>{{ alertas_ativos }}</p>
+        <i class="fas fa-bell"></i> 
+    </div> 
+</div> 
+<!-- TABELA --> 
+<div class="table-container"> 
+    <h3 style="margin-bottom: 15px;">Produtos em Estoque</h3> 
+</div>
+<div class="table-wrapper">
+    <table class="tabela-estoque">
+        <thead>
+        <tr>
+            <th>Produto</th>
+            <th>Quantidade</th>
+            <th>Validade</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for produto in produtos %}
+            <tr>
+                <td data-label="Produto">{{ produto.nome }}</td>
+                <td data-label="Quantidade">{{ produto.quantidade }}</td>
+                <td data-label="Validade">{{ produto.validade }}</td>
+                <td data-label="Status">
+                    <span class="status {{ produto.status_css }}">
+                        {{ produto.status }}
+                    </span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">Nenhum produto em estoque.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div> 
+{% endblock content %}

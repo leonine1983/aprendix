@@ -1,0 +1,42 @@
+{% extends "estoque_base.html" %}
+
+
+{% block content %}
+<div class="content">
+    <h2 style="margin-bottom: 20px;">
+        {% if object %}Editar{% else %}Cadastrar{% endif %} {{ titulo }}
+    </h2>
+
+    <div class="table-container" style="padding: 25px; max-width: 600px; margin: 0 auto;">
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="{{ field.id_for_label }}" style="font-weight:600; display:block; margin-bottom:6px;">
+                        {{ field.label }}
+                        {% if field.field.required %}<span style="color:red;">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small style="color:#6b7280;">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div style="color:#c0392b; font-size:0.85rem;">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <div style="display:flex; gap:12px; margin-top:20px;">
+                <button type="submit" 
+                        style="background-color:var(--verde-principal); color:#fff; padding:10px 20px; border:none; border-radius:8px; font-weight:600; cursor:pointer;">
+                    Salvar
+                </button>
+                <a href="{{ cancel_url }}" 
+                style="background-color:#f3f4f6; color:#111827; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:600;">
+                Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}
