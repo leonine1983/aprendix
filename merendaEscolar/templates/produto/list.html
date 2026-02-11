@@ -1,14 +1,240 @@
 {% extends "estoque_base.html" %}
 
 {% block content %}
-<h2>Produtos</h2>
 
-<a href="{% url 'merendaEscolar:produto_create' %}" class="btn btn-primary mb-3">
-    Novo Produto
-</a>
+<style>
+    /* ====== Indicadores ====== */
+.page-summary {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
 
-<div class="table-responsive">
-    <table class="table table-striped align-middle">
+.summary-card {
+    background: #f8fafc;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-number {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2563eb;
+}
+
+.summary-label {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+/* ====== Barra de Filtro ====== */
+.filter-bar {
+    margin-bottom: 1.5rem;
+}
+
+.form-control-modern {
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 0.55rem 0.9rem;
+    background: #f8fafc;
+    transition: all 0.2s ease;
+}
+
+.form-control-modern:focus {
+    border-color: #2563eb;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    outline: none;
+}
+
+    /* ====== Header da Página ====== */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-size: 1.7rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+}
+
+/* ====== Botão Primário ====== */
+.btn-primary-custom {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1.4rem;
+    font-weight: 600;
+    color: #fff;
+    transition: all 0.25s ease;
+}
+
+.btn-primary-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+/* ====== Container da Tabela ====== */
+.table-modern {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+}
+
+/* ====== Cabeçalho ====== */
+.table-modern thead {
+    background: #f1f5f9;
+}
+
+.table-modern th {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #475569;
+    padding: 1rem;
+}
+
+/* ====== Corpo ====== */
+.table-modern td {
+    padding: 1rem;
+    color: #334155;
+    vertical-align: middle;
+}
+
+.table-modern tbody tr {
+    transition: background 0.2s ease;
+}
+
+.table-modern tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* ====== Badge Status ====== */
+.status-badge {
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-inactive {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+/* ====== Botão Editar ====== */
+.btn-outline-modern {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    background: #ffffff;
+}
+
+.btn-outline-modern:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+/* ====== Estado vazio ====== */
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #64748b;
+}
+
+/* ====== Responsividade ====== */
+@media (max-width: 768px) {
+
+    .table-modern thead {
+        display: none;
+    }
+
+    .table-modern tbody tr {
+        display: block;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .table-modern tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+    }
+
+    .table-modern tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #475569;
+    }
+}
+
+</style>
+
+<div class="page-header">
+    <div class="page-summary">
+
+    <div class="summary-card">
+        <span class="summary-number">{{ total_produtos }}</span>
+        <span class="summary-label">Total de Produtos</span>
+    </div>
+
+    <div class="summary-card">
+        <span class="summary-number">{{ total_ativos }}</span>
+        <span class="summary-label">Produtos Ativos</span>
+    </div>
+
+    <div class="summary-card">
+        <span class="summary-number">{{ total_inativos }}</span>
+        <span class="summary-label">Produtos Inativos</span>
+    </div>
+
+
+</div>
+
+<div class="filter-bar">
+    <form method="get" class="d-flex gap-2 flex-wrap">
+        <input type="text" 
+               name="search" 
+               placeholder="Buscar por nome ou código..."
+               class="form-control-modern"
+               value="{{ request.GET.search }}">
+
+        <button type="submit" class="btn-primary-custom">
+            Buscar
+        </button>
+    </form>
+</div>
+
+    <h2 class="page-title">Produtos</h2>
+
+    <a href="{% url 'merendaEscolar:produto_create' %}" 
+       class="btn-primary-custom">
+        Novo Produto
+    </a>
+</div>
+
+<div class="table-responsive table-modern">
+    <table class="table align-middle mb-0">
         <thead>
             <tr>
                 <th>Nome</th>
@@ -22,29 +248,34 @@
         <tbody>
         {% for produto in produtos %}
             <tr>
-                <td>{{ produto.nome }}</td>
-                <td>{{ produto.categoria|default:"—" }}</td>
-                <td>{{ produto.unidade_medida.sigla }}</td>
-                <td>{{ produto.codigo }}</td>
-                <td>
+                <td data-label="Nome">{{ produto.nome }}</td>
+                <td data-label="Categoria">{{ produto.categoria|default:"—" }}</td>
+                <td data-label="Unidade">{{ produto.unidade_medida.sigla }}</td>
+                <td data-label="Código">{{ produto.codigo }}</td>
+                <td data-label="Status">
                     {% if produto.ativo %}
-                        <span class="badge bg-success">Ativo</span>
+                        <span class="status-badge status-active">Ativo</span>
                     {% else %}
-                        <span class="badge bg-secondary">Inativo</span>
+                        <span class="status-badge status-inactive">Inativo</span>
                     {% endif %}
                 </td>
-                <td>
-                    <a href="{% url 'produto_update' produto.id %}" class="btn btn-sm btn-outline-secondary">
+                <td data-label="Ações">
+                    <a href="{% url 'merendaEscolar:produto_update' produto.id %}" 
+                       class="btn-outline-modern">
                         Editar
                     </a>
                 </td>
             </tr>
         {% empty %}
-            <tr>
-                <td colspan="6">Nenhum produto cadastrado.</td>
-            </tr>
+        <tr>
+            <td colspan="6" class="empty-state">
+                Nenhum produto cadastrado.<br>
+                <small>Exemplos recomendados: Arroz, Feijão, Leite, Carne Bovina, Cenoura, Macarrão.</small>
+            </td>
+        </tr>
         {% endfor %}
         </tbody>
     </table>
 </div>
+
 {% endblock %}

@@ -1,42 +1,255 @@
 {% extends "estoque_base.html" %}
 
-
 {% block content %}
-<div class="content">
-    <h2 style="margin-bottom: 20px;">
-        {% if object %}Editar{% else %}Cadastrar{% endif %} {{ titulo }}
-    </h2>
+<style>
+    /* ====== Bloco Introdutório ====== */
+.page-intro {
+    max-width: 640px;
+    margin: 0 auto 2rem auto;
+    background: #f8fafc;
+    border-left: 4px solid #16a34a;
+    padding: 1.2rem 1.4rem;
+    border-radius: 14px;
+}
 
-    <div class="table-container" style="padding: 25px; max-width: 600px; margin: 0 auto;">
-        <form method="post">
-            {% csrf_token %}
-            {% for field in form %}
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="{{ field.id_for_label }}" style="font-weight:600; display:block; margin-bottom:6px;">
-                        {{ field.label }}
-                        {% if field.field.required %}<span style="color:red;">*</span>{% endif %}
-                    </label>
-                    {{ field }}
-                    {% if field.help_text %}
-                        <small style="color:#6b7280;">{{ field.help_text }}</small>
-                    {% endif %}
-                    {% for error in field.errors %}
-                        <div style="color:#c0392b; font-size:0.85rem;">{{ error }}</div>
-                    {% endfor %}
-                </div>
-            {% endfor %}
+.page-intro p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #334155;
+    line-height: 1.5;
+}
 
-            <div style="display:flex; gap:12px; margin-top:20px;">
-                <button type="submit" 
-                        style="background-color:var(--verde-principal); color:#fff; padding:10px 20px; border:none; border-radius:8px; font-weight:600; cursor:pointer;">
-                    Salvar
-                </button>
-                <a href="{{ cancel_url }}" 
-                style="background-color:#f3f4f6; color:#111827; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:600;">
-                Cancelar
-                </a>
+.page-intro strong {
+    color: #0f172a;
+}
+.page-intro small {
+    font-size: 0.8rem;
+    letter-spacing: 0.3px;
+}
+
+
+@media (max-width: 768px) {
+    .page-intro {
+        padding: 1rem;
+    }
+}
+
+    /* ====== Container da Página ====== */
+.page-container {
+    padding: 2rem 1.5rem;
+}
+
+/* ====== Card Institucional ====== */
+.form-card {
+    max-width: 640px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+}
+
+.form-card .card-body {
+    padding: 2.2rem;
+}
+
+/* ====== Título ====== */
+.form-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 2rem;
+}
+
+/* ====== Labels ====== */
+.form-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.4rem;
+}
+
+/* ====== Inputs ====== */
+.form-control,
+input,
+select,
+textarea {
+    border-radius: 10px !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.95rem !important;
+    background-color: #f8fafc;
+    transition: all 0.25s ease;
+}
+
+.form-control:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #2563eb !important;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    outline: none;
+}
+
+/* ====== Separador de Ações ====== */
+.form-actions {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ====== Botões ====== */
+.btn-success-custom {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    color: #fff;
+    transition: all 0.25s ease;
+}
+
+.btn-success-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(22, 163, 74, 0.25);
+}
+
+.btn-secondary-custom {
+    background: #f1f5f9;
+    border-radius: 10px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    color: #1e293b;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary-custom:hover {
+    background: #e2e8f0;
+}
+
+/* ====== Responsividade ====== */
+@media (max-width: 768px) {
+
+    .page-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .form-card .card-body {
+        padding: 1.6rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-success-custom,
+    .btn-secondary-custom {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+</style>
+
+<div class="page-container">
+    <div class="page-intro">
+        <p>
+            Utilize este formulário para 
+            <strong>{% if view.object %}atualizar{% else %}cadastrar{% endif %}</strong> 
+            uma Unidade de Medida no sistema.  
+            As unidades são essenciais para padronizar o controle de estoque,
+            garantir precisão nas movimentações e manter consistência nos registros administrativos.
+        </p>
+
+        <div class="mt-3">
+            <small class="text-muted d-block mb-2">Exemplos de unidades utilizadas na merenda escolar:</small>
+            <div class="d-flex flex-wrap gap-3 ">
+                <div class="bg-light text-dark border">Quilograma (kg)</div>
+                <div class="bg-light text-dark border">Grama (g)</div>
+                <div class="bg-light text-dark border">Litro (L)</div>
+                <div class="bg-light text-dark border">Mililitro (ml)</div>
+                <div class=" bg-light text-dark border">Unidade (un)</div>
+                <div class=" bg-light text-dark border">Caixa (cx)</div>
+                <div class=" bg-light text-dark border">Pacote (pct)</div>
             </div>
-        </form>
+        </div>
     </div>
+
+
+    <div class="form-card">
+        <div class="card-body">
+
+            <h3 class="form-title">
+                {% if view.object %}
+                    Editar Unidade
+                {% else %}
+                    Nova Unidade
+                {% endif %}
+            </h3>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+
+                <div class="mb-3">
+                    <label class="form-label">Nome</label>
+                    
+                    {{ form.nome }}
+
+                    {% if form.nome.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.nome.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+
+                <div class="mb-3">
+                    <label class="form-label">Sigla</label>
+                    
+                    {{ form.sigla }}
+
+                    {% if form.sigla.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.sigla.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+
+                <div class="form-actions">
+                    <a href="{% url 'merendaEscolar:unidade_medida_list' %}" 
+                       class="btn-secondary-custom">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" 
+                            class="btn-success-custom">
+                        Salvar
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
 </div>
-{% endblock content %}
+
+{% endblock %}

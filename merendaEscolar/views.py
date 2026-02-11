@@ -7,11 +7,11 @@ from rh.models import Escola
 from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy
 
-from .models import EstoqueGeral, UnidadeMedida, CategoriaProduto, Produto
+from .models import EstoqueCentral, UnidadeMedida, CategoriaProduto, Produto
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
+from django.db.models import Q
 
 
 
@@ -53,7 +53,7 @@ class UnidadeMedidaCreateView(
     model = UnidadeMedida
     fields = ["nome", "sigla"]
     template_name = "unidade_medida/form.html"
-    success_url = reverse_lazy("unidade_medida_list")
+    success_url = reverse_lazy("merendaEscolar:unidade_medida_list")
     permission_required = "estoque.add_unidademedida"
     success_message = "Unidade de medida cadastrada com sucesso."
     error_message = "Erro ao cadastrar a unidade de medida."
@@ -69,7 +69,7 @@ class UnidadeMedidaUpdateView(
     model = UnidadeMedida
     fields = ["nome", "sigla"]
     template_name = "unidade_medida/form.html"
-    success_url = reverse_lazy("unidade_medida_list")
+    success_url = reverse_lazy("merendaEscolar:unidade_medida_list")
     permission_required = "estoque.change_unidademedida"
     success_message = "Unidade de medida atualizada com sucesso."
     error_message = "Erro ao atualizar a unidade de medida."
@@ -94,7 +94,7 @@ class CategoriaProdutoCreateView(
     model = CategoriaProduto
     fields = ["nome", "descricao"]
     template_name = "categoria_produto/form.html"
-    success_url = reverse_lazy("categoria_produto_list")
+    success_url = reverse_lazy("merendaEscolar:categoria_produto_list")
     permission_required = "estoque.add_categoriaproduto"
     success_message = "Categoria cadastrada com sucesso."
     error_message = "Erro ao cadastrar a categoria."
@@ -110,12 +110,14 @@ class CategoriaProdutoUpdateView(
     model = CategoriaProduto
     fields = ["nome", "descricao"]
     template_name = "categoria_produto/form.html"
-    success_url = reverse_lazy("categoria_produto_list")
+    success_url = reverse_lazy("merendaEscolar:categoria_produto_list")
     permission_required = "estoque.change_categoriaproduto"
     success_message = "Categoria atualizada com sucesso."
     error_message = "Erro ao atualizar a categoria."
 
 # Produtos
+from django.db.models import Q
+
 class ProdutoListView(LoginRequiredMixin, ListView):
     model = Produto
     template_name = "produto/list.html"
@@ -123,11 +125,34 @@ class ProdutoListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return (
+        queryset = (
             Produto.objects
             .select_related("categoria", "unidade_medida")
             .order_by("nome")
         )
+
+        search = self.request.GET.get("search", "").strip()
+
+        if search:
+            queryset = queryset.filter(
+                Q(nome__icontains=search) |
+                Q(codigo__icontains=search) |
+                Q(categoria__nome__icontains=search)
+            )
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        base_queryset = Produto.objects.all()
+
+        context["total_produtos"] = base_queryset.count()
+        context["total_ativos"] = base_queryset.filter(ativo=True).count()
+        context["total_inativos"] = base_queryset.filter(ativo=False).count()
+
+        return context
+
 
 
 class ProdutoCreateView(
@@ -143,7 +168,6 @@ class ProdutoCreateView(
         "descricao",
         "categoria",
         "unidade_medida",
-        "codigo",
         "ativo"
     ]
     template_name = "produto/form.html"
@@ -171,7 +195,6 @@ class ProdutoUpdateView(
         "descricao",
         "categoria",
         "unidade_medida",
-        "codigo",
         "ativo"
     ]
     template_name = "produto/form.html"
@@ -198,8 +221,8 @@ def inicio_merenda(request):
     # =========================
     # BASE DO ESTOQUE
     # =========================
-    estoques = (
-        EstoqueGeral.objects
+    """estoques = (
+        EstoqueCentral.objects
         .select_related(
             "produto",
             "produto__unidade_medida",
@@ -257,17 +280,17 @@ def inicio_merenda(request):
             "validade": item.data_validade.strftime("%m/%Y") if item.data_validade else "-",
             "status": status,
             "status_css": status_css,
-        })
+        })"""
 
     # =========================
     # CONTEXTO FINAL
     # =========================
     context = {
-        "total_itens_estoque": total_itens_estoque,
-        "escolas_atendidas": escolas_atendidas,
-        "envios_mes": envios_mes,
-        "alertas_ativos": alertas_ativos,
-        "produtos": produtos_tabela,
+        "total_itens_estoque": "total_itens_estoque",
+        "escolas_atendidas": "escolas_atendidas",
+        "envios_mes": "envios_mes",
+        "alertas_ativos": "alertas_ativos",
+        "produtos": "produtos_tabela",
     }
 
     return render(request, "dashboard.html", context)

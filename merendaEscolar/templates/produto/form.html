@@ -2,41 +2,279 @@
 
 
 {% block content %}
-<div class="content">
-    <h2 style="margin-bottom: 20px;">
-        {% if object %}Editar{% else %}Cadastrar{% endif %} {{ titulo }}
-    </h2>
+<style>
+  /* ====== Header Institucional ====== */
+.page-header-block {
+    max-width: 640px;
+    margin: 0 auto 2rem auto;
+}
 
-    <div class="table-container" style="padding: 25px; max-width: 600px; margin: 0 auto;">
+.page-title-group {
+    margin-bottom: 1.2rem;
+}
+
+.page-subtitle {
+    margin-top: 0.4rem;
+    font-size: 0.95rem;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+/* ====== Card Informativo ====== */
+.info-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+}
+
+.info-card-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.info-card-content {
+    font-size: 0.88rem;
+    color: #334155;
+    line-height: 1.6;
+}
+
+
+/* ====== Caixa de Exemplo ====== */
+.example-box {
+    margin-top: 1rem;
+    background: #f8fafc;
+    border-left: 4px solid var(--verde-principal);
+    padding: 0.9rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #334155;
+}
+
+    /* ====== Container Principal ====== */
+.page-content {
+    padding: 2rem 1.5rem;
+}
+
+.page-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 2rem;
+}
+
+/* ====== Card do Formulário ====== */
+.form-wrapper {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 35px rgba(15, 23, 42, 0.06);
+    padding: 2rem;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+/* ====== Grupo de Campo ====== */
+.form-group {
+    margin-bottom: 1.4rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+    color: #334155;
+}
+
+.required {
+    color: #dc2626;
+    margin-left: 4px;
+}
+
+/* ====== Inputs ====== */
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #2563eb;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    outline: none;
+}
+
+/* ====== Help Text ====== */
+.form-help {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* ====== Erros ====== */
+.form-error {
+    font-size: 0.82rem;
+    color: #b91c1c;
+    margin-top: 4px;
+}
+
+.form-group input.is-invalid,
+.form-group textarea.is-invalid,
+.form-group select.is-invalid {
+    border-color: #dc2626;
+    background: #fef2f2;
+}
+
+/* ====== Ações ====== */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+/* ====== Botão Primário ====== */
+.btn-primary-custom {
+    background: linear-gradient(135deg, var(--verde-principal), #15803d);
+    color: #ffffff;
+    padding: 0.65rem 1.6rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.btn-primary-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(21, 128, 61, 0.25);
+}
+
+/* ====== Botão Secundário ====== */
+.btn-secondary-custom {
+    background: #f1f5f9;
+    color: #1e293b;
+    padding: 0.65rem 1.6rem;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary-custom:hover {
+    background: #e2e8f0;
+}
+
+/* ====== Responsividade ====== */
+@media (max-width: 768px) {
+
+    .page-content {
+        padding: 1.5rem 1rem;
+    }
+
+    .form-wrapper {
+        padding: 1.5rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-primary-custom,
+    .btn-secondary-custom {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+</style>
+
+
+<div class="page-content">
+    <div class="page-header-block">
+
+    <div class="page-title-group">
+        <h2 class="page-title">
+            {% if object %}Editar{% else %}Cadastrar{% endif %} {{ titulo }}
+        </h2>
+
+        <p class="page-subtitle">
+            Preencha os dados abaixo para manter o cadastro organizado e padronizado
+            dentro do sistema de gestão de estoque.
+        </p>
+    </div>
+
+    <div class="info-card">
+        <div class="info-card-title">
+            Exemplo de preenchimento
+        </div>
+
+        <div class="info-card-content">
+            <strong>Produto:</strong> Arroz Tipo 1<br>
+            <strong>Categoria:</strong> Grãos<br>
+            <strong>Unidade:</strong> kg<br>
+            <strong>Código:</strong> ARZ001<br>
+            <strong>Status:</strong> Ativo
+        </div>
+    </div>
+
+</div>
+
+   
+
+
+    <div class="form-wrapper">
         <form method="post">
             {% csrf_token %}
+
             {% for field in form %}
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="{{ field.id_for_label }}" style="font-weight:600; display:block; margin-bottom:6px;">
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">
                         {{ field.label }}
-                        {% if field.field.required %}<span style="color:red;">*</span>{% endif %}
+                        {% if field.field.required %}
+                            <span class="required">*</span>
+                        {% endif %}
                     </label>
+
                     {{ field }}
+
                     {% if field.help_text %}
-                        <small style="color:#6b7280;">{{ field.help_text }}</small>
+                        <div class="form-help">
+                            {{ field.help_text }}
+                        </div>
                     {% endif %}
+
                     {% for error in field.errors %}
-                        <div style="color:#c0392b; font-size:0.85rem;">{{ error }}</div>
+                        <div class="form-error">
+                            {{ error }}
+                        </div>
                     {% endfor %}
                 </div>
             {% endfor %}
 
-            <div style="display:flex; gap:12px; margin-top:20px;">
-                <button type="submit" 
-                        style="background-color:var(--verde-principal); color:#fff; padding:10px 20px; border:none; border-radius:8px; font-weight:600; cursor:pointer;">
+            <div class="form-actions">
+                <button type="submit" class="btn-primary-custom">
                     Salvar
                 </button>
-                <a href="{{ cancel_url }}" 
-                style="background-color:#f3f4f6; color:#111827; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:600;">
-                Cancelar
+                <a href="{{ cancel_url }}" class="btn-secondary-custom">
+                    Cancelar
                 </a>
             </div>
         </form>
     </div>
+
 </div>
 {% endblock content %}

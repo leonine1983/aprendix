@@ -1,21 +1,26 @@
-from django.db import models
+from django.db import models, transaction
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 from rh.models import Escola
+from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
+
+
+User = get_user_model()
+
+
+# ==============================
+# MODELOS BÁSICOS DE CATEGORIA
+# ==============================
 
 class UnidadeMedida(models.Model):
     """
-    Representa a unidade de medida do produto.
-    Ex.: Quilograma (kg), Litro (L), Unidade (un)
+    Representa as unidades de medida dos produtos.
+    Ex.: kg, litro, unidade.
+    Usado em Produto para definir a medida de cada item.
     """
-
-    nome = models.CharField(
-        max_length=50,
-        unique=True
-    )
-
-    sigla = models.CharField(
-        max_length=10,
-        unique=True
-    )
+    nome = models.CharField(max_length=50, unique=True)
+    sigla = models.CharField(max_length=10, unique=True)
 
     class Meta:
         verbose_name = "Unidade de Medida"
@@ -23,24 +28,17 @@ class UnidadeMedida(models.Model):
         ordering = ["nome"]
 
     def __str__(self):
-        return self.sigla
+        return f"{self.nome} ({self.sigla})"
 
 
 class CategoriaProduto(models.Model):
     """
-    Classificação do produto.
-    Ex.: Alimentos, Material de Limpeza, Material Escolar
+    Agrupamento de produtos por categoria.
+    Ex.: Cereais, Carnes, Hortifrúti.
+    Facilita relatórios, filtros e organização do estoque.
     """
-
-    nome = models.CharField(
-        max_length=100,
-        unique=True
-    )
-
-    descricao = models.TextField(
-        blank=True,
-        null=True
-    )
+    nome = models.CharField(max_length=100, unique=True)
+    descricao = models.TextField(blank=True, null=True)
 
     class Meta:
         verbose_name = "Categoria de Produto"
@@ -51,23 +49,46 @@ class CategoriaProduto(models.Model):
         return self.nome
 
 
+# ==============================
+# SEQUÊNCIAS PARA CONTROLE DE CÓDIGOS
+# ==============================
+
+class SequenciaProduto(models.Model):
+    """
+    Controla a sequência anual de códigos de produtos.
+    Garante que cada produto criado recebe um código único,
+    sem depender de dados existentes e evitando duplicidade.
+    """
+    ano = models.IntegerField(unique=True)
+    ultimo_numero = models.IntegerField(default=0)
+
+
+class SequenciaTransferencia(models.Model):
+    """
+    Controla a sequência anual de números de transferências.
+    Garante numeração sequencial e auditável para cada transferência.
+    """
+    ano = models.IntegerField(unique=True)
+    ultimo_numero = models.IntegerField(default=0)
+
+    class Meta:
+        verbose_name = "Sequência de Transferência"
+        verbose_name_plural = "Sequências de Transferência"
+
+
+# ==============================
+# MODELO PRINCIPAL DE PRODUTO
+# ==============================
+
 class Produto(models.Model):
     """
-    Cadastro central de produtos utilizados no sistema de estoque.
-    Deve ser único e compartilhado entre todas as unidades escolares.
+    Representa os produtos do estoque.
+    Ex.: Arroz Branco Tipo 1.
+    - Relaciona-se com CategoriaProduto e UnidadeMedida.
+    - Recebe código sequencial anual via SequenciaProduto.
     """
-
-    nome = models.CharField(
-        max_length=150,
-        help_text="Nome do produto (ex.: Arroz Branco Tipo 1)"
-    )
-
-    descricao = models.TextField(
-        blank=True,
-        null=True,
-        help_text="Descrição detalhada do produto"
-    )
-
+    nome = models.CharField(max_length=150, help_text="Ex.: Arroz Branco Tipo 1")
+    descricao = models.TextField(blank=True, null=True)
     categoria = models.ForeignKey(
         CategoriaProduto,
         on_delete=models.SET_NULL,
@@ -75,138 +96,179 @@ class Produto(models.Model):
         blank=True,
         related_name="produtos"
     )
-
     unidade_medida = models.ForeignKey(
         UnidadeMedida,
         on_delete=models.PROTECT,
         related_name="produtos"
     )
-
-    codigo = models.CharField(
-        max_length=50,
-        unique=True,
-        help_text="Código interno ou código do sistema de compras"
-    )
-
-    ativo = models.BooleanField(
-        default=True,
-        help_text="Indica se o produto está ativo para uso no sistema"
-    )
-
-    criado_em = models.DateTimeField(
-        auto_now_add=True
-    )
-
-    atualizado_em = models.DateTimeField(
-        auto_now=True
-    )
+    codigo = models.CharField(max_length=20, unique=True, editable=False)
+    ativo = models.BooleanField(default=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Produto"
-        verbose_name_plural = "Produtos"
         ordering = ["nome"]
         indexes = [
             models.Index(fields=["nome"]),
             models.Index(fields=["codigo"]),
+            models.Index(fields=["ativo"]),
         ]
 
     def __str__(self):
         return f"{self.nome} ({self.unidade_medida.sigla})"
 
+    def save(self, *args, **kwargs):
+        if not self.codigo:
+            self.codigo = self._gerar_codigo_sequencial()
+        super().save(*args, **kwargs)
 
-class EstoqueGeral(models.Model):
-    # Unidade escolar à qual o estoque pertence
-    # Permite controlar o estoque de forma descentralizada por escola
-    unidade_escolar = models.ForeignKey(
-        Escola,
-        on_delete=models.CASCADE,
-        related_name="estoques"
-    )
+    def _gerar_codigo_sequencial(self):
+        """
+        Gera código do produto no formato PRD-ANO-XXXXX.
+        Usa SequenciaProduto para evitar duplicidade e gaps.
+        """
+        ano = timezone.now().year
+        with transaction.atomic():
+            seq, _ = SequenciaProduto.objects.select_for_update().get_or_create(ano=ano)
+            seq.ultimo_numero += 1
+            seq.save()
+            return f"PRD-{ano}-{seq.ultimo_numero:05d}"
 
-    # Produto armazenado no estoque (ex.: arroz, feijão, leite)
-    # PROTECT impede exclusão do produto se houver registro em estoque
-    produto = models.ForeignKey(
-        Produto,
-        on_delete=models.PROTECT,
-        related_name="movimentacoes_estoque"
-    )
 
-    # Data de fabricação do produto
-    # Campo opcional, pois nem todo produto possui essa informação
-    data_fabricacao = models.DateField(
-        null=True,
-        blank=True
-    )
+# ==============================
+# ESTOQUE
+# ==============================
 
-    # Data de validade do produto
-    # Fundamental para controle de vencimentos e alertas
-    data_validade = models.DateField(
-        null=True,
-        blank=True
-    )
-
-    # Data em que o produto entrou no estoque da unidade
-    # Usada para rastreamento e controle histórico
-    data_entrada = models.DateField()
-
-    # Quantidade atual disponível do produto em estoque
-    # Utiliza DecimalField para evitar erros de arredondamento
-    quantidade = models.DecimalField(
-        max_digits=10,
-        decimal_places=2
-    )
-
-    # Situação atual do item em estoque
-    # Ex.: "Disponível", "Vencido", "Baixo estoque", "Bloqueado"
-    situacao = models.CharField(
-        max_length=50,
-        blank=True
-    )
-
-    # Lote do produto
-    # Importante para rastreabilidade e controle sanitário
-    lote = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True
-    )
-
-    # Ano de exercício do estoque
-    # Facilita relatórios anuais e prestação de contas
-    exercicio = models.PositiveIntegerField(
-        help_text="Ano de referência do estoque"
-    )
-
-    # Data em que foi realizada a apuração ou conferência do estoque
-    # Pode representar inventário físico ou fechamento mensal
-    data_apuracao = models.DateField()
-
-    # Observações gerais sobre o item em estoque
-    # Campo livre para registros administrativos
-    observacoes = models.TextField(
-        blank=True,
-        null=True
-    )
-
-    # Data e hora de criação do registro
-    # Importante para auditoria
-    criado_em = models.DateTimeField(
-        auto_now_add=True
-    )
-
-    # Data e hora da última atualização do registro
-    atualizado_em = models.DateTimeField(
-        auto_now=True
-    )
+class EstoqueCentral(models.Model):
+    """
+    Estoque principal da instituição.
+    Cada produto pode ter vários lotes.
+    Usado para controlar entrada e saída central de produtos.
+    """
+    produto = models.ForeignKey(Produto, on_delete=models.PROTECT, related_name="estoque_central")
+    lote = models.CharField(max_length=50, blank=True, null=True)
+    data_validade = models.DateField(blank=True, null=True)
+    quantidade = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])
+    atualizado_em = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Controle de Estoque Geral"
-        verbose_name_plural = "Controle de Estoque Geral"
-        ordering = ["produto__nome"]
+        constraints = [
+            models.UniqueConstraint(fields=["produto", "lote"], name="unique_produto_lote_central")
+        ]
 
     def __str__(self):
-        return (
-            f"{self.produto} - "
-            f"{self.quantidade} {self.produto.unidade_medida.sigla} "
-            f"({self.unidade_escolar})"
-        )
+        return f"{self.produto.nome} - Lote {self.lote or 'Sem lote'}"
+
+
+class EstoqueEscola(models.Model):
+    """
+    Estoque de cada escola.
+    Recebe produtos do EstoqueCentral via Transferência.
+    Permite controle individual por escola e lote.
+    """
+    escola = models.ForeignKey(Escola, on_delete=models.CASCADE, related_name="estoque_escola")
+    produto = models.ForeignKey(Produto, on_delete=models.PROTECT)
+    lote = models.CharField(max_length=50, blank=True, null=True)
+    quantidade = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["escola", "produto", "lote"], name="unique_escola_produto_lote")
+        ]
+
+
+# ==============================
+# MOVIMENTAÇÃO DE ESTOQUE
+# ==============================
+
+class MovimentacaoEstoque(models.Model):
+    """
+    Registra entradas e saídas de produtos, seja do estoque central ou das escolas.
+    Tipos:
+        - ENTRADA_CENTRAL / SAIDA_CENTRAL
+        - ENTRADA_ESCOLA / SAIDA_ESCOLA
+        - AJUSTE (manual)
+    """
+    TIPO_CHOICES = (
+        ("ENTRADA_CENTRAL", "Entrada Central"),
+        ("SAIDA_CENTRAL", "Saída Central"),
+        ("ENTRADA_ESCOLA", "Entrada Escola"),
+        ("SAIDA_ESCOLA", "Saída Escola"),
+        ("AJUSTE", "Ajuste Manual"),
+    )
+
+    produto = models.ForeignKey(Produto, on_delete=models.PROTECT)
+    escola = models.ForeignKey(Escola, on_delete=models.SET_NULL, null=True, blank=True)
+    quantidade = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])
+    tipo = models.CharField(max_length=30, choices=TIPO_CHOICES)
+    usuario = models.ForeignKey(User, on_delete=models.PROTECT)
+    data_movimentacao = models.DateTimeField(auto_now_add=True)
+    observacao = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ["-data_movimentacao"]
+        indexes = [
+            models.Index(fields=["produto"]),
+            models.Index(fields=["tipo"]),
+            models.Index(fields=["data_movimentacao"]),
+        ]
+
+    def clean(self):
+        if "ESCOLA" in self.tipo and not self.escola:
+            raise ValidationError("Movimentações de escola exigem escola definida.")
+
+
+# ==============================
+# TRANSFERÊNCIAS DE ESTOQUE
+# ==============================
+
+class Transferencia(models.Model):
+    """
+    Representa o envio de produtos do estoque central para uma escola.
+    Cada transferência recebe número único anual via SequenciaTransferencia.
+    """
+    numero = models.CharField(max_length=30, unique=True, editable=False)
+    escola_destino = models.ForeignKey(Escola, on_delete=models.PROTECT)
+    status = models.CharField(
+        max_length=20,
+        choices=(("RASCUNHO", "Rascunho"), ("ENVIADO", "Enviado"), ("RECEBIDO", "Recebido")),
+        default="RASCUNHO"
+    )
+    criado_por = models.ForeignKey(User, on_delete=models.PROTECT)
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criado_em"]
+
+    def save(self, *args, **kwargs):
+        if not self.numero:
+            self.numero = self._gerar_numero_transferencia()
+        super().save(*args, **kwargs)
+
+    def _gerar_numero_transferencia(self):
+        """
+        Gera número da transferência no formato TRF-ANO-XXXXX.
+        Usa SequenciaTransferencia para evitar duplicidade.
+        """
+        ano = timezone.now().year
+        with transaction.atomic():
+            seq, _ = SequenciaTransferencia.objects.select_for_update().get_or_create(ano=ano)
+            seq.ultimo_numero += 1
+            seq.save()
+            return f"TRF-{ano}-{seq.ultimo_numero:05d}"
+
+
+class TransferenciaItem(models.Model):
+    """
+    Produtos específicos incluídos em uma Transferência.
+    Cada produto só pode aparecer uma vez por transferência.
+    """
+    transferencia = models.ForeignKey(Transferencia, on_delete=models.CASCADE, related_name="itens")
+    produto = models.ForeignKey(Produto, on_delete=models.PROTECT)
+    quantidade = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["transferencia", "produto"], name="unique_produto_por_transferencia")
+        ]

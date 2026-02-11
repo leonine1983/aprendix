@@ -1,50 +1,254 @@
 {% extends "estoque_base.html" %}
 
 {% block content %}
-<h2>Produtos</h2>
 
-<a href="{% url 'merendaEscolar:produto_create' %}" class="btn btn-primary mb-3">
-    Novo Produto
-</a>
+<style>
+    /* ====== Bloco Informativo ====== */
+.page-intro {
+    background: #f8fafc;
+    padding: 1.2rem 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1.8rem;
+    border-left: 4px solid #2563eb;
+}
 
-<div class="table-responsive">
-    <table class="table table-striped align-middle">
+.page-intro p {
+    margin: 0 0 0.8rem 0;
+    color: #475569;
+    font-size: 0.95rem;
+}
+
+.example-tags small {
+    display: block;
+    font-size: 0.8rem;
+    margin-bottom: 0.6rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.tags-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag {
+    background: #e2e8f0;
+    padding: 0.35rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: #334155;
+    font-weight: 500;
+}
+
+    /* ====== Layout Header ====== */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.page-header h2 {
+    font-weight: 600;
+    font-size: 1.6rem;
+    color: #1e293b;
+    margin: 0;
+}
+
+/* ====== Botão Primário Institucional ====== */
+.btn-primary {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border: none;
+    padding: 0.55rem 1.2rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+/* ====== Tabela Moderna ====== */
+.table-modern {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.table-modern thead {
+    background: #f1f5f9;
+}
+
+.table-modern th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #475569;
+    padding: 1rem;
+}
+
+.table-modern td {
+    padding: 1rem;
+    vertical-align: middle;
+    color: #334155;
+}
+
+.table-modern tbody tr {
+    transition: background 0.2s ease;
+}
+
+.table-modern tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* ====== Botão Outline Refinado ====== */
+.btn-outline-secondary {
+    border-radius: 6px;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
+/* ====== Estado Vazio ====== */
+.empty-state {
+    padding: 2rem;
+    text-align: center;
+    color: #64748b;
+    font-style: italic;
+}
+
+/* ====== Paginação Moderna ====== */
+.pagination {
+    margin-top: 2rem;
+    justify-content: center;
+}
+
+.page-link {
+    border-radius: 8px !important;
+    margin: 0 4px;
+    color: #1e293b;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+.page-link:hover {
+    background: #f1f5f9;
+}
+
+.page-item.active .page-link {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+}
+
+/* ====== Responsividade ====== */
+@media (max-width: 768px) {
+
+    .table-modern thead {
+        display: none;
+    }
+
+    .table-modern tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 1rem;
+    }
+
+    .table-modern tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.6rem 0;
+    }
+
+    .table-modern tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #475569;
+    }
+
+    .text-end {
+        text-align: left !important;
+    }
+}
+
+</style>
+
+<div class="page-header">
+
+    <div class="page-intro">
+        <p>
+            As categorias organizam os produtos do estoque em grupos estratégicos,
+            facilitando relatórios, auditorias e planejamento de compras.
+            Utilize nomenclaturas padronizadas para manter a consistência institucional.
+        </p>
+
+        <div class="example-tags">
+            <small>Exemplos de categorias utilizadas na merenda escolar:</small>
+            <div class="tags-wrapper">
+                <span class="tag">Grãos e Cereais</span>
+                <span class="tag">Hortifruti</span>
+                <span class="tag">Laticínios</span>
+                <span class="tag">Carnes</span>
+                <span class="tag">Bebidas</span>
+                <span class="tag">Condimentos</span>
+                <span class="tag">Panificação</span>
+            </div>
+        </div>
+    </div>
+
+
+    <h2>Categorias de Produto</h2>
+    <a href="{% url 'merendaEscolar:categoria_produto_create' %}" class="btn btn-primary">
+        Nova Categoria
+    </a>
+</div>
+
+<div class="table-responsive table-modern">
+    <table class="table align-middle mb-0">
         <thead>
             <tr>
                 <th>Nome</th>
-                <th>Categoria</th>
-                <th>Unidade</th>
-                <th>Código</th>
-                <th>Status</th>
-                <th></th>
+                <th>Descrição</th>
+                <th class="text-end">Ações</th>
             </tr>
         </thead>
         <tbody>
-        {% for produto in produtos %}
+        {% for categoria in categorias %}
             <tr>
-                <td>{{ produto.nome }}</td>
-                <td>{{ produto.categoria|default:"—" }}</td>
-                <td>{{ produto.unidade_medida.sigla }}</td>
-                <td>{{ produto.codigo }}</td>
-                <td>
-                    {% if produto.ativo %}
-                        <span class="badge bg-success">Ativo</span>
-                    {% else %}
-                        <span class="badge bg-secondary">Inativo</span>
-                    {% endif %}
+                <td data-label="Nome"><strong>{{ categoria.nome }}</strong></td>
+                <td data-label="Descrição">
+                    {{ categoria.descricao|default:"—" }}
                 </td>
-                <td>
-                    <a href="{% url 'produto_update' produto.id %}" class="btn btn-sm btn-outline-secondary">
+                <td data-label="Ações" class="text-end">
+                    <a href="{% url 'merendaEscolar:categoria_produto_update' categoria.id %}" 
+                       class="btn btn-sm btn-outline-secondary">
                         Editar
                     </a>
                 </td>
             </tr>
         {% empty %}
             <tr>
-                <td colspan="6">Nenhum produto cadastrado.</td>
+                <td colspan="3" class="empty-state">
+                    Nenhuma categoria cadastrada.
+                </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 </div>
+
+
 {% endblock %}

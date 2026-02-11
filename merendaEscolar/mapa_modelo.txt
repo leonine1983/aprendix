@@ -1,0 +1,55 @@
+[Produto] 
+   │
+   │ cria com código sequencial via SequenciaProduto
+   ▼
+[EstoqueCentral] ──┐
+   │               │ Entrada/Saída central
+   │               ▼
+   │          [MovimentacaoEstoque]
+   │               │ registra movimentações
+   │               │ (entrada, saída, ajustes)
+   ▼
+[Transferencia] ──> [TransferenciaItem] ──> [EstoqueEscola]
+   │                   │                       │
+   │ número sequencial │ cada item da           │
+   │ via Sequencia     │ transferência          │
+   │ Transferencia     │                       │
+   ▼                   ▼                       ▼
+  status (Rascunho, Enviado, Recebido)     quantidade atualizada
+
+
+
+
+Descrição do Fluxo:
+
+Produto
+
+Criado com informações básicas, categoria e unidade de medida.
+
+Recebe código único anual via SequenciaProduto.
+
+EstoqueCentral
+
+Mantém os produtos disponíveis na instituição.
+
+Controla lotes, validade e quantidade.
+
+MovimentacaoEstoque
+
+Registra todas as entradas e saídas: central ou escolas.
+
+Pode incluir ajustes manuais.
+
+Transferencia → TransferenciaItem
+
+Permite enviar produtos do estoque central para escolas.
+
+Cada transferência possui número sequencial anual via SequenciaTransferencia.
+
+Itens listam produtos e quantidades específicas.
+
+EstoqueEscola
+
+Atualiza a quantidade disponível em cada escola.
+
+Recebe produtos via transferência ou ajustes locais.

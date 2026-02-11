@@ -1,50 +1,245 @@
 {% extends "estoque_base.html" %}
-
 {% block content %}
-<h2>Produtos</h2>
+<style>
+    /* ===== Header ===== */
 
-<a href="{% url 'merendaEscolar:produto_create' %}" class="btn btn-primary mb-3">
-    Novo Produto
-</a>
+    /* ===== Bloco Introdutório ===== */
+.page-intro {
+    background: #f8fafc;
+    border-left: 4px solid #2563eb;
+    padding: 1.2rem 1.4rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
 
-<div class="table-responsive">
-    <table class="table table-striped align-middle">
+.page-intro p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #334155;
+    line-height: 1.5;
+}
+
+.page-intro strong {
+    color: #0f172a;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .page-intro {
+        padding: 1rem;
+    }
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-size: 1.7rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+}
+
+/* ===== Botão Primário ===== */
+.btn-primary-modern {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1.4rem;
+    font-weight: 600;
+    color: #ffffff;
+    transition: all 0.25s ease;
+}
+
+.btn-primary-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+/* ===== Tabela ===== */
+.table-modern {
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+}
+
+.table-modern thead {
+    background: #f8fafc;
+}
+
+.table-modern th {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #475569;
+    padding: 1rem;
+}
+
+.table-modern td {
+    padding: 1rem;
+    color: #334155;
+    vertical-align: middle;
+}
+
+.table-modern tbody tr {
+    transition: background 0.2s ease;
+}
+
+.table-modern tbody tr:hover {
+    background: #f1f5f9;
+}
+
+/* ===== Botão Editar ===== */
+.btn-outline-modern {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.85rem;
+    background: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-modern:hover {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+}
+
+/* ===== Estado vazio ===== */
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #64748b;
+    font-style: italic;
+}
+
+/* ===== Paginação ===== */
+.pagination-modern {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.pagination-modern a,
+.pagination-modern span {
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.pagination-modern a:hover {
+    background: #f1f5f9;
+}
+
+.pagination-modern .active-page {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+}
+
+/* ===== Responsividade ===== */
+@media (max-width: 768px) {
+
+    .table-modern thead {
+        display: none;
+    }
+
+    .table-modern tbody tr {
+        display: block;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .table-modern tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+    }
+
+    .table-modern tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #475569;
+    }
+}
+
+</style>
+
+    <div class="page-header">
+        <div class="page-intro">
+        <p>
+            Esta página permite o <strong>gerenciamento das Unidades de Medida</strong> 
+            utilizadas no sistema de estoque. As unidades cadastradas são aplicadas 
+            no registro de produtos e movimentações, garantindo padronização, 
+            controle quantitativo e consistência nas operações administrativas.
+            Utilize o botão <strong>"Nova Unidade"</strong> para adicionar novos registros.
+        </p>
+    </div>
+
+    <h2 class="page-title">Unidades de Medida</h2>
+
+    <a href="{% url 'merendaEscolar:unidade_medida_create' %}" 
+       class="btn-primary-modern">
+        Nova Unidade
+    </a>
+</div>
+
+<div class="table-responsive table-modern">
+    <table class="table align-middle mb-0">
         <thead>
             <tr>
                 <th>Nome</th>
-                <th>Categoria</th>
-                <th>Unidade</th>
-                <th>Código</th>
-                <th>Status</th>
-                <th></th>
+                <th>Sigla</th>
+                <th class="text-end">Ações</th>
             </tr>
         </thead>
         <tbody>
-        {% for produto in produtos %}
+        {% for unidade in unidades %}
             <tr>
-                <td>{{ produto.nome }}</td>
-                <td>{{ produto.categoria|default:"—" }}</td>
-                <td>{{ produto.unidade_medida.sigla }}</td>
-                <td>{{ produto.codigo }}</td>
-                <td>
-                    {% if produto.ativo %}
-                        <span class="badge bg-success">Ativo</span>
-                    {% else %}
-                        <span class="badge bg-secondary">Inativo</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'produto_update' produto.id %}" class="btn btn-sm btn-outline-secondary">
+                <td data-label="Nome">{{ unidade.nome }}</td>
+                <td data-label="Sigla"><strong>{{ unidade.sigla }}</strong></td>
+                <td data-label="Ações" class="text-end">
+                    <a href="{% url 'merendaEscolar:unidade_medida_update' unidade.id %}" 
+                       class="btn-outline-modern">
                         Editar
                     </a>
                 </td>
             </tr>
         {% empty %}
             <tr>
-                <td colspan="6">Nenhum produto cadastrado.</td>
+                <td colspan="3" class="empty-state">
+                    Nenhuma unidade cadastrada.
+                </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 </div>
+
+{% if is_paginated %}
+<nav class="pagination-modern">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+
+    <span class="active-page">{{ page_obj.number }}</span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Próxima</a>
+    {% endif %}
+</nav>
+{% endif %}
+
 {% endblock %}
