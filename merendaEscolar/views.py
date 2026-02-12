@@ -12,6 +12,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
+from core.permissions import GroupRequiredMixin
+from django.core.exceptions import PermissionDenied
+
+
+
+
+MERENDA_GROUPS = [
+    "Nutricionista",
+    "Merendeira",
+    "Admin",
+]
 
 
 
@@ -34,33 +45,43 @@ class ErrorMessageMixin:
 
 
 
-# Unidade de Medida
-class UnidadeMedidaListView(LoginRequiredMixin, ListView):
+class UnidadeMedidaListView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    ListView
+):
     model = UnidadeMedida
     template_name = "unidade_medida/list.html"
     context_object_name = "unidades"
     paginate_by = 10
 
+    group_required = MERENDA_GROUPS
+
+
 
 
 class UnidadeMedidaCreateView(
     LoginRequiredMixin,
+    GroupRequiredMixin,
     PermissionRequiredMixin,
     SuccessMessageMixin,
     ErrorMessageMixin,
     CreateView
+
 ):
     model = UnidadeMedida
     fields = ["nome", "sigla"]
     template_name = "unidade_medida/form.html"
     success_url = reverse_lazy("merendaEscolar:unidade_medida_list")
     permission_required = "estoque.add_unidademedida"
+    group_required = MERENDA_GROUPS
     success_message = "Unidade de medida cadastrada com sucesso."
     error_message = "Erro ao cadastrar a unidade de medida."
 
 
 class UnidadeMedidaUpdateView(
     LoginRequiredMixin,
+    GroupRequiredMixin,
     PermissionRequiredMixin,
     SuccessMessageMixin,
     ErrorMessageMixin,
@@ -71,22 +92,31 @@ class UnidadeMedidaUpdateView(
     template_name = "unidade_medida/form.html"
     success_url = reverse_lazy("merendaEscolar:unidade_medida_list")
     permission_required = "estoque.change_unidademedida"
+    group_required = MERENDA_GROUPS
     success_message = "Unidade de medida atualizada com sucesso."
     error_message = "Erro ao atualizar a unidade de medida."
 
 
 
 # Categoria de Produto
-class CategoriaProdutoListView(LoginRequiredMixin, ListView):
+class CategoriaProdutoListView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    ListView
+):
     model = CategoriaProduto
     template_name = "categoria_produto/list.html"
     context_object_name = "categorias"
     paginate_by = 10
 
+    group_required = MERENDA_GROUPS
+
+
 
 class CategoriaProdutoCreateView(
     LoginRequiredMixin,
-    PermissionRequiredMixin,
+    GroupRequiredMixin,
+    PermissionRequiredMixin,    
     SuccessMessageMixin,
     ErrorMessageMixin,
     CreateView
@@ -96,12 +126,14 @@ class CategoriaProdutoCreateView(
     template_name = "categoria_produto/form.html"
     success_url = reverse_lazy("merendaEscolar:categoria_produto_list")
     permission_required = "estoque.add_categoriaproduto"
+    group_required = MERENDA_GROUPS    
     success_message = "Categoria cadastrada com sucesso."
     error_message = "Erro ao cadastrar a categoria."
 
 
 class CategoriaProdutoUpdateView(
     LoginRequiredMixin,
+    GroupRequiredMixin,
     PermissionRequiredMixin,
     SuccessMessageMixin,
     ErrorMessageMixin,
@@ -112,17 +144,25 @@ class CategoriaProdutoUpdateView(
     template_name = "categoria_produto/form.html"
     success_url = reverse_lazy("merendaEscolar:categoria_produto_list")
     permission_required = "estoque.change_categoriaproduto"
+    group_required = MERENDA_GROUPS
     success_message = "Categoria atualizada com sucesso."
     error_message = "Erro ao atualizar a categoria."
 
 # Produtos
 from django.db.models import Q
 
-class ProdutoListView(LoginRequiredMixin, ListView):
+class ProdutoListView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    ListView
+):
     model = Produto
     template_name = "produto/list.html"
     context_object_name = "produtos"
     paginate_by = 10
+
+    group_required = MERENDA_GROUPS
+
 
     def get_queryset(self):
         queryset = (
@@ -157,6 +197,7 @@ class ProdutoListView(LoginRequiredMixin, ListView):
 
 class ProdutoCreateView(
     LoginRequiredMixin,
+    GroupRequiredMixin,
     PermissionRequiredMixin,
     SuccessMessageMixin,
     ErrorMessageMixin,
@@ -173,6 +214,7 @@ class ProdutoCreateView(
     template_name = "produto/form.html"
     success_url = reverse_lazy("merendaEscolar:produto_list")
     permission_required = "estoque.add_produto"
+    group_required = MERENDA_GROUPS
     success_message = "Produto cadastrado com sucesso."
     error_message = "Erro ao cadastrar o produto."
 
@@ -184,6 +226,7 @@ class ProdutoCreateView(
 
 class ProdutoUpdateView(
     LoginRequiredMixin,
+    GroupRequiredMixin,
     PermissionRequiredMixin,
     SuccessMessageMixin,
     ErrorMessageMixin,
@@ -200,6 +243,7 @@ class ProdutoUpdateView(
     template_name = "produto/form.html"
     success_url = reverse_lazy("merendaEscolar:produto_list")
     permission_required = "estoque.change_produto"
+    group_required = MERENDA_GROUPS
     success_message = "Produto atualizado com sucesso."
     error_message = "Erro ao atualizar o produto."
 
@@ -209,12 +253,12 @@ class ProdutoUpdateView(
         return context
 
 
-
-
-
-
-
+@login_required
 def inicio_merenda(request):
+
+    if not request.user.is_superuser and not request.user.groups.filter(name__in=MERENDA_GROUPS).exists():
+        raise PermissionDenied("Acesso restrito ao módulo Merenda Escolar.")
+
     hoje = timezone.now().date()
     limite_alerta_validade = hoje + timedelta(days=30)
 
@@ -293,4 +337,4 @@ def inicio_merenda(request):
         "produtos": "produtos_tabela",
     }
 
-    return render(request, "dashboard.html", context)
+    return render(request, "merendaEscolar/dashboard.html", context)

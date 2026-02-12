@@ -1,494 +1,342 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AprendiX - Gestão Escolar Inteligente</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acesso Institucional | Secretaria Municipal da Educação</title>
 
-  <meta name="google-site-verification" content="zxAVE3Xt5fZA1S30e8Tus_YoxrD1FbNsvuW4macBarI" />
 
-  <!-- SEO Essentials -->
-  <meta name="description" content="AprendiX é uma plataforma moderna de gestão escolar com tecnologia, IA e recursos que otimizam o ensino. Experimente gratuitamente!">
-  <meta name="keywords" content="gestão escolar, sistema educacional, diário digital, tecnologia na educação, IA na escola, AprendiX, plataforma escolar">
-  <meta name="author" content="Cauans Solutions">
-  <link rel="canonical" href="https://www.cauans-solutions.icu/" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
-  <meta property="og:title" content="AprendiX - Gestão Escolar Inteligente">
-  <meta property="og:description" content="Transforme sua escola com uma plataforma completa, intuitiva e com inteligência artificial. Solicite uma demonstração gratuita.">
-  <meta property="og:image" content="{% static 'social-cover.jpg' %}">
-  <meta property="og:url" content="https://www.cauans-solutions.icu/">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="AprendiX">
+<style>
+:root {
+    --primary: #2f6fed;
+    --primary-dark: #1e4fcc;
+    --bg: #f4f6f9;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --error: #b91c1c;
+    --success: #047857;
+    --radius: 14px;
+}
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="AprendiX - Gestão Escolar Inteligente">
-  <meta name="twitter:description" content="Solução digital completa para escolas públicas e privadas. Gestão, comunicação e IA num só lugar.">
-  <meta name="twitter:image" content="{% static 'social-cover.jpg' %}">  
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-  <!-- Favicon -->
-  <link rel="icon" href="{% static 'favicon.ico' %}" />
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f4f6f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: var(--text);
+    padding: 20px;
+    position: relative;
+}
+.bg-pattern {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;          /* Fica atrás */
+    pointer-events: none; /* Não interfere em clique */
+}
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Font Awesome -->
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
-  <!-- AOS (Animations) -->
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+.login-container {
+    background: var(--card);
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 32px;
+    border-radius: var(--radius);
+    box-shadow: 0 20px 45px rgba(0,0,0,0.08);
+}
 
-  <!-- Robots -->
-  <meta name="robots" content="index, follow">
+.logo {
+    text-align: center;
+    margin-bottom: 24px;
+}
 
-  <!-- Schema.org (JSON-LD) -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "AprendiX",
-    "url": "https://aprendix.cauans-solutions.icu",
-    "logo": "https://cauans-solutions.icu/media/logo.png",
-    "description": "Plataforma inteligente de gestão escolar com IA, busca ativa e recursos digitais.",
-    "sameAs": [
-      "https://www.facebook.com/aprendix",
-      "https://www.instagram.com/aprendix",
-      "https://www.linkedin.com/company/aprendix"
-    ]
-  }
-  </script>
-  <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.7.2/css/all.css">
+.logo img {
+    max-width: 120px;
+}
 
-  <style>
-    html {
-      scroll-behavior: smooth;
-    }
-    body {
-      background-color: #F5F7FA;
-      color: #1E1E1E;
-      font-family: 'Inter', sans-serif;
-    }
-    .container {
-      max-width: 1100px;
-      background-color: rgba(14, 68, 27, 0.36); /* Transparência leve */
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-      display: flex;
-      flex-wrap: wrap;
-      margin: 0 auto;
-    }
-    .left, .right {
-      flex: 1 1 300px;
-      padding: 3rem 2rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      background-color: #f0f4f8;
-    }
-    .left {
-      text-align: center;
-      color: #1f2937;
-    }
-    .left p {
-      color: #805500;
-      margin: 1rem 0;
-      font-weight: 600;
-    }
-    .matricula-btn {
-      display: inline-block;
-      margin-top: 1rem;
-      background-color: #2563eb;
-      color: white;
-      padding: 0.5rem 1.25rem;
-      border-radius: 6px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: background-color 0.3s;
-    }
-    .matricula-btn:hover {
-      background-color: #1d4ed8;
-    }
-    .logo-sme {
-      width: 180px;
-      margin: 0 auto 1rem;
-    }
-    .logo {
-      width: 7rem !important;
-      margin-bottom: 1rem;
-      align-self: center;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-    .input-group {
-      position: relative;
-    }
-    .input-group i {
-      position: absolute;
-      top: 50%;
-      left: 1rem;
-      transform: translateY(-50%);
-      color: #6b7280;
-      font-size: 1.125rem;
-    }
-    .input-group input {
-      width: 100%;
-      padding: 0.75rem 1rem 0.75rem 3rem;
-      border: 1.5px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: border-color 0.3s;
-    }
-    .input-group input:focus {
-      border-color: #2563eb;
-      outline: none;
-      box-shadow: 0 0 5px rgba(37, 99, 235, 0.5);
-    }
-    .options {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.875rem;
-      color: #6b7280;
-    }
-    .options a {
-      color: #2563eb;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    .options a:hover {
-      text-decoration: underline;
-    }
-    button[type="submit"] {
-      background-color: #2563eb;
-      color: white;
-      padding: 0.75rem;
-      font-size: 1rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.5rem;
-      transition: background-color 0.3s;
-    }
-    button[type="submit"]:hover {
-      background-color: #1d4ed8;
-    }
-    .footer {
-      margin-top: 2rem;
-      font-size: 0.875rem;
-      color: #6b7280;
-      text-align: center;
-    }
-    /* Botão flutuante para mobile */
-    .botao-flutuante {
-      display: none;
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      background-color: #2563eb;
-      color: white;
-      font-size: 1.125rem;
-      padding: 0.75rem 1rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      z-index: 1000;
-      transition: background-color 0.3s, transform 0.2s;
-      text-decoration: none;
-      align-items: center;
-      gap: 0.5rem;
-      display: inline-flex;
-    }
-    .botao-flutuante:hover {
-      background-color: #1d4ed8;
-      transform: scale(1.1);
-    }
-    @media (max-width: 768px) {
-      .botao-flutuante {
-        display: inline-flex;
-      }
-      #matricula {
-        display: none;
-      }
-      .container {
-        flex-direction: column;
-        background-color: transparent;
-        box-shadow: none;
-      }
-      .left, .right {
-        background-color: transparent;
-        padding: 1.5rem 1rem;
-      }
-      .left p {
-        color: #374151;
-      }
-    }
+h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 8px;
+}
 
-    .bg-p-1
-    {
-      --s: 50px;
-      --c: #191b22;
-      --_s: calc(2*var(--s)) calc(2*var(--s));
-      --_g: 35.36% 35.36% at;
-      --_c: #0000 66%,#20222a 68% 70%,#0000 72%;
-      background: 
-        radial-gradient(var(--_g) 100% 25%,var(--_c)) var(--s) var(--s)/var(--_s), 
-        radial-gradient(var(--_g) 0 75%,var(--_c)) var(--s) var(--s)/var(--_s), 
-        radial-gradient(var(--_g) 100% 25%,var(--_c)) 0 0/var(--_s), 
-        radial-gradient(var(--_g) 0 75%,var(--_c)) 0 0/var(--_s), 
-        repeating-conic-gradient(var(--c) 0 25%,#0000 0 50%) 0 0/var(--_s), 
-        radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
-      background-attachment: fixed;
+.subtitle {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 28px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(47,111,237,0.15);
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    background: none;
+    border: none;
+    font-size: 0.8rem;
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    margin-bottom: 24px;
+}
+
+.options a {
+    text-decoration: none;
+    color: var(--primary);
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+button[type="submit"]:hover {
+    background: var(--primary-dark);
+}
+
+.footer-text {
+    margin-top: 24px;
+    font-size: 0.75rem;
+    text-align: center;
+    color: var(--muted);
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 32px 24px;
     }
-  </style>
+}
+</style>
 </head>
-<body class="font-sans">
-  {% include "Escola/partials/mensagens.html" %}
 
-  <!-- HEADER -->
-  <header class="bg-white shadow-md px-6 py-4 flex justify-between items-center sticky top-0 z-50">
-    <h1 class="text-xl font-bold text-[#1A73E8]" data-aos="fade-down">AprendiX</h1>
-    <nav class="hidden md:flex space-x-6 text-sm font-medium">
-      <a href="#funcionalidades" class="hover:text-[#1A73E8]" data-aos="fade-down" data-aos-delay="100">Funcionalidades</a>
-      <a href="#diferenciais" class="hover:text-[#1A73E8]" data-aos="fade-down" data-aos-delay="200">Diferenciais</a>
-      <a href="#contato" class="hover:text-[#1A73E8]" data-aos="fade-down" data-aos-delay="300">Contato</a>
-    </nav>
-    <!-- BOTÕES DE COMPARTILHAMENTO FIXOS À DIREITA -->
-    <div
-      class="fixed top-1/2 right-4 transform -translate-y-1/2 bg-white p-3 rounded-lg shadow-lg"
-      data-aos="fade-down"
-      style="z-index: 9999;"
-    >
-        <h3 class="font-semibold text-center mb-2"><small>Compartilhe</small></h3>
-        <div class="flex flex-col gap-4 items-center">
-          <a href="https://www.facebook.com/sharer/sharer.php?u=https://www.cauans-solutions.icu/" 
-            target="_blank" 
-            class="text-blue-600 hover:text-blue-800 text-3xl" 
-            title="Compartilhar no Facebook">
-            <i class="fab fa-facebook-square"></i>
-          </a>
-          <a href="https://api.whatsapp.com/send?text=Veja%20essa%20plataforma%20incrível:%20https://www.cauans-solutions.icu/" 
-            target="_blank" 
-            class="text-green-500 hover:text-green-600 text-3xl" 
-            title="Compartilhar no WhatsApp">
-            <i class="fa-brands fa-whatsapp"></i>
-          </a>
-          <a href="https://twitter.com/intent/tweet?text=Conheça%20o%20AprendiX%20-%20Gestão%20Escolar%20Inteligente&url=https://www.cauans-solutions.icu/" 
-            target="_blank" 
-            class="text-blue-400 hover:text-blue-600 text-3xl" 
-            title="Compartilhar no Twitter">
-            <i class="fab fa-twitter"></i>
-          </a>
-          <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://www.cauans-solutions.icu/" 
-            target="_blank" 
-            class="text-blue-700 hover:text-blue-900 text-3xl" 
-            title="Compartilhar no LinkedIn">
-            <i class="fab fa-linkedin"></i>
-          </a>
-        </div>
-      </div>
+<body>
+   <!-- Background Institucional -->
 
-    </div>
-    <a href="#contato" class="bg-[#1A73E8] text-white px-4 py-2 rounded hover:bg-blue-700 text-sm transition" data-aos="fade-down" data-aos-delay="400">Solicitar Demonstração</a>
-  </header>
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" 
+     style="position: absolute; top: 0; left: 0; z-index: -1; pointer-events: none; opacity: 0.6;">
   
+  <defs>
+    <pattern id="eduTechOutline" x="0" y="0" width="500" height="500" patternUnits="userSpaceOnUse">
+      
+      <g fill="none" stroke="#334155" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        
+        <g transform="translate(40, 50) rotate(-15)">
+          <path d="M2,10 Q12,5 22,10 V40 Q12,35 2,40 V10 Z M22,10 Q32,5 42,10 V40 Q32,35 22,40 V10" />
+          <line x1="22" y1="10" x2="22" y2="40" />
+          <path d="M6,15 H18 M26,15 H38 M6,22 H18 M26,22 H38" stroke-width="1" opacity="0.6"/>
+        </g>
+        
+        <g transform="translate(150, 40) rotate(45)">
+          <path d="M5,0 L15,0 L15,40 L10,50 L5,40 Z" />
+          <line x1="5" y1="5" x2="15" y2="5" />
+          <line x1="10" y1="0" x2="10" y2="40" opacity="0.5"/>
+        </g>
 
-  <!-- HERO -->
-  <section class="flex flex-col items-center text-center px-6 md:px-20 py-24 bg-p-1 ">
-    <h2 class="text-4xl md:text-5xl font-extrabold mb-6 text-[#fff]" data-aos="zoom-in">Gestão Escolar com Inteligência</h2>
-    <p class="max-w-2xl text-[#fff] text-lg mb-8" data-aos="fade-up" data-aos-delay="200">Com o <strong>AprendiX</strong>, sua escola ganha agilidade, organização e engajamento real com uma plataforma digital moderna.</p>
-    <div>
+        <g transform="translate(350, 60) rotate(5)">
+          <rect x="0" y="0" width="40" height="28" rx="2" />
+          <line x1="-4" y1="32" x2="44" y2="32" stroke-width="2"/>
+          <line x1="18" y1="28" x2="22" y2="28" />
+        </g>
 
-      <!--LOGIN -->
-      <div class="container" data-aos="fade-up" data-aos-delay="300">
-        <!-- Lado Esquerdo -->
-        <div id="matricula" class="left rounded-l-lg">
-          {% if prefeitura.brasao %}
-          <img src="{{prefeitura.brasao.url}}" alt="Logo SME" class="logo-sme" />
-          {% else %}
-          <img src="{% static 'brasaoMockup.png' %}" alt="Logo SME" class="logo-sme" />
-          {% endif %}
-          <p>Sistema oficial de <strong>gerenciamento escolar</strong> | {{prefeitura}}.</p>          
-        </div>
+        <g transform="translate(440, 40) rotate(-10)">
+          <polyline points="10,0 0,10 10,20" />
+          <polyline points="20,0 30,10 20,20" />
+          <line x1="12" y1="22" x2="18" y2="-2" />
+        </g>
 
-        <!-- Lado Direito -->
-        <div class="right rounded-r-lg bg-white shadow-md">
-          <img class="logo" src="{% static 'logo.png' %}" alt="Ícone Aprendix" title='Aprendix' />
-          <p class="mb-6 text-center text-gray-700 font-semibold">Bem-vindo ao sistema Aprendix</p>
-          <form method="post" novalidate>
-            {% csrf_token %}
-            <div class="input-group">
-              <i class="fas fa-user"></i>
-              <input type="text" name='username' placeholder="Usuário" required autocomplete="username" />
-            </div>
-            <div class="input-group">
-              <i class="fas fa-lock"></i>
-              <input type="password" name='password' placeholder="Senha" required autocomplete="current-password" />
-            </div>
-            <div class="options">
-              <label><input type="checkbox" name="remember"> Lembrar senha</label>
-              <a href="#">Esqueceu a senha?</a>
-            </div>
-            <button type="submit">
-              <i class="fas fa-sign-in-alt"></i> Entrar
-            </button>
-          </form>
-          <div class="footer mt-6">
-            ©2023 CAUAN’s Technology | Todos os direitos reservados
-          </div>
-        </div>
-      </div>
-      <!-- End login-->
-    </div>
+        <g transform="translate(100, 400) rotate(20)">
+          <rect x="0" y="0" width="24" height="24" rx="2" />
+          <path d="M-4,6 H0 M-4,12 H0 M-4,18 H0 M24,6 H28 M24,12 H28 M24,18 H28 M6,-4 V0 M12,-4 V0 M18,-4 V0 M6,24 V28 M12,24 V28 M18,24 V28" stroke-width="1"/>
+          <rect x="6" y="6" width="12" height="12" stroke-width="1" opacity="0.6"/>
+        </g>
 
-    <!-- Matricula online mobile -->
-    <a class="botao-flutuante" title="Matrícula Online" href="{% url 'Gestao_Escolar:pesquisar_aluno' %}">
-      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      Matrícula Online
-    </a>
-  </section>
+        <g transform="translate(280, 200)">
+          <ellipse cx="20" cy="20" rx="20" ry="6" transform="rotate(0 20 20)" />
+          <ellipse cx="20" cy="20" rx="20" ry="6" transform="rotate(60 20 20)" />
+          <ellipse cx="20" cy="20" rx="20" ry="6" transform="rotate(120 20 20)" />
+          <circle cx="20" cy="20" r="3" />
+        </g>
 
-  <!-- FUNCIONALIDADES -->
-  <section id="funcionalidades" class="py-20 px-6 md:px-20 bg-white">
-    <h3 class="text-3xl font-bold text-center text-[#1A73E8] mb-12" data-aos="fade-up">Funcionalidades</h3>
-    <div class="grid md:grid-cols-3 gap-10 text-center max-w-5xl mx-auto">
-      <div class="p-6 bg-[#F5F7FA] rounded-lg shadow hover:shadow-md transition" data-aos="fade-up" data-aos-delay="100">
-        <h4 class="text-xl font-semibold mb-2 text-[#1E1E1E]">📚 Caderneta Digital</h4>
-        <p class="text-gray-700">Notas, faltas e planos de aula com visual inteligente por disciplina.</p>
-      </div>
-      <div class="p-6 bg-[#F5F7FA] rounded-lg shadow hover:shadow-md transition" data-aos="fade-up" data-aos-delay="200">
-        <h4 class="text-xl font-semibold mb-2 text-[#1E1E1E]">🧠 Inteligência Artificial</h4>
-        <p class="text-gray-700">Geração automática de pareceres e relatórios descritivos com IA.</p>
-      </div>
-      <div class="p-6 bg-[#F5F7FA] rounded-lg shadow hover:shadow-md transition" data-aos="fade-up" data-aos-delay="300">
-        <h4 class="text-xl font-semibold mb-2 text-[#1E1E1E]">📲 Acesso Mobile</h4>
-        <p class="text-gray-700">Funciona em qualquer dispositivo com interface responsiva e amigável.</p>
-      </div>
-    </div>
-  </section>
+        <g transform="translate(50, 200) rotate(15)">
+          <path d="M25,15 L28,10 L34,12 L35,18 L40,20 L40,26 L35,28 L34,34 L28,36 L25,31 L19,31 L16,36 L10,34 L9,28 L4,26 L4,20 L9,18 L10,12 L16,10 L19,15 Z" stroke-linejoin="round"/>
+          <circle cx="22" cy="23" r="5" />
+        </g>
 
-  <!-- FUNCIONALIDADES EM DESENVOLVIMENTO -->
-  <section id="funcionalidades" class="py-20 px-6 md:px-20 bg-white">
-    <h3 class="text-3xl font-bold text-center text-[#1A73E8] mb-12" data-aos="fade-up">
-      Funcionalidades em desenvolvimento
-    </h3>
-    <div class="grid md:grid-cols-4 gap-10 text-center max-w-6xl mx-auto">
+        <g transform="translate(420, 250) rotate(-5)">
+          <rect x="0" y="10" width="30" height="20" rx="4" />
+          <line x1="8" y1="10" x2="8" y2="0" />
+          <circle cx="8" cy="-2" r="2" />
+          <line x1="22" y1="10" x2="22" y2="0" />
+          <circle cx="22" cy="-2" r="2" />
+          <circle cx="9" cy="18" r="2" fill="none"/>
+          <circle cx="21" cy="18" r="2" fill="none"/>
+          <path d="M10,24 Q15,28 20,24" fill="none" />
+        </g>
 
-      <div class="p-6 bg-[#F5F7FA] rounded-lg shadow hover:shadow-md transition" data-aos="fade-up" data-aos-delay="100">
-        <h4 class="text-xl font-semibold mb-2 text-[#1E1E1E]">⬇️ Download de Vídeos</h4>
-        <p class="text-gray-700">Ferramenta para fazer download de vídeos para uso pedagógico.</p>
-      </div>
+        <g transform="translate(200, 350) rotate(-10)">
+          <path d="M15,5 Q20,0 25,5 Q32,8 30,18 Q28,28 15,30 Q2,28 0,18 Q-2,8 5,5 Q10,0 15,5 Z" />
+          <path d="M15,5 Q15,0 20,-5" fill="none"/>
+        </g>
 
-      <div class="p-6 bg-[#F5F7FA] rounded-lg shadow hover:shadow-md transition" data-aos="fade-up" data-aos-delay="200">
-        <h4 class="text-xl font-semibold mb-2 text-[#1E1E1E]">📄 Gestor de Ofícios</h4>
-        <p class="text-gray-700">Crie, organize e acompanhe ofícios e documentos administrativos com facilidade.</p>
-      </div>
+        <g transform="translate(380, 420)">
+          <path d="M10,20 Q5,10 15,5 Q25,0 35,10 Q45,5 50,20 Q55,35 40,40 Q30,45 20,40 Q5,40 10,20 Z" />
+          <path d="M20,10 Q25,20 30,10 M15,25 Q25,30 35,25" opacity="0.5"/>
+        </g>
 
-      <div class="p-6 bg-[#F5F7FA] rounded-lg shadow hover:shadow-md transition" data-aos="fade-up" data-aos-delay="300">
-        <h4 class="text-xl font-semibold mb-2 text-[#1E1E1E]">💬 Comunicação Interna</h4>
-        <p class="text-gray-700">Chats por categorias para facilitar a comunicação entre equipes da escola.</p>
-      </div>
+        <circle cx="200" cy="100" r="1.5" fill="#334155" stroke="none"/>
+        <circle cx="300" cy="400" r="1.5" fill="#334155" stroke="none"/>
+        <path d="M100,100 L108,108 M108,100 L100,108" stroke-width="1" transform="translate(20,20)"/>
+        <rect x="400" y="150" width="6" height="6" stroke-width="1"/>
 
-      <div class="p-6 bg-[#F5F7FA] rounded-lg shadow hover:shadow-md transition" data-aos="fade-up" data-aos-delay="400">
-        <h4 class="text-xl font-semibold mb-2 text-[#1E1E1E]">🎓 Certificados para Alunos</h4>
-        <p class="text-gray-700">Geração automática de certificados de cursos e conclusão escolar.</p>
-      </div>
+      </g>
 
-      <div class="p-6 bg-[#F5F7FA] rounded-lg shadow hover:shadow-md transition" data-aos="fade-up" data-aos-delay="500">
-        <h4 class="text-xl font-semibold mb-2 text-[#1E1E1E]">🥗 Gestão da Merenda</h4>
-        <p class="text-gray-700">Controle de estoque, avaliação da qualidade e feedback dos alunos.</p>
-      </div>
+      <use href="#eduTechOutline" x="250" y="250" transform="rotate(180 250 250)" opacity="0.7"/>
 
-      <div class="p-6 bg-[#F5F7FA] rounded-lg shadow hover:shadow-md transition" data-aos="fade-up" data-aos-delay="600">
-        <h4 class="text-xl font-semibold mb-2 text-[#1E1E1E]">📚 Biblioteca Virtual</h4>
-        <p class="text-gray-700">Empréstimo físico e acesso a livros digitais via módulo do aluno.</p>
-      </div>
+    </pattern>
+  </defs>
 
-      <div class="p-6 bg-[#F5F7FA] rounded-lg shadow hover:shadow-md transition" data-aos="fade-up" data-aos-delay="700">
-        <h4 class="text-xl font-semibold mb-2 text-[#1E1E1E]">🕹️ Jogos Pedagógicos</h4>
-        <p class="text-gray-700">Atividades gamificadas para reforçar conteúdos no ambiente virtual.</p>
-      </div>
+  <rect width="100%" height="100%" fill="url(#eduTechOutline)" />
+</svg>
 
-      <div class="p-6 bg-[#F5F7FA] rounded-lg shadow hover:shadow-md transition" data-aos="fade-up" data-aos-delay="800">
-        <h4 class="text-xl font-semibold mb-2 text-[#1E1E1E]">💰 Edu-Coin</h4>
-        <p class="text-gray-700">Moeda escolar para promover educação financeira e gamificação.</p>
-      </div>
-
-      <div class="p-6 bg-[#F5F7FA] rounded-lg shadow hover:shadow-md transition" data-aos="fade-up" data-aos-delay="900">
-        <h4 class="text-xl font-semibold mb-2 text-[#1E1E1E]">🛠️ Novas Funcionalidades</h4>
-        <p class="text-gray-700">Aberto a ideias da Secretaria ou das escolas para evoluir continuamente.</p>
-      </div>
-
-    </div>
-  </section> 
-
-  <section id="diferenciais" class="py-20 px-6 md:px-20 bg-[#E8F0FE]">
-<img src="{% static 'professorCoruja/prof-reponsivo.png' %}" alt="Professor Coruja" class="mx-auto mb-5 w-full md:w-3/4">
-
-    <h3 class="text-3xl font-bold text-center text-[#1A73E8] mb-12" data-aos="fade-up">Diferenciais</h3>
-    <div class="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
-      <div class="flex gap-4 items-start" data-aos="fade-right">
-        <div class="text-2xl text-[#1A73E8]">✔</div>
-        <div>
-          <h4 class="font-semibold text-lg text-[#1E1E1E]">Busca Ativa Automatizada</h4>
-          <p class="text-gray-700">Detecta evasão escolar e ajuda na intervenção precoce.</p>
-        </div>
-      </div>
-      <div class="flex gap-4 items-start" data-aos="fade-left" data-aos-delay="200">
-        <div class="text-2xl text-[#1A73E8]">✔</div>
-        <div>
-          <h4 class="font-semibold text-lg text-[#1E1E1E]">Grêmios & Comunicação</h4>
-          <p class="text-gray-700">Espaço digital para grêmios, mural escolar e rádio integrada.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FORMULÁRIO DEMONSTRAÇÃO -->
-  <section id="contato" class="py-24 px-6 md:px-20 text-center bg-white">
-    <h3 class="text-3xl font-bold text-[#1A73E8] mb-6" data-aos="zoom-in">Solicite uma Demonstração Gratuita</h3>
-    <p class="text-gray-700 mb-8 max-w-lg mx-auto" data-aos="fade-up" data-aos-delay="100">
-      Receba acesso à plataforma e veja como o AprendiX pode transformar a gestão escolar.
-    </p>
+<main class="login-container" role="main">
     
-    <form class="max-w-xl mx-auto space-y-4" data-aos="fade-up" data-aos-delay="200">
-      <input type="text" placeholder="Nome da Escola" class="w-full border border-gray-300 px-4 py-3 rounded focus:ring-2 focus:ring-[#1A73E8]" />
-      <input type="email" placeholder="E-mail" class="w-full border border-gray-300 px-4 py-3 rounded focus:ring-2 focus:ring-[#1A73E8]" />
-      <button type="submit" class="w-full bg-[#1A73E8] text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-        Enviar Solicitação
-      </button>
+    <div class="logo">
+        <img src="{% static 'prefeitura.png' %}" alt="Logo Prefeitura de Vera Cruz">
+    </div>
+
+    <h1>Secretaria Municipal da Educação</h1>
+<p class="subtitle">Acesso à Plataforma Institucional da Rede Municipal de Ensino</p>
+
+
+    <form method="POST"  aria-describedby="form-instructions">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="id_username">Usuário</label>
+            <input 
+                type="text"
+                class='password-wrapper'
+                id="id_username"
+                name="username"
+                required
+                autocomplete="username"
+                aria-required="true"
+                placeholder="Digite seu usuário institucional">
+        </div>
+
+        <div class="form-group">
+            <label for="id_password">Senha</label>
+            <div class="password-wrapper">
+                <input type="password"
+                       id="id_password"
+                       name="password"
+                       required
+                       autocomplete="current-password"
+                       aria-required="true">
+                <button type="button"
+                        class="toggle-password"
+                        onclick="togglePassword()"
+                        aria-label="Mostrar ou ocultar senha">
+                        Mostrar
+                </button>
+            </div>
+        </div>
+
+        <div class="options">
+            <label>
+                <input type="checkbox" name="remember_me">
+                Lembrar-me
+            </label>
+            <a href="">Esqueceu a senha?</a>
+        </div>
+
+        <button type="submit">Entrar</button>
+
+        <p class="footer-text">
+            Plataforma oficial da Secretaria Municipal da Educação<br>
+            © 2026 Prefeitura de Vera Cruz
+        </p>
+
     </form>
+</main>
 
-  <!-- Botão WhatsApp -->
-  <div class="mt-8" data-aos="fade-up" data-aos-delay="300">
-    <a href="https://wa.me/71986881943" target="_blank" rel="noopener noreferrer"
-       class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition text-base font-medium shadow-md">
-      <i class="fab fa-whatsapp text-xl"></i> Entrar em contato pelo WhatsApp
-    </a>
-  </div>
-</section>
+<script>
+function togglePassword() {
+    const input = document.getElementById('id_password');
+    const btn = document.querySelector('.toggle-password');
 
+    if (input.type === "password") {
+        input.type = "text";
+        btn.textContent = "Ocultar";
+    } else {
+        input.type = "password";
+        btn.textContent = "Mostrar";
+    }
+}
+</script>
 
-  <!-- RODAPÉ -->
-  <footer class="bg-[#E8F0FE] py-6 text-center text-sm text-gray-600" data-aos="fade-up">
-    &copy; 2025 AprendiX • Desenvolvido por Cauans Solutions
-  </footer>
-
-  <!-- AOS Script -->
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    AOS.init({
-      duration: 900,
-      once: true,
-    });
-  </script>
 </body>
 </html>

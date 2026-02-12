@@ -9,7 +9,7 @@ from django.views import View
 from django import forms
 from ckeditor.widgets import CKEditorWidget
 from .models import MessageUser, PaletaCores
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from rh.models import Prefeitura
 
 # Login
@@ -86,12 +86,15 @@ class CreateLoginView(LoginView):
         mensagem = mensagem.format(self.request.user.first_name)
         messages.info(self.request, f'<i class="fa-duotone fa-solid fa-hand-wave fa-shake fs-1"></i> {mensagem}')
 
+        """
         if self.request.user.groups.filter(name='Aluno').exists():
             return reverse_lazy('modulo_aluno:homeAluno')        
         elif self.request.user.groups.filter(name='Professor').exists():
             return reverse_lazy('modulo_professor:homeProfessor')                
         else:
             return reverse_lazy('Gestao_Escolar:GE_inicio')
+        """
+        return reverse_lazy('admin_acessos:starsme')
 
 
 

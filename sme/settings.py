@@ -33,7 +33,8 @@ INSTALLED_APPS = [
     'modulo_professor',
     'ckeditor',
     'ckeditor_uploader',
-    'merendaEscolar'
+    'merendaEscolar',
+    'core'
 ]
 
 MIDDLEWARE = [    
