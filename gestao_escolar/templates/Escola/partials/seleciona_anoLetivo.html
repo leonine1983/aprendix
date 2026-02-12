@@ -16,12 +16,16 @@
     </li>
 </ul>  
 <script>
-        function selecionaAnoLetivo(){
-            var selectElement = document.getElementById("form-select-sm");
-            var selectedId = selectElement.value;
-            if (selectedId){
-                window.location.href = "/anoLetivo/selecionar/" + selectedId + "/";
-            }
-        }            
-</script> 
+    function selecionaAnoLetivo(){
+        var selectElement = document.getElementById("form-select-sm");
+        var selectedId = selectElement.value;
+
+        if (selectedId){
+            var baseUrl = "{% url 'Gestao_Escolar:selecionar-ano' 0 %}";
+            var finalUrl = baseUrl.replace('0', selectedId);
+            window.location.href = finalUrl;
+        }
+    }
+</script>
+
 {% include "Escola/partials/modal_partials/modal_bottom.html" %}     

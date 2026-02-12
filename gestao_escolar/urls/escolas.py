@@ -9,7 +9,7 @@ urlpatterns = [
     path('gestao_escolar', ListView_Escola.as_view(), name="GE_inicio"),    
     path('escolas/selecionar/<int:pk>/', Seleciona_escola, name='escola-selecionar'),
     path('gestao_escolar/anoLetivo', Seleciona_anoLetivo.as_view(), name="GE_anoLetivo"),
-    path('anoLetivo/selecionar/<int:pk>/', seleciona_anoLetivo_session, name='selecionar-ano'),
+    path('gestao_escolar/anoLetivo/selecionar/<int:pk>/', seleciona_anoLetivo_session, name='selecionar-ano'),
 
     
     # A parti daqui o desenvolvimento da escola inicia
