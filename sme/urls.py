@@ -4,14 +4,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls import handler400, handler404, handler500, handler403
 from django.shortcuts import render
-"""
+
 
 def error_400(request, exception):
 
     return render(request, 'Escola/inicio.html', {'conteudo_page' :"400"  }, status=400)
 
 def error_403(request, exception):
-    return render(request, 'Escola/inicio.html', {'conteudo_page' :"403"  }, status=403)
+    return render(request, 'Admin_Acessos/erros/403.html', {'conteudo_page' :"403"  }, status=403)
 
 def error_404(request, exception):
     return render(request, 'Escola/inicio.html', {'conteudo_page' :"404"  }, status=404)
@@ -23,7 +23,7 @@ handler400 = error_400
 handler403 = error_403
 handler404 = error_404
 handler500 = error_500
-"""
+
 urlpatterns = [    
     path('', include('admin_acessos.urls')),
     path('admin/', admin.site.urls),    

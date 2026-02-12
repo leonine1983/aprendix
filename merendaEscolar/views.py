@@ -51,7 +51,7 @@ class UnidadeMedidaListView(
     ListView
 ):
     model = UnidadeMedida
-    template_name = "unidade_medida/list.html"
+    template_name = "merendaEscolar/unidade_medida/list.html"
     context_object_name = "unidades"
     paginate_by = 10
 
@@ -71,7 +71,7 @@ class UnidadeMedidaCreateView(
 ):
     model = UnidadeMedida
     fields = ["nome", "sigla"]
-    template_name = "unidade_medida/form.html"
+    template_name = "merendaEscolar/unidade_medida/form.html"
     success_url = reverse_lazy("merendaEscolar:unidade_medida_list")
     permission_required = "estoque.add_unidademedida"
     group_required = MERENDA_GROUPS
@@ -89,7 +89,7 @@ class UnidadeMedidaUpdateView(
 ):
     model = UnidadeMedida
     fields = ["nome", "sigla"]
-    template_name = "unidade_medida/form.html"
+    template_name = "merendaEscolar/unidade_medida/form.html"
     success_url = reverse_lazy("merendaEscolar:unidade_medida_list")
     permission_required = "estoque.change_unidademedida"
     group_required = MERENDA_GROUPS
@@ -105,7 +105,7 @@ class CategoriaProdutoListView(
     ListView
 ):
     model = CategoriaProduto
-    template_name = "categoria_produto/list.html"
+    template_name = "merendaEscolar/categoria_produto/list.html"
     context_object_name = "categorias"
     paginate_by = 10
 
@@ -123,7 +123,7 @@ class CategoriaProdutoCreateView(
 ):
     model = CategoriaProduto
     fields = ["nome", "descricao"]
-    template_name = "categoria_produto/form.html"
+    template_name = "merendaEscolar/categoria_produto/form.html"
     success_url = reverse_lazy("merendaEscolar:categoria_produto_list")
     permission_required = "estoque.add_categoriaproduto"
     group_required = MERENDA_GROUPS    
@@ -141,7 +141,7 @@ class CategoriaProdutoUpdateView(
 ):
     model = CategoriaProduto
     fields = ["nome", "descricao"]
-    template_name = "categoria_produto/form.html"
+    template_name = "merendaEscolar/categoria_produto/form.html"
     success_url = reverse_lazy("merendaEscolar:categoria_produto_list")
     permission_required = "estoque.change_categoriaproduto"
     group_required = MERENDA_GROUPS
@@ -157,7 +157,7 @@ class ProdutoListView(
     ListView
 ):
     model = Produto
-    template_name = "produto/list.html"
+    template_name = "merendaEscolar/produto/list.html"
     context_object_name = "produtos"
     paginate_by = 10
 

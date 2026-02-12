@@ -32,7 +32,7 @@ def iniciar_registros():
             )
             print("Nomeclatura criada com sucesso.")
 
-        group_names = ['Nutricionista', 'Professor', 'Diretor', 'Aluno']
+        group_names = ['Nutricionista', 'Merendeira', "Admin" 'Professor', 'Diretor', 'Aluno']
         if not Group.objects.exists():
             for group_name in group_names:
                 Group.objects.get_or_create(name=group_name)
