@@ -1,5 +1,7 @@
 from django.urls import path, include
-from .views import *
+from . views import *
+
+
 
 app_name = 'merendaEscolar'
 urlpatterns = [    
@@ -17,4 +19,23 @@ urlpatterns = [
     path("produtos/", ProdutoListView.as_view(), name="produto_list"),
     path("produtos/novo/", ProdutoCreateView.as_view(), name="produto_create"),
     path("produtos/<int:pk>/editar/", ProdutoUpdateView.as_view(), name="produto_update"),
+
+    # Estoque ----------------
+     # Dashboard / Listagem
+    path(
+        "central/",
+        EstoqueCentralListView.as_view(),
+        name="estoque-central"
+    ),
+
+    # Entrada de produtos no estoque central
+    path(
+        "central/entrada/",
+        EntradaEstoqueCentralView.as_view(),
+        name="entrada-central"
+    ),
+
+
+    
+    
 ]

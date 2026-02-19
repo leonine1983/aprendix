@@ -7,7 +7,7 @@ from rh.models import Escola
 from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy
 
-from .models import EstoqueCentral, UnidadeMedida, CategoriaProduto, Produto
+from ..models import EstoqueCentral, UnidadeMedida, CategoriaProduto, Produto
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
