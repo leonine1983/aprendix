@@ -1,19 +1,150 @@
-{% extends "estoque_base.html" %}
+{% extends "merendaEscolar/estoque_base.html" %}
+{% load widget_tweaks %}
 
 {% block content %}
-<h2>Entrada de Produto no Estoque Central</h2>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+<div class="container py-4">
 
-    <button type="submit">Registrar Entrada</button>
-</form>
+    <!-- ========================= -->
+    <!-- CABEÇALHO -->
+    <!-- ========================= -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Entrada de Produtos no Estoque Central</h2>
+            <p class="text-muted mb-0">
+                Registro formal de recebimento de mercadorias no almoxarifado central.
+            </p>
+        </div>
 
-{% if messages %}
-    {% for message in messages %}
-        <p>{{ message }}</p>
-    {% endfor %}
-{% endif %}
+        <a href="{% url 'merendaEscolar:estoque-central' %}"
+           class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>
+            Voltar ao Estoque
+        </a>
+    </div>
 
-{% endblock %}
+    <!-- ========================= -->
+    <!-- CARD FORMULÁRIO -->
+    <!-- ========================= -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="row g-3">
+
+                    <!-- Produto -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Produto
+                        </label>
+                        {{ form.produto|add_class:"form-select"|attr:"aria-describedby:produtoHelp" }}
+                        <div id="produtoHelp" class="form-text">
+                            Selecione o item conforme cadastro oficial. Certifique-se de que o produto corresponde à nota fiscal recebida.
+                        </div>
+                        {% if form.produto.errors %}
+                            <div class="text-danger small">
+                                {{ form.produto.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Lote -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Lote
+                        </label>
+                        {{ form.lote|add_class:"form-control"|attr:"aria-describedby:loteHelp" }}
+                        <div id="loteHelp" class="form-text">
+                            Informe o número do lote conforme indicado pelo fornecedor. Este dado é essencial para rastreabilidade sanitária.
+                        </div>
+                        {% if form.lote.errors %}
+                            <div class="text-danger small">
+                                {{ form.lote.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Data de Validade -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Data de Validade
+                        </label>
+                        {{ form.data_validade|add_class:"form-control"|attr:"aria-describedby:validadeHelp" }}
+                        <div id="validadeHelp" class="form-text">
+                            Informe a data de vencimento do produto. Produtos com validade próxima devem ser monitorados com prioridade.
+                        </div>
+                        {% if form.data_validade.errors %}
+                            <div class="text-danger small">
+                                {{ form.data_validade.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Quantidade -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Quantidade Recebida
+                        </label>
+                        {{ form.quantidade|add_class:"form-control"|attr:"aria-describedby:quantidadeHelp" }}
+                        <div id="quantidadeHelp" class="form-text">
+                            Informe a quantidade efetivamente recebida após conferência física da mercadoria.
+                        </div>
+                        {% if form.quantidade.errors %}
+                            <div class="text-danger small">
+                                {{ form.quantidade.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Observação -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">
+                            Observação
+                        </label>
+                        {{ form.observacao|add_class:"form-control"|attr:"aria-describedby:observacaoHelp" }}
+                        <div id="observacaoHelp" class="form-text">
+                            Utilize este campo para registrar ocorrências relevantes, como divergências, avarias ou informações complementares.
+                        </div>
+                        {% if form.observacao.errors %}
+                            <div class="text-danger small">
+                                {{ form.observacao.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <!-- ========================= -->
+                <!-- AÇÕES -->
+                <!-- ========================= -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
+
+                    <a href="{% url 'merendaEscolar:estoque-central' %}"
+                       class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary shadow-sm">
+                        <i class="fas fa-save me-1"></i>
+                        Registrar Entrada
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock content %}

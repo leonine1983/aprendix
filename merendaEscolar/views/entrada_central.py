@@ -13,14 +13,45 @@ from ..models import (
     DivergenciaEntrega
 )
 from ..forms import EntradaEstoqueCentralForm
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+
+from core.permissions import GroupRequiredMixin
+from django.core.exceptions import PermissionDenied
+
+
+class ErrorMessageMixin:
+    error_message = "Ocorreu um erro ao processar a solicitação."
+
+    def form_invalid(self, form):
+        messages.error(self.request, self.error_message)
+        return super().form_invalid(form)
+
+
+
+MERENDA_GROUPS = [
+    "Nutricionista",
+    "Merendeira",
+    "Admin",
+]
 
 
 # ===============================
 # ENTRADA DE ESTOQUE CENTRAL
 # ===============================
 
-class EntradaEstoqueCentralView(LoginRequiredMixin, FormView):
-    template_name = "estoque/entrada_central_form.html"
+class EntradaEstoqueCentralView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    PermissionRequiredMixin,
+    SuccessMessageMixin,
+    ErrorMessageMixin,
+    FormView,
+):
+    permission_required = "merendaEscolar.add_estoquecentral"
+    group_required = MERENDA_GROUPS
+
+    template_name = "merendaEscolar/estoque/entrada_central_form.html"
     form_class = EntradaEstoqueCentralForm
     success_url = reverse_lazy("merendaEscolar:entrada-central")  # corrigido namespace
 
@@ -65,10 +96,14 @@ class EntradaEstoqueCentralView(LoginRequiredMixin, FormView):
 # ===============================
 # DASHBOARD ESTOQUE CENTRAL
 # ===============================
-
-class EstoqueCentralListView(LoginRequiredMixin, ListView):
+class EstoqueCentralListView(LoginRequiredMixin,
+                            GroupRequiredMixin,
+                            PermissionRequiredMixin,
+                              ListView):
     model = EstoqueCentral
-    template_name = "estoque/estoque_central.html"
+    permission_required = "merendaEscolar.add_estoquecentral"
+    group_required = MERENDA_GROUPS
+    template_name = "merendaEscolar/dashboard.html"
     context_object_name = "produtos"
 
     def get_queryset(self):
@@ -82,32 +117,50 @@ class EstoqueCentralListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
 
         hoje = timezone.now().date()
-        produtos = context["produtos"]
+        produtos_qs = context["produtos"]
 
-        # Total consolidado em estoque
-        total_itens = produtos.aggregate(
+        # Total consolidado
+        total_itens = produtos_qs.aggregate(
             total=Sum("quantidade")
         )["total"] or 0
+
+        # Total de produtos distintos
+        total_produtos_distintos = produtos_qs.values(
+            "produto"
+        ).distinct().count()
+
+        # Total de lotes ativos
+        total_lotes = produtos_qs.count()
 
         # Escolas atendidas
         escolas_atendidas = Escola.objects.count()
 
-        # Primeiro dia do mês atual
+        # Primeiro dia do mês
         inicio_mes = hoje.replace(day=1)
 
-        # corrigido: campo correto do model
+        # Movimentações de saída no mês
         envios_mes = MovimentacaoEstoque.objects.filter(
             tipo="SAIDA_CENTRAL",
             data_movimentacao__date__gte=inicio_mes
         ).count()
 
-        # corrigido: sem enum inexistente
+        # Divergências abertas
         divergencias_abertas = DivergenciaEntrega.objects.filter(
             status="ABERTA"
         ).count()
 
+        # Produtos com validade próxima (30 dias)
+        produtos_vencendo = produtos_qs.filter(
+            data_validade__isnull=False,
+            data_validade__lte=hoje + timezone.timedelta(days=30),
+            data_validade__gte=hoje
+        ).count()
+
         context.update({
             "total_itens_estoque": total_itens,
+            "total_produtos_distintos": total_produtos_distintos,
+            "total_lotes": total_lotes,
+            "produtos_vencendo": produtos_vencendo,
             "escolas_atendidas": escolas_atendidas,
             "envios_mes": envios_mes,
             "divergencias_abertas": divergencias_abertas,

@@ -34,7 +34,9 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',
     'merendaEscolar',
-    'core'
+    'core',
+    'widget_tweaks',
+
 ]
 
 MIDDLEWARE = [    
