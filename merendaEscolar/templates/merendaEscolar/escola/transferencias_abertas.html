@@ -1,0 +1,36 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+<h1>Transferências Pendentes - {{ escola.nome }}</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Número</th>
+            <th>Data de Criação</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in transferencias %}
+        <tr>
+            <td>{{ t.numero }}</td>
+            <td>{{ t.criado_em|date:"d/m/Y H:i" }}</td>
+            <td>{{ t.get_status_display }}</td>
+            <td>
+                <a href="{% url 'merendaEscolar:escola_receber' t.id %}" class="btn btn-success btn-sm">
+                    Confirmar Recebimento
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">Nenhuma transferência pendente para esta escola.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'merendaEscolar:lista_escolas' %}" class="btn btn-secondary">Voltar</a>
+{% endblock %}

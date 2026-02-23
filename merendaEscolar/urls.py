@@ -70,7 +70,14 @@ urlpatterns = [
     "transferencia/<int:pk>/item/novo/",
     TransferenciaItemCreateView.as_view(),
     name="transferenciaitem-create"
-),
+    ),
+
+    # Escola 
+    path('escolas/', ListaEscolasRecebimentoView.as_view(), name='lista_escolas'),
+    path('escola/<int:escola_id>/', TransferenciasAbertasEscolaView.as_view(), name='transferencias_abertas'),
+    path('receber/<int:pk>/', ReceberTransferenciaView.as_view(), name='escola_receber'),
+
+    
         
     
 ]

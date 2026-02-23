@@ -1,0 +1,26 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+
+{% block content %}
+<h1>Selecione a Escola</h1>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Escola</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for escola in escolas %}
+        <tr>
+            <td>{{ escola.nome_escola }}</td>
+            <td>
+                <a href="{% url 'merendaEscolar:transferencias_abertas' escola.id %}" class="btn btn-primary btn-sm">
+                    Ver Transferências
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

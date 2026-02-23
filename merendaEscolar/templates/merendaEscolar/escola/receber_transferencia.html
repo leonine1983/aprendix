@@ -1,0 +1,32 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+<h1>Receber Transferência {{ transferencia.numero }}</h1>
+<p>Escola Destino: {{ transferencia.escola_destino.nome }}</p>
+<p>Status: {{ transferencia.get_status_display }}</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Produto</th>
+            <th>Lote</th>
+            <th>Quantidade</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in itens %}
+        <tr>
+            <td>{{ item.produto.nome }}</td>
+            <td>{{ item.estoque_origem.lote|default:"Sem lote" }}</td>
+            <td>{{ item.quantidade }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success">Confirmar Recebimento</button>
+    <a href="{% url 'merendaEscolar:lista_escolas' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}
