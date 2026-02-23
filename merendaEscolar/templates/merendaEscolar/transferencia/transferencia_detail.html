@@ -1,0 +1,206 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+/* ================================
+   CARD INSTITUCIONAL
+================================ */
+.card-acoes-transferencia{
+    border-left: 4px solid var(--verde-principal);
+    background: linear-gradient(180deg, #ffffff 0%, #f9fbfa 100%);
+}
+
+/* ================================
+   BOTÕES
+================================ */
+.btn-enviar-transferencia{
+    background: linear-gradient(135deg, var(--verde-principal), #157347);
+    border: none;
+    color: #fff!important;
+    border-radius: 10px;
+    transition: all .2s ease-in-out;
+    box-shadow: 0 4px 10px rgba(0,0,0,.08);
+}
+
+.btn-enviar-transferencia:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,.12);
+    opacity: .95;
+}
+
+.btn-receber-transferencia{
+    background: linear-gradient(135deg, #198754, #146c43);
+    border: none;
+    color: #fff;
+    border-radius: 10px;
+    transition: all .2s ease-in-out;
+    box-shadow: 0 4px 10px rgba(0,0,0,.08);
+}
+
+.btn-receber-transferencia:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,.12);
+    opacity: .95;
+}
+
+.form-acao-transferencia{
+    margin: 0;
+}
+</style>
+
+
+<div class="container-fluid mt-4">
+
+    <!-- ================================
+         CABEÇALHO DA TRANSFERÊNCIA
+    ================================= -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <small class="text-muted">Número</small>
+                    <div class="fw-semibold">{{ transferencia.numero }}</div>
+                </div>
+
+                <div class="col-md-4">
+                    <small class="text-muted">Escola Destino</small>
+                    <div class="fw-semibold">{{ transferencia.escola_destino }}</div>
+                </div>
+
+                <div class="col-md-4">
+                    <small class="text-muted">Status</small>
+                    <div>
+                        {% if transferencia.status == "RASCUNHO" %}
+                            <span class="badge bg-secondary">Rascunho</span>
+                        {% elif transferencia.status == "ENVIADO" %}
+                            <span class="badge bg-warning text-dark">Enviado</span>
+                        {% elif transferencia.status == "RECEBIDO" %}
+                            <span class="badge bg-success">Recebido</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ================================
+         ITENS DA TRANSFERÊNCIA
+    ================================= -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-semibold mb-0"
+                    style="color:var(--verde-principal);">
+                    Itens da Transferência
+                </h6>
+
+                {% if transferencia.status == "RASCUNHO" %}
+                    <a href="{% url 'merendaEscolar:transferenciaitem-create' transferencia.pk %}"
+                       class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-plus-circle me-1"></i>
+                        Adicionar Item
+                    </a>
+                {% endif %}
+            </div>
+
+            {% if transferencia.itens.exists %}
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Produto</th>
+                                <th class="text-end">Quantidade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in transferencia.itens.all %}
+                            <tr>
+                                <td>{{ item.produto.nome }}</td>
+                                <td class="text-end">
+                                    {{ item.quantidade }}
+                                    {{ item.produto.unidade_medida.sigla }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-warning mb-0">
+                    Nenhum item foi adicionado a esta transferência.
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+
+    <!-- ================================
+         AÇÕES DA TRANSFERÊNCIA
+    ================================= -->
+    <div class="card shadow-sm border-0 card-acoes-transferencia">
+        <div class="card-body p-4">
+
+            <h5 class="fw-semibold mb-1"
+                style="color:var(--verde-principal); letter-spacing:.3px;">
+                Ações da Transferência
+            </h5>
+            <small class="text-muted">
+                Execute a próxima etapa do fluxo operacional conforme o status atual.
+            </small>
+            <hr class="mt-3">
+
+            <div class="d-flex gap-3 flex-wrap align-items-center">
+
+                <!-- ENVIAR -->
+                {% if transferencia.status == "RASCUNHO" %}
+
+                    {% if transferencia.itens.exists %}
+                        <form method="post"
+                              action="{% url 'merendaEscolar:transferencia-enviar' transferencia.pk %}"
+                              class="form-acao-transferencia"
+                              onsubmit="return confirm('Confirma o envio desta transferência? Esta ação dará baixa definitiva no estoque central.');">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="btn btn-enviar-transferencia px-4 py-2">
+                                <i class="bi bi-send me-2"></i>
+                                <span class="fw-semibold">Enviar Transferência</span>
+                            </button>
+                        </form>
+                    {% else %}
+                        <button class="btn btn-secondary px-4 py-2" disabled>
+                            Adicione itens antes de enviar
+                        </button>
+                    {% endif %}
+
+                {% endif %}
+
+                <!-- RECEBER -->
+                {% if transferencia.status == "ENVIADO" %}
+                    <form method="post"
+                          action="{% url 'merendaEscolar:transferencia-receber' transferencia.pk %}"
+                          class="form-acao-transferencia"
+                          onsubmit="return confirm('Confirma o recebimento desta transferência? Esta ação dará entrada definitiva no estoque da escola.');">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="btn btn-receber-transferencia px-4 py-2">
+                            <i class="bi bi-check-circle me-2"></i>
+                            <span class="fw-semibold">Confirmar Recebimento</span>
+                        </button>
+                    </form>
+                {% endif %}
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock content %}

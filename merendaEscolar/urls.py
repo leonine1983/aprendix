@@ -35,7 +35,42 @@ urlpatterns = [
         name="entrada-central"
     ),
 
+    # Transferencias
+    path(
+        "transferencias/",
+        TransferenciaListView.as_view(),
+        name="transferencia-list"
+    ),
 
-    
+    path(
+        "transferencia/<int:pk>/",
+        TransferenciaDetailView.as_view(),
+        name="transferencia-detail"
+    ),
+
+    path(
+        "transferencia/<int:pk>/enviar/",
+        TransferenciaEnviarView.as_view(),
+        name="transferencia-enviar"
+    ),
+
+    path(
+        "transferencia/<int:pk>/receber/",
+        TransferenciaReceberView.as_view(),
+        name="transferencia-receber"
+    ),
+
+    path(
+    "transferencias/nova/",
+    TransferenciaCreateView.as_view(),
+    name="transferencia-create"
+    ),
+
+    path(
+    "transferencia/<int:pk>/item/novo/",
+    TransferenciaItemCreateView.as_view(),
+    name="transferenciaitem-create"
+),
+        
     
 ]

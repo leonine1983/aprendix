@@ -155,6 +155,7 @@ class EstoqueCentral(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["produto", "lote"], name="unique_produto_lote_central")
         ]
+        
 
     def __str__(self):
         return f"{self.produto.nome} - Lote {self.lote or 'Sem lote'}"
@@ -256,23 +257,212 @@ class Transferencia(models.Model):
             seq, _ = SequenciaTransferencia.objects.select_for_update().get_or_create(ano=ano)
             seq.ultimo_numero += 1
             seq.save()
-            return f"TRF-{ano}-{seq.ultimo_numero:05d}"
+            return f"TRF-{ano}-{seq.ultimo_numero:05d}"        
+
+    @transaction.atomic
+    def enviar(self, usuario):
+        """
+        Executa o envio institucional da transferência.
+
+        Regras aplicadas:
+        - Apenas transferências em RASCUNHO podem ser enviadas.
+        - Deve existir ao menos um item.
+        - Cada item deve possuir saldo suficiente no lote selecionado.
+        - A baixa ocorre exatamente no lote de origem.
+        - Gera movimentações de saída com identificação do lote.
+        - Atualiza o status para ENVIADO.
+
+        Garantias técnicas:
+        - Operação transacional (atomic).
+        - Bloqueio pessimista de estoque (select_for_update).
+        - Rastreabilidade sanitária por lote.
+        """
+
+        if self.status != "RASCUNHO":
+            raise ValidationError("Apenas transferências em rascunho podem ser enviadas.")
+
+        if not self.itens.exists():
+            raise ValidationError("Não é permitido enviar transferência sem itens.")
+
+        for item in self.itens.select_related("estoque_origem"):
+
+            estoque = (
+                EstoqueCentral.objects
+                .select_for_update()
+                .get(pk=item.estoque_origem.pk)
+            )
+
+            if estoque.quantidade < item.quantidade:
+                raise ValidationError(
+                    f"Saldo insuficiente no lote {estoque.lote} "
+                    f"do produto {estoque.produto.nome}."
+                )
+
+        for item in self.itens.select_related("estoque_origem"):
+
+            estoque = item.estoque_origem
+            estoque.quantidade -= item.quantidade
+            estoque.save()
+
+            MovimentacaoEstoque.objects.create(
+                produto=estoque.produto,
+                quantidade=item.quantidade,
+                tipo="SAIDA_CENTRAL",
+                usuario=usuario,
+                observacao=f"Transferência {self.numero} - Lote {estoque.lote}"
+            )
+
+        self.status = "ENVIADO"
+        self.save()
+    
+    @transaction.atomic
+    def receber(self, usuario):
+        """
+        Confirma o recebimento da transferência pela escola.
+
+        Regras aplicadas:
+        - Apenas transferências com status ENVIADO podem ser recebidas.
+        - Atualiza o estoque da escola.
+        - Gera movimentações de entrada.
+        - Atualiza status para RECEBIDO.
+
+        Mantém integridade institucional do fluxo logístico.
+        """
+
+        if self.status != "ENVIADO":
+            raise ValidationError("Somente transferências enviadas podem ser recebidas.")
+
+        for item in self.itens.select_related("produto"):
+
+            estoque_escola, _ = EstoqueEscola.objects.select_for_update().get_or_create(
+                escola=self.escola_destino,
+                produto=item.produto,
+                lote=None,
+                defaults={"quantidade": 0}
+            )
+
+            estoque_escola.quantidade += item.quantidade
+            estoque_escola.save()
+
+            MovimentacaoEstoque.objects.create(
+                produto=item.produto,
+                escola=self.escola_destino,
+                quantidade=item.quantidade,
+                tipo="ENTRADA_ESCOLA",
+                usuario=usuario,
+                observacao=f"Recebimento da Transferência {self.numero}"
+            )
+
+        self.status = "RECEBIDO"
+        self.save()
+    
+    def delete(self, *args, **kwargs):
+        """
+        Impede exclusão de transferências já enviadas ou recebidas.
+
+        Apenas transferências em RASCUNHO podem ser excluídas,
+        garantindo rastreabilidade e segurança jurídica.
+        """
+
+        if self.status != "RASCUNHO":
+            raise ValidationError(
+                "Transferências enviadas ou recebidas não podem ser excluídas."
+            )
+
+        super().delete(*args, **kwargs)
 
 
 class TransferenciaItem(models.Model):
     """
-    Produtos específicos incluídos em uma Transferência.
-    Cada produto só pode aparecer uma vez por transferência.
+    Representa um item específico dentro de uma Transferência.
+
+    Cada item referencia explicitamente um lote do EstoqueCentral
+    (estoque_origem), garantindo rastreabilidade sanitária e contábil.
+
+    Regras institucionais:
+    - O lote selecionado deve pertencer ao produto informado.
+    - Não é permitido alterar itens de transferências já enviadas.
+    - A quantidade solicitada não pode exceder o saldo disponível no lote.
+    - O mesmo lote não pode ser incluído mais de uma vez na mesma transferência.
+
+    Essa modelagem garante:
+    - Controle por lote (rastreabilidade sanitária).
+    - Aplicação da estratégia FEFO (First Expire, First Out).
+    - Integridade jurídica e auditável do fluxo logístico.
     """
-    transferencia = models.ForeignKey(Transferencia, on_delete=models.CASCADE, related_name="itens")
-    produto = models.ForeignKey(Produto, on_delete=models.PROTECT)
-    quantidade = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])
+
+    transferencia = models.ForeignKey(
+        Transferencia,
+        on_delete=models.CASCADE,
+        related_name="itens"
+    )
+
+    produto = models.ForeignKey(
+        Produto,
+        on_delete=models.PROTECT
+    )
+
+    estoque_origem = models.ForeignKey(
+        EstoqueCentral,
+        on_delete=models.PROTECT,
+        related_name="transferencias_itens"
+    )
+
+    quantidade = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        validators=[MinValueValidator(0)]
+    )
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["transferencia", "produto"], name="unique_produto_por_transferencia")
+            models.UniqueConstraint(
+                fields=["transferencia", "estoque_origem"],
+                name="unique_lote_por_transferencia"
+            )
         ]
 
+    def clean(self):
+        """
+        Validação institucional do item de transferência.
+
+        Regras aplicadas:
+        - Transferências não podem ser alteradas após envio.
+        - O lote selecionado deve pertencer ao produto informado.
+        - A quantidade não pode exceder o saldo do lote.
+
+        Implementação defensiva:
+        - Nunca assume que FKs estão resolvidas.
+        - Usa *_id antes de acessar relacionamentos.
+        """
+
+        super().clean()
+
+        # Garantir que a transferência está presente
+        if not self.transferencia_id:
+            return  # CreateView ainda pode não ter vinculado
+
+        # Bloqueio por status
+        if self.transferencia.status != "RASCUNHO":
+            raise ValidationError(
+                "Não é permitido alterar itens de transferência já enviada."
+            )
+
+        # Garantir que campos essenciais existem antes de validar
+        if not self.estoque_origem_id or not self.produto_id:
+            return  # O próprio form validará obrigatoriedade
+
+        # Validar coerência produto ↔ lote (comparando IDs)
+        if self.estoque_origem.produto_id != self.produto_id:
+            raise ValidationError(
+                "O lote selecionado não pertence ao produto informado."
+            )
+
+        # Validar saldo
+        if self.quantidade and self.quantidade > self.estoque_origem.quantidade:
+            raise ValidationError(
+                "Quantidade superior ao saldo disponível no lote."
+            )
 
 # ==============================
 # DIVERGÊNCIAS DE ENTREGA

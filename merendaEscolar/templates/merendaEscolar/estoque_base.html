@@ -379,6 +379,9 @@ body{
                     <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
                 </a>
                 <div class="submenu">
+                    <a href="{% url 'merendaEscolar:estoque-central' %}" title="Todos os itens na cantina (estoque)">
+                        <i class="fas fa-balance-scale-left"></i> Todos os Itens no Estoque (Cantina)
+                    </a>
                     <a href="{% url 'merendaEscolar:unidade_medida_list' %}">
                         <i class="fas fa-balance-scale-left"></i> Unidades de Medida
                     </a>
@@ -392,7 +395,9 @@ body{
             </div>
 
             <!-- Links futuros (placeholders) -->
-            <a><i class="fas fa-school"></i> Envio para Escolas</a>
+            <a href="{% url 'merendaEscolar:transferencia-list' %}">
+                <i class="fas fa-truck-loading"></i> Transferências
+            </a>
             <a><i class="fas fa-truck"></i> Distribuição</a>
             <a><i class="fas fa-bell"></i> Alertas</a>
             <a><i class="fas fa-file-alt"></i> Relatórios</a>
