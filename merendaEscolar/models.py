@@ -4,6 +4,7 @@ from django.utils import timezone
 from rh.models import Escola
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
+from ckeditor.fields import RichTextField
 
 
 User = get_user_model()
@@ -230,12 +231,17 @@ class Transferencia(models.Model):
     Cada transferência recebe número único anual via SequenciaTransferencia.
     """
     numero = models.CharField(max_length=30, unique=True, editable=False)
-    escola_destino = models.ForeignKey(Escola, on_delete=models.PROTECT)
+    escola_destino = models.ForeignKey(Escola, related_name='escola_confirma_transf', on_delete=models.PROTECT)
     status = models.CharField(
-        max_length=20,
-        choices=(("RASCUNHO", "Rascunho"), ("ENVIADO", "Enviado"), ("RECEBIDO", "Recebido")),
-        default="RASCUNHO"
-    )
+                                    max_length=20,
+                                    choices=(
+                                        ("RASCUNHO", "Rascunho"),
+                                        ("ENVIADO", "Enviado"),
+                                        ("EM_CONFERENCIA", "Em Conferência"),
+                                        ("RECEBIDO", "Recebido"),
+                                    ),
+                                    default="RASCUNHO"
+                                )
     criado_por = models.ForeignKey(User, on_delete=models.PROTECT)
     criado_em = models.DateTimeField(auto_now_add=True)
 
@@ -314,26 +320,45 @@ class Transferencia(models.Model):
 
         self.status = "ENVIADO"
         self.save()
-    
     @transaction.atomic
     def receber(self, usuario):
         """
-        Confirma o recebimento da transferência pela escola.
+        Confirma o recebimento institucional da transferência.
 
         Regras aplicadas:
-        - Apenas transferências com status ENVIADO podem ser recebidas.
-        - Atualiza o estoque da escola.
-        - Gera movimentações de entrada.
+        - Apenas transferências em EM_CONFERENCIA podem ser recebidas.
+        - Considera divergências registradas pela escola.
+        - Atualiza estoque com a quantidade efetivamente recebida.
+        - Gera movimentação de entrada rastreável.
         - Atualiza status para RECEBIDO.
 
-        Mantém integridade institucional do fluxo logístico.
+        Garantias:
+        - Operação transacional.
+        - Bloqueio pessimista do estoque da escola.
+        - Integridade contábil e auditável.
         """
 
-        if self.status != "ENVIADO":
-            raise ValidationError("Somente transferências enviadas podem ser recebidas.")
+        if self.status != "EM_CONFERENCIA":
+            raise ValidationError(
+                "A transferência deve estar em conferência para ser recebida."
+            )
 
         for item in self.itens.select_related("produto"):
 
+            # Verifica se existe divergência registrada para o produto
+            divergencia = (
+                self.divergencias
+                .filter(produto=item.produto)
+                .first()
+            )
+
+            # Define quantidade final a ser lançada no estoque
+            if divergencia:
+                quantidade_final = divergencia.quantidade_recebida
+            else:
+                quantidade_final = item.quantidade
+
+            # Atualiza estoque da escola com lock
             estoque_escola, _ = EstoqueEscola.objects.select_for_update().get_or_create(
                 escola=self.escola_destino,
                 produto=item.produto,
@@ -341,13 +366,14 @@ class Transferencia(models.Model):
                 defaults={"quantidade": 0}
             )
 
-            estoque_escola.quantidade += item.quantidade
+            estoque_escola.quantidade += quantidade_final
             estoque_escola.save()
 
+            # Gera movimentação auditável
             MovimentacaoEstoque.objects.create(
                 produto=item.produto,
                 escola=self.escola_destino,
-                quantidade=item.quantidade,
+                quantidade=quantidade_final,
                 tipo="ENTRADA_ESCOLA",
                 usuario=usuario,
                 observacao=f"Recebimento da Transferência {self.numero}"
@@ -355,7 +381,7 @@ class Transferencia(models.Model):
 
         self.status = "RECEBIDO"
         self.save()
-    
+
     def delete(self, *args, **kwargs):
         """
         Impede exclusão de transferências já enviadas ou recebidas.
@@ -506,8 +532,10 @@ class DivergenciaEntrega(models.Model):
         validators=[MinValueValidator(0)]
     )
 
-    descricao = models.TextField(
-        help_text="Descreva detalhadamente a divergência identificada."
+
+    descricao = RichTextField(
+        help_text="Descreva detalhadamente a divergência identificada.",
+        config_name="default"
     )
 
     registrado_por = models.ForeignKey(

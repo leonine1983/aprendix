@@ -15,3 +15,4 @@ from .transferenciaItens.transferenciaItemCreateView import *
 from .escola_confirma_transferencia.listaEscolasRecebimentoView import *
 from .escola_confirma_transferencia.transferenciasAbertasEscolaView import *
 from .escola_confirma_transferencia.receberTransferenciaView import *
+from .escola_confirma_transferencia.transferenciaConferenciaView import *

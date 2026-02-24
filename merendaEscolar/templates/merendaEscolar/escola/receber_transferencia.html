@@ -24,9 +24,8 @@
     </tbody>
 </table>
 
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-success">Confirmar Recebimento</button>
-    <a href="{% url 'merendaEscolar:lista_escolas' %}" class="btn btn-secondary">Cancelar</a>
-</form>
+<a href="{% url 'merendaEscolar:transferencia_conferencia' transferencia.pk %}" 
+   class="btn btn-warning">
+   Iniciar Conferência
+</a>
 {% endblock %}

@@ -183,19 +183,15 @@
 
                 <!-- RECEBER -->
                 {% if transferencia.status == "ENVIADO" %}
-                    <form method="post"
-                          action="{% url 'merendaEscolar:transferencia-receber' transferencia.pk %}"
-                          class="form-acao-transferencia"
-                          onsubmit="return confirm('Confirma o recebimento desta transferência? Esta ação dará entrada definitiva no estoque da escola.');">
-                        {% csrf_token %}
-                        <button type="submit"
-                                class="btn btn-receber-transferencia px-4 py-2">
-                            <i class="bi bi-check-circle me-2"></i>
-                            <span class="fw-semibold">Confirmar Recebimento</span>
-                        </button>
-                    </form>
+                    <div class="alert alert-warning d-flex align-items-center" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <div>
+                            Esta transferência está enviada. A escola deverá confirmar o recebimento do produto.
+                            Somente após a confirmação, o status mudará para <strong>RECEBIDO</strong> 
+                            e os produtos serão transferidos do Estoque Central para o Estoque da Escola.
+                        </div>
+                    </div>
                 {% endif %}
-
             </div>
 
         </div>

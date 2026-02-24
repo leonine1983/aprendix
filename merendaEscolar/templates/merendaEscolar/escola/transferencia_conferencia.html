@@ -1,0 +1,135 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+<div class="container my-5">
+
+    <!-- Cabeçalho Institucional -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="fw-bold text-primary mb-1">
+                        Conferência de Transferência
+                    </h2>
+                    <p class="mb-0 text-muted">
+                        Nº {{ transferencia.numero }}
+                    </p>
+                </div>
+
+                <span class="badge bg-warning text-dark fs-6">
+                    {{ transferencia.get_status_display }}
+                </span>
+            </div>
+
+            <hr>
+
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <small class="text-muted">Escola Destino</small>
+                    <p class="fw-semibold mb-0">
+                        {{ transferencia.escola_destino.nome }}
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <small class="text-muted">Data de Envio</small>
+                    <p class="fw-semibold mb-0">
+                        {{ transferencia.data_envio|date:"d/m/Y H:i" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Orientação -->
+    <div class="alert alert-info border-start border-4 border-info shadow-sm">
+        <strong>Atenção:</strong> Realize a conferência física dos itens recebidos.
+        Caso exista divergência entre quantidade enviada e recebida,
+        descreva detalhadamente o ocorrido no campo abaixo para fins de auditoria e rastreabilidade.
+    </div>
+
+
+    <!-- Formulário -->
+    <form method="post" class="card shadow-sm border-0">
+        {% csrf_token %}
+
+        <div class="card-body">
+
+            <!-- Tabela de Conferência -->
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr class="text-secondary small text-uppercase">
+                            <th>Produto</th>
+                            <th>Lote</th>
+                            <th class="text-center">Qtd. Enviada</th>
+                            <th class="text-center">Qtd. Recebida</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in itens %}
+                        <tr>
+                            <td class="fw-medium">
+                                {{ item.produto.nome }}
+                            </td>
+
+                            <td>
+                                {{ item.estoque_origem.lote|default:"—" }}
+                            </td>
+
+                            <td class="text-center fw-semibold">
+                                {{ item.quantidade }}
+                            </td>
+
+                            <td style="max-width:150px;">
+                                <input type="number"
+                                       step="0.01"
+                                       name="recebido_{{ item.id }}"
+                                       value="{{ item.quantidade }}"
+                                       class="form-control text-center"
+                                       min="0"
+                                       required>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Campo de Descrição da Ocorrência -->
+            <div class="mt-4">
+                <label for="descricao_ocorrencia" class="form-label fw-semibold">
+                    Relato da Ocorrência (obrigatório em caso de divergência)
+                </label>
+
+                <textarea name="descricao_ocorrencia"
+                          id="descricao_ocorrencia"
+                          rows="5"
+                          class="form-control"
+                          placeholder="Descreva detalhadamente o ocorrido: produto faltando, avaria, erro de separação, embalagem violada, etc."></textarea>
+
+                <div class="form-text">
+                    Este campo será utilizado para análise da Secretaria e auditoria interna.
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card-footer bg-light d-flex justify-content-between">
+            <a href="{% url 'merendaEscolar:lista_escolas' %}"
+               class="btn btn-outline-secondary">
+                Cancelar
+            </a>
+
+            <button type="submit"
+                    class="btn btn-success px-4">
+                Finalizar Conferência
+            </button>
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}

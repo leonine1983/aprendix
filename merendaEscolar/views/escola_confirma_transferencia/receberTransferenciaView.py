@@ -17,7 +17,7 @@ class ReceberTransferenciaView(LoginRequiredMixin, View):
         transferencia = get_object_or_404(Transferencia, pk=pk)
         if transferencia.status != "ENVIADO":
             messages.warning(request, "Somente transferências enviadas podem ser recebidas.")
-            return redirect('transferencias:lista')
+            return redirect('merendaEscolar:lista')
         itens = transferencia.itens.all()
         return render(request, self.template_name, {"transferencia": transferencia, "itens": itens})
 
@@ -26,7 +26,7 @@ class ReceberTransferenciaView(LoginRequiredMixin, View):
         try:
             transferencia.receber(usuario=request.user)
             messages.success(request, f"Transferência {transferencia.numero} recebida com sucesso.")
-            return redirect('transferencias:lista')
+            return redirect('merendaEscolar:lista_escolas')
         except ValidationError as e:
             messages.error(request, e.message)
-            return redirect('transferencias:receber', pk=pk)
+            return redirect('merendaEscolar:escola_receber', pk=pk)
