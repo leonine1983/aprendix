@@ -92,49 +92,107 @@
 <!-- ========================= -->
 <!-- TABELA DE ESTOQUE -->
 <!-- ========================= -->
-<div class="table-container">
-    <h3>Produtos em Estoque Central</h3>
-</div>
+<div class="module-card">
 
-<div class="table-wrapper">
-    <table class="tabela-estoque">
-        <thead>
-            <tr>
-                <th>Produto</th>
-                <th>Quantidade Atual</th>
-                <th>Lote</th>
-                <th>Validade</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in produtos %}
-            <tr>
-                <td data-label="Produto">
-                    {{ item.produto.nome }}
-                </td>
+    <div class="module-header">
+        <h3 class="module-title">Gestão de Estoque Central</h3>
+        <p class="module-subtitle">
+            Monitoramento consolidado dos produtos armazenados na unidade central
+        </p>
 
-                <td data-label="Quantidade">
-                    {{ item.quantidade }} {{ item.produto.unidade_medida }}
-                </td>
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div class="kpi-label">Total de Produtos</div>
+                <div class="kpi-value">{{ produtos|length }}</div>
+            </div>
 
-                <td data-label="Lote">
-                    {{ item.lote }}
-                </td>
+            <div class="kpi-card">
+                <div class="kpi-label">Lotes Próximos da Validade</div>
+                <div class="kpi-value">{{ lotes_proximos }}</div>
+            </div>
+        </div>
+    </div>
 
-                <td data-label="Validade">
-                    {{ item.data_validade|date:"d/m/Y" }}
-                </td>
-            </tr>
+    <div class="table-wrapper">
+        <table class="tabela-estoque">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Quantidade Atual</th>
+                    <th>Lote</th>
+                    <th>Validade</th>
+                </tr>
+            </thead>
 
-            {% empty %}
-            <tr>
-                <td colspan="4" style="text-align:center;">
-                    Nenhum produto cadastrado no estoque central.
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            <tbody>
+                {% for item in produtos %}
+                <tr>
+
+                    <td class="col-produto" data-label="Produto">
+                        {{ item.produto.nome }}
+                    </td>
+
+                    <td data-label="Quantidade">
+                        <span class="badge-quantidade">
+                            {{ item.quantidade }} {{ item.produto.unidade_medida }}
+                        </span>
+                    </td>
+
+                    <td data-label="Lote">
+                        {{ item.lote }}
+                    </td>
+                    <td data-label="Validade">
+                        {% with status=item.status_validade %}
+                            {% if status == "VENCIDO" %}
+                                <span class="validade-vencido">
+                                    {{ item.data_validade|date:"d/m/Y" }} (Vencido)
+                                </span>
+                            {% elif status == "CRITICO" %}
+                                <span class="validade-critica">
+                                    {{ item.data_validade|date:"d/m/Y" }} (Crítico)
+                                </span>
+                            {% elif status == "ALERTA" %}
+                                <span class="validade-atencao">
+                                    {{ item.data_validade|date:"d/m/Y" }} (Atenção)
+                                </span>
+                            {% else %}
+                                <span class="validade-normal">
+                                    {{ item.data_validade|date:"d/m/Y" }}
+                                </span>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <!--
+                    <td data-label="Validade">
+                        {% if item.dias_para_vencer <= 7 %}
+                            <span class="validade-critica">
+                                {{ item.data_validade|date:"d/m/Y" }}
+                            </span>
+                        {% elif item.dias_para_vencer <= 30 %}
+                            <span class="validade-atencao">
+                                {{ item.data_validade|date:"d/m/Y" }}
+                            </span>
+                        {% else %}
+                            <span class="validade-normal">
+                                {{ item.data_validade|date:"d/m/Y" }}
+                            </span>
+                        {% endif %}
+                    </td>-->
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">
+                        <div class="empty-state">
+                            Nenhum produto cadastrado no estoque central.
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 {% endblock content %}

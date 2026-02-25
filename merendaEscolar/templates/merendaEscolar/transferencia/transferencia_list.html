@@ -2,6 +2,42 @@
 {% load static %}
 
 {% block content %}
+<style>
+.status {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status.alerta {
+    background-color: #e5e7eb;
+    color: #374151;
+}
+
+.status.pendente {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status.ok {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.legenda-box {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.legenda-item {
+    margin-bottom: 6px;
+}
+</style>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
@@ -9,79 +45,144 @@
             Transferências
         </h2>
         <small class="text-muted">
-            Gestão de envios do estoque central para escolas
+            Gestão de envios do estoque central para unidades escolares
         </small>
     </div>
 
     <a href="{% url 'merendaEscolar:transferencia-create' %}"
-    class="btn btn-primary">
+       class="btn btn-primary">
         <i class="fas fa-plus"></i>
         Nova Transferência
     </a>
 </div>
 
-<div class="table-wrapper">
-    <table class="tabela-estoque">
-        <thead>
-            <tr>
-                <th>Nº</th>
-                <th>Origem</th>
-                <th>Destino</th>
-                <th>Status</th>
-                <th>Data</th>
-                <th style="width:120px;">Ações</th>
-            </tr>
-        </thead>
 
-        <tbody>
-            {% for transferencia in transferencias %}
-            <tr>
-                <td data-label="Nº">
-                    <strong>{{ transferencia.numero }}</strong>
-                </td>
+<!-- TEXTO EXPLICATIVO DA FUNCIONALIDADE -->
+<div class="alert alert-light border shadow-sm mb-4">
+    <h6 class="fw-semibold mb-2">Sobre esta funcionalidade</h6>
+    <p class="mb-0 text-muted">
+        Esta janela permite o acompanhamento completo das transferências de gêneros
+        alimentícios do estoque central para as escolas.
+        Aqui é possível visualizar o status operacional de cada envio,
+        monitorar o fluxo logístico e garantir rastreabilidade no processo
+        de distribuição da merenda escolar.
+    </p>
+</div>
 
-                <td data-label="Origem">
-                    Estoque Central
-                </td>
 
-                <td data-label="Destino">
-                    {{ transferencia.escola_destino }}
-                </td>
+<!-- LEGENDA DE STATUS -->
+<div class="legenda-box">
+    <h6 class="fw-semibold mb-3">Legenda de Situação</h6>
 
-                <td data-label="Status">
-                    <span class="status
-                        {% if transferencia.status == 'RASCUNHO' %}alerta{% endif %}
-                        {% if transferencia.status == 'ENVIADO' %}ok{% endif %}
-                        {% if transferencia.status == 'RECEBIDO' %}ok{% endif %}
-                    ">
-                        {{ transferencia.get_status_display }}
-                    </span>
-                </td>
+    <div class="legenda-item">
+        <span class="status alerta">Rascunho</span>
+        <small class="text-muted ms-2">
+            Transferência em fase de preparação. Ainda não foi enviada à escola.
+        </small>
+    </div>
 
-                <td data-label="Data">
-                    {{ transferencia.criado_em|date:"d/m/Y H:i" }}
-                </td>
+    <div class="legenda-item">
+        <span class="status pendente">Enviado</span>
+        <small class="text-muted ms-2">
+            Transferência já despachada pelo estoque central e aguardando conferência pela escola.
+        </small>
+    </div>
 
-                <td data-label="Ações">
-                    <a href="{% url 'merendaEscolar:transferencia-detail' transferencia.pk %}"
-                       class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                </td>
-            </tr>
+    <div class="legenda-item">
+        <span class="status ok">Recebido</span>
+        <small class="text-muted ms-2">
+            Conferência finalizada pela escola, com ou sem registro de divergências.
+        </small>
+    </div>
+</div>
 
-            {% empty %}
-            <tr>
-                <td colspan="6" class="text-center py-4">
-                    <div style="color:#6b7280;">
-                        <i class="fas fa-inbox fa-2x mb-2"></i>
-                        <p>Nenhuma transferência registrada.</p>
-                    </div>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="module-card">
+
+    <div class="module-header">
+        <h3 class="module-title">Gestão de Transferências</h3>
+        <p class="module-subtitle">
+            Controle e rastreabilidade das movimentações entre estoque central e unidades escolares
+        </p>
+
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Registrado</div>
+                <div class="kpi-value">{{ transferencias|length }}</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">Pendentes de Confirmação</div>
+                <div class="kpi-value">{{ pendentes }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="tabela-estoque">
+            <thead>
+                <tr>
+                    <th>Nº</th>
+                    <th>Origem</th>
+                    <th>Destino</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                    <th style="width:100px;">Ações</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for transferencia in transferencias %}
+                <tr>
+
+                    <td class="col-numero" data-label="Nº">
+                        {{ transferencia.numero }}
+                    </td>
+
+                    <td data-label="Origem">
+                        Estoque Central
+                    </td>
+
+                    <td data-label="Destino">
+                        {{ transferencia.escola_destino }}
+                    </td>
+
+                    <td data-label="Status">
+                        <span class="status-badge
+                            {% if transferencia.status == 'RASCUNHO' %}status-rascunho{% endif %}
+                            {% if transferencia.status == 'ENVIADO' %}status-enviado{% endif %}
+                            {% if transferencia.status == 'RECEBIDO' %}status-recebido{% endif %}
+                        ">
+                            {{ transferencia.get_status_display }}
+                        </span>
+                    </td>
+
+                    <td data-label="Data">
+                        {{ transferencia.criado_em|date:"d/m/Y H:i" }}
+                    </td>
+
+                    <td data-label="Ações">
+                        <a href="{% url 'merendaEscolar:transferencia-detail' transferencia.pk %}"
+                           class="btn-acao"
+                           title="Visualizar Detalhes">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </td>
+
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            Nenhuma transferência registrada até o momento.
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 

@@ -106,11 +106,18 @@ class EstoqueCentralListView(LoginRequiredMixin,
     template_name = "merendaEscolar/dashboard.html"
     context_object_name = "produtos"
 
+    """
     def get_queryset(self):
         return (
             EstoqueCentral.objects
             .select_related("produto")
             .order_by("produto__nome")
+        ) """
+    def get_queryset(self):
+        return (
+            EstoqueCentral.objects
+            .select_related("produto")
+            .ordenado_por_validade()
         )
 
     def get_context_data(self, **kwargs):

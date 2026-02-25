@@ -139,7 +139,7 @@ class Produto(models.Model):
 # ==============================
 # ESTOQUE
 # ==============================
-
+from .utils import EstoqueCentralQuerySet
 class EstoqueCentral(models.Model):
     """
     Estoque principal da instituição.
@@ -152,6 +152,8 @@ class EstoqueCentral(models.Model):
     quantidade = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])
     atualizado_em = models.DateTimeField(auto_now=True)
 
+    objects = EstoqueCentralQuerySet.as_manager() 
+
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=["produto", "lote"], name="unique_produto_lote_central")
@@ -160,6 +162,23 @@ class EstoqueCentral(models.Model):
 
     def __str__(self):
         return f"{self.produto.nome} - Lote {self.lote or 'Sem lote'}"
+    
+    @property
+    def status_validade(self):
+        hoje = timezone.now().date()
+
+        if not self.data_validade:
+            return "SEM_VALIDADE"
+
+        dias = (self.data_validade - hoje).days
+
+        if dias < 0:
+            return "VENCIDO"
+        elif dias <= 7:
+            return "CRITICO"
+        elif dias <= 30:
+            return "ALERTA"
+        return "NORMAL"
 
 
 class EstoqueEscola(models.Model):
