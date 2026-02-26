@@ -1,0 +1,105 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+
+<div class="module-card">
+
+    <!-- HEADER INSTITUCIONAL -->
+    <div class="module-header">
+
+        <h2 class="module-title">
+            Dashboards de Estoque por Escola
+        </h2>
+
+        <p class="module-subtitle">
+            Selecione uma unidade escolar para visualizar indicadores estratégicos de estoque.
+        </p>
+
+        <!-- Busca Institucional -->
+        <form method="get" style="margin-top:20px; max-width:420px;">
+            <div style="position:relative;">
+                <i class="fas fa-search"
+                   style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#94a3b8;">
+                </i>
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ request.GET.q }}"
+                    placeholder="Buscar escola..."
+                    style="
+                        width:100%;
+                        padding:10px 14px 10px 38px;
+                        border-radius:12px;
+                        border:1px solid var(--border);
+                        font-size:.9rem;
+                        outline:none;
+                    ">
+            </div>
+        </form>
+
+    </div>
+
+    <!-- KPIs ESTRATÉGICOS -->
+    <div class="kpi-row" style="padding:24px 32px 0 32px;">
+
+        <div class="kpi-card kpi-normal">
+            <div class="kpi-label">Total de Escolas</div>
+            <div class="kpi-value">{{ escolas|length }}</div>
+        </div>
+
+        <div class="kpi-card kpi-alerta">
+            <div class="kpi-label">Com Estoque Crítico</div>
+            <div class="kpi-value">--</div>
+        </div>
+
+        <div class="kpi-card kpi-critico">
+            <div class="kpi-label">Itens Abaixo do Mínimo</div>
+            <div class="kpi-value">--</div>
+        </div>
+
+    </div>
+
+    <!-- LISTAGEM -->
+    <div class="table-wrapper" style="padding:28px 32px 32px 32px;">
+
+        <table class="tabela-estoque">
+            <thead>
+                <tr>
+                    <th>Unidade Escolar</th>
+                    <th style="text-align:right;">Acessar</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for escola in escolas %}
+                <tr>
+                    <td class="col-produto">
+                        <i class="fas fa-school" style="margin-right:10px; color:var(--primary);"></i>
+                        {{ escola.nome_escola }}
+                    </td>
+
+                    <td style="text-align:right;">
+                        <a href="{% url 'merendaEscolar:estoque_escola_dashboard' escola.id %}"
+                           class="btn-acao"
+                           title="Visualizar Dashboard">
+                            <i class="fas fa-chart-line"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" class="empty-state">
+                        Nenhuma escola encontrada.
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

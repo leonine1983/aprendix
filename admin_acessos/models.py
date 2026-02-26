@@ -68,3 +68,48 @@ class AtualizacaoNotificacao(models.Model):
 
     def __str__(self):
         return f'{self.titulo} - {"Lida" if self.lida else "Não lida"}'
+    
+
+
+    
+
+# notificacoes de merenda escolar
+
+from django.db import models
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+from rh.models import Escola
+
+User = get_user_model()
+
+class Notificacao(models.Model):
+
+    TIPO_CHOICES = (
+        ("ESTOQUE_BAIXO", "Estoque Baixo"),
+        ("PRODUTO_VENCENDO", "Produto Vencendo"),
+        ("TRANSFERENCIA_ENVIADA", "Transferência Enviada"),
+        ("TRANSFERENCIA_RECEBIDA", "Transferência Recebida"),
+        ("DIVERGENCIA_ABERTA", "Divergência Aberta"),
+    )
+
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notificacoes_escolas")
+    escola = models.ForeignKey(Escola, on_delete=models.CASCADE, null=True, blank=True)
+
+    titulo = models.CharField(max_length=200)
+    mensagem = models.TextField()
+
+    tipo = models.CharField(max_length=30, choices=TIPO_CHOICES)
+    lida = models.BooleanField(default=False)
+
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criado_em"]
+        indexes = [
+            models.Index(fields=["usuario", "lida"]),
+            models.Index(fields=["tipo"]),
+        ]
+
+    def __str__(self):
+        return f"{self.titulo} - {self.usuario}"
+

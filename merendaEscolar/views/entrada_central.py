@@ -91,7 +91,9 @@ class EntradaEstoqueCentralView(
 
         messages.success(self.request, "Entrada registrada com sucesso no estoque central.")
         return super().form_valid(form)
-
+    
+from django.db.models import Count, Q
+from datetime import timedelta
 
 # ===============================
 # DASHBOARD ESTOQUE CENTRAL
@@ -112,13 +114,45 @@ class EstoqueCentralListView(LoginRequiredMixin,
             EstoqueCentral.objects
             .select_related("produto")
             .order_by("produto__nome")
-        ) """
+        ) 
     def get_queryset(self):
         return (
             EstoqueCentral.objects
             .select_related("produto")
             .ordenado_por_validade()
+        )  """
+    
+    def get_queryset(self):
+        qs = (
+            EstoqueCentral.objects
+            .select_related("produto")
+            .ordenado_por_validade()
         )
+
+        filtro = self.request.GET.get("status")
+
+        hoje = timezone.now().date()
+
+        if filtro == "vencido":
+            qs = qs.filter(data_validade__lt=hoje)
+
+        elif filtro == "critico":
+            qs = qs.filter(
+                data_validade__gte=hoje,
+                data_validade__lte=hoje + timedelta(days=7)
+            )
+
+        elif filtro == "alerta":
+            qs = qs.filter(
+                data_validade__gt=hoje + timedelta(days=7),
+                data_validade__lte=hoje + timedelta(days=30)
+            )
+
+        return qs
+
+    from django.db.models import Sum
+    from django.utils import timezone
+    from datetime import timedelta
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -126,20 +160,16 @@ class EstoqueCentralListView(LoginRequiredMixin,
         hoje = timezone.now().date()
         produtos_qs = context["produtos"]
 
-        # Total consolidado
-        total_itens = produtos_qs.aggregate(
+        # ==========================================
+        # DASHBOARD – INDICADORES GERAIS
+        # ==========================================
+
+        # Total consolidado em estoque
+        total_itens_estoque = produtos_qs.aggregate(
             total=Sum("quantidade")
         )["total"] or 0
 
-        # Total de produtos distintos
-        total_produtos_distintos = produtos_qs.values(
-            "produto"
-        ).distinct().count()
-
-        # Total de lotes ativos
-        total_lotes = produtos_qs.count()
-
-        # Escolas atendidas
+        # Escolas cadastradas
         escolas_atendidas = Escola.objects.count()
 
         # Primeiro dia do mês
@@ -156,21 +186,42 @@ class EstoqueCentralListView(LoginRequiredMixin,
             status="ABERTA"
         ).count()
 
-        # Produtos com validade próxima (30 dias)
-        produtos_vencendo = produtos_qs.filter(
-            data_validade__isnull=False,
-            data_validade__lte=hoje + timezone.timedelta(days=30),
-            data_validade__gte=hoje
+        # ==========================================
+        # KPIs DE VALIDADE
+        # ==========================================
+
+        lotes_vencidos = produtos_qs.filter(
+            data_validade__lt=hoje
         ).count()
 
+        lotes_criticos = produtos_qs.filter(
+            data_validade__gte=hoje,
+            data_validade__lte=hoje + timedelta(days=7)
+        ).count()
+
+        lotes_alerta = produtos_qs.filter(
+            data_validade__gt=hoje + timedelta(days=7),
+            data_validade__lte=hoje + timedelta(days=30)
+        ).count()
+
+        lotes_normais = produtos_qs.filter(
+            data_validade__gt=hoje + timedelta(days=30)
+        ).count()
+
+        # ==========================================
+        # Atualiza Contexto
+        # ==========================================
+
         context.update({
-            "total_itens_estoque": total_itens,
-            "total_produtos_distintos": total_produtos_distintos,
-            "total_lotes": total_lotes,
-            "produtos_vencendo": produtos_vencendo,
+            "total_itens_estoque": total_itens_estoque,
             "escolas_atendidas": escolas_atendidas,
             "envios_mes": envios_mes,
             "divergencias_abertas": divergencias_abertas,
+
+            "lotes_vencidos": lotes_vencidos,
+            "lotes_criticos": lotes_criticos,
+            "lotes_alerta": lotes_alerta,
+            "lotes_normais": lotes_normais,
         })
 
         return context

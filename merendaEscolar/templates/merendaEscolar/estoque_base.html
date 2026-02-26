@@ -344,21 +344,25 @@ body{
     color:var(--text-muted);
 }
 
-/* KPIs */
 
+
+
+
+    /* KPIs */
 .kpi-row{
     display:flex;
     gap:24px;
     margin-top:20px;
-    flex-wrap:wrap;
+    flex-wrap:wrap; /* Permite responsividade */
 }
 
 .kpi-card{
+    flex:1;                 /* Faz todos crescerem igualmente */
+    min-width:200px;        /* Evita esmagamento */
     background:#f8fafc;
     padding:14px 18px;
     border-radius:12px;
     border:1px solid var(--border);
-    min-width:160px;
 }
 
 .kpi-label{
@@ -374,6 +378,20 @@ body{
     margin-top:4px;
     color:var(--text-strong);
 }
+
+/* Indicadores visuais */
+.kpi-danger { border-left: 4px solid #dc3545; }
+.kpi-critico { border-left: 4px solid #fd7e14; }
+.kpi-alerta { border-left: 4px solid #ffc107; }
+.kpi-normal { border-left: 4px solid #198754; }
+
+
+
+
+
+
+
+
 
 /* ==============================
    TABELA
@@ -649,50 +667,71 @@ body{
     <h2>Merenda Escolar</h2>
 
     <nav class="menu">
+<nav class="menu">
 
-        <a href="{% url 'merendaEscolar:estoque-central' %}">
-            <i class="fas fa-warehouse"></i>
-            Todos os Itens no Estoque (Cantina)
-        </a>
+    <a href="{% url 'merendaEscolar:estoque-central' %}">
+        <i class="fas fa-warehouse"></i>
+        Todos os Itens no Estoque (Cantina)
+    </a>
 
-        <div class="submenu-wrapper">
-            <a href="#" class="submenu-toggle">
-                <i class="fas fa-layer-group"></i>
-                Configuração de Itens
-                <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
-            </a>
-            <div class="submenu">
-                <a href="{% url 'merendaEscolar:unidade_medida_list' %}">
-                    <i class="fas fa-balance-scale"></i>
-                    Unidades de Medida
-                </a>
-                <a href="{% url 'merendaEscolar:categoria_produto_list' %}">
-                    <i class="fas fa-tags"></i>
-                    Categorias de Produtos
-                </a>
-                <a href="{% url 'merendaEscolar:produto_list' %}">
-                    <i class="fas fa-box"></i>
-                    Produtos
-                </a>
-            </div>
-        </div>
+    <a href="{% url 'merendaEscolar:transferencia-list' %}">
+        <i class="fas fa-truck"></i>
+        Transferências
+    </a>
 
-        <a href="{% url 'merendaEscolar:transferencia-list' %}">
-            <i class="fas fa-truck"></i>
-            Transferências
-        </a>
+    
 
+<div class="submenu-wrapper">
+    <a href="#" class="submenu-toggle">
+        <i class="fas fa-school"></i>
+        Escolas
+        <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
+    </a>
+
+    <div class="submenu">
+
+        <!-- Fluxo operacional -->
         <a href="{% url 'merendaEscolar:lista_escolas' %}">
-            <i class="fas fa-school"></i>
-            Escola Confirma Transferência
+            <i class="fas fa-clipboard-check"></i>
+            Confirma Transferência
         </a>
 
-        <a><i class="fas fa-route"></i> Distribuição</a>
-        <a><i class="fas fa-bell"></i> Alertas</a>
-        <a><i class="fas fa-file-alt"></i> Relatórios</a>
-        <a><i class="fas fa-cog"></i> Configurações</a>
+        <!-- Fluxo analítico -->
+        <a href="{% url 'merendaEscolar:lista_escolas_dashboard' %}">
+            <i class="fas fa-chart-line"></i>
+            Dashboards de Estoque
+        </a>
 
-    </nav>
+    </div>
+</div>
+
+
+    <a><i class="fas fa-bell"></i> Alertas</a>
+    <a><i class="fas fa-file-alt"></i> Relatórios</a>
+    
+    <div class="submenu-wrapper">
+        <a href="#" class="submenu-toggle">
+            <i class="fas fa-cog"></i>
+            Configuração
+            <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
+        </a>
+        <div class="submenu">
+            <a href="{% url 'merendaEscolar:unidade_medida_list' %}">
+                <i class="fas fa-balance-scale"></i>
+                Unidades de Medida
+            </a>
+            <a href="{% url 'merendaEscolar:categoria_produto_list' %}">
+                <i class="fas fa-tags"></i>
+                Categorias de Produtos
+            </a>
+            <a href="{% url 'merendaEscolar:produto_list' %}">
+                <i class="fas fa-box"></i>
+                Produtos
+            </a>
+        </div>
+    </div>
+
+</nav>
 </aside>
 
 <div class="main">

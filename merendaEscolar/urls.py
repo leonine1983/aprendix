@@ -73,6 +73,11 @@ urlpatterns = [
     ),
 
     # Escola 
+    path(
+        "escola/<int:escola_id>/estoque/",
+        EstoqueEscolaDashboardView.as_view(),
+        name="estoque_escola_dashboard"
+    ),
     path('escolas/', ListaEscolasRecebimentoView.as_view(), name='lista_escolas'),
     path('escola/<int:escola_id>/', TransferenciasAbertasEscolaView.as_view(), name='transferencias_abertas'),
     path('receber/<int:pk>/', ReceberTransferenciaView.as_view(), name='escola_receber'),
@@ -81,6 +86,9 @@ urlpatterns = [
         TransferenciaConferenciaView.as_view(),
         name="transferencia_conferencia"
     ),
+
+    path('escolas/dashboard', ListaEscolasView.as_view(), name='lista_escolas_dashboard'),
+    path('escola/<int:escola_id>/estoque/', EstoqueEscolaDashboardView.as_view(), name='estoque_escola_dashboard'),
 
 
 

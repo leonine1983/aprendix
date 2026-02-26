@@ -1,6 +1,8 @@
 {% extends "merendaEscolar/estoque_base.html" %}
 {% block content %}
 
+
+
 <!-- ========================= -->
 <!-- DASHBOARD INSTITUCIONAL -->
 <!-- ========================= -->
@@ -36,11 +38,9 @@
 <!-- ========================= -->
 <!-- AÇÕES RÁPIDAS -->
 <!-- ========================= -->
-<!-- ========================= -->
-<!-- AÇÕES RÁPIDAS -->
-<!-- ========================= -->
 <div class="row g-3 mb-4">
 
+    <!-- Nova Entrada -->
     <div class="col-md-4">
         <a href="{% url 'merendaEscolar:entrada-central' %}"
            class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm">
@@ -49,18 +49,19 @@
         </a>
     </div>
 
+    <!-- Visualizar Estoque (mantém filtros ativos) -->
     <div class="col-md-4">
-        <a href="{% url 'merendaEscolar:estoque-central' %}"
+        <a href="{% url 'merendaEscolar:estoque-central' %}?{{ request.GET.urlencode }}"
            class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm">
             <i class="fas fa-list"></i>
             <span>Visualizar Estoque</span>
         </a>
     </div>
 
+    <!-- Relatórios de Divergência (já preparado para filtro futuro) -->
     <div class="col-md-4">
-        <a href="#"
-           class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm disabled"
-           aria-disabled="true" tabindex="-1">
+        <a href=""
+           class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm">
             <i class="fas fa-file-alt"></i>
             <span>Relatórios de Divergência</span>
         </a>
@@ -100,16 +101,36 @@
             Monitoramento consolidado dos produtos armazenados na unidade central
         </p>
 
-        <div class="kpi-row">
-            <div class="kpi-card">
-                <div class="kpi-label">Total de Produtos</div>
-                <div class="kpi-value">{{ produtos|length }}</div>
-            </div>
+      <div class="kpi-row">
 
-            <div class="kpi-card">
-                <div class="kpi-label">Lotes Próximos da Validade</div>
-                <div class="kpi-value">{{ lotes_proximos }}</div>
-            </div>
+        <!-- TOTAL -->
+        <a href="{% url 'merendaEscolar:estoque-central' %}"
+        class="kpi-card text-decoration-none">
+            <div class="kpi-label">Total de Produtos</div>
+            <div class="kpi-value">{{ produtos|length }}</div>
+        </a>
+
+        <!-- VENCIDOS -->
+        <a href="?status=vencido"
+        class="kpi-card kpi-danger text-decoration-none">
+            <div class="kpi-label">Lotes Vencidos</div>
+            <div class="kpi-value">{{ lotes_vencidos }}</div>
+        </a>
+
+        <!-- CRÍTICOS -->
+        <a href="?status=critico"
+        class="kpi-card kpi-critico text-decoration-none">
+            <div class="kpi-label">Críticos (7 dias)</div>
+            <div class="kpi-value">{{ lotes_criticos }}</div>
+        </a>
+
+        <!-- ALERTA -->
+        <a href="?status=alerta"
+        class="kpi-card kpi-alerta text-decoration-none">
+            <div class="kpi-label">Alerta (30 dias)</div>
+            <div class="kpi-value">{{ lotes_alerta }}</div>
+        </a>
+
         </div>
     </div>
 

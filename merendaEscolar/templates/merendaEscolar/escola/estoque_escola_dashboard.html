@@ -1,0 +1,89 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+{% block content %}
+
+<div class="module-card">
+
+    <!-- HEADER -->
+    <div class="module-header">
+        <h2 class="module-title">Dashboard de Estoque</h2>
+        <p class="module-subtitle">
+            Unidade Escolar: <strong>{{ escola.nome_escola }}</strong>
+        </p>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-row" style="padding:24px 32px 0 32px;">
+
+        <div class="kpi-card kpi-normal">
+            <div class="kpi-label">Total de Produtos</div>
+            <div class="kpi-value">{{ total_produtos }}</div>
+        </div>
+
+        <div class="kpi-card kpi-critico">
+            <div class="kpi-label">Abaixo do Mínimo</div>
+            <div class="kpi-value">{{ produtos_criticos }}</div>
+        </div>
+
+        <div class="kpi-card kpi-alerta">
+            <div class="kpi-label">Produtos Regulares</div>
+            <div class="kpi-value">{{ produtos_regulares }}</div>
+        </div>
+
+    </div>
+
+    <!-- TABELA -->
+    <div class="table-wrapper" style="padding:28px 32px 32px 32px;">
+
+        <table class="tabela-estoque">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Quantidade Atual</th>
+                    <th>Estoque Mínimo</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in estoque %}
+                <tr>
+
+                    <td class="col-produto">
+                        {{ item.produto__nome }}
+                    </td>
+
+                    <td data-label="Quantidade Atual">
+                        <span class="badge-quantidade">
+                            {{ item.total }} {{ item.produto__unidade_medida__sigla }}
+                        </span>
+                    </td>
+
+                    <td data-label="Estoque Mínimo">
+                        {{ item.produto__estoque_minimo }} {{ item.produto__unidade_medida__sigla }}
+                    </td>
+
+                    <td data-label="Status">
+                        {% if item.abaixo_minimo %}
+                            <span class="status alerta">Abaixo do Mínimo</span>
+                        {% else %}
+                            <span class="status ok">Regular</span>
+                        {% endif %}
+                    </td>
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="empty-state">
+                        Nenhum produto cadastrado nesta escola.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

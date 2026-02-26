@@ -107,6 +107,13 @@ class Produto(models.Model):
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
 
+    estoque_minimo = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        default=0,
+        help_text="Quantidade mínima aceitável no estoque da escola."
+    )
+
     class Meta:
         ordering = ["nome"]
         indexes = [
@@ -139,20 +146,69 @@ class Produto(models.Model):
 # ==============================
 # ESTOQUE
 # ==============================
-from .utils import EstoqueCentralQuerySet
+
+from django.db.models import Case, When, Value, IntegerField
+from django.db.models.functions import Coalesce
+from django.utils import timezone
+from datetime import timedelta
+from django.utils import timezone
+from django.db.models import Case, When, Value, IntegerField
+
+
+class EstoqueCentralQuerySet(models.QuerySet):
+
+    def ordenado_por_validade(self):
+        hoje = timezone.now().date()
+
+        return (
+            self.annotate(
+                prioridade_validade=Case(
+                    # Vencido
+                    When(data_validade__lt=hoje, then=Value(0)),
+
+                    # Crítico: até 7 dias
+                    When(
+                        data_validade__gte=hoje,
+                        data_validade__lte=hoje + timedelta(days=7),
+                        then=Value(1)
+                    ),
+
+                    # Alerta: 8 a 30 dias
+                    When(
+                        data_validade__gt=hoje + timedelta(days=7),
+                        data_validade__lte=hoje + timedelta(days=30),
+                        then=Value(2)
+                    ),
+
+                    # Normal (mais de 30 dias)
+                    When(data_validade__gt=hoje + timedelta(days=30), then=Value(3)),
+
+                    # Sem validade
+                    default=Value(4),
+
+                    output_field=IntegerField(),
+                )
+            )
+            .order_by("prioridade_validade", "data_validade")
+        )
+
 class EstoqueCentral(models.Model):
     """
     Estoque principal da instituição.
     Cada produto pode ter vários lotes.
     Usado para controlar entrada e saída central de produtos.
     """
+
+    objects = EstoqueCentralQuerySet.as_manager()
+
     produto = models.ForeignKey(Produto, on_delete=models.PROTECT, related_name="estoque_central")
     lote = models.CharField(max_length=50, blank=True, null=True)
     data_validade = models.DateField(blank=True, null=True)
     quantidade = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])
     atualizado_em = models.DateTimeField(auto_now=True)
 
-    objects = EstoqueCentralQuerySet.as_manager() 
+    
+
 
     class Meta:
         constraints = [
@@ -238,6 +294,13 @@ class MovimentacaoEstoque(models.Model):
     def clean(self):
         if "ESCOLA" in self.tipo and not self.escola:
             raise ValidationError("Movimentações de escola exigem escola definida.")
+        
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.tipo in ["ENTRADA_ESCOLA", "SAIDA_ESCOLA"] and self.escola:
+            from merendaEscolar.services import verificar_estoque_baixo
+            verificar_estoque_baixo(self.escola)
 
 
 # ==============================
@@ -598,3 +661,4 @@ class DivergenciaEntrega(models.Model):
 
     def __str__(self):
         return f"Divergência - {self.transferencia.numero} - {self.produto.nome}"
+    
