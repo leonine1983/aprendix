@@ -1,0 +1,219 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+{% block content %}
+
+
+
+<!-- ========================= -->
+<!-- DASHBOARD INSTITUCIONAL -->
+<!-- ========================= -->
+<div class="cards">
+
+    <div class="card">
+        <h3>Itens em Estoque</h3>
+        <p>{{ total_itens_estoque }}</p>
+        <i class="fas fa-box"></i>
+    </div>
+
+    <div class="card">
+        <h3>Escolas Atendidas</h3>
+        <p>{{ escolas_atendidas }}</p>
+        <i class="fas fa-school"></i>
+    </div>
+
+    <div class="card">
+        <h3>Envios no Mês</h3>
+        <p>{{ envios_mes }}</p>
+        <i class="fas fa-truck"></i>
+    </div>
+
+    <div class="card alerta">
+        <h3>Divergências Abertas</h3>
+        <p>{{ divergencias_abertas }}</p>
+        <i class="fas fa-exclamation-triangle"></i>
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- AÇÕES RÁPIDAS -->
+<!-- ========================= -->
+<div class="row g-3 mb-4">
+
+    <!-- Nova Entrada -->
+    <div class="col-md-4">
+        <a href="{% url 'merendaEscolar:entrada-central' %}"
+           class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+            <i class="fas fa-plus-circle"></i>
+            <span>Nova Entrada no Estoque</span>
+        </a>
+    </div>
+
+    <!-- Visualizar Estoque (mantém filtros ativos) -->
+    <div class="col-md-4">
+        <a href="{% url 'merendaEscolar:estoque-central' %}?{{ request.GET.urlencode }}"
+           class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+            <i class="fas fa-list"></i>
+            <span>Visualizar Estoque</span>
+        </a>
+    </div>
+
+    <!-- Relatórios de Divergência (já preparado para filtro futuro) -->
+    <div class="col-md-4">
+        <a href=""
+           class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+            <i class="fas fa-file-alt"></i>
+            <span>Relatórios de Divergência</span>
+        </a>
+    </div>
+
+</div>
+
+
+   {% if transferencia.status == "RASCUNHO" %}
+<form method="post" action="{% url 'merendaEscolar:transferencia-enviar' transferencia.pk %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">
+        Enviar Transferência
+    </button>
+</form>
+{% endif %}
+
+{% if transferencia.status == "ENVIADO" %}
+<form method="post" action="{% url 'merendaEscolar:transferencia-receber' transferencia.pk %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success">
+        Confirmar Recebimento
+    </button>
+</form>
+{% endif %}
+
+
+
+<!-- ========================= -->
+<!-- TABELA DE ESTOQUE -->
+<!-- ========================= -->
+<div class="module-card">
+
+    <div class="module-header">
+        <h3 class="module-title">Gestão de Estoque Central</h3>
+        <p class="module-subtitle">
+            Monitoramento consolidado dos produtos armazenados na unidade central
+        </p>
+
+      <div class="kpi-row">
+
+        <!-- TOTAL -->
+        <a href="{% url 'merendaEscolar:estoque-central' %}"
+        class="kpi-card text-decoration-none">
+            <div class="kpi-label">Total de Produtos</div>
+            <div class="kpi-value">{{ produtos|length }}</div>
+        </a>
+
+        <!-- VENCIDOS -->
+        <a href="?status=vencido"
+        class="kpi-card kpi-danger text-decoration-none">
+            <div class="kpi-label">Lotes Vencidos</div>
+            <div class="kpi-value">{{ lotes_vencidos }}</div>
+        </a>
+
+        <!-- CRÍTICOS -->
+        <a href="?status=critico"
+        class="kpi-card kpi-critico text-decoration-none">
+            <div class="kpi-label">Críticos (7 dias)</div>
+            <div class="kpi-value">{{ lotes_criticos }}</div>
+        </a>
+
+        <!-- ALERTA -->
+        <a href="?status=alerta"
+        class="kpi-card kpi-alerta text-decoration-none">
+            <div class="kpi-label">Alerta (30 dias)</div>
+            <div class="kpi-value">{{ lotes_alerta }}</div>
+        </a>
+
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="tabela-estoque">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Quantidade Atual</th>
+                    <th>Lote</th>
+                    <th>Validade</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in produtos %}
+                <tr>
+
+                    <td class="col-produto" data-label="Produto">
+                        {{ item.produto.nome }}
+                    </td>
+
+                    <td data-label="Quantidade">
+                        <span class="badge-quantidade">
+                            {{ item.quantidade }} {{ item.produto.unidade_medida }}
+                        </span>
+                    </td>
+
+                    <td data-label="Lote">
+                        {{ item.lote }}
+                    </td>
+                    <td data-label="Validade">
+                        {% with status=item.status_validade %}
+                            {% if status == "VENCIDO" %}
+                                <span class="validade-vencido">
+                                    {{ item.data_validade|date:"d/m/Y" }} (Vencido)
+                                </span>
+                            {% elif status == "CRITICO" %}
+                                <span class="validade-critica">
+                                    {{ item.data_validade|date:"d/m/Y" }} (Crítico)
+                                </span>
+                            {% elif status == "ALERTA" %}
+                                <span class="validade-atencao">
+                                    {{ item.data_validade|date:"d/m/Y" }} (Atenção)
+                                </span>
+                            {% else %}
+                                <span class="validade-normal">
+                                    {{ item.data_validade|date:"d/m/Y" }}
+                                </span>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <!--
+                    <td data-label="Validade">
+                        {% if item.dias_para_vencer <= 7 %}
+                            <span class="validade-critica">
+                                {{ item.data_validade|date:"d/m/Y" }}
+                            </span>
+                        {% elif item.dias_para_vencer <= 30 %}
+                            <span class="validade-atencao">
+                                {{ item.data_validade|date:"d/m/Y" }}
+                            </span>
+                        {% else %}
+                            <span class="validade-normal">
+                                {{ item.data_validade|date:"d/m/Y" }}
+                            </span>
+                        {% endif %}
+                    </td>-->
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">
+                        <div class="empty-state">
+                            Nenhum produto cadastrado no estoque central.
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock content %}

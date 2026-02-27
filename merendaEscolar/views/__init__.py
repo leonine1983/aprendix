@@ -19,3 +19,6 @@ from .escola_confirma_transferencia.receberTransferenciaView import *
 from .escola_confirma_transferencia.transferenciaConferenciaView import *
 from .escola_confirma_transferencia.estoqueEscolaDashboardView import *
 from .escola_confirma_transferencia.listaEscolasViewDashboard import *
+
+# Receitas
+from .receitas.receitaListView import *

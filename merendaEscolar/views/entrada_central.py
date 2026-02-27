@@ -17,7 +17,9 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
 from core.permissions import GroupRequiredMixin
+from core.groups.nutricionista import NUTRICIONISTA_GROUPS
 from django.core.exceptions import PermissionDenied
+
 
 
 class ErrorMessageMixin:
@@ -26,14 +28,6 @@ class ErrorMessageMixin:
     def form_invalid(self, form):
         messages.error(self.request, self.error_message)
         return super().form_invalid(form)
-
-
-
-MERENDA_GROUPS = [
-    "Nutricionista",
-    "Merendeira",
-    "Admin",
-]
 
 
 # ===============================
@@ -49,7 +43,7 @@ class EntradaEstoqueCentralView(
     FormView,
 ):
     permission_required = "merendaEscolar.add_estoquecentral"
-    group_required = MERENDA_GROUPS
+    group_required = NUTRICIONISTA_GROUPS
 
     template_name = "merendaEscolar/estoque/entrada_central_form.html"
     form_class = EntradaEstoqueCentralForm
@@ -103,9 +97,9 @@ class EstoqueCentralListView(LoginRequiredMixin,
                             PermissionRequiredMixin,
                               ListView):
     model = EstoqueCentral
-    permission_required = "merendaEscolar.add_estoquecentral"
-    group_required = MERENDA_GROUPS
-    template_name = "merendaEscolar/dashboard.html"
+    permission_required = permission_required = "merendaEscolar.view_estoquecentral"
+    group_required = NUTRICIONISTA_GROUPS
+    template_name = "merendaEscolar/estoque/estoque.html"
     context_object_name = "produtos"
 
     """

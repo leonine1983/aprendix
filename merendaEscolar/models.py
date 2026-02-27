@@ -39,7 +39,12 @@ class CategoriaProduto(models.Model):
     Facilita relatórios, filtros e organização do estoque.
     """
     nome = models.CharField(max_length=100, unique=True)
-    descricao = models.TextField(blank=True, null=True)
+    descricao = RichTextField(
+    blank=True,
+    null=True,
+    config_name="default",
+    help_text="Descrição técnica da categoria alimentar."
+)
 
     class Meta:
         verbose_name = "Categoria de Produto"
@@ -89,7 +94,12 @@ class Produto(models.Model):
     - Recebe código sequencial anual via SequenciaProduto.
     """
     nome = models.CharField(max_length=150, help_text="Ex.: Arroz Branco Tipo 1")
-    descricao = models.TextField(blank=True, null=True)
+    descricao = RichTextField(
+    blank=True,
+    null=True,
+    config_name="default",
+    help_text="Descrição técnica detalhada do produto."
+)
     categoria = models.ForeignKey(
         CategoriaProduto,
         on_delete=models.SET_NULL,
@@ -237,23 +247,32 @@ class EstoqueCentral(models.Model):
         return "NORMAL"
 
 
+########### ESCOLA ###############################
 class EstoqueEscola(models.Model):
-    """
-    Estoque de cada escola.
-    Recebe produtos do EstoqueCentral via Transferência.
-    Permite controle individual por escola e lote.
-    """
+
     escola = models.ForeignKey(Escola, on_delete=models.CASCADE, related_name="estoque_escola")
+
     produto = models.ForeignKey(Produto, on_delete=models.PROTECT)
+
     lote = models.CharField(max_length=50, blank=True, null=True)
-    quantidade = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])
+
+    data_validade = models.DateField(blank=True, null=True)
+
+    quantidade = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        validators=[MinValueValidator(0)]
+    )
+
     atualizado_em = models.DateTimeField(auto_now=True)
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["escola", "produto", "lote"], name="unique_escola_produto_lote")
+            models.UniqueConstraint(
+                fields=["escola", "produto", "lote"],
+                name="unique_escola_produto_lote"
+            )
         ]
-
 
 # ==============================
 # MOVIMENTAÇÃO DE ESTOQUE
@@ -281,7 +300,11 @@ class MovimentacaoEstoque(models.Model):
     tipo = models.CharField(max_length=30, choices=TIPO_CHOICES)
     usuario = models.ForeignKey(User, on_delete=models.PROTECT)
     data_movimentacao = models.DateTimeField(auto_now_add=True)
-    observacao = models.TextField(blank=True, null=True)
+    observacao = RichTextField(
+    blank=True,
+    null=True,
+    config_name="minimal"
+)
 
     class Meta:
         ordering = ["-data_movimentacao"]
@@ -442,10 +465,13 @@ class Transferencia(models.Model):
 
             # Atualiza estoque da escola com lock
             estoque_escola, _ = EstoqueEscola.objects.select_for_update().get_or_create(
-                escola=self.escola_destino,
-                produto=item.produto,
-                lote=None,
-                defaults={"quantidade": 0}
+            escola=self.escola_destino,
+            produto=item.produto,
+            lote=item.estoque_origem.lote,
+            defaults={
+                "quantidade": 0,
+                "data_validade": item.estoque_origem.data_validade
+            }
             )
 
             estoque_escola.quantidade += quantidade_final
@@ -662,3 +688,140 @@ class DivergenciaEntrega(models.Model):
     def __str__(self):
         return f"Divergência - {self.transferencia.numero} - {self.produto.nome}"
     
+
+
+################# RECEITA ##########################
+####################################################
+class Receita(models.Model):
+    """
+    Receita institucional proposta pela Secretaria.
+    Não executa estoque. Apenas define composição técnica.
+    """
+
+    nome = models.CharField(max_length=150)
+    descricao = RichTextField()
+    modo_preparo = RichTextField()
+    ativa = models.BooleanField(default=True)
+
+    criada_por = models.ForeignKey(User, on_delete=models.PROTECT)
+    criada_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["nome"]
+
+    def __str__(self):
+        return self.nome
+   
+
+class ReceitaIngrediente(models.Model):
+    """
+    Define os insumos necessários para preparar a receita.
+    Representa a ficha técnica alimentar.
+    """
+
+    receita = models.ForeignKey(
+        Receita,
+        on_delete=models.CASCADE,
+        related_name="ingredientes"
+    )
+
+    produto = models.ForeignKey(Produto, on_delete=models.PROTECT)
+
+    quantidade = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        validators=[MinValueValidator(0)]
+    )
+
+    class Meta:
+        unique_together = ("receita", "produto")
+
+
+class ExecucaoReceita(models.Model):
+    """
+    Representa a execução real da receita pela escola.
+    É aqui que ocorre o abatimento automático do estoque.
+    """
+
+    STATUS_CHOICES = (
+        ("PLANEJADA", "Planejada"),
+        ("EXECUTADA", "Executada"),
+        ("CANCELADA", "Cancelada"),
+    )
+
+    receita = models.ForeignKey(Receita, on_delete=models.PROTECT)
+    escola = models.ForeignKey(Escola, on_delete=models.PROTECT)
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="PLANEJADA")
+
+    executada_por = models.ForeignKey(User, on_delete=models.PROTECT)
+    data_execucao = models.DateField(default=timezone.now)
+
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-data_execucao"]
+
+
+from django.db import transaction
+from django.utils import timezone
+
+@transaction.atomic
+def executar_receita(execucao: ExecucaoReceita, usuario: User):
+
+    if execucao.status != "PLANEJADA":
+        raise ValidationError("Receita já executada ou cancelada.")
+
+    hoje = timezone.now().date()
+
+    for ingrediente in execucao.receita.ingredientes.select_related("produto"):
+
+        quantidade_necessaria = ingrediente.quantidade
+
+        # Buscar lotes da escola ordenados por validade (FEFO)
+        lotes = (
+            EstoqueEscola.objects
+            .select_for_update()
+            .filter(
+                escola=execucao.escola,
+                produto=ingrediente.produto,
+                quantidade__gt=0
+            )
+            .order_by("lote")  # idealmente substituir por data_validade quando você adicionar no modelo
+        )
+
+        # IMPORTANTE: você ainda não possui data_validade no EstoqueEscola.
+        # Recomendo fortemente adicionar esse campo para rastreabilidade sanitária.
+
+        for lote in lotes:
+
+            # Aqui você deverá validar vencimento quando incluir data_validade
+            # if lote.data_validade < hoje:
+            #     continue
+
+            if quantidade_necessaria <= 0:
+                break
+
+            consumir = min(lote.quantidade, quantidade_necessaria)
+
+            lote.quantidade -= consumir
+            lote.save()
+
+            MovimentacaoEstoque.objects.create(
+                produto=lote.produto,
+                escola=execucao.escola,
+                quantidade=consumir,
+                tipo="SAIDA_ESCOLA",
+                usuario=usuario,
+                observacao=f"Execução da receita {execucao.receita.nome}"
+            )
+
+            quantidade_necessaria -= consumir
+
+        if quantidade_necessaria > 0:
+            raise ValidationError(
+                f"Estoque insuficiente para o produto {ingrediente.produto.nome}"
+            )
+
+    execucao.status = "EXECUTADA"
+    execucao.save()

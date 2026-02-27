@@ -1,0 +1,25 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+{% block title %}Excluir Receita{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <h1 class="h4 text-danger">Confirma exclusão?</h1>
+
+    <p>
+        Você está prestes a excluir a receita:
+        <strong>{{ object.nome }}</strong>
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">
+            Confirmar Exclusão
+        </button>
+        <a href="{% url 'merendaEscolar:receita_lista' %}" class="btn btn-secondary">
+            Cancelar
+        </a>
+    </form>
+
+</div>
+{% endblock %}

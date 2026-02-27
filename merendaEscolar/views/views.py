@@ -13,16 +13,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
 from core.permissions import GroupRequiredMixin
+from core.groups.nutricionista import NUTRICIONISTA_GROUPS
 from django.core.exceptions import PermissionDenied
-
-
-
-
-MERENDA_GROUPS = [
-    "Nutricionista",
-    "Merendeira",
-    "Admin",
-]
 
 
 
@@ -48,14 +40,15 @@ class ErrorMessageMixin:
 class UnidadeMedidaListView(
     LoginRequiredMixin,
     GroupRequiredMixin,
+    PermissionRequiredMixin,
     ListView
 ):
     model = UnidadeMedida
     template_name = "merendaEscolar/unidade_medida/list.html"
     context_object_name = "unidades"
     paginate_by = 10
-
-    group_required = MERENDA_GROUPS
+    group_required = NUTRICIONISTA_GROUPS
+    permission_required = "merendaEscolar.view_estoquecentral"
 
 
 
@@ -74,7 +67,7 @@ class UnidadeMedidaCreateView(
     template_name = "merendaEscolar/unidade_medida/form.html"
     success_url = reverse_lazy("merendaEscolar:unidade_medida_list")
     permission_required = "estoque.add_unidademedida"
-    group_required = MERENDA_GROUPS
+    group_required = NUTRICIONISTA_GROUPS
     success_message = "Unidade de medida cadastrada com sucesso."
     error_message = "Erro ao cadastrar a unidade de medida."
 
@@ -92,7 +85,7 @@ class UnidadeMedidaUpdateView(
     template_name = "merendaEscolar/unidade_medida/form.html"
     success_url = reverse_lazy("merendaEscolar:unidade_medida_list")
     permission_required = "estoque.change_unidademedida"
-    group_required = MERENDA_GROUPS
+    group_required = NUTRICIONISTA_GROUPS
     success_message = "Unidade de medida atualizada com sucesso."
     error_message = "Erro ao atualizar a unidade de medida."
 
@@ -102,6 +95,7 @@ class UnidadeMedidaUpdateView(
 class CategoriaProdutoListView(
     LoginRequiredMixin,
     GroupRequiredMixin,
+    PermissionRequiredMixin,
     ListView
 ):
     model = CategoriaProduto
@@ -109,7 +103,8 @@ class CategoriaProdutoListView(
     context_object_name = "categorias"
     paginate_by = 10
 
-    group_required = MERENDA_GROUPS
+    group_required = NUTRICIONISTA_GROUPS
+    permission_required = "merendaEscolar.view_estoquecentral"
 
 
 
@@ -126,7 +121,7 @@ class CategoriaProdutoCreateView(
     template_name = "merendaEscolar/categoria_produto/form.html"
     success_url = reverse_lazy("merendaEscolar:categoria_produto_list")
     permission_required = "estoque.add_categoriaproduto"
-    group_required = MERENDA_GROUPS    
+    group_required = NUTRICIONISTA_GROUPS  
     success_message = "Categoria cadastrada com sucesso."
     error_message = "Erro ao cadastrar a categoria."
 
@@ -144,7 +139,7 @@ class CategoriaProdutoUpdateView(
     template_name = "merendaEscolar/categoria_produto/form.html"
     success_url = reverse_lazy("merendaEscolar:categoria_produto_list")
     permission_required = "estoque.change_categoriaproduto"
-    group_required = MERENDA_GROUPS
+    group_required = NUTRICIONISTA_GROUPS
     success_message = "Categoria atualizada com sucesso."
     error_message = "Erro ao atualizar a categoria."
 
@@ -161,7 +156,8 @@ class ProdutoListView(
     context_object_name = "produtos"
     paginate_by = 10
 
-    group_required = MERENDA_GROUPS
+    group_required = NUTRICIONISTA_GROUPS
+    permission_required = "merendaEscolar.view_estoquecentral"
 
 
     def get_queryset(self):
@@ -214,7 +210,7 @@ class ProdutoCreateView(
     template_name = "produto/form.html"
     success_url = reverse_lazy("merendaEscolar:produto_list")
     permission_required = "estoque.add_produto"
-    group_required = MERENDA_GROUPS
+    group_required = NUTRICIONISTA_GROUPS
     success_message = "Produto cadastrado com sucesso."
     error_message = "Erro ao cadastrar o produto."
 
@@ -243,7 +239,7 @@ class ProdutoUpdateView(
     template_name = "produto/form.html"
     success_url = reverse_lazy("merendaEscolar:produto_list")
     permission_required = "estoque.change_produto"
-    group_required = MERENDA_GROUPS
+    group_required = NUTRICIONISTA_GROUPS
     success_message = "Produto atualizado com sucesso."
     error_message = "Erro ao atualizar o produto."
 
@@ -256,7 +252,7 @@ class ProdutoUpdateView(
 @login_required
 def inicio_merenda(request):
 
-    if not request.user.is_superuser and not request.user.groups.filter(name__in=MERENDA_GROUPS).exists():
+    if not request.user.is_superuser and not request.user.groups.filter(name__in=NUTRICIONISTA_GROUPS).exists():
         raise PermissionDenied("Acesso restrito ao módulo Merenda Escolar.")
 
     hoje = timezone.now().date()

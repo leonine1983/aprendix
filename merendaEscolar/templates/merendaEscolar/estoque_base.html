@@ -7,6 +7,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
 :root{
@@ -666,139 +667,147 @@ body{
 <aside class="sidebar" id="sidebar">
     <h2>Merenda Escolar</h2>
 
+    
     <nav class="menu">
-<nav class="menu">
 
-    <a href="{% url 'merendaEscolar:estoque-central' %}">
-        <i class="fas fa-warehouse"></i>
-        Todos os Itens no Estoque (Cantina)
-    </a>
-
-    <a href="{% url 'merendaEscolar:transferencia-list' %}">
-        <i class="fas fa-truck"></i>
-        Transferências
-    </a>
-
-    
-
-<div class="submenu-wrapper">
-    <a href="#" class="submenu-toggle">
-        <i class="fas fa-school"></i>
-        Escolas
-        <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
-    </a>
-
-    <div class="submenu">
-
-        <!-- Fluxo operacional -->
-        <a href="{% url 'merendaEscolar:lista_escolas' %}">
-            <i class="fas fa-clipboard-check"></i>
-            Confirma Transferência
+        <a href="{% url 'merendaEscolar:estoque-central' %}">
+            <i class="fas fa-warehouse"></i>
+            Todos os Itens no Estoque (Cantina)
         </a>
 
-        <!-- Fluxo analítico -->
-        <a href="{% url 'merendaEscolar:lista_escolas_dashboard' %}">
-            <i class="fas fa-chart-line"></i>
-            Dashboards de Estoque
+        <a href="{% url 'merendaEscolar:transferencia-list' %}">
+            <i class="fas fa-truck"></i>
+            Transferências
         </a>
 
-    </div>
-</div>
-
-
-    <a><i class="fas fa-bell"></i> Alertas</a>
-    <a><i class="fas fa-file-alt"></i> Relatórios</a>
-    
-    <div class="submenu-wrapper">
-        <a href="#" class="submenu-toggle">
-            <i class="fas fa-cog"></i>
-            Configuração
-            <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
+        <a href="{% url 'merendaEscolar:receita_lista' %}">
+            <i class="fas fa-utensils"></i>
+            Receitas Institucionais
         </a>
-        <div class="submenu">
-            <a href="{% url 'merendaEscolar:unidade_medida_list' %}">
-                <i class="fas fa-balance-scale"></i>
-                Unidades de Medida
+
+        <div class="submenu-wrapper">
+            <a href="#" class="submenu-toggle">
+                <i class="fas fa-school"></i>
+                Escolas
+                <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
             </a>
-            <a href="{% url 'merendaEscolar:categoria_produto_list' %}">
-                <i class="fas fa-tags"></i>
-                Categorias de Produtos
-            </a>
-            <a href="{% url 'merendaEscolar:produto_list' %}">
-                <i class="fas fa-box"></i>
-                Produtos
-            </a>
+
+            <div class="submenu">
+
+                <!-- Fluxo operacional -->
+                <a href="{% url 'merendaEscolar:lista_escolas' %}">
+                    <i class="fas fa-clipboard-check"></i>
+                    Confirma Transferência
+                </a>
+
+                <!-- Fluxo analítico -->
+                <a href="{% url 'merendaEscolar:lista_escolas_dashboard' %}">
+                    <i class="fas fa-chart-line"></i>
+                    Dashboards de Estoque
+                </a>
+
+                <!-- PREVISÃO DE IMPLEMENTAÇÃO -->
+                <a href="#"
+                class="disabled"
+                aria-disabled="true"
+                title="Funcionalidade prevista para futura implementação">
+                    <i class="fas fa-comments"></i>
+                    Feedback da Merenda
+                </a>
+
+            </div>
         </div>
-    </div>
-
-</nav>
+        <a><i class="fas fa-bell"></i> Alertas</a>
+        <a><i class="fas fa-file-alt"></i> Relatórios</a>
+        
+        <div class="submenu-wrapper">
+            <a href="#" class="submenu-toggle">
+                <i class="fas fa-cog"></i>
+                Configuração
+                <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
+            </a>
+            <div class="submenu">
+                <a href="{% url 'merendaEscolar:unidade_medida_list' %}">
+                    <i class="fas fa-balance-scale"></i>
+                    Unidades de Medida
+                </a>
+                <a href="{% url 'merendaEscolar:categoria_produto_list' %}">
+                    <i class="fas fa-tags"></i>
+                    Categorias de Produtos
+                </a>
+                <a href="{% url 'merendaEscolar:produto_list' %}">
+                    <i class="fas fa-box"></i>
+                    Produtos
+                </a>
+            </div>
+        </div>
+    </nav>
 </aside>
 
 <div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <i class="fas fa-bars menu-toggle" id="menuToggle"></i>
+            <h1>Controle de Estoque</h1>
+        </div>
 
-<header class="topbar">
-    <div class="topbar-left">
-        <i class="fas fa-bars menu-toggle" id="menuToggle"></i>
-        <h1>Controle de Estoque</h1>
+        <div class="topbar-icons">
+
+            <div class="icon-wrapper" id="notifToggle">
+                <i class="fas fa-bell"></i>
+                <span class="badge">3</span>
+                <div class="custom-dropdown">
+                    <h4>Notificações</h4>
+                    <ul>
+                        <li>Estoque baixo de Feijão</li>
+                        <li>Novo envio para Escola João XXIII</li>
+                        <li>Produto próximo da validade</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="icon-wrapper" id="msgToggle">
+                <i class="fas fa-envelope"></i>
+                <span class="badge">2</span>
+                <div class="custom-dropdown">
+                    <h4>Mensagens</h4>
+                    <ul>
+                        <li>Coordenação solicitou relatório</li>
+                        <li>Confirmação de entrega</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="icon-wrapper" id="userToggle">
+                <i class="fas fa-user-circle"></i>
+                <div class="custom-dropdown">
+                    <h4>Minha Conta</h4>
+                    <ul>
+                        <li>Meu Perfil</li>
+                        <li>Alterar Senha</li>
+                        <li>Configurações</li>
+                        <li style="color:#dc2626;font-weight:600;">Sair</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message|safe }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
     </div>
-
-    <div class="topbar-icons">
-
-        <div class="icon-wrapper" id="notifToggle">
-            <i class="fas fa-bell"></i>
-            <span class="badge">3</span>
-            <div class="custom-dropdown">
-                <h4>Notificações</h4>
-                <ul>
-                    <li>Estoque baixo de Feijão</li>
-                    <li>Novo envio para Escola João XXIII</li>
-                    <li>Produto próximo da validade</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="icon-wrapper" id="msgToggle">
-            <i class="fas fa-envelope"></i>
-            <span class="badge">2</span>
-            <div class="custom-dropdown">
-                <h4>Mensagens</h4>
-                <ul>
-                    <li>Coordenação solicitou relatório</li>
-                    <li>Confirmação de entrega</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="icon-wrapper" id="userToggle">
-            <i class="fas fa-user-circle"></i>
-            <div class="custom-dropdown">
-                <h4>Minha Conta</h4>
-                <ul>
-                    <li>Meu Perfil</li>
-                    <li>Alterar Senha</li>
-                    <li>Configurações</li>
-                    <li style="color:#dc2626;font-weight:600;">Sair</li>
-                </ul>
-            </div>
-        </div>
-
-    </div>
-</header>
-
-{% if messages %}
-<div class="container mt-3">
-    {% for message in messages %}
-        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message|safe }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    {% endfor %}
-</div>
-{% endif %}
-<section class="content">
-    {% block content %}
-    {% endblock content %}
-</section>
+    {% endif %}
+    <section class="content">
+        {% block content %}
+        {% endblock content %}
+    </section>
 
 </div>
 

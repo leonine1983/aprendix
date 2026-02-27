@@ -90,9 +90,12 @@ urlpatterns = [
     path('escolas/dashboard', ListaEscolasView.as_view(), name='lista_escolas_dashboard'),
     path('escola/<int:escola_id>/estoque/', EstoqueEscolaDashboardView.as_view(), name='estoque_escola_dashboard'),
 
-
-
-    
-        
+    # RECEITA  
+    path("receita/", ReceitaListView.as_view(), name="receita_lista"),
+    path("nova/", ReceitaCreateView.as_view(), name="receita_criar"),
+    path("<int:pk>/", ReceitaDetailView.as_view(), name="receita_detalhe"),
+    path("<int:pk>/editar/", ReceitaUpdateView.as_view(), name="receita_editar"),
+    path("<int:pk>/excluir/", ReceitaDeleteView.as_view(), name="receita_excluir"),
+     
     
 ]

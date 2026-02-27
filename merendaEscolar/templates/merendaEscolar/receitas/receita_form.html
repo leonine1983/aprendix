@@ -1,0 +1,172 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+{% block title %}Cadastro de Receita{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+
+                    <!-- CABEÇALHO INSTITUCIONAL -->
+                    <div class="mb-4 pb-3 border-bottom">
+                        <div class="d-flex align-items-center gap-3">
+
+                            <div class="bg-primary bg-opacity-10 text-primary 
+                                        rounded-3 d-flex align-items-center 
+                                        justify-content-center"
+                                style="width:40px; height:40px;">
+                                <i class="bi bi-journal-text fs-5"></i>
+                            </div>
+
+                            <div>
+                                <h1 class="h5 fw-semibold mb-1">
+                                    {% if object %}
+                                        Editar Receita Institucional
+                                    {% else %}
+                                        Nova Receita Institucional
+                                    {% endif %}
+                                </h1>
+
+                                <section class="text-muted small mb-0" style="max-width:600px;">
+                                    Documento técnico utilizado para padronização alimentar nas unidades escolares.
+                                </section>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {{ form.media }}
+
+                        <!-- BLOCO 1 – IDENTIFICAÇÃO -->
+                        <fieldset class="mb-4">
+                            <legend class="h6 text-uppercase text-muted mb-3 fw-semibold">
+                                Identificação
+                            </legend>
+
+                            <div class="mb-3">
+                                <label for="{{ form.nome.id_for_label }}" 
+                                       class="form-label fw-semibold">
+                                    Nome da Receita
+                                </label>
+
+                                {{ form.nome }}
+
+                                <div class="form-text">
+                                    Utilize nome padronizado e objetivo.
+                                    Exemplo: <strong>Arroz Integral com Legumes</strong>.
+                                    Esse nome será exibido nos relatórios e planejamentos.
+                                </div>
+
+                                {% if form.nome.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.nome.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </fieldset>
+
+                        <!-- BLOCO 2 – CONTEÚDO TÉCNICO -->
+                        <fieldset class="mb-4">
+                            <legend class="h6 text-uppercase text-muted mb-3 fw-semibold">
+                                Conteúdo Técnico
+                            </legend>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">
+                                    Descrição Técnica
+                                </label>
+
+                                <div class="border rounded p-2 bg-light">
+                                    {{ form.descricao }}
+                                </div>
+
+                                <div class="form-text">
+                                    Descreva objetivo nutricional, público-alvo e características relevantes.
+                                    Exemplo: fonte de fibras, preparo com baixo teor de sódio,
+                                    adequado para ensino fundamental.
+                                </div>
+
+                                {% if form.descricao.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.descricao.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    Modo de Preparo
+                                </label>
+
+                                <div class="border rounded p-2 bg-light">
+                                    {{ form.modo_preparo }}
+                                </div>
+
+                                <div class="form-text">
+                                    Liste as etapas de execução operacional em ordem lógica.
+                                    Inclua tempo médio, técnicas aplicadas e observações importantes.
+                                    Isso garante padronização entre unidades.
+                                </div>
+
+                                {% if form.modo_preparo.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.modo_preparo.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </fieldset>
+
+                        <!-- BLOCO 3 – STATUS -->
+                        <fieldset class="mb-4">
+                            <legend class="h6 text-uppercase text-muted mb-3 fw-semibold">
+                                Status Institucional
+                            </legend>
+
+                            <div class="form-check form-switch">
+                                {{ form.ativa }}
+                                <label class="form-check-label fw-semibold"
+                                       for="{{ form.ativa.id_for_label }}">
+                                    Receita ativa para planejamento alimentar
+                                </label>
+                            </div>
+
+                            <div class="form-text mt-1">
+                                Receitas ativas podem ser utilizadas no planejamento semanal.
+                                Desative apenas quando a receita não estiver mais em vigência.
+                            </div>
+                        </fieldset>
+
+                        <!-- AÇÕES -->
+                        <div class="d-flex justify-content-between align-items-center 
+                                    mt-4 pt-3 border-top">
+
+                            <a href="{% url 'merendaEscolar:receita_lista' %}" 
+                               class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+
+                            <button type="submit" class="btn btn-primary px-4">
+                                {% if object %}
+                                    Atualizar Receita
+                                {% else %}
+                                    Salvar Receita
+                                {% endif %}
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
