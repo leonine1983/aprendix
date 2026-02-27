@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -64,6 +65,33 @@ body{
     margin-bottom:40px;
     letter-spacing:.5px;
     opacity:.9;
+}
+
+.sidebar-brand{
+    margin-bottom:35px;
+    padding-bottom:20px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.brand-title{
+    font-size:.65rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:#94a3b8;
+    margin-bottom:6px;
+}
+
+.brand-module{
+    font-size:1.05rem;
+    font-weight:600;
+    color:#ffffff;
+    margin-bottom:4px;
+}
+
+.brand-sector{
+    font-size:.75rem;
+    color:#cbd5e1;
+    opacity:.8;
 }
 
 .menu{
@@ -345,6 +373,24 @@ body{
     color:var(--text-muted);
 }
 
+.header-brasao{
+    height:38px;
+    width:auto;
+    margin-right:14px;
+}
+
+.header-title-group{
+    display:flex;
+    flex-direction:column;
+    line-height:1.1;
+}
+
+.header-subtitle{
+    font-size:.7rem;
+    color:var(--text-muted);
+    letter-spacing:.05em;
+    text-transform:uppercase;
+}
 
 
 
@@ -657,6 +703,26 @@ body{
         gap:18px;
     }
 }
+
+/* RODAPÉ INSTITUCIONAL SIDEBAR */
+.sidebar-footer{
+    margin-top:auto;
+    padding-top:30px;
+    text-align:center;
+    opacity:.75;
+}
+
+.brasao-prefeitura{
+    max-width:120px;
+    width:100%;
+    height:auto;
+    transition:.3s ease;
+}
+
+.brasao-prefeitura:hover{
+    opacity:1;
+    transform:scale(1.03);
+}
 </style>
 </head>
 
@@ -665,7 +731,11 @@ body{
 <div class="overlay" id="overlay"></div>
 
 <aside class="sidebar" id="sidebar">
-    <h2>Merenda Escolar</h2>
+    <div class="sidebar-brand">
+        <div class="brand-title">Prefeitura Municipal de Vera Cruz</div>
+        <div class="brand-module">Sistema de Merenda Escolar</div>
+        <div class="brand-sector">Gestão de Estoque</div>
+    </div>
 
     
     <nav class="menu">
@@ -740,15 +810,28 @@ body{
                     Produtos
                 </a>
             </div>
-        </div>
+        </div> 
     </nav>
+    <div class="sidebar-footer">
+        <img src="{% static 'prefeitura.png' %}" 
+            alt="Brasão da Prefeitura"
+            class="brasao-prefeitura">
+    </div>
 </aside>
 
 <div class="main">
     <header class="topbar">
         <div class="topbar-left">
             <i class="fas fa-bars menu-toggle" id="menuToggle"></i>
-            <h1>Controle de Estoque</h1>
+
+            <img src="{% static 'prefeitura.png' %}" 
+                alt="Brasão da Prefeitura"
+                class="header-brasao">
+
+            <div class="header-title-group">
+                <h1>Controle de Estoque</h1>
+                <small class="header-subtitle">Merenda Escolar</small>
+            </div>
         </div>
 
         <div class="topbar-icons">
