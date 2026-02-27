@@ -10,7 +10,7 @@
 
     <div class="card">
         <h3>Itens em Estoque</h3>
-        <p>{{ total_itens_estoque }}</p>
+        <p>{{ total_itens_estoque }} ítens</p>
         <i class="fas fa-box"></i>
     </div>
 
@@ -107,7 +107,7 @@
         <a href="{% url 'merendaEscolar:estoque-central' %}"
         class="kpi-card text-decoration-none">
             <div class="kpi-label">Total de Produtos</div>
-            <div class="kpi-value">{{ produtos|length }}</div>
+            <div class="kpi-value">{{ produtos|length }} </div>
         </a>
 
         <!-- VENCIDOS -->
