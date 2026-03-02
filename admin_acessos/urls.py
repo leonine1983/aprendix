@@ -6,13 +6,14 @@ from .views import (
     PaletaCoresCreateView,
     PaletaCoresUpdateView,
     PaletaCoresDeleteView,
-    CreateUsers, marcar_notificacao_como_lida, EnviarNotificacaoView, startSme
+    CreateUsers, marcar_notificacao_como_lida, EnviarNotificacaoView, startSme, loginMerendaEscolar
 )
 
 app_name = 'admin_acessos'
 
 urlpatterns = [
     path('', startSme, name='starsme' ),
+    path('merendaEscolar', loginMerendaEscolar, name='loginMerendaEscolar' ),
 
     path('logout', LogoutView_logout.as_view(), name='logout' ),
     path('loginAprendix', CreateLoginView.as_view(), name='login_create' ),

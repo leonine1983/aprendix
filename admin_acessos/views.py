@@ -18,19 +18,92 @@ import random
 def startSme(request):
     return render(request, 'Admin_Acessos/starSme.html')
 
+
+# Login da merenda escolar
+def loginMerendaEscolar(request):
+    return render(request, 'Admin_Acessos/index_merendaEscolar.html')
+
+
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
+from django.urls import reverse_lazy
+from django.contrib import messages
+import random
+from core.groups.merenda import MERENDEIRA_GROUPS
+from core.groups.nutricionista import NUTRICIONISTA_GROUPS
+
 class CreateLoginView(LoginView):
     template_name = 'Admin_Acessos/index.html'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context ['prefeitura'] = Prefeitura.objects.all().first()
+        context['prefeitura'] = Prefeitura.objects.all().first()
         return context
 
     def form_invalid(self, form):
-        messages.error(self.request, 'Credenciais inválidas. Por favor, tente novamente.')
+        messages.error(
+            self.request,
+            'Credenciais inválidas. Por favor, tente novamente.'
+        )
         return super().form_invalid(form)
 
+    def form_valid(self, form):
+        """
+        Validação institucional do perfil selecionado.
+        Só prossegue se o usuário realmente pertencer ao grupo escolhido.
+        """
+        response = super().form_valid(form)
+        user = self.request.user
+        perfil = self.request.POST.get("perfil")
+
+        # Superusuário ignora validação de perfil
+        if user.is_superuser:
+            return response
+
+        # MERENDEIRA
+        if perfil == "merendeira":
+            if not user.groups.filter(name__in=MERENDEIRA_GROUPS).exists():
+                messages.error(
+                    self.request,
+                    "Seu usuário não possui permissão institucional como Merendeira."
+                )
+                self.request.session.flush()
+                raise PermissionDenied()
+
+        # NUTRICIONISTA
+        elif perfil == "nutricionista":
+            if not user.groups.filter(name__in=NUTRICIONISTA_GROUPS).exists():
+                messages.error(
+                    self.request,
+                    "Seu usuário não possui permissão institucional como Nutricionista."
+                )
+                self.request.session.flush()
+                raise PermissionDenied()
+
+        else:
+            messages.error(
+                self.request,
+                "Perfil institucional inválido."
+            )
+            self.request.session.flush()
+            raise PermissionDenied()
+
+        return response
+
     def get_success_url(self):
-        name = f'{self.request.user.first_name.capitalize()} {self.request.user.last_name.capitalize()}'
+        """
+        Mantém a mensagem motivacional
+        e direciona conforme perfil selecionado.
+        """
+
+        user = self.request.user
+        perfil = self.request.POST.get("perfil")
+
+        # Construção segura do nome
+        first = user.first_name.capitalize() if user.first_name else ""
+        last = user.last_name.capitalize() if user.last_name else ""
+        name = f"{first} {last}".strip() or user.username
+
         mensagens_boas_vindas = [
             f'Sabe {name}, \'A educação é a arma mais poderosa que você pode usar para mudar o mundo.\' - Nelson Mandela',
             f'{name}, \'O sucesso é ir de fracasso em fracasso sem perder o entusiasmo.\' - Winston Churchill',
@@ -81,19 +154,35 @@ class CreateLoginView(LoginView):
             f'{name}, \'Quando você quer alguma coisa, todo o universo conspira para que você realize seu desejo.\' - Paulo Coelho',
             f'{name}, \'O futuro pertence àqueles que acreditam na beleza de seus sonhos.\' - Eleanor Roosevelt',
             f'{name}, \'A felicidade é a única coisa que se multiplica quando é dividida.\' - Albert Schweitzer'
-        ]        
-        mensagem = random.choice(mensagens_boas_vindas)
-        mensagem = mensagem.format(self.request.user.first_name)
-        messages.info(self.request, f'<i class="fa-duotone fa-solid fa-hand-wave fa-shake fs-1"></i> {mensagem}')
+        ]  
 
-        """
-        if self.request.user.groups.filter(name='Aluno').exists():
-            return reverse_lazy('modulo_aluno:homeAluno')        
-        elif self.request.user.groups.filter(name='Professor').exists():
-            return reverse_lazy('modulo_professor:homeProfessor')                
-        else:
-            return reverse_lazy('Gestao_Escolar:GE_inicio')
-        """
+        mensagens_boas_vindas = [
+            f'{name}, "A educação é a arma mais poderosa que você pode usar para mudar o mundo." - Nelson Mandela',
+            f'{name}, "O sucesso é ir de fracasso em fracasso sem perder o entusiasmo." - Winston Churchill',
+            f'{name}, "Aprender é a única coisa de que a mente nunca se cansa." - Leonardo da Vinci',
+            f'{name}, "A educação não transforma o mundo. Educação muda pessoas." - Paulo Freire',
+            f'{name}, "A disciplina é a mãe do sucesso." - Ésquilo',
+            f'{name}, "A ação é a chave fundamental para todo sucesso." - Pablo Picasso',
+            f'{name}, "A jornada de mil milhas começa com um único passo." - Lao Tsé',
+        ]
+
+        mensagem = random.choice(mensagens_boas_vindas)
+
+        messages.info(
+            self.request,
+            f'<i class="fa-duotone fa-solid fa-hand-wave fa-shake fs-1"></i> {mensagem}'
+        )
+
+        # 🔀 ROTEAMENTO ESTRATÉGICO
+        if user.is_superuser:
+            return reverse_lazy('admin_acessos:starsme')
+
+        if perfil == "merendeira":
+            return reverse_lazy('controle_estoque:dashboard_merendeira')
+
+        if perfil == "nutricionista":
+            return reverse_lazy('merendaEscolar:merenda_inicio')
+
         return reverse_lazy('admin_acessos:starsme')
 
 

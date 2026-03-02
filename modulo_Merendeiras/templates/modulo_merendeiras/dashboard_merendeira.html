@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>📊 Painel da Merendeira</h1>
+
+<div class="grid">
+    <div class="card">
+        <h3>Total em Estoque</h3>
+        <p>{{ total_itens }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Receitas Ativas</h3>
+        <p>{{ receitas_ativas }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Execuções Registradas</h3>
+        <p>{{ execucoes_hoje }}</p>
+    </div>
+</div>
+
+<a href="{% url 'modulo_merendeiras:estoque_lista' %}">Ver Estoque</a>
+<a href="{% url 'modulo_merendeiras:receita_lista' %}">Gerenciar Receitas</a>
+{% endblock %}

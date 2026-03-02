@@ -12,8 +12,9 @@
 
 <style>
 :root {
-    --primary: #2f6fed;
-    --primary-dark: #1e4fcc;
+    --primary: #ea580c;           /* Laranja institucional */
+    --primary-dark: #c2410c;
+    --primary-soft: #fff7ed;
     --bg: #f4f6f9;
     --card: #ffffff;
     --text: #1f2937;
@@ -58,7 +59,8 @@ body {
     max-width: 420px;
     padding: 40px 32px;
     border-radius: var(--radius);
-    box-shadow: 0 20px 45px rgba(0,0,0,0.08);
+    box-shadow: 0 20px 45px rgba(234,88,12,0.15);
+    border-top: 5px solid var(--primary);
 }
 
 .logo {
@@ -108,7 +110,7 @@ input[type="password"] {
 input:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(47,111,237,0.15);
+    box-shadow: 0 0 0 3px rgba(234,88,12,0.15);
 }
 
 .password-wrapper {
@@ -149,13 +151,13 @@ button[type="submit"] {
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 button[type="submit"]:hover {
     background: var(--primary-dark);
+    transform: translateY(-1px);
 }
-
 .footer-text {
     margin-top: 24px;
     font-size: 0.75rem;
@@ -168,6 +170,19 @@ button[type="submit"]:hover {
     .login-container {
         padding: 32px 24px;
     }
+}
+
+.merenda-badge {
+    background: var(--primary-soft);
+    color: var(--primary-dark);
+    border: 1px solid #fed7aa;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
 }
 </style>
 </head>
@@ -266,12 +281,16 @@ button[type="submit"]:hover {
     <div class="logo">
         <img src="{% static 'prefeitura.png' %}" alt="Logo Prefeitura de Vera Cruz">
     </div>
+    <div class="merenda-badge">
+        🍽️ Espaço Oficial da Merenda Escolar
+    </div>
 
     <h1>Secretaria Municipal da Educação</h1>
-<p class="subtitle">Acesso à Plataforma Institucional da Rede Municipal de Ensino</p>
+    <p class="subtitle">
+    Sistema de Gestão da Alimentação Escolar – Rede Municipal de Ensino
+    </p>
 
-
-    <form method="POST"  aria-describedby="form-instructions">
+    <form method="POST"  aria-describedby="form-instructions" action="{% url 'admin_acessos:login_create' %}">
         {% csrf_token %}
 
         <div class="form-group">

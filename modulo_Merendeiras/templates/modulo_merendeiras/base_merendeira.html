@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIGAME | Controle de Merenda Escolar - Vera Cruz/BA</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --primary-900:#0f172a;
+    --primary-700:#1e3a8a;
+    --primary-600:#2563eb;
+    --success-600:#059669;
+    --warning-600:#d97706;
+    --danger-600:#dc2626;
+    --bg-body:#f8fafc;
+    --bg-card:#ffffff;
+    --border:#e2e8f0;
+    --text-main:#1e293b;
+    --text-muted:#64748b;
+    --radius:14px;
+    --shadow:0 4px 12px rgba(0,0,0,0.05);
+    --sidebar-width:280px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+    font-family:'Inter',sans-serif;
+    background:var(--bg-body);
+    color:var(--text-main);
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+
+aside{
+    width:var(--sidebar-width);
+    background:var(--bg-card);
+    border-right:1px solid var(--border);
+    padding:2rem 1.5rem;
+    position:fixed;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+.logo-area{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:2.5rem;
+}
+
+.logo-icon{
+    width:46px;
+    height:46px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:2px solid var(--primary-600);
+}
+
+.logo-icon svg{
+    width:28px;
+    height:28px;
+    stroke:var(--primary-600);
+}
+
+.logo-text{
+    font-weight:700;
+    font-size:1.2rem;
+    color:var(--primary-900);
+}
+
+nav ul{
+    list-style:none;
+    flex:1;
+}
+
+.nav-link{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:1rem;
+    text-decoration:none;
+    color:var(--text-muted);
+    border-radius:10px;
+    font-weight:500;
+    transition:.2s;
+}
+
+.nav-link svg{
+    width:26px;
+    height:26px;
+    min-width:26px;
+    stroke-width:1.8;
+}
+
+.nav-link:hover,
+.nav-link:focus-visible{
+    background:#eff6ff;
+    color:var(--primary-600);
+    outline:none;
+}
+
+.nav-link.active{
+    background:#e0ecff;
+    color:var(--primary-600);
+}
+
+/* MAIN */
+
+.main{
+    margin-left:var(--sidebar-width);
+    flex:1;
+    display:flex;
+    flex-direction:column;
+}
+
+header{
+    height:80px;
+    background:var(--bg-card);
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 2.5rem;
+}
+
+header small{
+    color:var(--text-muted);
+}
+
+.content{
+    padding:2.5rem;
+}
+
+/* ALERT */
+
+.alert{
+    background:#eff6ff;
+    border-left:4px solid var(--primary-600);
+    padding:1rem 1.5rem;
+    border-radius:var(--radius);
+    margin-bottom:2rem;
+    font-size:0.9rem;
+}
+
+/* STATS */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:1.5rem;
+    margin-bottom:2rem;
+}
+
+.stat-card{
+    background:var(--bg-card);
+    padding:1.5rem;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    border:1px solid var(--border);
+}
+
+.stat-card h3{
+    font-size:0.85rem;
+    color:var(--text-muted);
+    margin-bottom:0.5rem;
+}
+
+.stat-card p{
+    font-size:1.6rem;
+    font-weight:700;
+}
+
+/* TABLE */
+
+.table-container{
+    background:var(--bg-card);
+    border-radius:var(--radius);
+    border:1px solid var(--border);
+    overflow:hidden;
+}
+
+.table-header{
+    padding:1.5rem;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.search-box{
+    padding:0.7rem 1rem;
+    border-radius:8px;
+    border:1px solid var(--border);
+    width:280px;
+}
+
+.search-box:focus{
+    outline:2px solid var(--primary-600);
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#f9fafb;
+    text-align:left;
+    padding:1rem;
+    font-size:0.75rem;
+    text-transform:uppercase;
+    color:var(--text-muted);
+}
+
+td{
+    padding:1rem;
+    border-top:1px solid var(--border);
+}
+
+.badge{
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:0.75rem;
+    font-weight:600;
+}
+
+.success{background:#ecfdf5;color:var(--success-600);}
+.warning{background:#fffbeb;color:var(--warning-600);}
+.danger{background:#fef2f2;color:var(--danger-600);}
+
+.btn{
+    padding:8px 14px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#fff;
+    cursor:pointer;
+    font-weight:500;
+    transition:.2s;
+}
+
+.btn:hover,
+.btn:focus-visible{
+    background:var(--primary-600);
+    color:#fff;
+    outline:none;
+}
+</style>
+</head>
+
+<body>
+
+<aside>
+    <div class="logo-area">
+        <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 7l9-4 9 4-9 4-9-4z"/>
+                <path d="M3 17l9 4 9-4"/>
+                <path d="M3 12l9 4 9-4"/>
+            </svg>
+        </div>
+        <div class="logo-text">SIGAME</div>
+    </div>
+
+    <nav aria-label="Menu principal">
+        <ul>
+            <li>
+                <a href="#" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    Painel Geral
+                </a>
+            </li>
+
+            <li>
+                <a href="#" class="nav-link active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 7l9-4 9 4-9 4-9-4z"/>
+                        <path d="M3 17l9 4 9-4"/>
+                        <path d="M3 12l9 4 9-4"/>
+                    </svg>
+                    Estoque Escolar
+                </a>
+            </li>
+
+            <li>
+                <a href="#" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 3v7a4 4 0 0 0 8 0V3"/>
+                        <line x1="8" y1="3" x2="8" y2="21"/>
+                        <path d="M16 3h4v11a4 4 0 0 1-4 4"/>
+                    </svg>
+                    Cozinha
+                </a>
+            </li>
+
+            <li>
+                <a href="#" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                    </svg>
+                    Relatórios
+                </a>
+            </li>
+        </ul>
+    </nav>
+</aside>
+
+<div class="main">
+
+<header>
+    <div>
+        <strong>Controle de Estoque</strong><br>
+        <small>Escola Municipal São João • Vera Cruz/BA</small>
+    </div>
+    <div>
+        <strong>Dona Maria</strong>
+    </div>
+</header>
+
+<main class="content">
+
+<div class="alert" role="alert">
+3 produtos estão com estoque crítico. Avalie solicitação de reposição.
+</div>
+
+<section class="stats">
+    <div class="stat-card">
+        <h3>Total em Estoque</h3>
+        <p>124 kg</p>
+    </div>
+    <div class="stat-card">
+        <h3>Itens a Vencer (30 dias)</h3>
+        <p>08</p>
+    </div>
+    <div class="stat-card">
+        <h3>Última Movimentação</h3>
+        <p>Ontem, 14:20</p>
+    </div>
+</section>
+
+<section class="table-container">
+    <div class="table-header">
+        <h2>Lista de Produtos</h2>
+        <input class="search-box" type="search" placeholder="Buscar alimento..." aria-label="Buscar produto">
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Categoria</th>
+                <th>Quantidade</th>
+                <th>Status</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Arroz Tipo 1 (5kg)</td>
+                <td>Grãos</td>
+                <td><strong>25 un.</strong></td>
+                <td><span class="badge success">Estoque OK</span></td>
+                <td><button class="btn">Registrar Saída</button></td>
+            </tr>
+            <tr>
+                <td>Leite Integral (1L)</td>
+                <td>Laticínios</td>
+                <td><strong>03 un.</strong></td>
+                <td><span class="badge danger">Crítico</span></td>
+                <td><button class="btn">Registrar Saída</button></td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+</main>
+</div>
+
+</body>
+</html>

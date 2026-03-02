@@ -32,13 +32,50 @@ def iniciar_registros():
             )
             print("Nomeclatura criada com sucesso.")
 
-        group_names = ['Nutricionista', 'Merendeira', "Admin" 'Professor', 'Diretor', 'Aluno']
-        if not Group.objects.exists():
+        from django.contrib.auth.models import Group, Permission
+        from django.contrib.contenttypes.models import ContentType
+        from django.db import transaction
+
+
+        @transaction.atomic
+        def configurar_grupos_institucionais():
+            group_names = [
+                "Nutricionista",
+                "Merendeira",
+                "Admin",
+                "Professor",
+                "Diretor",
+                "Aluno",
+            ]
+
+            # ===============================
+            # Criação dos grupos
+            # ===============================
+            grupos = {}
             for group_name in group_names:
-                Group.objects.get_or_create(name=group_name)
-            print("Grupos criados com sucesso.")
-        print("")
-        print("")     
+                grupo, _ = Group.objects.get_or_create(name=group_name)
+                grupos[group_name] = grupo
+
+            # ===============================
+            # Permissões do app merendaEscolar
+            # ===============================
+            permissoes_merenda = Permission.objects.filter(
+                content_type__app_label="merendaEscolar"
+            )
+
+            # ===============================
+            # Admin → acesso total ao app
+            # ===============================
+            grupos["Admin"].permissions.add(*permissoes_merenda)
+
+            # ===============================
+            # Nutricionista → acesso total ao app
+            # ===============================
+            grupos["Nutricionista"].permissions.add(*permissoes_merenda)            
+
+            print("Grupos institucionais configurados com sucesso.")
+        configurar_grupos_institucionais()
+
         print("------ Inicializando os registros do Moldulo RH ------")
         if not Config_plataforma.objects.exists():
             Config_plataforma.objects.create(

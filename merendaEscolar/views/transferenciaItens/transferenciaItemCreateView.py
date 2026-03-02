@@ -4,8 +4,11 @@ from django.shortcuts import get_object_or_404
 from django import forms
 from django.db import transaction
 from django.core.exceptions import ValidationError
-
 from ...models import Transferencia, TransferenciaItem, EstoqueCentral
+from core.permissions import GroupRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from core.groups.nutricionista import NUTRICIONISTA_GROUPS
+from django.core.exceptions import PermissionDenied
 
 
 class TransferenciaItemForm(forms.ModelForm):
@@ -66,6 +69,12 @@ class TransferenciaItemCreateView(CreateView):
     model = TransferenciaItem
     form_class = TransferenciaItemForm
     template_name = "merendaEscolar/transferencia/transferencia_item_form.html"
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    PermissionRequiredMixin,
+
+    permission_required = "estoque.add_unidademedida"
+    group_required = NUTRICIONISTA_GROUPS
 
     def dispatch(self, request, *args, **kwargs):
         self.transferencia = get_object_or_404(

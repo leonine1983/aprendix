@@ -1,5 +1,4 @@
-NUTRICIONISTA_GROUPS = (
+MERENDEIRA_GROUPS = (
     "Merendeira",
-    "Nutricionista",
     "Admin",
 )

@@ -4,15 +4,22 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db.models import Q
+from core.permissions import GroupRequiredMixin
+from core.groups.nutricionista import NUTRICIONISTA_GROUPS
 
 from ...models import Transferencia
 
 
 class TransferenciaEnviarView(
     LoginRequiredMixin,
+    GroupRequiredMixin,
     PermissionRequiredMixin,
     View,
 ):
+    
     """
     Responsável por executar o envio formal da transferência.
 
@@ -20,7 +27,7 @@ class TransferenciaEnviarView(
     - Chama método institucional do model.
     - Garante integridade do fluxo.
     """
-
+    group_required = NUTRICIONISTA_GROUPS
     permission_required = "merendaEscolar.change_transferencia"
 
     def post(self, request, pk):

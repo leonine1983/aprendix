@@ -6,6 +6,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.urls import reverse
 from ...models import Transferencia
 
+from core.permissions import GroupRequiredMixin
+from core.groups.nutricionista import NUTRICIONISTA_GROUPS
+from django.core.exceptions import PermissionDenied
+
+
 class TransferenciaReceberView(
     LoginRequiredMixin,
     PermissionRequiredMixin,
@@ -18,7 +23,7 @@ class TransferenciaReceberView(
     - Gera movimentações.
     - Finaliza o ciclo logístico.
     """
-
+    group_required = NUTRICIONISTA_GROUPS
     permission_required = "merendaEscolar.change_transferencia"
 
     def post(self, request, pk):
