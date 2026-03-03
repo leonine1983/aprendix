@@ -184,6 +184,44 @@ button[type="submit"]:hover {
     margin-bottom: 18px;
     letter-spacing: 0.5px;
 }
+/* ===============================
+   Django Messages Institucionais
+================================= */
+
+
+.message {
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+    margin-bottom: 10px;
+}
+/* Compatibilidade com Django + Bootstrap style */
+
+.message.alert-success {
+    background: #ecfdf5;
+    color: var(--success);
+    border-color: #a7f3d0;
+}
+
+.message.alert-danger {
+    background: #fef2f2;
+    color: var(--error);
+    border-color: #fecaca;
+}
+
+.message.alert-warning {
+    background: #fffbeb;
+    color: #92400e;
+    border-color: #fde68a;
+}
+
+.message.alert-info {
+    background: #eff6ff;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
 </style>
 </head>
 
@@ -276,6 +314,15 @@ button[type="submit"]:hover {
   <rect width="100%" height="100%" fill="url(#eduTechOutline)" />
 </svg>
 
+{% if messages %}
+<div class="messages" aria-live="polite">
+    {% for message in messages %}
+        <div class="message {{ message.tags }}" role="alert">
+            {{ message|safe }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
 <main class="login-container" role="main">
     
     <div class="logo">
@@ -286,9 +333,12 @@ button[type="submit"]:hover {
     </div>
 
     <h1>Secretaria Municipal da Educação</h1>
-    <p class="subtitle">
-    Sistema de Gestão da Alimentação Escolar – Rede Municipal de Ensino
-    </p>
+<p class="subtitle">
+Sistema de Gestão da Alimentação Escolar – Rede Municipal de Ensino
+</p>
+
+
+<form method="POST" aria-describedby="form-instructions" action="{% url 'admin_acessos:login_create' %}">
 
     <form method="POST"  aria-describedby="form-instructions" action="{% url 'admin_acessos:login_create' %}">
         {% csrf_token %}
@@ -329,7 +379,7 @@ button[type="submit"]:hover {
             <div style="display:flex; gap:12px; margin-top:8px;">
                 <label style="display:flex; align-items:center; gap:6px;">
                     <input type="radio" name="perfil" value="merendeira" required>
-                    Merendeira tem mudança
+                    Merendeira
                 </label>
 
                 <label style="display:flex; align-items:center; gap:6px;">

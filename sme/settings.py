@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'merendaEscolar',
     'modulo_Merendeiras',
+    'modulo_coordenacao',
     'core',
     'widget_tweaks',
 

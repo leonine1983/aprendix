@@ -26,7 +26,8 @@ handler500 = error_500
 
 urlpatterns = [    
     path('', include('admin_acessos.urls')),
-    path('admin/', admin.site.urls),    
+    path('admin/', admin.site.urls),   
+    path('core/', include('core.urls')), 
     path('rh/', include('rh.urls')),
     path('aprendix/', include('gestao_escolar.urls')),
     #path('nutricao/', include('controle_estoque.urls')),

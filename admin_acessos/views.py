@@ -33,7 +33,7 @@ from core.groups.merenda import MERENDEIRA_GROUPS
 from core.groups.nutricionista import NUTRICIONISTA_GROUPS
 
 class CreateLoginView(LoginView):
-    template_name = 'Admin_Acessos/index.html'
+    template_name = 'Admin_Acessos/starSme.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -182,18 +182,31 @@ class CreateLoginView(LoginView):
 
         if perfil == "nutricionista":
             return reverse_lazy('merendaEscolar:merenda_inicio')
-
+        
+        messages.error(
+            self.request,
+            "Seu acesso não foi autorizado para o perfil selecionado. "
+            "Verifique se você está vinculado corretamente a um perfil do sistema. "
+            "Em caso de dúvida, entre em contato com o Administrador para regularização."
+        )
         return reverse_lazy('admin_acessos:logout')
 
 
 
 # Logout
 class LogoutView_logout(LogoutView):
-    next_page = reverse_lazy('admin_acessos:painel_acesso')    
-    success_url = reverse_lazy('admin_acessos:login_create')
+    """
+    View responsável por encerrar a sessão do usuário
+    e redirecionar para a tela de login com feedback institucional.
+    """
+
+    next_page = reverse_lazy('admin_acessos:login_create')
 
     def dispatch(self, request, *args, **kwargs):
-        logout(request)
+        messages.success(
+            request,
+            "Sessão encerrada com sucesso. Para acessar novamente, realize um novo login."
+        )
         return super().dispatch(request, *args, **kwargs)
     
 

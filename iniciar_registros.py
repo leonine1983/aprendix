@@ -32,13 +32,12 @@ def iniciar_registros():
             )
             print("Nomeclatura criada com sucesso.")
 
+
         from django.contrib.auth.models import Group, Permission
         from django.contrib.contenttypes.models import ContentType
         from django.db import transaction
+        from django.apps import apps
 
-
-        from django.contrib.auth.models import Group, Permission
-        from django.db import transaction
 
         @transaction.atomic
         def configurar_grupos_institucionais():
@@ -48,47 +47,94 @@ def iniciar_registros():
                 "Admin",
                 "Professor",
                 "Diretor",
+                "Secretario",
+                "Coordenador",
                 "Aluno",
             ]
 
             # ===============================
-            # Criação dos grupos
+            # Criação / Garantia dos grupos
             # ===============================
             grupos = {}
             for group_name in group_names:
-                grupo, _ = Group.objects.get_or_create(name=group_name)
+                grupo, created = Group.objects.get_or_create(name=group_name)
                 grupos[group_name] = grupo
+                if created:
+                    print(f"Grupo criado: {group_name}")
+                else:
+                    print(f"Grupo já existente: {group_name}")
 
-            # ===============================
-            # Permissões do app merendaEscolar 
-            # ===============================
-
-            # Permissões do app merendaEscolar
+            # ======================================================
+            # merendaEscolar → Admin e Nutricionista (mantém regra)
+            # ======================================================
             permissoes_merenda = Permission.objects.filter(
                 content_type__app_label="merendaEscolar"
             )
 
-            # Admin → acesso total ao app merendaEscolar
             grupos["Admin"].permissions.add(*permissoes_merenda)
+            print(f"Permissões atribuídas ao grupo Admin (merendaEscolar): {permissoes_merenda.count()}")
 
-            # Grupo Nutricionista → mantém permissões do merendaEscolar
             grupos["Nutricionista"].permissions.add(*permissoes_merenda)
+            print(f"Permissões atribuídas ao grupo Nutricionista (merendaEscolar): {permissoes_merenda.count()}")
 
-            # Grupo Merendeira → todas as permissões do app modulo_Merendeiras
-            from django.apps import apps
-
-            app_config = apps.get_app_config('modulo_Merendeiras')
+            # ======================================================
+            # modulo_Merendeiras → Merendeira
+            # ======================================================
+            app_config = apps.get_app_config("modulo_Merendeiras")
             permissoes_merendeira = []
+
             for model in app_config.get_models():
                 content_type = ContentType.objects.get_for_model(model)
-                permissoes_merendeira.extend(Permission.objects.filter(content_type=content_type))
+                permissoes_merendeira.extend(
+                    Permission.objects.filter(content_type=content_type)
+                )
 
             grupos["Merendeira"].permissions.add(*permissoes_merendeira)
-            print(f"Permissões atribuídas ao grupo Merendeira: {len(permissoes_merendeira)}")
-           
+            print(f"Permissões atribuídas ao grupo Merendeira (modulo_Merendeiras): {len(permissoes_merendeira)}")
 
+            # ======================================================
+            # modulo_professor → Professor
+            # ======================================================
+            permissoes_professor = Permission.objects.filter(
+                content_type__app_label="modulo_professor"
+            )
+            grupos["Professor"].permissions.add(*permissoes_professor)
+            print(f"Permissões atribuídas ao grupo Professor (modulo_professor): {permissoes_professor.count()}")
 
-            print("Grupos institucionais configurados com sucesso.")
+            # ======================================================
+            # modulo_aluno → Aluno
+            # ======================================================
+            permissoes_aluno = Permission.objects.filter(
+                content_type__app_label="modulo_aluno"
+            )
+            grupos["Aluno"].permissions.add(*permissoes_aluno)
+            print(f"Permissões atribuídas ao grupo Aluno (modulo_aluno): {permissoes_aluno.count()}")
+
+            # ======================================================
+            # gestao_escolar → Diretor e Secretário
+            # ======================================================
+            permissoes_gestao = Permission.objects.filter(
+                content_type__app_label="gestao_escolar"
+            )
+
+            grupos["Diretor"].permissions.add(*permissoes_gestao)
+            print(f"Permissões atribuídas ao grupo Diretor (gestao_escolar): {permissoes_gestao.count()}")
+
+            grupos["Secretario"].permissions.add(*permissoes_gestao)
+            print(f"Permissões atribuídas ao grupo Secretario (gestao_escolar): {permissoes_gestao.count()}")
+
+            # ======================================================
+            # modulo_coordenacao → Coordenador
+            # ======================================================
+            permissoes_coordenador = Permission.objects.filter(
+                content_type__app_label="modulo_coordenacao"
+            )
+
+            grupos["Coordenador"].permissions.add(*permissoes_coordenador)
+            print(f"Permissões atribuídas ao grupo Coordenador (modulo_coordenacao): {permissoes_coordenador.count()}")
+
+            print("Configuração institucional de grupos concluída com sucesso.")
+
 
         configurar_grupos_institucionais()
 

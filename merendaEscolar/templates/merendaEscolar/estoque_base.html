@@ -866,10 +866,25 @@ body{
                 <div class="custom-dropdown">
                     <h4>Minha Conta</h4>
                     <ul>
-                        <li>Meu Perfil</li>
-                        <li>Alterar Senha</li>
-                        <li>Configurações</li>
-                        <li style="color:#dc2626;font-weight:600;">Sair</li>
+                        <li>
+                            <a href="{% url 'core:meu-perfil' %}">Meu Perfil</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'core:alterar-senha' %}">Alterar Senha</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'core:configuracoes' %}">Configurações</a>
+                        </li>
+                        <li style="color:#dc2626;font-weight:600;">
+                            <form method="post" action="{% url 'admin_acessos:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;">
+                                    Sair
+                                </button>
+                            </form>
+
+
+                        </li>
                     </ul>
                 </div>
             </div>

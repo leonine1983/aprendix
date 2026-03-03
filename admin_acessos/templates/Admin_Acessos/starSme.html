@@ -251,6 +251,86 @@ header p{
 }
 
 }
+/* Overlay total da tela */
+.message-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+
+    /* Background sofisticado */
+    background: linear-gradient(
+        135deg,
+        rgba(25, 118, 210, 0.85),
+        rgba(46, 125, 50, 0.85)
+    );
+
+    backdrop-filter: blur(6px);
+}
+
+/* Card central */
+.message-card {
+    background: rgba(255, 255, 255, 0.92);
+    padding: 50px 60px;
+    border-radius: 20px;
+    text-align: center;
+    width: 90%;
+    max-width: 450px;
+
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+    animation: scaleIn 0.35s ease;
+}
+
+/* Ícone */
+.message-icon {
+    width: 90px;
+    margin-bottom: 25px;
+}
+
+/* Título */
+.message-title {
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #2e7d32;
+}
+
+/* Texto */
+.message-text {
+    font-size: 1.05rem;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+/* Botão */
+.message-button {
+    background-color: #2e7d32;
+    color: #fff;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.message-button:hover {
+    background-color: #1b5e20;
+}
+
+/* Animação */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.85);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
 </style>
 </head>
 
@@ -347,14 +427,37 @@ header p{
 <div class="app">
 
 <header>
+     {% if messages %}
+    {% for message in messages %}
+        <div class="message-overlay" aria-live="polite">
+            <div class="message-card alert-{{ message.tags }}" role="alert">
+
+                <img src="{% static 'img/sucesso.png' %}" 
+                     alt="Sucesso"
+                     class="message-icon">
+
+                <h3 class="message-title">Operação realizada</h3>
+
+                <p class="message-text">
+                    {{ message|safe }}
+                </p>
+
+                <button class="message-button" onclick="closeMessage()">OK</button>
+
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
     <img src="{% static 'prefeitura.png' %}" alt="Prefeitura Municipal" style='width:150px'>
     <h1>Portal Digital da Educação</h1>
+   
     <p>
         Plataforma oficial da <strong>Secretaria Municipal da Educação</strong>,
         desenvolvida para centralizar sistemas educacionais e administrativos,
         oferecendo uma experiência moderna, acessível e eficiente para toda a comunidade escolar.
     </p>
 </header>
+
 
 <nav class="nav">
     <button class="active" onclick="openTab('servicos', this)">Serviços</button>

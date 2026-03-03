@@ -1,0 +1,29 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+{% block content %}
+
+<div class="module-card">
+    <div class="module-header">
+        <h2 class="module-title">
+            <i class="fas fa-id-badge"></i>
+            Meu Perfil
+        </h2>
+        <p class="module-subtitle">
+            Informações institucionais do usuário autenticado.
+        </p>
+    </div>
+
+    <div style="padding:30px;">
+        <p><strong>Nome:</strong> {{ request.user.get_full_name }}</p>
+        <p><strong>Usuário:</strong> {{ request.user.username }}</p>
+        <p><strong>Email:</strong> {{ request.user.email }}</p>
+        <p><strong>Grupos:</strong>
+            {% for grupo in request.user.groups.all %}
+                {{ grupo.name }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+                Sem grupo definido
+            {% endfor %}
+        </p>
+    </div>
+</div>
+
+{% endblock %}
