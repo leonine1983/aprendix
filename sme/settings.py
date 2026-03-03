@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'merendaEscolar',
     'modulo_Merendeiras',
     'modulo_coordenacao',
-    'core',
+    'core.apps.CoreConfig',
     'widget_tweaks',
 
 ]

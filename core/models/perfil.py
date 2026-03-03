@@ -17,9 +17,3 @@ class PerfilUsuario(models.Model):
         return f"Perfil - {self.user.username}"
     
 
-
-
-@receiver(post_save, sender=User)
-def criar_perfil_usuario(sender, instance, created, **kwargs):
-    if created:
-        PerfilUsuario.objects.create(user=instance)
