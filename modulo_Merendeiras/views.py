@@ -12,10 +12,12 @@ from merendaEscolar.models import (
     EstoqueEscola,
 )
 from merendaEscolar.services import executar_receita
+from core.permissions import GroupRequiredMixin
+from core.groups.merenda import MERENDEIRA_GROUPS
 
 
 class BaseMerendeiraView(GroupRequiredMixin):
-    group_required = ("Merendeira", "Admin")
+    group_required = MERENDEIRA_GROUPS
 
 
 # =========================

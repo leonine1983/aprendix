@@ -72,6 +72,16 @@ urlpatterns = [
     TransferenciaItemCreateView.as_view(),
     name="transferenciaitem-create"
     ),
+    path(
+    "transferencia/item/<int:pk>/excluir/",
+    TransferenciaItemDeleteView.as_view(),
+    name="transferenciaitem-delete"
+    ),
+    path(
+    "transferencia/item/<int:pk>/editar/",
+    TransferenciaItemUpdateView.as_view(),
+    name="transferenciaitem-update"
+    ),
 
     # Escola 
     path(

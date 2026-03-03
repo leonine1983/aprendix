@@ -1,0 +1,69 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid mt-4">
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <div class="mb-4">
+                <h5 class="fw-semibold"
+                    style="color:var(--verde-principal);">
+                    Adicionar Item à Transferência
+                </h5>
+                <small class="text-muted">
+                    Informe o produto e a quantidade que será enviada.
+                </small>
+                <hr>
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label">Produto</label>
+                        {{ form.produto }}
+                        {% if form.produto.errors %}
+                            <div class="text-danger small">
+                                {{ form.produto.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Quantidade</label>
+                        {{ form.quantidade }}
+                        {% if form.quantidade.errors %}
+                            <div class="text-danger small">
+                                {{ form.quantidade.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit"
+                            class="btn btn-success px-4">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Salvar Item
+                    </button>
+
+                    <a href="{% url 'merendaEscolar:transferencia-detail' view.kwargs.pk %}"
+                       class="btn btn-outline-secondary px-4">
+                        Cancelar
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock content %}

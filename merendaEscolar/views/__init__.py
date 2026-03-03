@@ -8,8 +8,11 @@ from .transferencias.transferenciaDetailView import *
 from .transferencias.transferenciaListView import *
 from .transferencias.transferenciaCreateView import *
 
+
 # Transferencia  Itens
 from .transferenciaItens.transferenciaItemCreateView import *
+from .transferenciaItens.transferenciaItemDeleteView import *
+from .transferenciaItens.transferenciaItemUpdateView import *
 
 # Confirma transferencia
 from .escola_confirma_transferencia.notificacaoListView import *

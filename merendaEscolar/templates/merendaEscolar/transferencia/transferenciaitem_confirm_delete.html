@@ -1,0 +1,94 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid mt-4">
+
+    <!-- ======================================
+         CABEÇALHO
+    ======================================= -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body py-3">
+
+            <div class="d-flex align-items-center gap-3 mb-3">
+
+                <div class="bg-danger bg-opacity-10 text-danger 
+                            rounded-3 d-flex align-items-center 
+                            justify-content-center"
+                     style="width:40px; height:40px;">
+                    <i class="bi bi-trash fs-5"></i>
+                </div>
+
+                <div>
+                    <h1 class="h5 fw-semibold mb-1">
+                        Remover Item da Transferência
+                    </h1>
+                    <p class="text-muted small mb-0">
+                        Esta ação remove o item da transferência em rascunho.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ======================================
+         CONFIRMAÇÃO
+    ======================================= -->
+    <div class="card shadow-sm border-0 border-start border-3 border-danger">
+        <div class="card-body px-4 py-4">
+
+            <div class="mb-4">
+
+                <div class="small text-muted mb-1">Transferência</div>
+                <div class="fw-semibold mb-3">
+                    {{ object.transferencia.numero }}
+                </div>
+
+                <div class="small text-muted mb-1">Produto</div>
+                <div class="fw-semibold mb-3">
+                    {{ object.produto.nome }}
+                </div>
+
+                <div class="small text-muted mb-1">Quantidade</div>
+                <div class="fw-semibold">
+                    {{ object.quantidade }}
+                    {{ object.produto.unidade_medida.sigla }}
+                </div>
+
+            </div>
+
+            <div class="alert alert-warning small">
+                <strong>Atenção:</strong>
+                Esta ação não poderá ser desfeita.
+                O item será removido permanentemente da transferência.
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="d-flex justify-content-between mt-4">
+
+                    <a href="{% url 'merendaEscolar:transferencia-detail' object.transferencia.pk %}"
+                       class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-danger px-4">
+                        <i class="bi bi-trash me-1"></i>
+                        Confirmar Exclusão
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock content %}

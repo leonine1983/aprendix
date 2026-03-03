@@ -37,6 +37,9 @@ def iniciar_registros():
         from django.db import transaction
 
 
+        from django.contrib.auth.models import Group, Permission
+        from django.db import transaction
+
         @transaction.atomic
         def configurar_grupos_institucionais():
             group_names = [
@@ -57,23 +60,36 @@ def iniciar_registros():
                 grupos[group_name] = grupo
 
             # ===============================
-            # Permissões do app merendaEscolar
+            # Permissões do app merendaEscolar 
             # ===============================
+
+            # Permissões do app merendaEscolar
             permissoes_merenda = Permission.objects.filter(
                 content_type__app_label="merendaEscolar"
             )
 
-            # ===============================
-            # Admin → acesso total ao app
-            # ===============================
+            # Admin → acesso total ao app merendaEscolar
             grupos["Admin"].permissions.add(*permissoes_merenda)
 
-            # ===============================
-            # Nutricionista → acesso total ao app
-            # ===============================
-            grupos["Nutricionista"].permissions.add(*permissoes_merenda)            
+            # Grupo Nutricionista → mantém permissões do merendaEscolar
+            grupos["Nutricionista"].permissions.add(*permissoes_merenda)
+
+            # Grupo Merendeira → todas as permissões do app modulo_Merendeiras
+            from django.apps import apps
+
+            app_config = apps.get_app_config('modulo_Merendeiras')
+            permissoes_merendeira = []
+            for model in app_config.get_models():
+                content_type = ContentType.objects.get_for_model(model)
+                permissoes_merendeira.extend(Permission.objects.filter(content_type=content_type))
+
+            grupos["Merendeira"].permissions.add(*permissoes_merendeira)
+            print(f"Permissões atribuídas ao grupo Merendeira: {len(permissoes_merendeira)}")
+           
+
 
             print("Grupos institucionais configurados com sucesso.")
+
         configurar_grupos_institucionais()
 
         print("------ Inicializando os registros do Moldulo RH ------")

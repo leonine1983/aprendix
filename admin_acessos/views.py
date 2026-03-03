@@ -178,12 +178,12 @@ class CreateLoginView(LoginView):
             return reverse_lazy('admin_acessos:starsme')
 
         if perfil == "merendeira":
-            return reverse_lazy('controle_estoque:dashboard_merendeira')
+            return reverse_lazy('modulo_merendeiras:dashboard_merendeira')
 
         if perfil == "nutricionista":
             return reverse_lazy('merendaEscolar:merenda_inicio')
 
-        return reverse_lazy('admin_acessos:starsme')
+        return reverse_lazy('admin_acessos:logout')
 
 
 

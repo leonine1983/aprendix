@@ -1,6 +1,6 @@
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django import forms
 from django.db import transaction
 from django.core.exceptions import ValidationError
@@ -64,7 +64,7 @@ class TransferenciaItemForm(forms.ModelForm):
             if not self.instance.pk and qs.exists():
                 self.initial["estoque_origem"] = qs.first()
 
-
+"""
 class TransferenciaItemCreateView(CreateView):
     model = TransferenciaItem
     form_class = TransferenciaItemForm
@@ -116,4 +116,94 @@ class TransferenciaItemCreateView(CreateView):
     def get_success_url(self):
         return reverse_lazy(
             "merendaEscolar:transferencia-detail", kwargs={"pk": self.transferencia.pk}
+        )"""
+
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404
+from django import forms
+from django.db import transaction
+from django.contrib import messages
+from ...models import Transferencia, TransferenciaItem, EstoqueCentral
+
+from core.permissions import GroupRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from core.groups.nutricionista import NUTRICIONISTA_GROUPS
+
+
+class TransferenciaItemCreateView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    PermissionRequiredMixin,
+    CreateView
+):
+    model = TransferenciaItem
+    form_class = TransferenciaItemForm
+    template_name = "merendaEscolar/transferencia/transferenciaitem_form.html"
+
+    permission_required = "merendaEscolar.add_transferenciaitem"
+    group_required = NUTRICIONISTA_GROUPS
+
+    def dispatch(self, request, *args, **kwargs):
+        self.transferencia = get_object_or_404(
+            Transferencia,
+            pk=self.kwargs["pk"]
         )
+
+        # 🔒 Regra institucional: só permite editar RASCUNHO
+        if self.transferencia.status != "RASCUNHO":
+            messages.error(
+                request,
+                "Não é possível adicionar itens a uma transferência já finalizada."
+            )
+            return redirect(
+                "merendaEscolar:transferencia-detail",
+                pk=self.transferencia.pk
+            )
+
+        return super().dispatch(request, *args, **kwargs)
+
+    @transaction.atomic
+    def form_valid(self, form):
+        produto = form.cleaned_data["produto"]
+        quantidade = form.cleaned_data["quantidade"]
+
+        lote = (
+            EstoqueCentral.objects
+            .select_for_update()
+            .filter(produto=produto, quantidade__gt=0)
+            .order_by("data_validade")
+            .first()
+        )
+
+        if not lote:
+            form.add_error(
+                "produto",
+                "Não há saldo disponível no estoque central para este produto."
+            )
+            return self.form_invalid(form)
+
+        if quantidade > lote.quantidade:
+            form.add_error(
+                "quantidade",
+                f"Saldo disponível no lote: {lote.quantidade}."
+            )
+            return self.form_invalid(form)
+
+        form.instance.transferencia = self.transferencia
+        form.instance.estoque_origem = lote
+
+        messages.success(
+            self.request,
+            "Item adicionado à transferência com sucesso."
+        )
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy(
+            "merendaEscolar:transferencia-detail",
+            kwargs={"pk": self.transferencia.pk}
+        )
+    
+    

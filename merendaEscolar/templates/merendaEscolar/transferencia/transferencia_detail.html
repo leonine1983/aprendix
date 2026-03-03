@@ -107,6 +107,10 @@
                             <tr>
                                 <th>Produto</th>
                                 <th class="text-end">Quantidade</th>
+
+                                {% if transferencia.status == "RASCUNHO" %}
+                                    <th class="text-end">Ações</th>
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
@@ -115,12 +119,36 @@
                                 <td class="fw-semibold">
                                     {{ item.produto.nome }}
                                 </td>
+
                                 <td class="text-end">
                                     {{ item.quantidade }}
                                     <span class="text-muted small">
                                         {{ item.produto.unidade_medida.sigla }}
                                     </span>
                                 </td>
+
+                                {% if transferencia.status == "RASCUNHO" %}
+                                <td class="text-end">
+
+                                    <!-- Editar -->
+                                    <a href="{% url 'merendaEscolar:transferenciaitem-update' item.pk %}"
+                                    class="btn btn-sm btn-outline-primary me-1"
+                                    title="Editar item"
+                                    aria-label="Editar item da transferência">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
+                                    <!-- Excluir -->
+                                    <a href="{% url 'merendaEscolar:transferenciaitem-delete' item.pk %}"
+                                    class="btn btn-sm btn-outline-danger"
+                                    title="Remover item"
+                                    aria-label="Remover item da transferência"
+                                    onclick="return confirm('Deseja remover este item?');">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+
+                                </td>
+                                {% endif %}
                             </tr>
                             {% endfor %}
                         </tbody>

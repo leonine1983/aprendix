@@ -7,7 +7,7 @@ app_name = "modulo_merendeiras"
 
 urlpatterns = [
 
-    path("", views.DashboardMerendeiraView.as_view(), name="dashboard"),
+    path("", views.DashboardMerendeiraView.as_view(), name="dashboard_merendeira"),
 
     path("estoque/", views.EstoqueEscolaListView.as_view(), name="estoque_lista"),
 
