@@ -20,7 +20,6 @@ class TransferenciaCreateView(
     template_name = "merendaEscolar/transferencia/transferencia_form.html"
     permission_required = "merendaEscolar.add_transferencia"
 
-    permission_required = "estoque.add_unidademedida"
     group_required = NUTRICIONISTA_GROUPS
 
     def form_valid(self, form):
