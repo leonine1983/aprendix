@@ -1,0 +1,81 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+{% block content %}
+
+<div class="module-card">
+    
+    <!-- HEADER INSTITUCIONAL -->
+    <div class="module-header">
+        <h2 class="module-title">
+            <i class="fas fa-key"></i>
+            Alteração de Senha
+        </h2>
+        <p class="module-subtitle">
+            Atualize sua credencial de acesso ao sistema institucional.
+        </p>
+    </div>
+
+    <!-- CONTEÚDO -->
+    <div style="padding:30px; max-width:600px;">
+        
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <!-- Senha Atual -->
+            <div class="mb-3">
+                <label class="form-label">Senha Atual</label>
+                {{ form.old_password }}
+                {% if form.old_password.errors %}
+                    <div class="text-danger small mt-1">
+                        {{ form.old_password.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Nova Senha -->
+            <div class="mb-3">
+                <label class="form-label">Nova Senha</label>
+                {{ form.new_password1 }}
+                {% if form.new_password1.errors %}
+                    <div class="text-danger small mt-1">
+                        {{ form.new_password1.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Confirmação -->
+            <div class="mb-4">
+                <label class="form-label">Confirme a Nova Senha</label>
+                {{ form.new_password2 }}
+                {% if form.new_password2.errors %}
+                    <div class="text-danger small mt-1">
+                        {{ form.new_password2.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- BOTÕES -->
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-check-circle"></i>
+                    Atualizar Senha
+                </button>
+
+                <a href="{% url 'core:meu-perfil' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Voltar
+                </a>
+            </div>
+
+        </form>
+
+        <!-- REGRAS DE SEGURANÇA -->
+        {% if form.errors %}
+        <div class="alert alert-warning mt-4">
+            <strong>Atenção:</strong> verifique os critérios de segurança exigidos.
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}
