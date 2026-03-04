@@ -39,24 +39,17 @@ class ErrorMessageMixin:
 
 class UnidadeMedidaListView(
     LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
     ListView
 ):
     model = UnidadeMedida
     template_name = "merendaEscolar/unidade_medida/list.html"
     context_object_name = "unidades"
     paginate_by = 10
-    group_required = NUTRICIONISTA_GROUPS
-    permission_required = "merendaEscolar.view_estoquecentral"
-
 
 
 
 class UnidadeMedidaCreateView(
     LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
     SuccessMessageMixin,
     ErrorMessageMixin,
     CreateView
@@ -66,16 +59,12 @@ class UnidadeMedidaCreateView(
     fields = ["nome", "sigla"]
     template_name = "merendaEscolar/unidade_medida/form.html"
     success_url = reverse_lazy("merendaEscolar:unidade_medida_list")
-    permission_required = "estoque.add_unidademedida"
-    group_required = NUTRICIONISTA_GROUPS
     success_message = "Unidade de medida cadastrada com sucesso."
     error_message = "Erro ao cadastrar a unidade de medida."
 
 
 class UnidadeMedidaUpdateView(
     LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
     SuccessMessageMixin,
     ErrorMessageMixin,
     UpdateView
@@ -84,8 +73,6 @@ class UnidadeMedidaUpdateView(
     fields = ["nome", "sigla"]
     template_name = "merendaEscolar/unidade_medida/form.html"
     success_url = reverse_lazy("merendaEscolar:unidade_medida_list")
-    permission_required = "estoque.change_unidademedida"
-    group_required = NUTRICIONISTA_GROUPS
     success_message = "Unidade de medida atualizada com sucesso."
     error_message = "Erro ao atualizar a unidade de medida."
 
@@ -94,8 +81,6 @@ class UnidadeMedidaUpdateView(
 # Categoria de Produto
 class CategoriaProdutoListView(
     LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
     ListView
 ):
     model = CategoriaProduto
@@ -103,15 +88,11 @@ class CategoriaProdutoListView(
     context_object_name = "categorias"
     paginate_by = 10
 
-    group_required = NUTRICIONISTA_GROUPS
-    permission_required = "merendaEscolar.view_estoquecentral"
 
 
 
 class CategoriaProdutoCreateView(
     LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,    
     SuccessMessageMixin,
     ErrorMessageMixin,
     CreateView
@@ -120,16 +101,12 @@ class CategoriaProdutoCreateView(
     fields = ["nome", "descricao"]
     template_name = "merendaEscolar/categoria_produto/form.html"
     success_url = reverse_lazy("merendaEscolar:categoria_produto_list")
-    permission_required = "estoque.add_categoriaproduto"
-    group_required = NUTRICIONISTA_GROUPS  
     success_message = "Categoria cadastrada com sucesso."
     error_message = "Erro ao cadastrar a categoria."
 
 
 class CategoriaProdutoUpdateView(
     LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
     SuccessMessageMixin,
     ErrorMessageMixin,
     UpdateView
@@ -138,8 +115,6 @@ class CategoriaProdutoUpdateView(
     fields = ["nome", "descricao"]
     template_name = "merendaEscolar/categoria_produto/form.html"
     success_url = reverse_lazy("merendaEscolar:categoria_produto_list")
-    permission_required = "estoque.change_categoriaproduto"
-    group_required = NUTRICIONISTA_GROUPS
     success_message = "Categoria atualizada com sucesso."
     error_message = "Erro ao atualizar a categoria."
 
@@ -148,17 +123,12 @@ from django.db.models import Q
 
 class ProdutoListView(
     LoginRequiredMixin,
-    GroupRequiredMixin,
     ListView
 ):
     model = Produto
     template_name = "merendaEscolar/produto/list.html"
     context_object_name = "produtos"
     paginate_by = 10
-
-    group_required = NUTRICIONISTA_GROUPS
-    permission_required = "merendaEscolar.view_estoquecentral"
-
 
     def get_queryset(self):
         queryset = (
@@ -193,8 +163,6 @@ class ProdutoListView(
 
 class ProdutoCreateView(
     LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
     SuccessMessageMixin,
     ErrorMessageMixin,
     CreateView
@@ -209,8 +177,6 @@ class ProdutoCreateView(
     ]
     template_name = "produto/form.html"
     success_url = reverse_lazy("merendaEscolar:produto_list")
-    permission_required = "estoque.add_produto"
-    group_required = NUTRICIONISTA_GROUPS
     success_message = "Produto cadastrado com sucesso."
     error_message = "Erro ao cadastrar o produto."
 
@@ -222,8 +188,6 @@ class ProdutoCreateView(
 
 class ProdutoUpdateView(
     LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
     SuccessMessageMixin,
     ErrorMessageMixin,
     UpdateView
@@ -238,8 +202,6 @@ class ProdutoUpdateView(
     ]
     template_name = "produto/form.html"
     success_url = reverse_lazy("merendaEscolar:produto_list")
-    permission_required = "estoque.change_produto"
-    group_required = NUTRICIONISTA_GROUPS
     success_message = "Produto atualizado com sucesso."
     error_message = "Erro ao atualizar o produto."
 

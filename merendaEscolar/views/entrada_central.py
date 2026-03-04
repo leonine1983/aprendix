@@ -38,14 +38,11 @@ class ErrorMessageMixin:
 
 class EntradaEstoqueCentralView(
     LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
     SuccessMessageMixin,
     ErrorMessageMixin,
     FormView,
 ):
-    permission_required = "merendaEscolar.add_estoquecentral"
-    group_required = NUTRICIONISTA_GROUPS
+    
 
     template_name = "merendaEscolar/estoque/entrada_central_form.html"
     form_class = EntradaEstoqueCentralForm
