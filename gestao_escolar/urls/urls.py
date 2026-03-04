@@ -19,74 +19,74 @@ urlpatterns = [
 
     # Turmas
     path('gestao_escolar/Turmas/', Create_turmas.as_view(), name="GE_Escola_turmas"),
-    path('gestao_escolar/Turmas/all', ListView_Escola.as_view(), name="GE_Escola_turmas_lista"),
-    path('gestao_escolar/Turmas/atualiza/<int:pk>', UpdateTurmas.as_view(), name="GE_Escola_Turmas_update"),    
-    path('gestao_escolar/Turmas/delete/<int:pk>', Delete_Turmas.as_view(), name="GE_Escola_Turmas_delete"),
+    path('gestao_escolar/Turmas/all/', ListView_Escola.as_view(), name="GE_Escola_turmas_lista"),
+    path('gestao_escolar/Turmas/atualiza/<int:pk>/', UpdateTurmas.as_view(), name="GE_Escola_Turmas_update"),    
+    path('gestao_escolar/Turmas/delete/<int:pk>/', Delete_Turmas.as_view(), name="GE_Escola_Turmas_delete"),
 
     # Alunos
     path('gestao_escolar/Alunos/', Create_Alunos.as_view(), name="GE_Escola_alunos_create"),
-    path('gestao_escolar/Alunos/encontred/<str:nome_completo>/<str:nome_mae>', AlunosEcontred.as_view(), name="alunos_encontred"),
-    path('gestao_escolar/Alunos/econtred', CreateAlunosConfirma.as_view(), name="alunos_create_encontred"),
-    path('gestao_escolar/Alunos/etapa_2/<int:pk>', CreateAlunosConfirmaEtapa2.as_view(), name="alunos_create_etapa2"),    
-    path('gestao_escolar/Alunos/etapa_3/<int:pk>', CreateAlunosConfirmaEtapa3.as_view(), name="alunos_create_etapa3"),
-    path('gestao_escolar/Alunos/etapa_4/<int:pk>', CreateAlunosConfirmaEtapa4.as_view(), name="alunos_create_etapa4"),
-    path('gestao_escolar/Alunos/etapa_5/<int:pk>', CreateAlunosConfirmaEtapa5.as_view(), name="alunos_create_etapa5"),
-    path('gestao_escolar/Alunos/perfil/<int:pk>', PerfilAluno.as_view(), name="alunos_perfil"),
+    path('gestao_escolar/Alunos/encontred/<str:nome_completo>/<str:nome_mae>/', AlunosEcontred.as_view(), name="alunos_encontred"),
+    path('gestao_escolar/Alunos/econtred/', CreateAlunosConfirma.as_view(), name="alunos_create_encontred"),
+    path('gestao_escolar/Alunos/etapa_2/<int:pk>/', CreateAlunosConfirmaEtapa2.as_view(), name="alunos_create_etapa2"),    
+    path('gestao_escolar/Alunos/etapa_3/<int:pk>/', CreateAlunosConfirmaEtapa3.as_view(), name="alunos_create_etapa3"),
+    path('gestao_escolar/Alunos/etapa_4/<int:pk>/', CreateAlunosConfirmaEtapa4.as_view(), name="alunos_create_etapa4"),
+    path('gestao_escolar/Alunos/etapa_5/<int:pk>/', CreateAlunosConfirmaEtapa5.as_view(), name="alunos_create_etapa5"),
+    path('gestao_escolar/Alunos/perfil/<int:pk>/', PerfilAluno.as_view(), name="alunos_perfil"),
 
 
-    path('gestao_escolar/Alunos/<int:pk>', Create_Alunos_Document.as_view(), name="GE_alunos_create_document"),     
-    path('gestao_escolar/Alunos/documentos/atualiza<int:pk>', Update_Alunos_Document.as_view(), name="GE_alunos_update_document"),
-    path('gestao_escolar/Alunos/atualiza/<int:pk>', Update_Alunos.as_view(), name="GE_Escola_alunos_update"),    
-    path('gestao_escolar/Alunos/delete/<int:pk>', Delete_Alunos.as_view(), name="GE_Escola_alunos_delete"),
+    path('gestao_escolar/Alunos/<int:pk>/', Create_Alunos_Document.as_view(), name="GE_alunos_create_document"),     
+    path('gestao_escolar/Alunos/documentos/atualiza<int:pk>/', Update_Alunos_Document.as_view(), name="GE_alunos_update_document"),
+    path('gestao_escolar/Alunos/atualiza/<int:pk>/', Update_Alunos.as_view(), name="GE_Escola_alunos_update"),    
+    path('gestao_escolar/Alunos/delete/<int:pk>/', Delete_Alunos.as_view(), name="GE_Escola_alunos_delete"),
     #path('autocomplete/', autocomplete.Select2ListView.as_view(), name='autocomplete_aluno'),
    
 
     # Matriculas
-    path('gestao_escolar/Matricula/all_classes', View_turmas_Matriculas.as_view(), name="GE_Escola_Matricula_Turmas_lista"), 
-    path('gestao_escolar/Matricula/create/<int:pk>', Create_Matriculas.as_view(), name="GE_Escola_Matricula_create"),       
-    path('gestao_escolar/Matricula/all', List_Matriculas.as_view(), name="GE_Escola_Matricula_lista"),
-    path('gestao_escolar/Matricula/imprime/<int:pk>', ViewDetailMatriculasTurma.as_view(), name="Matricula_turma"),    
-    path('gestao_escolar/Matricula/comprovante/imprime/<int:pk>', ComprovanteMatricula.as_view(), name="Matricula_comprovante"),    
+    path('gestao_escolar/Matricula/all_classes/', View_turmas_Matriculas.as_view(), name="GE_Escola_Matricula_Turmas_lista"), 
+    path('gestao_escolar/Matricula/create/<int:pk>/', Create_Matriculas.as_view(), name="GE_Escola_Matricula_create"),       
+    path('gestao_escolar/Matricula/all/', List_Matriculas.as_view(), name="GE_Escola_Matricula_lista"),
+    path('gestao_escolar/Matricula/imprime/<int:pk>/', ViewDetailMatriculasTurma.as_view(), name="Matricula_turma"),    
+    path('gestao_escolar/Matricula/comprovante/imprime/<int:pk>/', ComprovanteMatricula.as_view(), name="Matricula_comprovante"),    
 
     # Matriculas retorno aluno
-    path('gestao_escolar/Matricula/create/aluno/<int:pk>', Create_Matriculas_Retorno_alunos.as_view(), name="GE_Escola_Matricula_create_aluno"),    
-    path('gestao_escolar/Matricula/atualiza/<int:pk>', Update_Matricula.as_view(), name="GE_Escola_Matricula_update"),    
-    path('gestao_escolar/Matricula/delete/<int:pk>', Delete_Matriculas.as_view(), name="GE_Escola_Matricula_delete"),
+    path('gestao_escolar/Matricula/create/aluno/<int:pk>/', Create_Matriculas_Retorno_alunos.as_view(), name="GE_Escola_Matricula_create_aluno"),    
+    path('gestao_escolar/Matricula/atualiza/<int:pk>/', Update_Matricula.as_view(), name="GE_Escola_Matricula_update"),    
+    path('gestao_escolar/Matricula/delete/<int:pk>/', Delete_Matriculas.as_view(), name="GE_Escola_Matricula_delete"),
 
     # Remanejamento
-    path('gestao_escolar/Matricula/remaneja_aluno/<int:pk>', Create_Remanejamento.as_view(), name="GE_Escola_Remaneja_create"),     
-    path('gestao_escolar/Matricula/remaneja_aluno/Turma/<int:pk>', Update_Matricula_remanejamento.as_view(), name="GE_Escola_Remaneja_update"),     
+    path('gestao_escolar/Matricula/remaneja_aluno/<int:pk>/', Create_Remanejamento.as_view(), name="GE_Escola_Remaneja_create"),     
+    path('gestao_escolar/Matricula/remaneja_aluno/Turma/<int:pk>/', Update_Matricula_remanejamento.as_view(), name="GE_Escola_Remaneja_update"),     
     #path('gestao_escolar/Matricula/remaneja_aluno/Turma/<int:pk>', Update_Matricula_remanejamento.as_view(), name="GE_Escola_Remaneja_update"), 
 
     # Discplinas
     path('gestao_escolar/Disciplinas/create/', Create_disciplinas.as_view(), name="GE_Disciplina_create"),     
-    path('gestao_escolar/Matricula/remaneja_aluno/Turma/<int:pk>', Update_Matricula_remanejamento.as_view(), name="GE_Escola_Remaneja_update"), 
+    path('gestao_escolar/Matricula/remaneja_aluno/Turma/<int:pk>/', Update_Matricula_remanejamento.as_view(), name="GE_Escola_Remaneja_update"), 
 
     # Grades
-    path('gestao_escolar/Grades/create/turmas', View_turmas_Grade.as_view(), name="Grades_turmas"),   
-    path('gestao_escolar/Grades/create/<int:pk>', Create_Grades.as_view(), name="Grades_create"),   
-    path('gestao_escolar/Grades/update/<int:pk>', Update_Grade.as_view(), name="Grades_update"),     
-    path('gestao_escolar/Grades/delete/<int:pk>', Delete_Grade.as_view(), name="Grades_delete"),  
-    path('gestao_escolar/Matricula/remaneja_aluno/Turma/<int:pk>', Update_Matricula_remanejamento.as_view(), name="GE_Escola_Remaneja_update"),    
+    path('gestao_escolar/Grades/create/turmas/', View_turmas_Grade.as_view(), name="Grades_turmas"),   
+    path('gestao_escolar/Grades/create/<int:pk>/', Create_Grades.as_view(), name="Grades_create"),   
+    path('gestao_escolar/Grades/update/<int:pk>/', Update_Grade.as_view(), name="Grades_update"),     
+    path('gestao_escolar/Grades/delete/<int:pk>/', Delete_Grade.as_view(), name="Grades_delete"),  
+    path('gestao_escolar/Matricula/remaneja_aluno/Turma/<int:pk>/', Update_Matricula_remanejamento.as_view(), name="GE_Escola_Remaneja_update"),    
 
     # Professores
     #path('gestao_escolar/Professores/Pessoas', Create_Pessoa_Professores.as_view(), name="Professores_Pessoa_create"),   
     #path('gestao_escolar/Professores/Pessoas/vinculo/<int:pk>', Create_Pessoa_Vinculo.as_view(), name="Professores_Pessoa_vinculo_create"), 
     #path('gestao_escolar/Professores/Pessoas/encaminhamento/<int:pk>,<int:destino>,<int:profissao>', Create_Pessoa_Encaminhamento.as_view(), name="Professores_Encaminhamento"), 
     path('gestao_escolar/Professores/', Create_Professores.as_view(), name="GE_Professores_create"),    
-    path('gestao_escolar/Professores/encaminhamento/<int:pk>', EncaminhaEscola.as_view(), name="encaminha_escola"),   
-    path('gestao_escolar/Professores/encaminhamento/apagar/<int:pk>', EncaminhaEscolaDelete.as_view(), name="encaminha_escolaDelete"),   
+    path('gestao_escolar/Professores/encaminhamento/<int:pk>/', EncaminhaEscola.as_view(), name="encaminha_escola"),   
+    path('gestao_escolar/Professores/encaminhamento/apagar/<int:pk>/', EncaminhaEscolaDelete.as_view(), name="encaminha_escolaDelete"),   
 
     # pessoas (para uso de decreto e outros) ----------------------------------------------
     #path('pessoas/', PessoasListView.as_view(), name='pessoas-list'),
     #path('pessoas/<int:pk>/', PessoasDetailView.as_view(), name='pessoas-detail'),
-    path('gestao_escolar/Professores/Pessoas', PessoasCreateView.as_view(), name="Professores_Pessoa_create"),   
+    path('gestao_escolar/Professores/Pessoas/', PessoasCreateView.as_view(), name="Professores_Pessoa_create"),   
     path('pessoas/criar/', PessoasCreateView.as_view(), name='pessoas-create'),
     path('pessoas/<int:pk>/editar/', PessoasUpdateView.as_view(), name='pessoas-update'),
     path('pessoas/<int:pk>/excluir/', PessoasDeleteView.as_view(), name='pessoas-delete'),
 
     # pessoasContrato (para uso de decreto e outros) ----------------------------------------------
-    path('pessoas/contrato/<int:pk>', PessoasContratoCreateView.as_view(), name='pessoasContrato-create'),
+    path('pessoas/contrato/<int:pk>/', PessoasContratoCreateView.as_view(), name='pessoasContrato-create'),
     
 
     # Decretos
@@ -97,23 +97,23 @@ urlpatterns = [
     #path('decretos/<int:pk>/excluir/', DecretoDeleteView.as_view(), name='decreto-delete'),
 
     # Decreto Ativo    
-    path('decretos/ano_ativo/<int:pk>', DecretoAnoLetivoAtivo_create.as_view(), name='decreto-ativo'),
+    path('decretos/ano_ativo/<int:pk>/', DecretoAnoLetivoAtivo_create.as_view(), name='decreto-ativo'),
     
 
     # Definir o cargo que o profissional irá exercer na escola
     path('gestao_escolar/Profissionais/', Create_Define_Profissional.as_view(), name="Professores_Profissionais_create"),      
-    path('gestao_escolar/Profissionais/<int:pk>', Update_Define_Profissional.as_view(), name="Professores_Profissionais_atualiza"),  
+    path('gestao_escolar/Profissionais/<int:pk>/', Update_Define_Profissional.as_view(), name="Professores_Profissionais_atualiza"),  
 
     # Gestão de Turmas
     path('gestao_escolar/Gestao_Turmas/', GestaoSelecionaTurma.as_view(), name="NotasAluno_all_create"),  
-    path('gestao_escolar/Gestao_Turmas/turma/<int:pk>', GerirTurmaSelecionada.as_view(), name="NotasAluno_one_create"),      
-    path('gestao_escolar/Gestao_Turmas/turma/notas/<int:pk>', verifica_e_cria_gestao_turmas, name="NotasAluno"),        
-    path('gestao_escolar/Gestao_Turmas/aluno/notas/<int:pk>',gestao_turmas_update_view, name='gestao_turmas_update'), 
+    path('gestao_escolar/Gestao_Turmas/turma/<int:pk>/', GerirTurmaSelecionada.as_view(), name="NotasAluno_one_create"),      
+    path('gestao_escolar/Gestao_Turmas/turma/notas/<int:pk>/', verifica_e_cria_gestao_turmas, name="NotasAluno"),        
+    path('gestao_escolar/Gestao_Turmas/aluno/notas/<int:pk>/',gestao_turmas_update_view, name='gestao_turmas_update'), 
 
     # Conselho de classe 
-    path('gestao_escolar/Gestao_Turmas/aluno/conselhoClasse/<int:pk>',AprovaConselho.as_view(), name='aprovaConselho'),  
-    path('gestao_escolar/Gestao_Turmas/aluno/conselhoClasse_cancela/<int:pk>',AprovaConselhoCancela.as_view(), name='aprovaConselhoCancela'),  
-    path('gestao_escolar/Gestao_Turmas/aluno/conselhoClasse_reprovado/<int:pk>',ReprovaConselho.as_view(), name='reprovaConselho'),  
+    path('gestao_escolar/Gestao_Turmas/aluno/conselhoClasse/<int:pk>/',AprovaConselho.as_view(), name='aprovaConselho'),  
+    path('gestao_escolar/Gestao_Turmas/aluno/conselhoClasse_cancela/<int:pk>/',AprovaConselhoCancela.as_view(), name='aprovaConselhoCancela'),  
+    path('gestao_escolar/Gestao_Turmas/aluno/conselhoClasse_reprovado/<int:pk>/',ReprovaConselho.as_view(), name='reprovaConselho'),  
 
     
 
@@ -142,10 +142,10 @@ urlpatterns = [
     path('criar-gestao-turma/parecer/aluno/Final<int:pk>/<int:trimestre>/', alunoGestaoTurmasParecerResumo, name='criaParecerAlunoFinal'), 
     
     # IMPRESSOS
-    path('turmas/impressao', Imprime_Turmas.as_view(), name='imprime_list_turmas'),
-    path('turmas/impressao/filtros', ImprimeTurmasFiltros.as_view(), name='imprime_turmas_filtros'),
-    path('escolas/impressao', Imprime_Escolas.as_view(), name='imprime_list_escolas'),
-    path('horarios/all/impressao', ImprimeAllHorarios .as_view(), name='imprime_all_horarios'),
+    path('turmas/impressao/', Imprime_Turmas.as_view(), name='imprime_list_turmas'),
+    path('turmas/impressao/filtros/', ImprimeTurmasFiltros.as_view(), name='imprime_turmas_filtros'),
+    path('escolas/impressao/', Imprime_Escolas.as_view(), name='imprime_list_escolas'),
+    path('horarios/all/impressao/', ImprimeAllHorarios .as_view(), name='imprime_all_horarios'),
     
     path('historico/<int:pk>/', HistoricoEscolarAlunoView.as_view(), name='historico_escolar'),
 
@@ -193,18 +193,18 @@ urlpatterns = [
     # Faze de matricula online do aluno
     path('matricula_online/<int:aluno_id>/', matricular_aluno, name='matricular_aluno'),
     path('matricula_online/<int:aluno_id>/<int:serie_id>/', finaliza_matricular_aluno, name='matricular_alunoSerie'),
-    path('matricula_online/impugna/<int:mat_id>', matricula_confirma_impugna, name='matricular_confirma_impugna'),
-    path('matricula_online/impugna/confirmada/<int:mat_id>', matricula_confirmada, name='matricularOnine_confirma'),
+    path('matricula_online/impugna/<int:mat_id>/', matricula_confirma_impugna, name='matricular_confirma_impugna'),
+    path('matricula_online/impugna/confirmada/<int:mat_id>/', matricula_confirmada, name='matricularOnine_confirma'),
 
     
     # Apuração final
     path('apuracaoFinal/selecionaTurma/', listaTurmaApuracao, name='apuracaoSelecTurma'),
-    path('apuracaoFinal/selecionaTurma/<int:turma_id>', selecionaTurmaSelecionada, name='apuracaoSelec'),
+    path('apuracaoFinal/selecionaTurma/<int:turma_id>/', selecionaTurmaSelecionada, name='apuracaoSelec'),
 
     
     # Conclui turmas
-    path('gestao_escolar/turmas/concluir/<int:pk>',ConcluirTurmas.as_view(), name='ConcluirTurmas'),
-    path('gestao_escolar/turmas/desconcluir/<int:pk>',DesconcluirTurmas.as_view(), name='DesconcluirTurmas'),        
+    path('gestao_escolar/turmas/concluir/<int:pk>/',ConcluirTurmas.as_view(), name='ConcluirTurmas'),
+    path('gestao_escolar/turmas/desconcluir/<int:pk>/',DesconcluirTurmas.as_view(), name='DesconcluirTurmas'),        
     
 ] 
 

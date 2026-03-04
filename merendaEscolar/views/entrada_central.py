@@ -5,6 +5,8 @@ from django.db import transaction
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
 from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Count, Q
 
 from ..models import (
     EstoqueCentral,
@@ -84,10 +86,8 @@ class EntradaEstoqueCentralView(
             )
 
         messages.success(self.request, "Entrada registrada com sucesso no estoque central.")
-        return super().form_valid(form)
-    
-from django.db.models import Count, Q
-from datetime import timedelta
+        return super().form_valid(form)   
+
 
 # ===============================
 # DASHBOARD ESTOQUE CENTRAL
@@ -100,21 +100,7 @@ class EstoqueCentralListView(LoginRequiredMixin,
     permission_required = permission_required = "merendaEscolar.view_estoquecentral"
     group_required = NUTRICIONISTA_GROUPS
     template_name = "merendaEscolar/estoque/estoque.html"
-    context_object_name = "produtos"
-
-    """
-    def get_queryset(self):
-        return (
-            EstoqueCentral.objects
-            .select_related("produto")
-            .order_by("produto__nome")
-        ) 
-    def get_queryset(self):
-        return (
-            EstoqueCentral.objects
-            .select_related("produto")
-            .ordenado_por_validade()
-        )  """
+    context_object_name = "produtos"  
     
     def get_queryset(self):
         qs = (
@@ -142,11 +128,7 @@ class EstoqueCentralListView(LoginRequiredMixin,
                 data_validade__lte=hoje + timedelta(days=30)
             )
 
-        return qs
-
-    from django.db.models import Sum
-    from django.utils import timezone
-    from datetime import timedelta
+        return qs    
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
