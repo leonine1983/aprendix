@@ -94,7 +94,6 @@ class EntradaEstoqueCentralView(
 # ===============================
 class EstoqueCentralListView(LoginRequiredMixin,
                             GroupRequiredMixin,
-                            PermissionRequiredMixin,
                               ListView):
     model = EstoqueCentral
     permission_required = permission_required = "merendaEscolar.view_estoquecentral"
