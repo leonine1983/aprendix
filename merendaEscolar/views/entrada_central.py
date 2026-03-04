@@ -93,11 +93,8 @@ class EntradaEstoqueCentralView(
 # DASHBOARD ESTOQUE CENTRAL
 # ===============================
 class EstoqueCentralListView(LoginRequiredMixin,
-                            GroupRequiredMixin,
                               ListView):
     model = EstoqueCentral
-    permission_required = permission_required = "merendaEscolar.view_estoquecentral"
-    group_required = NUTRICIONISTA_GROUPS
     template_name = "merendaEscolar/estoque/estoque.html"
     context_object_name = "produtos"  
     
