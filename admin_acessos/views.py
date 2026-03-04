@@ -180,6 +180,7 @@ class CreateLoginView(LoginView):
             return reverse_lazy('modulo_merendeiras:dashboard_merendeira')
 
         if perfil == "nutricionista":
+            messages.success(self.request, "Você esta acessando como: nutricionista ")
             return reverse_lazy('merendaEscolar:merenda_inicio')
         
         messages.error(
