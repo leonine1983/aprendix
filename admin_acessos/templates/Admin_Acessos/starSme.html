@@ -524,3 +524,21 @@ function openTab(id, btn){
 
 </body>
 </html>
+
+<script>
+// Fecha a mensagem ao clicar no botão
+function closeMessage() {
+    const overlay = document.querySelector('.message-overlay');
+    if (overlay) {
+        overlay.remove();
+    }
+}
+
+// Remove automaticamente a mensagem após 5 segundos (5000 ms)
+window.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.querySelector('.message-overlay');
+    if (overlay) {
+        setTimeout(() => overlay.remove(), 5000);
+    }
+});
+</script>
