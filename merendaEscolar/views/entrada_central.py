@@ -129,6 +129,12 @@ class EstoqueCentralListView(LoginRequiredMixin,
             )
 
         return qs    
+    
+    def dispatch(self, request, *args, **kwargs):
+        print("AUTH:", request.user.is_authenticated)
+        print("USER:", request.user)
+        print("SESSION:", request.session.session_key)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -199,5 +205,6 @@ class EstoqueCentralListView(LoginRequiredMixin,
             "lotes_alerta": lotes_alerta,
             "lotes_normais": lotes_normais,
         })
+        
 
         return context

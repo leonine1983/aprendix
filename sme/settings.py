@@ -251,7 +251,5 @@ LOGIN_URL = 'admin_acessos:login_create'
 SESSION_COOKIE_AGE = 3600  # 1 hora
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
-LOGIN_URL = 'admin_acessos:login_create'
-
 
 
