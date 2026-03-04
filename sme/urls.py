@@ -29,7 +29,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),   
     path('core/', include('core.urls')), 
     path('rh/', include('rh.urls')),
-    path('aprendix/', include('gestao_escolar.urls')),
+    path('sga/Sist.Gest.Aprendizagem/', include('gestao_escolar.urls')),
     #path('nutricao/', include('controle_estoque.urls')),
     path('administrativo/', include('docsGestao_Escolar.urls')),
     path('acesso_aluno', include('modulo_aluno.urls')),

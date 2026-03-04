@@ -98,6 +98,7 @@ class CreateLoginView(LoginView):
 
         user = self.request.user
         perfil = self.request.POST.get("perfil")
+        print(f'esse é o perfil {perfil}')
 
         # Construção segura do nome
         first = user.first_name.capitalize() if user.first_name else ""
@@ -154,9 +155,7 @@ class CreateLoginView(LoginView):
             f'{name}, \'Quando você quer alguma coisa, todo o universo conspira para que você realize seu desejo.\' - Paulo Coelho',
             f'{name}, \'O futuro pertence àqueles que acreditam na beleza de seus sonhos.\' - Eleanor Roosevelt',
             f'{name}, \'A felicidade é a única coisa que se multiplica quando é dividida.\' - Albert Schweitzer'
-        ]  
-
-        mensagens_boas_vindas = [
+        
             f'{name}, "A educação é a arma mais poderosa que você pode usar para mudar o mundo." - Nelson Mandela',
             f'{name}, "O sucesso é ir de fracasso em fracasso sem perder o entusiasmo." - Winston Churchill',
             f'{name}, "Aprender é a única coisa de que a mente nunca se cansa." - Leonardo da Vinci',
