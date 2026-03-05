@@ -2,7 +2,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from gestao_escolar.models import ParecerDescritivo, Trimestre
 from django.contrib import messages
-from g4f.client import Client
 from django.contrib.auth.decorators import login_required
 
 @login_required
@@ -54,7 +53,7 @@ def alunoGestaoTurmasParecer(request, pk, trimestre):
             }
         )
         parecer_atualizado = get_object_or_404(ParecerDescritivo, matricula=pk, trimestre__id=trimestre)    
-        
+        from g4f.client import Client
         client = Client()
         message_resumo = [
             "Por favor, Com base nas informações\

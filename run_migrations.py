@@ -32,16 +32,15 @@ def log(message, end="\n"):
 
 def run_command(command, env=None):
     """Executa um comando shell e retorna (retcode, stdout, stderr)."""
-    process = subprocess.Popen(
+    process = subprocess.run(
         command,
         shell=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
+        text=True,           # <-- resolve encoding automaticamente
         env=env
     )
-    stdout, stderr = process.communicate()
-    return process.returncode, stdout.decode().strip(), stderr.decode().strip()
 
+    return process.returncode, process.stdout.strip(), process.stderr.strip()
 def migrate_app(app_name):
     """Executa makemigrations e migrate para um app específico."""
     log(f"🔧 App: {app_name}")
