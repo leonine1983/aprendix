@@ -31,12 +31,19 @@ INSTALLED_APPS = [
     'docsGestao_Escolar',  
     'modulo_aluno',
     'modulo_professor',
-    'ckeditor',
-    'ckeditor_uploader',
-    'merendaEscolar',
-    'modulo_Merendeiras',
-    'modulo_coordenacao',
+    # 🔹 Base institucional
     'core.apps.CoreConfig',
+
+    # 🔹 Domínio Merenda
+    "merendaEscolar",
+
+    # 🔹 Módulos dependentes
+    "modulo_Merendeiras",
+    "modulo_coordenacao",
+
+    
+    'ckeditor',
+    'ckeditor_uploader',    
     'widget_tweaks',
 
 ]

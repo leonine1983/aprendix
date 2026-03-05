@@ -6,13 +6,19 @@ from datetime import datetime
 
 # Ordem correta de migrações
 APPS = [
-    "rh",                 # Dependências principais
-    "admin_acessos",      # Depende de rh
+    "rh",                 
+    "admin_acessos",      
     "controle_estoque",
     "gestao_escolar",    
     "modulo_professor",
     "modulo_aluno",
     "docsGestao_Escolar",
+
+    # 🔽 Adicionados conforme solicitado
+    "core",
+    "merendaEscolar",
+    "modulo_Merendeiras",
+    "modulo_coordenacao",
 ]
 
 LOG_FILE = "migracoes.log"
@@ -26,12 +32,18 @@ def log(message, end="\n"):
 
 def run_command(command, env=None):
     """Executa um comando shell e retorna (retcode, stdout, stderr)."""
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+    process = subprocess.Popen(
+        command,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=env
+    )
     stdout, stderr = process.communicate()
     return process.returncode, stdout.decode().strip(), stderr.decode().strip()
 
 def migrate_app(app_name):
-    """Executa makemigrations e migrate para um app específico, lidando com histórico inconsistente."""
+    """Executa makemigrations e migrate para um app específico."""
     log(f"🔧 App: {app_name}")
     start_time = time.time()
 
@@ -48,8 +60,8 @@ def migrate_app(app_name):
     log(f"📦 migrate [{app_name}]:")
     if retcode != 0 and "InconsistentMigrationHistory" in stderr:
         log(f"⚠️ Inconsistência detectada, aplicando fake migrate para {app_name}")
-        # Fake para corrigir histórico
         retcode, stdout, stderr = run_command(f"python manage.py migrate {app_name} --fake")
+
     log(stdout or "[sem saída]")
     if retcode != 0:
         log(f"❌ Erro final em migrate para {app_name}: {stderr}")

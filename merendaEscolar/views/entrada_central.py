@@ -38,10 +38,14 @@ class ErrorMessageMixin:
 
 class EntradaEstoqueCentralView(
     LoginRequiredMixin,
+    GroupRequiredMixin,
+    PermissionDenied,
     SuccessMessageMixin,
     ErrorMessageMixin,
     FormView,
 ):
+    group_required = NUTRICIONISTA_GROUPS
+    raise_exception = True  
     
 
     template_name = "merendaEscolar/estoque/entrada_central_form.html"
@@ -89,8 +93,15 @@ class EntradaEstoqueCentralView(
 # ===============================
 # DASHBOARD ESTOQUE CENTRAL
 # ===============================
-class EstoqueCentralListView(LoginRequiredMixin,
-                              ListView):
+class EstoqueCentralListView(
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    ListView):
+    
+    group_required = NUTRICIONISTA_GROUPS
+    permission_required = "merendaEscolar.view_estoquecentral"
+    raise_exception = True
+
     model = EstoqueCentral
     template_name = "merendaEscolar/estoque/estoque.html"
     context_object_name = "produtos"  
