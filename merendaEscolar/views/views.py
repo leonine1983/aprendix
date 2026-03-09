@@ -175,7 +175,7 @@ class ProdutoCreateView(
         "unidade_medida",
         "ativo"
     ]
-    template_name = "produto/form.html"
+    template_name = "merendaEscolar/produto/form.html"
     success_url = reverse_lazy("merendaEscolar:produto_list")
     success_message = "Produto cadastrado com sucesso."
     error_message = "Erro ao cadastrar o produto."
@@ -183,6 +183,7 @@ class ProdutoCreateView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = "Produto"
+        context["titulo"] = "Produto"
         return context
 
 

@@ -1,9 +1,9 @@
 {% extends "merendaEscolar/estoque_base.html" %}
 
-
 {% block content %}
 <style>
-  /* ====== Header Institucional ====== */
+
+/* ====== Header Institucional ====== */
 .page-header-block {
     max-width: 640px;
     margin: 0 auto 2rem auto;
@@ -43,19 +43,7 @@
     line-height: 1.6;
 }
 
-
-/* ====== Caixa de Exemplo ====== */
-.example-box {
-    margin-top: 1rem;
-    background: #f8fafc;
-    border-left: 4px solid var(--verde-principal);
-    padding: 0.9rem 1rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    color: #334155;
-}
-
-    /* ====== Container Principal ====== */
+/* ====== Container Principal ====== */
 .page-content {
     padding: 2rem 1.5rem;
 }
@@ -64,7 +52,7 @@
     font-size: 1.6rem;
     font-weight: 600;
     color: #0f172a;
-    margin-bottom: 2rem;
+    margin-bottom: 0.5rem;
 }
 
 /* ====== Card do Formulário ====== */
@@ -204,16 +192,17 @@
 
 
 <div class="page-content">
-    <div class="page-header-block">
+
+<div class="page-header-block">
 
     <div class="page-title-group">
         <h2 class="page-title">
-            {% if object %}Editar{% else %}Cadastrar{% endif %} {{ titulo }}
+            📦 {% if object %}Editar{% else %}Cadastrar{% endif %} {{ titulo }}
         </h2>
 
         <p class="page-subtitle">
             Preencha os dados abaixo para manter o cadastro organizado e padronizado
-            dentro do sistema de gestão de estoque.
+            dentro do sistema de gestão de estoque da merenda escolar.
         </p>
     </div>
 
@@ -233,48 +222,60 @@
 
 </div>
 
-   
 
+<div class="form-wrapper">
 
-    <div class="form-wrapper">
-        <form method="post">
-            {% csrf_token %}
+<form method="post" novalidate>
 
-            {% for field in form %}
-                <div class="form-group">
-                    <label for="{{ field.id_for_label }}">
-                        {{ field.label }}
-                        {% if field.field.required %}
-                            <span class="required">*</span>
-                        {% endif %}
-                    </label>
+{% csrf_token %}
 
-                    {{ field }}
+{% for field in form %}
 
-                    {% if field.help_text %}
-                        <div class="form-help">
-                            {{ field.help_text }}
-                        </div>
-                    {% endif %}
+<div class="form-group">
 
-                    {% for error in field.errors %}
-                        <div class="form-error">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endfor %}
+<label for="{{ field.id_for_label }}">
+    {{ field.label }}
 
-            <div class="form-actions">
-                <button type="submit" class="btn-primary-custom">
-                    Salvar
-                </button>
-                <a href="{{ cancel_url }}" class="btn-secondary-custom">
-                    Cancelar
-                </a>
-            </div>
-        </form>
-    </div>
+    {% if field.field.required %}
+        <span class="required">*</span>
+    {% endif %}
+</label>
+
+{{ field }}
+
+{% if field.help_text %}
+<div class="form-help">
+    {{ field.help_text }}
+</div>
+{% endif %}
+
+{% for error in field.errors %}
+<div class="form-error">
+    {{ error }}
+</div>
+{% endfor %}
 
 </div>
+
+{% endfor %}
+
+
+<div class="form-actions">
+
+<button type="submit" class="btn-primary-custom" aria-label="Salvar registro">
+    💾 Salvar
+</button>
+
+<a href="{% url 'merendaEscolar:produto_list' %}" class="btn-secondary-custom">
+    ↩ Cancelar  
+</a>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
 {% endblock content %}
