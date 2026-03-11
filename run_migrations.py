@@ -3,6 +3,9 @@ import sys
 import time
 from datetime import datetime
 
+# Usa o mesmo interpretador Python que executa este script
+PYTHON_CMD = sys.executable
+
 APPS = [
     "rh",
     "admin_acessos",
@@ -41,7 +44,7 @@ def run_command(command):
 
 
 # ---------------------------------------------------------
-# MIGRAÇÃO GLOBAL
+# ETAPA 1 — MIGRAÇÃO GLOBAL
 # ---------------------------------------------------------
 
 def migrate_global():
@@ -50,7 +53,7 @@ def migrate_global():
     log("🚀 ETAPA 1 — MIGRAÇÃO GLOBAL DO DJANGO")
     log("================================================\n")
 
-    retcode, stdout, stderr = run_command("py manage.py makemigrations")
+    retcode, stdout, stderr = run_command(f"{PYTHON_CMD} manage.py makemigrations")
 
     log("📄 makemigrations GLOBAL:")
     log(stdout or "[sem saída]")
@@ -59,7 +62,7 @@ def migrate_global():
         log(f"❌ Erro no makemigrations global: {stderr}")
         sys.exit(1)
 
-    retcode, stdout, stderr = run_command("py manage.py migrate")
+    retcode, stdout, stderr = run_command(f"{PYTHON_CMD} manage.py migrate")
 
     log("📦 migrate GLOBAL:")
     log(stdout or "[sem saída]")
@@ -72,7 +75,7 @@ def migrate_global():
 
 
 # ---------------------------------------------------------
-# MIGRAÇÃO APP POR APP
+# ETAPA 2 — MIGRAÇÃO APP POR APP
 # ---------------------------------------------------------
 
 def migrate_app(app_name, index):
@@ -84,7 +87,7 @@ def migrate_app(app_name, index):
     start_time = time.time()
 
     retcode, stdout, stderr = run_command(
-        f"py manage.py makemigrations {app_name}"
+        f"{PYTHON_CMD} manage.py makemigrations {app_name}"
     )
 
     log(f"📄 makemigrations [{app_name}]")
@@ -95,7 +98,7 @@ def migrate_app(app_name, index):
         sys.exit(1)
 
     retcode, stdout, stderr = run_command(
-        f"py manage.py migrate {app_name}"
+        f"{PYTHON_CMD} manage.py migrate {app_name}"
     )
 
     log(f"📦 migrate [{app_name}]")
@@ -133,7 +136,7 @@ def migrate_all_apps():
 
 
 # ---------------------------------------------------------
-# SUPERUSER
+# ETAPA 3 — CRIAÇÃO DE SUPERUSUÁRIO
 # ---------------------------------------------------------
 
 def criar_superuser():
@@ -141,7 +144,7 @@ def criar_superuser():
     log("👑 Verificando superusuário 'rogerio'")
 
     command = (
-        "py manage.py shell -c \""
+        f"{PYTHON_CMD} manage.py shell -c \""
         "from django.contrib.auth import get_user_model;"
         "User=get_user_model();"
         "User.objects.filter(username='rogerio').exists() or "
