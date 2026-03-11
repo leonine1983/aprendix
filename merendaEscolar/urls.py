@@ -14,6 +14,7 @@ urlpatterns = [
     path("unidades/", UnidadeMedidaListView.as_view(), name="unidade_medida_list"),
     path("unidades/nova/", UnidadeMedidaCreateView.as_view(), name="unidade_medida_create"),
     path("unidades/<int:pk>/editar/", UnidadeMedidaUpdateView.as_view(), name="unidade_medida_update"),
+    path("unidades/<int:pk>/excluir/", UnidadeMedidaDeleteView.as_view(), name="unidade_medida_delete"),
 
     # Categoria
     path("categorias/", CategoriaProdutoListView.as_view(), name="categoria_produto_list"),

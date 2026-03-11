@@ -1,0 +1,72 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+
+<style>
+
+.delete-card {
+    max-width: 520px;
+    margin: 3rem auto;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.delete-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.delete-warning {
+    color: #64748b;
+    margin-bottom: 2rem;
+}
+
+.btn-danger-modern {
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1.4rem;
+    margin-right: 10px;
+}
+
+.btn-cancel-modern {
+    background: #e2e8f0;
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1.4rem;
+}
+
+</style>
+
+<div class="delete-card">
+
+    <div class="delete-title">
+        Confirmar Exclusão
+    </div>
+
+    <p class="delete-warning">
+        Tem certeza que deseja excluir a unidade de medida
+        <strong>{{ object.nome }} ({{ object.sigla }})</strong>?
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <button type="submit" class="btn-danger-modern">
+            Confirmar Exclusão
+        </button>
+
+        <a href="{% url 'merendaEscolar:unidade_medida_list' %}"
+           class="btn-cancel-modern">
+            Cancelar
+        </a>
+    </form>
+
+</div>
+
+{% endblock %}

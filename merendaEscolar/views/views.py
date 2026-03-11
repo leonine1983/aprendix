@@ -1,10 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.db.models import Sum, Count
 from django.utils import timezone
 from datetime import timedelta
 from rh.models import Escola
 
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 
 from ..models import EstoqueCentral, UnidadeMedida, CategoriaProduto, Produto
@@ -41,10 +41,55 @@ class UnidadeMedidaListView(
     LoginRequiredMixin,
     ListView
 ):
+    """
+    Lista paginada das unidades de medida cadastradas no sistema.
+
+    Esta view possui também uma responsabilidade adicional:
+    informar ao template se cada unidade de medida possui vínculo
+    com outros registros do sistema (ex: produtos cadastrados).
+
+    Essa informação é utilizada para fins de segurança na interface,
+    permitindo exibir o botão "Excluir" apenas quando a unidade ainda
+    não estiver sendo utilizada por nenhuma outra tabela.
+
+    IMPORTANTE:
+    Mesmo com essa verificação no template, a validação definitiva
+    deve ocorrer também na view de exclusão para garantir integridade
+    de dados no backend.
+    """
+
     model = UnidadeMedida
     template_name = "merendaEscolar/unidade_medida/list.html"
     context_object_name = "unidades"
     paginate_by = 10
+
+    def get_queryset(self):
+        """
+        Sobrescrevemos o queryset padrão para adicionar uma informação
+        auxiliar em cada objeto retornado.
+
+        Para cada unidade de medida, verificamos se existe algum registro
+        relacionado (por exemplo, produtos que utilizam essa unidade).
+
+        Se existir vínculo:
+            unidade.tem_vinculo = True
+
+        Se não existir:
+            unidade.tem_vinculo = False
+
+        O template usa essa informação para decidir se deve ou não
+        exibir o botão de exclusão para o usuário.
+        """
+
+        queryset = super().get_queryset()
+
+        for unidade in queryset:
+
+            # Verifica se existe algum produto vinculado a esta unidade.
+            # O related_name "produtos" deve existir no model Produto.
+            unidade.tem_vinculo = unidade.produtos.exists()
+
+        return queryset
 
 
 
@@ -76,6 +121,71 @@ class UnidadeMedidaUpdateView(
     success_message = "Unidade de medida atualizada com sucesso."
     error_message = "Erro ao atualizar a unidade de medida."
 
+
+
+
+class UnidadeMedidaDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Exclusão institucional de Unidade de Medida.
+
+    Regras de negócio aplicadas:
+
+    1) Uma unidade de medida NÃO pode ser excluída caso exista
+       qualquer Produto vinculado a ela.
+
+    2) A validação ocorre obrigatoriamente no backend para garantir
+       integridade referencial do banco de dados.
+
+    3) O template apenas solicita confirmação da ação do usuário.
+
+    4) Todas as respostas da view enviam mensagens ao usuário,
+       seguindo a diretriz institucional de feedback explícito
+       utilizando o Django Messages Framework.
+    """
+
+    model = UnidadeMedida
+    template_name = "merendaEscolar/unidade_medida/confirm_delete.html"
+    success_url = reverse_lazy("merendaEscolar:unidade_medida_list")
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Executa a exclusão da unidade de medida com validação
+        de integridade referencial.
+        """
+
+        self.object = self.get_object()
+
+        try:
+            # Verifica se existe produto utilizando esta unidade
+            if self.object.produtos.exists():
+
+                messages.warning(
+                    request,
+                    "Esta unidade de medida não pode ser excluída pois já está vinculada a produtos cadastrados."
+                )
+
+                return redirect(self.success_url)
+
+            nome_unidade = str(self.object)
+
+            self.object.delete()
+
+            messages.success(
+                request,
+                f'A unidade de medida "{nome_unidade}" foi excluída com sucesso.'
+            )
+
+            return redirect(self.success_url)
+
+        except Exception:
+            # Tratamento defensivo para falhas inesperadas
+
+            messages.error(
+                request,
+                "Ocorreu um erro inesperado ao tentar excluir a unidade de medida."
+            )
+
+            return redirect(self.success_url)
 
 
 # Categoria de Produto

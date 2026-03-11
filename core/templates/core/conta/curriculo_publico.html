@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>
+Currículo - {{ perfil.user.get_full_name|default:perfil.user.username }}
+</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+
+body{
+    background:#f5f7fa;
+}
+
+.curriculo-container{
+    max-width:1000px;
+    margin:auto;
+}
+
+.foto-perfil{
+    width:160px;
+    height:160px;
+    object-fit:cover;
+}
+
+.card{
+    border:none;
+}
+
+.section-title{
+    font-weight:600;
+}
+
+/* BOTÃO DE IMPRESSÃO */
+
+.print-btn{
+    position:fixed;
+    top:20px;
+    right:20px;
+    z-index:1000;
+}
+
+/* ESTILO PARA IMPRESSÃO */
+
+@media print {
+
+    body{
+        background:white;
+    }
+
+    .print-btn{
+        display:none;
+    }
+
+    .card{
+        box-shadow:none !important;
+        border:1px solid #ddd;
+    }
+
+    .container{
+        max-width:100%;
+        padding:0;
+    }
+
+    .curriculo-container{
+        margin:0;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- BOTÃO DE IMPRESSÃO -->
+
+<div class="print-btn">
+    <button class="btn btn-primary" onclick="window.print()">
+        <i class="bi bi-printer"></i>
+        Imprimir currículo
+    </button>
+</div>
+
+
+<div class="container py-5 curriculo-container">
+
+    <!-- CABEÇALHO -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <div class="row align-items-center">
+
+                <div class="col-md-3 text-center mb-3 mb-md-0">
+
+                    {% if perfil.foto %}
+                        <img
+                        src="{{ perfil.foto.url }}"
+                        class="rounded-circle shadow foto-perfil"
+                        alt="Foto de {{ perfil.user.get_full_name }}">
+                    {% else %}
+                        <img
+                        src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                        class="rounded-circle shadow foto-perfil"
+                        alt="Foto padrão">
+                    {% endif %}
+
+                </div>
+
+                <div class="col-md-9">
+
+                    <h1 class="mb-1">
+                        <i class="bi bi-person-badge-fill"></i>
+                        {{ perfil.user.get_full_name|default:perfil.user.username }}
+                    </h1>
+
+                    {% if perfil.cargo %}
+                    <p class="text-muted fs-5 mb-2">
+                        {{ perfil.cargo }}
+                    </p>
+                    {% endif %}
+
+                    <div class="small text-secondary">
+
+                        {% if perfil.cidade %}
+                        <div>
+                            <i class="bi bi-geo-alt"></i>
+                            {{ perfil.cidade }} - {{ perfil.estado }}
+                        </div>
+                        {% endif %}
+
+                        {% if perfil.telefone %}
+                        <div>
+                            <i class="bi bi-telephone"></i>
+                            {{ perfil.telefone }}
+                        </div>
+                        {% endif %}
+
+                        {% if perfil.user.email %}
+                        <div>
+                            <i class="bi bi-envelope"></i>
+                            {{ perfil.user.email }}
+                        </div>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- BIOGRAFIA -->
+    {% if perfil.biografia %}
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h4 class="section-title mb-3">
+                <i class="bi bi-file-person"></i>
+                Sobre o Profissional
+            </h4>
+
+            <p class="text-muted">
+                {{ perfil.biografia|linebreaks }}
+            </p>
+
+        </div>
+
+    </div>
+    {% endif %}
+
+
+    <!-- FORMAÇÃO -->
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h4 class="section-title mb-3">
+                <i class="bi bi-mortarboard-fill"></i>
+                Formação Acadêmica
+            </h4>
+
+            <ul class="list-group list-group-flush">
+
+                {% if perfil.graduacao %}
+                <li class="list-group-item">
+                    <strong>Graduação</strong><br>
+                    {{ perfil.graduacao }}
+                </li>
+                {% endif %}
+
+                {% if perfil.especializacao %}
+                <li class="list-group-item">
+                    <strong>Especialização</strong><br>
+                    {{ perfil.especializacao }}
+                </li>
+                {% endif %}
+
+            </ul>
+
+        </div>
+
+    </div>
+
+
+    <!-- ENDEREÇO -->
+    {% if perfil.endereco %}
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h4 class="section-title mb-3">
+                <i class="bi bi-building"></i>
+                Localização
+            </h4>
+
+            <p class="text-muted mb-0">
+                {{ perfil.endereco }}<br>
+                {{ perfil.cidade }} - {{ perfil.estado }}<br>
+
+                {% if perfil.cep %}
+                CEP: {{ perfil.cep }}
+                {% endif %}
+            </p>
+
+        </div>
+
+    </div>
+    {% endif %}
+
+
+    <!-- RODAPÉ -->
+    <div class="text-center text-muted small mt-4">
+
+        <hr>
+
+        Currículo público gerado automaticamente •
+        {{ perfil.atualizado_em|date:"d/m/Y H:i" }}
+
+    </div>
+
+</div>
+
+</body>
+</html>

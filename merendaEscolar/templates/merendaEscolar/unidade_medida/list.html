@@ -175,6 +175,39 @@
     }
 }
 
+/* Botão base */
+.btn-outline-modern {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    margin-left: 5px;
+}
+
+/* Editar */
+.btn-editar {
+    color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-editar:hover {
+    background: #0d6efd;
+    color: #fff;
+}
+
+/* Excluir */
+.btn-excluir {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-excluir:hover {
+    background: #dc3545;
+    color: #fff;
+}
+
 </style>
 
     <div class="page-header">
@@ -209,12 +242,27 @@
         {% for unidade in unidades %}
             <tr>
                 <td data-label="Nome">{{ unidade.nome }}</td>
-                <td data-label="Sigla"><strong>{{ unidade.sigla }}</strong></td>
+
+                <td data-label="Sigla">
+                    <strong>{{ unidade.sigla }}</strong>
+                </td>
+
                 <td data-label="Ações" class="text-end">
-                    <a href="{% url 'merendaEscolar:unidade_medida_update' unidade.id %}" 
-                       class="btn-outline-modern">
+
+                    <a href="{% url 'merendaEscolar:unidade_medida_update' unidade.id %}"
+                    class="btn-outline-modern btn-editar">
+                        <i class="bi bi-pencil-square me-1"></i>
                         Editar
                     </a>
+
+                    {% if not unidade.tem_vinculo %}
+                    <a href="{% url 'merendaEscolar:unidade_medida_delete' unidade.id %}"
+                    class="btn-outline-modern btn-excluir">
+                        <i class="bi bi-trash me-1"></i>
+                        Excluir
+                    </a>
+                    {% endif %}
+
                 </td>
             </tr>
         {% empty %}

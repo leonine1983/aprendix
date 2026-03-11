@@ -267,6 +267,7 @@ class EstoqueEscola(models.Model):
     atualizado_em = models.DateTimeField(auto_now=True)
 
     class Meta:
+        ordering = ["data_validade"]   # ← aqui
         constraints = [
             models.UniqueConstraint(
                 fields=["escola", "produto", "lote"],
