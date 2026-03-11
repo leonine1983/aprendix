@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.db import transaction
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.utils import timezone
 
 from merendaEscolar.models import Transferencia, DivergenciaEntrega
@@ -33,16 +33,13 @@ class TransferenciaConferenciaView(LoginRequiredMixin, DetailView):
 
         houve_divergencia = False
 
+        # 🔹 Registrar divergências
         for item in transferencia.itens.all():
             qtd_enviada = item.quantidade
-            qtd_recebida = float(
-                request.POST.get(f"recebido_{item.id}", qtd_enviada)
-            )
-
+            qtd_recebida = float(request.POST.get(f"recebido_{item.id}", qtd_enviada))
             descricao = request.POST.get(f"descricao_{item.id}", "").strip()
 
             if qtd_recebida != qtd_enviada:
-
                 if not descricao:
                     messages.error(
                         request,
@@ -64,12 +61,21 @@ class TransferenciaConferenciaView(LoginRequiredMixin, DetailView):
                     registrado_por=request.user,
                 )
 
-        # Atualiza status
-        transferencia.status = "RECEBIDO"
-        transferencia.data_recebimento = timezone.now()
-        transferencia.recebido_por = request.user
+        # 🔹 Atualizar status para EM_CONFERENCIA antes de receber
+        transferencia.status = "EM_CONFERENCIA"
         transferencia.save()
 
+        # 🔹 Chamar método institucional de recebimento
+        try:
+            transferencia.receber(request.user)
+        except ValidationError as e:
+            messages.error(request, str(e))
+            return redirect(
+                "merendaEscolar:transferencia-conferencia",
+                pk=transferencia.pk
+            )
+
+        # 🔹 Mensagens de feedback
         if houve_divergencia:
             messages.warning(request, "Conferência finalizada com divergência registrada.")
         else:

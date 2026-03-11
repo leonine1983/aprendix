@@ -5,3 +5,4 @@ from .models import *
 admin.site.register(Produto)
 admin.site.register(EstoqueCentral)
 admin.site.register(Transferencia)
+admin.site.register(EstoqueEscola)

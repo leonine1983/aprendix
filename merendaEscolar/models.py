@@ -217,8 +217,6 @@ class EstoqueCentral(models.Model):
     quantidade = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])
     atualizado_em = models.DateTimeField(auto_now=True)
 
-    
-
 
     class Meta:
         constraints = [
@@ -265,6 +263,9 @@ class EstoqueEscola(models.Model):
     )
 
     atualizado_em = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Lote:  {self.lote} - {self.escola}"
 
     class Meta:
         ordering = ["data_validade"]   # ← aqui
@@ -351,6 +352,23 @@ class Transferencia(models.Model):
     criado_por = models.ForeignKey(User, on_delete=models.PROTECT)
     criado_em = models.DateTimeField(auto_now_add=True)
 
+    enviado_por = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="transferencias_enviadas"
+    )
+
+    enviado_em = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return f"{self.numero} - {self.escola_destino}"
+
+
     class Meta:
         ordering = ["-criado_em"]
 
@@ -389,6 +407,7 @@ class Transferencia(models.Model):
         - Bloqueio pessimista de estoque (select_for_update).
         - Rastreabilidade sanitária por lote.
         """
+        from django.utils import timezone
 
         if self.status != "RASCUNHO":
             raise ValidationError("Apenas transferências em rascunho podem ser enviadas.")
@@ -425,7 +444,10 @@ class Transferencia(models.Model):
             )
 
         self.status = "ENVIADO"
+        self.enviado_por = usuario
+        self.enviado_em = timezone.now()
         self.save()
+        
     @transaction.atomic
     def receber(self, usuario):
         """

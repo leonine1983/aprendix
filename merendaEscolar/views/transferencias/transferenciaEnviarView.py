@@ -51,4 +51,6 @@ class TransferenciaEnviarView(
                 "Erro inesperado ao enviar a transferência."
             )
 
-        return redirect(reverse("merendaEscolar:transferencia-detail", args=[pk]))
+        #return redirect(reverse("merendaEscolar:transferencia-detail", args=[pk]))
+        return redirect(reverse("merendaEscolar:transferencia-print", args=[pk])
+)

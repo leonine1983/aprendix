@@ -96,6 +96,11 @@ urlpatterns = [
     TransferenciaItemUpdateView.as_view(),
     name="transferenciaitem-update"
     ),
+    path(
+    "transferencia/<int:pk>/imprimir/",
+    TransferenciaPrintView.as_view(),
+    name="transferencia-print"
+    ),
 
     # Escola 
     path(

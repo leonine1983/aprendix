@@ -7,6 +7,7 @@ from .transferencias.transferenciaReceberView import *
 from .transferencias.transferenciaDetailView import *
 from .transferencias.transferenciaListView import *
 from .transferencias.transferenciaCreateView import *
+from .transferencias.transferenciaPrintView import *
 
 
 # Transferencia  Itens
@@ -22,6 +23,7 @@ from .escola_confirma_transferencia.receberTransferenciaView import *
 from .escola_confirma_transferencia.transferenciaConferenciaView import *
 from .escola_confirma_transferencia.estoqueEscolaDashboardView import *
 from .escola_confirma_transferencia.listaEscolasViewDashboard import *
+
 
 # Receitas
 from .receitas.receitaListView import *

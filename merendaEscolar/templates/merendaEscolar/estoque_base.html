@@ -752,6 +752,27 @@ body{
     border-color:#dc2626;
 }
 
+
+/* =====================================
+   MASCOTE FLUTUANTE - PROFESSOR CORUJA
+===================================== */
+
+.coruja-assistente{
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 140px;
+    height: auto;
+    z-index: 9999; /* sobrepõe todos os elementos */
+    pointer-events: none; /* não bloqueia cliques da interface */
+    opacity: 0.95;
+    transition: transform .25s ease;
+}
+
+.coruja-assistente:hover{
+    transform: scale(1.05);
+}
+
 </style>
 </head>
 
