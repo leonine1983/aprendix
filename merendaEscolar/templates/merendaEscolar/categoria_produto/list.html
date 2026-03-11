@@ -218,35 +218,79 @@
 
 <div class="table-responsive table-modern">
     <table class="table align-middle mb-0">
+
         <thead>
             <tr>
                 <th>Nome</th>
                 <th>Descrição</th>
+                <th>Uso no Estoque</th>
                 <th class="text-end">Ações</th>
             </tr>
         </thead>
+
         <tbody>
+
         {% for categoria in categorias %}
+
             <tr>
-                <td data-label="Nome"><strong>{{ categoria.nome }}</strong></td>
+
+                <td data-label="Nome">
+                    <strong>{{ categoria.nome }}</strong>
+                </td>
+
                 <td data-label="Descrição">
                     {{ categoria.descricao|default:"—" }}
                 </td>
+
+                <td data-label="Uso">
+
+                    {% if categoria.total_produtos > 0 %}
+                        <span class="badge bg-secondary">
+                            <i class="bi bi-box-seam"></i>
+                            Em uso ({{ categoria.total_produtos }})
+                        </span>
+                    {% else %}
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle"></i>
+                            Disponível
+                        </span>
+                    {% endif %}
+
+                </td>
+
                 <td data-label="Ações" class="text-end">
-                    <a href="{% url 'merendaEscolar:categoria_produto_update' categoria.id %}" 
-                       class="btn btn-sm btn-outline-secondary">
+
+                    <a href="{% url 'merendaEscolar:categoria_produto_update' categoria.id %}"
+                    class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-pencil-square me-1"></i>
                         Editar
                     </a>
+
+                    {% if categoria.total_produtos == 0 %}
+                    
+                    <a href="{% url 'merendaEscolar:categoria_produto_delete' categoria.id %}"
+                    class="btn-outline-danger-modern">
+                        <i class="bi bi-trash me-1"></i>
+                        Excluir
+                    </a>
+                    {% endif %}
+
                 </td>
+
             </tr>
+
         {% empty %}
+
             <tr>
-                <td colspan="3" class="empty-state">
+                <td colspan="4" class="empty-state">
                     Nenhuma categoria cadastrada.
                 </td>
             </tr>
+
         {% endfor %}
+
         </tbody>
+
     </table>
 </div>
 

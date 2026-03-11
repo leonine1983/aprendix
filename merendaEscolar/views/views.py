@@ -189,14 +189,48 @@ class UnidadeMedidaDeleteView(LoginRequiredMixin, DeleteView):
 
 
 # Categoria de Produto
+from django.db.models import Count
+
+
 class CategoriaProdutoListView(
     LoginRequiredMixin,
     ListView
 ):
+    """
+    Listagem institucional de categorias de produto.
+
+    Estratégia:
+    - O banco calcula o total de produtos vinculados
+    - A view deriva propriedades de controle (tem_vinculo, pode_excluir)
+    - O template apenas consome essas propriedades
+    """
+
     model = CategoriaProduto
     template_name = "merendaEscolar/categoria_produto/list.html"
     context_object_name = "categorias"
     paginate_by = 10
+
+    def get_queryset(self):
+        queryset = (
+            CategoriaProduto.objects
+            .annotate(total_produtos=Count("produtos"))
+            .order_by("nome")
+        )
+
+        for categoria in queryset:
+
+            # indicador de vínculo
+            categoria.tem_vinculo = categoria.total_produtos > 0
+
+            # regra institucional de exclusão
+            categoria.pode_excluir = categoria.total_produtos == 0
+
+            # indicador visual para o template
+            categoria.status_visual = (
+                "Em uso" if categoria.tem_vinculo else "Disponível"
+            )
+
+        return queryset
 
 
 
@@ -228,8 +262,54 @@ class CategoriaProdutoUpdateView(
     success_message = "Categoria atualizada com sucesso."
     error_message = "Erro ao atualizar a categoria."
 
+
+
+class CategoriaProdutoDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Exclusão de Categoria de Produto.
+
+    Regras institucionais:
+
+    - Uma categoria NÃO pode ser excluída se possuir produtos vinculados.
+    - A validação ocorre no backend para garantir integridade do sistema.
+    - Sempre enviamos feedback ao usuário utilizando Django Messages.
+    """
+
+    model = CategoriaProduto
+    template_name = "merendaEscolar/categoria_produto/confirm_delete.html"
+    success_url = reverse_lazy("merendaEscolar:categoria_produto_list")
+
+    def delete(self, request, *args, **kwargs):
+
+        self.object = self.get_object()
+
+        # Verifica se existem produtos vinculados à categoria
+        if self.object.produtos.exists():
+
+            messages.warning(
+                request,
+                "Esta categoria não pode ser excluída pois possui produtos vinculados."
+            )
+
+            return redirect(self.success_url)
+
+        nome_categoria = self.object.nome
+
+        # exclusão segura
+        self.object.delete()
+
+        messages.success(
+            request,
+            f'A categoria "{nome_categoria}" foi excluída com sucesso.'
+        )
+
+        return redirect(self.success_url)
+
+
 # Produtos
 from django.db.models import Q
+from django.db.models import Exists, OuterRef
+from ..models import EstoqueEscola, MovimentacaoEstoque, ReceitaIngrediente, TransferenciaItem
 
 class ProdutoListView(
     LoginRequiredMixin,
@@ -240,10 +320,27 @@ class ProdutoListView(
     context_object_name = "produtos"
     paginate_by = 10
 
+    
+
     def get_queryset(self):
+
         queryset = (
             Produto.objects
             .select_related("categoria", "unidade_medida")
+            .annotate(
+                possui_estoque_central=Exists(
+                    EstoqueCentral.objects.filter(produto=OuterRef("pk"))
+                ),
+                possui_estoque_escola=Exists(
+                    EstoqueEscola.objects.filter(produto=OuterRef("pk"))
+                ),
+                possui_movimentacao=Exists(
+                    MovimentacaoEstoque.objects.filter(produto=OuterRef("pk"))
+                ),
+                possui_receita=Exists(
+                    ReceitaIngrediente.objects.filter(produto=OuterRef("pk"))
+                ),
+            )
             .order_by("nome")
         )
 
@@ -320,6 +417,52 @@ class ProdutoUpdateView(
         context = super().get_context_data(**kwargs)
         context['titulo'] = "Produto"
         return context
+    
+
+from django.urls import reverse_lazy
+from django.views.generic import DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.core.exceptions import ValidationError
+
+class ProdutoDeleteView(
+    LoginRequiredMixin,
+    DeleteView
+):
+    model = Produto
+    template_name = "merendaEscolar/produto/delete.html"
+    success_url = reverse_lazy("merendaEscolar:produto_list")
+
+    def dispatch(self, request, *args, **kwargs):
+        produto = self.get_object()
+
+        if self._possui_vinculos(produto):
+            messages.error(
+                request,
+                "Este produto possui vínculos institucionais e não pode ser excluído."
+            )
+            return redirect("merendaEscolar:produto_list")
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def _possui_vinculos(self, produto):
+
+        if produto.estoque_central.exists():
+            return True
+
+        if EstoqueEscola.objects.filter(produto=produto).exists():
+            return True
+
+        if MovimentacaoEstoque.objects.filter(produto=produto).exists():
+            return True
+
+        if ReceitaIngrediente.objects.filter(produto=produto).exists():
+            return True
+
+        if TransferenciaItem.objects.filter(produto=produto).exists():
+            return True
+
+        return False
 
 
 @login_required

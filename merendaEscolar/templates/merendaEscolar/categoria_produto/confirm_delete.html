@@ -1,0 +1,90 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+
+<style>
+.confirm-card{
+    max-width:600px;
+    margin:auto;
+    margin-top:40px;
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.08);
+}
+
+.confirm-title{
+    font-size:1.4rem;
+    font-weight:600;
+    margin-bottom:10px;
+    color:#1e293b;
+}
+
+.confirm-text{
+    color:#475569;
+    margin-bottom:25px;
+}
+
+.confirm-actions{
+    display:flex;
+    gap:10px;
+}
+
+
+/* ===== Botão de ação destrutiva ===== */
+
+.btn-danger-delete{
+    background:#dc2626;
+    border:none;
+    color:white;
+    padding:0.55rem 1.1rem;
+    border-radius:8px;
+    font-weight:500;
+    transition:all 0.25s ease;
+}
+
+.btn-danger-delete:hover{
+    background:#b91c1c;
+    transform:translateY(-1px);
+    box-shadow:0 6px 14px rgba(220,38,38,0.25);
+}
+
+.btn-danger-delete i{
+    margin-right:6px;
+}
+</style>
+
+<div class="confirm-card">
+
+    <div class="confirm-title">
+        <i class="bi bi-exclamation-triangle text-warning"></i>
+        Confirmar exclusão
+    </div>
+
+    <p class="confirm-text">
+        Tem certeza que deseja excluir a categoria
+        <strong>{{ object.nome }}</strong>?
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="confirm-actions">
+
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i>
+                Confirmar Exclusão
+            </button>
+
+            <a href="{% url 'merendaEscolar:categoria_produto_list' %}"
+               class="btn btn-outline-secondary">
+                Cancelar
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

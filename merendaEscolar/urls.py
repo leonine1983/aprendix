@@ -20,11 +20,20 @@ urlpatterns = [
     path("categorias/", CategoriaProdutoListView.as_view(), name="categoria_produto_list"),
     path("categorias/nova/", CategoriaProdutoCreateView.as_view(), name="categoria_produto_create"),
     path("categorias/<int:pk>/editar/", CategoriaProdutoUpdateView.as_view(), name="categoria_produto_update"),
+    # Excluir categoria
+    path(
+        "categorias/<int:pk>/excluir/",
+        CategoriaProdutoDeleteView.as_view(),
+        name="categoria_produto_delete"
+    ),
 
     # Produto
     path("produtos/", ProdutoListView.as_view(), name="produto_list"),
     path("produtos/novo/", ProdutoCreateView.as_view(), name="produto_create"),
     path("produtos/<int:pk>/editar/", ProdutoUpdateView.as_view(), name="produto_update"),
+    path(
+    "produtos/<int:pk>/excluir/", ProdutoDeleteView.as_view(), name="produto_delete"
+),
 
     # Estoque ----------------
      # Dashboard / Listagem

@@ -1,0 +1,96 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+
+<style>
+
+.confirm-card{
+    max-width:600px;
+    margin:auto;
+    margin-top:40px;
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.08);
+}
+
+.confirm-title{
+    font-size:1.4rem;
+    font-weight:600;
+    margin-bottom:10px;
+    color:#1e293b;
+}
+
+.confirm-text{
+    color:#475569;
+    margin-bottom:25px;
+}
+
+.confirm-actions{
+    display:flex;
+    gap:10px;
+}
+
+.btn-danger-custom{
+    background:#dc2626;
+    border:none;
+    color:white;
+    padding:8px 18px;
+    border-radius:8px;
+    font-weight:600;
+    transition:all .2s ease;
+}
+
+.btn-danger-custom:hover{
+    background:#b91c1c;
+}
+
+.btn-secondary-custom{
+    background:#f1f5f9;
+    border:1px solid #e2e8f0;
+    padding:8px 18px;
+    border-radius:8px;
+    text-decoration:none;
+    color:#334155;
+    font-weight:500;
+}
+
+.btn-secondary-custom:hover{
+    background:#e2e8f0;
+}
+
+</style>
+
+<div class="confirm-card">
+
+<div class="confirm-title">
+    Confirmar exclusão
+</div>
+
+<div class="confirm-text">
+    Você está prestes a excluir o produto:
+    <strong>{{ object.nome }}</strong>.
+    <br><br>
+    Esta ação não poderá ser desfeita.
+</div>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="confirm-actions">
+
+        <button type="submit" class="btn-danger-custom">
+            Excluir Produto
+        </button>
+
+        <a href="{% url 'merendaEscolar:produto_list' %}" class="btn-secondary-custom">
+            Cancelar
+        </a>
+
+    </div>
+
+</form>
+
+</div>
+
+{% endblock %}

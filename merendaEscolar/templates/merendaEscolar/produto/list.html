@@ -259,12 +259,23 @@
                         <span class="status-badge status-inactive">Inativo</span>
                     {% endif %}
                 </td>
-                <td data-label="Ações">
-                    <a href="{% url 'merendaEscolar:produto_update' produto.id %}" 
-                       class="btn-outline-modern">
+                <td data-label="Ações" class="text-end">
+
+                    <a href="{% url 'merendaEscolar:produto_update' produto.id %}"
+                    class="btn btn-sm btn-outline-secondary">
                         Editar
                     </a>
-                </td>
+
+                    {% if not produto.possui_estoque_central and not produto.possui_estoque_escola and not produto.possui_movimentacao and not produto.possui_receita %}
+                    
+                        <a href="{% url 'merendaEscolar:produto_delete' produto.id %}"
+                        class="btn btn-sm btn-outline-danger">
+                            Excluir
+                        </a>
+
+                    {% endif %}
+
+                </td>                
             </tr>
         {% empty %}
         <tr>
