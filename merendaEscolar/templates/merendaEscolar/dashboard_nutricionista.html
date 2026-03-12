@@ -1,0 +1,349 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+
+<div class="container-fluid mt-4">
+
+    <!-- CABEÇALHO -->
+
+    <div class="d-flex align-items-center mb-4">
+        <h2 class="me-2">📊</h2>
+        <h2 class="mb-0">Painel de Gestão Nutricional da Rede Escolar</h2>
+    </div>
+
+
+    <!-- INDICADORES -->
+
+    <div class="row mb-4">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h6>Total de Produtos</h6>
+                    <h3>{{ total_produtos }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h6>Estoque Central</h6>
+                    <h3>{{ estoque_total_central|default:0 }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h6>Estoque nas Escolas</h6>
+                    <h3>{{ estoque_total_escolas|default:0 }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h6>Movimentações no Mês</h6>
+                    <h3>{{ movimentacoes_mes }}</h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- LOGÍSTICA -->
+
+    <div class="row mb-4">
+
+        <div class="col-md-4">
+            <div class="card border-warning shadow-sm">
+                <div class="card-body text-center">
+                    <h6>Aguardando Confirmação de Recebimento pela Escola</h6>
+                    <h3>{{ transferencias_pendentes }}</h3>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <div class="col-md-4">
+            <div class="card border-danger shadow-sm">
+                <div class="card-body text-center">
+                    <h6>Divergências Registradas</h6>
+                    <h3>{{ divergencias_abertas }}</h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- GRÁFICOS -->
+
+    <div class="row">
+
+        <!-- Pizza -->
+
+        <div class="col-md-6 mb-4">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+                    Distribuição de Estoque por Categoria
+                </div>
+
+                <div class="card-body">
+                    <canvas id="graficoCategoria"></canvas>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Barras consumo -->
+
+        <div class="col-md-6 mb-4">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+                    Ranking de Consumo de Produtos
+                </div>
+
+                <div class="card-body">
+                    <canvas id="graficoConsumo"></canvas>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Estoque por escola -->
+
+        <div class="col-md-6 mb-4">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+                    Estoque por Escola
+                </div>
+
+                <div class="card-body">
+                    <canvas id="graficoEscolas"></canvas>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Histórico -->
+
+        <div class="col-md-6 mb-4">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+                    Histórico de Movimentação
+                </div>
+
+                <div class="card-body">
+                    <canvas id="graficoHistorico"></canvas>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TABELAS -->
+
+    <div class="row">
+
+        <div class="col-md-6">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+                    Produtos Mais Consumidos
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table table-sm">
+
+                        <thead>
+
+                            <tr>
+                                <th>Produto</th>
+                                <th>Consumo</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for p in consumo_produtos %}
+
+                            <tr>
+                                <td>{{ p.produto__nome }}</td>
+                                <td>{{ p.total }}</td>
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+                    Ranking de Estoque por Escola
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table table-sm">
+
+                        <thead>
+
+                            <tr>
+                                <th>Escola</th>
+                                <th>Quantidade</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for e in estoque_escolas %}
+
+                            <tr>
+                                <td>{{ e.escola__nome_escola }}</td>
+                                <td>{{ e.total }}</td>
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- SERIALIZAÇÃO SEGURA DJANGO -->
+
+{{ estoque_categoria|json_script:"estoqueCategoriaData" }}
+{{ consumo_produtos|json_script:"consumoProdutosData" }}
+{{ estoque_escolas|json_script:"estoqueEscolasData" }}
+{{ historico|json_script:"historicoData" }}
+
+
+<!-- CHART.JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const categorias = JSON.parse(document.getElementById("estoqueCategoriaData").textContent);
+const consumo = JSON.parse(document.getElementById("consumoProdutosData").textContent);
+const escolas = JSON.parse(document.getElementById("estoqueEscolasData").textContent);
+const historico = JSON.parse(document.getElementById("historicoData").textContent);
+
+
+/* Pizza */
+
+new Chart(document.getElementById('graficoCategoria'), {
+
+    type: 'pie',
+
+    data: {
+        labels: categorias.map(c => c.nome),
+        datasets: [{
+            data: categorias.map(c => c.total)
+        }]
+    }
+
+});
+
+
+/* Consumo */
+
+new Chart(document.getElementById('graficoConsumo'), {
+
+    type: 'bar',
+
+    data: {
+        labels: consumo.map(c => c.produto__nome),
+        datasets: [{
+            label: 'Consumo',
+            data: consumo.map(c => c.total)
+        }]
+    }
+
+});
+
+
+/* Escolas */
+
+new Chart(document.getElementById('graficoEscolas'), {
+
+    type: 'bar',
+
+    data: {
+        labels: escolas.map(e => e.escola__nome_escola),
+        datasets: [{
+            label: 'Estoque',
+            data: escolas.map(e => e.total)
+        }]
+    }
+
+});
+
+
+/* Histórico */
+
+new Chart(document.getElementById('graficoHistorico'), {
+
+    type: 'line',
+
+    data: {
+        labels: historico.map(h => h.mes),
+        datasets: [{
+            label: 'Movimentações',
+            data: historico.map(h => h.total)
+        }]
+    }
+
+});
+
+</script>
+
+{% endblock %}

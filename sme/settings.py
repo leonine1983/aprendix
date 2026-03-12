@@ -190,7 +190,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 import mimetypes
-mimetypes.add_type("text/javascript", ".js", True)
+#mimetypes.add_type("text/javascript", ".js", True)
+import mimetypes
+mimetypes.types_map[".js"] = "text/javascript"
 
 
 # Security settings

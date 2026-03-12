@@ -465,6 +465,213 @@ class ProdutoDeleteView(
         return False
 
 
+
+
+
+# daqui pra baixo sao os exemplos de dashboards
+
+
+
+from django.views.generic import TemplateView
+from django.contrib import messages
+from django.db.models import Sum, Count, Avg
+from django.db.models.functions import TruncMonth
+from django.utils import timezone
+
+from merendaEscolar.models import (
+    Produto,
+    EstoqueCentral,
+    EstoqueEscola,
+    MovimentacaoEstoque,
+    Transferencia,
+    DivergenciaEntrega,
+    CategoriaProduto
+)
+
+class DashboardNutricionalView(TemplateView):
+
+    template_name = "merendaEscolar/dashboard_nutricionista.html"
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        hoje = timezone.now()
+        mes_inicio = hoje.replace(day=1)
+
+        """
+        IMPORTANTE:
+        Usamos annotate() para realizar cálculos diretamente no banco.
+
+        Isso evita loops Python e permite que o banco execute
+        agregações com alta performance, essencial para redes
+        municipais com muitas escolas.
+        """
+
+        # =========================
+        # INDICADORES GERAIS
+        # =========================
+
+        context["total_produtos"] = Produto.objects.count()
+
+        context["estoque_total_central"] = (
+            EstoqueCentral.objects.aggregate(
+                total=Sum("quantidade")
+            )["total"] or 0
+        )
+
+        context["estoque_total_escolas"] = (
+            EstoqueEscola.objects.aggregate(
+                total=Sum("quantidade")
+            )["total"] or 0
+        )
+
+        context["movimentacoes_mes"] = (
+            MovimentacaoEstoque.objects
+            .filter(data_movimentacao__gte=mes_inicio)
+            .count()
+        )
+
+        # =========================
+        # ESTOQUE POR CATEGORIA
+        # =========================
+
+        estoque_categoria = (
+            CategoriaProduto.objects
+            .annotate(
+                total=Sum("produtos__estoque_central__quantidade")
+            )
+            .values("nome", "total")
+        )
+
+        context["estoque_categoria"] = list(estoque_categoria)
+
+        # =========================
+        # ESTOQUE POR ESCOLA
+        # =========================
+
+        estoque_escolas = (
+            EstoqueEscola.objects
+            .values("escola__nome_escola")
+            .annotate(total=Sum("quantidade"))
+            .order_by("-total")[:10]
+        )
+
+        context["estoque_escolas"] = list(estoque_escolas)
+
+        # =========================
+        # PRODUTOS MAIS CONSUMIDOS
+        # =========================
+
+        consumo_produtos = (
+            MovimentacaoEstoque.objects
+            .filter(tipo="SAIDA_ESCOLA")
+            .values("produto__nome")
+            .annotate(total=Sum("quantidade"))
+            .order_by("-total")[:10]
+        )
+
+        context["consumo_produtos"] = list(consumo_produtos)
+
+        # =========================
+        # MOVIMENTAÇÃO MENSAL
+        # =========================
+
+        historico = (
+            MovimentacaoEstoque.objects
+            .annotate(mes=TruncMonth("data_movimentacao"))
+            .values("mes")
+            .annotate(total=Count("id"))
+            .order_by("mes")
+        )
+
+        context["historico"] = list(historico)
+
+        # =========================
+        # LOGÍSTICA
+        # =========================
+
+        context["transferencias_pendentes"] = Transferencia.objects.filter(
+            status="ENVIADO"
+        ).count()
+
+        context["entregas_conferencia"] = Transferencia.objects.filter(
+            status="EM_CONFERENCIA"
+        ).count()
+
+        context["divergencias_abertas"] = DivergenciaEntrega.objects.filter(
+            status="ABERTA"
+        ).count()
+
+        messages.success(
+            self.request,
+            "Painel nutricional carregado com sucesso."
+        )
+
+        return context
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+""""""
 @login_required
 def inicio_merenda(request):
 

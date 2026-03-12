@@ -4,13 +4,9 @@ from . views import *
 
 
 app_name = 'merendaEscolar'
-urlpatterns = [    
-    #path('', inicio_merenda, name='merenda_inicio'),  
-    path(
-        "central/",
-        EstoqueCentralListView.as_view(),
-        name="merenda_inicio"
-    ),
+urlpatterns = [ 
+    
+    path('', DashboardNutricionalView.as_view()  , name='merenda_inicio'),   
     path("unidades/", UnidadeMedidaListView.as_view(), name="unidade_medida_list"),
     path("unidades/nova/", UnidadeMedidaCreateView.as_view(), name="unidade_medida_create"),
     path("unidades/<int:pk>/editar/", UnidadeMedidaUpdateView.as_view(), name="unidade_medida_update"),
@@ -37,11 +33,7 @@ urlpatterns = [
 
     # Estoque ----------------
      # Dashboard / Listagem
-    path(
-        "central/",
-        EstoqueCentralListView.as_view(),
-        name="estoque-central"
-    ),
+    #path("central/",EstoqueCentralListView.as_view(), name="estoque-central"  ),
 
     # Entrada de produtos no estoque central
     path(
