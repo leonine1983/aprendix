@@ -4,6 +4,8 @@ from .views import *
 from .entrada_central import *
 from .estoqueCentral.registrarDescarteView import *
 from .estoqueCentral.notaDescarteView import *
+from .estoqueCentral.descarte_relatorio import *
+from .estoqueCentral.descarteDetalhesView import *
 
 # TRansferencias
 from .transferencias.transferenciaEnviarView import *

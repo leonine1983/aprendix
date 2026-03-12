@@ -842,7 +842,42 @@ body{
             </div>
         </div>
         <a><i class="fas fa-bell"></i> Alertas</a>
-        <a><i class="fas fa-file-alt"></i> Relatórios</a>
+        
+        <div class="submenu-wrapper">
+
+        <a href="#" class="submenu-toggle">
+            <i class="fas fa-file-alt"></i>
+            Relatórios
+            <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
+        </a>
+
+        <div class="submenu">
+
+            <a href="{% url 'merendaEscolar:relatorio-descartes' %}">
+                <i class="fas fa-trash-alt"></i>
+                Relatório de Descartes
+            </a>
+
+            <a href="#">
+                <i class="fas fa-boxes"></i>
+                Relatório de Estoque
+            </a>
+
+            <a href="#">
+                <i class="fas fa-exchange-alt"></i>
+                Movimentações de Estoque
+            </a>
+
+            <a href="#">
+                <i class="fas fa-truck-loading"></i>
+                Transferências
+            </a>
+
+        </div>
+
+    </div>
+
+
         
         <div class="submenu-wrapper">
             <a href="#" class="submenu-toggle">

@@ -1,0 +1,135 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- ============================= -->
+    <!-- TÍTULO DO RELATÓRIO -->
+    <!-- ============================= -->
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+        <div>
+            <h2 class="fw-bold">🗑️ Relatório de Descartes da Merenda</h2>
+            <p class="text-muted mb-0">
+                Monitoramento nutricional e auditoria de desperdícios nas unidades escolares.
+            </p>
+        </div>
+        <div>
+            <button onclick="window.print()" class="btn btn-success">🖨️ Imprimir Relatório</button>
+        </div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- FILTROS -->
+    <!-- ============================= -->
+    <div class="card shadow-sm mb-4 no-print">
+        <div class="card-header fw-semibold">🔎 Filtros de Pesquisa</div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+
+                <div class="col-md-4">
+                    <input type="text" name="q" class="form-control" placeholder="Buscar produto, motivo ou usuário"
+                        value="{{ request.GET.q }}">
+                </div>
+
+                <div class="col-md-2">
+                    <input type="date" name="data_inicio" class="form-control" value="{{ request.GET.data_inicio }}">
+                </div>
+
+                <div class="col-md-2">
+                    <input type="date" name="data_fim" class="form-control" value="{{ request.GET.data_fim }}">
+                </div>
+
+                <div class="col-md-1 d-grid">
+                    <button class="btn btn-primary">Filtrar</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- TABELA DE DESCARTES -->
+    <!-- ============================= -->
+    <div class="card shadow-sm">
+        <div class="card-header fw-semibold">📋 Registros de Descarte</div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Data</th>
+                            <th>Produto</th>
+                            <th>Quantidade</th>
+                            <th>Motivo</th>
+                            <th>Registrado por</th>
+                            <th class="no-print">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for descarte in descartes %}
+                            <tr>
+                                <td>{{ descarte.criado_em|date:"d/m/Y H:i" }}</td>
+                                <td><strong>{{ descarte.produto.nome }}</strong></td>
+                                <td>{{ descarte.quantidade }}</td>
+                                <td><span class="badge bg-danger">{{ descarte.motivo }}</span></td>
+                                <td>{{ descarte.registrado_por }}</td>
+                                <td class="no-print">
+                                    <a href="{% url 'merendaEscolar:descarte_detalhes' descarte.id %}" class="btn btn-sm btn-info">
+                                        🔍 Ver detalhes
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center p-4 text-muted">Nenhum descarte encontrado.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- PAGINAÇÃO -->
+    <!-- ============================= -->
+    {% if is_paginated %}
+        <nav class="mt-4 no-print">
+            <ul class="pagination justify-content-center">
+
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item disabled">
+                    <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+                    </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    {% endif %}
+
+</div>
+
+<!-- ============================= -->
+<!-- ESTILO DE IMPRESSÃO -->
+<!-- ============================= -->
+<style>
+@media print {
+    .no-print { display: none !important; }
+    .table { font-size: 12pt; }
+    body { margin: 1cm; }
+}
+</style>
+
+{% endblock %}

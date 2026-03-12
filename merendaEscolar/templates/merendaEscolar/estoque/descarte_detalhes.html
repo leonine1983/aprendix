@@ -1,0 +1,148 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- ============================= -->
+    <!-- CABEÇALHO INSTITUCIONAL -->
+    <!-- ============================= -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold text-primary">📋 Detalhes do Descarte</h1>
+            <p class="text-muted mb-1">
+                Consulta detalhada do registro de descarte selecionado. Visualize todas as informações críticas:
+                produto, quantidade, motivo, responsável e estoque de origem.
+            </p>
+            <small class="text-secondary">
+                Use os botões ao lado para voltar à lista de descartes ou gerar uma impressão oficial do registro.
+            </small>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'merendaEscolar:relatorio-descartes' %}" class="btn btn-outline-secondary">
+                ⬅️ Voltar
+            </a>
+            <button onclick="window.print()" class="btn btn-success">
+                🖨️ Imprimir
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- TABELA DE DETALHES -->
+    <!-- ============================= -->
+    <div class="card shadow-sm border-primary mb-4">
+        <div class="card-header bg-primary text-white fw-bold">
+            Informações do Descarte
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered table-striped table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Campo</th>
+                        <th>Informação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>Data e Hora</th>
+                        <td>{{ descarte.criado_em|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Produto</th>
+                        <td>{{ descarte.produto.nome }}</td>
+                    </tr>
+                    <tr>
+                        <th>Quantidade Descartada</th>
+                        <td>{{ descarte.quantidade }}</td>
+                    </tr>
+                    <tr>
+                        <th>Motivo</th>
+                        <td>{{ descarte.motivo }}</td>
+                    </tr>
+                    <tr>
+                        <th>Registrado por</th>
+                        <td>{{ descarte.registrado_por }}</td>
+                    </tr>
+                    <tr>
+                        <th>Estoque</th>
+                        <td>{{ descarte.estoque }}</td>
+                    </tr>
+                    <tr>
+                        <th>Descrição</th>
+                        <td>{{ descarte.descricao|default:"—" }}</td>
+                    </tr>
+                    {% comment %}
+                        Aqui você pode adicionar mais campos do modelo se houver outros dados importantes, 
+                        garantindo que tudo seja impresso.
+                    {% endcomment %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+<style>
+@media print {
+    /* Tornar todo o container visível */
+    body * {
+        visibility: hidden;
+    }
+
+    .container-fluid, 
+    .container-fluid * {
+        visibility: visible;
+    }
+
+    .container-fluid {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 0;
+    }
+
+    /* Tabela de detalhes */
+    table {
+        border-collapse: collapse !important;
+        width: 100%;
+        page-break-inside: avoid; /* evita quebra no meio da tabela */
+    }
+
+    thead {
+        display: table-header-group; /* repete cabeçalho em várias páginas */
+    }
+
+    tbody {
+        display: table-row-group;
+    }
+
+    tr {
+        page-break-inside: avoid; /* mantém linha inteira junta */
+    }
+
+    th, td {
+        border: 1px solid #000 !important;
+        padding: 0.5rem !important;
+        color: #000 !important;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    th {
+        background-color: #f0f0f0 !important;
+    }
+
+    /* Remover botões da impressão */
+    button, a.btn {
+        display: none;
+    }
+
+    /* Garantir que títulos e descrições sejam visíveis */
+    h1, p, small {
+        color: #000 !important;
+    }
+}
+</style>
+{% endblock %}

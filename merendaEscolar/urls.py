@@ -38,6 +38,8 @@ urlpatterns = [
     path("central/entrada/", EntradaEstoqueCentralView.as_view(), name="entrada-central"),
     path("estoque/descarte/<int:pk>/", RegistrarDescarteView.as_view(), name="registrar-descarte",),
     path("estoque/descarte/nota/<int:pk>/", NotaDescarteView.as_view(), name="nota-descarte"),
+    path("relatorios/descartes/", RelatorioDescarteListView.as_view(), name="relatorio-descartes",),
+    path("descartes/<int:pk>/detalhes/", DescarteDetalhesView.as_view(), name="descarte_detalhes"),
 
     # Transferencias
     path(
