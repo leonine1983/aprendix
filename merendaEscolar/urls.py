@@ -32,8 +32,7 @@ urlpatterns = [
 ),
 
     # Estoque ----------------
-     # Dashboard / Listagem
-    #path("central/",EstoqueCentralListView.as_view(), name="estoque-central"  ),
+    path("central/",EstoqueCentralListView.as_view(), name="estoque-central"  ),
 
     # Entrada de produtos no estoque central
     path(

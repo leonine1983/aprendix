@@ -608,152 +608,207 @@ class DashboardNutricionalView(TemplateView):
             "Painel nutricional carregado com sucesso."
         )
 
-        return context
+        return context  
 
 
 
 
 
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.utils import timezone
+from django.db.models import Count
+from datetime import timedelta
 
+from merendaEscolar.models import EstoqueCentral, Transferencia, DivergenciaEntrega
+from rh.models import Escola
 
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.utils import timezone
+from django.db.models import Sum
+from datetime import timedelta
 
+from merendaEscolar.models import (
+    EstoqueCentral,
+    Transferencia,
+    DivergenciaEntrega,
+    Escola
+)
 
 
+class EstoqueCentralListView(LoginRequiredMixin, ListView):
+    """
+    Dashboard institucional do estoque central da merenda escolar.
 
+    A view fornece:
 
+    - visão consolidada do estoque
+    - monitoramento de validade de produtos
+    - indicadores logísticos da distribuição
+    - métricas operacionais da rede escolar
 
+    A arquitetura prioriza agregações no banco
+    para evitar loops Python e manter escalabilidade
+    em redes municipais com muitas escolas.
+    """
 
+    model = EstoqueCentral
+    template_name = "merendaEscolar/estoque/estoque.html"
+    context_object_name = "produtos"
+    paginate_by = 50
 
+    # ==============================
+    # QUERYSET PRINCIPAL
+    # ==============================
 
+    def get_queryset(self):
+        """
+        Query otimizada para evitar problema N+1.
+        """
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-""""""
-@login_required
-def inicio_merenda(request):
-
-    if not request.user.is_superuser and not request.user.groups.filter(name__in=NUTRICIONISTA_GROUPS).exists():
-        raise PermissionDenied("Acesso restrito ao módulo Merenda Escolar.")
-
-    hoje = timezone.now().date()
-    limite_alerta_validade = hoje + timedelta(days=30)
-
-    # =========================
-    # BASE DO ESTOQUE
-    # =========================
-    """estoques = (
-        EstoqueCentral.objects
-        .select_related(
-            "produto",
-            "produto__unidade_medida",
-            "unidade_escolar"
+        queryset = (
+            EstoqueCentral.objects
+            .select_related("produto")
+            .order_by("produto__nome")
         )
-        .filter(quantidade__gt=0)
-    )
 
-    # =========================
-    # CARDS
-    # =========================
+        status = self.request.GET.get("status")
 
-    # Total de itens em estoque (registros)
-    total_itens_estoque = estoques.count()
+        hoje = timezone.now().date()
+        critico = hoje + timedelta(days=7)
+        alerta = hoje + timedelta(days=30)
 
-    # Escolas atendidas
-    escolas_atendidas = (
-        estoques
-        .values("unidade_escolar")
-        .distinct()
-        .count()
-    )
+        if status == "vencido":
+            queryset = queryset.filter(data_validade__lt=hoje)
 
-    # Envios no mês (placeholder inteligente)
-    # Ideal: usar um model de MovimentacaoEstoque
-    envios_mes = 0
+        elif status == "critico":
+            queryset = queryset.filter(
+                data_validade__gte=hoje,
+                data_validade__lte=critico
+            )
 
-    # Alertas ativos
-    alertas_ativos = estoques.filter(
-        quantidade__lte=10
-    ).count() + estoques.filter(
-        data_validade__lte=limite_alerta_validade
-    ).count()
+        elif status == "alerta":
+            queryset = queryset.filter(
+                data_validade__gt=critico,
+                data_validade__lte=alerta
+            )
 
-    # =========================
-    # TABELA DE PRODUTOS
-    # =========================
-    produtos_tabela = []
+        return queryset
 
-    for item in estoques:
-        # Regra de status
-        if item.data_validade and item.data_validade < hoje:
-            status = "Vencido"
-            status_css = "alerta"
-        elif item.quantidade <= 10:
-            status = "Baixo"
-            status_css = "alerta"
-        else:
-            status = "Adequado"
-            status_css = "ok"
+    # ==============================
+    # CONTEXTO DO DASHBOARD
+    # ==============================
 
-        produtos_tabela.append({
-            "nome": item.produto.nome,
-            "quantidade": f"{item.quantidade} {item.produto.unidade_medida.sigla}",
-            "validade": item.data_validade.strftime("%m/%Y") if item.data_validade else "-",
-            "status": status,
-            "status_css": status_css,
-        })"""
+    def get_context_data(self, **kwargs):
 
-    # =========================
-    # CONTEXTO FINAL
-    # =========================
-    context = {
-        "total_itens_estoque": "total_itens_estoque",
-        "escolas_atendidas": "escolas_atendidas",
-        "envios_mes": "envios_mes",
-        "alertas_ativos": "alertas_ativos",
-        "produtos": "produtos_tabela",
-    }
+        context = super().get_context_data(**kwargs)
 
-    return render(request, "merendaEscolar/dashboard.html", context)
+        hoje = timezone.now().date()
+        agora = timezone.now()
+
+        critico = hoje + timedelta(days=7)
+        alerta = hoje + timedelta(days=30)
+
+        estoque = EstoqueCentral.objects.all()
+
+        """
+        IMPORTANTE
+
+        As métricas utilizam aggregate() para que os cálculos
+        sejam realizados diretamente no banco de dados,
+        garantindo melhor performance em cenários com
+        grande volume de dados.
+        """
+
+        # =========================
+        # KPIs OPERACIONAIS
+        # =========================
+
+        context["total_itens_estoque"] = estoque.count()
+
+        context["quantidade_total_estoque"] = (
+            estoque.aggregate(total=Sum("quantidade"))["total"] or 0
+        )
+
+        context["escolas_atendidas"] = Escola.objects.count()
+
+        # =========================
+        # INDICADORES LOGÍSTICOS
+        # =========================
+
+        context["envios_mes"] = Transferencia.objects.filter(
+            status__in=["ENVIADO", "EM_CONFERENCIA", "RECEBIDO"],
+            enviado_em__month=agora.month,
+            enviado_em__year=agora.year
+        ).count()
+
+        context["transferencias_pendentes"] = Transferencia.objects.filter(
+            status="ENVIADO"
+        ).count()
+
+        context["entregas_em_conferencia"] = Transferencia.objects.filter(
+            status="EM_CONFERENCIA"
+        ).count()
+
+        context["divergencias_abertas"] = (
+            DivergenciaEntrega.objects
+            .filter(status__in=["ABERTA", "EM_ANALISE"])
+            .count()
+        )
+
+        # =========================
+        # MONITORAMENTO DE VALIDADE
+        # =========================
+
+        context["lotes_vencidos"] = estoque.filter(
+            data_validade__lt=hoje
+        ).count()
+
+        context["lotes_criticos"] = estoque.filter(
+            data_validade__gte=hoje,
+            data_validade__lte=critico
+        ).count()
+
+        context["lotes_alerta"] = estoque.filter(
+            data_validade__gt=critico,
+            data_validade__lte=alerta
+        ).count()
+
+        # =========================
+        # ALERTAS OPERACIONAIS
+        # =========================
+
+        if context["lotes_vencidos"] > 0:
+
+            messages.warning(
+                self.request,
+                f"Atenção: existem {context['lotes_vencidos']} lotes vencidos no estoque central."
+            )
+
+        elif context["lotes_criticos"] > 0:
+
+            messages.info(
+                self.request,
+                f"{context['lotes_criticos']} lotes estão próximos do vencimento."
+            )
+
+        if not context["produtos"]:
+
+            messages.info(
+                self.request,
+                "Nenhum produto encontrado no estoque central com os filtros aplicados."
+            )
+
+        # =========================
+        # FEEDBACK FINAL
+        # =========================
+
+        messages.success(
+            self.request,
+            "Painel do estoque central carregado com sucesso."
+        )
+
+        return context
