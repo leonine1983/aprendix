@@ -611,19 +611,6 @@ class DashboardNutricionalView(TemplateView):
         return context  
 
 
-
-
-
-from django.views.generic import ListView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
-from django.utils import timezone
-from django.db.models import Count
-from datetime import timedelta
-
-from merendaEscolar.models import EstoqueCentral, Transferencia, DivergenciaEntrega
-from rh.models import Escola
-
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -650,9 +637,10 @@ class EstoqueCentralListView(LoginRequiredMixin, ListView):
     - indicadores logísticos da distribuição
     - métricas operacionais da rede escolar
 
-    A arquitetura prioriza agregações no banco
-    para evitar loops Python e manter escalabilidade
-    em redes municipais com muitas escolas.
+    IMPORTANTE
+    Itens com quantidade zero são ocultados da listagem,
+    pois já foram consumidos ou descartados.
+    O histórico permanece no banco para auditoria.
     """
 
     model = EstoqueCentral
@@ -660,18 +648,20 @@ class EstoqueCentralListView(LoginRequiredMixin, ListView):
     context_object_name = "produtos"
     paginate_by = 50
 
-    # ==============================
-    # QUERYSET PRINCIPAL
-    # ==============================
+    # ====================================
+    # QUERYSET PRINCIPAL (ESTOQUE ATIVO)
+    # ====================================
 
     def get_queryset(self):
         """
-        Query otimizada para evitar problema N+1.
+        Query otimizada evitando N+1 queries e
+        ocultando itens sem saldo disponível.
         """
 
         queryset = (
             EstoqueCentral.objects
             .select_related("produto")
+            .filter(quantidade__gt=0)  # Oculta itens descartados ou zerados
             .order_by("produto__nome")
         )
 
@@ -698,9 +688,9 @@ class EstoqueCentralListView(LoginRequiredMixin, ListView):
 
         return queryset
 
-    # ==============================
+    # ====================================
     # CONTEXTO DO DASHBOARD
-    # ==============================
+    # ====================================
 
     def get_context_data(self, **kwargs):
 
@@ -712,25 +702,23 @@ class EstoqueCentralListView(LoginRequiredMixin, ListView):
         critico = hoje + timedelta(days=7)
         alerta = hoje + timedelta(days=30)
 
-        estoque = EstoqueCentral.objects.all()
-
         """
         IMPORTANTE
 
-        As métricas utilizam aggregate() para que os cálculos
-        sejam realizados diretamente no banco de dados,
-        garantindo melhor performance em cenários com
-        grande volume de dados.
+        Todas as métricas usam aggregate() ou filtros no banco
+        para evitar loops Python e garantir escalabilidade.
         """
+
+        estoque_ativo = EstoqueCentral.objects.filter(quantidade__gt=0)
 
         # =========================
         # KPIs OPERACIONAIS
         # =========================
 
-        context["total_itens_estoque"] = estoque.count()
+        context["total_itens_estoque"] = estoque_ativo.count()
 
         context["quantidade_total_estoque"] = (
-            estoque.aggregate(total=Sum("quantidade"))["total"] or 0
+            estoque_ativo.aggregate(total=Sum("quantidade"))["total"] or 0
         )
 
         context["escolas_atendidas"] = Escola.objects.count()
@@ -763,16 +751,16 @@ class EstoqueCentralListView(LoginRequiredMixin, ListView):
         # MONITORAMENTO DE VALIDADE
         # =========================
 
-        context["lotes_vencidos"] = estoque.filter(
+        context["lotes_vencidos"] = estoque_ativo.filter(
             data_validade__lt=hoje
         ).count()
 
-        context["lotes_criticos"] = estoque.filter(
+        context["lotes_criticos"] = estoque_ativo.filter(
             data_validade__gte=hoje,
             data_validade__lte=critico
         ).count()
 
-        context["lotes_alerta"] = estoque.filter(
+        context["lotes_alerta"] = estoque_ativo.filter(
             data_validade__gt=critico,
             data_validade__lte=alerta
         ).count()
@@ -799,7 +787,7 @@ class EstoqueCentralListView(LoginRequiredMixin, ListView):
 
             messages.info(
                 self.request,
-                "Nenhum produto encontrado no estoque central com os filtros aplicados."
+                "Nenhum produto disponível no estoque central com os filtros aplicados."
             )
 
         # =========================

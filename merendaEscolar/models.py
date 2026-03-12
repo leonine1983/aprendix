@@ -245,6 +245,66 @@ class EstoqueCentral(models.Model):
         return "NORMAL"
 
 
+# Descarte de protudo
+class DescarteEstoque(models.Model):
+    """
+    Registro institucional de descarte de produtos do estoque.
+    Usado para baixa sanitária de itens vencidos ou impróprios para consumo.
+    """
+
+    MOTIVO_CHOICES = (
+        ("VENCIDO", "Produto Vencido"),
+        ("MOFO", "Produto Mofado"),
+        ("GORGULHO", "Infestação (gorgulho ou insetos)"),
+        ("EMBALAGEM_DANIFICADA", "Embalagem Danificada"),
+        ("CONTAMINACAO", "Contaminação"),
+        ("OUTRO", "Outro Motivo"),
+    )
+
+    estoque = models.ForeignKey(
+        EstoqueCentral,
+        on_delete=models.PROTECT,
+        related_name="descartes"
+    )
+
+    produto = models.ForeignKey(
+        Produto,
+        on_delete=models.PROTECT
+    )
+
+    quantidade = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        validators=[MinValueValidator(0)]
+    )
+
+    motivo = models.CharField(
+        max_length=30,
+        choices=MOTIVO_CHOICES
+    )
+
+    descricao = RichTextField(
+        blank=True,
+        null=True,
+        config_name="minimal",
+        help_text="Descrição complementar do descarte."
+    )
+
+    registrado_por = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT
+    )
+
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criado_em"]
+
+    def __str__(self):
+        return f"Descarte - {self.produto.nome}"
+
+
+
 ########### ESCOLA ###############################
 class EstoqueEscola(models.Model):
 

@@ -142,6 +142,7 @@
                     <th>Quantidade Atual</th>
                     <th>Lote</th>
                     <th>Validade</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
 
@@ -183,23 +184,20 @@
                             {% endif %}
                         {% endwith %}
                     </td>
-                    <!--
-                    <td data-label="Validade">
-                        {% if item.dias_para_vencer <= 7 %}
-                            <span class="validade-critica">
-                                {{ item.data_validade|date:"d/m/Y" }}
-                            </span>
-                        {% elif item.dias_para_vencer <= 30 %}
-                            <span class="validade-atencao">
-                                {{ item.data_validade|date:"d/m/Y" }}
-                            </span>
-                        {% else %}
-                            <span class="validade-normal">
-                                {{ item.data_validade|date:"d/m/Y" }}
-                            </span>
-                        {% endif %}
-                    </td>-->
+                    <td>
+                        <form method="post"
+                            action="{% url 'merendaEscolar:registrar-descarte' item.id %}"
+                            style="display:inline">
 
+                            {% csrf_token %}
+
+                            <button class="btn btn-sm btn-outline-danger"
+                                    title="Registrar descarte do produto">
+                                <i class="fas fa-trash-alt"></i>
+                                Descarte
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>

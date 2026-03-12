@@ -1,0 +1,155 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Nota de Descarte de Alimentos</title>
+
+<style>
+
+body{
+    font-family: Arial;
+    background:#f4f6f9;
+}
+
+.container{
+    width:800px;
+    margin:auto;
+    background:white;
+    padding:40px;
+    border-radius:8px;
+}
+
+.header{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.titulo{
+    font-size:22px;
+    font-weight:bold;
+}
+
+.tabela{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.tabela td{
+    padding:10px;
+    border-bottom:1px solid #ddd;
+}
+
+.botoes{
+    margin-top:30px;
+    text-align:center;
+}
+
+.btn{
+    padding:10px 20px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.imprimir{
+    background:#2c7be5;
+    color:white;
+}
+
+.voltar{
+    background:#6c757d;
+    color:white;
+}
+
+@media print{
+
+.botoes{
+display:none;
+}
+
+body{
+background:white;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<div class="titulo">
+🧾 Comprovante de Descarte Sanitário
+</div>
+
+<p>
+Sistema de Gestão da Merenda Escolar
+</p>
+
+</div>
+
+<table class="tabela">
+
+<tr>
+<td><strong>Produto</strong></td>
+<td>{{ descarte.produto.nome }}</td>
+</tr>
+
+<tr>
+<td><strong>Lote</strong></td>
+<td>{{ descarte.estoque.lote }}</td>
+</tr>
+
+<tr>
+<td><strong>Quantidade descartada</strong></td>
+<td>{{ descarte.quantidade }}</td>
+</tr>
+
+<tr>
+<td><strong>Motivo</strong></td>
+<td>{{ descarte.motivo }}</td>
+</tr>
+
+<tr>
+<td><strong>Descrição</strong></td>
+<td>{{ descarte.descricao }}</td>
+</tr>
+
+<tr>
+<td><strong>Responsável</strong></td>
+<td>{{ descarte.registrado_por }}</td>
+</tr>
+
+<tr>
+<td><strong>Data</strong></td>
+<td>{{ descarte.criado_em }}</td>
+</tr>
+
+</table>
+
+
+<div class="botoes">
+
+<button class="btn imprimir" onclick="window.print()">
+🖨 Imprimir
+</button>
+
+<a href="{% url 'merendaEscolar:estoque-central' %}">
+<button class="btn voltar">
+⬅ Voltar ao Estoque
+</button>
+</a>
+
+</div>
+
+</div>
+
+</body>
+</html>

@@ -35,11 +35,9 @@ urlpatterns = [
     path("central/",EstoqueCentralListView.as_view(), name="estoque-central"  ),
 
     # Entrada de produtos no estoque central
-    path(
-        "central/entrada/",
-        EntradaEstoqueCentralView.as_view(),
-        name="entrada-central"
-    ),
+    path("central/entrada/", EntradaEstoqueCentralView.as_view(), name="entrada-central"),
+    path("estoque/descarte/<int:pk>/", RegistrarDescarteView.as_view(), name="registrar-descarte",),
+    path("estoque/descarte/nota/<int:pk>/", NotaDescarteView.as_view(), name="nota-descarte"),
 
     # Transferencias
     path(

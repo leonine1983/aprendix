@@ -1,0 +1,168 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+
+<div class="module-card p-4">
+
+    <!-- HEADER -->
+    <div class="module-header">
+        <h3 class="module-title">
+            <i class="fas fa-trash-alt text-danger"></i>
+            Registro de Descarte Sanitário
+        </h3>
+
+        <p class="module-subtitle">
+            Utilize esta tela para registrar o descarte de produtos impróprios para consumo.
+            Todas as operações são registradas para fins de auditoria e controle sanitário.
+        </p>
+    </div>
+
+
+    <!-- INFORMAÇÕES DO LOTE -->
+    <div class="alert alert-warning border shadow-sm">
+
+        <h5 class="mb-3">
+            <i class="fas fa-box-open"></i>
+            Informações do Produto
+        </h5>
+
+        <div class="row">
+
+            <div class="col-md-6 mb-2">
+                <strong><i class="fas fa-utensils"></i> Produto:</strong><br>
+                {{ produto.nome }}
+            </div>
+
+            <div class="col-md-3 mb-2">
+                <strong><i class="fas fa-barcode"></i> Lote:</strong><br>
+                {{ estoque.lote|default:"—" }}
+            </div>
+
+            <div class="col-md-3 mb-2">
+                <strong><i class="fas fa-calendar-alt"></i> Validade:</strong><br>
+                {{ estoque.data_validade|date:"d/m/Y"|default:"Não informada" }}
+            </div>
+
+            <div class="col-md-4 mt-2">
+                <strong><i class="fas fa-weight"></i> Quantidade disponível:</strong><br>
+                <span class="badge fs-5  bg-secondary">
+                    {{ estoque.quantidade }} {{ produto.unidade_medida }}
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FORMULÁRIO -->
+    <form method="post" class="mt-4">
+
+        {% csrf_token %}
+
+        <div class="row">
+
+            <!-- QUANTIDADE -->
+            <div class="col-md-4 mb-3">
+
+                <label class="form-label fw-semibold">
+                    <i class="fas fa-balance-scale"></i>
+                    Quantidade a descartar
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="quantidade"
+                    class="form-control"
+                    value="{{ estoque.quantidade }}"
+                    required
+                >
+
+                <small class="text-muted">
+                    Informe a quantidade que será descartada.
+                </small>
+
+            </div>
+
+
+            <!-- MOTIVO -->
+            <div class="col-md-4 mb-3">
+
+                <label class="form-label fw-semibold">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Motivo do descarte
+                </label>
+
+                <select name="motivo" class="form-select" required>
+
+                    <option value="">Selecione o motivo</option>
+                    <option value="VENCIDO">Produto vencido</option>
+                    <option value="MOFO">Produto mofado</option>
+                    <option value="GORGULHO">Infestação por gorgulho</option>
+                    <option value="EMBALAGEM_DANIFICADA">Embalagem danificada</option>
+                    <option value="CONTAMINACAO">Contaminação</option>
+                    <option value="OUTRO">Outro motivo</option>
+
+                </select>
+
+            </div>
+
+
+            <!-- DESCRIÇÃO -->
+            <div class="col-md-12 mb-3">
+
+                <label class="form-label fw-semibold">
+                    <i class="fas fa-align-left"></i>
+                    Observação complementar
+                </label>
+
+                <textarea
+                    name="descricao"
+                    class="form-control"
+                    rows="3"
+                    placeholder="Descreva detalhes do descarte (opcional)..."
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- ALERTA OPERACIONAL -->
+        <div class="alert alert-danger mt-3">
+
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Atenção:</strong>
+            Ao confirmar o descarte, a quantidade informada será removida do estoque
+            e registrada no histórico de movimentações do sistema.
+
+        </div>
+
+
+        <!-- BOTÕES -->
+        <div class="d-flex gap-3 mt-4">
+
+            <button type="submit" class="btn btn-danger px-4">
+
+                <i class="fas fa-trash"></i>
+                Confirmar Descarte
+
+            </button>
+
+            <a
+                href="{% url 'merendaEscolar:estoque-central' %}"
+                class="btn btn-outline-secondary px-4"
+            >
+                <i class="fas fa-arrow-left"></i>
+                Cancelar
+
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

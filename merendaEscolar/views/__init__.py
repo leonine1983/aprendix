@@ -1,5 +1,9 @@
-from .entrada_central import *
+
 from .views import *
+# Estoque Central
+from .entrada_central import *
+from .estoqueCentral.registrarDescarteView import *
+from .estoqueCentral.notaDescarteView import *
 
 # TRansferencias
 from .transferencias.transferenciaEnviarView import *
