@@ -1,0 +1,156 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+<h2 class="mb-4">
+📊 Relatórios do Estoque Central
+</h2>
+
+
+<!-- FILTROS -->
+<div class="card mb-4">
+<div class="card-body">
+
+<form method="get" class="row g-3">
+
+<div class="col-md-2">
+<label>Ano</label>
+<select name="ano" class="form-control">
+<option value="">Todos</option>
+{% for a in anos %}
+<option value="{{a}}">{{a}}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="col-md-2">
+<label>Mês</label>
+<select name="mes" class="form-control">
+<option value="">Todos</option>
+{% for m in meses %}
+<option value="{{m}}">{{m}}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="col-md-3">
+<label>Produto</label>
+<select name="produto" class="form-control">
+<option value="">Todos</option>
+{% for p in produtos_filtro %}
+<option value="{{p.id}}">{{p.nome}}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="col-md-3">
+<label>Categoria</label>
+<select name="categoria" class="form-control">
+<option value="">Todas</option>
+{% for c in categorias %}
+<option value="{{c.id}}">{{c.nome}}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="col-md-2 d-flex align-items-end">
+<button class="btn btn-primary w-100">
+🔎 Filtrar
+</button>
+</div>
+
+</form>
+
+</div>
+</div>
+
+
+<!-- KPIs -->
+<div class="row mb-4">
+
+<div class="col-md-3">
+<div class="card shadow-sm">
+<div class="card-body">
+<h6>📦 Total de Lotes</h6>
+<h3>{{kpis.total_lotes}}</h3>
+</div>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card shadow-sm">
+<div class="card-body">
+<h6>⚖ Quantidade Total</h6>
+<h3>{{kpis.quantidade_total}}</h3>
+</div>
+</div>
+</div>
+
+<div class="col-md-2">
+<div class="card border-danger">
+<div class="card-body">
+<h6>🚨 Vencidos</h6>
+<h3>{{kpis.vencidos}}</h3>
+</div>
+</div>
+</div>
+
+<div class="col-md-2">
+<div class="card border-warning">
+<div class="card-body">
+<h6>⚠ Críticos</h6>
+<h3>{{kpis.criticos}}</h3>
+</div>
+</div>
+</div>
+
+<div class="col-md-2">
+<div class="card border-info">
+<div class="card-body">
+<h6>⏳ Alerta</h6>
+<h3>{{kpis.alerta}}</h3>
+</div>
+</div>
+</div>
+
+</div>
+
+
+<!-- RELATÓRIO POR PRODUTO -->
+<div class="card">
+
+<div class="card-header">
+📋 Quantidade por Produto
+</div>
+
+<table class="table table-striped">
+
+<thead>
+<tr>
+<th>Produto</th>
+<th>Lotes</th>
+<th>Quantidade Total</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for p in produtos %}
+<tr>
+<td>{{p.produto__nome}}</td>
+<td>{{p.lotes}}</td>
+<td>{{p.quantidade_total}}</td>
+</tr>
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+{% endblock %}

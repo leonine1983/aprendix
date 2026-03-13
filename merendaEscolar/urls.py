@@ -117,6 +117,9 @@ urlpatterns = [
     path("<int:pk>/", ReceitaDetailView.as_view(), name="receita_detalhe"),
     path("<int:pk>/editar/", ReceitaUpdateView.as_view(), name="receita_editar"),
     path("<int:pk>/excluir/", ReceitaDeleteView.as_view(), name="receita_excluir"),
+
+    # RELATÓRIOS
+     path("estoque/central/relatorios/", RelatorioEstoqueCentralView.as_view(), name="relatorio_estoque_central", ),
      
     
 ]

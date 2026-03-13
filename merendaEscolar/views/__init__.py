@@ -33,3 +33,6 @@ from .escola_confirma_transferencia.listaEscolasViewDashboard import *
 
 # Receitas
 from .receitas.receitaListView import *
+
+# RELATÓRIOS
+from .relatorios.relatorioEstoqueCentralView import *
