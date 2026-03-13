@@ -1,0 +1,293 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+
+<style>
+
+    /* Cabeçalho da página */
+
+    .page-header {
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    .page-description {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    /* Tabela */
+
+    .table thead th {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+    }
+
+    .usuario-nome {
+        font-weight: 600;
+    }
+
+    .usuario-email {
+        font-size: .85rem;
+        color: #6c757d;
+    }
+
+    /* Badges */
+
+    .badge-grupo {
+        font-size: .75rem;
+        padding: 5px 8px;
+    }
+
+    /* Métricas */
+
+    .metric {
+        font-weight: 600;
+    }
+
+    .metric-muted {
+        font-size: .85rem;
+        color: #6c757d;
+    }
+
+    /* Botão ação */
+
+    .btn-action {
+        padding: 4px 8px;
+    }
+
+</style>
+
+
+<div class="container mt-4">
+
+    <!-- Cabeçalho da página -->
+
+    <div class="page-header d-flex justify-content-between align-items-start">
+
+        <div>
+
+            <h4 class="mb-1">
+                <i class="bi bi-people-fill"></i>
+                Gestão de Usuários
+            </h4>
+
+            <div class="page-description">
+                Administração institucional de contas do sistema.
+                Aqui é possível visualizar usuários cadastrados,
+                grupos de acesso e histórico de utilização da plataforma.
+            </div>
+
+            <div class="alert alert-warning mt-3 mb-0">
+
+                <i class="bi bi-shield-lock"></i>
+
+                <strong>Política de exclusão de usuários:</strong>
+                Apenas administradores do sistema podem excluir contas.
+                Esta restrição garante segurança institucional e evita
+                remoções indevidas de usuários da plataforma.
+
+            </div>
+
+        </div>
+
+        <div>
+
+            <a href="{% url 'core:usuarios_novo' %}" class="btn btn-primary">
+                <i class="bi bi-person-plus"></i>
+                Novo Usuário
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- Card principal -->
+
+    <div class="card shadow-sm">
+
+        <div class="card-body p-0">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+
+                    <tr>
+
+                        <th>
+                            <i class="bi bi-person"></i>
+                            Usuário
+                        </th>
+
+                        <th>
+                            <i class="bi bi-envelope"></i>
+                            Contato
+                        </th>
+
+                        <th>
+                            <i class="bi bi-diagram-3"></i>
+                            Grupo
+                        </th>
+
+                        <th>
+                            <i class="bi bi-bar-chart"></i>
+                            Acessos
+                        </th>
+
+                        <th>
+                            <i class="bi bi-clock-history"></i>
+                            Último acesso
+                        </th>
+
+                        <th class="text-end">
+                            <i class="bi bi-gear"></i>
+                            Ações
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for usuario in usuarios %}
+
+                        <tr>
+
+                            <td>
+
+                                <div class="usuario-nome">
+                                    <i class="bi bi-person-circle"></i>
+                                    {{ usuario.get_full_name|default:usuario.username }}
+                                </div>
+
+                                <div class="usuario-email">
+                                    {{ usuario.username }}
+                                </div>
+
+                            </td>
+
+                            <td>
+
+                                {% if usuario.email %}
+                                    {{ usuario.email }}
+                                {% else %}
+                                    <span class="text-muted">
+                                        Não informado
+                                    </span>
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {% if usuario.groups.first %}
+                                    {% for g in usuario.groups.all %}
+
+                                    <span class="d-block p-1">
+                                        <svg  height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="12" cy="8" r="2.5" stroke="#222222" stroke-linecap="round"></circle> <path d="M13.7679 6.5C13.9657 6.15743 14.2607 5.88121 14.6154 5.70625C14.9702 5.5313 15.3689 5.46548 15.7611 5.51711C16.1532 5.56874 16.5213 5.73551 16.8187 5.99632C17.1161 6.25713 17.3295 6.60028 17.4319 6.98236C17.5342 7.36445 17.521 7.76831 17.3939 8.14288C17.2667 8.51745 17.0313 8.8459 16.7175 9.08671C16.4037 9.32751 16.0255 9.46985 15.6308 9.49572C15.2361 9.52159 14.8426 9.42983 14.5 9.23205" stroke="#222222"></path> <path d="M10.2321 6.5C10.0343 6.15743 9.73935 5.88121 9.38458 5.70625C9.02981 5.5313 8.63113 5.46548 8.23895 5.51711C7.84677 5.56874 7.47871 5.73551 7.18131 5.99632C6.88391 6.25713 6.67053 6.60028 6.56815 6.98236C6.46577 7.36445 6.47899 7.76831 6.60614 8.14288C6.73329 8.51745 6.96866 8.8459 7.28248 9.08671C7.5963 9.32751 7.97448 9.46985 8.36919 9.49572C8.76391 9.52159 9.15743 9.42983 9.5 9.23205" stroke="#222222"></path> <path d="M12 12.5C16.0802 12.5 17.1335 15.8022 17.4054 17.507C17.4924 18.0524 17.0523 18.5 16.5 18.5H7.5C6.94771 18.5 6.50763 18.0524 6.59461 17.507C6.86649 15.8022 7.91976 12.5 12 12.5Z" stroke="#222222" stroke-linecap="round"></path> <path d="M19.2965 15.4162L18.8115 15.5377L19.2965 15.4162ZM13.0871 12.5859L12.7179 12.2488L12.0974 12.9283L13.0051 13.0791L13.0871 12.5859ZM17.1813 16.5L16.701 16.639L16.8055 17H17.1813V16.5ZM15.5 12C16.5277 12 17.2495 12.5027 17.7783 13.2069C18.3177 13.9253 18.6344 14.8306 18.8115 15.5377L19.7816 15.2948C19.5904 14.5315 19.2329 13.4787 18.578 12.6065C17.9126 11.7203 16.9202 11 15.5 11V12ZM13.4563 12.923C13.9567 12.375 14.6107 12 15.5 12V11C14.2828 11 13.3736 11.5306 12.7179 12.2488L13.4563 12.923ZM13.0051 13.0791C15.3056 13.4614 16.279 15.1801 16.701 16.639L17.6616 16.361C17.1905 14.7326 16.019 12.5663 13.1691 12.0927L13.0051 13.0791ZM18.395 16H17.1813V17H18.395V16ZM18.8115 15.5377C18.8653 15.7526 18.7075 16 18.395 16V17C19.2657 17 20.0152 16.2277 19.7816 15.2948L18.8115 15.5377Z" fill="#222222"></path> <path d="M10.9129 12.5859L10.9949 13.0791L11.9026 12.9283L11.2821 12.2488L10.9129 12.5859ZM4.70343 15.4162L5.18845 15.5377L4.70343 15.4162ZM6.81868 16.5V17H7.19453L7.29898 16.639L6.81868 16.5ZM8.49999 12C9.38931 12 10.0433 12.375 10.5436 12.923L11.2821 12.2488C10.6264 11.5306 9.71723 11 8.49999 11V12ZM5.18845 15.5377C5.36554 14.8306 5.68228 13.9253 6.22167 13.2069C6.75048 12.5027 7.47226 12 8.49999 12V11C7.0798 11 6.08743 11.7203 5.42199 12.6065C4.76713 13.4787 4.40955 14.5315 4.21841 15.2948L5.18845 15.5377ZM5.60498 16C5.29247 16 5.13465 15.7526 5.18845 15.5377L4.21841 15.2948C3.98477 16.2277 4.73424 17 5.60498 17V16ZM6.81868 16H5.60498V17H6.81868V16ZM7.29898 16.639C7.72104 15.1801 8.69435 13.4614 10.9949 13.0791L10.8309 12.0927C7.98101 12.5663 6.8095 14.7326 6.33838 16.361L7.29898 16.639Z" fill="#222222"></path> </g></svg>
+                                        {{g}}
+                                    </span>
+                                    {% endfor %}
+
+                                {% else %}
+
+                                    <span class="badge bg-secondary badge-grupo">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                        Sem grupo
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                <span class="metric">
+                                    <i class="bi bi-bar-chart-line"></i>
+                                    {{ usuario.total_acessos|default:0 }}
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                {% if usuario.ultimo_acesso %}
+
+                                    <span class="metric">
+                                        <i class="bi bi-clock"></i>
+                                        {{ usuario.ultimo_acesso|date:"d/m/Y H:i" }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="metric-muted">
+                                        <i class="bi bi-clock"></i>
+                                        Nunca acessou
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td class="text-end">
+
+                                <a
+                                    href="{% url 'core:usuarios_editar' usuario.id %}"
+                                    class="btn btn-sm btn-outline-primary btn-action" title='Editar dados do usuario'
+                                >
+                                    <svg  height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#3f2fb6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="#3f2fb6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                                </a>
+
+                                <form
+                                method="post"
+                                action="{% url 'core:usuarios_excluir' usuario.id %}"
+                                class="d-inline"
+                            >
+                                {% csrf_token %}
+
+                                <button
+                                    class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Deseja realmente excluir este usuário?')" title='Excluir usuário'
+                                >
+                                    <svg  height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 11V17" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M14 11V17" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M4 7H20" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6 7H12H18V18C18 19.6569 16.6569 21 15 21H9C7.34315 21 6 19.6569 6 18V7Z" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                                </button>
+
+</form>
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td colspan="6" class="text-center text-muted p-5">
+
+                                <i class="bi bi-info-circle fs-4"></i>
+
+                                <div class="mt-2">
+                                    Nenhum usuário cadastrado no sistema.
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

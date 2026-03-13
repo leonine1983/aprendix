@@ -1,0 +1,295 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+
+<style>
+
+    /* Cabeçalho institucional */
+
+    .page-header {
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    .page-description {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    /* Inputs institucionais */
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        width: 100%;
+        height: 38px;
+        padding: 6px 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        transition: border-color .15s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+        outline: none;
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 2px rgba(13,110,253,0.08);
+    }
+
+    label.form-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    /* Cards de grupo */
+
+    .grupo-card {
+        cursor: pointer;
+        transition: all .15s ease;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+    }
+
+    .grupo-card:hover {
+        border-color: #0d6efd;
+        background: #fafcff;
+    }
+
+    .grupo-card input {
+        transform: scale(1.1);
+    }
+
+    .grupo-card h6 {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-top: 10px;
+        margin-bottom: 4px;
+    }
+
+    .grupo-card p {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-bottom: 0;
+        line-height: 1.2;
+    }
+
+</style>
+
+
+<div class="container mt-4">
+
+    <!-- Cabeçalho da página -->
+
+    <div class="page-header">
+
+        <h4 class="mb-1">
+            <i class="bi bi-person-gear"></i>
+            Gestão de Usuário
+        </h4>
+
+        <div class="page-description">
+            Cadastro e manutenção de contas de acesso do sistema.
+            Defina os dados do usuário e selecione o grupo institucional
+            responsável pelas permissões de acesso.
+        </div>
+
+    </div>
+
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                <!-- Nome -->
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            <i class="bi bi-person"></i>
+                            Nome
+                        </label>
+
+                        {{ form.first_name }}
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            <i class="bi bi-person"></i>
+                            Sobrenome
+                        </label>
+
+                        {{ form.last_name }}
+
+                    </div>
+
+                </div>
+
+
+                <!-- Credenciais -->
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            <i class="bi bi-person-badge"></i>
+                            Usuário
+                        </label>
+
+                        {{ form.username }}
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            <i class="bi bi-envelope"></i>
+                            Email
+                        </label>
+
+                        {{ form.email }}
+
+                    </div>
+
+                </div>
+
+
+                <!-- Senha -->
+
+                {% if form.password %}
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                <i class="bi bi-key"></i>
+                                Senha
+                            </label>
+
+                            {{ form.password }}
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+
+                <hr>
+
+
+                <!-- Seleção de grupo -->
+
+                <h6 class="mb-3">
+                    <i class="bi bi-diagram-3"></i>
+                    Grupo institucional
+                </h6>
+
+                <div class="row">
+
+                    <!-- Nutricionista -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="card grupo-card p-3">
+
+                            <input
+                                type="radio"
+                                name="grupo"
+                                value="Nutricionista"
+                                class="form-check-input"
+                                {% if form.grupo.value == "Nutricionista" %}checked{% endif %}
+                            >
+
+                            <h6>
+                                <i class="bi bi-heart-pulse"></i>
+                                Nutricionista
+                            </h6>
+
+                            <p>
+                                Gestão nutricional e supervisão da merenda.
+                            </p>
+
+                        </label>
+
+                    </div>
+
+
+                    <!-- Merendeira -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="card grupo-card p-3">
+
+                            <input
+                                type="radio"
+                                name="grupo"
+                                value="Merendeira"
+                                class="form-check-input"
+                                {% if form.grupo.value == "Merendeira" %}checked{% endif %}
+                            >
+
+                            <h6>
+                                <i class="bi bi-egg-fried"></i>
+                                Merendeira
+                            </h6>
+
+                            <p>
+                                Preparação e registro da merenda escolar.
+                            </p>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <hr>
+
+
+                <!-- Ações -->
+
+                <div class="d-flex gap-2">
+
+                    <button class="btn btn-success">
+
+                        <i class="bi bi-check-circle"></i>
+                        Salvar usuário
+
+                    </button>
+
+                    <a
+                        href="{% url 'core:usuarios_lista' %}"
+                        class="btn btn-secondary"
+                    >
+
+                        <i class="bi bi-arrow-left"></i>
+                        Voltar
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
