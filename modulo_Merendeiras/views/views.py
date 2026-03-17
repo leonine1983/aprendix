@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.db.models import Sum
-from .forms import ReceitaForm
+from ..forms import ReceitaForm
 from merendaEscolar.models import (
     Receita,
     ExecucaoReceita,
@@ -14,23 +14,62 @@ from merendaEscolar.models import (
 from merendaEscolar.services import executar_receita
 from core.permissions import GroupRequiredMixin
 from core.groups.merenda import MERENDEIRA_GROUPS
+from .baseMerendeiraView import BaseMerendeiraView
 
 
-class BaseMerendeiraView(GroupRequiredMixin):
-    group_required = MERENDEIRA_GROUPS
+from django.views.generic import TemplateView
+from django.shortcuts import redirect
+from django.db.models import Sum
+
+
 
 
 # =========================
 # DASHBOARD OPERACIONAL
 # =========================
 
+
+
+
+
 class DashboardMerendeiraView(BaseMerendeiraView, TemplateView):
-    template_name = "modulo_merendeiras/dashboard.html"
+    template_name = "modulo_merendeiras/dashboard_merendeira.html"
+
+    def get_escola_usuario(self):
+        """
+        Recupera a escola vinculada ao usuário de forma segura.
+        Evita quebra de sistema caso o perfil não exista.
+        """
+        perfil = getattr(self.request.user, "perfilusuario", None)
+
+        if not perfil:
+            messages.error(self.request, "Perfil de usuário não encontrado.")
+            return None
+
+        if not perfil.escola:
+            messages.warning(self.request, "Usuário não está vinculado a nenhuma escola.")
+            return None
+
+        return perfil.escola
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Camada de proteção antes da execução da view.
+        Evita processamento desnecessário e falhas internas.
+        """
+        escola = self.get_escola_usuario()
+
+        if not escola:
+            return redirect("merendaEscolar")  # ou página institucional adequada
+
+        self.escola = escola
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        escola = self.request.user.escola
+        escola = self.escola
 
+        # 🔥 Uso de aggregate direto no banco (performance e escalabilidade)
         ctx["total_itens"] = (
             EstoqueEscola.objects
             .filter(escola=escola)
@@ -39,9 +78,11 @@ class DashboardMerendeiraView(BaseMerendeiraView, TemplateView):
 
         ctx["receitas_ativas"] = Receita.objects.filter(ativa=True).count()
 
-        ctx["execucoes_hoje"] = ExecucaoReceita.objects.filter(
-            escola=escola
-        ).count()
+        ctx["execucoes_hoje"] = (
+            ExecucaoReceita.objects
+            .filter(escola=escola)
+            .count()
+        )
 
         return ctx
 

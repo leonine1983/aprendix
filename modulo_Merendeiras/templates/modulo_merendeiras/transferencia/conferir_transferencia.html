@@ -1,0 +1,116 @@
+{% extends "modulo_merendeiras/base_merendeira.html" %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- 🟢 INFORMAÇÃO INICIAL DA PÁGINA -->
+    <div class="page-info mb-4 p-3 rounded shadow-sm bg-light">
+        <h5 class="mb-1 fw-semibold">📌 Painel de Transferências - Escola</h5>
+        <p class="text-secondary mb-0">
+            Aqui você encontra todas as transferências enviadas para sua escola que precisam ser conferidas.
+            Priorize conferências urgentes marcadas com ⚠.
+        </p>
+    </div>
+
+    <!-- 🟢 TRANSFERÊNCIAS -->
+    <h4 class="mb-3 fw-semibold">📦 Transferências</h4>
+
+    {% if transferencias %}
+    <div class="table-responsive mb-5">
+        <table class="table table-hover table-bordered align-middle table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col"># Número</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="text-center">Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transferencia in transferencias %}
+                <tr>
+                    <td data-label="# Número">{{ transferencia.numero }}</td>
+                    <td data-label="Status">
+                        {% if transferencia.status == "RECEBIDO" %}
+                            <span class="status-ok badge">✔ {{ transferencia.get_status_display }}</span>
+                        {% else %}
+                            <span class="status-alerta badge">⚠ {{ transferencia.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center" data-label="Ação">
+                        {% if transferencia.status != "RECEBIDO" %}
+                        <a href="{% url 'modulo_merendeiras:conferir_transferencia' transferencia.id %}"
+                           class="btn btn-acao btn-sm">
+                            📝 Conferir
+                        </a>
+                        {% else %}
+                        <span class="text-muted fst-italic">Conferida</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="text-muted fst-italic">Nenhuma transferência no momento.</p>
+    {% endif %}
+
+</div>
+
+<style>
+/* 🏷️ Status badges refinados */
+.status-ok {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.status-alerta {
+    background-color: #fff3cd;
+    color: #664d03;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+/* Botão ação refinado */
+.btn-acao {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: #fff;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-acao:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+/* Info da página */
+.page-info { font-size: 0.9rem; }
+
+/* Tabela hover e borda */
+.table-hover tbody tr:hover { background-color: #f8f9fa; }
+.table-bordered th, .table-bordered td { border: 1px solid #dee2e6; }
+.table-striped tbody tr:nth-of-type(odd) { background-color: #f9f9f9; }
+
+/* Container e responsividade */
+.container { max-width: 960px; }
+@media (max-width: 576px) {
+    table thead { display: none; }
+    table, table tbody, table tr, table td { display: block; width: 100%; }
+    table tr { margin-bottom: 1rem; }
+    table td { text-align: right; padding-left: 50%; position: relative; }
+    table td::before { content: attr(data-label); position: absolute; left: 0; width: 50%; padding-left: 1rem; font-weight: 600; text-align: left; }
+}
+</style>
+{% endblock %}

@@ -1,6 +1,7 @@
 # core/models/perfil.py
 
 from django.db import models
+from rh.models import Escola
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 
@@ -31,6 +32,15 @@ class PerfilUsuario(models.Model):
     graduacao = models.CharField(max_length=255, blank=True)
     especializacao = models.CharField(max_length=255, blank=True)
     biografia = models.TextField(blank=True)
+
+    escola = models.ForeignKey(
+        Escola,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="usuarios",
+        verbose_name="Escola vinculada"
+    )
 
     # Controle de visibilidade
     visibilidade_curriculo = models.CharField(

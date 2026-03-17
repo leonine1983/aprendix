@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "modulo_merendeiras/base_merendeira.html" %}
 
 {% block content %}
 <h1>📊 Painel da Merendeira</h1>
@@ -19,7 +19,4 @@
         <p>{{ execucoes_hoje }}</p>
     </div>
 </div>
-
-<a href="{% url 'modulo_merendeiras:estoque_lista' %}">Ver Estoque</a>
-<a href="{% url 'modulo_merendeiras:receita_lista' %}">Gerenciar Receitas</a>
 {% endblock %}

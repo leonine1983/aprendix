@@ -5,15 +5,17 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django import forms
 
-from core.permissions import GroupRequiredMixin
 from core.models.perfil import PerfilUsuario
 
-User = get_user_model()
 
 from django.views.generic import ListView
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Max
 from django.contrib import messages
+from django.db.models import Q
+
+from django.db.models import Count, Max, Q, Exists, OuterRef
+from django.contrib.auth.models import Group
 
 from core.permissions import GroupRequiredMixin
 from core.models.acesso import HistoricoAcesso
@@ -29,29 +31,55 @@ class UsuarioListView(GroupRequiredMixin, ListView):
     template_name = "core/usuarios/lista.html"
     context_object_name = "usuarios"
     paginate_by = 20
-
+    
     def get_queryset(self):
 
-            """
-            Utiliza annotate para calcular métricas de acesso diretamente no banco,
-            evitando loops Python e garantindo melhor performance e escalabilidade
-            para ambientes institucionais com muitos usuários.
+        busca = self.request.GET.get("q")
 
-            Superusuários são excluídos da listagem para evitar manipulação
-            indevida de contas administrativas do sistema.
-            """
+        grupo_nutricionista = Group.objects.filter(
+            name="Nutricionista",
+            user=OuterRef("pk")
+        )
 
-            queryset = (
-                User.objects
-                .exclude(is_superuser=True)  # ← filtro importante
-                .annotate(
-                    total_acessos=Count("acessos"),
-                    ultimo_acesso=Max("acessos__data_acesso")
-                )
-                .order_by("first_name", "username")
+        grupo_merendeira = Group.objects.filter(
+            name="Merendeira",
+            user=OuterRef("pk")
+        )
+
+        queryset = (
+            User.objects
+            .exclude(is_superuser=True)
+            .filter(
+                groups__name__in=["Merendeira", "Nutricionista"]
+            )
+            .annotate(
+                total_acessos=Count("acessos"),
+                ultimo_acesso=Max("acessos__data_acesso"),
+
+                # 🔥 Flags institucionais
+                is_nutricionista=Exists(grupo_nutricionista),
+                is_merendeira=Exists(grupo_merendeira),
+            )
+            .select_related("perfilusuario")
+            .distinct()
+            .order_by("first_name", "username")
+        )
+
+        if busca:
+            queryset = queryset.filter(
+                Q(first_name__icontains=busca) |
+                Q(username__icontains=busca) |
+                Q(email__icontains=busca)
             )
 
-            return queryset
+        return queryset
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+        context["q"] = self.request.GET.get("q", "")
+
+        return context
 
     def get(self, request, *args, **kwargs):
 
@@ -247,3 +275,82 @@ class UsuarioDeleteView(GroupRequiredMixin, DeleteView):
         )
 
         return redirect(self.success_url)
+    
+
+from django.views.generic import UpdateView
+from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
+from django.contrib import messages
+
+from core.permissions import GroupRequiredMixin
+from core.models.perfil import PerfilUsuario
+from rh.models import Escola  # ajuste conforme seu app
+
+from django import forms
+
+
+class VincularUsuarioEscolaForm(forms.ModelForm):
+
+    class Meta:
+        model = PerfilUsuario
+        fields = ["escola"]
+        widgets = {
+            "escola": forms.Select(attrs={
+                "class": "form-select"
+            })
+        }
+        labels = {
+            "escola": "Escola vinculada"
+        }
+
+
+class VincularUsuarioEscolaView(GroupRequiredMixin, UpdateView):
+
+    group_required = ("Nutricionista", "Admin")
+
+    model = PerfilUsuario
+    form_class = VincularUsuarioEscolaForm
+    template_name = "core/usuarios/vincular_escola.html"
+    success_url = reverse_lazy("core:usuarios_lista")
+
+    def get_object(self, queryset=None):
+        user_id = self.kwargs.get("pk")
+        user = get_object_or_404(User, pk=user_id)
+
+        perfil, _ = PerfilUsuario.objects.get_or_create(user=user)
+        return perfil
+
+    def dispatch(self, request, *args, **kwargs):
+
+        perfil = self.get_object()
+
+        if not perfil.user.groups.filter(name="Merendeira").exists():
+
+            messages.error(
+                request,
+                "Apenas usuários do grupo Merendeira podem ser vinculados a uma escola."
+            )
+
+            return redirect("core:usuarios_lista")
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+
+        response = super().form_valid(form)
+
+        messages.success(
+            self.request,
+            "Usuário vinculado à escola com sucesso."
+        )
+
+        return response
+
+    def form_invalid(self, form):
+
+        messages.error(
+            self.request,
+            "Erro ao vincular usuário à escola."
+        )
+
+        return super().form_invalid(form)

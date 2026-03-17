@@ -25,6 +25,10 @@ urlpatterns = [
     path(
     "usuarios/<int:pk>/excluir/",
     UsuarioDeleteView.as_view(),
-    name="usuarios_excluir"
-), 
+    name="usuarios_excluir"), 
+    path(
+        "usuarios/<int:pk>/vincular-escola/",
+        VincularUsuarioEscolaView.as_view(),
+        name="vincular_escola"
+    ),
 ]
