@@ -101,7 +101,7 @@ urlpatterns = [
     ),
     path('escolas/', ListaEscolasRecebimentoView.as_view(), name='lista_escolas'),
     path('escola/<int:escola_id>/', TransferenciasAbertasEscolaView.as_view(), name='transferencias_abertas'),
-    path('receber/<int:pk>/', ReceberTransferenciaView.as_view(), name='escola_receber'),
+    path('escola/receber/<int:pk>/', ReceberTransferenciaView.as_view(), name='escola_receber'),
     path(
         "transferencia/<int:pk>/conferencia/",
         TransferenciaConferenciaView.as_view(),

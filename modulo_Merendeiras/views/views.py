@@ -60,7 +60,8 @@ class DashboardMerendeiraView(BaseMerendeiraView, TemplateView):
         escola = self.get_escola_usuario()
 
         if not escola:
-            return redirect("merendaEscolar")  # ou página institucional adequada
+            messages.warning(self.request, "O profissional não está vinculado a nenhuma escola")
+            return redirect("admin_acessos:logout")  # ou página institucional adequada
 
         self.escola = escola
         return super().dispatch(request, *args, **kwargs)

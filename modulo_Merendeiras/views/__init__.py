@@ -1,6 +1,6 @@
 from .views import *
-from .conferirTransferenciaView import *
-from .confirmarRecebimentoView import*
-from .iniciarConferenciaView import *
-from .registrarDivergenciaView import *
+from .receberTransferenciaView import *
+from .transferenciaConferenciaView import *
+
+
 from .transferenciasRecebidasListView import *

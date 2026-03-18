@@ -15,7 +15,7 @@ class PerfilUsuario(models.Model):
         ("publico", "Público"),
     )
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User,  on_delete=models.CASCADE)
 
     # Identidade
     foto = models.ImageField(upload_to="perfis/fotos/", blank=True, null=True)

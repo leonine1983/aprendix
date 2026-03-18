@@ -19,38 +19,26 @@ urlpatterns = [
     path("execucoes/<int:pk>/executar/", views.ExecutarReceitaView.as_view(), name="executar_receita"),
 
 
-       # 📦 Transferências recebidas
+       # 📦 Transferências recebidas ESCOLA
     path(
         "transferencias/escola/",
-        views.TransferenciasAbertasListView.as_view(),
+        views.TransferenciasEscolaListView.as_view(),
         name="transferencias_recebidas"
     ),
 
-    # ▶️ Iniciar conferência
     path(
-        "transferencias/<int:pk>/iniciar/",
-        views.IniciarConferenciaView.as_view(),
-        name="iniciar_conferencia"
+        "transferencias/escola/conferir/<int:pk>/iniciar/",
+        views.ReceberTransferenciaView.as_view(),
+        name="escola_receber_transfe"        
     ),
 
-    # 🔍 Tela principal de conferência
     path(
-        "transferencias/<int:pk>/conferir/",
-        views.ConferirTransferenciaView.as_view(),
-        name="conferir_transferencia"
+        "transferencia/escola/<int:pk>/conferencia/",
+        views.TransferenciaConferenciaView.as_view(),
+        name="transferencia_conferencia_escola"
     ),
 
-    # ⚠️ Registrar divergência
-    path(
-        "transferencias/<int:pk>/divergencia/<int:item_id>/",
-        views.RegistrarDivergenciaView.as_view(),
-        name="registrar_divergencia"
-    ),
 
-    # ✅ Confirmar recebimento
-    path(
-        "transferencias/<int:pk>/confirmar/",
-        views.ConfirmarRecebimentoView.as_view(),
-        name="confirmar_recebimento"
-    ),
+
+
 ]

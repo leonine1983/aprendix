@@ -425,6 +425,19 @@ class Transferencia(models.Model):
         blank=True
     )
 
+    recebido_por = models.ForeignKey(
+    User,
+    on_delete=models.PROTECT,
+    null=True,
+    blank=True,
+    related_name="transferencias_recebidas"
+    )
+
+    recebido_em = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
     def __str__(self):
         return f"{self.numero} - {self.escola_destino}"
 
@@ -570,7 +583,11 @@ class Transferencia(models.Model):
                 observacao=f"Recebimento da Transferência {self.numero}"
             )
 
+        from django.utils import timezone
+
         self.status = "RECEBIDO"
+        self.recebido_por = usuario
+        self.recebido_em = timezone.now()
         self.save()
 
     def delete(self, *args, **kwargs):
