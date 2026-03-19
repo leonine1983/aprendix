@@ -4,3 +4,4 @@ from .transferenciaConferenciaView import *
 
 
 from .transferenciasRecebidasListView import *
+from .transferenciaEscolaDetailView import *

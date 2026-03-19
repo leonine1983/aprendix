@@ -163,6 +163,22 @@ table th{
 </table>
 
 
+<div style="margin-top:40px; display:flex; justify-content:space-between; align-items:center;">
+
+    <div>
+        <strong>Validação Digital da Transferência</strong><br>
+        <small>Escaneie para confirmar o recebimento pela escola</small><br>
+        <small>{{ url_recebimento }}</small>
+    </div>
+
+    <div style="text-align:center;">
+        <img src="data:image/png;base64,{{ qr_code }}" width="120">
+        <div style="font-size:10px;">QR Code de Conferência</div>
+    </div>
+
+</div>
+
+
 <div class="assinaturas">
 
 <div>

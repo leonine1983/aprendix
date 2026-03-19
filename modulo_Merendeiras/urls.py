@@ -38,6 +38,12 @@ urlpatterns = [
         name="transferencia_conferencia_escola"
     ),
 
+    path(
+    "transferencias/escola/<int:pk>/",
+    views.TransferenciaEscolaDetailView.as_view(),
+    name="transferencia_detalhe_escola"
+),
+
 
 
 

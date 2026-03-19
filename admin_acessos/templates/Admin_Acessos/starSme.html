@@ -427,27 +427,7 @@ header p{
 <div class="app">
 
 <header>
-     {% if messages %}
-    {% for message in messages %}
-        <div class="message-overlay" aria-live="polite">
-            <div class="message-card alert-{{ message.tags }}" role="alert">
-
-                <img src="{% static 'img/sucesso.png' %}" 
-                     alt="Sucesso"
-                     class="message-icon">
-
-                <h3 class="message-title">Operação realizada</h3>
-
-                <p class="message-text">
-                    {{ message|safe }}
-                </p>
-
-                <button class="message-button" onclick="closeMessage()">OK</button>
-
-            </div>
-        </div>
-    {% endfor %}
-{% endif %}
+     
     <img src="{% static 'prefeitura.png' %}" alt="Prefeitura Municipal" style='width:150px'>
     <h1>Portal Digital da Educação</h1>
    

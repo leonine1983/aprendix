@@ -1,0 +1,318 @@
+{% extends "modulo_merendeiras/base_merendeira.html" %}
+
+{% block content %}
+<style>
+
+/* 🔷 CONTAINER DOCUMENTO */
+.doc-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* 🔷 TÍTULOS */
+.section-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6c757d;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 4px;
+    margin-bottom: 10px;
+}
+
+/* 🔷 CABEÇALHO IMPRESSÃO */
+.print-header {
+    display: none;
+}
+
+/* 🔷 ASSINATURA */
+.signature-box {
+    margin-top: 60px;
+}
+
+.signature-line {
+    border-top: 1px solid #000;
+    width: 250px;
+    margin-top: 40px;
+}
+
+/* 🔷 IMPRESSÃO PROFISSIONAL */
+@media print {
+
+    body * {
+        visibility: hidden;
+    }
+
+    #impressao, #impressao * {
+        visibility: visible;
+    }
+
+    #impressao {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+
+    body {
+        background: #fff !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .container-fluid {
+        padding: 0 !important;
+    }
+
+    .print-header {
+        display: block;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .print-header h5 {
+        margin: 0;
+        font-weight: bold;
+    }
+
+    .table th, .table td {
+        font-size: 12px;
+        padding: 6px !important;
+    }
+
+    h3 {
+        font-size: 18px;
+        text-align: center;
+    }
+}
+@page {
+    size: A4 portrait;
+    margin: 15mm;
+}
+
+@media print {
+
+    html, body {
+        width: 210mm;
+        height: 297mm;
+    }
+
+    body * {
+        visibility: hidden;
+    }
+
+    #impressao, #impressao * {
+        visibility: visible;
+    }
+
+    #impressao {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+
+    body {
+        background: #fff !important;
+        font-size: 12px;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .container-fluid {
+        padding: 0 !important;
+    }
+
+    .print-header {
+        display: block;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .table th, .table td {
+        font-size: 11px;
+        padding: 5px !important;
+    }
+
+    h3 {
+        font-size: 16px;
+        text-align: center;
+    }
+}
+</style>
+
+<div class="container-fluid py-4 px-lg-5">
+<div class="doc-container">
+
+    <!-- 🔷 BOTÃO TOPO -->
+    <div class="d-flex justify-content-end mb-3 no-print">
+        <button onclick="window.print()" class="btn btn-dark d-flex align-items-center gap-2">
+            🖨 <span>Imprimir Documento</span>
+        </button>
+    </div>
+
+    <!-- 🔷 ÁREA DE IMPRESSÃO -->
+    <div id="impressao">
+
+        <!-- 🔷 CABEÇALHO OFICIAL -->
+        <div class="print-header">
+            <h5>PREFEITURA MUNICIPAL</h5>
+            <small>Secretaria de Educação</small><br>
+            <small>Controle de Estoque Escolar</small>
+        </div>
+
+        <!-- 🔷 TÍTULO -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body text-center">
+
+                <h3 class="fw-bold text-primary">
+                    Transferência de Estoque
+                </h3>
+
+                <div class="mt-2">
+                    <strong>Nº:</strong> {{ transferencia.numero }}
+                </div>
+
+                <div class="mt-1">
+                    <strong>Emitido em:</strong> {{ now|date:"d/m/Y H:i" }}
+                </div>
+
+                <div class="mt-2">
+                    {% if status_label == "Recebido" %}
+                        <span class="badge bg-success px-3 py-2">✔ {{ status_label }}</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark px-3 py-2">⏳ {{ status_label }}</span>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 🔷 INFORMAÇÕES -->
+        <div class="row g-4">
+
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="section-title">📍 Dados Gerais</div>
+
+                        <p class="mb-1">
+                            <strong>Data de criação:</strong>
+                            {{ transferencia.criado_em|date:"d/m/Y H:i" }}
+                        </p>
+
+                        <p class="mb-0">
+                            <strong>Responsável:</strong>
+                            {{ transferencia.criado_por.get_full_name }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="section-title">🚚 Logística</div>
+
+                        <p class="mb-1">
+                            <strong>Enviado por:</strong>
+                            {{ transferencia.enviado_por.get_full_name|default:"—" }}
+                        </p>
+
+                        <p class="mb-1">
+                            <strong>Data envio:</strong>
+                            {{ transferencia.enviado_em|date:"d/m/Y H:i"|default:"—" }}
+                        </p>
+
+                        <p class="mb-1 mt-2">
+                            <strong>Recebido por:</strong>
+                            {{ transferencia.recebido_por.get_full_name|default:"—" }}
+                        </p>
+
+                        <p class="mb-0">
+                            <strong>Data recebimento:</strong>
+                            {{ transferencia.recebido_em|date:"d/m/Y H:i"|default:"—" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 🔷 TABELA -->
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-body">
+
+                <div class="section-title">📦 Itens da Transferência</div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+
+                        <thead class="table-light text-center">
+                            <tr>
+                                <th class="text-start">Produto</th>
+                                <th>Quantidade</th>
+                                <th>Unidade</th>
+                                <th>Lote</th>
+                                <th>Validade</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for item in itens %}
+                            <tr>
+                                <td>{{ item.produto.nome }}</td>
+                                <td class="text-center">{{ item.quantidade }}</td>
+                                <td class="text-center">{{ item.produto.unidade_medida.sigla }}</td>
+                                <td class="text-center">{{ item.estoque_origem.lote }}</td>
+                                <td class="text-center">{{ item.estoque_origem.data_validade|date:"d/m/Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    Nenhum item registrado
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 🔷 ASSINATURAS -->
+        <div class="row signature-box text-center">
+
+            <div class="col-6">
+                <div class="signature-line mx-auto"></div>
+                <small>Responsável pelo Envio</small>
+            </div>
+
+            <div class="col-6">
+                <div class="signature-line mx-auto"></div>
+                <small>Responsável pelo Recebimento</small>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+</div>
+{% endblock %}

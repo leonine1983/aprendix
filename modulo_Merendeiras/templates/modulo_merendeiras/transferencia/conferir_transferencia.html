@@ -174,11 +174,23 @@
                         {% for t in confirmadas %}
                         <tr>
 
-                            <td class="fw-semibold">{{ t.numero }}</td>
+                            <td class="fw-semibold">
+                                <a href="{% url 'modulo_merendeiras:transferencia_detalhe_escola' t.id %}">
+                                    {{ t.numero }}
+                                </a>
+                            </td>
 
-                            <td>{{ t.criado_em|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'modulo_merendeiras:transferencia_detalhe_escola' t.id %}">
+                                {{ t.criado_em|date:"d/m/Y H:i" }}
+                                </a>
+                            </td>
 
-                            <td>{{ t.enviado_por.get_full_name }}</td>
+                            <td>
+                                <a href="{% url 'modulo_merendeiras:transferencia_detalhe_escola' t.id %}">
+                                {{ t.enviado_por.get_full_name }}
+                                </a>
+                            </td>
 
                             <td>
                                 {% if t.recebido_por %}
