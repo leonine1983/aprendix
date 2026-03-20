@@ -1,0 +1,183 @@
+{% extends "modulo_merendeiras/base_merendeira.html" %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- 🔷 CABEÇALHO INSTITUCIONAL -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
+
+            <div>
+                <h4 class="fw-bold text-primary mb-1">
+                    📦 Controle de Estoque
+                </h4>
+                <small class="text-muted">
+                    Monitoramento de validade e disponibilidade dos alimentos
+                </small>
+            </div>
+
+            <!-- 🔥 Indicador rápido -->
+            <div class="text-end">
+                <span class="badge bg-danger me-1">Vencidos</span>
+                <span class="badge bg-warning text-dark me-1">A vencer</span>
+                <span class="badge bg-success">OK</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 🔎 FILTROS INTELIGENTES -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+
+            <form method="get" class="row g-3 align-items-end">
+
+                <div class="col-md-4">
+                    <label class="form-label small text-muted">Produto</label>
+                    <input type="text"
+                           name="produto"
+                           class="form-control"
+                           placeholder="Ex: Arroz, Feijão..."
+                           value="{{ request.GET.produto }}">
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label small text-muted">Ano Validade</label>
+                    <input type="number"
+                           name="ano"
+                           class="form-control"
+                           placeholder="2026"
+                           value="{{ request.GET.ano }}">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="ok" {% if request.GET.status == "ok" %}selected{% endif %}>OK</option>
+                        <option value="alerta" {% if request.GET.status == "alerta" %}selected{% endif %}>A vencer</option>
+                        <option value="vencido" {% if request.GET.status == "vencido" %}selected{% endif %}>Vencido</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 d-flex gap-2">
+                    <button class="btn btn-primary w-100">
+                        🔍 Filtrar
+                    </button>
+                    <a href="?" class="btn btn-outline-secondary w-100">
+                        Limpar
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- 📊 TABELA DE ESTOQUE -->
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 fw-semibold">
+                📋 Itens em Estoque
+            </h6>
+            <small class="text-muted">
+                Ordenado por validade (FEFO)
+            </small>
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>Produto</th>
+                        <th>Lote</th>
+                        <th>Validade</th>
+                        <th class="text-end">Quantidade</th>
+                        <th>Status</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for e in estoques %}
+                    <tr>
+
+                        <!-- PRODUTO -->
+                        <td>
+                            <div class="fw-semibold">
+                                {{ e.produto.nome }}
+                            </div>
+                            <small class="text-muted">
+                                ID: {{ e.produto.id }}
+                            </small>
+                        </td>
+
+                        <!-- LOTE -->
+                        <td>
+                            {{ e.lote|default:"-" }}
+                        </td>
+
+                        <!-- VALIDADE -->
+                        <td>
+                            {{ e.data_validade|date:"d/m/Y" }}
+                        </td>
+
+                        <!-- QUANTIDADE -->
+                        <td class="text-end fw-semibold">
+                            {{ e.quantidade }}
+                        </td>
+
+                        <!-- STATUS VISUAL -->
+                        <td>
+                            {% if e.status_validade == "vencido" %}
+                                <span class="badge bg-danger">
+                                    ⚠ Vencido
+                                </span>
+                            {% elif e.status_validade == "alerta" %}
+                                <span class="badge bg-warning text-dark">
+                                    ⏳ A vencer
+                                </span>
+                            {% else %}
+                                <span class="badge bg-success">
+                                    ✔ OK
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <!-- AÇÕES -->
+                        <td class="text-end">
+
+                            <td class="text-end">
+                                <a href="{% url 'modulo_merendeiras:movimentacao_estoque_list' %}?produto={{ e.produto.id }}"
+                                class="btn btn-sm btn-outline-primary">
+                                    📊 Mov.
+                                </a>
+
+                                <a href="{% url 'modulo_merendeiras:descartar_estoque' e.id %}" class="btn btn-sm btn-outline-danger">
+                                    🗑️ Descartar
+                                </a>
+                            </td>
+                        </td>
+                    </tr>
+                 
+    
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-5">
+                            📭 Nenhum item encontrado com os filtros aplicados.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

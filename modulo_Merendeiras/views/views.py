@@ -92,20 +92,6 @@ class DashboardMerendeiraView(BaseMerendeiraView, TemplateView):
 # ESTOQUE DA ESCOLA
 # =========================
 
-class EstoqueEscolaListView(BaseMerendeiraView, ListView):
-    model = EstoqueEscola
-    template_name = "modulo_merendeiras/estoque_lista.html"
-    context_object_name = "estoques"
-
-    def get_queryset(self):
-        return (
-            EstoqueEscola.objects
-            .filter(escola=self.request.user.escola)
-            .select_related("produto")
-            .order_by("produto__nome")
-        )
-
-
 # =========================
 # RECEITAS
 # =========================

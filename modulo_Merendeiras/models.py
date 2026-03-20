@@ -22,15 +22,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.contrib.auth import get_user_model
 
-# =========================================================
-# IMPORTS TERCEIROS
-# =========================================================
-
 from ckeditor.fields import RichTextField
-
-# =========================================================
-# IMPORTS INTERNOS DO PROJETO
-# =========================================================
 
 from rh.models import Escola
 
@@ -48,9 +40,79 @@ from merendaEscolar.models import (
 User = get_user_model()
 
 
-# =========================================================
-# MODELO: MOVIMENTAÇÃO DA COZINHA
-# =========================================================
+
+class DescarteEstoqueEscola(models.Model):
+    """
+    Registro institucional de descarte realizado na escola.
+
+    Garante rastreabilidade sanitária e controle de perdas
+    no nível da unidade escolar.
+    """
+
+    MOTIVO_CHOICES = (
+        ("VENCIDO", "Produto Vencido"),
+        ("MOFO", "Produto Mofado"),
+        ("GORGULHO", "Infestação (gorgulho ou insetos)"),
+        ("EMBALAGEM_DANIFICADA", "Embalagem Danificada"),
+        ("CONTAMINACAO", "Contaminação"),
+        ("ARMAZENAMENTO_INADEQUADO", "Armazenamento inadequado"),  # 🔥 diferencial escola
+        ("OUTRO", "Outro Motivo"),
+    )
+
+    escola = models.ForeignKey(
+        Escola,
+        on_delete=models.PROTECT,
+        related_name="descartes"
+    )
+
+    estoque = models.ForeignKey(
+        EstoqueEscola,
+        on_delete=models.PROTECT,
+        related_name="descartes"
+    )
+
+    produto = models.ForeignKey(
+        Produto,
+        on_delete=models.PROTECT
+    )
+
+    lote = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True
+    )
+
+    quantidade = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        validators=[MinValueValidator(0)]
+    )
+
+    motivo = models.CharField(
+        max_length=30,
+        choices=MOTIVO_CHOICES
+    )
+
+    descricao = RichTextField(
+        blank=True,
+        null=True,
+        config_name="minimal",
+        help_text="Descrição complementar do descarte."
+    )
+
+    registrado_por = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT
+    )
+
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criado_em"]
+
+    def __str__(self):
+        return f"Descarte Escola - {self.produto.nome}"
+
 
 class MovimentacaoCozinha(models.Model):
     """
@@ -296,6 +358,62 @@ def devolver_ingrediente(execucao, produto, lote, quantidade, usuario):
         execucao_receita=execucao
     )
 
+
+@transaction.atomic
+def descartar_produto_escola(estoque, quantidade, motivo, usuario, descricao=None):
+    """
+    Descarte institucional no estoque da escola.
+
+    - Isolado do estoque central
+    - Rastreável
+    - Transacional
+    """
+
+    estoque = (
+        EstoqueEscola.objects
+        .select_for_update()
+        .select_related("produto", "escola")
+        .get(pk=estoque.pk)
+    )
+
+    # 🔴 Validações institucionais
+    if quantidade <= 0:
+        raise ValidationError("Quantidade inválida para descarte.")
+
+    if quantidade > estoque.quantidade:
+        raise ValidationError(
+            f"Estoque insuficiente. Disponível: {estoque.quantidade}"
+        )
+
+    # 📉 Baixa no estoque
+    estoque.quantidade -= quantidade
+    estoque.save()
+
+    # 📊 Registro do descarte (snapshot completo)
+    DescarteEstoqueEscola.objects.create(
+        escola=estoque.escola,
+        estoque=estoque,
+        produto=estoque.produto,
+        lote=estoque.lote,
+        quantidade=quantidade,
+        motivo=motivo,
+        descricao=descricao,
+        registrado_por=usuario
+    )
+
+    # 📦 Movimento contábil
+    MovimentacaoEstoque.objects.create(
+        produto=estoque.produto,
+        escola=estoque.escola,
+        quantidade=quantidade,
+        tipo="SAIDA_ESCOLA",
+        usuario=usuario,
+        observacao=f"Descarte ({motivo}) - lote {estoque.lote}"
+    )
+
+    return estoque
+
+
 """
 Fluxo operacional real da merendeira
 1️⃣ Merendeira abre receita do dia
@@ -310,3 +428,4 @@ Fluxo operacional real da merendeira
         ↓
 6️⃣ Finaliza preparo
 """
+

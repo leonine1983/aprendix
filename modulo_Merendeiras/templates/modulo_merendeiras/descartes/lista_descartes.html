@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- 🧠 Título com ícone (sua diretriz) -->
+    <h2 class="mb-4">
+        🗑️ Registro de Descartes de Produtos
+    </h2>
+
+    {% if descartes %}
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Produto</th>
+                        <th>Quantidade</th>
+                        <th>Motivo</th>
+                        <th>Responsável</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for d in descartes %}
+                    <tr>
+                        <td>{{ d.produto.nome }}</td>
+                        <td>{{ d.quantidade }}</td>
+                        <td>{{ d.get_motivo_display }}</td>
+                        <td>{{ d.registrado_por }}</td>
+                        <td>{{ d.criado_em|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+    {% else %}
+
+    <div class="alert alert-info">
+        Nenhum descarte registrado até o momento.
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

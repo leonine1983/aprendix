@@ -42,7 +42,29 @@ urlpatterns = [
     "transferencias/escola/<int:pk>/",
     views.TransferenciaEscolaDetailView.as_view(),
     name="transferencia_detalhe_escola"
-),
+    ),
+
+    # ESTOQUE ESCOLA ----------------------------------------------
+    # 📦 Estoque da escola (visão da merendeira)
+    path("estoque/", views.EstoqueEscolaListView.as_view(), name="estoque_list_escola" ),
+
+    # Descartes Escola
+    path("estoque/<int:pk>/descartar/", views.DescartarEstoqueView.as_view(), name="descartar_estoque" ),        
+    path("estoque/descartes/", views.ListaDescartesView.as_view(), name="lista_descartes_escola" ),
+
+      # 📊 Listagem de movimentações
+    path(
+        "estoque/movimentacoes/",
+        views.MovimentacaoEstoqueListView.as_view(),
+        name="movimentacao_estoque_list"
+    ),
+
+    # 🔍 Detalhe da movimentação
+    path(
+        "estoque/movimentacoes/<int:pk>/",
+        views.MovimentacaoEstoqueDetailView.as_view(),
+        name="movimentacao_estoque_detail"
+    ),
 
 
 
