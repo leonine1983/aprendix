@@ -11,10 +11,9 @@
 
 <style>
 
-/* ========================
-   🎨 DESIGN SYSTEM REFINADO
-======================== */
-
+/* =========================================================
+   🎨 1. DESIGN SYSTEM (TOKENS INSTITUCIONAIS)
+========================================================= */
 :root{
     --primary:#1f6f5c;
     --primary-dark:#174f42;
@@ -35,6 +34,9 @@
     --shadow:0 4px 14px rgba(0,0,0,0.05);
 }
 
+/* =========================================================
+   🧱 2. LAYOUT BASE
+========================================================= */
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
@@ -44,10 +46,9 @@ body{
     display:flex;
 }
 
-/* ========================
-   SIDEBAR INSTITUCIONAL
-======================== */
-
+/* =========================================================
+   📌 3. SIDEBAR
+========================================================= */
 .sidebar{
     width:260px;
     height:100vh;
@@ -66,9 +67,7 @@ body{
     margin-bottom:32px;
 }
 
-.nav{
-    list-style:none;
-}
+.nav{ list-style:none; }
 
 .nav a{
     display:flex;
@@ -80,12 +79,10 @@ body{
     color:rgba(255,255,255,0.85);
     margin-bottom:6px;
     font-size:0.9rem;
-    transition:all .2s ease;
+    transition:.2s;
 }
 
-.nav a:hover{
-    background:rgba(255,255,255,0.15);
-}
+.nav a:hover{ background:rgba(255,255,255,0.15); }
 
 .nav a.active{
     background:#fff;
@@ -93,16 +90,19 @@ body{
     font-weight:600;
 }
 
-/* ========================
-   MAIN
-======================== */
+/* SUBMENU */
+.nav-group{}
+.nav-toggle{ /* botão grupo */ }
+.nav-sub{ display:none; }
+.nav-group.active .nav-sub{ display:block; }
 
+/* =========================================================
+   🧭 4. HEADER
+========================================================= */
 .main{
     margin-left:260px;
     width:100%;
 }
-
-/* HEADER */
 
 .header{
     background:#fff;
@@ -113,72 +113,22 @@ body{
     align-items:center;
 }
 
-.header-title{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    font-weight:600;
-    font-size:1.2rem;
-}
-
-.header-subtitle{
-    color:var(--muted);
-    font-size:0.85rem;
-    margin-top:4px;
-}
-
-.user-box{
-    display:flex;
-    flex-direction:column;
-    align-items:flex-end;
-    gap:6px;
-}
-
-.btn-logout{
-    font-size:0.8rem;
-    text-decoration:none;
-    color:var(--danger);
-    border:1px solid var(--danger);
-    padding:6px 12px;
-    border-radius:6px;
-    transition:.2s;
-}
-
-.btn-logout:hover{
-    background:var(--danger);
-    color:#fff;
-}
-
-/* CONTENT */
-
+/* =========================================================
+   📄 5. CONTENT AREA
+========================================================= */
 .content{
     padding:30px;
 }
 
-/* ALERT */
+/* =========================================================
+   🧩 6. COMPONENTES
+========================================================= */
 
-.alert{
-    background:#fff;
-    border-left:5px solid var(--danger);
-    padding:16px 18px;
-    border-radius:var(--radius);
-    margin-bottom:25px;
-    display:flex;
-    align-items:center;
-    gap:12px;
-    box-shadow:var(--shadow);
-    font-size:0.9rem;
-}
-
-/* ========================
-   CARDS MAIS INTELIGENTES
-======================== */
-
+/* CARDS */
 .grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
     gap:20px;
-    margin-bottom:30px;
 }
 
 .card{
@@ -187,31 +137,9 @@ body{
     border-radius:var(--radius);
     box-shadow:var(--shadow);
     border:1px solid var(--border);
-    transition:.2s;
 }
 
-.card:hover{
-    transform:translateY(-2px);
-}
-
-.card-header{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-size:0.8rem;
-    color:var(--muted);
-    margin-bottom:8px;
-}
-
-.card h2{
-    font-size:1.6rem;
-    font-weight:700;
-}
-
-/* ========================
-   TABELA PROFISSIONAL
-======================== */
-
+/* TABELA */
 .table-box{
     background:var(--card);
     border-radius:var(--radius);
@@ -219,463 +147,290 @@ body{
     overflow:hidden;
 }
 
-.table-header{
-    padding:18px;
-    border-bottom:1px solid var(--border);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-.search{
-    padding:10px 12px;
-    border-radius:8px;
-    border:1px solid var(--border);
-    outline:none;
-    width:220px;
-}
-
-.search:focus{
-    border-color:var(--primary);
-}
-
-/* TABLE */
-
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-th{
-    background:#f8fafb;
-    padding:12px;
-    font-size:0.75rem;
-    text-transform:uppercase;
-    color:var(--muted);
-}
-
-td{
-    padding:14px;
-    border-top:1px solid var(--border);
-    font-size:0.9rem;
-}
-
-tr:hover{
-    background:#f9fbfb;
-}
-
-/* STATUS */
-
+/* BADGES */
 .badge{
     padding:6px 10px;
     border-radius:20px;
     font-size:0.75rem;
-    font-weight:600;
 }
 
-.ok{background:#e6f4ef;color:var(--primary);}
-.warn{background:#fff4e0;color:var(--warning);}
-.crit{background:#fdeaea;color:var(--danger);}
+/* =========================================================
+   👤 7. USER MENU (DROPDOWN)
+========================================================= */
+.user-menu{ position:relative; }
+.dropdown-menu{ display:none; }
+.user-menu.active .dropdown-menu{ display:block; }
 
-/* BUTTON */
+/* =========================================================
+   📱 8. RESPONSIVO
+========================================================= */
+.menu-toggle{ display:none; }
 
-.btn{
-    padding:8px 14px;
-    border-radius:6px;
-    border:1px solid var(--primary);
-    background:#fff;
-    color:var(--primary);
-    cursor:pointer;
-    font-size:0.85rem;
-    transition:.2s;
-}
 
-.btn:hover{
-    background:var(--primary);
+/* =========================================================
+   SIDEBAR PREMIUM UX
+========================================================= */
+/* =========================
+   SIDEBAR BASE
+========================= */
+
+.sidebar{
+    width:260px;
+    height:100vh;
+    position:fixed;
+    background:linear-gradient(180deg,var(--primary-dark),#0f3f35);
     color:#fff;
-}
-
-/* ========================
-   RESPONSIVO
-======================== */
-
-.table-box{
-    overflow-x:auto;
-}
-
-
-/* ========================
-   USER DROPDOWN (ALTO NÍVEL)
-======================== */
-
-.user-menu{
-    position:relative;
-}
-
-.user-trigger{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    background:#fff;
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:6px 10px;
-    cursor:pointer;
-    transition:.2s;
-}
-
-.user-trigger:hover{
-    box-shadow:var(--shadow);
-}
-
-.avatar{
-    width:36px;
-    height:36px;
-    border-radius:50%;
-    object-fit:cover;
-    border:2px solid var(--primary-light);
-}
-
-.user-info{
     display:flex;
     flex-direction:column;
-    text-align:left;
-    line-height:1.1;
+    transition:.3s;
 }
 
-.user-info strong{
-    font-size:0.85rem;
+/* COLAPSADO */
+.sidebar.collapsed{
+    width:80px;
 }
 
-.user-info small{
-    font-size:0.75rem;
-    color:var(--muted);
-}
-
-.chevron{
-    font-size:0.7rem;
-    color:var(--muted);
-}
-
-/* DROPDOWN */
-
-.dropdown-menu{
-    position:absolute;
-    right:0;
-    top:110%;
-    width:220px;
-    background:#fff;
-    border:1px solid var(--border);
-    border-radius:10px;
-    box-shadow:var(--shadow);
-    padding:8px;
-    display:none;
-    z-index:100;
-}
-
-.user-menu.active .dropdown-menu{
-    display:block;
-}
-
-/* HEADER DO MENU */
-
-.dropdown-header{
-    padding:10px;
-    border-bottom:1px solid var(--border);
-    margin-bottom:6px;
-}
-
-.dropdown-header small{
-    display:block;
-    color:var(--muted);
-    font-size:0.75rem;
-}
-
-/* ITENS */
-
-.dropdown-item{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    padding:10px;
-    border-radius:6px;
-    text-decoration:none;
-    color:var(--text);
-    font-size:0.85rem;
-    transition:.2s;
-}
-
-.dropdown-item:hover{
-    background:#f5f7f9;
-}
-
-.dropdown-item.danger{
-    color:var(--danger);
-}
-
-.dropdown-item.danger:hover{
-    background:#fdeaea;
-}
-
-/* DIVIDER */
-
-.dropdown-divider{
-    height:1px;
-    background:var(--border);
-    margin:6px 0;
-}
-
-
-
-
-/* SIDEBR*/
-/* BOTÃO MENU */
-
-.menu-toggle{
-    display:none;
-    font-size:1.2rem;
-    background:none;
-    border:none;
-    cursor:pointer;
-    margin-right:8px;
-}
-
-/* OVERLAY */
-
-.sidebar-overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.4);
-    opacity:0;
-    visibility:hidden;
-    transition:.2s;
-    z-index:90;
-}
-
-/* ========================
-   MOBILE SIDEBAR
-======================== */
-
-@media (max-width: 768px){
-
-    .menu-toggle{
-        display:block;
-    }
-
-    .sidebar{
-        position:fixed;
-        left:-260px;
-        top:0;
-        height:100vh;
-        width:260px;
-        z-index:100;
-        transition:.3s ease;
-    }
-
-    .sidebar.active{
-        left:0;
-    }
-
-    .sidebar-overlay.active{
-        opacity:1;
-        visibility:visible;
-    }
-
-    /* MAIN não empurra mais */
-    .main{
-        margin-left:0;
-    }
-}
-
-
-/* ========================
-   NAV GROUP (SUBMENU)
-======================== */
-
-.nav-group{
-    margin-bottom:8px;
-}
-
-.nav-toggle{
-    width:100%;
+/* HEADER */
+.sidebar-header{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    padding:12px 14px;
-    border:none;
+    padding:16px;
+}
+
+/* LOGO */
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.logo-text{
+    transition:.3s;
+}
+
+.sidebar.collapsed .logo-text{
+    opacity:0;
+    width:0;
+    overflow:hidden;
+}
+
+/* BOTÃO */
+.collapse-btn{
     background:none;
-    color:rgba(255,255,255,0.85);
-    border-radius:8px;
+    border:none;
+    color:#fff;
     cursor:pointer;
-    font-size:0.9rem;
 }
 
-.nav-toggle:hover{
-    background:rgba(255,255,255,0.15);
+/* NAV */
+.nav{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    padding:10px;
 }
 
+/* ITEM */
+.nav-item, .nav-toggle{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:12px;
+    border-radius:10px;
+    color:rgba(255,255,255,0.85);
+    text-decoration:none;
+    transition:.25s;
+    position:relative;
+}
+
+/* ÍCONE */
+.icon svg{
+    width:22px;
+    height:22px;
+    fill:currentColor;
+}
+
+/* LABEL */
+.label{
+    transition:.3s;
+}
+
+.sidebar.collapsed .label{
+    opacity:0;
+    width:0;
+    overflow:hidden;
+}
+
+/* HOVER */
+.nav-item:hover, .nav-toggle:hover{
+    background:rgba(255,255,255,0.12);
+}
+
+/* ACTIVE */
+.nav-item.active{
+    background:#fff;
+    color:var(--primary-dark);
+}
+
+/* SUBMENU */
 .nav-sub{
-    list-style:none;
-    margin-top:6px;
-    padding-left:10px;
-    display:none;
-}
-
-.nav-sub a{
-    font-size:0.85rem;
-    padding:10px 12px;
-    display:block;
-    border-radius:6px;
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .3s ease;
 }
 
 .nav-group.active .nav-sub{
-    display:block;
+    max-height:200px;
 }
 
-/* seta animada */
-.nav-group.active .chevron{
-    transform:rotate(180deg);
+/* TOOLTIP */
+.sidebar.collapsed .nav-item::after,
+.sidebar.collapsed .nav-toggle::after{
+    content:attr(data-tooltip);
+    position:absolute;
+    left:90px;
+    background:#000;
+    color:#fff;
+    padding:6px 10px;
+    border-radius:6px;
+    font-size:0.75rem;
+    opacity:0;
+    pointer-events:none;
+    transition:.2s;
+}
+
+.sidebar.collapsed .nav-item:hover::after,
+.sidebar.collapsed .nav-toggle:hover::after{
+    opacity:1;
 }
 </style>
 </head>
 
 <body>
+    <!-- =====================================================
+        📌 SIDEBAR
+    ===================================================== -->
+    <aside class="sidebar" id="sidebar">
 
-
-
-
-
-<aside class="sidebar" id="sidebar" aria-label="Menu principal do sistema">
-
-    <div class="logo">🏫 SIGAME • Escola</div>
-
-    <ul class="nav">
-
-    <!-- 📊 PAINEL -->
-    <li>
-        <a href="#">
-            📊 Painel
-        </a>
-    </li>
-
-    <!-- 📦 ESTOQUE (MÓDULO AGRUPADOR) -->
-    <li class="nav-group">
-
-        <button class="nav-toggle" aria-expanded="false">
-            📦 Estoque
-            <span class="chevron">▾</span>
-        </button>
-
-        <ul class="nav-sub">
-
-            <li>
-                <a href='{% url "modulo_merendeiras:estoque_list_escola" %}'
-                   class="{% if request.path == '/estoque/' %}active{% endif %}">
-                    📦 Visão Geral
-                </a>
-                <a href='{% url "modulo_merendeiras:lista_descartes_escola" %}'
-                   class="{% if request.path == '/estoque/' %}active{% endif %}">
-                    📦 Descartes
-                </a>
-                
-            </li>
-
-            <li>
-                <a href="{% url 'modulo_merendeiras:movimentacao_estoque_list' %}"
-                   class="{% if 'movimentacao_estoque' in request.path %}active{% endif %}">
-                    📊 Movimentações
-                </a>
-            </li>
-
-        </ul>
-
-    </li>
-
-    <!-- 🔄 TRANSFERÊNCIAS -->
-    <li>
-        <a href="{% url 'modulo_merendeiras:transferencias_recebidas' %}"
-           class="{% if 'transferencias' in request.path %}active{% endif %}">
-            🔄 Transferências
-        </a>
-    </li>
-
-    <!-- 📑 RELATÓRIOS -->
-    <li>
-        <a href="#">
-            📑 Relatórios
-        </a>
-    </li>
-
-</ul>
-
-</aside>
-
-<!-- OVERLAY MOBILE -->
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-<div class="main">
-
-<header class="header">
-
-    <div style='display: flex;'>
-        <button class="menu-toggle" aria-label="Abrir menu">
-                    ☰
-                </button>
-        <img height='50' src='{% static "prefeitura.png" %}'>
-        <div>
-            <div class="header-title">                
-                Controle de Estoque
-            </div>
-            <div class="header-subtitle">
-                {{escola_usuario}}
-            </div>
-        </div>
-    </div>
-
-    <div class="user-menu" aria-label="Menu do usuário">
-
-        <button class="user-trigger" aria-haspopup="true" aria-expanded="false">
-            <img src="{% static 'img/user-default.png' %}" alt="Foto do usuário" class="avatar">
-
-           
-
-            <span class="chevron">▾</span>
-        </button>
-
-        <div class="dropdown-menu">
-
-            <div class="dropdown-header">
-                <strong>{{usuario_nome}}</strong>
-                <small>{{grupo_principal}}</small>
+        <!-- HEADER -->
+        <div class="sidebar-header">
+            <div class="logo">
+                <span class="logo-icon">🏫</span>
+                <span class="logo-text">SIGAME</span>
             </div>
 
-            <a href="#" class="dropdown-item">
-                👤 Meu Perfil
-            </a>
-
-            <a href="#" class="dropdown-item">
-                ⚙️ Minha Conta
-            </a>
-
-            <div class="dropdown-divider"></div>
-
-            <form method="post" action="{% url 'admin_acessos:logout' %}">
-                {% csrf_token %}
-                <button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;">
-                    Sair
-                </button>
-            </form>
+            <button class="collapse-btn" id="collapseBtn">⇤</button>
         </div>
 
+        <!-- NAV -->
+        <nav class="nav">
+
+            <!-- ITEM -->
+            <a href="#" class="nav-item active" data-tooltip="Painel">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm10 8h8V11h-8v10zM3 21h8v-6H3v6zm10-10h8V3h-8v8z"/></svg>
+                </span>
+                <span class="label">Painel</span>
+            </a>
+
+            <!-- GRUPO -->
+            <div class="nav-group">
+
+                <button class="nav-toggle" data-tooltip="Estoque">
+                    <div class="nav-left">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M21 16V8l-9-5-9 5v8l9 5 9-5z"/></svg>
+                        </span>
+                        <span class="label">Estoque</span>
+                    </div>
+                    <span class="chevron">▾</span>
+                </button>
+
+                <div class="nav-sub">
+
+                    <a href="{% url 'modulo_merendeiras:estoque_list_escola' %}" class="nav-sub-item">
+                        📦 Visão Geral
+                    </a>
+
+                    <a href="{% url 'modulo_merendeiras:lista_descartes_escola' %}" class="nav-sub-item">
+                        🗑️ Descartes
+                    </a>
+
+                </div>
+            </div>
+
+            <!-- ITEM -->
+            <a href="{% url 'modulo_merendeiras:transferencias_recebidas' %}" class="nav-item" data-tooltip="Transferências">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4M7 23l-4-4 4-4"/></svg>
+                </span>
+                <span class="label">Transferências</span>
+            </a>
+
+        </nav>
+
+    </aside>
+
+    <!-- =====================================================
+     📄 MAIN LAYOUT
+    ===================================================== -->
+    <div class="main">
+
+        <!-- =================================================
+            🧭 HEADER
+        ================================================= -->
+        <header class="header">
+
+            <div class="header-left">
+                <button class="menu-toggle">☰</button>
+
+                <img height="50" src='{% static "prefeitura.png" %}'>
+
+                <div>
+                    <div class="header-title">Controle de Estoque</div>
+                    <div class="header-subtitle">{{escola_usuario}}</div>
+                </div>
+            </div>
+
+            <!-- USER MENU -->
+            <div class="user-menu">
+                <button class="user-trigger">
+                    <img src="{% static 'img/user-default.png' %}" class="avatar">
+                    <span class="chevron">▾</span>
+                </button>
+
+                <div class="dropdown-menu">
+
+                    <div class="dropdown-header">
+                        <strong>{{usuario_nome}}</strong>
+                        <small>{{grupo_principal}}</small>
+                    </div>
+
+                    <a href="#" class="dropdown-item">👤 Perfil</a>
+                    <a href="#" class="dropdown-item">⚙️ Conta</a>
+
+                    <div class="dropdown-divider"></div>
+
+                    <form method="post" action="{% url 'admin_acessos:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit">Sair</button>
+                    </form>
+
+                </div>
+            </div>
+
+        </header>
+
+        <!-- =================================================
+            📦 CONTENT
+        ================================================= -->
+        <main class="content">
+            {% block content %}{% endblock %}
+        </main>
+
     </div>
-
-</header>
-
-<main class="content">
-    {% block content %}{% endblock content %}
-</main>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 <script>
@@ -694,40 +449,57 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
-
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
 
     const sidebar = document.getElementById("sidebar");
-    const overlay = document.getElementById("sidebarOverlay");
-    const toggle = document.querySelector(".menu-toggle");
+    const collapseBtn = document.getElementById("collapseBtn");
 
-    toggle.addEventListener("click", function () {
-        sidebar.classList.toggle("active");
-        overlay.classList.toggle("active");
+    /* =========================
+       ESTADO PERSISTENTE
+    ========================= */
+    if(localStorage.getItem("sidebar-collapsed") === "true"){
+        sidebar.classList.add("collapsed");
+    }
+
+    collapseBtn.addEventListener("click", () => {
+        sidebar.classList.toggle("collapsed");
+
+        localStorage.setItem(
+            "sidebar-collapsed",
+            sidebar.classList.contains("collapsed")
+        );
     });
 
-    overlay.addEventListener("click", function () {
-        sidebar.classList.remove("active");
-        overlay.classList.remove("active");
-    });
-
-});
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const groups = document.querySelectorAll(".nav-group");
-
-    groups.forEach(group => {
-        const toggle = group.querySelector(".nav-toggle");
+    /* =========================
+       SUBMENU
+    ========================= */
+    document.querySelectorAll(".nav-toggle").forEach(toggle => {
 
         toggle.addEventListener("click", () => {
-            group.classList.toggle("active");
+            const group = toggle.parentElement;
 
-            const expanded = toggle.getAttribute("aria-expanded") === "true";
-            toggle.setAttribute("aria-expanded", !expanded);
+            document.querySelectorAll(".nav-group").forEach(g => {
+                if(g !== group) g.classList.remove("active");
+            });
+
+            group.classList.toggle("active");
         });
+
+    });
+
+    /* =========================
+       ATIVO POR URL
+    ========================= */
+    document.querySelectorAll(".nav-item, .nav-sub-item").forEach(link => {
+
+        if(link.href === window.location.href){
+            link.classList.add("active");
+
+            const group = link.closest(".nav-group");
+            if(group) group.classList.add("active");
+        }
+
     });
 
 });
