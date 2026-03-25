@@ -6,503 +6,1594 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SIGAME | Controle de Merenda</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
 
 /* =========================================================
-   🎨 1. DESIGN SYSTEM (TOKENS INSTITUCIONAIS)
+   🎨 DESIGN SYSTEM
 ========================================================= */
-:root{
-    --primary:#1f6f5c;
-    --primary-dark:#174f42;
-    --primary-light:#e8f3f1;
+:root {
+    --accent:        #3B6EF8;
+    --accent-glow:   rgba(59, 110, 248, 0.28);
+    --accent-light:  rgba(59, 110, 248, 0.10);
 
-    --accent:#2c7be5;
-    --danger:#d64545;
-    --warning:#d9a441;
+    --bg:            #EAECF0;
 
-    --bg:#f5f7f9;
-    --card:#ffffff;
-    --border:#e4e9ee;
+    --sidebar-top:   #1B4D3E;
+    --sidebar-bot:   #0D2B22;
+    --sidebar-text:  rgba(255,255,255,0.70);
+    --sidebar-w:     268px;
+    --sidebar-w-col: 76px;
 
-    --text:#1e2a2a;
-    --muted:#6b7b7a;
+    --surface:       #FFFFFF;
+    --border:        rgba(0,0,0,0.07);
+    --shadow-sm:     0 2px 8px rgba(0,0,0,0.06);
+    --shadow-md:     0 8px 28px rgba(0,0,0,0.10);
+    --shadow-lg:     0 20px 50px rgba(0,0,0,0.14);
 
-    --radius:12px;
-    --shadow:0 4px 14px rgba(0,0,0,0.05);
+    --text:          #111827;
+    --muted:         #6B7280;
+
+    --radius:        16px;
+    --nav-h:         80px;
+    --transition:    .28s cubic-bezier(.4,0,.2,1);
 }
 
 /* =========================================================
-   🧱 2. LAYOUT BASE
+   RESET
 ========================================================= */
-*{margin:0;padding:0;box-sizing:border-box;}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-body{
-    font-family:'Inter',system-ui;
-    background:var(--bg);
-    color:var(--text);
-    display:flex;
+body {
+    font-family: 'DM Sans', system-ui;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    overflow-x: hidden;
 }
 
 /* =========================================================
-   📌 3. SIDEBAR
+   📌 SIDEBAR — DESKTOP
 ========================================================= */
-.sidebar{
-    width:260px;
-    height:100vh;
-    background:linear-gradient(180deg,var(--primary-dark),var(--primary));
-    color:#fff;
-    padding:24px 18px;
-    position:fixed;
+body.sidebar-collapsed .expand-trigger {
+    opacity: 1;
+    pointer-events: auto;
+    left: calc(var(--sidebar-w-col) + 12px);
 }
 
-.logo{
-    font-weight:700;
-    font-size:1.2rem;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:32px;
+.sidebar {
+    width: var(--sidebar-w);
+    height: 100vh;
+    position: fixed;
+    top: 0; left: 0;
+    background: linear-gradient(175deg, var(--sidebar-top), var(--sidebar-bot));
+    display: flex;
+    flex-direction: column;
+    transition: width var(--transition);
+    box-shadow: 6px 0 32px rgba(0,0,0,0.20);
+    z-index: 200;
+    overflow: hidden;
 }
 
-.nav{ list-style:none; }
-
-.nav a{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding:12px 14px;
-    border-radius:8px;
-    text-decoration:none;
-    color:rgba(255,255,255,0.85);
-    margin-bottom:6px;
-    font-size:0.9rem;
-    transition:.2s;
+.sidebar.collapsed {
+    width: var(--sidebar-w-col);
 }
 
-.nav a:hover{ background:rgba(255,255,255,0.15); }
-
-.nav a.active{
-    background:#fff;
-    color:var(--primary-dark);
-    font-weight:600;
+/* ── LOGO ── */
+.sidebar-header {
+    padding: 24px 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
 }
 
-/* SUBMENU */
-.nav-group{}
-.nav-toggle{ /* botão grupo */ }
-.nav-sub{ display:none; }
-.nav-group.active .nav-sub{ display:block; }
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    text-decoration: none;
+}
+
+.logo-icon {
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.10);
+    border-radius: 12px;
+    display: grid; place-items: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.logo-text {
+    font-family: 'Sora', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #fff;
+    letter-spacing: .5px;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: opacity var(--transition), max-width var(--transition);
+    max-width: 160px;
+}
+
+.sidebar.collapsed .logo-text {
+    opacity: 0;
+    max-width: 0;
+}
+
+.collapse-btn {
+    background: rgba(255,255,255,0.07);
+    border: none;
+    color: rgba(255,255,255,0.7);
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: grid; place-items: center;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.collapse-btn:hover {
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+}
+
+.collapse-btn svg {
+    width: 16px; height: 16px;
+    stroke: currentColor;
+    transition: transform var(--transition);
+}
+
+.sidebar.collapsed .collapse-btn svg {
+    transform: rotate(180deg);
+}
+
+/* ── NAV ── */
+.nav {
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+}
+
+.nav::-webkit-scrollbar { display: none; }
+
+.nav-item,
+.nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 13px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--sidebar-text);
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    transition: background var(--transition), color var(--transition), transform var(--transition);
+    position: relative;
+    white-space: nowrap;
+}
+
+.nav-item:hover,
+.nav-toggle:hover {
+    background: rgba(255,255,255,0.07);
+    color: #fff;
+}
+
+.nav-item.active {
+    background: rgba(59,110,248,0.18);
+    color: #fff;
+}
+
+.nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 8px; bottom: 8px;
+    width: 4px;
+    border-radius: 4px;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.nav-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: grid; place-items: center;
+    background: rgba(255,255,255,0.06);
+    flex-shrink: 0;
+    transition: background var(--transition);
+}
+
+.nav-item.active .nav-icon {
+    background: var(--accent);
+    box-shadow: 0 4px 14px var(--accent-glow);
+}
+
+.nav-item:hover .nav-icon,
+.nav-toggle:hover .nav-icon {
+    background: rgba(255,255,255,0.12);
+}
+
+.nav-icon svg {
+    width: 18px; height: 18px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.nav-label {
+    font-size: .875rem;
+    font-weight: 500;
+    overflow: hidden;
+    max-width: 140px;
+    transition: opacity var(--transition), max-width var(--transition);
+}
+
+.sidebar.collapsed .nav-label,
+.sidebar.collapsed .chevron {
+    opacity: 0;
+    max-width: 0;
+}
+
+.chevron {
+    font-size: .7rem;
+    opacity: .5;
+    transition: transform var(--transition), opacity var(--transition), max-width var(--transition);
+    overflow: hidden;
+    max-width: 20px;
+}
+
+.nav-group.open .chevron {
+    transform: rotate(180deg);
+}
+
+.nav-sub {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .35s cubic-bezier(.4,0,.2,1);
+    padding-left: 51px;
+}
+
+.nav-group.open .nav-sub {
+    max-height: 300px;
+}
+
+.sidebar.collapsed .nav-sub {
+    padding-left: 0;
+}
+
+.nav-sub-item {
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-size: .82rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: rgba(255,255,255,0.52);
+    transition: var(--transition);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.nav-sub-item:hover {
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    padding-left: 18px;
+}
+
+.nav-sub-item.active {
+    color: #93c5fd;
+    font-weight: 600;
+}
+
+/* TOOLTIP (collapsed) */
+.sidebar.collapsed [data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    left: calc(var(--sidebar-w-col) + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #0d1117;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: .78rem;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .2s;
+    z-index: 999;
+}
+
+.sidebar.collapsed [data-tip]:hover::after {
+    opacity: 1;
+}
 
 /* =========================================================
-   🧭 4. HEADER
+   👤 USER MENU — SIDEBAR FOOTER
+   Contém avatar + info do usuário + botão que abre o menu
 ========================================================= */
-.main{
-    margin-left:260px;
-    width:100%;
+.sidebar-footer {
+    padding: 14px 12px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+    /* Necessário para posicionamento relativo do menu */
+    position: relative;
 }
 
-.header{
-    background:#fff;
-    border-bottom:1px solid var(--border);
-    padding:20px 30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+/*
+ * O botão do usuário no sidebar.
+ * Ao clicar, dispara o menu de usuário do sidebar (sidebar-user-menu).
+ */
+.sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 11px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background var(--transition);
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    color: inherit;
+}
+
+.sidebar-user:hover {
+    background: rgba(255,255,255,0.07);
+}
+
+/* Anel pulsante no avatar quando o menu está aberto */
+.sidebar-user[aria-expanded="true"] .sidebar-avatar {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.sidebar-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 2px solid rgba(255,255,255,0.15);
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.sidebar-user-info {
+    overflow: hidden;
+    transition: opacity var(--transition), max-width var(--transition);
+    max-width: 160px;
+    flex: 1;
+}
+
+.sidebar.collapsed .sidebar-user-info {
+    opacity: 0;
+    max-width: 0;
+}
+
+.sidebar-user-name {
+    font-size: .84rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-user-role {
+    font-size: .72rem;
+    color: rgba(255,255,255,0.50);
+    white-space: nowrap;
+}
+
+/* Ícone de "mais opções" no footer do sidebar */
+.sidebar-user-dots {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex-shrink: 0;
+    opacity: 0.5;
+    transition: opacity var(--transition), max-width var(--transition);
+    overflow: hidden;
+    max-width: 20px;
+}
+
+.sidebar.collapsed .sidebar-user-dots {
+    opacity: 0;
+    max-width: 0;
+}
+
+.sidebar-user-dots span {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.7);
+    display: block;
+}
+
+/*
+ * Menu flutuante do usuário no sidebar.
+ * Posicionado ACIMA do footer via bottom/left absolute.
+ * Visível apenas quando .active está presente (controlado por JS).
+ */
+.sidebar-user-menu {
+    position: absolute;
+    bottom: calc(100% + 8px); /* Flutua acima do footer */
+    left: 12px;
+    right: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    z-index: 9999;
+
+    /* Estado inicial: escondido */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition:
+        opacity .22s cubic-bezier(.4,0,.2,1),
+        transform .22s cubic-bezier(.4,0,.2,1),
+        visibility .22s;
+}
+
+/* Abre o menu */
+.sidebar-user-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Cabeçalho interno do menu (avatar + nome) */
+.um-header {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.um-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent);
+    flex-shrink: 0;
+}
+
+.um-info-name {
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.um-info-role {
+    font-size: .72rem;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+/* Lista de itens do menu */
+.um-list {
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* Item de link comum */
+.um-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: .855rem;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    transition: background var(--transition), color var(--transition);
+    border: none;
+    background: transparent;
+    width: 100%;
+    cursor: pointer;
+    text-align: left;
+}
+
+.um-item:hover {
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.um-item svg {
+    width: 16px; height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+    opacity: .7;
+}
+
+/* Item de "Sair" — destaque vermelho */
+.um-item.um-logout {
+    color: #DC2626;
+}
+
+.um-item.um-logout:hover {
+    background: rgba(220, 38, 38, 0.08);
+    color: #DC2626;
+}
+
+/* Divisor interno */
+.um-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 8px;
 }
 
 /* =========================================================
-   📄 5. CONTENT AREA
+   👤 USER MENU — TOPBAR (HEADER)
+   Dropdown que aparece ao clicar no avatar no header.
+   Usa position:fixed para evitar clipping por stacking context.
 ========================================================= */
-.content{
-    padding:30px;
+
+/*
+ * Botão trigger no header.
+ * Exibe avatar + nome do usuário.
+ */
+.topbar-user-btn {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    padding: 5px 12px 5px 5px;
+    cursor: pointer;
+    transition: box-shadow var(--transition), border-color var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+
+.topbar-user-btn:hover {
+    box-shadow: var(--shadow-md);
+    border-color: rgba(59,110,248,0.3);
+}
+
+/* Estado ativo: borda azul */
+.topbar-user-btn[aria-expanded="true"] {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.topbar-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.topbar-user-name {
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Seta animada */
+.topbar-chevron {
+    width: 14px; height: 14px;
+    stroke: var(--muted);
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform var(--transition);
+    flex-shrink: 0;
+}
+
+.topbar-user-btn[aria-expanded="true"] .topbar-chevron {
+    transform: rotate(180deg);
+}
+
+/*
+ * Dropdown do topbar.
+ * Usa position:fixed + top/right calculados via JS para evitar
+ * clipping causado por backdrop-filter da topbar (stacking context).
+ * O JS injeta as coordenadas como style inline.
+ */
+.topbar-user-menu {
+    position: fixed;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    min-width: 220px;
+    overflow: hidden;
+    z-index: 9999;
+
+    /* Estado inicial: escondido */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px) scale(0.97);
+    transform-origin: top right;
+    transition:
+        opacity .22s cubic-bezier(.4,0,.2,1),
+        transform .22s cubic-bezier(.4,0,.2,1),
+        visibility .22s;
+}
+
+/* Abre o dropdown */
+.topbar-user-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+
+/* =========================================================
+   🔘 EXPAND TRIGGER
+========================================================= */
+.expand-trigger {
+    position: fixed;
+    top: 24px;
+    left: calc(var(--sidebar-w-col) - 20px);
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    z-index: 201;
+    transition: var(--transition);
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.expand-trigger svg {
+    width: 18px;
+    height: 18px;
+}
+
+.sidebar.collapsed + .expand-trigger {
+    opacity: 1;
+    pointer-events: auto;
+    left: calc(var(--sidebar-w-col) + 12px);
+}
+
+@media (max-width: 768px) {
+    .expand-trigger { display: none !important; }
 }
 
 /* =========================================================
-   🧩 6. COMPONENTES
+   📄 MAIN
 ========================================================= */
-
-/* CARDS */
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:20px;
+.main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: margin-left var(--transition);
 }
 
-.card{
-    background:var(--card);
-    padding:20px;
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    border:1px solid var(--border);
+.sidebar.collapsed ~ .main {
+    margin-left: var(--sidebar-w-col);
 }
 
-/* TABELA */
-.table-box{
-    background:var(--card);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    overflow:hidden;
+/* ── TOPBAR ── */
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
 }
 
-/* BADGES */
-.badge{
-    padding:6px 10px;
-    border-radius:20px;
-    font-size:0.75rem;
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.menu-toggle {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    width: 40px; height: 40px;
+    border-radius: 11px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.menu-toggle:hover {
+    background: var(--accent-light);
+    border-color: var(--accent);
+}
+
+.prefeitura-logo {
+    height: 42px;
+    object-fit: contain;
+}
+
+.topbar-titles {
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar-title {
+    font-family: 'Sora', sans-serif;
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+}
+
+.topbar-subtitle {
+    font-size: .78rem;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+/* ── CONTENT ── */
+.content {
+    padding: 28px;
+    flex: 1;
+}
+
+/* ── CARD ── */
+.card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    padding: 22px;
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
 }
 
 /* =========================================================
-   👤 7. USER MENU (DROPDOWN)
+   📱 BOTTOM NAV MOBILE
 ========================================================= */
-.user-menu{ position:relative; }
-.dropdown-menu{ display:none; }
-.user-menu.active .dropdown-menu{ display:block; }
+.bottom-nav {
+    display: none;
+}
 
 /* =========================================================
-   📱 8. RESPONSIVO
+   OVERLAY (mobile sidebar)
 ========================================================= */
-.menu-toggle{ display:none; }
+.overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 190;
+    opacity: 0;
+    transition: opacity var(--transition);
+    backdrop-filter: blur(3px);
+}
 
+.overlay.visible {
+    opacity: 1;
+}
 
 /* =========================================================
-   SIDEBAR PREMIUM UX
+   📱 RESPONSIVO
 ========================================================= */
-/* =========================
-   SIDEBAR BASE
-========================= */
+@media (max-width: 768px) {
 
-.sidebar{
-    width:260px;
-    height:100vh;
-    position:fixed;
-    background:linear-gradient(180deg,var(--primary-dark),#0f3f35);
-    color:#fff;
-    display:flex;
-    flex-direction:column;
-    transition:.3s;
+    .sidebar {
+        left: calc(-1 * var(--sidebar-w));
+        width: var(--sidebar-w) !important;
+        z-index: 300;
+        transition: left var(--transition);
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+
+    .overlay {
+        display: block;
+    }
+
+    .main {
+        margin-left: 0 !important;
+        padding-bottom: calc(var(--nav-h) + 16px);
+    }
+
+    .menu-toggle {
+        display: grid;
+        place-items: center;
+    }
+
+    /* Esconde nome no botão topbar em telas pequenas */
+    .topbar-user-name {
+        display: none;
+    }
+
+    /* ── BOTTOM NAV ── */
+    .bottom-nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 250;
+        padding: 10px 18px;
+        background: #FFFFFF;
+        border-radius: 100px;
+        box-shadow:
+            0 8px 32px rgba(0,0,0,0.12),
+            0 2px 8px rgba(0,0,0,0.06),
+            inset 0 1px 0 rgba(255,255,255,0.9);
+        gap: 4px;
+        width: calc(100% - 32px);
+        max-width: 400px;
+    }
+
+    .bn-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        flex: 1;
+        text-decoration: none;
+        color: #9CA3AF;
+        padding: 6px 4px;
+        border-radius: 50px;
+        transition: color var(--transition);
+        position: relative;
+    }
+
+    .bn-item:hover { color: #6B7280; }
+
+    .bn-icon {
+        width: 44px; height: 44px;
+        border-radius: 50%;
+        display: grid; place-items: center;
+        transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+    }
+
+    .bn-icon svg {
+        width: 22px; height: 22px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: stroke var(--transition);
+    }
+
+    .bn-label {
+        font-size: .68rem;
+        font-weight: 600;
+        transition: color var(--transition);
+        letter-spacing: .01em;
+    }
+
+    .bn-item.active { color: var(--accent); }
+
+    .bn-item.active .bn-icon {
+        background: var(--accent);
+        box-shadow:
+            0 6px 20px var(--accent-glow),
+            0 2px 8px rgba(59,110,248,0.25);
+        transform: translateY(-2px);
+    }
+
+    .bn-item.active .bn-icon svg { stroke: #ffffff; }
+    .bn-item.active .bn-label { color: var(--accent); }
+    .bn-item:not(.active):hover .bn-icon { background: rgba(0,0,0,0.04); }
+
+    .topbar {
+        padding: 0 16px;
+        height: 60px;
+    }
+
+    .prefeitura-logo { height: 34px; }
+    .content { padding: 16px; }
 }
 
-/* COLAPSADO */
-.sidebar.collapsed{
-    width:80px;
+@media (max-width: 420px) {
+    .bottom-nav {
+        width: calc(100% - 24px);
+        padding: 8px 14px;
+    }
+    .bn-icon { width: 40px; height: 40px; }
+    .bn-label { font-size: .62rem; }
 }
 
-/* HEADER */
-.sidebar-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:16px;
-}
-
-/* LOGO */
-.logo{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-.logo-text{
-    transition:.3s;
-}
-
-.sidebar.collapsed .logo-text{
-    opacity:0;
-    width:0;
-    overflow:hidden;
-}
-
-/* BOTÃO */
-.collapse-btn{
-    background:none;
-    border:none;
-    color:#fff;
-    cursor:pointer;
-}
-
-/* NAV */
-.nav{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    padding:10px;
-}
-
-/* ITEM */
-.nav-item, .nav-toggle{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    padding:12px;
-    border-radius:10px;
-    color:rgba(255,255,255,0.85);
-    text-decoration:none;
-    transition:.25s;
-    position:relative;
-}
-
-/* ÍCONE */
-.icon svg{
-    width:22px;
-    height:22px;
-    fill:currentColor;
-}
-
-/* LABEL */
-.label{
-    transition:.3s;
-}
-
-.sidebar.collapsed .label{
-    opacity:0;
-    width:0;
-    overflow:hidden;
-}
-
-/* HOVER */
-.nav-item:hover, .nav-toggle:hover{
-    background:rgba(255,255,255,0.12);
-}
-
-/* ACTIVE */
-.nav-item.active{
-    background:#fff;
-    color:var(--primary-dark);
-}
-
-/* SUBMENU */
-.nav-sub{
-    max-height:0;
-    overflow:hidden;
-    transition:max-height .3s ease;
-}
-
-.nav-group.active .nav-sub{
-    max-height:200px;
-}
-
-/* TOOLTIP */
-.sidebar.collapsed .nav-item::after,
-.sidebar.collapsed .nav-toggle::after{
-    content:attr(data-tooltip);
-    position:absolute;
-    left:90px;
-    background:#000;
-    color:#fff;
-    padding:6px 10px;
-    border-radius:6px;
-    font-size:0.75rem;
-    opacity:0;
-    pointer-events:none;
-    transition:.2s;
-}
-
-.sidebar.collapsed .nav-item:hover::after,
-.sidebar.collapsed .nav-toggle:hover::after{
-    opacity:1;
-}
 </style>
 </head>
 
 <body>
-    <!-- =====================================================
-        📌 SIDEBAR
-    ===================================================== -->
-    <aside class="sidebar" id="sidebar">
 
-        <!-- HEADER -->
-        <div class="sidebar-header">
-            <div class="logo">
-                <span class="logo-icon">🏫</span>
-                <span class="logo-text">SIGAME</span>
+<!-- =========================================================
+     OVERLAY (mobile sidebar)
+========================================================= -->
+<div class="overlay" id="overlay"></div>
+
+<!-- =========================================================
+     📌 SIDEBAR
+========================================================= -->
+<button class="expand-trigger" id="expandTrigger" aria-label="Abrir menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="9 18 15 12 9 6"/>
+    </svg>
+</button>
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-header">
+        <a href="#" class="logo">
+            <span class="logo-icon">🏫</span>
+            <span class="logo-text">SIGAME</span>
+        </a>
+        <button class="collapse-btn" id="collapseBtn" aria-label="Recolher menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"/>
+            </svg>
+        </button>
+    </div>
+
+    <nav class="nav">
+
+        <!-- PAINEL -->
+        <a href="#" class="nav-item active" data-tip="Painel">
+            <div class="nav-left">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Painel</span>
             </div>
+        </a>
 
-            <button class="collapse-btn" id="collapseBtn">⇤</button>
+        <!-- ESTOQUE -->
+        <div class="nav-group" id="group-estoque">
+            <button class="nav-toggle" data-tip="Estoque">
+                <div class="nav-left">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                        </svg>
+                    </span>
+                    <span class="nav-label">Estoque</span>
+                </div>
+                <span class="chevron">▾</span>
+            </button>
+
+            <div class="nav-sub">
+                <a href="{% url 'modulo_merendeiras:estoque_list_escola' %}" class="nav-sub-item">
+                    📦 Visão Geral
+                </a>
+                <a href="{% url 'modulo_merendeiras:lista_descartes_escola' %}" class="nav-sub-item">
+                    🗑️ Descartes
+                </a>
+            </div>
         </div>
 
-        <!-- NAV -->
-        <nav class="nav">
-
-            <!-- ITEM -->
-            <a href="#" class="nav-item active" data-tooltip="Painel">
-                <span class="icon">
-                    <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm10 8h8V11h-8v10zM3 21h8v-6H3v6zm10-10h8V3h-8v8z"/></svg>
+        <!-- TRANSFERÊNCIAS -->
+        <a href="{% url 'modulo_merendeiras:transferencias_recebidas' %}" class="nav-item" data-tip="Transferências">
+            <div class="nav-left">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <polyline points="17 1 21 5 17 9"/>
+                        <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                        <polyline points="7 23 3 19 7 15"/>
+                        <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                    </svg>
                 </span>
-                <span class="label">Painel</span>
-            </a>
-
-            <!-- GRUPO -->
-            <div class="nav-group">
-
-                <button class="nav-toggle" data-tooltip="Estoque">
-                    <div class="nav-left">
-                        <span class="icon">
-                            <svg viewBox="0 0 24 24"><path d="M21 16V8l-9-5-9 5v8l9 5 9-5z"/></svg>
-                        </span>
-                        <span class="label">Estoque</span>
-                    </div>
-                    <span class="chevron">▾</span>
-                </button>
-
-                <div class="nav-sub">
-
-                    <a href="{% url 'modulo_merendeiras:estoque_list_escola' %}" class="nav-sub-item">
-                        📦 Visão Geral
-                    </a>
-
-                    <a href="{% url 'modulo_merendeiras:lista_descartes_escola' %}" class="nav-sub-item">
-                        🗑️ Descartes
-                    </a>
-
-                </div>
+                <span class="nav-label">Transferências</span>
             </div>
+        </a>
 
-            <!-- ITEM -->
-            <a href="{% url 'modulo_merendeiras:transferencias_recebidas' %}" class="nav-item" data-tooltip="Transferências">
-                <span class="icon">
-                    <svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4M7 23l-4-4 4-4"/></svg>
-                </span>
-                <span class="label">Transferências</span>
-            </a>
+    </nav>
 
-        </nav>
-
-    </aside>
-
-    <!-- =====================================================
-     📄 MAIN LAYOUT
+    <!-- ====================================================
+         👤 SIDEBAR FOOTER — USER MENU
+         Clique no botão .sidebar-user abre .sidebar-user-menu
+         O menu flutua ACIMA do footer (bottom: 100% + 8px)
     ===================================================== -->
-    <div class="main">
+    <div class="sidebar-footer">
 
-        <!-- =================================================
-            🧭 HEADER
-        ================================================= -->
-        <header class="header">
+        <!--
+            Botão trigger do menu no sidebar.
+            aria-expanded é atualizado pelo JS ao abrir/fechar.
+            aria-controls aponta para o ID do menu.
+        -->
+        <button
+            class="sidebar-user"
+            id="sidebarUserBtn"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="sidebarUserMenu"
+        >
+            <img src="{% static 'img/user-default.png' %}" class="sidebar-avatar" alt="Avatar do usuário">
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name">{{ usuario_nome }}</div>
+                <div class="sidebar-user-role">{{ grupo_principal }}</div>
+            </div>
+            <!-- Três pontos verticais, escondidos quando sidebar colapsado -->
+            <div class="sidebar-user-dots" aria-hidden="true">
+                <span></span><span></span><span></span>
+            </div>
+        </button>
 
-            <div class="header-left">
-                <button class="menu-toggle">☰</button>
-
-                <img height="50" src='{% static "prefeitura.png" %}'>
-
+        <!--
+            Menu flutuante do usuário (sidebar).
+            Usa position:absolute dentro do .sidebar-footer (position:relative).
+            JS adiciona/remove .active para abrir/fechar.
+        -->
+        <div
+            class="sidebar-user-menu"
+            id="sidebarUserMenu"
+            role="menu"
+            aria-labelledby="sidebarUserBtn"
+        >
+            <!-- Cabeçalho: avatar + nome + cargo -->
+            <div class="um-header" aria-hidden="true">
+                <img src="{% static 'img/user-default.png' %}" class="um-avatar" alt="">
                 <div>
-                    <div class="header-title">Controle de Estoque</div>
-                    <div class="header-subtitle">{{escola_usuario}}</div>
+                    <div class="um-info-name">{{ usuario_nome }}</div>
+                    <div class="um-info-role">{{ grupo_principal }}</div>
                 </div>
             </div>
 
-            <!-- USER MENU -->
-            <div class="user-menu">
-                <button class="user-trigger">
-                    <img src="{% static 'img/user-default.png' %}" class="avatar">
-                    <span class="chevron">▾</span>
+            <!-- Links do menu -->
+            <div class="um-list">
+                <a href="" class="um-item" role="menuitem">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Perfil
+                </a>
+
+                <a href="" class="um-item" role="menuitem">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                    Currículo
+                </a>
+
+                <div class="um-divider" role="separator"></div>
+
+                <!--
+                    Logout via POST com CSRF token (Django).
+                    O botão submete o form oculto #logoutForm.
+                -->
+                <button
+                    class="um-item um-logout"
+                    role="menuitem"
+                    onclick="document.getElementById('logoutFormSidebar').submit()"
+                >
+                    <svg viewBox="0 0 24 24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Sair
                 </button>
 
-                <div class="dropdown-menu">
+                <!-- Form oculto para o POST de logout -->
+                <form id="logoutFormSidebar" method="post" action="" style="display:none">
+                    {% csrf_token %}
+                </form>
+            </div>
+        </div>
 
-                    <div class="dropdown-header">
-                        <strong>{{usuario_nome}}</strong>
-                        <small>{{grupo_principal}}</small>
+    </div><!-- /sidebar-footer -->
+
+</aside>
+
+<!-- =========================================================
+     📄 MAIN
+========================================================= -->
+<div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">☰</button>
+            <img class="prefeitura-logo" src="{% static 'prefeitura.png' %}" alt="Prefeitura">
+            <div class="topbar-titles">
+                <span class="topbar-title">Controle de Estoque</span>
+                <span class="topbar-subtitle">{{ escola_usuario }}</span>
+            </div>
+        </div>
+
+        <!-- ================================================
+             👤 TOPBAR — USER MENU TRIGGER
+             O botão .topbar-user-btn abre .topbar-user-menu
+             O menu usa position:fixed com coordenadas calculadas por JS
+             para evitar clipping causado pelo backdrop-filter da topbar.
+        ================================================= -->
+        <div style="position:relative">
+            <!--
+                Trigger do menu no header.
+                aria-expanded é atualizado pelo JS.
+                aria-controls aponta para o menu.
+            -->
+            <button
+                class="topbar-user-btn"
+                id="topbarUserBtn"
+                aria-haspopup="true"
+                aria-expanded="false"
+                aria-controls="topbarUserMenu"
+            >
+                <img src="{% static 'img/user-default.png' %}" class="topbar-avatar" alt="Avatar">
+                <span class="topbar-user-name">{{ usuario_nome }}</span>
+                <svg class="topbar-chevron" viewBox="0 0 24 24">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </button>
+
+            <!--
+                Dropdown do header.
+                position:fixed — o JS calcula top e right com getBoundingClientRect()
+                e injeta via style inline para posicionamento preciso.
+                JS adiciona/remove .active para abrir/fechar.
+            -->
+            <div
+                class="topbar-user-menu"
+                id="topbarUserMenu"
+                role="menu"
+                aria-labelledby="topbarUserBtn"
+            >
+                <!-- Cabeçalho do dropdown -->
+                <div class="um-header" aria-hidden="true">
+                    <img src="{% static 'img/user-default.png' %}" class="um-avatar" alt="">
+                    <div>
+                        <div class="um-info-name">{{ usuario_nome }}</div>
+                        <div class="um-info-role">{{ grupo_principal }}</div>
                     </div>
+                </div>
 
-                    <a href="#" class="dropdown-item">👤 Perfil</a>
-                    <a href="#" class="dropdown-item">⚙️ Conta</a>
+                <!-- Links do menu -->
+                <div class="um-list">
+                    <a href="" class="um-item" role="menuitem">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        Perfil
+                    </a>
 
-                    <div class="dropdown-divider"></div>
+                    <a href="" class="um-item" role="menuitem">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                        Currículo
+                    </a>
 
-                    <form method="post" action="{% url 'admin_acessos:logout' %}">
+                    <div class="um-divider" role="separator"></div>
+
+                    <!-- Logout via POST -->
+                    <button
+                        class="um-item um-logout"
+                        role="menuitem"
+                        onclick="document.getElementById('logoutFormTopbar').submit()"
+                    >
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        Sair
+                    </button>
+
+                    <form id="logoutFormTopbar" method="post" action="" style="display:none">
                         {% csrf_token %}
-                        <button type="submit">Sair</button>
                     </form>
-
                 </div>
             </div>
 
-        </header>
+        </div>
 
-        <!-- =================================================
-            📦 CONTENT
-        ================================================= -->
-        <main class="content">
-            {% block content %}{% endblock %}
-        </main>
+    </header>
 
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- CONTENT -->
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
 
-</body>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const menu = document.querySelector(".user-menu");
-    const trigger = document.querySelector(".user-trigger");
+</div>
 
-    trigger.addEventListener("click", function (e) {
-        e.stopPropagation();
-        menu.classList.toggle("active");
-    });
+<!-- =========================================================
+     📱 BOTTOM NAV MOBILE
+========================================================= -->
+<nav class="bottom-nav" id="bottomNav">
 
-    document.addEventListener("click", function () {
-        menu.classList.remove("active");
-    });
-});
-</script>
+    <a href="#" class="bn-item active" data-page="painel">
+        <span class="bn-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+            </svg>
+        </span>
+        <span class="bn-label">Painel</span>
+    </a>
+
+    <a href="{% url 'modulo_merendeiras:estoque_list_escola' %}" class="bn-item" data-page="estoque">
+        <span class="bn-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            </svg>
+        </span>
+        <span class="bn-label">Estoque</span>
+    </a>
+
+    <a href="{% url 'modulo_merendeiras:transferencias_recebidas' %}" class="bn-item" data-page="transf">
+        <span class="bn-icon">
+            <svg viewBox="0 0 24 24">
+                <polyline points="17 1 21 5 17 9"/>
+                <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                <polyline points="7 23 3 19 7 15"/>
+                <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+            </svg>
+        </span>
+        <span class="bn-label">Transf.</span>
+    </a>
+
+    <a href="{% url 'modulo_merendeiras:lista_descartes_escola' %}" class="bn-item" data-page="descartes">
+        <span class="bn-icon">
+            <svg viewBox="0 0 24 24">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14H6L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+                <path d="M9 6V4h6v2"/>
+            </svg>
+        </span>
+        <span class="bn-label">Descartes</span>
+    </a>
+
+</nav>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-    const sidebar = document.getElementById("sidebar");
-    const collapseBtn = document.getElementById("collapseBtn");
+    /* ============================================================
+       REFERÊNCIAS
+    ============================================================ */
+    const sidebar       = document.getElementById("sidebar");
+    const collapseBtn   = document.getElementById("collapseBtn");
+    const expandTrigger = document.getElementById("expandTrigger");
+    const menuToggle    = document.getElementById("menuToggle");
+    const overlay       = document.getElementById("overlay");
 
-    /* =========================
-       ESTADO PERSISTENTE
-    ========================= */
-    if(localStorage.getItem("sidebar-collapsed") === "true"){
-        sidebar.classList.add("collapsed");
+    // User menu — sidebar
+    const sidebarUserBtn  = document.getElementById("sidebarUserBtn");
+    const sidebarUserMenu = document.getElementById("sidebarUserMenu");
+
+    // User menu — topbar
+    const topbarUserBtn   = document.getElementById("topbarUserBtn");
+    const topbarUserMenu  = document.getElementById("topbarUserMenu");
+
+    /* ============================================================
+       HELPERS
+    ============================================================ */
+    const isDesktop = () => window.innerWidth > 768;
+
+    /*
+     * Fecha todos os user menus abertos.
+     * Chamado ao clicar fora ou abrir outro menu.
+     */
+    function closeAllUserMenus() {
+        [sidebarUserBtn, topbarUserBtn].forEach(btn => {
+            if (btn) btn.setAttribute("aria-expanded", "false");
+        });
+        [sidebarUserMenu, topbarUserMenu].forEach(menu => {
+            if (menu) menu.classList.remove("active");
+        });
     }
 
-    collapseBtn.addEventListener("click", () => {
-        sidebar.classList.toggle("collapsed");
+    /*
+     * Abre ou fecha um menu específico.
+     * @param {HTMLElement} btn   — o botão trigger
+     * @param {HTMLElement} menu  — o painel do menu
+     */
+    function toggleMenu(btn, menu) {
+        const isOpen = menu.classList.contains("active");
 
-        localStorage.setItem(
-            "sidebar-collapsed",
-            sidebar.classList.contains("collapsed")
-        );
-    });
+        // Fecha tudo antes de abrir outro
+        closeAllUserMenus();
 
-    /* =========================
-       SUBMENU
-    ========================= */
-    document.querySelectorAll(".nav-toggle").forEach(toggle => {
+        if (!isOpen) {
+            menu.classList.add("active");
+            btn.setAttribute("aria-expanded", "true");
 
-        toggle.addEventListener("click", () => {
-            const group = toggle.parentElement;
-
-            document.querySelectorAll(".nav-group").forEach(g => {
-                if(g !== group) g.classList.remove("active");
-            });
-
-            group.classList.toggle("active");
-        });
-
-    });
-
-    /* =========================
-       ATIVO POR URL
-    ========================= */
-    document.querySelectorAll(".nav-item, .nav-sub-item").forEach(link => {
-
-        if(link.href === window.location.href){
-            link.classList.add("active");
-
-            const group = link.closest(".nav-group");
-            if(group) group.classList.add("active");
+            // Move o foco para o primeiro item focável
+            const firstItem = menu.querySelector(".um-item");
+            if (firstItem) firstItem.focus();
         }
+    }
 
+    /* ============================================================
+       USER MENU — TOPBAR
+       Posicionamento via position:fixed + getBoundingClientRect.
+       Isso resolve o clipping causado pelo backdrop-filter da topbar
+       (que cria um novo stacking context, bloqueando position:absolute).
+    ============================================================ */
+    if (topbarUserBtn && topbarUserMenu) {
+
+        topbarUserBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            /*
+             * Calcula a posição do dropdown com base nas coordenadas
+             * do botão trigger em relação à viewport.
+             * top  = abaixo do botão + 8px de espaço
+             * right = distância entre borda direita da viewport e
+             *         borda direita do botão (alinhamento à direita)
+             */
+            const rect = topbarUserBtn.getBoundingClientRect();
+            topbarUserMenu.style.top   = (rect.bottom + 8) + "px";
+            topbarUserMenu.style.right = (window.innerWidth - rect.right) + "px";
+            topbarUserMenu.style.left  = "auto"; // garante alinhamento à direita
+
+            toggleMenu(topbarUserBtn, topbarUserMenu);
+        });
+    }
+
+    /* ============================================================
+       USER MENU — SIDEBAR
+       Usa position:absolute dentro do .sidebar-footer (relative).
+       Sem necessidade de cálculo de coordenadas.
+    ============================================================ */
+    if (sidebarUserBtn && sidebarUserMenu) {
+
+        sidebarUserBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            /*
+             * Se o sidebar estiver colapsado, expande antes de abrir o menu.
+             * Isso garante que o menu seja visível e não cortado.
+             */
+            if (sidebar.classList.contains("collapsed")) {
+                collapsed = false;
+                saveSidebar();
+                render();
+
+                // Aguarda a transição de largura antes de abrir o menu
+                setTimeout(() => {
+                    toggleMenu(sidebarUserBtn, sidebarUserMenu);
+                }, 300);
+                return;
+            }
+
+            toggleMenu(sidebarUserBtn, sidebarUserMenu);
+        });
+    }
+
+    /* ============================================================
+       FECHAR AO CLICAR FORA
+       Escuta cliques no document. Se o clique não está dentro de
+       nenhum menu nem em um botão trigger, fecha tudo.
+    ============================================================ */
+    document.addEventListener("click", (e) => {
+        const clickedInsideSidebarMenu = sidebarUserMenu?.contains(e.target);
+        const clickedInsideTopbarMenu  = topbarUserMenu?.contains(e.target);
+        const clickedSidebarBtn        = sidebarUserBtn?.contains(e.target);
+        const clickedTopbarBtn         = topbarUserBtn?.contains(e.target);
+
+        if (!clickedInsideSidebarMenu && !clickedInsideTopbarMenu
+            && !clickedSidebarBtn && !clickedTopbarBtn) {
+            closeAllUserMenus();
+        }
     });
 
-});
+    /* ============================================================
+       FECHAR COM TECLA ESCAPE
+       Acessibilidade: Esc fecha o menu ativo e retorna foco ao trigger.
+    ============================================================ */
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            const wasTopbarOpen  = topbarUserMenu?.classList.contains("active");
+            const wasSidebarOpen = sidebarUserMenu?.classList.contains("active");
+
+            closeAllUserMenus();
+
+            // Retorna o foco ao trigger que estava aberto
+            if (wasTopbarOpen)  topbarUserBtn?.focus();
+            if (wasSidebarOpen) sidebarUserBtn?.focus();
+        }
+    });
+
+    /* ============================================================
+       NAVEGAÇÃO POR TECLADO DENTRO DO MENU (Tab / Arrow Keys)
+       Permite navegar entre os itens com ↑ ↓ e fechar com Esc.
+    ============================================================ */
+    [sidebarUserMenu, topbarUserMenu].forEach(menu => {
+        if (!menu) return;
+
+        menu.addEventListener("keydown", (e) => {
+            const items = Array.from(menu.querySelectorAll(".um-item"));
+            const currentIndex = items.indexOf(document.activeElement);
+
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                const next = items[(currentIndex + 1) % items.length];
+                next?.focus();
+            }
+
+            if (e.key === "ArrowUp") {
+                e.preventDefault();
+                const prev = items[(currentIndex - 1 + items.length) % items.length];
+                prev?.focus();
+            }
+        });
+    });
+
+    /* ============================================================
+       FECHAR MENU AO REDIMENSIONAR (evita menu aberto em posição errada)
+    ============================================================ */
+    window.addEventListener("resize", () => {
+        closeAllUserMenus();
+    });
+
+    /* ============================================================
+       SIDEBAR — COLLAPSE / EXPAND
+    ============================================================ */
+    let collapsed = localStorage.getItem("sidebar-collapsed") === "true";
+    let open      = false; // estado mobile
+    let lastMode  = isDesktop();
+
+    function saveSidebar() {
+        localStorage.setItem("sidebar-collapsed", collapsed);
+    }
+
+    function saveNavGroup(id) {
+        localStorage.setItem("nav-open-group", id);
+    }
+
+    function getSavedNavGroup() {
+        return localStorage.getItem("nav-open-group");
+    }
+
+    function render() {
+        sidebar.classList.remove("collapsed", "open");
+        overlay.classList.remove("visible");
+        document.body.classList.remove("sidebar-collapsed");
+        document.body.style.overflow = "";
+
+        if (isDesktop()) {
+            if (collapsed) {
+                sidebar.classList.add("collapsed");
+                document.body.classList.add("sidebar-collapsed");
+            }
+        } else {
+            if (open) {
+                sidebar.classList.add("open");
+                overlay.classList.add("visible");
+                document.body.style.overflow = "hidden";
+            }
+        }
+    }
+
+    /* ── SUBMENUS ── */
+    const savedGroup = getSavedNavGroup();
+    document.querySelectorAll(".nav-group").forEach(group => {
+        if (group.id === savedGroup) group.classList.add("open");
+    });
+
+    document.querySelectorAll(".nav-toggle").forEach(toggle => {
+        toggle.addEventListener("click", () => {
+            const group = toggle.closest(".nav-group");
+            document.querySelectorAll(".nav-group").forEach(g => {
+                if (g !== group) g.classList.remove("open");
+            });
+            const isOpen = group.classList.toggle("open");
+            isOpen ? saveNavGroup(group.id) : localStorage.removeItem("nav-open-group");
+        });
+    });
+
+    collapseBtn?.addEventListener("click", () => {
+        if (!isDesktop()) return;
+        collapsed = !collapsed;
+        saveSidebar();
+        render();
+        // Fecha menu do sidebar ao colapsar
+        closeAllUserMenus();
+    });
+
+    expandTrigger?.addEventListener("click", () => {
+        if (!isDesktop()) return;
+        collapsed = false;
+        saveSidebar();
+        render();
+    });
+
+    menuToggle?.addEventListener("click", () => {
+        if (isDesktop()) return;
+        open = !open;
+        render();
+    });
+
+    overlay?.addEventListener("click", () => {
+        open = false;
+        render();
+        closeAllUserMenus();
+    });
+
+    window.addEventListener("resize", () => {
+        const currentMode = isDesktop();
+        if (currentMode !== lastMode) {
+            open = false;
+            render();
+            lastMode = currentMode;
+        }
+    });
+
+    render();
+
+}); // fim DOMContentLoaded
 </script>
 
+</body>
 </html>

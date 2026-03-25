@@ -8,7 +8,7 @@ from ...baseMerendeiraView import BaseMerendeiraView
 
 class ListaDescartesView(BaseMerendeiraView, View):
 
-    template_name = ""
+    template_name = "modulo_merendeiras/descartes/lista_descartes.html"
 
     def get(self, request):
 
