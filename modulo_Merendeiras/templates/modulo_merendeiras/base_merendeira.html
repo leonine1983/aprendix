@@ -38,6 +38,11 @@
     --radius:        16px;
     --nav-h:         80px;
     --transition:    .28s cubic-bezier(.4,0,.2,1);
+
+    /* ── Variáveis exclusivas do mobile ── */
+    --mobile-bottom-nav-h: 74px;
+    --mobile-topbar-h:     60px;
+    --mobile-safe-bottom:  env(safe-area-inset-bottom, 0px);
 }
 
 /* =========================================================
@@ -331,20 +336,14 @@ body.sidebar-collapsed .expand-trigger {
 
 /* =========================================================
    👤 USER MENU — SIDEBAR FOOTER
-   Contém avatar + info do usuário + botão que abre o menu
 ========================================================= */
 .sidebar-footer {
     padding: 14px 12px;
     border-top: 1px solid rgba(255,255,255,0.06);
     flex-shrink: 0;
-    /* Necessário para posicionamento relativo do menu */
     position: relative;
 }
 
-/*
- * O botão do usuário no sidebar.
- * Ao clicar, dispara o menu de usuário do sidebar (sidebar-user-menu).
- */
 .sidebar-user {
     display: flex;
     align-items: center;
@@ -364,7 +363,6 @@ body.sidebar-collapsed .expand-trigger {
     background: rgba(255,255,255,0.07);
 }
 
-/* Anel pulsante no avatar quando o menu está aberto */
 .sidebar-user[aria-expanded="true"] .sidebar-avatar {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-glow);
@@ -406,7 +404,6 @@ body.sidebar-collapsed .expand-trigger {
     white-space: nowrap;
 }
 
-/* Ícone de "mais opções" no footer do sidebar */
 .sidebar-user-dots {
     display: flex;
     flex-direction: column;
@@ -430,14 +427,9 @@ body.sidebar-collapsed .expand-trigger {
     display: block;
 }
 
-/*
- * Menu flutuante do usuário no sidebar.
- * Posicionado ACIMA do footer via bottom/left absolute.
- * Visível apenas quando .active está presente (controlado por JS).
- */
 .sidebar-user-menu {
     position: absolute;
-    bottom: calc(100% + 8px); /* Flutua acima do footer */
+    bottom: calc(100% + 8px);
     left: 12px;
     right: 12px;
     background: var(--surface);
@@ -447,7 +439,6 @@ body.sidebar-collapsed .expand-trigger {
     overflow: hidden;
     z-index: 9999;
 
-    /* Estado inicial: escondido */
     opacity: 0;
     visibility: hidden;
     transform: translateY(8px);
@@ -457,14 +448,12 @@ body.sidebar-collapsed .expand-trigger {
         visibility .22s;
 }
 
-/* Abre o menu */
 .sidebar-user-menu.active {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
 }
 
-/* Cabeçalho interno do menu (avatar + nome) */
 .um-header {
     padding: 14px 16px 12px;
     border-bottom: 1px solid var(--border);
@@ -496,7 +485,6 @@ body.sidebar-collapsed .expand-trigger {
     white-space: nowrap;
 }
 
-/* Lista de itens do menu */
 .um-list {
     padding: 8px;
     display: flex;
@@ -504,7 +492,6 @@ body.sidebar-collapsed .expand-trigger {
     gap: 2px;
 }
 
-/* Item de link comum */
 .um-item {
     display: flex;
     align-items: center;
@@ -539,7 +526,6 @@ body.sidebar-collapsed .expand-trigger {
     opacity: .7;
 }
 
-/* Item de "Sair" — destaque vermelho */
 .um-item.um-logout {
     color: #DC2626;
 }
@@ -549,7 +535,6 @@ body.sidebar-collapsed .expand-trigger {
     color: #DC2626;
 }
 
-/* Divisor interno */
 .um-divider {
     height: 1px;
     background: var(--border);
@@ -558,14 +543,7 @@ body.sidebar-collapsed .expand-trigger {
 
 /* =========================================================
    👤 USER MENU — TOPBAR (HEADER)
-   Dropdown que aparece ao clicar no avatar no header.
-   Usa position:fixed para evitar clipping por stacking context.
 ========================================================= */
-
-/*
- * Botão trigger no header.
- * Exibe avatar + nome do usuário.
- */
 .topbar-user-btn {
     display: flex;
     align-items: center;
@@ -584,7 +562,6 @@ body.sidebar-collapsed .expand-trigger {
     border-color: rgba(59,110,248,0.3);
 }
 
-/* Estado ativo: borda azul */
 .topbar-user-btn[aria-expanded="true"] {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-glow);
@@ -607,7 +584,6 @@ body.sidebar-collapsed .expand-trigger {
     text-overflow: ellipsis;
 }
 
-/* Seta animada */
 .topbar-chevron {
     width: 14px; height: 14px;
     stroke: var(--muted);
@@ -623,12 +599,6 @@ body.sidebar-collapsed .expand-trigger {
     transform: rotate(180deg);
 }
 
-/*
- * Dropdown do topbar.
- * Usa position:fixed + top/right calculados via JS para evitar
- * clipping causado por backdrop-filter da topbar (stacking context).
- * O JS injeta as coordenadas como style inline.
- */
 .topbar-user-menu {
     position: fixed;
     background: var(--surface);
@@ -639,7 +609,6 @@ body.sidebar-collapsed .expand-trigger {
     overflow: hidden;
     z-index: 9999;
 
-    /* Estado inicial: escondido */
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px) scale(0.97);
@@ -650,13 +619,11 @@ body.sidebar-collapsed .expand-trigger {
         visibility .22s;
 }
 
-/* Abre o dropdown */
 .topbar-user-menu.active {
     opacity: 1;
     visibility: visible;
     transform: translateY(0) scale(1);
 }
-
 
 /* =========================================================
    🔘 EXPAND TRIGGER
@@ -798,14 +765,14 @@ body.sidebar-collapsed .expand-trigger {
 }
 
 /* =========================================================
-   📱 BOTTOM NAV MOBILE
+   📱 BOTTOM NAV — BASE (hidden no desktop)
 ========================================================= */
 .bottom-nav {
     display: none;
 }
 
 /* =========================================================
-   OVERLAY (mobile sidebar)
+   OVERLAY
 ========================================================= */
 .overlay {
     display: none;
@@ -823,60 +790,260 @@ body.sidebar-collapsed .expand-trigger {
 }
 
 /* =========================================================
-   📱 RESPONSIVO
+   ╔═══════════════════════════════════════════════════════╗
+   ║        📱  MOBILE — EXCLUSIVO (max-width: 768px)      ║
+   ║  Não afeta nenhum comportamento ou layout do desktop. ║
+   ╚═══════════════════════════════════════════════════════╝
 ========================================================= */
 @media (max-width: 768px) {
 
+    /* ── Body ── */
+    body { overflow-x: hidden; }
+
+    /* ======================================================
+       SIDEBAR MOBILE
+       – Usa translateX em vez de left para performance GPU
+       – Transição independente de width (não conflita com desktop)
+       – z-index 300 > overlay 290 > bottom-nav 250
+    ====================================================== */
     .sidebar {
-        left: calc(-1 * var(--sidebar-w));
-        width: var(--sidebar-w) !important;
+        width: var(--sidebar-w) !important; /* fixa, não colapsa */
+        left: 0 !important;                 /* sempre parte do left:0 */
+        transform: translateX(-100%);        /* estado inicial: fora */
+        transition:
+            transform .32s cubic-bezier(.4,0,.2,1),
+            box-shadow .32s cubic-bezier(.4,0,.2,1);
         z-index: 300;
-        transition: left var(--transition);
     }
 
+    /* Abre o sidebar com slide-in */
     .sidebar.open {
-        left: 0;
+        transform: translateX(0);
+        box-shadow: 8px 0 48px rgba(0,0,0,0.32);
     }
 
-    .overlay {
-        display: block;
+    /*
+     * Cancela o estado "collapsed" herdado do desktop.
+     * No mobile o sidebar nunca fica em modo ícone.
+     */
+    .sidebar.collapsed {
+        width: var(--sidebar-w) !important;
     }
 
-    .main {
-        margin-left: 0 !important;
-        padding-bottom: calc(var(--nav-h) + 16px);
+    /* Restaura visibilidade dos elementos ocultos pelo collapsed */
+    .sidebar.collapsed .logo-text,
+    .sidebar.collapsed .nav-label,
+    .sidebar.collapsed .chevron,
+    .sidebar.collapsed .sidebar-user-info,
+    .sidebar.collapsed .sidebar-user-dots {
+        opacity: 1 !important;
+        max-width: 999px !important;
+        pointer-events: auto;
     }
 
-    .menu-toggle {
-        display: grid;
-        place-items: center;
-    }
-
-    /* Esconde nome no botão topbar em telas pequenas */
-    .topbar-user-name {
+    /* Oculta tooltips (só fazem sentido no collapsed desktop) */
+    .sidebar.collapsed [data-tip]::after {
         display: none;
     }
 
-    /* ── BOTTOM NAV ── */
+    /* Botão colapsar (desktop) fica oculto no mobile */
+    .collapse-btn { display: none; }
+
+    /*
+     * Botão de fechar (X) — exibido pelo JS no mobile.
+     * Base: hidden por padrão via style inline no HTML.
+     * Quando JS chama .style.display="grid" ele aparece.
+     */
+    .sidebar-close-btn {
+        background: rgba(255,255,255,0.08);
+        border: none;
+        color: rgba(255,255,255,0.85);
+        width: 44px; height: 44px; /* área de toque ≥ 44px */
+        border-radius: 12px;
+        cursor: pointer;
+        display: grid; /* sobrescrito pelo JS */
+        place-items: center;
+        flex-shrink: 0;
+        transition: background var(--transition);
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .sidebar-close-btn:hover,
+    .sidebar-close-btn:focus-visible {
+        background: rgba(255,255,255,0.16);
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+    }
+
+    .sidebar-close-btn svg {
+        width: 18px; height: 18px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+    }
+
+    /* Itens de nav: altura mínima 48px para conforto de toque */
+    .nav-item, .nav-toggle { min-height: 48px; padding: 12px 13px; }
+    .nav-sub-item { min-height: 44px; padding: 11px 12px; display: flex; align-items: center; }
+
+    /* ======================================================
+       OVERLAY MOBILE
+       z-index: 290 (abaixo do sidebar 300, acima do conteúdo)
+    ====================================================== */
+    .overlay {
+        display: block;
+        z-index: 290;
+    }
+
+    /* ======================================================
+       MAIN + TOPBAR MOBILE
+    ====================================================== */
+    .main {
+        margin-left: 0 !important;
+        /* Reserva espaço para a bottom nav flutuante */
+        padding-bottom: calc(var(--mobile-bottom-nav-h) + 20px + var(--mobile-safe-bottom));
+    }
+
+    .topbar {
+        padding: 0 14px;
+        height: var(--mobile-topbar-h);
+        gap: 10px;
+    }
+
+    /* Botão ☰ visível e com boa área de toque */
+    .menu-toggle {
+        display: grid;
+        place-items: center;
+        width: 44px; height: 44px;
+        min-width: 44px; min-height: 44px;
+        border-radius: 12px;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .menu-toggle:active {
+        background: var(--accent-light);
+        border-color: var(--accent);
+        transform: scale(0.92);
+    }
+
+    /* Logo menor */
+    .prefeitura-logo { height: 32px; }
+
+    /* Títulos limitados para não transbordar */
+    .topbar-title {
+        font-size: .84rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 130px;
+    }
+
+    .topbar-subtitle {
+        font-size: .70rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 130px;
+    }
+
+    /* Nome do usuário ocultado no topbar (só avatar) */
+    .topbar-user-name { display: none; }
+
+    /* Botão do usuário no header: mais compacto */
+    .topbar-user-btn {
+        padding: 5px 9px 5px 5px;
+        min-height: 44px;
+        gap: 6px;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .topbar-avatar { width: 34px; height: 34px; }
+
+    /* ======================================================
+       USER MENU — TOPBAR (MOBILE)
+       position:fixed com top/right calculados pelo JS.
+       z-index 9999: acima de sidebar (300) e overlay (290).
+    ====================================================== */
+    .topbar-user-menu {
+        min-width: 200px;
+        max-width: calc(100vw - 24px); /* nunca sai da tela */
+        z-index: 9999;
+    }
+
+    /* Itens do menu com área de toque confortável */
+    .um-item {
+        min-height: 48px;
+        padding: 12px 14px;
+        font-size: .9rem;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .um-item:active {
+        background: var(--accent-light);
+        transform: scale(0.98);
+    }
+
+    .um-item.um-logout:active {
+        background: rgba(220,38,38,0.10);
+        transform: scale(0.98);
+    }
+
+    /* ======================================================
+       USER MENU — SIDEBAR (MOBILE)
+       position:absolute dentro do footer (position:relative).
+       z-index 9999: acima de tudo, inclusive do overlay.
+    ====================================================== */
+    .sidebar-user-menu {
+        z-index: 9999;
+        /* Evita crescer além da tela em celulares pequenos */
+        max-height: 65vh;
+        overflow-y: auto;
+    }
+
+    /* Botão do usuário: área de toque mínima */
+    .sidebar-user {
+        min-height: 52px;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ======================================================
+       CONTENT MOBILE
+    ====================================================== */
+    .content { padding: 16px 14px; }
+
+    /* Cards: sem lift-hover (touch não possui hover real) */
+    .card:hover {
+        transform: none;
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* ======================================================
+       BOTTOM NAVIGATION MOBILE
+       – Pill flutuante fixada acima da safe area do dispositivo
+       – z-index 250: abaixo do sidebar (300) e menus (9999)
+       – height fixa para cálculo preciso do padding-bottom do main
+    ====================================================== */
     .bottom-nav {
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-around;
         position: fixed;
-        bottom: 16px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 250;
-        padding: 10px 18px;
+        bottom: calc(12px + var(--mobile-safe-bottom));
+        left: 12px;
+        right: 12px;
+        height: var(--mobile-bottom-nav-h);
+        z-index: 2500;
+        padding: 8px 10px;
         background: #FFFFFF;
         border-radius: 100px;
         box-shadow:
-            0 8px 32px rgba(0,0,0,0.12),
+            0 8px 32px rgba(0,0,0,0.13),
             0 2px 8px rgba(0,0,0,0.06),
             inset 0 1px 0 rgba(255,255,255,0.9);
-        gap: 4px;
-        width: calc(100% - 32px);
-        max-width: 400px;
+        overflow: visible;
     }
 
     .bn-item {
@@ -884,23 +1051,27 @@ body.sidebar-collapsed .expand-trigger {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 4px;
+        gap: 3px;
         flex: 1;
         text-decoration: none;
         color: #9CA3AF;
-        padding: 6px 4px;
+        padding: 4px 2px;
         border-radius: 50px;
+        min-height: 56px; /* área de toque mínima */
         transition: color var(--transition);
         position: relative;
+        -webkit-tap-highlight-color: transparent;
     }
-
-    .bn-item:hover { color: #6B7280; }
 
     .bn-icon {
         width: 44px; height: 44px;
         border-radius: 50%;
         display: grid; place-items: center;
-        transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+        transition:
+            background var(--transition),
+            box-shadow var(--transition),
+            transform .22s cubic-bezier(.34,1.56,.64,1); /* spring suave */
+        flex-shrink: 0;
     }
 
     .bn-icon svg {
@@ -914,43 +1085,77 @@ body.sidebar-collapsed .expand-trigger {
     }
 
     .bn-label {
-        font-size: .68rem;
+        font-size: .62rem;
         font-weight: 600;
-        transition: color var(--transition);
         letter-spacing: .01em;
+        line-height: 1;
+        transition: color var(--transition);
     }
 
+    /* Estado ativo */
     .bn-item.active { color: var(--accent); }
 
     .bn-item.active .bn-icon {
         background: var(--accent);
         box-shadow:
             0 6px 20px var(--accent-glow),
-            0 2px 8px rgba(59,110,248,0.25);
-        transform: translateY(-2px);
+            0 2px 8px rgba(59,110,248,0.28);
+        transform: translateY(-3px) scale(1.06);
     }
 
     .bn-item.active .bn-icon svg { stroke: #ffffff; }
-    .bn-item.active .bn-label { color: var(--accent); }
-    .bn-item:not(.active):hover .bn-icon { background: rgba(0,0,0,0.04); }
+    .bn-item.active .bn-label   { color: var(--accent); font-weight: 700; }
 
-    .topbar {
-        padding: 0 16px;
-        height: 60px;
+    /* Feedback de toque (inativos) */
+    .bn-item:not(.active):active .bn-icon {
+        background: rgba(0,0,0,0.06);
+        transform: scale(0.90);
     }
 
-    .prefeitura-logo { height: 34px; }
-    .content { padding: 16px; }
-}
+    /* Hover suave (dispositivos com cursor) */
+    .bn-item:not(.active):hover .bn-icon {
+        background: rgba(0,0,0,0.04);
+    }
 
-@media (max-width: 420px) {
+} /* /media max-width: 768px */
+
+/* =========================================================
+   📱 TELAS MUITO PEQUENAS (< 380px)
+   Ex: Galaxy A01, iPhone SE 1ª geração
+========================================================= */
+@media (max-width: 380px) {
+
+    .bottom-nav { left: 8px; right: 8px; padding: 8px 6px; }
+    .bn-icon    { width: 40px; height: 40px; }
+    .bn-label   { font-size: .58rem; }
+
+    .topbar-title    { max-width: 105px; font-size: .78rem; }
+    .topbar-subtitle { max-width: 105px; }
+
+    .content { padding: 12px 10px; }
+
+} /* /media max-width: 380px */
+
+/* =========================================================
+   📱 TABLET (541px – 768px)
+   Bottom nav centralizada e mais larga
+========================================================= */
+@media (min-width: 541px) and (max-width: 768px) {
+
     .bottom-nav {
-        width: calc(100% - 24px);
-        padding: 8px 14px;
+        max-width: 480px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        bottom: calc(16px + var(--mobile-safe-bottom));
     }
-    .bn-icon { width: 40px; height: 40px; }
-    .bn-label { font-size: .62rem; }
-}
+
+    .topbar-title    { max-width: 220px; }
+    .topbar-subtitle { max-width: 220px; }
+
+    .content { padding: 20px; }
+
+} /* /media 541-768px */
 
 </style>
 </head>
@@ -958,9 +1163,11 @@ body.sidebar-collapsed .expand-trigger {
 <body>
 
 <!-- =========================================================
-     OVERLAY (mobile sidebar)
+     OVERLAY
+     Cobre o conteúdo quando sidebar ou menus estão abertos no mobile.
+     Clique nele fecha sidebar + user-menus.
 ========================================================= -->
-<div class="overlay" id="overlay"></div>
+<div class="overlay" id="overlay" role="presentation" aria-hidden="true"></div>
 
 <!-- =========================================================
      📌 SIDEBAR
@@ -971,26 +1178,45 @@ body.sidebar-collapsed .expand-trigger {
     </svg>
 </button>
 
-<aside class="sidebar" id="sidebar">
+<aside class="sidebar" id="sidebar" aria-label="Menu principal">
 
     <div class="sidebar-header">
         <a href="#" class="logo">
             <span class="logo-icon">🏫</span>
             <span class="logo-text">SIGAME</span>
         </a>
+
+        <!-- Desktop: botão de colapsar -->
         <button class="collapse-btn" id="collapseBtn" aria-label="Recolher menu">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="15 18 9 12 15 6"/>
             </svg>
         </button>
+
+        <!--
+            Mobile: botão de fechar (X).
+            Oculto por padrão via style inline.
+            O JS faz display:"grid" quando detecta mobile.
+        -->
+        <button
+            class="sidebar-close-btn"
+            id="sidebarCloseBtn"
+            aria-label="Fechar menu"
+            style="display:none"
+        >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
     </div>
 
-    <nav class="nav">
+    <nav class="nav" aria-label="Navegação principal">
 
         <!-- PAINEL -->
         <a href="#" class="nav-item active" data-tip="Painel">
             <div class="nav-left">
-                <span class="nav-icon">
+                <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24">
                         <rect x="3" y="3" width="7" height="7" rx="1.5"/>
                         <rect x="14" y="3" width="7" height="7" rx="1.5"/>
@@ -1004,9 +1230,9 @@ body.sidebar-collapsed .expand-trigger {
 
         <!-- ESTOQUE -->
         <div class="nav-group" id="group-estoque">
-            <button class="nav-toggle" data-tip="Estoque">
+            <button class="nav-toggle" data-tip="Estoque" aria-expanded="false">
                 <div class="nav-left">
-                    <span class="nav-icon">
+                    <span class="nav-icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24">
                             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
                             <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
@@ -1015,23 +1241,18 @@ body.sidebar-collapsed .expand-trigger {
                     </span>
                     <span class="nav-label">Estoque</span>
                 </div>
-                <span class="chevron">▾</span>
+                <span class="chevron" aria-hidden="true">▾</span>
             </button>
-
             <div class="nav-sub">
-                <a href="{% url 'modulo_merendeiras:estoque_list_escola' %}" class="nav-sub-item">
-                    📦 Visão Geral
-                </a>
-                <a href="{% url 'modulo_merendeiras:lista_descartes_escola' %}" class="nav-sub-item">
-                    🗑️ Descartes
-                </a>
+                <a href="{% url 'modulo_merendeiras:estoque_list_escola' %}" class="nav-sub-item">📦 Visão Geral</a>
+                <a href="{% url 'modulo_merendeiras:lista_descartes_escola' %}" class="nav-sub-item">🗑️ Descartes</a>
             </div>
         </div>
 
         <!-- TRANSFERÊNCIAS -->
         <a href="{% url 'modulo_merendeiras:transferencias_recebidas' %}" class="nav-item" data-tip="Transferências">
             <div class="nav-left">
-                <span class="nav-icon">
+                <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24">
                         <polyline points="17 1 21 5 17 9"/>
                         <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
@@ -1045,18 +1266,8 @@ body.sidebar-collapsed .expand-trigger {
 
     </nav>
 
-    <!-- ====================================================
-         👤 SIDEBAR FOOTER — USER MENU
-         Clique no botão .sidebar-user abre .sidebar-user-menu
-         O menu flutua ACIMA do footer (bottom: 100% + 8px)
-    ===================================================== -->
+    <!-- USER MENU — SIDEBAR FOOTER -->
     <div class="sidebar-footer">
-
-        <!--
-            Botão trigger do menu no sidebar.
-            aria-expanded é atualizado pelo JS ao abrir/fechar.
-            aria-controls aponta para o ID do menu.
-        -->
         <button
             class="sidebar-user"
             id="sidebarUserBtn"
@@ -1069,24 +1280,12 @@ body.sidebar-collapsed .expand-trigger {
                 <div class="sidebar-user-name">{{ usuario_nome }}</div>
                 <div class="sidebar-user-role">{{ grupo_principal }}</div>
             </div>
-            <!-- Três pontos verticais, escondidos quando sidebar colapsado -->
             <div class="sidebar-user-dots" aria-hidden="true">
                 <span></span><span></span><span></span>
             </div>
         </button>
 
-        <!--
-            Menu flutuante do usuário (sidebar).
-            Usa position:absolute dentro do .sidebar-footer (position:relative).
-            JS adiciona/remove .active para abrir/fechar.
-        -->
-        <div
-            class="sidebar-user-menu"
-            id="sidebarUserMenu"
-            role="menu"
-            aria-labelledby="sidebarUserBtn"
-        >
-            <!-- Cabeçalho: avatar + nome + cargo -->
+        <div class="sidebar-user-menu" id="sidebarUserMenu" role="menu" aria-labelledby="sidebarUserBtn">
             <div class="um-header" aria-hidden="true">
                 <img src="{% static 'img/user-default.png' %}" class="um-avatar" alt="">
                 <div>
@@ -1094,55 +1293,24 @@ body.sidebar-collapsed .expand-trigger {
                     <div class="um-info-role">{{ grupo_principal }}</div>
                 </div>
             </div>
-
-            <!-- Links do menu -->
             <div class="um-list">
                 <a href="" class="um-item" role="menuitem">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     Perfil
                 </a>
-
                 <a href="" class="um-item" role="menuitem">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10 9 9 9 8 9"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                     Currículo
                 </a>
-
                 <div class="um-divider" role="separator"></div>
-
-                <!--
-                    Logout via POST com CSRF token (Django).
-                    O botão submete o form oculto #logoutForm.
-                -->
-                <button
-                    class="um-item um-logout"
-                    role="menuitem"
-                    onclick="document.getElementById('logoutFormSidebar').submit()"
-                >
-                    <svg viewBox="0 0 24 24">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                        <polyline points="16 17 21 12 16 7"/>
-                        <line x1="21" y1="12" x2="9" y2="12"/>
-                    </svg>
+                <button class="um-item um-logout" role="menuitem" onclick="document.getElementById('logoutFormSidebar').submit()">
+                    <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                     Sair
                 </button>
-
-                <!-- Form oculto para o POST de logout -->
-                <form id="logoutFormSidebar" method="post" action="" style="display:none">
-                    {% csrf_token %}
-                </form>
+                <form id="logoutFormSidebar" method="post" action="" style="display:none">{% csrf_token %}</form>
             </div>
         </div>
-
-    </div><!-- /sidebar-footer -->
+    </div>
 
 </aside>
 
@@ -1151,10 +1319,19 @@ body.sidebar-collapsed .expand-trigger {
 ========================================================= -->
 <div class="main">
 
-    <!-- TOPBAR -->
     <header class="topbar">
         <div class="topbar-left">
-            <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">☰</button>
+            <!--
+                Botão ☰ — visível só no mobile (via CSS display:none no desktop).
+                aria-expanded atualizado pelo JS ao abrir/fechar o sidebar.
+            -->
+            <button
+                class="menu-toggle"
+                id="menuToggle"
+                aria-label="Abrir menu"
+                aria-controls="sidebar"
+                aria-expanded="false"
+            >☰</button>
             <img class="prefeitura-logo" src="{% static 'prefeitura.png' %}" alt="Prefeitura">
             <div class="topbar-titles">
                 <span class="topbar-title">Controle de Estoque</span>
@@ -1162,18 +1339,8 @@ body.sidebar-collapsed .expand-trigger {
             </div>
         </div>
 
-        <!-- ================================================
-             👤 TOPBAR — USER MENU TRIGGER
-             O botão .topbar-user-btn abre .topbar-user-menu
-             O menu usa position:fixed com coordenadas calculadas por JS
-             para evitar clipping causado pelo backdrop-filter da topbar.
-        ================================================= -->
-        <div style="position:relative">
-            <!--
-                Trigger do menu no header.
-                aria-expanded é atualizado pelo JS.
-                aria-controls aponta para o menu.
-            -->
+        <!-- USER MENU — TOPBAR -->
+        <div style="position:relative; flex-shrink:0">
             <button
                 class="topbar-user-btn"
                 id="topbarUserBtn"
@@ -1183,24 +1350,10 @@ body.sidebar-collapsed .expand-trigger {
             >
                 <img src="{% static 'img/user-default.png' %}" class="topbar-avatar" alt="Avatar">
                 <span class="topbar-user-name">{{ usuario_nome }}</span>
-                <svg class="topbar-chevron" viewBox="0 0 24 24">
-                    <polyline points="6 9 12 15 18 9"/>
-                </svg>
+                <svg class="topbar-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
 
-            <!--
-                Dropdown do header.
-                position:fixed — o JS calcula top e right com getBoundingClientRect()
-                e injeta via style inline para posicionamento preciso.
-                JS adiciona/remove .active para abrir/fechar.
-            -->
-            <div
-                class="topbar-user-menu"
-                id="topbarUserMenu"
-                role="menu"
-                aria-labelledby="topbarUserBtn"
-            >
-                <!-- Cabeçalho do dropdown -->
+            <div class="topbar-user-menu" id="topbarUserMenu" role="menu" aria-labelledby="topbarUserBtn">
                 <div class="um-header" aria-hidden="true">
                     <img src="{% static 'img/user-default.png' %}" class="um-avatar" alt="">
                     <div>
@@ -1208,104 +1361,63 @@ body.sidebar-collapsed .expand-trigger {
                         <div class="um-info-role">{{ grupo_principal }}</div>
                     </div>
                 </div>
-
-                <!-- Links do menu -->
                 <div class="um-list">
                     <a href="" class="um-item" role="menuitem">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                         Perfil
                     </a>
-
                     <a href="" class="um-item" role="menuitem">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                            <polyline points="10 9 9 9 8 9"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                         Currículo
                     </a>
-
                     <div class="um-divider" role="separator"></div>
-
-                    <!-- Logout via POST -->
-                    <button
-                        class="um-item um-logout"
-                        role="menuitem"
-                        onclick="document.getElementById('logoutFormTopbar').submit()"
-                    >
-                        <svg viewBox="0 0 24 24">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                            <polyline points="16 17 21 12 16 7"/>
-                            <line x1="21" y1="12" x2="9" y2="12"/>
-                        </svg>
+                    <button class="um-item um-logout" role="menuitem" onclick="document.getElementById('logoutFormTopbar').submit()">
+                        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                         Sair
                     </button>
-
-                    <form id="logoutFormTopbar" method="post" action="" style="display:none">
-                        {% csrf_token %}
-                    </form>
+                    <form id="logoutFormTopbar" method="post" action="" style="display:none">{% csrf_token %}</form>
                 </div>
             </div>
-
         </div>
 
     </header>
 
-    <!-- CONTENT -->
-    <main class="content">
+    <main class="content" id="mainContent">
         {% block content %}{% endblock %}
     </main>
 
 </div>
 
 <!-- =========================================================
-     📱 BOTTOM NAV MOBILE
+     📱 BOTTOM NAVIGATION MOBILE
+     z-index 250: abaixo do sidebar (300) e acima do conteúdo
 ========================================================= -->
-<nav class="bottom-nav" id="bottomNav">
+<nav class="bottom-nav" id="bottomNav" aria-label="Navegação rápida">
 
-    <a href="#" class="bn-item active" data-page="painel">
-        <span class="bn-icon">
-            <svg viewBox="0 0 24 24">
-                <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
-            </svg>
+    <a href="#" class="bn-item active" data-page="painel" aria-current="page">
+        <span class="bn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/></svg>
         </span>
         <span class="bn-label">Painel</span>
     </a>
 
     <a href="{% url 'modulo_merendeiras:estoque_list_escola' %}" class="bn-item" data-page="estoque">
-        <span class="bn-icon">
-            <svg viewBox="0 0 24 24">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-            </svg>
+        <span class="bn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
         </span>
         <span class="bn-label">Estoque</span>
     </a>
 
     <a href="{% url 'modulo_merendeiras:transferencias_recebidas' %}" class="bn-item" data-page="transf">
-        <span class="bn-icon">
-            <svg viewBox="0 0 24 24">
-                <polyline points="17 1 21 5 17 9"/>
-                <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-                <polyline points="7 23 3 19 7 15"/>
-                <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-            </svg>
+        <span class="bn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
         </span>
         <span class="bn-label">Transf.</span>
     </a>
 
     <a href="{% url 'modulo_merendeiras:lista_descartes_escola' %}" class="bn-item" data-page="descartes">
-        <span class="bn-icon">
-            <svg viewBox="0 0 24 24">
-                <polyline points="3 6 5 6 21 6"/>
-                <path d="M19 6l-1 14H6L5 6"/>
-                <path d="M10 11v6M14 11v6"/>
-                <path d="M9 6V4h6v2"/>
-            </svg>
+        <span class="bn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
         </span>
         <span class="bn-label">Descartes</span>
     </a>
@@ -1319,280 +1431,333 @@ body.sidebar-collapsed .expand-trigger {
 document.addEventListener("DOMContentLoaded", () => {
 
     /* ============================================================
-       REFERÊNCIAS
+       REFERÊNCIAS DOM
     ============================================================ */
-    const sidebar       = document.getElementById("sidebar");
-    const collapseBtn   = document.getElementById("collapseBtn");
-    const expandTrigger = document.getElementById("expandTrigger");
-    const menuToggle    = document.getElementById("menuToggle");
-    const overlay       = document.getElementById("overlay");
-
-    // User menu — sidebar
+    const sidebar         = document.getElementById("sidebar");
+    const collapseBtn     = document.getElementById("collapseBtn");
+    const sidebarCloseBtn = document.getElementById("sidebarCloseBtn");
+    const expandTrigger   = document.getElementById("expandTrigger");
+    const menuToggle      = document.getElementById("menuToggle");
+    const overlay         = document.getElementById("overlay");
     const sidebarUserBtn  = document.getElementById("sidebarUserBtn");
     const sidebarUserMenu = document.getElementById("sidebarUserMenu");
-
-    // User menu — topbar
     const topbarUserBtn   = document.getElementById("topbarUserBtn");
     const topbarUserMenu  = document.getElementById("topbarUserMenu");
 
     /* ============================================================
        HELPERS
     ============================================================ */
+
+    /** true se viewport > 768px (desktop) */
     const isDesktop = () => window.innerWidth > 768;
 
-    /*
-     * Fecha todos os user menus abertos.
-     * Chamado ao clicar fora ou abrir outro menu.
-     */
-    function closeAllUserMenus() {
-        [sidebarUserBtn, topbarUserBtn].forEach(btn => {
-            if (btn) btn.setAttribute("aria-expanded", "false");
-        });
-        [sidebarUserMenu, topbarUserMenu].forEach(menu => {
-            if (menu) menu.classList.remove("active");
-        });
+    /* ============================================================
+       INIT MOBILE UI
+       Exibe/oculta o botão X do sidebar conforme o modo.
+       Chamado ao carregar e no resize.
+    ============================================================ */
+    function initMobileUI() {
+        if (sidebarCloseBtn) {
+            sidebarCloseBtn.style.display = isDesktop() ? "none" : "grid";
+        }
     }
 
-    /*
-     * Abre ou fecha um menu específico.
-     * @param {HTMLElement} btn   — o botão trigger
-     * @param {HTMLElement} menu  — o painel do menu
+    /* ============================================================
+       USER MENUS — UTILITÁRIOS
+    ============================================================ */
+
+    /** Fecha todos os user-menus e atualiza aria-expanded */
+    function closeAllUserMenus() {
+        [sidebarUserBtn, topbarUserBtn].forEach(btn =>
+            btn?.setAttribute("aria-expanded", "false")
+        );
+        [sidebarUserMenu, topbarUserMenu].forEach(menu =>
+            menu?.classList.remove("active")
+        );
+    }
+
+    /**
+     * Alterna a visibilidade de um menu específico.
+     * Fecha os demais antes de abrir.
      */
-    function toggleMenu(btn, menu) {
+    function toggleUserMenu(btn, menu) {
         const isOpen = menu.classList.contains("active");
-
-        // Fecha tudo antes de abrir outro
         closeAllUserMenus();
-
         if (!isOpen) {
             menu.classList.add("active");
             btn.setAttribute("aria-expanded", "true");
-
-            // Move o foco para o primeiro item focável
-            const firstItem = menu.querySelector(".um-item");
-            if (firstItem) firstItem.focus();
+            // Foco no primeiro item (acessibilidade)
+            const first = menu.querySelector(".um-item");
+            if (first) requestAnimationFrame(() => first.focus());
         }
     }
 
     /* ============================================================
        USER MENU — TOPBAR
-       Posicionamento via position:fixed + getBoundingClientRect.
-       Isso resolve o clipping causado pelo backdrop-filter da topbar
-       (que cria um novo stacking context, bloqueando position:absolute).
+       position:fixed com coordenadas calculadas via getBoundingClientRect.
+       Necessário porque backdrop-filter da topbar cria stacking context,
+       impedindo que position:absolute funcione corretamente.
     ============================================================ */
-    if (topbarUserBtn && topbarUserMenu) {
+    topbarUserBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
 
-        topbarUserBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
+        const rect       = topbarUserBtn.getBoundingClientRect();
+        const safeRight  = Math.max(window.innerWidth - rect.right, 8);
 
-            /*
-             * Calcula a posição do dropdown com base nas coordenadas
-             * do botão trigger em relação à viewport.
-             * top  = abaixo do botão + 8px de espaço
-             * right = distância entre borda direita da viewport e
-             *         borda direita do botão (alinhamento à direita)
-             */
-            const rect = topbarUserBtn.getBoundingClientRect();
-            topbarUserMenu.style.top   = (rect.bottom + 8) + "px";
-            topbarUserMenu.style.right = (window.innerWidth - rect.right) + "px";
-            topbarUserMenu.style.left  = "auto"; // garante alinhamento à direita
+        topbarUserMenu.style.top      = (rect.bottom + 8) + "px";
+        topbarUserMenu.style.right    = safeRight + "px";
+        topbarUserMenu.style.left     = "auto";
+        // Mobile: limita largura para não sair da tela
+        topbarUserMenu.style.maxWidth = isDesktop() ? "" : (window.innerWidth - 24) + "px";
 
-            toggleMenu(topbarUserBtn, topbarUserMenu);
-        });
-    }
+        toggleUserMenu(topbarUserBtn, topbarUserMenu);
+    });
 
     /* ============================================================
        USER MENU — SIDEBAR
-       Usa position:absolute dentro do .sidebar-footer (relative).
-       Sem necessidade de cálculo de coordenadas.
+       position:absolute dentro do footer (position:relative).
+       No desktop colapsado: expande o sidebar antes de abrir.
     ============================================================ */
-    if (sidebarUserBtn && sidebarUserMenu) {
+    sidebarUserBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
 
-        sidebarUserBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
+        if (isDesktop() && sidebar.classList.contains("collapsed")) {
+            // Expande sidebar e aguarda a transição antes de abrir o menu
+            collapsed = false;
+            saveSidebarState();
+            renderSidebar();
+            setTimeout(() => toggleUserMenu(sidebarUserBtn, sidebarUserMenu), 300);
+            return;
+        }
 
-            /*
-             * Se o sidebar estiver colapsado, expande antes de abrir o menu.
-             * Isso garante que o menu seja visível e não cortado.
-             */
-            if (sidebar.classList.contains("collapsed")) {
-                collapsed = false;
-                saveSidebar();
-                render();
-
-                // Aguarda a transição de largura antes de abrir o menu
-                setTimeout(() => {
-                    toggleMenu(sidebarUserBtn, sidebarUserMenu);
-                }, 300);
-                return;
-            }
-
-            toggleMenu(sidebarUserBtn, sidebarUserMenu);
-        });
-    }
+        toggleUserMenu(sidebarUserBtn, sidebarUserMenu);
+    });
 
     /* ============================================================
        FECHAR AO CLICAR FORA
-       Escuta cliques no document. Se o clique não está dentro de
-       nenhum menu nem em um botão trigger, fecha tudo.
     ============================================================ */
     document.addEventListener("click", (e) => {
-        const clickedInsideSidebarMenu = sidebarUserMenu?.contains(e.target);
-        const clickedInsideTopbarMenu  = topbarUserMenu?.contains(e.target);
-        const clickedSidebarBtn        = sidebarUserBtn?.contains(e.target);
-        const clickedTopbarBtn         = topbarUserBtn?.contains(e.target);
-
-        if (!clickedInsideSidebarMenu && !clickedInsideTopbarMenu
-            && !clickedSidebarBtn && !clickedTopbarBtn) {
-            closeAllUserMenus();
-        }
+        const inSidebar = sidebarUserMenu?.contains(e.target);
+        const inTopbar  = topbarUserMenu?.contains(e.target);
+        const onSbBtn   = sidebarUserBtn?.contains(e.target);
+        const onTbBtn   = topbarUserBtn?.contains(e.target);
+        if (!inSidebar && !inTopbar && !onSbBtn && !onTbBtn) closeAllUserMenus();
     });
 
     /* ============================================================
-       FECHAR COM TECLA ESCAPE
-       Acessibilidade: Esc fecha o menu ativo e retorna foco ao trigger.
+       FECHAR COM ESC (acessibilidade)
     ============================================================ */
     document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-            const wasTopbarOpen  = topbarUserMenu?.classList.contains("active");
-            const wasSidebarOpen = sidebarUserMenu?.classList.contains("active");
+        if (e.key !== "Escape") return;
 
-            closeAllUserMenus();
+        const wasTopbar  = topbarUserMenu?.classList.contains("active");
+        const wasSidebar = sidebarUserMenu?.classList.contains("active");
 
-            // Retorna o foco ao trigger que estava aberto
-            if (wasTopbarOpen)  topbarUserBtn?.focus();
-            if (wasSidebarOpen) sidebarUserBtn?.focus();
-        }
+        closeAllUserMenus();
+
+        if (wasTopbar)  topbarUserBtn?.focus();
+        if (wasSidebar) sidebarUserBtn?.focus();
+
+        // Mobile: ESC também fecha o sidebar
+        if (!isDesktop() && mobileOpen) closeMobileSidebar();
     });
 
     /* ============================================================
-       NAVEGAÇÃO POR TECLADO DENTRO DO MENU (Tab / Arrow Keys)
-       Permite navegar entre os itens com ↑ ↓ e fechar com Esc.
+       NAVEGAÇÃO POR TECLADO (↑ ↓) nos menus
     ============================================================ */
     [sidebarUserMenu, topbarUserMenu].forEach(menu => {
-        if (!menu) return;
-
-        menu.addEventListener("keydown", (e) => {
+        menu?.addEventListener("keydown", (e) => {
             const items = Array.from(menu.querySelectorAll(".um-item"));
-            const currentIndex = items.indexOf(document.activeElement);
-
-            if (e.key === "ArrowDown") {
-                e.preventDefault();
-                const next = items[(currentIndex + 1) % items.length];
-                next?.focus();
-            }
-
-            if (e.key === "ArrowUp") {
-                e.preventDefault();
-                const prev = items[(currentIndex - 1 + items.length) % items.length];
-                prev?.focus();
-            }
+            const idx   = items.indexOf(document.activeElement);
+            if (e.key === "ArrowDown") { e.preventDefault(); items[(idx + 1) % items.length]?.focus(); }
+            if (e.key === "ArrowUp")   { e.preventDefault(); items[(idx - 1 + items.length) % items.length]?.focus(); }
         });
     });
 
     /* ============================================================
-       FECHAR MENU AO REDIMENSIONAR (evita menu aberto em posição errada)
-    ============================================================ */
-    window.addEventListener("resize", () => {
-        closeAllUserMenus();
-    });
-
-    /* ============================================================
-       SIDEBAR — COLLAPSE / EXPAND
+       SIDEBAR DESKTOP — COLLAPSE / EXPAND
+       Toda a lógica de colapso desktop permanece igual ao original.
     ============================================================ */
     let collapsed = localStorage.getItem("sidebar-collapsed") === "true";
-    let open      = false; // estado mobile
-    let lastMode  = isDesktop();
 
-    function saveSidebar() {
+    function saveSidebarState() {
         localStorage.setItem("sidebar-collapsed", collapsed);
     }
 
-    function saveNavGroup(id) {
-        localStorage.setItem("nav-open-group", id);
-    }
-
-    function getSavedNavGroup() {
-        return localStorage.getItem("nav-open-group");
-    }
-
-    function render() {
-        sidebar.classList.remove("collapsed", "open");
+    /**
+     * Renderiza o estado correto do sidebar conforme o modo atual.
+     * Desktop: usa classes .collapsed / body.sidebar-collapsed
+     * Mobile : remove collapsed, não altera o estado open/close
+     */
+    function renderSidebar() {
+        if (!isDesktop()) {
+            // Mobile: sem colapso, apenas garante limpeza
+            sidebar.classList.remove("collapsed");
+            document.body.classList.remove("sidebar-collapsed");
+            return;
+        }
+        // Desktop
+        sidebar.classList.remove("open"); // segurança
         overlay.classList.remove("visible");
-        document.body.classList.remove("sidebar-collapsed");
         document.body.style.overflow = "";
 
-        if (isDesktop()) {
-            if (collapsed) {
-                sidebar.classList.add("collapsed");
-                document.body.classList.add("sidebar-collapsed");
-            }
+        if (collapsed) {
+            sidebar.classList.add("collapsed");
+            document.body.classList.add("sidebar-collapsed");
         } else {
-            if (open) {
-                sidebar.classList.add("open");
-                overlay.classList.add("visible");
-                document.body.style.overflow = "hidden";
-            }
+            sidebar.classList.remove("collapsed");
+            document.body.classList.remove("sidebar-collapsed");
         }
     }
 
-    /* ── SUBMENUS ── */
-    const savedGroup = getSavedNavGroup();
-    document.querySelectorAll(".nav-group").forEach(group => {
-        if (group.id === savedGroup) group.classList.add("open");
-    });
-
-    document.querySelectorAll(".nav-toggle").forEach(toggle => {
-        toggle.addEventListener("click", () => {
-            const group = toggle.closest(".nav-group");
-            document.querySelectorAll(".nav-group").forEach(g => {
-                if (g !== group) g.classList.remove("open");
-            });
-            const isOpen = group.classList.toggle("open");
-            isOpen ? saveNavGroup(group.id) : localStorage.removeItem("nav-open-group");
-        });
-    });
-
     collapseBtn?.addEventListener("click", () => {
-        if (!isDesktop()) return;
+        if (!isDesktop()) return; // ignorado no mobile (botão oculto via CSS)
         collapsed = !collapsed;
-        saveSidebar();
-        render();
-        // Fecha menu do sidebar ao colapsar
+        saveSidebarState();
+        renderSidebar();
         closeAllUserMenus();
     });
 
     expandTrigger?.addEventListener("click", () => {
         if (!isDesktop()) return;
         collapsed = false;
-        saveSidebar();
-        render();
+        saveSidebarState();
+        renderSidebar();
     });
 
+    /* ============================================================
+       SIDEBAR MOBILE — OPEN / CLOSE
+       Controla o slide-in via classe .open e o overlay.
+    ============================================================ */
+    let mobileOpen = false;
+
+    /** Abre o sidebar no mobile com animação e trava scroll do body */
+    function openMobileSidebar() {
+        mobileOpen = true;
+        sidebar.classList.add("open");
+        overlay.classList.add("visible");
+        document.body.style.overflow = "hidden";
+        menuToggle?.setAttribute("aria-expanded", "true");
+
+        // Foco no primeiro item de navegação (acessibilidade)
+        requestAnimationFrame(() => {
+            sidebar.querySelector(".nav-item, .nav-toggle")?.focus();
+        });
+    }
+
+    /** Fecha o sidebar no mobile e restaura o scroll */
+    function closeMobileSidebar() {
+        mobileOpen = false;
+        sidebar.classList.remove("open");
+        overlay.classList.remove("visible");
+        document.body.style.overflow = "";
+        menuToggle?.setAttribute("aria-expanded", "false");
+        closeAllUserMenus();
+    }
+
+    /* Botão ☰ da topbar */
     menuToggle?.addEventListener("click", () => {
         if (isDesktop()) return;
-        open = !open;
-        render();
+        mobileOpen ? closeMobileSidebar() : openMobileSidebar();
     });
 
+    /* Botão X do sidebar */
+    sidebarCloseBtn?.addEventListener("click", () => {
+        closeMobileSidebar();
+        menuToggle?.focus(); // retorna foco ao trigger (acessibilidade)
+    });
+
+    /* Overlay: fecha sidebar + menus */
     overlay?.addEventListener("click", () => {
-        open = false;
-        render();
-        closeAllUserMenus();
+        if (!isDesktop()) closeMobileSidebar();
+        else closeAllUserMenus();
     });
 
-    window.addEventListener("resize", () => {
-        const currentMode = isDesktop();
-        if (currentMode !== lastMode) {
-            open = false;
-            render();
-            lastMode = currentMode;
+    /*
+     * Itens de navegação: fecha o sidebar ao navegar no mobile.
+     * Aguarda um frame para o browser processar o link antes de fechar.
+     */
+    sidebar.querySelectorAll(".nav-item, .nav-sub-item").forEach(item => {
+        item.addEventListener("click", () => {
+            if (!isDesktop() && mobileOpen)
+                requestAnimationFrame(() => closeMobileSidebar());
+        });
+    });
+
+    /* ============================================================
+       SUBMENUS (NAV GROUPS) — com persistência
+    ============================================================ */
+    const savedGroup = localStorage.getItem("nav-open-group");
+
+    document.querySelectorAll(".nav-group").forEach(group => {
+        if (group.id === savedGroup) {
+            group.classList.add("open");
+            group.querySelector(".nav-toggle")?.setAttribute("aria-expanded", "true");
         }
     });
 
-    render();
+    document.querySelectorAll(".nav-toggle").forEach(toggle => {
+        toggle.addEventListener("click", () => {
+            const group  = toggle.closest(".nav-group");
+            const isOpen = group.classList.contains("open");
 
-}); // fim DOMContentLoaded
+            // Fecha todos os grupos abertos
+            document.querySelectorAll(".nav-group").forEach(g => {
+                g.classList.remove("open");
+                g.querySelector(".nav-toggle")?.setAttribute("aria-expanded", "false");
+            });
+
+            if (!isOpen) {
+                group.classList.add("open");
+                toggle.setAttribute("aria-expanded", "true");
+                localStorage.setItem("nav-open-group", group.id);
+            } else {
+                localStorage.removeItem("nav-open-group");
+            }
+        });
+    });
+
+    /* ============================================================
+       RESIZE — Sincroniza o estado ao mudar entre desktop/mobile
+    ============================================================ */
+    let lastIsDesktop = isDesktop();
+
+    window.addEventListener("resize", () => {
+        // Fecha menus ao redimensionar (evita posição incorreta)
+        closeAllUserMenus();
+
+        const nowDesktop = isDesktop();
+        if (nowDesktop !== lastIsDesktop) {
+            // Mudou de modo: reseta todos os estados de abertura
+            mobileOpen = false;
+            sidebar.classList.remove("open");
+            overlay.classList.remove("visible");
+            document.body.style.overflow = "";
+            menuToggle?.setAttribute("aria-expanded", "false");
+
+            initMobileUI();
+            renderSidebar();
+            lastIsDesktop = nowDesktop;
+        }
+    });
+
+    /* ============================================================
+       BOTTOM NAV — Feedback de toque (touch devices)
+    ============================================================ */
+    document.querySelectorAll(".bn-item").forEach(item => {
+        item.addEventListener("touchstart", () =>
+            item.classList.add("touch-active"), { passive: true });
+        item.addEventListener("touchend", () =>
+            setTimeout(() => item.classList.remove("touch-active"), 150), { passive: true });
+    });
+
+    /* ============================================================
+       INIT
+    ============================================================ */
+    initMobileUI();
+    renderSidebar();
+
+}); // /DOMContentLoaded
 </script>
 
 </body>
