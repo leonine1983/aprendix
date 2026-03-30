@@ -2,91 +2,86 @@
 
 {% block content %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<div class="main">
 
-<style>
-    .card-hover:hover {
-        transform: translateY(-2px);
-        transition: 0.2s;
-    }
-
-    .section-title {
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        color: #6c757d;
-    }
-
-    .table thead th {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: .04rem;
-    }
-
-    .filtro-bloco {
-        background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
-        border-bottom: 1px solid #dee2e6;
-    }
-</style>
-
-<div class="container-fluid py-4 px-4">
-
-    <!-- 🟦 HEADER -->
-    <div class="mb-4 p-4 rounded shadow-sm bg-white border-start border-5 border-success d-flex justify-content-between align-items-center flex-wrap">
+    <!-- 🔷 HEADER INSTITUCIONAL -->
+    <div class="page-hdr">
         <div>
-            <h4 class="fw-bold mb-1 d-flex align-items-center gap-2">
-                📦 Painel de Transferências
-            </h4>
-            <p class="text-muted small mb-0">
-                Gerencie recebimentos e consulte transferências com rapidez.
-            </p>
+            <div class="page-hdr__eyebrow">Gestão de Estoque</div>
+            <div class="page-hdr__title">📦 Painel de Transferências</div>
+            <div class="page-hdr__desc">
+                Gerencie recebimentos e acompanhe o histórico de transferências.
+            </div>
         </div>
 
-        <span class="badge bg-success px-3 py-2">
-            ✔ Sistema Operacional
-        </span>
+        <div class="page-hdr__actions">
+            <span class="pill pill--ok">✔ Sistema Operacional</span>
+        </div>
     </div>
 
-    <!-- 🔴 PENDENTES (FOCO TOTAL) -->
-    <div class="card shadow-sm border-0 mb-4">
+    <!-- ℹ️ EXPLICAÇÃO GLOBAL -->
+    <div class="alert-message info">
+        <span>ℹ️</span>
+        <div>
+            <strong>Como funciona este painel:</strong><br>
+            Aqui você acompanha as transferências de produtos enviadas para sua escola.
+            <br>
+            <strong>➡ Pendentes:</strong> precisam ser conferidas e recebidas.<br>
+            <strong>➡ Histórico:</strong> transferências já registradas no sistema.
+        </div>
+    </div>
 
-        <div class="card-header bg-warning-subtle fw-semibold d-flex justify-content-between align-items-center">
-            <span>📦 Pendentes de Conferência</span>
-            <span class="badge bg-warning text-dark fs-6">{{ pendentes|length }}</span>
+    <!-- 🔴 PENDENTES -->
+    <div class="card">
+
+        <div class="card__head">
+            <div class="card__title">📦 Transferências Aguardando Conferência</div>
+            <span class="pill pill--warn">{{ pendentes|length }}</span>
         </div>
 
-        <div class="card-body p-0">
+        <div class="card__body card__body--flush">
+
+            <!-- ALERTA CRÍTICO -->
+            <div class="impact-alert mb-3">
+                <span>⚠️</span>
+                <div>
+                    <strong>Atenção:</strong> Confira os itens fisicamente antes de receber.
+                    Após a confirmação, os produtos serão adicionados automaticamente ao estoque
+                    e não poderão ser alterados.
+                </div>
+            </div>
 
             {% if pendentes %}
-            <div class="table-responsive">
-                <table class="table align-middle mb-0 text-center">
+            <div class="table-wrap">
+                <table class="table">
 
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th>Nº</th>
                             <th>Data</th>
                             <th>Status</th>
-                            <th style="width:160px;">Ação</th>
+                            <th>Ação</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         {% for t in pendentes %}
-                        <tr class="table-warning-subtle">
+                        <tr>
 
-                            <td class="fw-semibold">{{ t.numero }}</td>
+                            <td class="tbl-code">{{ t.numero }}</td>
 
                             <td>{{ t.criado_em|date:"d/m/Y H:i" }}</td>
 
                             <td>
-                                <span class="badge bg-warning text-dark">
+                                <span class="pill pill--warn">
                                     ⏳ Aguardando Recebimento
                                 </span>
                             </td>
 
                             <td>
                                 <a href="{% url 'modulo_merendeiras:escola_receber_transfe' t.id %}"
-                                   class="btn btn-success btn-sm w-100">
-                                    ✔ Confirmar
+                                   class="btn btn--sm btn--primary">
+                                    ✔ Conferir e Receber
                                 </a>
                             </td>
 
@@ -97,53 +92,53 @@
                 </table>
             </div>
             {% else %}
-            <div class="text-center text-muted py-4">
-                📭 Nenhuma pendência encontrada.
+            <div class="card__body text-center">
+                <span class="pill pill--neutral">📭 Nenhuma pendência encontrada</span>
             </div>
             {% endif %}
 
         </div>
     </div>
 
-    <!-- 🔵 BLOCO ÚNICO: FILTRO + HISTÓRICO -->
-    <div class="card shadow-sm border-0">
+    <!-- 🔵 CONSULTA + HISTÓRICO -->
+    <div class="card">
 
-        <!-- FILTROS -->
-        <div class="card-header bg-primary text-white fw-semibold">
-            🔎 Consulta de Transferências
+        <!-- FILTRO -->
+        <div class="card__head">
+            <div class="card__title">🔎 Consulta de Transferências</div>
         </div>
 
-        <div class="card-body filtro-bloco">
+        <div class="card__body">
 
-            <form method="get" class="row g-3 align-items-end">
+            <form method="get" class="filter-grid">
 
-                <div class="col-lg-5 col-md-6">
-                    <label class="form-label small fw-semibold">Número</label>
+                <div class="form-group">
+                    <label class="form-label">Número</label>
                     <input type="text" name="numero"
                            value="{{ filtros.numero }}"
                            class="form-control"
                            placeholder="TRF-2026-00001">
                 </div>
 
-                <div class="col-lg-2 col-md-3">
-                    <label class="form-label small fw-semibold">Ano</label>
+                <div class="form-group">
+                    <label class="form-label">Ano</label>
                     <input type="number" name="ano"
                            value="{{ filtros.ano }}"
                            class="form-control">
                 </div>
 
-                <div class="col-lg-2 col-md-3">
-                    <label class="form-label small fw-semibold">Semana</label>
+                <div class="form-group">
+                    <label class="form-label">Semana</label>
                     <input type="number" name="semana"
                            value="{{ filtros.semana }}"
                            class="form-control">
                 </div>
 
-                <div class="col-lg-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary w-100 fw-semibold">
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn--md btn--primary">
                         🔍 Buscar
                     </button>
-                    <a href="?" class="btn btn-outline-secondary w-100">
+                    <a href="?" class="btn btn--md btn--outline">
                         Limpar
                     </a>
                 </div>
@@ -153,14 +148,14 @@
         </div>
 
         <!-- HISTÓRICO -->
-        <div class="card-body p-0">
+        <div class="card__body card__body--flush">
 
             {% if confirmadas %}
-            <div class="table-responsive">
+            <div class="table-wrap">
 
-                <table class="table table-striped align-middle mb-0 text-center">
+                <table class="table">
 
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th>Nº</th>
                             <th>Envio</th>
@@ -174,31 +169,28 @@
                         {% for t in confirmadas %}
                         <tr>
 
-                            <td class="fw-semibold">
+                            <td class="tbl-code">
                                 <a href="{% url 'modulo_merendeiras:transferencia_detalhe_escola' t.id %}">
                                     {{ t.numero }}
                                 </a>
                             </td>
 
-                            <td>
-                                <a href="{% url 'modulo_merendeiras:transferencia_detalhe_escola' t.id %}">
-                                {{ t.criado_em|date:"d/m/Y H:i" }}
-                                </a>
-                            </td>
+                            <td>{{ t.criado_em|date:"d/m/Y H:i" }}</td>
 
-                            <td>
-                                <a href="{% url 'modulo_merendeiras:transferencia_detalhe_escola' t.id %}">
+                            <td class="tbl-user">
+                                <div class="tbl-av">
+                                    {{ t.enviado_por.get_full_name|slice:":2" }}
+                                </div>
                                 {{ t.enviado_por.get_full_name }}
-                                </a>
                             </td>
 
                             <td>
                                 {% if t.recebido_por %}
-                                    <span class="badge bg-success">
+                                    <span class="pill pill--ok">
                                         ✔ {{ t.recebido_por.get_full_name }}
                                     </span>
                                 {% else %}
-                                    <span class="badge bg-warning text-dark">
+                                    <span class="pill pill--warn">
                                         ⏳ Pendente
                                     </span>
                                 {% endif %}
@@ -220,8 +212,8 @@
 
             </div>
             {% else %}
-            <div class="text-center text-muted py-4">
-                🔎 Nenhum resultado encontrado.
+            <div class="card__body text-center">
+                <span class="pill pill--neutral">🔎 Nenhum resultado encontrado</span>
             </div>
             {% endif %}
 

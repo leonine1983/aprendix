@@ -1,180 +1,137 @@
 {% extends "modulo_merendeiras/base_merendeira.html" %}
 
 {% block content %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-    .container-inst { max-width: 1200px; margin: auto; }
-    .header-alert { border-left: 6px solid var(--danger); background: linear-gradient(90deg, #fff, var(--danger-soft)); }
-    .table-inst { width: 100%; border-collapse: separate; border-spacing: 0; }
-    .table-inst th { font-size: 1rem; text-transform: uppercase; color: var(--text-muted); background: #f1f3f5; padding: 0.75rem; border-bottom: 1px solid var(--border); }
-    .table-inst td { padding: 0.9rem; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 1.2rem; }
-    .table-highlight { background: #e9f7ef; font-weight: bold; color: var(--success); }
-    .alert-impact { background: #fff8e6; border: 1px dashed var(--warning); padding: 1rem; border-radius: 8px; font-size: 1rem; }
-    .form-control:focus { border-color: var(--danger); box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.15); }
-    .btn-danger-custom { background: var(--danger); color: #fff; font-weight: 600; padding: 0.7rem 1.6rem; border-radius: 8px; border: none; }
-    @media (max-width: 768px) {
-        .table-inst th { display: none; }
-        .table-inst tr { display: block; margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 8px; }
-        .table-inst td { display: flex; justify-content: space-between; padding: 0.6rem; }
-        .table-inst td::before { content: attr(data-label); font-weight: bold; color: var(--text-muted); }
-        .btn-group-responsive { flex-direction: column-reverse; gap: 1rem; }
-        .btn-group-responsive a, .btn-group-responsive button { width: 100%; }
-    }
-</style>
+<div class="main">
 
-<div class="container-inst py-4 px-3">
-
-    <!-- 🔷 HEADER -->
-    <div class="header-alert p-3 mb-4 rounded">
-        <h1 class="h5 text-danger fw-bold mb-1">
-            <i class="bi bi-trash3"></i> Descarte de Produto
-        </h1>
-        <small class="text-muted">
-            Registro institucional com impacto direto no estoque.
-        </small>
+    <!-- 🔷 HEADER CRÍTICO -->
+    <div class="card">
+        <div class="card__body page-header-critical">
+            <h1>🗑️ Descarte de Produto</h1>
+            <small>Registro institucional com impacto direto no estoque</small>
+        </div>
     </div>
 
-    <div class="row g-4">
+    <div class="form-layout">
 
-        <!-- 🔷 TABELA DE CONTEXTO -->
-        <div class="col-12 col-lg-5">
-            <table class="table-inst shadow-sm bg-white rounded">
-                <thead>
-                    <tr><th colspan="2"><i class="bi bi-box-seam"></i> Informações do Produto</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td data-label="Produto">Produto</td><td data-label="Valor">{{ estoque.produto.nome }}</td></tr>
-                    <tr><td data-label="Lote">Lote</td><td data-label="Valor">{{ estoque.lote|default:"Não informado" }}</td></tr>
-                    <tr class="table-highlight"><td data-label="Estoque">Estoque Atual</td><td data-label="Valor">{{ estoque.quantidade }}</td></tr>
-                </tbody>
-            </table>
+        <!-- 🔷 CONTEXTO -->
+        <div class="context-card">
 
-            <div class="alert-impact mt-3">
-                <i class="bi bi-exclamation-triangle-fill text-warning"></i>
-                <strong>Atenção:</strong><br>
-                Este registro reduzirá automaticamente o estoque e será auditado.
+            <div class="context-card__head">
+                📦 Informações do Produto
             </div>
+
+            <div class="context-card__body">
+
+                <table class="info-table">
+                    <tr>
+                        <td>Produto</td>
+                        <td>{{ estoque.produto.nome }}</td>
+                    </tr>
+                    <tr>
+                        <td>Lote</td>
+                        <td>{{ estoque.lote|default:"Não informado" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Estoque Atual</td>
+                        <td>
+                            <span class="info-highlight">
+                                {{ estoque.quantidade }}
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="impact-alert" style="margin-top:16px;">
+                    ⚠ <div>
+                        <strong>Atenção:</strong><br>
+                        Este registro reduzirá automaticamente o estoque e será auditado.
+                    </div>
+                </div>
+
+            </div>
+
         </div>
 
-        <!-- 🔷 FORMULÁRIO -->
-        <div class="col-12 col-lg-7">
+        <!-- 🔷 FORM -->
+        <div class="card">
 
-            <!-- 🔷 MENSAGENS DE FEEDBACK -->
-            {% if messages %}
-                <div class="mb-3">
+            <div class="card__head">
+                <div class="card__title">📝 Registro do Descarte</div>
+            </div>
+
+            <div class="card__body">
+
+                <!-- 🔷 MESSAGES -->
+                {% if messages %}
+                <div class="alert-row">
                     {% for message in messages %}
-                        <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% elif message.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %} alert-dismissible fade show rounded" role="alert">
+                        <div class="alert-message {{ message.tags }}">
                             {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endfor %}
                 </div>
-            {% endif %}
+                {% endif %}
 
-            <form method="post">
-                {% csrf_token %}
+                <form method="post">
+                    {% csrf_token %}
 
-                <table class="table-inst shadow-sm bg-white rounded">
-                    <thead>
-                        <tr><th colspan="2"><i class="bi bi-clipboard-check"></i> Registro do Descarte</th></tr>
-                    </thead>
-                    <tbody>
+                    <!-- QUANTIDADE -->
+                    <div class="form-group">
+                        <label class="form-label">Quantidade *</label>
+                        <input type="number"
+                               step="0.01"
+                               min="0.01"
+                               name="quantidade"
+                               id="quantidade"
+                               class="form-control"
+                               required
+                               value="{{ quantidade_valor|default:'' }}">
+                        <small id="resultado" class="field-feedback text-muted">
+                            Informe a quantidade
+                        </small>
+                    </div>
 
-                        <!-- QUANTIDADE -->
-                        <tr>
-                            <td data-label="Campo">Quantidade *</td>
-                            <td data-label="Entrada">
-                                <input type="number"
-                                       step="0.01"
-                                       min="0.01"
-                                       name="quantidade"
-                                       id="quantidade"
-                                       class="form-control"
-                                       required
-                                       value="{{ quantidade_valor|default:'' }}">
-                                <small id="resultado" class="text-muted">Informe a quantidade</small>
-                            </td>
-                        </tr>
+                    <!-- MOTIVO -->
+                    <div class="form-group" style="margin-top:14px;">
+                        <label class="form-label">Motivo *</label>
+                        <select name="motivo" class="form-select" required>
+                            <option value="">Selecione</option>
+                            <option value="VENCIDO">Produto Vencido</option>
+                            <option value="MOFO">Mofo</option>
+                            <option value="GORGULHO">Infestação</option>
+                            <option value="EMBALAGEM_DANIFICADA">Embalagem Danificada</option>
+                            <option value="OUTRO">Outro</option>
+                        </select>
+                    </div>
 
-                        <!-- MOTIVO -->
-                        <tr>
-                            <td data-label="Campo">Motivo *</td>
-                            <td data-label="Entrada">
-                                <select name="motivo" class="form-select" required>
-                                    <option value="" disabled {% if not motivo_valor %}selected{% endif %}>Selecione</option>
-                                    <option value="VENCIDO" {% if motivo_valor == "VENCIDO" %}selected{% endif %}>Produto Vencido</option>
-                                    <option value="MOFO" {% if motivo_valor == "MOFO" %}selected{% endif %}>Mofo</option>
-                                    <option value="GORGULHO" {% if motivo_valor == "GORGULHO" %}selected{% endif %}>Infestação</option>
-                                    <option value="EMBALAGEM_DANIFICADA" {% if motivo_valor == "EMBALAGEM_DANIFICADA" %}selected{% endif %}>Embalagem Danificada</option>
-                                    <option value="OUTRO" {% if motivo_valor == "OUTRO" %}selected{% endif %}>Outro</option>
-                                </select>
-                            </td>
-                        </tr>
+                    <!-- OBS -->
+                    <div class="form-group" style="margin-top:14px;">
+                        <label class="form-label">Observação</label>
+                        <textarea name="descricao" class="form-control" rows="3">
+                            {{ descricao_valor|default:'' }}
+                        </textarea>
+                    </div>
 
-                        <!-- DESCRIÇÃO -->
-                        <tr>
-                            <td data-label="Campo">Observação</td>
-                            <td data-label="Entrada">
-                                <textarea name="descricao" class="form-control" rows="3">{{ descricao_valor|default:'' }}</textarea>
-                            </td>
-                        </tr>
+                    <!-- ACTIONS -->
+                    <div style="display:flex; justify-content:space-between; margin-top:20px;">
+                        <a href="{% url 'modulo_merendeiras:estoque_list_escola' %}"
+                           class="btn btn--outline btn--md">
+                           ← Voltar
+                        </a>
 
-                    </tbody>
-                </table>
+                        <button type="submit"
+                                class="btn btn--danger-strong btn--md">
+                            ✔ Confirmar Descarte
+                        </button>
+                    </div>
 
-                <div class="d-flex justify-content-between align-items-center mt-4 btn-group-responsive">
-                    <a href="{% url 'modulo_merendeiras:estoque_list_escola' %}" class="btn btn-light border">
-                        <i class="bi bi-arrow-left"></i> Voltar
-                    </a>
-                    <button type="submit" class="btn-danger-custom">
-                        <i class="bi bi-check-lg"></i> Confirmar Descarte
-                    </button>
-                </div>
+                </form>
 
-            </form>
+            </div>
 
         </div>
 
     </div>
 
 </div>
-
-<!-- 🔷 SCRIPT DE VALIDAÇÃO -->
-<script>
-(function () {
-    const inputQtd = document.getElementById("quantidade");
-    const display = document.getElementById("resultado");
-    const form = document.querySelector("form");
-    const estoque = parseFloat("{{ estoque.quantidade }}".replace(',', '.'));
-
-    function atualizarFeedback() {
-        let valor = parseFloat(inputQtd.value);
-        if (!inputQtd.value) { display.innerHTML = "Informe a quantidade"; display.className = "text-muted"; return; }
-        if (isNaN(valor)) { display.innerHTML = "❌ Valor inválido"; display.className = "text-danger fw-bold"; inputQtd.value = ""; return; }
-        if (valor < 0) { display.innerHTML = "❌ Não é permitido valor negativo"; display.className = "text-danger fw-bold"; inputQtd.value = ""; return; }
-        if (valor === 0) { display.innerHTML = "⚠ Quantidade deve ser maior que zero"; display.className = "text-warning fw-semibold"; return; }
-        if (valor > estoque) { display.innerHTML = "❌ Quantidade maior que o estoque disponível"; display.className = "text-danger fw-bold"; return; }
-        const restante = estoque - valor;
-        display.innerHTML = `✔ Estoque final: ${restante.toFixed(2)}`;
-        display.className = "text-success fw-semibold";
-    }
-
-    inputQtd.addEventListener("input", atualizarFeedback);
-
-    form.addEventListener("submit", function (e) {
-        let valor = parseFloat(inputQtd.value);
-        if (!inputQtd.value || isNaN(valor) || valor <= 0 || valor > estoque) {
-            e.preventDefault();
-            alert(
-                !inputQtd.value ? "Informe a quantidade." :
-                isNaN(valor) ? "Quantidade inválida." :
-                valor <= 0 ? "A quantidade deve ser maior que zero." :
-                "Quantidade maior que o estoque disponível."
-            );
-            inputQtd.focus();
-        }
-    });
-})();
-</script>
-
 {% endblock %}

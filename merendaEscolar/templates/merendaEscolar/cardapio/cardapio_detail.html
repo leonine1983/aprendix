@@ -1,0 +1,70 @@
+<h1>{{ cardapio.nome }}</h1>
+
+<p>
+    <strong>Período:</strong> {{ cardapio.data_inicio }} até {{ cardapio.data_fim }}
+</p>
+
+<a href="{% url 'merendaEscolar:cardapio_update' cardapio.id %}">Editar</a> |
+<a href="{% url 'merendaEscolar:cardapio_delete' cardapio.id %}">Excluir</a> |
+<a href="{% url 'merendaEscolar:semana_create' cardapio.id %}">
+    + Adicionar Semana
+</a>
+
+<hr>
+
+{% for semana in cardapio.semanas.all %}
+    <h2>Semana {{ semana.numero }}</h2>
+
+    <a href="{% url 'merendaEscolar:dia_create' semana.id %}">
+        + Adicionar Dia
+    </a>
+
+    <table border="1" cellpadding="8" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Dia</th>
+                <th>Refeições</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for dia in semana.dias.all %}
+                <tr>
+                    <td width="150">
+                        <strong>{{ dia.get_dia_semana_display }}</strong><br>
+
+                        <a href="{% url 'merendaEscolar:item_create' dia.id %}">
+                            + Item
+                        </a>
+                    </td>
+
+                    <td>
+                        {% if dia.itens.all %}
+                            <ul>
+                                {% for item in dia.itens.all %}
+                                    <li>
+                                        <strong>{{ item.tipo_refeicao }}:</strong>
+                                        {{ item.receita }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <em>Sem itens cadastrados</em>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">
+                        Nenhum dia cadastrado
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br>
+
+{% empty %}
+    <p>Nenhuma semana cadastrada.</p>
+{% endfor %}

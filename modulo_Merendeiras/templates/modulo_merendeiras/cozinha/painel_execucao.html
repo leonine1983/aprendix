@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="main">
+
+  <!-- HEADER -->
+  <div class="page-hdr">
+    <div>
+      <div class="page-hdr__eyebrow">
+        🍽️ Execução de Receita
+      </div>
+      <div class="page-hdr__title">
+        {{ object.receita.nome }}
+      </div>
+      <div class="page-hdr__desc">
+        Escola: {{ object.escola.nome }}
+      </div>
+    </div>
+
+    <div class="page-hdr__actions">
+
+      {% if object.status != "FINALIZADA" %}
+      <form method="post" action="{% url 'cozinha:finalizar_execucao' object.pk %}">
+        {% csrf_token %}
+        <button class="btn btn--primary">
+          ✔️ Finalizar Receita
+        </button>
+      </form>
+      {% endif %}
+
+    </div>
+  </div>
+
+
+  <!-- STATUS + KPIs -->
+  <div class="kpi-grid">
+
+    <div class="kpi kpi--primary">
+      <div class="kpi__top">
+        <div class="kpi__label">Status</div>
+      </div>
+      <div class="kpi__value">
+        {{ object.get_status_display }}
+      </div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi__top">
+        <div class="kpi__label">Iniciado por</div>
+      </div>
+      <div class="kpi__value" style="font-size:18px;">
+        {{ object.iniciado_por }}
+      </div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi__top">
+        <div class="kpi__label">Início</div>
+      </div>
+      <div class="kpi__value" style="font-size:18px;">
+        {{ object.iniciado_em|date:"H:i" }}
+      </div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi__top">
+        <div class="kpi__label">Movimentações</div>
+      </div>
+      <div class="kpi__value">
+        {{ movimentacoes.count }}
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- LAYOUT PRINCIPAL -->
+  <div class="content-layout">
+
+    <!-- ESQUERDA -->
+    <div>
+
+      <!-- ESTOQUE DISPONÍVEL -->
+      <div class="card">
+        <div class="card__head">
+          <div class="card__title">
+            📦 Estoque disponível
+          </div>
+        </div>
+
+        <div class="card__body--flush">
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Total disponível</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for item in estoque %}
+              <tr>
+                <td>{{ item.produto__nome }}</td>
+                <td>
+                  {% if item.total <= 0 %}
+                    <span class="badge-status badge-status--danger">Sem estoque</span>
+                  {% else %}
+                    <strong>{{ item.total }}</strong>
+                  {% endif %}
+                </td>
+
+                <td>
+                  {% if object.status != "FINALIZADA" %}
+                  <form method="post" action="{% url 'cozinha:retirar_ingrediente' object.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="produto" value="{{ item.produto__id }}">
+                    <input type="number" step="0.01" name="quantidade" placeholder="Qtd" required style="width:80px;">
+                    <button class="btn btn--sm btn--outline">
+                      Retirar
+                    </button>
+                  </form>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+
+          </table>
+
+        </div>
+      </div>
+
+
+      <!-- HISTÓRICO -->
+      <div class="card" style="margin-top:16px;">
+        <div class="card__head">
+          <div class="card__title">
+            📊 Movimentações da Cozinha
+          </div>
+        </div>
+
+        <div class="card__body--flush">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Tipo</th>
+                <th>Qtd</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for mov in movimentacoes %}
+              <tr>
+                <td>{{ mov.produto.nome }}</td>
+                <td>
+                  <span class="pill 
+                    {% if mov.tipo == 'DEVOLUCAO' %}pill--info
+                    {% else %}pill--warn{% endif %}">
+                    {{ mov.get_tipo_display }}
+                  </span>
+                </td>
+                <td>{{ mov.quantidade }}</td>
+                <td>{{ mov.criado_em|date:"H:i" }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4">Nenhuma movimentação ainda</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- DIREITA -->
+    <div class="side-col">
+
+      <!-- AÇÕES RÁPIDAS -->
+      <div class="card">
+        <div class="card__head">
+          <div class="card__title">
+            ⚡ Ações rápidas
+          </div>
+        </div>
+
+        <div class="card__body">
+          <div class="q-actions">
+
+            <form method="post" action="{% url 'cozinha:retirada_extra' object.pk %}">
+              {% csrf_token %}
+              <button class="q-action">
+                <div class="q-action__ico">➕</div>
+                Retirada extra
+              </button>
+            </form>
+
+            <form method="post" action="{% url 'cozinha:devolver_ingrediente' object.pk %}">
+              {% csrf_token %}
+              <button class="q-action">
+                <div class="q-action__ico">↩️</div>
+                Devolver
+              </button>
+            </form>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ALERTA -->
+      {% if object.status == "FINALIZADA" %}
+      <div class="impact-alert">
+        ⚠️ Receita finalizada. Nenhuma movimentação é permitida.
+      </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

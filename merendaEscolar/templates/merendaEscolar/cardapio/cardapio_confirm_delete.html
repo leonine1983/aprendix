@@ -1,0 +1,8 @@
+<h1>Excluir Cardápio</h1>
+
+<p>Tem certeza que deseja excluir "{{ object }}"?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Confirmar</button>
+</form>

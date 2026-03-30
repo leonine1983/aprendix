@@ -1,0 +1,48 @@
+<h1>{{ cardapio.nome }}</h1>
+
+<a href="{% url 'merendaEscolar:semana_create' cardapio.id %}">
+    + Adicionar Semana
+</a>
+
+<hr>
+<h1>{{ cardapio.nome }}</h1>
+
+{% if cardapio.pk %}
+    <a href="{% url 'merendaEscolar:semana_create' cardapio.pk %}">
+        + Adicionar Semana
+    </a>
+{% endif %}
+
+<hr>
+
+{% for semana in cardapio.semanas.all %}
+    <h2>Semana {{ semana.numero }}</h2>
+
+    <a href="{% url 'merendaEscolar:dia_create' semana.id %}">
+        + Adicionar Dia
+    </a>
+
+    {% for dia in semana.dias.all %}
+        <h3>{{ dia.get_dia_semana_display }}</h3>
+
+        <a href="{% url 'merendaEscolar:item_create' dia.id %}">
+            + Adicionar Item
+        </a>
+
+        <ul>
+            {% for item in dia.itens.all %}
+                <li>
+                    {{ item.tipo_refeicao }} - {{ item.receita }}
+                </li>
+            {% empty %}
+                <li><em>Sem itens</em></li>
+            {% endfor %}
+        </ul>
+
+    {% empty %}
+        <p>Nenhum dia cadastrado</p>
+    {% endfor %}
+
+{% empty %}
+    <p>Nenhuma semana cadastrada</p>
+{% endfor %}

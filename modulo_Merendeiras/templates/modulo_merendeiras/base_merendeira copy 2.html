@@ -10,7 +10,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
   <style>
-
+    /* ================================================================
+       GovLeaf · Design System — Single File
+       Sidebar: branco/cinza claro com acentos verdes
+       Main: background levemente acinzentado
+    ================================================================ */
 
     /* ── 1. TOKENS ─────────────────────────────────────────────── */
     :root {
@@ -265,7 +269,6 @@
       font-size: 13px; font-weight: 700;
       color: var(--color-primary);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      text-transform: capitalize;
     }
 
     .sb-user__role {
@@ -1091,215 +1094,6 @@
       0%, 100% { opacity: 1; transform: scale(1); }
       50%       { opacity: 0.6; transform: scale(1.3); }
     }
-
-
-    /* ── FORM COMPONENT (INSTITUCIONAL) ───────────────────────── */
-
-    .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    }
-
-    .form-label {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--color-text-3);
-    }
-
-    .form-control,
-    .form-select {
-    height: 38px;
-    border-radius: var(--r-sm);
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    padding: 0 12px;
-    font-family: 'Outfit', sans-serif;
-    font-size: 13.5px;
-    color: var(--color-text);
-    transition: all var(--t-base);
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(27,107,58,0.12);
-    outline: none;
-    }
-
-    /* Grid de filtros */
-    .filter-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1.5fr 1.5fr;
-    gap: 12px;
-    align-items: end;
-    }
-
-    .filter-actions {
-    display: flex;
-    gap: 8px;
-    }
-
-    /* Header institucional refinado */
-    .page-header-box {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    }
-
-    .page-header-title {
-    display: flex;
-    flex-direction: column;
-    }
-
-    .page-header-title h4 {
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--color-text);
-    }
-
-    .page-header-title small {
-    color: var(--color-text-3);
-    }
-
-    /* Status badges convertidos para design system */
-    .badge-status {
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: var(--r-pill);
-    }
-
-    .badge-status--danger {
-    background: var(--color-danger-light);
-    color: var(--color-danger);
-    }
-
-    .badge-status--warn {
-    background: var(--color-warning-light);
-    color: var(--color-warning);
-    }
-
-    .badge-status--ok {
-    background: var(--color-success-light);
-    color: var(--color-success);
-    }
-
-
-
-
-.context-card {
-  border: 1px solid var(--color-border);
-  border-radius: var(--r-lg);
-  background: var(--color-surface);
-  box-shadow: var(--sh-sm);
-  overflow: hidden;
-}
-
-.context-card__head {
-  padding: 14px 16px;
-  background: var(--color-danger-light);
-  border-bottom: 1px solid rgba(198,40,40,0.15);
-  font-weight: 700;
-  color: var(--color-danger);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.context-card__body {
-  padding: 16px;
-}
-
-/* Tabela institucional compacta */
-.info-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13.5px;
-}
-
-.info-table td {
-  padding: 10px 0;
-  border-bottom: 1px solid var(--color-border-sub);
-}
-
-.info-table td:first-child {
-  color: var(--color-text-3);
-  font-weight: 600;
-  width: 40%;
-}
-
-.info-table td:last-child {
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.info-highlight {
-  background: var(--color-primary-light);
-  padding: 8px 10px;
-  border-radius: var(--r-sm);
-}
-
-/* Alerta institucional forte */
-.impact-alert {
-  display: flex;
-  gap: 10px;
-  padding: 12px;
-  border-radius: var(--r-md);
-  background: var(--color-warning-light);
-  border: 1px solid rgba(230,81,0,0.2);
-  font-size: 13px;
-}
-
-/* Layout */
-.form-layout {
-  display: grid;
-  grid-template-columns: 1fr 1.4fr;
-  gap: 20px;
-}
-
-@media (max-width: 900px) {
-  .form-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Feedback inline */
-.field-feedback {
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-/* Botão crítico */
-.btn--danger-strong {
-  background: var(--color-danger);
-  color: #fff;
-  box-shadow: 0 6px 22px rgba(198,40,40,0.25);
-}
-
-.btn--danger-strong:hover {
-  background: #a91e1e;
-  transform: translateY(-1px);
-}
-
-/* Header crítico */
-.page-header-critical {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.page-header-critical h1 {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--color-danger);
-}
-
-
   </style>
 </head>
 <body>
@@ -1335,8 +1129,8 @@
     <div class="sb-user" aria-label="Usuário logado — Carlos Mendonça">
       <div class="sb-user__av" aria-hidden="true">CM</div>
       <div class="sb-user__info">
-        <div class="sb-user__name">{{ usuario_nome }}</div>
-        <div class="sb-user__role">{{ grupo_principal }}</div>
+        <div class="sb-user__name">Carlos Mendonça</div>
+        <div class="sb-user__role">Gestor Sênior</div>
       </div>
       <div class="sb-user__dot" aria-hidden="true"></div>
     </div>
@@ -1359,7 +1153,6 @@
         <span class="sb-item__dot" aria-hidden="true"></span>
       </a>
 
-      <!--
       <a href="#" class="sb-item" title="Calendário">
         <span class="sb-item__icon" aria-hidden="true">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
@@ -1456,21 +1249,6 @@
         <span class="sb-item__badge sb-item__badge--danger" aria-label="2 pendentes">2</span>
       </a>
 
-
-      <!-- ── Módulo Merendeiras ── -->
-      <div class="sb-section">Cozinha</div>      
-
-      <a href="{% url 'modulo_merendeiras:cozinha_merenda' %}" class="sb-item" data-page="estoque" title="Estoque">
-        <span class="sb-item__icon" aria-hidden="true">
-          <!-- Caixa 3D / Estoque de mantimentos -->
-          <svg fill="#b8b8b8" height="200px" width="200px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve" stroke="#b8b8b8"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M444.861,38.849h-33.998L400.505,7.774C398.958,3.131,394.612,0,389.719,0h-96.674c-4.893,0-9.238,3.131-10.786,7.774 L271.9,38.849h-31.795L229.746,7.774C228.199,3.131,223.855,0,218.96,0h-96.674c-4.893,0-9.238,3.131-10.786,7.774l-10.358,31.075 H67.145c-6.279,0-11.369,5.09-11.369,11.369v118.304c0,0.041-0.006,0.081-0.006,0.122c0,0.041,0.006,0.08,0.006,0.121v302.476 c0,6.279,5.09,11.369,11.369,11.369h34.222v18.021c0,6.279,5.09,11.369,11.369,11.369c6.279,0,11.369-5.09,11.369-11.369V482.61 h263.782v18.021c0,6.279,5.09,11.369,11.369,11.369s11.369-5.09,11.369-11.369V482.61h34.233c6.279,0,11.369-5.09,11.369-11.369 V50.219C456.23,43.939,451.14,38.849,444.861,38.849z M301.238,22.739h80.285l5.37,16.11h-91.026L301.238,22.739z M130.481,22.739 h80.285l5.37,16.11h-91.025L130.481,22.739z M78.515,61.588h30.821H231.91h48.184h122.574h30.823v95.685H78.515V61.588z M433.491,459.871H78.515V180.012h354.977V459.871z"></path> </g> </g> <g> <g> <path d="M352.353,247.092h-3.127c-6.279,0-11.369,5.09-11.369,11.369s5.09,11.369,11.369,11.369h3.127 c6.279,0,11.369-5.09,11.369-11.369S358.633,247.092,352.353,247.092z"></path> </g> </g> <g> <g> <path d="M399.257,247.092H383.76c-6.279,0-11.369,5.09-11.369,11.369s5.09,11.369,11.369,11.369h4.127V415.36H124.105V269.831 h192.86c6.279,0,11.369-5.09,11.369-11.369c0-6.279-5.09-11.369-11.369-11.369H112.737c-6.279,0-11.369,5.09-11.369,11.369 v168.268c0,6.279,5.09,11.369,11.369,11.369h286.521c6.279,0,11.369-5.09,11.369-11.369V258.461 C410.626,252.182,405.536,247.092,399.257,247.092z"></path> </g> </g> <g> <g> <path d="M399.257,203.32h-286.52c-6.279,0-11.369,5.09-11.369,11.369s5.09,11.369,11.369,11.369h286.521 c6.279,0,11.369-5.09,11.369-11.369S405.536,203.32,399.257,203.32z"></path> </g> </g> <g> <g> <path d="M155.348,99.005c-6.279,0-11.369,5.09-11.369,11.369c0,5.479-4.458,9.937-9.937,9.937s-9.937-4.457-9.937-9.937 c0-5.48,4.457-9.937,9.937-9.937c6.279,0,11.369-5.09,11.369-11.369c0-6.279-5.09-11.369-11.369-11.369 c-18.017,0-32.676,14.659-32.676,32.676s14.659,32.676,32.676,32.676c18.018,0,32.676-14.659,32.676-32.676 C166.718,104.095,161.627,99.005,155.348,99.005z"></path> </g> </g> <g> <g> <path d="M236.652,99.005c-6.279,0-11.369,5.09-11.369,11.369c0,5.479-4.457,9.937-9.937,9.937c-5.48,0-9.937-4.457-9.937-9.937 c0-5.48,4.458-9.937,9.937-9.937c6.279,0,11.369-5.09,11.369-11.369c0-6.279-5.09-11.369-11.369-11.369 c-18.017,0-32.676,14.659-32.676,32.676s14.659,32.676,32.676,32.676s32.676-14.659,32.676-32.676 C248.022,104.095,242.931,99.005,236.652,99.005z"></path> </g> </g> <g> <g> <path d="M317.954,99.005c-6.279,0-11.369,5.09-11.369,11.369c0,5.479-4.458,9.937-9.937,9.937s-9.937-4.457-9.937-9.937 c0-5.48,4.457-9.937,9.937-9.937c6.279,0,11.369-5.09,11.369-11.369c0-6.279-5.09-11.369-11.369-11.369 c-18.017,0-32.676,14.659-32.676,32.676s14.659,32.676,32.676,32.676s32.676-14.659,32.676-32.676 C329.323,104.095,324.233,99.005,317.954,99.005z"></path> </g> </g> <g> <g> <path d="M399.258,99.005c-6.279,0-11.369,5.09-11.369,11.369c0,5.479-4.457,9.937-9.937,9.937s-9.937-4.457-9.937-9.937 c0-5.48,4.458-9.937,9.937-9.937c6.279,0,11.369-5.09,11.369-11.369c0-6.279-5.09-11.369-11.369-11.369 c-18.018,0-32.676,14.659-32.676,32.676s14.657,32.676,32.676,32.676c18.017,0,32.676-14.659,32.676-32.676 C410.627,104.095,405.537,99.005,399.258,99.005z"></path> </g> </g> </g></svg>
-        </span>
-        <span class="sb-item__label">Cozinha</span>
-      </a>
-
-     
-      
-
       <!-- ITENS DE GESTÃO -->
       <div class="sb-section">Gestão</div>
 
@@ -1533,7 +1311,7 @@
         <div class="sb-footer__dot" aria-hidden="true"></div>
         <span class="sb-footer__text">Online</span>
       </div>
-      <span class="sb-footer__version">v1.0</span>
+      <span class="sb-footer__version">v3.1.0</span>
     </div>
 
   </aside>
@@ -1587,7 +1365,7 @@
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 9V13M12 17H12.01M10.29 3.86L1.82 18C1.55 18.47 1.55 19.05 1.82 19.52C2.1 20 2.61 20.3 3.16 20.3H20.84C21.39 20.3 21.9 20 22.18 19.52C22.45 19.05 22.45 18.47 22.18 18L13.71 3.86C13.43 3.38 12.93 3.08 12.38 3.08C11.83 3.08 11.32 3.38 11.05 3.86H10.29Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 <div class="notif-body">
-                  <p class="notif-text">Estoque crítico: <strong>Papel A4</strong> abaixo de 100 un.</p>
+                  <p class="notif-text">Estoque crítico: <strong>Tomates</strong> abaixo de 100 un.</p>
                   <time class="notif-time" datetime="2026-03-26T10:00">há 8 min</time>
                 </div>
                 <div class="notif-dot" aria-hidden="true"></div>
@@ -1656,7 +1434,7 @@
               <li class="notif-item notif-item--unread" style="background:#f3fbf5">
                 <div class="notif-icon" style="background:linear-gradient(135deg,var(--color-primary),var(--color-primary-mid));color:#fff;border-radius:50%;font-size:11px;font-weight:800" aria-hidden="true">FM</div>
                 <div class="notif-body">
-                  <p class="notif-text"><strong>Daise</strong> — Precisa de validação no processo 3841 antes das 14h.</p>
+                  <p class="notif-text"><strong>Fernanda Macedo</strong> — Precisa de validação no processo 3841 antes das 14h.</p>
                   <time class="notif-time" datetime="2026-03-26T10:05">há 5 min</time>
                 </div>
                 <div class="notif-dot" aria-hidden="true"></div>
@@ -1664,7 +1442,7 @@
               <li class="notif-item notif-item--unread" style="background:#f3fbf5">
                 <div class="notif-icon" style="background:linear-gradient(135deg,#0277bd,#29b6f6);color:#fff;border-radius:50%;font-size:11px;font-weight:800" aria-hidden="true">RO</div>
                 <div class="notif-body">
-                  <p class="notif-text"><strong>Luan</strong> — O relatório mensal foi enviado para conferência.</p>
+                  <p class="notif-text"><strong>Renato Oliveira</strong> — O relatório mensal foi enviado para conferência.</p>
                   <time class="notif-time" datetime="2026-03-26T09:48">há 22 min</time>
                 </div>
                 <div class="notif-dot" aria-hidden="true"></div>
@@ -1672,7 +1450,7 @@
               <li class="notif-item">
                 <div class="notif-icon" style="background:linear-gradient(135deg,#6a1b9a,#ba68c8);color:#fff;border-radius:50%;font-size:11px;font-weight:800" aria-hidden="true">BL</div>
                 <div class="notif-body">
-                  <p class="notif-text"><strong>Sílvia</strong> — Tudo certo!</p>
+                  <p class="notif-text"><strong>Beatriz Lima</strong> — Matrículas do turno noturno finalizadas. Tudo certo!</p>
                   <time class="notif-time" datetime="2026-03-26T08:30">há 1h 40min</time>
                 </div>
               </li>
@@ -1689,7 +1467,7 @@
         <div class="widget" id="userWidget">
           <button class="hdr-user" id="userToggle" aria-label="Menu do usuário — Carlos Mendonça" aria-haspopup="true" aria-expanded="false" aria-controls="userPanel">
             <div class="hdr-user__av" aria-hidden="true">CM</div>
-            <span class="hdr-user__name">{{ usuario_nome }}</span>
+            <span class="hdr-user__name">Carlos Mendonça</span>
             <svg class="hdr-user__chevron" width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
               <path d="M3 5L6.5 8.5L10 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
@@ -1699,7 +1477,7 @@
             <div class="user-panel__profile">
               <div class="user-panel__av" aria-hidden="true">CM</div>
               <div>
-                <div class="user-panel__name">{{ usuario_nome }}</div>
+                <div class="user-panel__name">Carlos Mendonça</div>
                 <div class="user-panel__email">c.mendonca@govleaf.gov.br</div>
                 <span class="user-panel__badge">Gestor Sênior</span>
               </div>
@@ -1739,11 +1517,328 @@
 
     <!-- MAIN CONTENT -->
     <main class="main" id="main-content" role="main" tabindex="-1">
-        {% block content %}
-        {% endblock content %} 
+
+      <!-- Page Header -->
+      <div class="page-hdr">
+        <div>
+          <div class="page-hdr__eyebrow">Secretaria Municipal de Educação</div>
+          <h1 class="page-hdr__title">Dashboard</h1>
+          <p class="page-hdr__desc">Visão geral do sistema · São Paulo, SP · 26 de março de 2026</p>
+        </div>
+        <div class="page-hdr__actions">
+          <button class="btn btn--outline btn--sm" aria-label="Atualizar dados">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 4V10H10M20 20V14H14" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M20 10C19.17 7.21 17.22 5.07 14.72 4.07C12.22 3.07 9.42 3.31 7.12 4.71L4 7M4 17C4.83 19.79 6.78 21.93 9.28 22.93C11.78 23.93 14.58 23.69 16.88 22.29L20 20" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+            </svg>
+            Atualizar
+          </button>
+          <button class="btn btn--primary btn--sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+            Nova Ação
+          </button>
+        </div>
+      </div>
+
+      <!-- Alert messages -->
+      <div class="alert-row" role="region" aria-label="Alertas do sistema">
+        <div class="alert-message success" role="alert">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Backup concluído com sucesso. Sistema sincronizado.</span>
+          <button class="alert-close" aria-label="Fechar alerta">✕</button>
+        </div>
+        <div class="alert-message warning" role="alert">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 9V13M12 17H12.01M10.29 3.86L1.82 18C1.55 18.47 1.55 19.05 1.82 19.52C2.1 20 2.61 20.3 3.16 20.3H20.84C21.39 20.3 21.9 20 22.18 19.52C22.45 19.05 22.45 18.47 22.18 18L13.71 3.86C13.43 3.38 12.93 3.08 12.38 3.08C11.83 3.08 11.32 3.38 11.05 3.86H10.29Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Estoque de Papel A4 em nível crítico (98 un. restantes).</span>
+          <button class="alert-close" aria-label="Fechar alerta">✕</button>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <section class="kpi-grid" aria-label="Métricas principais">
+
+        <article class="kpi kpi--primary">
+          <div class="kpi__top">
+            <span class="kpi__label">Matrículas Ativas</span>
+            <div class="kpi__icon-wrap" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3L2 8L12 13L22 8L12 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6 10.5V16.5C6 16.5 8 19 12 19C16 19 18 16.5 18 16.5V10.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="kpi__value">42.896</div>
+          <div class="kpi__footer">
+            <span class="kpi__delta kpi__delta--up">▲ 3,4%</span>
+            <span class="kpi__period">vs. mês anterior</span>
+          </div>
+          <span class="kpi__prog" role="presentation"><span class="kpi__prog-fill" style="--w:78%"></span></span>
+        </article>
+
+        <article class="kpi">
+          <div class="kpi__top">
+            <span class="kpi__label">Servidores Ativos</span>
+            <div class="kpi__icon-wrap" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M1 21C1 17.13 4.58 14 9 14H11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 19L18 21L22 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="kpi__value">5.241</div>
+          <div class="kpi__footer">
+            <span class="kpi__delta kpi__delta--flat">→ Estável</span>
+            <span class="kpi__period">sem variação</span>
+          </div>
+        </article>
+
+        <article class="kpi">
+          <div class="kpi__top">
+            <span class="kpi__label">Processos Abertos</span>
+            <div class="kpi__icon-wrap" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 12H15M9 16H12M7 4H4C3.45 4 3 4.45 3 5V19C3 19.55 3.45 20 4 20H20C20.55 20 21 19.55 21 19V5C21 4.45 20.55 4 20 4H17M9 4H15V8H9V4Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="kpi__value">312</div>
+          <div class="kpi__footer">
+            <span class="kpi__delta kpi__delta--down">▼ 12%</span>
+            <span class="kpi__period">vs. mês anterior</span>
+          </div>
+        </article>
+
+        <article class="kpi">
+          <div class="kpi__top">
+            <span class="kpi__label">Orçamento Executado</span>
+            <div class="kpi__icon-wrap" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M2 10H22" stroke="currentColor" stroke-width="1.8"/></svg>
+            </div>
+          </div>
+          <div class="kpi__value">68<span class="kpi__unit">%</span></div>
+          <div class="kpi__footer">
+            <span class="kpi__prog" role="progressbar" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100" aria-label="68% executado" style="display:block">
+              <span class="kpi__prog-fill" style="--w:68%"></span>
+            </span>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- Alerts showcase -->
+      <section style="margin-bottom:20px" aria-label="Componentes de alerta">
+        <div class="alert-row">
+          <div class="alert-message error" role="alert">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M15 9L9 15M9 9L15 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span>Erro crítico detectado no módulo de exportação PDF.</span>
+          </div>
+          <div class="alert-message info" role="alert">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 12V16M12 8H12.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span>Manutenção programada domingo 29/03 das 02h às 05h.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Two-column layout -->
+      <div class="content-layout">
+
+        <!-- Main card: Table -->
+        <section class="card" aria-labelledby="proc-title">
+          <div class="card__head">
+            <div>
+              <h2 class="card__title" id="proc-title">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 12H15M9 16H12M7 4H4C3.45 4 3 4.45 3 5V19C3 19.55 3.45 20 4 20H20C20.55 20 21 19.55 21 19V5C21 4.45 20.55 4 20 4H17M9 4H15V8H9V4Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Processos Recentes
+              </h2>
+              <div class="card__subtitle">Últimas movimentações do sistema</div>
+            </div>
+            <div class="card__head-right">
+              <button class="btn btn--ghost btn--sm">Exportar</button>
+              <a href="#" class="card__link">Ver tudo</a>
+            </div>
+          </div>
+          <div class="card__body card__body--flush">
+            <div class="table-wrap" role="region" aria-label="Tabela de processos" tabindex="0">
+              <table class="table" aria-describedby="proc-title">
+                <thead>
+                  <tr>
+                    <th scope="col">Processo</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Responsável</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Status</th>
+                    <th scope="col"><span class="sr-only">Ações</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="tbl-code">#PA-2026-0412</span></td>
+                    <td>Administrativo</td>
+                    <td><div class="tbl-user"><div class="tbl-av" aria-hidden="true">FM</div>Fernanda M.</div></td>
+                    <td><time datetime="2026-03-26">26/03/2026</time></td>
+                    <td><span class="pill pill--warn">Aguardando</span></td>
+                    <td><button class="tbl-action" aria-label="Ver processo PA-2026-0412">Ver</button></td>
+                  </tr>
+                  <tr>
+                    <td><span class="tbl-code">#LI-2026-0318</span></td>
+                    <td>Licitação</td>
+                    <td><div class="tbl-user"><div class="tbl-av tbl-av--b" aria-hidden="true">RO</div>Renato O.</div></td>
+                    <td><time datetime="2026-03-24">24/03/2026</time></td>
+                    <td><span class="pill pill--ok">Aprovado</span></td>
+                    <td><button class="tbl-action" aria-label="Ver processo LI-2026-0318">Ver</button></td>
+                  </tr>
+                  <tr>
+                    <td><span class="tbl-code">#RE-2026-0291</span></td>
+                    <td>Relatório</td>
+                    <td><div class="tbl-user"><div class="tbl-av tbl-av--c" aria-hidden="true">BL</div>Beatriz L.</div></td>
+                    <td><time datetime="2026-03-22">22/03/2026</time></td>
+                    <td><span class="pill pill--info">Em análise</span></td>
+                    <td><button class="tbl-action" aria-label="Ver processo RE-2026-0291">Ver</button></td>
+                  </tr>
+                  <tr>
+                    <td><span class="tbl-code">#PA-2026-0254</span></td>
+                    <td>Administrativo</td>
+                    <td><div class="tbl-user"><div class="tbl-av tbl-av--d" aria-hidden="true">MS</div>Marcos S.</div></td>
+                    <td><time datetime="2026-03-20">20/03/2026</time></td>
+                    <td><span class="pill pill--danger">Devolvido</span></td>
+                    <td><button class="tbl-action" aria-label="Ver processo PA-2026-0254">Ver</button></td>
+                  </tr>
+                  <tr>
+                    <td><span class="tbl-code">#LI-2026-0201</span></td>
+                    <td>Licitação</td>
+                    <td><div class="tbl-user"><div class="tbl-av" aria-hidden="true">CM</div>Carlos M.</div></td>
+                    <td><time datetime="2026-03-18">18/03/2026</time></td>
+                    <td><span class="pill pill--ok">Concluído</span></td>
+                    <td><button class="tbl-action" aria-label="Ver processo LI-2026-0201">Ver</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card__foot">
+            <span class="card__count">312 processos</span>
+            <nav class="pager" aria-label="Paginação">
+              <button class="pg" disabled aria-label="Anterior">‹</button>
+              <button class="pg pg--active" aria-current="page">1</button>
+              <button class="pg" aria-label="Página 2">2</button>
+              <button class="pg" aria-label="Página 3">3</button>
+              <span class="pg-dots">…</span>
+              <button class="pg" aria-label="Página 26">26</button>
+              <button class="pg" aria-label="Próximo">›</button>
+            </nav>
+          </div>
+        </section>
+
+        <!-- Side column -->
+        <div class="side-col">
+
+          <!-- Chart card -->
+          <section class="card" aria-labelledby="chart-title">
+            <div class="card__head">
+              <h2 class="card__title" id="chart-title">Distribuição</h2>
+            </div>
+            <div class="card__body">
+              <div class="donut-wrap">
+                <svg class="donut-svg" viewBox="0 0 100 100" aria-hidden="true">
+                  <circle cx="50" cy="50" r="36" fill="none" stroke="var(--color-border)" stroke-width="10"/>
+                  <circle cx="50" cy="50" r="36" fill="none" stroke="var(--color-primary)" stroke-width="10"
+                    stroke-dasharray="101.6 124.4" stroke-dashoffset="0" transform="rotate(-90 50 50)" class="donut-seg"/>
+                  <circle cx="50" cy="50" r="36" fill="none" stroke="var(--color-secondary)" stroke-width="10"
+                    stroke-dasharray="79.2 146.8" stroke-dashoffset="-101.6" transform="rotate(-90 50 50)" class="donut-seg"/>
+                  <circle cx="50" cy="50" r="36" fill="none" stroke="var(--color-warning)" stroke-width="10"
+                    stroke-dasharray="45.2 180.8" stroke-dashoffset="-180.8" transform="rotate(-90 50 50)" class="donut-seg"/>
+                  <text x="50" y="46" text-anchor="middle" class="donut-val">312</text>
+                  <text x="50" y="57" text-anchor="middle" class="donut-sub">processos</text>
+                </svg>
+                <div class="donut-legend" aria-label="Legenda do gráfico">
+                  <div class="dleg">
+                    <span class="dleg__dot" style="background:var(--color-primary)" aria-hidden="true"></span>
+                    <span>Concluídos</span>
+                    <strong>45%</strong>
+                  </div>
+                  <div class="dleg">
+                    <span class="dleg__dot" style="background:var(--color-secondary)" aria-hidden="true"></span>
+                    <span>Em andamento</span>
+                    <strong>35%</strong>
+                  </div>
+                  <div class="dleg">
+                    <span class="dleg__dot" style="background:var(--color-warning)" aria-hidden="true"></span>
+                    <span>Pendentes</span>
+                    <strong>20%</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Quick actions -->
+          <section class="card" aria-labelledby="qa-title">
+            <div class="card__head">
+              <h2 class="card__title" id="qa-title">Ações Rápidas</h2>
+            </div>
+            <div class="card__body">
+              <div class="q-actions" role="group" aria-label="Ações rápidas">
+                <button class="q-action">
+                  <div class="q-action__ico" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                  </div>
+                  Novo Processo
+                </button>
+                <button class="q-action">
+                  <div class="q-action__ico" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 15V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V15M17 8L12 3L7 8M12 3V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </div>
+                  Exportar Dados
+                </button>
+                <button class="q-action">
+                  <div class="q-action__ico" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 12H15M9 16H12M7 4H4C3.45 4 3 4.45 3 5V19C3 19.55 3.45 20 4 20H20C20.55 20 21 19.55 21 19V5C21 4.45 20.55 4 20 4H17M9 4H15V8H9V4Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </div>
+                  Gerar Relatório
+                </button>
+                <button class="q-action">
+                  <div class="q-action__ico" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M3 21C3 17.69 5.69 15 9 15H11M16 19L18 21L22 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </div>
+                  Novo Usuário
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Typography demo card -->
+          <section class="card" aria-labelledby="typo-title">
+            <div class="card__head">
+              <h2 class="card__title" id="typo-title">Tipografia</h2>
+            </div>
+            <div class="card__body">
+              <div class="typo-demo">
+                <h1>Título H1</h1>
+                <h2>Título H2</h2>
+                <h3>Título H3</h3>
+                <p>Texto de corpo. Usado para descrições e conteúdo geral do sistema.</p>
+                <small>Texto auxiliar — datas, metadados, rodapés.</small>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+
     </main>
   </div>
 
+
+
+
+  <a href="{% url 'modulo_merendeiras:estoque_list_escola' %}" class="sb-item" data-page="estoque" title="Estoque">
+        <span class="sb-item__icon" aria-hidden="true">
+          <!-- Caixa 3D / Estoque de mantimentos -->
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+              stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"
+              stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="12" y1="22.08" x2="12" y2="12"
+              stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="sb-item__label">Estoque Escolar</span>
+      </a>
 
 
 
@@ -1753,22 +1848,13 @@
       <span class="bn-item__ico" aria-hidden="true">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>
       </span>
-      <span class="bn-item__lbl">Painel</span>
+      <span class="bn-item__lbl">Home</span>
     </a>
-
-
-    <a href="{% url 'modulo_merendeiras:estoque_list_escola' %}" class="bn-item" aria-label="Processos" title="Estoque">
+    <a href="#" class="bn-item" aria-label="Processos">
       <span class="bn-item__ico" aria-hidden="true">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
-              stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-            <polyline points="3.27 6.96 12 12.01 20.73 6.96"
-              stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <line x1="12" y1="22.08" x2="12" y2="12"
-              stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 12H15M9 16H12M7 4H4C3.45 4 3 4.45 3 5V19C3 19.55 3.45 20 4 20H20C20.55 20 21 19.55 21 19V5C21 4.45 20.55 4 20 4H17M9 4H15V8H9V4Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </span>
-      <span class="bn-item__lbl">Estoque</span>
+      <span class="bn-item__lbl">Processos</span>
     </a>
     <a href="#" class="bn-item bn-item--fab" aria-label="Nova ação rápida">
       <div class="bn-fab" aria-hidden="true">

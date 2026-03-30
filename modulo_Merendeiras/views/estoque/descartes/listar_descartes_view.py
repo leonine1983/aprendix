@@ -18,6 +18,14 @@ class ListaDescartesView(BaseMerendeiraView, View):
             DescarteEstoqueEscola.objects
             .filter(escola=escola)
             .select_related("produto", "registrado_por")
+            .only(
+                "produto__nome",
+                "quantidade",
+                "motivo",
+                "registrado_por__username",
+                "criado_em",
+                "lote"
+            )
             .order_by("-criado_em")
         )
 

@@ -2,22 +2,59 @@
 
 {% block content %}
 
+<style>
+    .explicacao-box {
+        background: #f8f9fa;
+        border-left: 5px solid #dc3545;
+        padding: 16px;
+        border-radius: 8px;
+    }
+
+    .explicacao-box i {
+        font-size: 1.2rem;
+        margin-right: 6px;
+    }
+
+    .explicacao-box p {
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .explicacao-box strong {
+        color: #dc3545;
+    }
+</style>
+
 <div class="container mt-4">
 
-    <!-- 🧠 Título com ícone (sua diretriz) -->
-    <h2 class="mb-4">
-        🗑️ Registro de Descartes de Produtos
+    <!-- 🧠 Título com ícone -->
+    <h2 class="mb-3">
+        🗑️ Registro de Descartes de Produtos  
     </h2>
+
+    <!-- 🔷 BLOCO EXPLICATIVO INSTITUCIONAL -->
+    <div class="explicacao-box mb-4 shadow-sm">
+        <p>
+            <i class="bi bi-info-circle"></i>
+            Esta tela apresenta todos os <strong>descartes de produtos</strong> realizados na unidade escolar.
+            Produtos descartados são automaticamente <strong>removidos do estoque disponível</strong>, evitando uso indevido na merenda.
+        </p>
+        <p class="mt-2">
+            Utilize estas informações para acompanhamento, auditoria e controle de perdas.
+            Sempre verifique o <strong>lote</strong> e o <strong>motivo do descarte</strong> para garantir rastreabilidade.
+        </p>
+    </div>
 
     {% if descartes %}
 
-    <div class="card shadow-sm">
+    <div class="card shadow-sm border-0">
         <div class="card-body">
 
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
                         <th>Produto</th>
+                        <th>Lote</th>
                         <th>Quantidade</th>
                         <th>Motivo</th>
                         <th>Responsável</th>
@@ -29,6 +66,19 @@
                     {% for d in descartes %}
                     <tr>
                         <td>{{ d.produto.nome }}</td>
+
+                        <td>
+                            {% if d.lote %}
+                                <span class="badge bg-secondary">
+                                    {{ d.lote }}
+                                </span>
+                            {% else %}
+                                <span class="text-muted">
+                                    Não informado
+                                </span>
+                            {% endif %}
+                        </td>
+
                         <td>{{ d.quantidade }}</td>
                         <td>{{ d.get_motivo_display }}</td>
                         <td>{{ d.registrado_por }}</td>
@@ -44,7 +94,7 @@
 
     {% else %}
 
-    <div class="alert alert-info">
+    <div class="alert alert-info shadow-sm">
         Nenhum descarte registrado até o momento.
     </div>
 

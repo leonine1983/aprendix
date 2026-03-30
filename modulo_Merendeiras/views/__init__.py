@@ -16,3 +16,6 @@ from .estoque.descartes.listar_descartes_view import *
 # Movimentação de estoque
 from .movimentacaoEstoque.movimentacaoEstoqueDetailView import *
 from .movimentacaoEstoque.movimentacaoEstoqueListView import *
+
+# cOZINHA
+from .cozinha.painelExecucaoView import PainelExecucaoView

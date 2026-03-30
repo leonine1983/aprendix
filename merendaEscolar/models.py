@@ -887,10 +887,9 @@ def executar_receita(execucao: ExecucaoReceita, usuario: User):
                 produto=ingrediente.produto,
                 quantidade__gt=0
             )
-            .order_by("lote")  # idealmente substituir por data_validade quando você adicionar no modelo
+            .order_by("data_validade", "lote")
         )
 
-        # IMPORTANTE: você ainda não possui data_validade no EstoqueEscola.
         # Recomendo fortemente adicionar esse campo para rastreabilidade sanitária.
 
         for lote in lotes:
@@ -925,3 +924,109 @@ def executar_receita(execucao: ExecucaoReceita, usuario: User):
 
     execucao.status = "EXECUTADA"
     execucao.save()
+
+
+# PARTE DO CARDAPIO
+class Cardapio(models.Model):
+    """
+    Representa o cardápio institucional (mensal ou período).
+    Ex: Fundamental II - Março/2026
+    """
+
+    nome = models.CharField(max_length=150)
+    descricao = models.TextField(blank=True)
+
+    data_inicio = models.DateField()
+    data_fim = models.DateField()
+
+    ativo = models.BooleanField(default=True)
+    gerar_execucao = models.BooleanField(default=True)
+
+    criado_por = models.ForeignKey(User, on_delete=models.PROTECT)
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    def clean(self):
+        if self.data_fim < self.data_inicio:
+            raise ValidationError("Data fim não pode ser menor que data início.")
+        
+    class Meta:
+        indexes = [
+            models.Index(fields=["ativo"]),
+            models.Index(fields=["data_inicio", "data_fim"]),
+        ]
+
+    def __str__(self):
+        return self.nome
+    
+    
+class CardapioSemana(models.Model):
+    """
+    Divide o cardápio em semanas (1ª, 2ª, etc.)
+    """
+
+    cardapio = models.ForeignKey(Cardapio, on_delete=models.CASCADE, related_name="semanas")
+    numero = models.IntegerField()  # 1, 2, 3, 4...
+
+    class Meta:
+        unique_together = ("cardapio", "numero")
+
+    def __str__(self):
+        return f"Semana {self.numero} - {self.cardapio.nome}"
+    
+
+class CardapioDia(models.Model):
+    """
+    Representa o dia da semana dentro da semana do cardápio
+    """
+
+    DIAS_CHOICES = (
+        (1, "Segunda"),
+        (2, "Terça"),
+        (3, "Quarta"),
+        (4, "Quinta"),
+        (5, "Sexta"),
+    )
+
+    semana = models.ForeignKey(CardapioSemana, on_delete=models.CASCADE, related_name="dias")
+    dia_semana = models.IntegerField(choices=DIAS_CHOICES)
+
+    class Meta:
+        unique_together = ("semana", "dia_semana")
+
+    def __str__(self):
+        return f"{self.get_dia_semana_display()} - Semana {self.semana.numero}"
+    
+
+class TipoRefeicao(models.Model):
+    nome = models.CharField(max_length=50, unique=True)    
+
+    def __str__(self):
+        return self.nome
+    
+
+class CardapioItem(models.Model):
+    dia = models.ForeignKey(CardapioDia, on_delete=models.CASCADE, related_name="itens")
+    tipo_refeicao = models.ForeignKey(TipoRefeicao, on_delete=models.PROTECT)
+    receita = models.ForeignKey(Receita, on_delete=models.PROTECT)
+    ordem = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["ordem"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["dia", "tipo_refeicao", "receita"],
+                name="unique_receita_por_dia_refeicao"
+            ),
+            models.UniqueConstraint(
+                fields=["dia", "tipo_refeicao", "ordem"],
+                name="unique_ordem_por_refeicao"
+            )
+        ]
+
+
+class CardapioEscola(models.Model):
+    cardapio = models.ForeignKey(Cardapio, on_delete=models.CASCADE)
+    escola = models.ForeignKey(Escola, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("cardapio", "escola")

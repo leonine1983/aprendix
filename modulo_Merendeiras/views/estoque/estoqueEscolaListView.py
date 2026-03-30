@@ -24,12 +24,16 @@ class EstoqueEscolaListView(BaseMerendeiraView, ListView):
 
         escola = self.get_escola_usuario()
         hoje = timezone.now().date()
-        alerta = hoje + timedelta(days=30)
+        alerta = hoje + timedelta(days=30)       
+
 
         qs = (
             EstoqueEscola.objects
             .select_related("produto")
-            .filter(escola=escola)
+            .filter(
+                escola=escola,
+                quantidade__gt=0  # 🔥 REGRA CRÍTICA
+            )
             .annotate(
                 status_validade=Case(
                     When(data_validade__lt=hoje, then=Value("vencido")),

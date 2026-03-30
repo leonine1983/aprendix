@@ -12,7 +12,7 @@ from ...baseMerendeiraView import BaseMerendeiraView
 
 class DescartarEstoqueView(BaseMerendeiraView, View):
 
-    template_name = "modulo_merendeiras/descartes/lista_descartes.html"
+    template_name = "modulo_merendeiras/descartes/form_descarte.html"
 
     def get(self, request, pk):
         """
@@ -24,6 +24,7 @@ class DescartarEstoqueView(BaseMerendeiraView, View):
             pk=pk,
             escola=self.get_escola_usuario()
         )
+        print(f"estoque da esocl a {estoque}")
 
         return render(request, self.template_name, {
             "estoque": estoque
@@ -97,4 +98,5 @@ class DescartarEstoqueView(BaseMerendeiraView, View):
             "quantidade_valor": quantidade_valor,
             "motivo_valor": motivo_valor,
             "descricao_valor": descricao_valor,
+            
         })

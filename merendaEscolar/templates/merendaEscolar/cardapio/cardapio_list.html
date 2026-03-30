@@ -1,0 +1,15 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+{% block content %}
+<h1>Cardápios</h1>
+
+<a href="{% url 'merendaEscolar:cardapio_create' %}">Novo Cardápio</a>
+
+<ul>
+    {% for c in cardapios %}
+        <li>
+            <a href="{% url 'merendaEscolar:cardapio_detail' c.pk %}">
+                {{ c.nome }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>{% endblock content %}

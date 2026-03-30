@@ -120,6 +120,22 @@ urlpatterns = [
 
     # RELATÓRIOS
      path("estoque/central/relatorios/", RelatorioEstoqueCentralView.as_view(), name="relatorio_estoque_central", ),
+
+      # CARDÁPIO
+    path("cardapios/", CardapioListView.as_view(), name="cardapio_list"),
+    path("cardapios/novo/", CardapioCreateView.as_view(), name="cardapio_create"),
+    path("cardapios/<int:pk>/", CardapioDetailView.as_view(), name="cardapio_detail"),
+    path("cardapios/<int:pk>/editar/", CardapioUpdateView.as_view(), name="cardapio_update"),
+    path("cardapios/<int:pk>/excluir/", CardapioDeleteView.as_view(), name="cardapio_delete"),
+
+    # SEMANAS
+    path("cardapios/<int:cardapio_id>/semanas/nova/", SemanaCreateView.as_view(), name="semana_create"),
+
+    # DIAS
+    path("semanas/<int:semana_id>/dias/novo/", DiaCreateView.as_view(), name="dia_create"),
+
+    # ITENS
+    path("dias/<int:dia_id>/itens/novo/", ItemCreateView.as_view(), name="item_create"),
      
     
 ]

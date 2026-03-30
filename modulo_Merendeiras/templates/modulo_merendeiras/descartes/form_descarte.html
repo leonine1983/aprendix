@@ -1,0 +1,196 @@
+{% extends "modulo_merendeiras/base_merendeira.html" %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- 🔴 HEADER CRÍTICO -->
+    <div class="page-header-critical mb-4">
+        <h1>
+            <i class="bi bi-trash3"></i> Descarte de Produto
+        </h1>
+        <small class="text-muted">
+            Esta ação remove itens do estoque e deve ser realizada com atenção.
+        </small>
+    </div>
+
+    <div class="form-layout">
+
+        <!-- 🧾 CONTEXTO DO PRODUTO -->
+        <div class="context-card">
+
+            <div class="context-card__head">
+                <i class="bi bi-info-circle"></i>
+                Informações do Produto
+            </div>
+
+            <div class="context-card__body">
+
+                <table class="info-table">
+                    <tr>
+                        <td>Produto</td>
+                        <td>{{ estoque.produto.nome }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Lote</td>
+                        <td>
+                            {% if estoque.lote %}
+                                <span class="badge-status badge-status--warn">
+                                    {{ estoque.lote }}
+                                </span>
+                            {% else %}
+                                <span class="text-muted">Não informado</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Disponível</td>
+                        <td>
+                            <span class="info-highlight">
+                                {{ estoque.quantidade }}
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- ⚠️ ALERTA DE IMPACTO -->
+                <div class="impact-alert mt-3">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <div>
+                        O descarte reduz o estoque disponível e será registrado para auditoria.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- 🧠 BLOCO DE ORIENTAÇÃO -->
+<div class="card mb-4">
+
+    <div class="card__head">
+        <div class="card__title">
+            <i class="bi bi-question-circle"></i>
+            Como funciona o descarte?
+        </div>
+    </div>
+
+    <div class="card__body">
+
+        <div class="grid" style="display: grid; gap: 12px;">
+
+            <!-- ✔ Quando usar -->
+            <div class="impact-alert" style="background: var(--color-info-light); border-color: rgba(2,119,189,0.2);">
+                <i class="bi bi-check-circle"></i>
+                <div>
+                    Utilize esta função quando o produto estiver impróprio para consumo, como vencido, contaminado ou com embalagem danificada.
+                </div>
+            </div>
+
+            <!-- ⚠️ O que acontece -->
+            <div class="impact-alert">
+                <i class="bi bi-exclamation-triangle"></i>
+                <div>
+                    Ao confirmar, a quantidade será removida do estoque e registrada no histórico para controle e auditoria.
+                </div>
+            </div>
+
+            <!-- 🔍 Boas práticas -->
+            <div class="impact-alert" style="background: var(--color-primary-light); border-color: rgba(27,107,58,0.2);">
+                <i class="bi bi-lightbulb"></i>
+                <div>
+                    Sempre informe o motivo corretamente. Isso ajuda a identificar perdas e melhorar o controle da merenda escolar.
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+        <!-- 🔴 FORMULÁRIO -->
+        <div class="card">
+
+            <div class="card__head">
+                <div class="card__title">
+                    <i class="bi bi-pencil-square"></i>
+                    Registrar Descarte
+                </div>
+            </div>
+
+            <div class="card__body">
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <!-- Quantidade -->
+                    <div class="form-group mb-3">
+                        <label class="form-label">Quantidade</label>
+                        <input type="number"
+                               step="0.01"
+                               name="quantidade"
+                               class="form-control"
+                               value="{{ quantidade_valor|default:'' }}"
+                               required>
+
+                        <div class="field-feedback text-muted">
+                            Informe a quantidade a ser descartada.
+                        </div>
+                    </div>
+
+                    <!-- Motivo -->
+                    <div class="form-group mb-3">
+                        <label class="form-label">Motivo do descarte</label>
+                        <select name="motivo" class="form-select" required>
+                            <option value="">Selecione...</option>
+                            {% for key, label in estoque.descartes.model.MOTIVO_CHOICES %}
+                                <option value="{{ key }}"
+                                    {% if key == motivo_valor %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <div class="field-feedback text-muted">
+                            Obrigatório para rastreabilidade sanitária.
+                        </div>
+                    </div>
+
+                    <!-- Descrição -->
+                    <div class="form-group mb-4">
+                        <label class="form-label">Descrição complementar</label>
+                        <textarea name="descricao"
+                                  class="form-control"
+                                  rows="3">{{ descricao_valor|default:'' }}</textarea>
+
+                        <div class="field-feedback text-muted">
+                            Opcional, mas recomendado em casos críticos.
+                        </div>
+                    </div>
+
+                    <!-- AÇÕES -->
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <a href="{% url 'modulo_merendeiras:estoque_list_escola' %}"
+                           class="btn btn--outline btn--sm">
+                            ← Voltar
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn--danger-strong btn--md">
+                            <i class="bi bi-trash"></i>
+                            Confirmar Descarte
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

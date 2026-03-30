@@ -66,6 +66,12 @@ urlpatterns = [
         name="movimentacao_estoque_detail"
     ),
 
+    # COZINHA - EXCECUÇAÕ DAS RECEITAS
+    # 🔍 Detalhe da movimentação
+    path("cozinha/movimentacoes/", views.PainelExecucaoView.as_view(), name="cozinha_merenda"
+    ),
+
+
 
 
 
