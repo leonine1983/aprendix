@@ -1,0 +1,61 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+
+<div class="module-card">
+
+    <!-- HEADER -->
+    <div class="module-header">
+        <h2 class="module-title">➕ Vincular Cardápio à Escola</h2>
+        <p class="module-subtitle">
+            Associe um cardápio a uma escola para que ela passe a utilizá-lo no sistema.
+        </p>
+    </div>
+
+    <!-- CONTEXTO / AJUDA -->
+    <div style="padding: 0 32px; margin-top: 16px;">
+        <div class="alert alert-info">
+            <strong>💡 Dica:</strong>
+            Esse vínculo define qual cardápio será aplicado à escola.
+            Certifique-se de selecionar corretamente antes de salvar.
+        </div>
+    </div>
+
+    <!-- BODY -->
+    <div style="padding:28px 32px;">
+
+        <form method="post" class="form-modern">
+            {% csrf_token %}
+
+            <!-- DESCRIÇÃO GUIADA -->
+            <p style="margin-bottom:18px; color:var(--text-muted); font-size:.9rem;">
+                Preencha os campos abaixo. Ambos são obrigatórios:
+                <strong>Cardápio</strong> e <strong>Escola</strong>.
+            </p>
+
+            <div class="form-grid">
+                {{ form.as_p }}
+            </div>
+
+            <!-- AÇÕES -->
+            <div class="form-actions">
+                <button type="submit" class="btn-primary-custom">
+                    ✔ Confirmar vínculo
+                </button>
+
+                <a href="{% url 'merendaEscolar:cardapio_escola_list' %}" class="btn-outline-danger-modern">
+                    Voltar
+                </a>
+            </div>
+
+            <!-- FEEDBACK FINAL -->
+            <p style="margin-top:14px; font-size:.8rem; color:var(--text-muted);">
+                Após salvar, o vínculo será listado automaticamente na tela principal.
+            </p>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+
+<style>
+:root {
+    --bg: #f4f8fb;
+    --card: #ffffff;
+    --border: #e3e8ee;
+    --primary: #2d7ff9;
+    --danger: #e74c3c;
+    --radius: 10px;
+}
+
+.container-box {
+    background: var(--card);
+    padding: 20px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.header h2 {
+    margin: 0;
+}
+
+.actions a {
+    text-decoration: none;
+}
+
+.btn {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.table th,
+.table td {
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+.table th {
+    background: #f9fbfd;
+    font-weight: 600;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 30px;
+    color: #777;
+}
+</style>
+
+<div class="container-box">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div>
+            <h2>📚 Vínculos Cardápio x Escola</h2>
+            <small>Gerencie quais cardápios estão vinculados a cada escola</small>
+        </div>
+
+        <div class="actions">
+            <a href="{% url 'merendaEscolar:cardapio_escola_create' %}" 
+               class="btn btn-primary"
+               title="Criar novo vínculo">
+               + Novo Vínculo
+            </a>
+        </div>
+    </div>
+
+    <!-- TABELA -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Cardápio</th>
+                <th>Escola</th>
+                <th style="width:120px;">Ações</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for v in vinculos %}
+            <tr>
+                <td>{{ v.cardapio }}</td>
+                <td>{{ v.escola }}</td>
+                <td>
+                    <a href="{% url 'merendaEscolar:cardapio_escola_delete' v.id %}" 
+                       class="btn btn-danger"
+                       title="Remover vínculo">
+                       Excluir
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="empty-state">
+                    Nenhum vínculo encontrado.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

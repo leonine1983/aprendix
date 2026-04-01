@@ -152,8 +152,11 @@ urlpatterns = [
     path("item/<int:pk>/deletar/", ItemDeleteView.as_view(), name="item_delete"),
 
     # CARDAPIO ESCOLA
+    path("cardapio-escola/", CardapioEscolaListView.as_view(), name="cardapio_escola_list"),
+    path("cardapio-escola/upload/", CardapioEscolaUploadView.as_view(), name="cardapio_escola_upload"),
     path("cardapio-escola/novo/", CardapioEscolaCreateView.as_view(), name="cardapio_escola_create"),
     path("cardapio-escola/<int:pk>/deletar/", CardapioEscolaDeleteView.as_view(), name="cardapio_escola_delete"),
+
 
      
     

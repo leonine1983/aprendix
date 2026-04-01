@@ -1,4 +1,4 @@
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View
 from django.urls import reverse_lazy
 from django.contrib import messages
 from ...models import (
@@ -309,14 +309,71 @@ class ItemDeleteView(NutricionistaRequiredMixin, DeleteView):
 # CARDAPIO ESCOLA
 # =========================
 
+# =========================
+# CARDAPIO ESCOLA LIST
+# =========================
+class CardapioEscolaListView(NutricionistaRequiredMixin, ListView):
+    model = CardapioEscola
+    template_name = "merendaEscolar/cardapioEscola/cardapio_escola_list.html"
+    context_object_name = "vinculos"
+
+
 class CardapioEscolaCreateView(NutricionistaRequiredMixin, CreateView):
     model = CardapioEscola
     fields = "__all__"
-    success_url = reverse_lazy("merendaEscolar:cardapio_list")
+    success_url = reverse_lazy("merendaEscolar:cardapio_escola_list")
+    template_name = "merendaEscolar/cardapioEscola/cardapio_escola_create.html"
 
     def form_valid(self, form):
+        cardapio = form.cleaned_data["cardapio"]
+        escola = form.cleaned_data["escola"]
+
+        if CardapioEscola.objects.filter(cardapio=cardapio, escola=escola).exists():
+            form.add_error(None, "Esse vínculo já existe.")
+            return self.form_invalid(form)
+
         messages.success(self.request, "Cardápio vinculado à escola!")
         return super().form_valid(form)
+    
+
+import csv
+from django.shortcuts import redirect
+from django.contrib import messages
+
+class CardapioEscolaUploadView(NutricionistaRequiredMixin, View):
+
+    def post(self, request):
+        arquivo = request.FILES.get("arquivo")
+
+        if not arquivo:
+            messages.error(request, "Envie um arquivo CSV.")
+            return redirect("merendaEscolar:cardapio_escola_list")
+
+        decoded = arquivo.read().decode("utf-8").splitlines()
+        reader = csv.DictReader(decoded)
+
+        criados = 0
+        ignorados = 0
+
+        for row in reader:
+            cardapio_id = row.get("cardapio_id")
+            escola_id = row.get("escola_id")
+
+            if not cardapio_id or not escola_id:
+                continue
+
+            obj, created = CardapioEscola.objects.get_or_create(
+                cardapio_id=cardapio_id,
+                escola_id=escola_id
+            )
+
+            if created:
+                criados += 1
+            else:
+                ignorados += 1
+
+        messages.success(request, f"{criados} criados, {ignorados} ignorados.")
+        return redirect("merendaEscolar:cardapio_escola_list")
 
 
 class CardapioEscolaDeleteView(NutricionistaRequiredMixin, DeleteView):
