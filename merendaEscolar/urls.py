@@ -121,21 +121,40 @@ urlpatterns = [
     # RELATÓRIOS
      path("estoque/central/relatorios/", RelatorioEstoqueCentralView.as_view(), name="relatorio_estoque_central", ),
 
-      # CARDÁPIO
+
+     # =========================
+    # CARDÁPIO
+    # =========================
     path("cardapios/", CardapioListView.as_view(), name="cardapio_list"),
-    path("cardapios/novo/", CardapioCreateView.as_view(), name="cardapio_create"),
-    path("cardapios/<int:pk>/", CardapioDetailView.as_view(), name="cardapio_detail"),
-    path("cardapios/<int:pk>/editar/", CardapioUpdateView.as_view(), name="cardapio_update"),
-    path("cardapios/<int:pk>/excluir/", CardapioDeleteView.as_view(), name="cardapio_delete"),
+    path("cardapio/novo/", CardapioCreateView.as_view(), name="cardapio_create"),
+    path("cardapio/<int:pk>/editar/", CardapioUpdateView.as_view(), name="cardapio_update"),
+    path("cardapio/<int:pk>/deletar/", CardapioDeleteView.as_view(), name="cardapio_delete"),
 
-    # SEMANAS
-    path("cardapios/<int:cardapio_id>/semanas/nova/", SemanaCreateView.as_view(), name="semana_create"),
+    # SEMANA
+    path("semana/nova/<int:pk>/", SemanaCreateView.as_view(), name="semana_create"),
+    path("semana/<int:pk>/editar/", SemanaUpdateView.as_view(), name="semana_update"),
+    path("semana/<int:pk>/deletar/", SemanaDeleteView.as_view(), name="semana_delete"),
 
-    # DIAS
-    path("semanas/<int:semana_id>/dias/novo/", DiaCreateView.as_view(), name="dia_create"),
+    # DIA
+    path("dia/novo/<int:pk>/", DiaCreateView.as_view(), name="dia_create"),
+    path("dia/<int:pk>/editar/", DiaUpdateView.as_view(), name="dia_update"),
+    path("dia/<int:pk>/deletar/", DiaDeleteView.as_view(), name="dia_delete"),
 
-    # ITENS
-    path("dias/<int:dia_id>/itens/novo/", ItemCreateView.as_view(), name="item_create"),
+    # TIPO REFEICAO
+    path("tipo-refeicao/", TipoRefeicaoListView.as_view(), name="tipo_refeicao_list"),
+    path("tipo-refeicao/novo/", TipoRefeicaoCreateView.as_view(), name="tipo_refeicao_create"),
+    path("tipo-refeicao/<int:pk>/editar/", TipoRefeicaoUpdateView.as_view(), name="tipo_refeicao_update"),
+    path("tipo-refeicao/<int:pk>/deletar/", TipoRefeicaoDeleteView.as_view(), name="tipo_refeicao_delete"),
+
+    # ITEM
+    path("item/novo/<int:pk>/", ItemCreateView.as_view(), name="item_create"),
+    path("item/<int:pk>/editar/", ItemUpdateView.as_view(), name="item_update"),
+    path("item/<int:pk>/deletar/", ItemDeleteView.as_view(), name="item_delete"),
+
+    # CARDAPIO ESCOLA
+    path("cardapio-escola/novo/", CardapioEscolaCreateView.as_view(), name="cardapio_escola_create"),
+    path("cardapio-escola/<int:pk>/deletar/", CardapioEscolaDeleteView.as_view(), name="cardapio_escola_delete"),
+
      
     
 ]

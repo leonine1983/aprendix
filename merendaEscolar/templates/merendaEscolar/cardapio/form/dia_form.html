@@ -1,7 +1,25 @@
-<h1>Nova Semana</h1>
+{% extends "merendaEscolar/estoque_base.html" %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Salvar</button>
-</form>
+{% block content %}
+
+<div class="container mt-4">
+
+    <h3>Adicionar Dia</h3>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label>Dia da Semana</label>
+            {{ form.dia_semana }}
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            Salvar
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

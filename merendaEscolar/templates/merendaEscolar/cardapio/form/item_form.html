@@ -1,7 +1,257 @@
-<h1>Nova Semana</h1>
+{% extends "merendaEscolar/estoque_base.html" %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Salvar</button>
-</form>
+{% block content %}
+
+<style>
+/* ===== CONTEXTO ===== */
+.context-highlight{
+    background:linear-gradient(135deg,#f0fdf4,#ecfeff);
+    border:1px solid #a7f3d0;
+    padding:16px;
+    border-radius:14px;
+    margin-bottom:20px;
+}
+
+/* ===== SEMANA DESTAQUE (UPGRADE) ===== */
+.semana-highlight{
+    background:linear-gradient(135deg,#eef2ff,#f0f9ff);
+    border:1px solid #c7d2fe;
+    padding:18px;
+    border-radius:14px;
+    margin-bottom:16px;
+}
+
+.semana-badge{
+    display:inline-block;
+    background:#4f46e5;
+    color:#fff;
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:.75rem;
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+/* 🔥 NOME GRANDE */
+.semana-title{
+    font-size:1.6rem;
+    font-weight:800;
+    color:#1e293b;
+    line-height:1.2;
+}
+
+.semana-path{
+    font-size:.8rem;
+    color:#64748b;
+    margin-top:4px;
+}
+
+/* ===== BOTÃO VOLTAR ===== */
+.btn-voltar{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:.85rem;
+    padding:8px 14px;
+    border-radius:10px;
+    background:#f1f5f9;
+    border:1px solid var(--border);
+    text-decoration:none;
+    color:#334155;
+    font-weight:600;
+    transition:.2s;
+}
+
+.btn-voltar:hover{
+    background:#e2e8f0;
+}
+
+/* ===== CAMPOS ===== */
+.field-box{
+    padding:12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#fafafa;
+}
+
+.field-error{
+    border:1px solid #ef4444 !important;
+    background:#fff1f2;
+}
+
+.form-error{
+    font-size:.75rem;
+    color:#dc2626;
+    margin-top:4px;
+}
+
+/* ALERTA */
+.form-alert-error{
+    background:#fef2f2;
+    border:1px solid #fecaca;
+    color:#7f1d1d;
+    padding:14px;
+    border-radius:12px;
+    margin-bottom:20px;
+}
+
+/* BOTÕES INLINE */
+.inline-actions{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+}
+
+.btn-inline{
+    font-size:.75rem;
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid var(--primary);
+    color:var(--primary);
+    text-decoration:none;
+    font-weight:600;
+}
+</style>
+
+<div class="module-card">
+
+    <!-- HEADER -->
+    <div class="module-header">
+
+        <!-- 🔙 VOLTAR -->
+        <a href="{% url 'merendaEscolar:cardapio_list' %}" 
+           class="btn-voltar"
+           title="Voltar para lista de cardápios">
+           ← Voltar
+        </a>
+
+        <h1 class="module-title">Adicionar Item ao Cardápio</h1>
+
+        <p class="module-subtitle">
+            Monte o cardápio do dia de forma organizada e sem duplicações.
+        </p>
+    </div>
+
+    <div class="content">
+
+        <!-- CONTEXTO -->
+        <div class="context-highlight">
+
+            <div class="semana-highlight">
+
+                <div class="semana-badge">
+                    Semana {{ dia.semana.numero }}
+                </div>
+
+                <!-- 🔥 NOME GRANDE -->
+                <div class="semana-title">
+                    Semana {{ dia.semana.numero }}
+                </div>
+
+                <div class="semana-path">
+                    Cardápio → Semana → Dia
+                </div>
+
+            </div>
+
+            <strong>Dia selecionado:</strong><br>
+            {{ dia }}
+
+        </div>
+
+        <!-- FORM -->
+        <div class="form-card">
+
+            <div class="form-header">
+                <div class="form-title">Dados da Refeição</div>
+            </div>
+
+            <form method="post" class="form-body">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                <div class="form-alert-error">
+                    <strong>⚠️ Corrija os erros:</strong>
+                    <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li><b>{{ field.label }}:</b> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <!-- TIPO -->
+                <div class="form-group field-box {% if form.tipo_refeicao.errors %}field-error{% endif %}">
+                    <label><b>Tipo de Refeição</b></label>
+                    {{ form.tipo_refeicao }}
+
+                    <div class="inline-actions">
+                        <a href="{% url 'merendaEscolar:tipo_refeicao_create' %}" class="btn-inline">
+                            + Novo Tipo
+                        </a>
+                    </div>
+
+                    {% for error in form.tipo_refeicao.errors %}
+                        <div class="form-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- RECEITA -->
+                <div class="form-group field-box {% if form.receita.errors %}field-error{% endif %}">
+                    <label><b>Receita</b></label>
+                    {{ form.receita }}
+
+                    <div class="inline-actions">
+                        <a href="{% url 'merendaEscolar:receita_criar' %}" class="btn-inline">
+                            + Nova Receita
+                        </a>
+                    </div>
+
+                    {% for error in form.receita.errors %}
+                        <div class="form-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- ORDEM -->
+                <div class="form-group field-box {% if form.ordem.errors %}field-error{% endif %}">
+                    <label><b>Ordem</b></label>
+                    {{ form.ordem }}
+
+                    {% for error in form.ordem.errors %}
+                        <div class="form-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- AÇÕES -->
+                <div class="form-actions">
+                    <a href="{% url 'merendaEscolar:cardapio_list' %}" class="btn-secondary-custom">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn-primary-custom">
+                        Salvar Item
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    const errorField = document.querySelector(".field-error input, .field-error select");
+    if(errorField){
+        errorField.focus();
+    }
+});
+</script>
+
+{% endblock %}

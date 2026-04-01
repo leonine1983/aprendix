@@ -1,0 +1,251 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+
+
+<style>
+    /* =====================================
+   FORM UI - PADRÃO SISTEMA
+===================================== */
+
+.form-card{
+    max-width:600px;
+    margin:0 auto;
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-sm);
+    overflow:hidden;
+}
+
+/* HEADER */
+.form-header{
+    padding:20px 24px;
+    border-bottom:1px solid var(--border);
+    background:linear-gradient(to right,#f8fafc,#ffffff);
+}
+
+.form-title{
+    font-size:1.1rem;
+    font-weight:700;
+    color:var(--text-main);
+}
+
+.form-subtitle{
+    font-size:.8rem;
+    color:var(--text-muted);
+    margin-top:4px;
+}
+
+.form-body input,
+.form-body select,
+.form-body textarea{
+    width:100%;
+    padding:10px 12px;
+    border-radius:var(--radius-sm);
+    border:1px solid var(--border);
+    background:#fff;
+    font-size:.9rem;
+    transition:.2s;
+}
+
+.form-body input:focus,
+.form-body select:focus,
+.form-body textarea:focus{
+    outline:none;
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(14,165,164,.15);
+}
+/* INFO BOX */
+.info-box{
+    margin-top:15px;
+    background:#eff6ff;
+    border:1px solid #bfdbfe;
+    padding:14px 16px;
+    border-radius:10px;
+    font-size:.85rem;
+    color:#1e3a8a;
+}
+
+.info-box ul{
+    margin-top:6px;
+    padding-left:18px;
+}
+
+/* FORM GROUP */
+.form-group{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-bottom:18px;
+}
+
+.form-group label{
+    font-size:.8rem;
+    font-weight:600;
+}
+
+/* TEXTO DE AJUDA */
+.form-help{
+    font-size:.75rem;
+    color:var(--text-muted);
+}
+
+/* ERRO */
+.form-error{
+    font-size:.75rem;
+    color:#dc2626;
+    margin-top:2px;
+}
+
+/* AÇÕES */
+.form-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:10px;
+}
+/* ALERTA GERAL */
+.form-alert-error{
+    background:#fef2f2;
+    border:1px solid #fecaca;
+    color:#7f1d1d;
+    padding:12px 14px;
+    border-radius:10px;
+    font-size:.85rem;
+    margin-bottom:18px;
+}
+
+.form-alert-error ul{
+    margin-top:6px;
+    padding-left:18px;
+}
+
+/* INPUT COM ERRO */
+.input-error{
+    border-color:#dc2626 !important;
+    background:#fff5f5;
+}
+.field-wrapper input{
+    width:100%;
+}
+
+.field-wrapper.error input{
+    border-color:#dc2626;
+    background:#fff5f5;
+}
+
+.field-wrapper.error input:focus{
+    box-shadow:0 0 0 3px rgba(220,38,38,.15);
+}
+</style>
+<div class="module-card">
+
+    <!-- HEADER PADRÃO -->
+    <div class="module-header">
+        <h1 class="module-title">Adicionar Semana ao Cardápio</h1>
+
+        <p class="module-subtitle">
+            Esta etapa organiza o planejamento alimentar em períodos semanais,
+            permitindo estruturar os dias e refeições de forma padronizada.
+        </p>
+
+        <!-- BLOCO EXPLICATIVO -->
+        <div class="info-box">
+            <strong>Por que esta tela é importante?</strong>
+            <ul>
+                <li>O cardápio é organizado por <b>semanas</b> para facilitar o planejamento escolar</li>
+                <li>Cada semana agrupa os <b>dias da semana (segunda a sexta)</b></li>
+                <li>Dentro de cada dia, você poderá adicionar as <b>refeições</b></li>
+            </ul>
+
+            <strong>Como utilizar:</strong>
+            <ul>
+                <li>Informe o número da semana (ex: 1, 2, 3...)</li>
+                <li>Evite repetir números dentro do mesmo cardápio</li>
+                <li>Após salvar, você poderá adicionar os dias</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <div class="form-card">
+
+            <!-- HEADER DO FORM -->
+            <div class="form-header">
+                <div class="form-title">Cadastro de Semana</div>
+                <div class="form-subtitle">
+                    Defina a posição da semana dentro do cardápio
+                </div>
+            </div>
+
+            <!-- FORM -->
+            <form method="post" class="form-body">
+                {% csrf_token %}
+                {% if form.errors %}
+                    <div class="form-alert-error">
+                        <strong>Corrija os erros abaixo:</strong>
+                        <ul>
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li><b>{{ field.label }}:</b> {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                   <div class="form-group">
+                        <label for="id_numero">
+                            Número da Semana
+                        </label>
+
+                        <small class="form-help">
+                            Exemplo: 1ª semana do cardápio
+                        </small>
+
+                        {% if form.numero.errors %}
+                            <div class="field-wrapper error">
+                                {{ form.numero }}
+                            </div>
+                        {% else %}
+                            <div class="field-wrapper">
+                                {{ form.numero }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in form.numero.errors %}
+                            <div class="form-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                <!-- AÇÕES -->
+                <div class="form-actions">
+
+                    <a href="{% url 'merendaEscolar:cardapio_list' %}" 
+                       class="btn-secondary-custom"
+                       title="Voltar para lista de cardápios">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" 
+                            class="btn-primary-custom"
+                            title="Salvar nova semana no cardápio">
+                        Salvar Semana
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

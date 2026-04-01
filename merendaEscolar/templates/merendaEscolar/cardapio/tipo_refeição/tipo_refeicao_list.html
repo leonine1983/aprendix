@@ -1,0 +1,37 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+
+<h1>Tipos de Refeição</h1>
+
+<a href="{% url 'merendaEscolar:tipo_refeicao_create' %}" class="btn btn-success">
+    + Novo Tipo
+</a>
+
+<hr>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for tipo in object_list %}
+        <tr>
+            <td>{{ tipo.nome }}</td>
+            <td>
+                <a href="{% url 'merendaEscolar:tipo_refeicao_update' tipo.id %}">Editar</a>
+                <a href="{% url 'merendaEscolar:tipo_refeicao_delete' tipo.id %}">Excluir</a>
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="2">Nenhum tipo cadastrado</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'merendaEscolar:cardapio_list' %}">← Voltar</a>
+
+{% endblock %}

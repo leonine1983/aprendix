@@ -1,48 +1,139 @@
-<h1>{{ cardapio.nome }}</h1>
+{% extends "merendaEscolar/estoque_base.html" %}
 
-<a href="{% url 'merendaEscolar:semana_create' cardapio.id %}">
-    + Adicionar Semana
-</a>
+{% block content %}
 
-<hr>
-<h1>{{ cardapio.nome }}</h1>
+<div class="container mt-4">
 
-{% if cardapio.pk %}
-    <a href="{% url 'merendaEscolar:semana_create' cardapio.pk %}">
-        + Adicionar Semana
-    </a>
-{% endif %}
+    <h2>
+        {% if object %}
+            ✏️ Editar Cardápio
+        {% else %}
+            📋 Novo Cardápio
+        {% endif %}
+    </h2>
 
-<hr>
+    <hr>
 
-{% for semana in cardapio.semanas.all %}
-    <h2>Semana {{ semana.numero }}</h2>
+    <!-- DESCRIÇÃO DA TELA -->
+    <div class="alert alert-info">
+        <strong>📌 Sobre esta tela:</strong><br>
+        Aqui você cadastra um <b>cardápio escolar</b>, que representa um período de alimentação
+        (ex: mensal, bimestral ou específico).<br><br>
 
-    <a href="{% url 'merendaEscolar:dia_create' semana.id %}">
-        + Adicionar Dia
-    </a>
-
-    {% for dia in semana.dias.all %}
-        <h3>{{ dia.get_dia_semana_display }}</h3>
-
-        <a href="{% url 'merendaEscolar:item_create' dia.id %}">
-            + Adicionar Item
-        </a>
-
+        <b>Como preencher:</b>
         <ul>
-            {% for item in dia.itens.all %}
-                <li>
-                    {{ item.tipo_refeicao }} - {{ item.receita }}
-                </li>
-            {% empty %}
-                <li><em>Sem itens</em></li>
-            {% endfor %}
+            <li><b>Nome:</b> Identificação do cardápio (ex: "Fundamental II - Março/2026")</li>
+            <li><b>Descrição:</b> Informações adicionais (opcional)</li>
+            <li><b>Data Início / Fim:</b> Período de validade do cardápio</li>
+            <li><b>Ativo:</b> Define se o cardápio está em uso</li>
+            <li><b>Gerar execução automática:</b> Cria automaticamente os registros diários de refeições</li>
         </ul>
 
-    {% empty %}
-        <p>Nenhum dia cadastrado</p>
-    {% endfor %}
+        ⚠️ <b>Atenção:</b> A data final não pode ser menor que a data inicial.
+    </div>
 
-{% empty %}
-    <p>Nenhuma semana cadastrada</p>
-{% endfor %}
+    <!-- MENSAGENS -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+    {% csrf_token %}
+
+    <!-- ERROS GERAIS -->
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            <strong>Erro:</strong>
+            <ul>
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- NOME -->
+    <div class="mb-3">
+        <label class="form-label">Nome</label>
+        {{ form.nome }}
+        
+        {% if form.nome.errors %}
+            <div class="text-danger mt-1">
+                {% for error in form.nome.errors %}
+                    <small>⚠️ {{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- DESCRIÇÃO -->
+    <div class="mb-3">
+        <label class="form-label">Descrição</label>
+        {{ form.descricao }}
+
+        {% if form.descricao.errors %}
+            <div class="text-danger mt-1">
+                {% for error in form.descricao.errors %}
+                    <small>⚠️ {{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- DATAS -->
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Data Início</label>
+            {{ form.data_inicio }}
+
+            {% if form.data_inicio.errors %}
+                <div class="text-danger mt-1">
+                    {% for error in form.data_inicio.errors %}
+                        <small>⚠️ {{ error }}</small><br>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Data Fim</label>
+            {{ form.data_fim }}
+
+            {% if form.data_fim.errors %}
+                <div class="text-danger mt-1">
+                    {% for error in form.data_fim.errors %}
+                        <small>⚠️ {{ error }}</small><br>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- CHECKBOX -->
+    <div class="form-check mb-2">
+        {{ form.ativo }} 
+        <label class="form-check-label">Ativo</label>
+    </div>
+
+    <div class="form-check mb-3">
+        {{ form.gerar_execucao }} 
+        <label class="form-check-label">Gerar execução automática</label>
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        💾 Salvar
+    </button>
+
+    <a href="javascript:history.back()" class="btn btn-secondary">
+        ← Voltar
+    </a>
+
+</form>
+
+</div>
+
+{% endblock %}

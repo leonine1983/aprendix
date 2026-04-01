@@ -1,70 +1,63 @@
-<h1>{{ cardapio.nome }}</h1>
+{% extends "merendaEscolar/estoque_base.html" %}
 
-<p>
-    <strong>Período:</strong> {{ cardapio.data_inicio }} até {{ cardapio.data_fim }}
-</p>
+{% block content %}
 
-<a href="{% url 'merendaEscolar:cardapio_update' cardapio.id %}">Editar</a> |
-<a href="{% url 'merendaEscolar:cardapio_delete' cardapio.id %}">Excluir</a> |
-<a href="{% url 'merendaEscolar:semana_create' cardapio.id %}">
-    + Adicionar Semana
-</a>
+<div class="container mt-4">
 
-<hr>
+    <h1>{{ cardapio.nome }}</h1>
 
-{% for semana in cardapio.semanas.all %}
-    <h2>Semana {{ semana.numero }}</h2>
-
-    <a href="{% url 'merendaEscolar:dia_create' semana.id %}">
-        + Adicionar Dia
+    <a href="{% url 'merendaEscolar:cardapio_update' cardapio.id %}" class="btn btn-warning">
+        Editar
     </a>
 
-    <table border="1" cellpadding="8" cellspacing="0" width="100%">
-        <thead>
-            <tr>
-                <th>Dia</th>
-                <th>Refeições</th>
-            </tr>
-        </thead>
+    <a href="{% url 'merendaEscolar:cardapio_delete' cardapio.id %}" class="btn btn-danger">
+        Excluir
+    </a>
 
-        <tbody>
-            {% for dia in semana.dias.all %}
-                <tr>
-                    <td width="150">
-                        <strong>{{ dia.get_dia_semana_display }}</strong><br>
+    <hr>
 
-                        <a href="{% url 'merendaEscolar:item_create' dia.id %}">
-                            + Item
-                        </a>
-                    </td>
+    <a href="{% url 'merendaEscolar:semana_create' cardapio.id %}" class="btn btn-primary">
+        + Adicionar Semana
+    </a>
 
-                    <td>
-                        {% if dia.itens.all %}
-                            <ul>
-                                {% for item in dia.itens.all %}
-                                    <li>
-                                        <strong>{{ item.tipo_refeicao }}:</strong>
-                                        {{ item.receita }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <em>Sem itens cadastrados</em>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="2">
-                        Nenhum dia cadastrado
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <hr>
 
-    <br>
+    {% for semana in cardapio.semanas.all %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <strong>Semana {{ semana.numero }}</strong>
 
-{% empty %}
-    <p>Nenhuma semana cadastrada.</p>
-{% endfor %}
+                <a href="{% url 'merendaEscolar:semana_delete' semana.id %}" class="btn btn-sm btn-danger float-end">
+                    Excluir
+                </a>
+            </div>
+
+            <div class="card-body">
+
+                <a href="{% url 'merendaEscolar:dia_create' semana.id %}" class="btn btn-sm btn-success mb-2">
+                    + Dia
+                </a>
+
+                <ul>
+                    {% for dia in semana.dias.all %}
+                        <li>
+                            {{ dia.get_dia_semana_display }}
+
+                            <a href="{% url 'merendaEscolar:dia_delete' dia.id %}" class="text-danger">
+                                (Excluir)
+                            </a>
+                        </li>
+                    {% empty %}
+                        <li>Nenhum dia cadastrado</li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+    {% empty %}
+        <p>Nenhuma semana cadastrada.</p>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

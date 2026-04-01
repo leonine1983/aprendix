@@ -1,8 +1,31 @@
-<h1>Excluir Cardápio</h1>
+{% extends "merendaEscolar/estoque_base.html" %}
 
-<p>Tem certeza que deseja excluir "{{ object }}"?</p>
+{% block content %}
 
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Confirmar</button>
-</form>
+<div class="container mt-4">
+
+    <h2>⚠️ Confirmar Exclusão</h2>
+
+    <hr>
+
+    <div class="alert alert-danger">
+        Tem certeza que deseja excluir o cardápio:
+        <strong>{{ object.nome }}</strong>?
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <button type="submit" class="btn btn-danger">
+            🗑️ Sim, excluir
+        </button>
+
+        <a href="javascript:history.back()" class="btn btn-secondary">
+            Cancelar
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}

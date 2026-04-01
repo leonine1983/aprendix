@@ -1,15 +1,311 @@
 {% extends "merendaEscolar/estoque_base.html" %}
 {% block content %}
-<h1>Cardápios</h1>
 
-<a href="{% url 'merendaEscolar:cardapio_create' %}">Novo Cardápio</a>
+<style>
 
-<ul>
-    {% for c in cardapios %}
-        <li>
-            <a href="{% url 'merendaEscolar:cardapio_detail' c.pk %}">
-                {{ c.nome }}
+/* ===== TOPO ===== */
+.top-actions{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+/* 🔥 NOVA ÁREA DE LINKS RÁPIDOS */
+.quick-links{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.btn-quick{
+    font-size:.8rem;
+    padding:8px 12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#f8fafc;
+    text-decoration:none;
+    color:#334155;
+    font-weight:600;
+    transition:.2s;
+}
+
+.btn-quick:hover{
+    background:#e2e8f0;
+}
+
+/* ===== CARDÁPIO ===== */
+.cardapio-box{
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:22px;
+    margin-bottom:22px;
+    background:#fff;
+    box-shadow:var(--shadow-md);
+    transition:.2s;
+}
+
+.cardapio-box:hover{
+    transform:translateY(-2px);
+}
+
+/* HEADER */
+.cardapio-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:18px;
+}
+
+/* ===== SEMANA ===== */
+.semana-box{
+    border-left:4px solid var(--primary);
+    padding-left:16px;
+    margin-top:18px;
+}
+
+/* ===== DIA ===== */
+.dia-box{
+    border-radius:12px;
+    padding:14px;
+    margin-bottom:12px;
+    border:1px solid var(--border);
+    transition:.2s;
+}
+
+/* CORES POR DIA */
+.dia-segunda{ background:#f0fdf4; border-left:4px solid #22c55e; }
+.dia-terca{ background:#eff6ff; border-left:4px solid #3b82f6; }
+.dia-quarta{ background:#fefce8; border-left:4px solid #eab308; }
+.dia-quinta{ background:#fdf4ff; border-left:4px solid #d946ef; }
+.dia-sexta{ background:#fff7ed; border-left:4px solid #f97316; }
+.dia-sabado{ background:#ecfeff; border-left:4px solid #06b6d4; }
+.dia-domingo{ background:#fef2f2; border-left:4px solid #ef4444; }
+
+.dia-box:hover{
+    transform:scale(1.01);
+}
+
+/* HEADER DIA */
+.dia-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+
+/* ===== ITENS ===== */
+.itens-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.item-box{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#fff;
+    border:1px solid var(--border);
+    padding:10px 12px;
+    border-radius:10px;
+    transition:.2s;
+}
+
+.item-box:hover{
+    border-color:var(--primary);
+}
+
+/* BADGE */
+.badge-refeicao{
+    background:var(--primary-soft);
+    color:var(--primary-strong);
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:.75rem;
+    font-weight:600;
+}
+
+/* BOTÕES */
+.btn-add{
+    font-size:.8rem;
+    color:var(--primary);
+    font-weight:600;
+    text-decoration:none;
+}
+
+.btn-add:hover{
+    text-decoration:underline;
+}
+
+.actions-inline{
+    display:flex;
+    gap:8px;
+}
+
+/* TEXTO */
+.text-muted{
+    font-size:.85rem;
+    color:var(--text-muted);
+}
+
+.empty-mini{
+    font-size:.8rem;
+    color:var(--text-muted);
+}
+
+/* INFO */
+.info-box{
+    margin-top:15px;
+    background:#f0f9ff;
+    border:1px solid #bae6fd;
+    padding:14px;
+    border-radius:12px;
+    font-size:.85rem;
+}
+
+</style>
+
+
+<div class="module-card">
+
+    <!-- HEADER -->
+    <div class="module-header">
+        <h1 class="module-title">Gestão de Cardápios</h1>
+
+        <p class="module-subtitle">
+            Visualize e organize o planejamento alimentar escolar de forma clara e eficiente.
+        </p>
+
+        <div class="info-box">
+            💡 <strong>Dica:</strong> Cada cor representa um dia da semana — isso ajuda a identificar rapidamente o planejamento.
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- 🔥 LINKS RÁPIDOS -->
+        <div class="quick-links">
+            <a href="{% url 'merendaEscolar:tipo_refeicao_list' %}" 
+               class="btn-quick"
+               title="Ver tipos de refeição cadastrados">
+               🍽️ Tipos de Refeição
             </a>
-        </li>
-    {% endfor %}
-</ul>{% endblock content %}
+
+            <a href="{% url 'merendaEscolar:receita_lista' %}" 
+               class="btn-quick"
+               title="Ver receitas cadastradas">
+               📋 Receitas
+            </a>
+        </div>
+
+        <!-- AÇÕES -->
+        <div class="top-actions">
+            <span class="text-muted">
+                Gerencie semanas, dias e refeições em poucos cliques
+            </span>
+
+            <a href="{% url 'merendaEscolar:cardapio_create' %}" 
+               class="btn-primary-custom"
+               title="Criar novo cardápio">
+                + Novo Cardápio
+            </a>
+        </div>
+
+        {% for cardapio in object_list %}
+
+        <div class="cardapio-box">
+
+            <!-- HEADER -->
+            <div class="cardapio-header">
+                <div>
+                    <h2>{{ cardapio.nome }}</h2>
+                    <p class="text-muted">{{ cardapio.descricao }}</p>
+                </div>
+
+                <div class="actions-inline">
+                    <a href="{% url 'merendaEscolar:cardapio_update' cardapio.id %}" class="btn-acao">✏️</a>
+                    <a href="{% url 'merendaEscolar:cardapio_delete' cardapio.id %}" class="btn-acao">🗑️</a>
+                    <a href="{% url 'merendaEscolar:semana_create' cardapio.id %}" class="btn-add">+ Semana</a>
+                </div>
+            </div>
+
+            <!-- SEMANAS -->
+            {% for semana in cardapio.semanas.all %}
+            <div class="semana-box">
+
+                <div class="dia-header">
+                    <h3>Semana {{ semana.numero }}</h3>
+
+                    <a href="{% url 'merendaEscolar:dia_create' semana.id %}" class="btn-add">
+                        + Dia
+                    </a>
+                </div>
+
+                <!-- DIAS -->
+                {% for dia in semana.dias.all %}
+                <div class="dia-box 
+                    {% if dia.dia_semana == 1 %}dia-segunda
+                    {% elif dia.dia_semana == 2 %}dia-terca
+                    {% elif dia.dia_semana == 3 %}dia-quarta
+                    {% elif dia.dia_semana == 4 %}dia-quinta
+                    {% elif dia.dia_semana == 5 %}dia-sexta
+                    {% elif dia.dia_semana == 6 %}dia-sabado
+                    {% elif dia.dia_semana == 7 %}dia-domingo
+                    {% endif %}
+                ">
+
+                    <div class="dia-header">
+                        <strong>{{ dia.get_dia_semana_display }}</strong>
+
+                        <div class="actions-inline">
+                            <a href="{% url 'merendaEscolar:dia_update' dia.id %}" class="btn-acao">✏️</a>
+                            <a href="{% url 'merendaEscolar:dia_delete' dia.id %}" class="btn-acao">🗑️</a>
+                            <a href="{% url 'merendaEscolar:item_create' dia.id %}" class="btn-add">
+                                + Item
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- ITENS -->
+                    <div class="itens-list">
+                        {% for item in dia.itens.all %}
+                        <div class="item-box">
+                            <div>
+                                <span class="badge-refeicao">{{ item.tipo_refeicao }}</span>
+                                {{ item.receita }}
+                            </div>
+
+                            <div class="actions-inline">
+                                <a href="{% url 'merendaEscolar:item_update' item.id %}" class="btn-acao">✏️</a>
+                                <a href="{% url 'merendaEscolar:item_delete' item.id %}" class="btn-acao">🗑️</a>
+                            </div>
+                        </div>
+                        {% empty %}
+                            <div class="empty-mini">Nenhuma refeição cadastrada</div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+                {% empty %}
+                    <div class="empty-mini">Nenhum dia cadastrado</div>
+                {% endfor %}
+
+            </div>
+            {% empty %}
+                <div class="empty-mini">Nenhuma semana cadastrada</div>
+            {% endfor %}
+
+        </div>
+
+        {% empty %}
+            <div class="empty-state">
+                Nenhum cardápio cadastrado.<br>
+                Clique em <strong>"Novo Cardápio"</strong> para começar.
+            </div>
+        {% endfor %}
+
+    </div>
+</div>
+
+{% endblock %}
