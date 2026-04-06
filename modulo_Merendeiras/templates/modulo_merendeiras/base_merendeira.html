@@ -1402,7 +1402,7 @@
         <span class="sb-item__icon" aria-hidden="true">
           <img src='{% static "meredeiras/gif_almocando.png" %}' height='30'>
         </span>
-        <span class="sb-item__label">Cardápio do dia</span>
+        <span class="sb-item__label">Cardápio do </span>
         <span class="sb-item__dot" aria-hidden="true"></span>
       </a>
 
@@ -1817,19 +1817,21 @@
   <!-- MOBILE BOTTOM NAV -->
   <nav class="bottom-nav" role="navigation" aria-label="Navegação principal mobile">
 
-    
-    <a href="{% url 'modulo_merendeiras:cardapio_hoje' %}" class="bn-item bn-item--active" aria-current="page">
-      <span class="bn-item__ico" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>
-      </span>
-      <span class="bn-item__lbl">Cardápio do dia</span>
-    </a>
     <a href="#" class="bn-item bn-item--active" aria-current="page">
       <span class="bn-item__ico" aria-hidden="true">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>
       </span>
       <span class="bn-item__lbl">Painel</span>
     </a>
+
+    
+    <a href="{% url 'modulo_merendeiras:cardapio_hoje' %}" class="bn-item bn-item--active" aria-current="page">
+      <span class="bn-item__ico" aria-hidden="true">
+        <img src='{% static "meredeiras/gif_almocando.png" %}' height='25'>
+      </span>
+      <span class="bn-item__lbl">Cardápio do dia</span>
+    </a>
+    
 
 
     <a href="{% url 'modulo_merendeiras:estoque_list_escola' %}" class="bn-item" aria-label="Processos" title="Estoque">
@@ -1845,24 +1847,9 @@
       </span>
       <span class="bn-item__lbl">Estoque</span>
     </a>
-    <a href="#" class="bn-item bn-item--fab" aria-label="Nova ação rápida">
-      <div class="bn-fab" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-      </div>
-    </a>
-    <a href="#" class="bn-item" aria-label="Notificações — 4 não lidas">
-      <span class="bn-item__ico" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3C9.24 3 7 5.24 7 8V13L5 15V16H19V15L17 13V8C17 5.24 14.76 3 12 3ZM12 21C13.1 21 14 20.1 14 19H10C10 20.1 10.9 21 12 21Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-        <span class="bn-badge" aria-hidden="true">4</span>
-      </span>
-      <span class="bn-item__lbl">Alertas</span>
-    </a>
-    <a href="#" class="bn-item" aria-label="Perfil">
-      <span class="bn-item__ico" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20C4 16.69 7.58 14 12 14C16.42 14 20 16.69 20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      </span>
-      <span class="bn-item__lbl">Perfil</span>
-    </a>
+   
+   
+   
   </nav>
 
   <!-- ============================================================
