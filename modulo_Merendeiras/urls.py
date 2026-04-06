@@ -7,7 +7,7 @@ app_name = "modulo_merendeiras"
 
 urlpatterns = [
 
-    path("", views.DashboardMerendeiraView.as_view(), name="dashboard_merendeira"),
+    path("dashboard/", views.DashboardMerendeiraView.as_view(), name="dashboard_merendeira"),
 
     path("estoque/", views.EstoqueEscolaListView.as_view(), name="estoque_lista"),
 
@@ -17,6 +17,10 @@ urlpatterns = [
 
     path("execucoes/", views.ExecucaoListView.as_view(), name="execucao_lista"),
     path("execucoes/<int:pk>/executar/", views.ExecutarReceitaView.as_view(), name="executar_receita"),
+
+    # Cardapio Hoje
+    path("", views.CardapioHojeView.as_view(), name="cardapio_hoje"),
+    path("receita/<int:pk>/", views.ReceitaDetailView.as_view(), name="receita_detail"),
 
 
        # 📦 Transferências recebidas ESCOLA

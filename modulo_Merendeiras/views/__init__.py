@@ -6,6 +6,10 @@ from .transferenciaConferenciaView import *
 from .transferenciasRecebidasListView import *
 from .transferenciaEscolaDetailView import *
 
+# Cardapio Hoje
+from .cardápioHoje.cardapioHojeView import CardapioHojeView
+from .cardápioHoje.receitaDetailView import ReceitaDetailView
+
 # Estoque Escola
 from .estoque.estoqueEscolaListView import *
 

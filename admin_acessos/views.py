@@ -177,7 +177,7 @@ class CreateLoginView(LoginView):
             return reverse_lazy('admin_acessos:starsme')
 
         if perfil == "merendeira":
-            return reverse_lazy('modulo_merendeiras:dashboard_merendeira')
+            return reverse_lazy('modulo_merendeiras:cardapio_hoje')
 
         if perfil == "nutricionista":
             messages.success(self.request, "Você esta acessando como: nutricionista ")

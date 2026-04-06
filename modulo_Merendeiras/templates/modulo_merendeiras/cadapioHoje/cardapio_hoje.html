@@ -1,0 +1,471 @@
+{% extends "modulo_merendeiras/base_merendeira.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  /* ── Cardápio Hoje — extensões do design system ── */
+
+  .meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--r-pill);
+    padding: 5px 14px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text-2);
+    box-shadow: var(--sh-xs);
+  }
+
+  .meta-chip strong {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .meta-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  /* ── Seção de refeição ── */
+  .refeicao-section {
+    margin-bottom: 20px;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--sh-sm);
+    animation: slide-up 0.4s var(--ease) both;
+  }
+
+  .refeicao-section:nth-child(1) { animation-delay: 0.05s; }
+  .refeicao-section:nth-child(2) { animation-delay: 0.10s; }
+  .refeicao-section:nth-child(3) { animation-delay: 0.15s; }
+  .refeicao-section:nth-child(4) { animation-delay: 0.20s; }
+
+  .refeicao-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-mid) 100%);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  .refeicao-header__icon {
+    width: 28px;
+    height: 28px;
+    background: rgba(255,255,255,0.18);
+    border-radius: var(--r-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .refeicao-header__count {
+    margin-left: auto;
+    font-size: 10.5px;
+    font-weight: 700;
+    background: rgba(255,255,255,0.2);
+    padding: 2px 10px;
+    border-radius: var(--r-pill);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Item de receita ── */
+  .receita-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 20px;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border-sub);
+    transition: background var(--t-fast);
+  }
+
+  .receita-item:last-child {
+    border-bottom: none;
+  }
+
+  .receita-item:hover {
+    background: var(--color-surface-2);
+  }
+
+  .receita-item__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--r-md);
+    background: var(--color-primary-light);
+    border: 1px solid rgba(27,107,58,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .receita-item__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .receita-item__nome {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 2px;
+  }
+
+  .receita-item__desc {
+    font-size: 12.5px;
+    color: var(--color-text-3);
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+
+  /* ── Ingredientes (details/summary) ── */
+  .ingredientes-toggle {
+    margin-top: 4px;
+  }
+
+  .ingredientes-toggle summary {
+    list-style: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-primary);
+    padding: 4px 10px;
+    border-radius: var(--r-pill);
+    background: var(--color-primary-light);
+    border: 1px solid rgba(27,107,58,0.15);
+    user-select: none;
+    transition: background var(--t-fast);
+  }
+
+  .ingredientes-toggle summary::-webkit-details-marker { display: none; }
+
+  .ingredientes-toggle summary:hover {
+    background: #d0eada;
+  }
+
+  .ingredientes-toggle summary .toggle-arrow {
+    font-size: 9px;
+    transition: transform var(--t-base);
+  }
+
+  .ingredientes-toggle[open] summary .toggle-arrow {
+    transform: rotate(90deg);
+  }
+
+  .ingredientes-list {
+    margin: 10px 0 4px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ingrediente-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--color-text-2);
+    padding: 5px 10px;
+    border-radius: var(--r-sm);
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border-sub);
+  }
+
+  .ingrediente-row__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-primary-mid);
+    flex-shrink: 0;
+  }
+
+  .ingrediente-row__qtd {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: var(--color-primary-light);
+    padding: 1px 8px;
+    border-radius: var(--r-pill);
+  }
+
+  /* ── Estado vazio ── */
+  .empty-cardapio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 64px 32px;
+    background: var(--color-surface);
+    border: 2px dashed var(--color-border);
+    border-radius: var(--r-xl);
+    animation: slide-up 0.4s var(--ease) both;
+  }
+
+  .empty-cardapio__emoji {
+    font-size: 52px;
+    margin-bottom: 16px;
+    line-height: 1;
+  }
+
+  .empty-cardapio__title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-text);
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+
+  .empty-cardapio__msg {
+    font-size: 13.5px;
+    color: var(--color-text-3);
+    max-width: 360px;
+    line-height: 1.6;
+  }
+
+  /* ── Top bar (título + ação) ── */
+  .section-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .section-top__label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-3);
+  }
+
+  /* ── Rodapé da página ── */
+  .page-footer-note {
+    text-align: center;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--color-text-3);
+    margin-top: 32px;
+    padding-bottom: 8px;
+  }
+
+  @media (max-width: 600px) {
+    .refeicao-header { padding: 10px 14px; }
+    .receita-item    { padding: 12px 14px; gap: 10px; }
+    .meta-bar        { gap: 6px; }
+  }
+
+  @media print {
+    .btn--outline, .ingredientes-toggle summary { display: none; }
+  }
+  .receita-item {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+}
+</style>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  PAGE HEADER                                                   -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="page-hdr">
+  <div>
+    <div class="page-hdr__eyebrow">Merenda Escolar</div>
+    <h1 class="page-hdr__title">Cardápio de Hoje</h1>
+    <p class="page-hdr__desc">
+      {% if escola %}{{ escola.nome }}{% else %}Escola não identificada{% endif %}
+    </p>
+  </div>
+
+  <div class="page-hdr__actions">
+    {% if not sem_cardapio %}
+    <button onclick="window.print()" class="btn btn--outline btn--sm">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 6 2 18 2 18 9"/>
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16
+                 a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+        <rect x="6" y="14" width="12" height="8"/>
+      </svg>
+      Imprimir
+    </button>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  META CHIPS                                                    -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="meta-bar">
+
+  <span class="meta-chip">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+      <line x1="16" y1="2" x2="16" y2="6"/>
+      <line x1="8"  y1="2" x2="8"  y2="6"/>
+      <line x1="3"  y1="10" x2="21" y2="10"/>
+    </svg>
+    <strong>{{ hoje|date:"l, d \d\e F \d\e Y" }}</strong>
+  </span>
+
+  {% if cardapio %}
+  <span class="meta-chip">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12
+               a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+    </svg>
+    <strong>{{ cardapio.nome }}</strong>
+  </span>
+  {% endif %}
+
+  {% if semana %}
+  <span class="meta-chip">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2"/>
+      <line x1="3" y1="10" x2="21" y2="10"/>
+      <line x1="8" y1="2"  x2="8"  y2="6"/>
+      <line x1="16" y1="2" x2="16" y2="6"/>
+    </svg>
+    Semana <strong>{{ semana.numero }}</strong>
+  </span>
+  {% endif %}
+
+  {% if dia %}
+  <span class="meta-chip">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <polyline points="12 6 12 12 16 14"/>
+    </svg>
+    {{ dia.get_dia_semana_display }}
+  </span>
+  {% endif %}
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  ESTADO VAZIO                                                  -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+{% if sem_cardapio %}
+
+  <div class="empty-cardapio">
+    <div class="empty-cardapio__emoji">
+      {% if dia_semana_iso > 5 %}🏖️{% else %}
+       <img src='{% static "meredeiras/gif_almocando.png" %}' height='60'>
+      {% endif %}
+    </div>
+    <div class="empty-cardapio__title">
+      {% if dia_semana_iso > 5 %}
+        Bom descanso!
+      {% else %}
+        Cardápio não disponível
+      {% endif %}
+    </div>
+    <p class="empty-cardapio__msg">{{ motivo }}</p>
+  </div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  CARDÁPIO DO DIA                                               -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+{% else %}
+
+  <div class="section-top">
+    <span class="section-top__label">
+      {{ refeicoes|length }} tipo{{ refeicoes|length|pluralize }} de refeição
+    </span>
+  </div>
+
+  {% for tipo, itens in refeicoes.items %}
+  <section class="refeicao-section">
+
+    <!-- Cabeçalho da refeição -->
+    <div class="refeicao-header">
+      <div class="refeicao-header__icon">🍴</div>
+      {{ tipo }}
+      <span class="refeicao-header__count">
+        {{ itens|length }} receita{{ itens|length|pluralize }}
+      </span>
+    </div>
+
+    <!-- Itens -->
+    {% for item in itens %}
+    <a href="{% url 'modulo_merendeiras:receita_detail' item.receita.id %}" class="receita-item">
+
+      <div class="receita-item__icon">🥘</div>
+
+      <div class="receita-item__body">
+        <div class="receita-item__nome">{{ item.receita.nome }}</div>
+
+        {% if item.receita.descricao %}
+        <div class="receita-item__desc">
+          {{ item.receita.descricao|striptags|truncatechars:140 }}
+        </div>
+        {% endif %}
+
+        {% with ingredientes=item.receita.ingredientes.all %}
+        {% if ingredientes %}
+        <details class="ingredientes-toggle">
+          <summary>
+            <span class="toggle-arrow">▶</span>
+            Ver ingredientes ({{ ingredientes|length }})
+          </summary>
+
+          <div class="ingredientes-list">
+            {% for ing in ingredientes %}
+            <div class="ingrediente-row">
+              <span class="ingrediente-row__dot"></span>
+              <span>{{ ing.produto.nome }}</span>
+              <span class="ingrediente-row__qtd">
+                {{ ing.quantidade|floatformat:"-2" }}
+                {{ ing.produto.unidade_medida.sigla }}
+              </span>
+            </div>
+            {% endfor %}
+          </div>
+        </details>
+        {% endif %}
+        {% endwith %}
+      </div>
+
+    </a>
+    {% endfor %}
+
+  </section>
+  {% endfor %}
+
+{% endif %}
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  RODAPÉ DA PÁGINA                                              -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<p class="page-footer-note">
+  Sistema de Gestão da Merenda Escolar &mdash;
+  Gerado em {{ hoje|date:"d/m/Y" }}
+</p>
+
+{% endblock content %}

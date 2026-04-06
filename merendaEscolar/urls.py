@@ -113,7 +113,7 @@ urlpatterns = [
 
     # RECEITA  
     path("receita/", ReceitaListView.as_view(), name="receita_lista"),
-    path("nova/", ReceitaCreateView.as_view(), name="receita_criar"),
+    path("receitas/nova/", ReceitaCreateView.as_view(), name="receita_criar"),
     path("<int:pk>/", ReceitaDetailView.as_view(), name="receita_detalhe"),
     path("<int:pk>/editar/", ReceitaUpdateView.as_view(), name="receita_editar"),
     path("<int:pk>/excluir/", ReceitaDeleteView.as_view(), name="receita_excluir"),

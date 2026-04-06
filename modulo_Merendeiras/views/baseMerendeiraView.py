@@ -7,13 +7,13 @@ class BaseMerendeiraView(GroupRequiredMixin):
 
     def get_escola_usuario(self):
 
-        user = self.request.user
+        user = self.request.user        
         grupos = user.groups.all()
         perfil = getattr(user, "perfilusuario", None)
         if not perfil:
             return None
 
-        escola = getattr(perfil, "escola", None)
+        escola = getattr(perfil, "escola", None)        
         return escola
 
     def get_context_data(self, **kwargs):
@@ -33,7 +33,7 @@ class BaseMerendeiraView(GroupRequiredMixin):
         )
 
         # 🔥 CONTEXTO PADRÃO
-        ctx["escola_usuario"] = escola
+        ctx["escola_usuario"] = escola  
         ctx["nome_escola"] = nome_escola
         ctx["usuario_nome"] = usuario_nome
 

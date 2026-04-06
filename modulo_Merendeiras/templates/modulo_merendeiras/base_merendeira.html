@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -208,6 +209,60 @@
     }
 
     .sb-logo svg { color: white; }
+
+    /* ===== TIMBRE DO APP ===== */
+.app-stamp{
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  padding:6px 10px;
+  border-radius:8px;
+
+  background: rgba(27,107,58,0.06);
+  border:1px solid rgba(27,107,58,0.12);
+
+  width: fit-content;
+}
+
+.app-stamp__logo{
+  height:32px;
+  width:auto;
+  object-fit:contain;
+}
+
+.app-stamp__text{
+  display:flex;
+  flex-direction:column;
+  line-height:1.2;
+}
+
+.sb-brand-name .plus{
+  color: var(--color-accent);
+  font-weight:800;
+}
+
+/* órgão */
+.app-stamp__org{
+  font-size:10px;
+  font-weight:500;
+  color: var(--color-text-3);
+  letter-spacing:0.04em;
+}
+
+/* nome do app */
+.app-stamp__app{
+  font-size:13px;
+  font-weight:700;
+  color: var(--color-primary);
+  letter-spacing:-0.01em;
+}
+
+/* destaque do + */
+.app-stamp__app .plus{
+  color: var(--color-accent);
+  font-weight:800;
+}
 
     .sb-brand-text {
       display: flex; flex-direction: column;
@@ -537,8 +592,9 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0;
       box-shadow: 0 2px 8px rgba(27,107,58,0.22);
+      text-transform: uppercase;
     }
-    .hdr-user__name { font-size: 13.5px; font-weight: 600; color: var(--color-text); }
+    .hdr-user__name { font-size: 13.5px; font-weight: 600; color: var(--color-text); text-transform: capitalize; }
     .hdr-user__chevron { color: var(--color-text-3); transition: transform var(--t-base); }
     .hdr-user--open .hdr-user__chevron { transform: rotate(180deg); }
 
@@ -1300,6 +1356,9 @@
 }
 
 
+
+
+
   </style>
 </head>
 <body>
@@ -1321,8 +1380,10 @@
         </svg>
       </div>
       <div class="sb-brand-text">
-        <strong class="sb-brand-name">GovLeaf</strong>
-        <span class="sb-brand-sub">Sistema Municipal</span>
+        <span class="sb-brand-name brand-merenda">
+          MerendaFácil<span class="plus">+</span>
+        </span>
+        <span class="sb-brand-sub">Sist. Mun. de Alim. Escolar</span>
       </div>
       <button class="sb-pin" id="sbPinBtn" aria-label="Recolher menu">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -1331,20 +1392,19 @@
       </button>
     </div>
 
-    <!-- Mini user card -->
-    <div class="sb-user" aria-label="Usuário logado — Carlos Mendonça">
-      <div class="sb-user__av" aria-hidden="true">CM</div>
-      <div class="sb-user__info">
-        <div class="sb-user__name">{{ usuario_nome }}</div>
-        <div class="sb-user__role">{{ grupo_principal }}</div>
-      </div>
-      <div class="sb-user__dot" aria-hidden="true"></div>
-    </div>
-
+ 
     <!-- Nav -->
     <nav class="sb-nav" aria-label="Módulos">
 
       <div class="sb-section">Principal</div>
+     
+      <a href="{% url 'modulo_merendeiras:cardapio_hoje' %}" class="sb-item sb-item--active" aria-current="page" title="Dashboard">
+        <span class="sb-item__icon" aria-hidden="true">
+          <img src='{% static "meredeiras/gif_almocando.png" %}' height='30'>
+        </span>
+        <span class="sb-item__label">Cardápio do dia</span>
+        <span class="sb-item__dot" aria-hidden="true"></span>
+      </a>
 
       <a href="#" class="sb-item sb-item--active" aria-current="page" title="Dashboard">
         <span class="sb-item__icon" aria-hidden="true">
@@ -1355,8 +1415,7 @@
             <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
           </svg>
         </span>
-        <span class="sb-item__label">Pàinel</span>
-        <span class="sb-item__dot" aria-hidden="true"></span>
+        <span class="sb-item__label">Painel</span>
       </a>
 
       <!--
@@ -1552,16 +1611,24 @@
             <path d="M2.5 5H17.5M2.5 10H17.5M2.5 15H11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
         </button>
+        <!-- Timbre do App -->
+        <div class="app-stamp">
+          
+          <img src="{% static 'prefeitura.png' %}" alt="Prefeitura" class="app-stamp__logo">
 
-        <div class="hdr-search" role="search">
-          <label for="globalSearch" class="sr-only">Pesquisa global</label>
-          <svg class="hdr-search__ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/>
-            <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
-          <input type="search" id="globalSearch" class="hdr-search__input" placeholder="Pesquisar módulo, usuário, processo…" autocomplete="off" />
-          <kbd class="hdr-search__kbd" aria-hidden="true">⌘K</kbd>
+          <div class="app-stamp__text">
+            <span class="app-stamp__org">
+              Secretaria Municipal da Educação
+            </span>
+
+            <span class="app-stamp__app">
+              MerendaFácil<span class="plus">+</span>
+            </span>
+          </div>
+
         </div>
+        <!-- End Timbre -->
+        
 
       </div>
 
@@ -1688,7 +1755,7 @@
         <!-- User widget -->
         <div class="widget" id="userWidget">
           <button class="hdr-user" id="userToggle" aria-label="Menu do usuário — Carlos Mendonça" aria-haspopup="true" aria-expanded="false" aria-controls="userPanel">
-            <div class="hdr-user__av" aria-hidden="true">CM</div>
+            <div class="hdr-user__av" aria-hidden="true">{{ usuario_nome|slice:":1" }}</div>
             <span class="hdr-user__name">{{ usuario_nome }}</span>
             <svg class="hdr-user__chevron" width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
               <path d="M3 5L6.5 8.5L10 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1749,6 +1816,14 @@
 
   <!-- MOBILE BOTTOM NAV -->
   <nav class="bottom-nav" role="navigation" aria-label="Navegação principal mobile">
+
+    
+    <a href="{% url 'modulo_merendeiras:cardapio_hoje' %}" class="bn-item bn-item--active" aria-current="page">
+      <span class="bn-item__ico" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>
+      </span>
+      <span class="bn-item__lbl">Cardápio do dia</span>
+    </a>
     <a href="#" class="bn-item bn-item--active" aria-current="page">
       <span class="bn-item__ico" aria-hidden="true">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>

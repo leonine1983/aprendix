@@ -6,7 +6,11 @@ from django.contrib import messages
 from core.groups.nutricionista import NUTRICIONISTA_GROUPS
 from core.permissions import GroupRequiredMixin
 
-from ...models import Receita
+
+
+from django.shortcuts import redirect
+from django.forms import inlineformset_factory
+from ...models import Receita, ReceitaIngrediente
 
 
 class ReceitaListView(
@@ -38,6 +42,27 @@ class ReceitaDetailView(
     group_required = NUTRICIONISTA_GROUPS
 
 
+
+
+# ajuste conforme seu projeto
+NUTRICIONISTA_GROUPS = ("Nutricionista", "Admin")
+
+
+# ==============================
+# FORMSET DE INGREDIENTES
+# ==============================
+ReceitaIngredienteFormSet = inlineformset_factory(
+    Receita,
+    ReceitaIngrediente,
+    fields=["produto", "quantidade"],
+    extra=3,              # quantidade inicial de linhas
+    can_delete=True
+)
+
+
+# ==============================
+# CREATE VIEW COMPLETA
+# ==============================
 class ReceitaCreateView(
     LoginRequiredMixin,
     GroupRequiredMixin,
@@ -52,18 +77,61 @@ class ReceitaCreateView(
     permission_required = "merendaEscolar.add_receita"
     group_required = NUTRICIONISTA_GROUPS
 
-    def form_valid(self, form):
-        form.instance.criada_por = self.request.user
-        response = super().form_valid(form)
+    # ==============================
+    # CONTEXTO COM FORMSET
+    # ==============================
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-        messages.success(
-            self.request,
-            "Receita institucional cadastrada com sucesso."
+        if self.request.POST:
+            context["formset"] = ReceitaIngredienteFormSet(
+                self.request.POST
+            )
+        else:
+            context["formset"] = ReceitaIngredienteFormSet()
+
+        return context
+
+    # ==============================
+    # SALVAMENTO COMPLETO
+    # ==============================
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context["formset"]
+
+        # define usuário
+        form.instance.criada_por = self.request.user
+
+        # valida tudo junto
+        if formset.is_valid():
+            self.object = form.save()
+
+            formset.instance = self.object
+            formset.save()
+
+            messages.success(
+                self.request,
+                "Receita institucional cadastrada com sucesso."
+            )
+
+            return redirect(self.success_url)
+
+        # se formset inválido, renderiza novamente
+        return self.render_to_response(
+            self.get_context_data(form=form)
         )
 
-        return response
+    # ==============================
+    # CASO FORM PRINCIPAL DÊ ERRO
+    # ==============================
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            "Erro ao cadastrar receita. Verifique os campos."
+        )
+        return super().form_invalid(form)
 
-
+# Update das Receitas ----------------------------------------------------
 class ReceitaUpdateView(
     LoginRequiredMixin,
     GroupRequiredMixin,
@@ -78,15 +146,59 @@ class ReceitaUpdateView(
     permission_required = "merendaEscolar.change_receita"
     group_required = NUTRICIONISTA_GROUPS
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
+    # ==============================
+    # CONTEXTO COM FORMSET
+    # ==============================
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-        messages.success(
-            self.request,
-            "Receita institucional atualizada com sucesso."
+        if self.request.POST:
+            context["formset"] = ReceitaIngredienteFormSet(
+                self.request.POST,
+                instance=self.object   # 🔥 ESSENCIAL
+            )
+        else:
+            context["formset"] = ReceitaIngredienteFormSet(
+                instance=self.object   # 🔥 CARREGA EXISTENTES
+            )
+
+        return context
+
+    # ==============================
+    # SALVAR TUDO JUNTO
+    # ==============================
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context["formset"]
+
+        if formset.is_valid():
+            self.object = form.save()
+
+            formset.instance = self.object
+            formset.save()
+
+            messages.success(
+                self.request,
+                "Receita institucional atualizada com sucesso."
+            )
+
+            return redirect(self.success_url)
+
+        return self.render_to_response(
+            self.get_context_data(form=form)
         )
 
-        return response
+    # ==============================
+    # ERRO
+    # ==============================
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            "Erro ao atualizar receita. Verifique os campos."
+        )
+        return super().form_invalid(form)
+
+
 
 
 class ReceitaDeleteView(

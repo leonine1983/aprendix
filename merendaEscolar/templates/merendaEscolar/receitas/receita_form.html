@@ -39,6 +39,11 @@
                     </div>
 
                     <form method="post" novalidate>
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
                         {% csrf_token %}
                         {{ form.media }}
 
@@ -138,6 +143,76 @@
                             <div class="form-text mt-1">
                                 Receitas ativas podem ser utilizadas no planejamento semanal.
                                 Desative apenas quando a receita não estiver mais em vigência.
+                            </div>
+                        </fieldset>
+
+                        <!-- BLOCO 4 – INGREDIENTES -->
+                        <fieldset class="mb-4">
+                            <legend class="h6 text-uppercase text-muted mb-3 fw-semibold">
+                                Ingredientes da Receita
+                            </legend>
+
+                            <!-- ESSENCIAL -->
+                            {{ formset.management_form }}
+
+                            <div id="ingredientes-list">
+
+                                {% for f in formset %}
+                                <div class="row mb-3 border rounded p-3 bg-light">
+                                    {% if formset.non_form_errors %}
+                                    <div class="alert alert-danger">
+                                        {{ formset.non_form_errors }}
+                                    </div>
+                                    {% endif %}
+
+                                    <!-- PRODUTO -->
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+                                            Produto
+                                        </label>
+                                        {{ f.produto }}
+
+                                        {% if f.produto.errors %}
+                                            <div class="text-danger small">
+                                                {{ f.produto.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- QUANTIDADE -->
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold">
+                                            Quantidade
+                                        </label>
+                                        {{ f.quantidade }}
+
+                                        {% if f.quantidade.errors %}
+                                            <div class="text-danger small">
+                                                {{ f.quantidade.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- REMOVER -->
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        {% if f.instance.pk %}
+                                            <div class="form-check">
+                                                {{ f.DELETE }}
+                                                <label class="form-check-label small">
+                                                    Remover
+                                                </label>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                </div>
+                                {% endfor %}
+
+                            </div>
+
+                            <div class="form-text">
+                                Adicione todos os insumos necessários para execução da receita.
+                                Esses dados serão utilizados para controle de estoque e planejamento alimentar.
                             </div>
                         </fieldset>
 
