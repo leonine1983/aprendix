@@ -129,6 +129,7 @@ urlpatterns = [
     path("cardapio/novo/", CardapioCreateView.as_view(), name="cardapio_create"),
     path("cardapio/<int:pk>/editar/", CardapioUpdateView.as_view(), name="cardapio_update"),
     path("cardapio/<int:pk>/deletar/", CardapioDeleteView.as_view(), name="cardapio_delete"),
+    path("cardapio/<int:pk>/", CardapioDetailView.as_view(), name="cardapio_detail"),
 
     # SEMANA
     path("semana/nova/<int:pk>/", SemanaCreateView.as_view(), name="semana_create"),

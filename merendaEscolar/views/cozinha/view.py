@@ -72,6 +72,89 @@ class CardapioDeleteView(NutricionistaRequiredMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "Cardápio removido com sucesso!")
         return super().delete(request, *args, **kwargs)
+    
+
+# ─────────────────────────────────────────────
+#  VIEW  ·  CardapioDetailView
+#  Arquivo: merendaEscolar/views.py  (trecho)
+# ─────────────────────────────────────────────
+
+from django.views.generic import DetailView
+from django.utils import timezone
+from ...models import Cardapio, CardapioSemana, CardapioDia, CardapioItem
+
+
+class CardapioDetailView(NutricionistaRequiredMixin, DetailView):
+    """
+    Exibe o detalhamento completo de um cardápio institucional.
+
+    Contexto extra injetado:
+    - dia_atual  : número do dia da semana (1=Seg … 5=Sex) para destacar "Hoje"
+    - total_semanas  : quantidade de semanas do cardápio
+    - total_dias     : total de dias cadastrados (todas as semanas)
+    - total_refeicoes: total de itens cadastrados (todas as semanas/dias)
+    """
+
+    model = Cardapio
+    template_name = "merendaEscolar/cardapio/cardapio_detail.html"
+    context_object_name = "cardapio"
+
+    def get_queryset(self):
+        """
+        Prefetch encadeado para evitar N+1 queries:
+        cardapio → semanas → dias → itens (tipo_refeicao + receita)
+        """
+        from django.db.models import Prefetch
+       
+        return (
+            Cardapio.objects
+            .prefetch_related(
+                Prefetch(
+                    "semanas",
+                    queryset=CardapioSemana.objects.order_by("numero").prefetch_related(
+                        Prefetch(
+                            "dias",
+                            queryset=CardapioDia.objects.order_by("dia_semana").prefetch_related(
+                                Prefetch(
+                                    "itens",
+                                    queryset=CardapioItem.objects
+                                    .select_related("tipo_refeicao", "receita")
+                                    .order_by("ordem"),
+                                )
+                            ),
+                        )
+                    ),
+                )
+            )
+        )
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        cardapio = self.object
+
+        # Dia atual (1=Seg, 7=Dom) para marcar "Hoje" no template
+        hoje = timezone.now().isoweekday()          # 1=Seg … 7=Dom
+        ctx["dia_atual"] = hoje if hoje <= 5 else None   # só úteis
+
+        # Estatísticas do cardápio
+        semanas = list(cardapio.semanas.all())
+        ctx["total_semanas"] = len(semanas)
+
+        total_dias = 0
+        total_refeicoes = 0
+        for semana in semanas:
+            dias = list(semana.dias.all())
+            total_dias += len(dias)
+            for dia in dias:
+                total_refeicoes += len(list(dia.itens.all()))
+
+        ctx["total_dias"] = total_dias
+        ctx["total_refeicoes"] = total_refeicoes
+
+        return ctx
+
+    
+
 
 
 # =========================
@@ -205,19 +288,59 @@ class TipoRefeicaoUpdateView(NutricionistaRequiredMixin, UpdateView):
     model = TipoRefeicao
     fields = "__all__"
     success_url = reverse_lazy("merendaEscolar:tipo_refeicao_list")
+    template_name = "merendaEscolar/cardapio/tipo_refeição/tipo_refeicao_form.html"
 
     def form_valid(self, form):
         messages.success(self.request, "Tipo atualizado!")
         return super().form_valid(form)
 
 
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
+
 class TipoRefeicaoDeleteView(NutricionistaRequiredMixin, DeleteView):
     model = TipoRefeicao
     success_url = reverse_lazy("merendaEscolar:tipo_refeicao_list")
+    template_name = "merendaEscolar/cardapio/tipo_refeição/tiporefeicao_confirm_delete.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        obj = self.get_object()
+        
+        # Verificar vínculos existentes com URLs
+        vinculos = []
+        
+        # Verifica vínculos com CardapioItem
+        itens_cardapio = obj.cardapioitem_set.select_related(
+            'dia__semana__cardapio', 'receita'
+        ).all()
+        
+        if itens_cardapio.exists():
+            detalhes = []
+            for item in itens_cardapio[:5]:  # Pega os 5 primeiros
+                detalhes.append({
+                    'objeto': item,
+                    'texto': f"{item.receita.nome} - {item.dia.get_dia_semana_display()}",
+                    'url': reverse('merendaEscolar:cardapio_detail', 
+                                 kwargs={'pk': item.dia.semana.cardapio.pk})
+                })
+            
+            vinculos.append({
+                'tipo': 'Itens de Cardápio',
+                'quantidade': itens_cardapio.count(),
+                'detalhes': detalhes,
+                'listagem_url': reverse('merendaEscolar:cardapio_list'),
+                'icone': '📅'
+            })
+        
+        context['tem_vinculos'] = len(vinculos) > 0
+        context['vinculos'] = vinculos
+        return context
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "Tipo removido!")
         return super().delete(request, *args, **kwargs)
+
 
 
 # =========================

@@ -4,22 +4,68 @@
 {% block content %}
 <div class="container py-4">
 
-    <h1 class="h4 text-danger">Confirma exclusão?</h1>
+    <h1 class="h4 text-danger">
+        <i class="bi bi-exclamation-triangle"></i>
+        Confirma exclusão?
+    </h1>
 
     <p>
-        Você está prestes a excluir a receita:
+        Receita:
         <strong>{{ object.nome }}</strong>
     </p>
 
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">
-            Confirmar Exclusão
-        </button>
-        <a href="{% url 'merendaEscolar:receita_lista' %}" class="btn btn-secondary">
-            Cancelar
+    {% if possui_vinculo %}
+
+        <div class="alert alert-warning mt-4">
+            <h5 class="mb-3">
+                <i class="bi bi-lock"></i>
+                Exclusão bloqueada
+            </h5>
+
+            <p>
+                Esta receita possui vínculos institucionais e não pode ser removida.
+            </p>
+
+            <ul class="list-group mt-3">
+                {% for item in bloqueios %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ item.tipo }}</strong><br>
+                            <small>{{ item.descricao }}</small>
+                        </div>
+
+                        
+
+                        {% if item.url != "#" %}
+                            <a href="{{ item.url }}" class="btn btn-sm btn-outline-primary">
+                                Ver registro
+                            </a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <a href="{% url 'merendaEscolar:receita_lista' %}" class="btn btn-secondary mt-3">
+            Voltar
         </a>
-    </form>
+
+    {% else %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i>
+                Confirmar Exclusão
+            </button>
+
+            <a href="{% url 'merendaEscolar:receita_lista' %}" class="btn btn-secondary">
+                Cancelar
+            </a>
+        </form>
+
+    {% endif %}
 
 </div>
 {% endblock %}

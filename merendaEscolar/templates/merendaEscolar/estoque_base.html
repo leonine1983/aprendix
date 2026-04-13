@@ -776,6 +776,120 @@ body{
 .coruja-assistente:hover{
     transform: scale(1.05);
 }
+/* RODAPÉ TÉCNICO - MAIN FOOTER */
+.main-footer{
+    margin-top: auto;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    padding: 20px 35px;
+    box-shadow: 0 -4px 20px rgba(15,23,42,0.03);
+}
+
+.footer-content{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.footer-info{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.footer-label{
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.footer-info strong{
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.footer-separator{
+    color: var(--border);
+    font-weight: 300;
+}
+
+.footer-link{
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.footer-link:hover{
+    color: var(--primary-strong);
+    text-decoration: underline;
+}
+
+.footer-contacts{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.footer-contact-item{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.footer-contact-item:hover{
+    color: var(--primary);
+}
+
+.footer-contact-item i{
+    font-size: 0.9rem;
+}
+
+.footer-copyright{
+    text-align: center;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+/* Responsivo */
+@media(max-width: 768px){
+    .footer-content{
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    
+    .footer-info{
+        justify-content: center;
+    }
+    
+    .footer-contacts{
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+/* Destaque visual opcional para o Instagram */
+.footer-contact-item.instagram-item:hover{
+    color: #E1306C; /* Cor oficial do Instagram */
+    transform: scale(1.1);
+}
+
+.footer-contact-item.instagram-item i{
+    font-size: 1rem; /* Ícone do Instagram um pouco maior */
+}
+
 
 </style>
 </head>
@@ -1029,6 +1143,42 @@ body{
         {% block content %}
         {% endblock content %}
     </section>
+
+    <!--Rodape-->
+        <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <span class="footer-label">Sistema desenvolvido por</span>
+                <strong>Rogerio Cerqueira da Silva</strong>
+                <span class="footer-separator">|</span>
+                <a href="https://www.cauans-solutions.icu" target="_blank" class="footer-link">
+                    Cauans Solutions
+                </a>
+            </div>
+            
+            <div class="footer-contacts">
+                <a href="mailto:rogerleonino@gmail.com" class="footer-contact-item" title="E-mail">
+                    <i class="fas fa-envelope"></i>
+                    <span>rogerleonino@gmail.com</span>
+                </a>
+                <a href="tel:+5571986881943" class="footer-contact-item" title="Suporte Técnico">
+                    <i class="fas fa-phone-alt"></i>
+                    <span>(71) 9 8688-1943</span>
+                </a>
+                <a href="https://linkedin.com/in/rogeriosilva-dev" target="_blank" class="footer-contact-item" title="LinkedIn Profissional">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <!-- Instagram adicionado aqui -->
+                <a href="https://instagram.com/rogerio_silva1983" target="_blank" class="footer-contact-item instagram-item" title="Instagram @rogerio_silva1983">
+                    <i class="fab fa-instagram"></i>
+                </a>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <small>&copy; {% now "Y" %} Prefeitura Municipal de Vera Cruz/BA. Todos os direitos reservados.</small>
+        </div>
+    </footer>
+
 
 </div>
 

@@ -10,7 +10,7 @@ from core.permissions import GroupRequiredMixin
 
 from django.shortcuts import redirect
 from django.forms import inlineformset_factory
-from ...models import Receita, ReceitaIngrediente
+from ...models import Receita, ReceitaIngrediente, CardapioItem, ExecucaoReceita
 
 
 class ReceitaListView(
@@ -132,6 +132,11 @@ class ReceitaCreateView(
         return super().form_invalid(form)
 
 # Update das Receitas ----------------------------------------------------
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.db import transaction
+
 class ReceitaUpdateView(
     LoginRequiredMixin,
     GroupRequiredMixin,
@@ -147,6 +152,13 @@ class ReceitaUpdateView(
     group_required = NUTRICIONISTA_GROUPS
 
     # ==============================
+    # GARANTE OBJECT NO POST
+    # ==============================
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().post(request, *args, **kwargs)
+
+    # ==============================
     # CONTEXTO COM FORMSET
     # ==============================
     def get_context_data(self, **kwargs):
@@ -155,51 +167,58 @@ class ReceitaUpdateView(
         if self.request.POST:
             context["formset"] = ReceitaIngredienteFormSet(
                 self.request.POST,
-                instance=self.object   # 🔥 ESSENCIAL
+                instance=self.object
             )
         else:
             context["formset"] = ReceitaIngredienteFormSet(
-                instance=self.object   # 🔥 CARREGA EXISTENTES
+                instance=self.object
             )
 
         return context
 
     # ==============================
-    # SALVAR TUDO JUNTO
+    # VALIDAÇÃO GLOBAL (FORM + FORMSET)
     # ==============================
     def form_valid(self, form):
         context = self.get_context_data()
         formset = context["formset"]
 
-        if formset.is_valid():
+        if not formset.is_valid():
+            return self.form_invalid(form)
+
+        with transaction.atomic():
+            # salva receita
             self.object = form.save()
 
+            # vincula corretamente o formset
             formset.instance = self.object
             formset.save()
 
-            messages.success(
-                self.request,
-                "Receita institucional atualizada com sucesso."
-            )
-
-            return redirect(self.success_url)
-
-        return self.render_to_response(
-            self.get_context_data(form=form)
+        messages.success(
+            self.request,
+            "Receita institucional atualizada com sucesso."
         )
 
+        return redirect(self.success_url)
+
     # ==============================
-    # ERRO
+    # TRATAMENTO DE ERRO
     # ==============================
     def form_invalid(self, form):
         messages.error(
             self.request,
-            "Erro ao atualizar receita. Verifique os campos."
+            "Erro ao atualizar receita. Corrija os campos destacados."
         )
-        return super().form_invalid(form)
+        return self.render_to_response(
+            self.get_context_data(form=form)
+        )
 
 
 
+
+# DELETAR RECEITA --------------------   
+
+from django.urls import reverse
 
 class ReceitaDeleteView(
     LoginRequiredMixin,
@@ -213,6 +232,39 @@ class ReceitaDeleteView(
 
     permission_required = "merendaEscolar.delete_receita"
     group_required = NUTRICIONISTA_GROUPS
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        receita = self.object
+        bloqueios = []
+
+        # 🔒 1. Execução de receita (uso real)
+        execucoes = ExecucaoReceita.objects.filter(receita=receita)
+
+        if execucoes.exists():
+            for execucao in execucoes:
+                bloqueios.append({
+                    "tipo": "Execução de Receita",
+                    "descricao": f"Execução na escola {execucao.escola}",
+                    "url": "#",  # você pode criar uma rota futura
+                })
+
+        # 🔒 2. Cardápio (planejamento institucional)
+        itens_cardapio = CardapioItem.objects.filter(receita=receita)
+
+        if itens_cardapio.exists():
+            for item in itens_cardapio.select_related("dia__semana__cardapio"):
+                bloqueios.append({
+                    "tipo": "Cardápio Escolar",
+                    "descricao": f"{item.dia.semana.cardapio.nome} - {item.dia.get_dia_semana_display()}",
+                    "url": reverse("merendaEscolar:cardapio_detail", args=[item.dia.semana.cardapio.id])
+                })
+
+        context["bloqueios"] = bloqueios
+        context["possui_vinculo"] = len(bloqueios) > 0
+
+        return context
 
     def form_valid(self, form):
         messages.success(

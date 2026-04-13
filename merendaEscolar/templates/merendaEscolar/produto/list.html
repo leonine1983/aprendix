@@ -90,6 +90,7 @@
     border-radius: 16px;
     box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
     overflow: hidden;
+    margin-bottom: 1.5rem;
 }
 
 /* ====== Cabeçalho ====== */
@@ -161,6 +162,94 @@
     color: #64748b;
 }
 
+/* ====== PAGINADOR MODERNO ====== */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.pagination-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0 0.75rem;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(.disabled):not(.active) {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.pagination-btn.active {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border-color: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    font-weight: 600;
+}
+
+.pagination-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #94a3b8;
+}
+
+.pagination-btn.prev-next {
+    font-weight: 600;
+    padding: 0 1rem;
+}
+
+.pagination-info {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: 0 1rem;
+    font-weight: 500;
+}
+
+.pagination-ellipsis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    color: #94a3b8;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
 /* ====== Responsividade ====== */
 @media (max-width: 768px) {
 
@@ -185,6 +274,22 @@
         content: attr(data-label);
         font-weight: 600;
         color: #475569;
+    }
+    
+    .pagination-container {
+        padding: 1rem;
+    }
+    
+    .pagination-btn {
+        min-width: 2rem;
+        height: 2rem;
+        font-size: 0.85rem;
+        padding: 0 0.5rem;
+    }
+    
+    .pagination-info {
+        font-size: 0.8rem;
+        margin: 0 0.5rem;
     }
 }
 
@@ -288,5 +393,91 @@
         </tbody>
     </table>
 </div>
+
+{% if page_obj %}
+<div class="pagination-container">
+    <nav aria-label="Navegação de páginas">
+        <ul class="pagination-nav">
+            {% if page_obj.has_previous %}
+                <li>
+                    <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}page=1" 
+                       class="pagination-btn prev-next" 
+                       title="Primeira página">
+                        <i class="bi bi-chevron-double-left"></i> << 
+                    </a>
+                </li>
+                <li>
+                    <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}page={{ page_obj.previous_page_number }}" 
+                       class="pagination-btn prev-next" 
+                       title="Página anterior">
+                        <i class="bi bi-chevron-left"></i> <
+                    </a>
+                </li>
+            {% else %}
+                <li>
+                    <span class="pagination-btn prev-next disabled">
+                        <i class="bi bi-chevron-double-left"></i> <<
+                    </span>
+                </li>
+                <li>
+                    <span class="pagination-btn prev-next disabled">
+                        <i class="bi bi-chevron-left"></i> <
+                    </span>
+                </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <li>
+                        <span class="pagination-btn active">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li>
+                        <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}page={{ num }}" 
+                           class="pagination-btn">{{ num }}</a>
+                    </li>
+                {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
+                    <li>
+                        <span class="pagination-ellipsis">...</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li>
+                    <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}page={{ page_obj.next_page_number }}" 
+                       class="pagination-btn prev-next" 
+                       title="Próxima página">
+                        > <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}page={{ page_obj.paginator.num_pages }}" 
+                       class="pagination-btn prev-next" 
+                       title="Última página">
+                        >> <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+            {% else %}
+                <li>
+                    <span class="pagination-btn prev-next disabled">
+                        > <i class="bi bi-chevron-right"></i>
+                    </span>
+                </li>
+                <li>
+                    <span class="pagination-btn prev-next disabled">
+                        >> <i class="bi bi-chevron-double-right"></i>
+                    </span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    
+    <div class="pagination-info">
+        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }} 
+        <span class="d-none d-md-inline">({{ page_obj.paginator.count }} registros)</span>
+    </div>
+</div>
+{% endif %}
 
 {% endblock %}

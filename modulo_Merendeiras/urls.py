@@ -77,6 +77,41 @@ urlpatterns = [
 
 
 
+    # Executar o cardapio
+      # Execução do Cardápio do Dia
+    path(
+        "cardapio/hoje/cozinha",
+        views.CardapioHojeView.as_view(),
+        name="cardapio_hoje"
+    ),
+    path(
+        "cardapio/executar/",
+        views.PrepararExecucaoView.as_view(),
+        name="preparar_execucao"
+    ),
+    path(
+        "cardapio/execucao/<int:pk>/",
+        views.ExecucaoCardapioDetailView.as_view(),
+        name="execucao_detalhe"
+    ),
+    path(
+        "cardapio/execucao/<int:pk>/finalizar/",
+        views.FinalizarExecucaoView.as_view(),
+        name="finalizar_execucao"
+    ),
+    path(
+        "cardapio/execucao/<int:execucao_pk>/item/<int:item_pk>/cancelar/",
+        views.CancelarReceitaView.as_view(),
+        name="cancelar_receita"
+    ),
+    path(
+        "cardapio/historico/",
+        views.HistoricoExecucoesView.as_view(),
+        name="historico_execucoes"
+    ),
+
+
+
 
 
 ]

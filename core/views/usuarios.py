@@ -78,6 +78,8 @@ class UsuarioListView(GroupRequiredMixin, ListView):
 
         context = super().get_context_data(**kwargs)
         context["q"] = self.request.GET.get("q", "")
+        context['is_admin'] = self.request.user.groups.filter(name='Admin').exists()
+        
 
         return context
 
@@ -89,6 +91,9 @@ class UsuarioListView(GroupRequiredMixin, ListView):
         )
 
         return super().get(request, *args, **kwargs)
+    
+   
+
 
 
 class UsuarioForm(forms.ModelForm):

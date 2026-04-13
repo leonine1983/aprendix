@@ -1,63 +1,737 @@
 {% extends "merendaEscolar/estoque_base.html" %}
-
 {% block content %}
 
-<div class="container mt-4">
+<!-- ═══════════════════════════════════════════════════
+     CARDÁPIO DETAIL — mesmo design system do list
+════════════════════════════════════════════════════ -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 
-    <h1>{{ cardapio.nome }}</h1>
+  /* ── Design tokens (idênticos ao list) ── */
+  :root {
+    --gc-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --gc-mono: 'DM Mono', monospace;
 
-    <a href="{% url 'merendaEscolar:cardapio_update' cardapio.id %}" class="btn btn-warning">
-        Editar
+    --s1-bg: #f0fdf4; --s1-border: #86efac; --s1-accent: #16a34a; --s1-text: #14532d;
+    --s2-bg: #eff6ff; --s2-border: #93c5fd; --s2-accent: #2563eb; --s2-text: #1e3a8a;
+    --s3-bg: #fff7ed; --s3-border: #fdba74; --s3-accent: #ea580c; --s3-text: #7c2d12;
+    --s4-bg: #fdf4ff; --s4-border: #e9d5ff; --s4-accent: #9333ea; --s4-text: #581c87;
+
+    --d1-bg: #f0fdf4; --d1-dot: #22c55e;
+    --d2-bg: #eff6ff; --d2-dot: #3b82f6;
+    --d3-bg: #fefce8; --d3-dot: #eab308;
+    --d4-bg: #fdf4ff; --d4-dot: #a855f7;
+    --d5-bg: #fff7ed; --d5-dot: #f97316;
+
+    --gc-surface:   #ffffff;
+    --gc-surface-2: #f8fafc;
+    --gc-surface-3: #f1f5f9;
+    --gc-border:       #e2e8f0;
+    --gc-border-hover: #cbd5e1;
+
+    --gc-text:   #0f172a;
+    --gc-text-2: #334155;
+    --gc-text-3: #64748b;
+    --gc-text-4: #94a3b8;
+
+    --gc-primary:       #16a34a;
+    --gc-primary-hover: #15803d;
+    --gc-primary-light: #f0fdf4;
+    --gc-primary-mid:   #bbf7d0;
+    --gc-shadow-primary: 0 4px 14px rgba(22,163,74,0.25);
+
+    --gc-sh-xs: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+    --gc-sh-sm: 0 4px 12px rgba(15,23,42,0.08), 0 1px 3px rgba(15,23,42,0.05);
+    --gc-sh-md: 0 12px 32px rgba(15,23,42,0.12), 0 4px 12px rgba(15,23,42,0.06);
+
+    --gc-r-xs:   8px;  --gc-r-sm: 12px; --gc-r-md: 16px;
+    --gc-r-lg:  20px;  --gc-r-xl: 24px; --gc-r-pill: 999px;
+    --gc-t: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .gcd * { font-family: var(--gc-font); box-sizing: border-box; }
+
+  /* ══ WRAPPER ══ */
+  .gcd-wrapper {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 24px 32px 60px;
+  }
+  @media (max-width: 640px) { .gcd-wrapper { padding: 16px 12px 40px; } }
+
+  /* ══ BOTÕES (reutilizados do list) ══ */
+  .gc-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px; font-family: var(--gc-font); font-size: 13px; font-weight: 600;
+    padding: 10px 18px; border-radius: var(--gc-r-sm); border: 1px solid transparent;
+    cursor: pointer; text-decoration: none; white-space: nowrap;
+    transition: all var(--gc-t); line-height: 1; min-height: 40px;
+  }
+  .gc-btn--primary { background: var(--gc-primary); color:#fff; box-shadow: var(--gc-shadow-primary); }
+  .gc-btn--primary:hover { background: var(--gc-primary-hover); transform: translateY(-1px); color:#fff; text-decoration:none; }
+  .gc-btn--secondary { background: var(--gc-surface); color: var(--gc-text-2); border-color: var(--gc-border); }
+  .gc-btn--secondary:hover { background: var(--gc-surface-2); border-color: var(--gc-border-hover); color: var(--gc-text); text-decoration:none; }
+  .gc-btn--ghost { background:transparent; color: var(--gc-text-3); border-color: var(--gc-border); }
+  .gc-btn--ghost:hover { background: var(--gc-primary-light); color: var(--gc-primary); border-color: var(--gc-primary-mid); text-decoration:none; }
+  .gc-btn--danger { background: var(--gc-surface); color: #dc2626; border-color: var(--gc-border); }
+  .gc-btn--danger:hover { background: #fef2f2; border-color: #fecaca; color:#b91c1c; text-decoration:none; }
+  .gc-btn--icon { width:36px; height:36px; min-height:36px; padding:0; background: var(--gc-surface); color: var(--gc-text-3); border-color: var(--gc-border); border-radius: var(--gc-r-xs); flex-shrink:0; }
+  .gc-btn--icon:hover { background: var(--gc-surface-2); color: var(--gc-text); border-color: var(--gc-border-hover); text-decoration:none; transform:scale(1.05); }
+  .gc-btn--icon.gc-btn--danger:hover { background:#fef2f2; color:#dc2626; border-color:#fecaca; }
+  .gc-btn--sm { font-size:12px; padding:8px 14px; min-height:36px; }
+  .gc-btn--xs { font-size:11px; padding:6px 12px; min-height:32px; }
+  .gc-ico { display:block; flex-shrink:0; }
+
+  /* ══ BREADCRUMB ══ */
+  .gcd-breadcrumb {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--gc-text-3);
+    margin-bottom: 20px;
+  }
+  .gcd-breadcrumb a { color: var(--gc-text-3); text-decoration: none; transition: color var(--gc-t); }
+  .gcd-breadcrumb a:hover { color: var(--gc-primary); }
+  .gcd-breadcrumb__sep { color: var(--gc-text-4); }
+  .gcd-breadcrumb__current { color: var(--gc-text-2); font-weight: 600; }
+
+  /* ══ HERO CARD ══ */
+  .gcd-hero {
+    background: var(--gc-surface);
+    border: 1px solid var(--gc-border);
+    border-radius: var(--gc-r-xl);
+    box-shadow: var(--gc-sh-sm);
+    overflow: hidden;
+    margin-bottom: 28px;
+    animation: gcd-fade-up 0.4s cubic-bezier(0.4,0,0.2,1) both;
+  }
+
+  .gcd-hero__top {
+    background: linear-gradient(135deg, var(--gc-primary-light) 0%, #ffffff 100%);
+    border-bottom: 1px solid var(--gc-primary-mid);
+    padding: 28px 32px 24px;
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 24px; flex-wrap: wrap;
+    position: relative; overflow: hidden;
+  }
+  .gcd-hero__top::before {
+    content: '';
+    position: absolute; left: 0; top: 0;
+    width: 4px; height: 100%;
+    background: var(--gc-primary);
+  }
+
+  .gcd-hero__left { display:flex; flex-direction:column; gap:8px; flex:1; min-width:0; }
+
+  .gcd-hero__eyebrow {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--gc-primary);
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .gcd-hero__title {
+    font-size: 26px; font-weight: 800;
+    color: var(--gc-text); letter-spacing: -0.03em;
+    line-height: 1.15; margin: 0;
+  }
+
+  .gcd-hero__desc {
+    font-size: 14px; color: var(--gc-text-3); line-height: 1.6;
+    max-width: 640px; margin: 0;
+  }
+
+  .gcd-hero__actions {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex-shrink: 0;
+  }
+
+  /* Status pill */
+  .gc-status-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; padding: 4px 12px; border-radius: var(--gc-r-pill);
+    width: fit-content;
+  }
+  .gc-status-pill--ativo   { background:#dcfce7; color:#15803d; border:1px solid #86efac; }
+  .gc-status-pill--inativo { background: var(--gc-surface-2); color: var(--gc-text-3); border:1px solid var(--gc-border); }
+  .gc-status-dot { width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0; }
+
+  /* ══ STATS BAR ══ */
+  .gcd-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--gc-border);
+  }
+
+  .gcd-stat {
+    padding: 18px 24px;
+    display: flex; align-items: center; gap: 14px;
+    border-right: 1px solid var(--gc-border);
+    transition: background var(--gc-t);
+  }
+  .gcd-stat:last-child { border-right: none; }
+  .gcd-stat:hover { background: var(--gc-surface-2); }
+
+  .gcd-stat__icon {
+    width: 40px; height: 40px;
+    background: var(--gc-primary-light);
+    border: 1px solid var(--gc-primary-mid);
+    border-radius: var(--gc-r-sm);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gc-primary); flex-shrink: 0;
+  }
+
+  .gcd-stat__body { display:flex; flex-direction:column; gap:2px; }
+  .gcd-stat__value { font-size: 22px; font-weight: 800; color: var(--gc-text); letter-spacing: -0.03em; line-height:1; }
+  .gcd-stat__label { font-size: 12px; color: var(--gc-text-3); font-weight: 500; }
+
+  /* Período */
+  .gcd-stat--period .gcd-stat__icon { background: #eff6ff; border-color: #bfdbfe; color: #2563eb; }
+
+  @media (max-width: 640px) {
+    .gcd-hero__top { padding: 20px; }
+    .gcd-stats { grid-template-columns: 1fr 1fr; }
+    .gcd-stat { border-bottom: 1px solid var(--gc-border); }
+  }
+
+  /* ══ LAYOUT PRINCIPAL ══ */
+  .gcd-body {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  /* ══ SEMANAS (idêntico ao list, com pequenos ajustes) ══ */
+  .gc-semana {
+    border-radius: var(--gc-r-md);
+    border: 1px solid var(--gc-border);
+    overflow: hidden;
+    transition: all var(--gc-t);
+    background: var(--gc-surface);
+    box-shadow: var(--gc-sh-xs);
+    animation: gcd-fade-up 0.4s cubic-bezier(0.4,0,0.2,1) both;
+  }
+  .gc-semana:nth-child(1) { animation-delay: 0.05s; }
+  .gc-semana:nth-child(2) { animation-delay: 0.12s; }
+  .gc-semana:nth-child(3) { animation-delay: 0.19s; }
+  .gc-semana:nth-child(4) { animation-delay: 0.26s; }
+
+  .gc-semana:hover { border-color: var(--gc-border-hover); box-shadow: var(--gc-sh-sm); }
+
+  .gc-semana__head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; cursor: pointer; user-select: none;
+    transition: all var(--gc-t); gap: 12px;
+  }
+  .gc-semana__head-left { display:flex; align-items:center; gap:12px; flex:1; min-width:0; }
+  .gc-semana__badge {
+    width:34px; height:34px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:800; color:#fff; flex-shrink:0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+  }
+  .gc-semana__label { font-size:14px; font-weight:700; letter-spacing:-0.01em; }
+  .gc-semana__sublabel { font-size:12px; font-weight:400; opacity:.6; margin-left:4px; }
+  .gc-semana__right { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+  .gc-semana__count {
+    font-size:11px; font-weight:700; padding:3px 10px;
+    border-radius: var(--gc-r-pill); background: rgba(0,0,0,0.08);
+  }
+  .gc-semana__chevron { transition:transform 0.3s var(--gc-t); opacity:.5; flex-shrink:0; }
+  .gc-semana.open .gc-semana__chevron { transform: rotate(180deg); }
+
+  .gc-semana--1 .gc-semana__head { background: var(--s1-bg); color: var(--s1-text); }
+  .gc-semana--1 .gc-semana__badge { background: var(--s1-accent); }
+  .gc-semana--1 { border-left: 3px solid var(--s1-accent); }
+  .gc-semana--2 .gc-semana__head { background: var(--s2-bg); color: var(--s2-text); }
+  .gc-semana--2 .gc-semana__badge { background: var(--s2-accent); }
+  .gc-semana--2 { border-left: 3px solid var(--s2-accent); }
+  .gc-semana--3 .gc-semana__head { background: var(--s3-bg); color: var(--s3-text); }
+  .gc-semana--3 .gc-semana__badge { background: var(--s3-accent); }
+  .gc-semana--3 { border-left: 3px solid var(--s3-accent); }
+  .gc-semana--4 .gc-semana__head { background: var(--s4-bg); color: var(--s4-text); }
+  .gc-semana--4 .gc-semana__badge { background: var(--s4-accent); }
+  .gc-semana--4 { border-left: 3px solid var(--s4-accent); }
+
+  .gc-semana__body {
+    background: var(--gc-surface-2);
+    padding: 14px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .gc-semana:not(.open) .gc-semana__body { display: none; }
+
+  /* ══ DIAS ══ */
+  .gc-dia {
+    background: var(--gc-surface);
+    border-radius: var(--gc-r-sm);
+    border: 1px solid var(--gc-border);
+    overflow: hidden;
+    transition: all var(--gc-t);
+  }
+  .gc-dia:hover { box-shadow: var(--gc-sh-xs); border-color: var(--gc-border-hover); }
+
+  .gc-dia__head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; border-bottom: 1px solid var(--gc-border);
+    gap: 10px; flex-wrap: wrap;
+  }
+  .gc-dia__head-left { display:flex; align-items:center; gap:10px; flex:1; min-width:0; }
+  .gc-dia__dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; box-shadow:inset 0 0 0 2px rgba(255,255,255,.5); }
+  .gc-dia__nome { font-size:14px; font-weight:700; color: var(--gc-text); letter-spacing:-0.01em; }
+  .gc-dia__hoje-tag {
+    font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.05em;
+    background: var(--gc-primary); color:#fff; padding:3px 10px; border-radius: var(--gc-r-pill);
+    flex-shrink:0; box-shadow:0 2px 4px rgba(22,163,74,.2);
+  }
+  .gc-dia__actions { display:flex; align-items:center; gap:6px; }
+
+  .gc-dia--1 .gc-dia__head { background: var(--d1-bg); } .gc-dia--1 .gc-dia__dot { background: var(--d1-dot); }
+  .gc-dia--2 .gc-dia__head { background: var(--d2-bg); } .gc-dia--2 .gc-dia__dot { background: var(--d2-dot); }
+  .gc-dia--3 .gc-dia__head { background: var(--d3-bg); } .gc-dia--3 .gc-dia__dot { background: var(--d3-dot); }
+  .gc-dia--4 .gc-dia__head { background: var(--d4-bg); } .gc-dia--4 .gc-dia__dot { background: var(--d4-dot); }
+  .gc-dia--5 .gc-dia__head { background: var(--d5-bg); } .gc-dia--5 .gc-dia__dot { background: var(--d5-dot); }
+
+  .gc-dia--hoje { border: 2px solid var(--gc-primary); box-shadow: 0 0 0 4px rgba(22,163,74,.08); }
+
+  /* ══ ITENS DE REFEIÇÃO ══ */
+  .gc-itens { padding: 10px; display:flex; flex-direction:column; gap:8px; }
+
+  .gc-item {
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; padding:10px 12px;
+    background: var(--gc-surface); border:1px solid var(--gc-border);
+    border-radius: var(--gc-r-xs); transition: all var(--gc-t);
+  }
+  .gc-item:hover { background: var(--gc-primary-light); border-color: var(--gc-primary-mid); transform:translateX(4px); box-shadow: var(--gc-sh-xs); }
+  .gc-item__left { display:flex; align-items:center; gap:12px; min-width:0; flex:1; }
+  .gc-item__icon {
+    width:36px; height:36px; background: var(--gc-primary-light); border:1px solid var(--gc-primary-mid);
+    border-radius: var(--gc-r-xs); color: var(--gc-primary);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    transition: all var(--gc-t);
+  }
+  .gc-item:hover .gc-item__icon { background:#dcfce7; transform:scale(1.1); }
+  .gc-item__info { min-width:0; display:flex; flex-direction:column; gap:4px; }
+  .gc-item__tipo {
+    display:inline-block; font-size:10px; font-weight:700;
+    text-transform:uppercase; letter-spacing:.06em;
+    color: var(--gc-primary); background: var(--gc-primary-light);
+    border:1px solid var(--gc-primary-mid); padding:2px 8px;
+    border-radius: var(--gc-r-pill); width:fit-content;
+  }
+  .gc-item__name { font-size:13px; font-weight:600; color: var(--gc-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .gc-item__actions { display:flex; gap:6px; flex-shrink:0; }
+
+  /* ══ ADD ROW ══ */
+  .gc-add-row {
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    padding:10px 16px; font-family: var(--gc-font); font-size:13px; font-weight:600;
+    color: var(--gc-text-3); background:transparent;
+    border:1.5px dashed var(--gc-border-hover);
+    border-radius: var(--gc-r-xs); cursor:pointer; text-decoration:none;
+    transition: all var(--gc-t); width:100%; margin-top:4px;
+  }
+  .gc-add-row:hover { color: var(--gc-primary); border-color: var(--gc-primary); background: var(--gc-primary-light); text-decoration:none; border-style:solid; }
+  .gc-add-row--inline { width:auto; padding:6px 14px; font-size:12px; }
+
+  /* ══ EMPTY ══ */
+  .gc-empty-inline {
+    font-size:13px; color: var(--gc-text-4); padding:16px; text-align:center; font-style:italic;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    background:rgba(241,245,249,.5); border-radius: var(--gc-r-xs);
+  }
+
+  /* ══ RECEITA LINK ══ */
+  .gcd-receita-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; color: var(--gc-text-3);
+    text-decoration: none; border: 1px solid var(--gc-border);
+    padding: 4px 10px; border-radius: var(--gc-r-pill);
+    transition: all var(--gc-t); background: var(--gc-surface);
+    flex-shrink: 0;
+  }
+  .gcd-receita-link:hover { color: var(--gc-primary); border-color: var(--gc-primary-mid); background: var(--gc-primary-light); text-decoration:none; }
+
+  /* ══ ANIMAÇÃO ══ */
+  @keyframes gcd-fade-up {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  .gcd-hero { animation: gcd-fade-up 0.35s cubic-bezier(0.4,0,0.2,1) both; }
+
+  /* ══ RESPONSIVO ══ */
+  @media (max-width: 640px) {
+    .gcd-hero__top { padding: 18px 16px; }
+    .gcd-hero__title { font-size: 20px; }
+    .gcd-stat { padding: 14px 16px; }
+    .gcd-stat__value { font-size: 18px; }
+    .gc-semana__head { padding: 12px 14px; }
+  }
+
+  /* Acessibilidade */
+  .gc-btn:focus-visible, .gc-semana__head:focus-visible, .gc-add-row:focus-visible {
+    outline: 2px solid var(--gc-primary); outline-offset: 2px;
+  }
+</style>
+
+<div class="gcd-wrapper">
+
+  <!-- ══ BREADCRUMB ══ -->
+  <nav class="gcd-breadcrumb" aria-label="Navegação">
+    <a href="{% url 'merendaEscolar:merenda_inicio' %}">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
     </a>
+    <span class="gcd-breadcrumb__sep">›</span>
+    <a href="{% url 'merendaEscolar:cardapio_list' %}">Cardápios</a>
+    <span class="gcd-breadcrumb__sep">›</span>
+    <span class="gcd-breadcrumb__current">{{ cardapio.nome }}</span>
+  </nav>
 
-    <a href="{% url 'merendaEscolar:cardapio_delete' cardapio.id %}" class="btn btn-danger">
-        Excluir
-    </a>
+  <!-- ══ HERO CARD ══ -->
+  <div class="gcd-hero">
 
-    <hr>
+    <div class="gcd-hero__top">
+      <div class="gcd-hero__left">
 
-    <a href="{% url 'merendaEscolar:semana_create' cardapio.id %}" class="btn btn-primary">
-        + Adicionar Semana
-    </a>
+        {% if cardapio.ativo %}
+          <span class="gc-status-pill gc-status-pill--ativo">
+            <span class="gc-status-dot"></span> Cardápio Ativo
+          </span>
+        {% else %}
+          <span class="gc-status-pill gc-status-pill--inativo">
+            <span class="gc-status-dot"></span> Inativo
+          </span>
+        {% endif %}
 
-    <hr>
+        <span class="gcd-hero__eyebrow">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          Merenda Escolar · Cardápio
+        </span>
+
+        <h1 class="gcd-hero__title">{{ cardapio.nome }}</h1>
+
+        {% if cardapio.descricao %}
+          <p class="gcd-hero__desc">{{ cardapio.descricao|striptags|truncatechars:200 }}</p>
+        {% endif %}
+
+      </div>
+
+      <div class="gcd-hero__actions">
+        <a href="{% url 'merendaEscolar:semana_create' cardapio.id %}" class="gc-btn gc-btn--ghost gc-btn--sm">
+          <svg class="gc-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Adicionar Semana
+        </a>
+        <a href="{% url 'merendaEscolar:cardapio_update' cardapio.id %}" class="gc-btn gc-btn--secondary gc-btn--sm">
+          <svg class="gc-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Editar
+        </a>
+        <a href="{% url 'merendaEscolar:cardapio_delete' cardapio.id %}" class="gc-btn gc-btn--danger gc-btn--sm">
+          <svg class="gc-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6"/><path d="M14 11v6"/>
+          </svg>
+          Excluir
+        </a>
+      </div>
+    </div>
+
+    <!-- Barra de estatísticas -->
+    <div class="gcd-stats">
+
+      <div class="gcd-stat">
+        <div class="gcd-stat__icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="gcd-stat__body">
+          <span class="gcd-stat__value">{{ total_semanas }}</span>
+          <span class="gcd-stat__label">Semana{{ total_semanas|pluralize }}</span>
+        </div>
+      </div>
+
+      <div class="gcd-stat">
+        <div class="gcd-stat__icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="gcd-stat__body">
+          <span class="gcd-stat__value">{{ total_dias }}</span>
+          <span class="gcd-stat__label">Dia{{ total_dias|pluralize }} planejado{{ total_dias|pluralize }}</span>
+        </div>
+      </div>
+
+      <div class="gcd-stat">
+        <div class="gcd-stat__icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+            <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+          </svg>
+        </div>
+        <div class="gcd-stat__body">
+          <span class="gcd-stat__value">{{ total_refeicoes }}</span>
+          <span class="gcd-stat__label">Refeição{{ total_refeicoes|pluralize }}</span>
+        </div>
+      </div>
+
+      <div class="gcd-stat gcd-stat--period">
+        <div class="gcd-stat__icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="gcd-stat__body">
+          <span class="gcd-stat__value" style="font-size:14px; letter-spacing:0;">
+            {{ cardapio.data_inicio|date:"d/m/Y" }} → {{ cardapio.data_fim|date:"d/m/Y" }}
+          </span>
+          <span class="gcd-stat__label">Período de vigência</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SEMANAS ══ -->
+  <div class="gcd-body">
 
     {% for semana in cardapio.semanas.all %}
-        <div class="card mb-3">
-            <div class="card-header">
-                <strong>Semana {{ semana.numero }}</strong>
 
-                <a href="{% url 'merendaEscolar:semana_delete' semana.id %}" class="btn btn-sm btn-danger float-end">
-                    Excluir
-                </a>
-            </div>
+    {% with n=semana.numero %}
+    <div class="gc-semana gc-semana--{% if n == 1 %}1{% elif n == 2 %}2{% elif n == 3 %}3{% else %}4{% endif %} open"
+         id="sem-{{ semana.id }}"
+         tabindex="0"
+         role="button"
+         aria-expanded="true"
+         aria-controls="sem-body-{{ semana.id }}"
+         onclick="gcToggle('sem-{{ semana.id }}')">
+    {% endwith %}
 
-            <div class="card-body">
-
-                <a href="{% url 'merendaEscolar:dia_create' semana.id %}" class="btn btn-sm btn-success mb-2">
-                    + Dia
-                </a>
-
-                <ul>
-                    {% for dia in semana.dias.all %}
-                        <li>
-                            {{ dia.get_dia_semana_display }}
-
-                            <a href="{% url 'merendaEscolar:dia_delete' dia.id %}" class="text-danger">
-                                (Excluir)
-                            </a>
-                        </li>
-                    {% empty %}
-                        <li>Nenhum dia cadastrado</li>
-                    {% endfor %}
-                </ul>
-
-            </div>
+      <div class="gc-semana__head">
+        <div class="gc-semana__head-left">
+          <span class="gc-semana__badge">{{ semana.numero }}</span>
+          <span class="gc-semana__label">
+            Semana {{ semana.numero }}
+            <span class="gc-semana__sublabel">— {{ semana.dias.count }} dia{{ semana.dias.count|pluralize }}</span>
+          </span>
         </div>
+
+        <div class="gc-semana__right">
+          <!-- Ações de edição da semana -->
+          <a href="{% url 'merendaEscolar:dia_create' semana.id %}"
+             class="gc-add-row gc-add-row--inline"
+             onclick="event.stopPropagation()"
+             title="Adicionar dia">
+            <svg class="gc-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Dia
+          </a>
+          <a href="{% url 'merendaEscolar:semana_update' semana.id %}"
+             class="gc-btn gc-btn--icon"
+             onclick="event.stopPropagation()"
+             title="Editar semana">
+            <svg class="gc-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </a>
+          <a href="{% url 'merendaEscolar:semana_delete' semana.id %}"
+             class="gc-btn gc-btn--icon gc-btn--danger"
+             onclick="event.stopPropagation()"
+             title="Remover semana">
+            <svg class="gc-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            </svg>
+          </a>
+          <svg class="gc-ico gc-semana__chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Corpo da semana -->
+      <div class="gc-semana__body" id="sem-body-{{ semana.id }}">
+
+        {% for dia in semana.dias.all %}
+
+        <div class="gc-dia gc-dia--{{ dia.dia_semana }}{% if dia.dia_semana == dia_atual %} gc-dia--hoje{% endif %}">
+
+          <div class="gc-dia__head">
+            <div class="gc-dia__head-left">
+              <span class="gc-dia__dot"></span>
+              <span class="gc-dia__nome">{{ dia.get_dia_semana_display }}</span>
+              {% if dia.dia_semana == dia_atual %}
+                <span class="gc-dia__hoje-tag">Hoje</span>
+              {% endif %}
+            </div>
+
+            <div class="gc-dia__actions">
+              <a href="{% url 'merendaEscolar:dia_update' dia.id %}"
+                 class="gc-btn gc-btn--icon" title="Editar dia">
+                <svg class="gc-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </a>
+              <a href="{% url 'merendaEscolar:dia_delete' dia.id %}"
+                 class="gc-btn gc-btn--icon gc-btn--danger" title="Remover dia">
+                <svg class="gc-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                </svg>
+              </a>
+              <a href="{% url 'merendaEscolar:item_create' dia.id %}"
+                 class="gc-btn gc-btn--ghost gc-btn--xs" title="Adicionar refeição">
+                <svg class="gc-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Refeição
+              </a>
+            </div>
+          </div>
+
+          <!-- Itens -->
+          <div class="gc-itens">
+            {% for item in dia.itens.all %}
+            <div class="gc-item">
+              <div class="gc-item__left">
+                <div class="gc-item__icon">
+                  <svg class="gc-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                    <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+                  </svg>
+                </div>
+                <div class="gc-item__info">
+                  <span class="gc-item__tipo">{{ item.tipo_refeicao }}</span>
+                  <span class="gc-item__name" title="{{ item.receita }}">{{ item.receita }}</span>
+                </div>
+              </div>
+
+              <div class="gc-item__actions">
+                <!-- Link para detalhe da receita -->
+                <a href="{% url 'merendaEscolar:receita_detalhe' item.receita.id %}"
+                   class="gcd-receita-link" title="Ver receita completa">
+                  <svg class="gc-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                  Receita
+                </a>
+                <a href="{% url 'merendaEscolar:item_update' item.id %}"
+                   class="gc-btn gc-btn--icon" title="Trocar receita">
+                  <svg class="gc-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </a>
+                <a href="{% url 'merendaEscolar:item_delete' item.id %}"
+                   class="gc-btn gc-btn--icon gc-btn--danger" title="Remover refeição">
+                  <svg class="gc-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            {% empty %}
+            <div class="gc-empty-inline">
+              <svg class="gc-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              Nenhuma refeição cadastrada neste dia
+            </div>
+            {% endfor %}
+
+            <a href="{% url 'merendaEscolar:item_create' dia.id %}" class="gc-add-row">
+              <svg class="gc-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Adicionar refeição ao dia
+            </a>
+          </div>
+
+        </div>
+        {% empty %}
+        <div class="gc-empty-inline">
+          <svg class="gc-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          Nenhum dia cadastrado nesta semana. Clique em "Adicionar Dia".
+        </div>
+        {% endfor %}
+
+        <a href="{% url 'merendaEscolar:dia_create' semana.id %}" class="gc-add-row">
+          <svg class="gc-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Adicionar novo dia à semana
+        </a>
+
+      </div>{# /semana__body #}
+    </div>{# /gc-semana #}
+
     {% empty %}
-        <p>Nenhuma semana cadastrada.</p>
+    <div style="text-align:center; padding:48px 24px; background: var(--gc-surface); border:2px dashed var(--gc-border); border-radius: var(--gc-r-xl);">
+      <div style="width:56px;height:56px;margin:0 auto 16px;background:var(--gc-primary-light);border:2px solid var(--gc-primary-mid);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gc-primary);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <h3 style="font-size:18px;font-weight:800;color:var(--gc-text);margin:0 0 8px;">Nenhuma semana cadastrada</h3>
+      <p style="font-size:14px;color:var(--gc-text-3);margin:0 0 20px;">Adicione a primeira semana para começar a montar o cardápio.</p>
+      <a href="{% url 'merendaEscolar:semana_create' cardapio.id %}" class="gc-btn gc-btn--primary">
+        <svg class="gc-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Adicionar Primeira Semana
+      </a>
+    </div>
     {% endfor %}
 
-</div>
+  </div>{# /gcd-body #}
+
+</div>{# /gcd-wrapper #}
+
+<script>
+function gcToggle(id) {
+  var el = document.getElementById(id);
+  if (el) {
+    el.classList.toggle('open');
+    el.setAttribute('aria-expanded', el.classList.contains('open'));
+  }
+}
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.gc-semana__head').forEach(function (h) {
+    h.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); h.click(); }
+    });
+  });
+});
+</script>
 
 {% endblock %}

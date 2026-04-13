@@ -1,0 +1,380 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+
+<style>
+/* =====================================
+FORMULÁRIO MODERNO - MERENDA
+===================================== */
+
+.form-container{
+    max-width: 700px;
+    margin: 0 auto;
+    padding:28px 32px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* ALERTA DE EXCLUSÃO - VERMELHO */
+.delete-alert{
+    background:#fef2f2;
+    border:1px solid #fecaca;
+    color:#991b1b;
+    padding:16px 20px;
+    border-radius:10px;
+    font-size:.9rem;
+    margin-bottom:24px;
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+}
+
+.delete-alert i,
+.delete-alert::before{
+    content:"⚠️";
+    font-size:1.2rem;
+    flex-shrink:0;
+}
+
+.delete-alert strong{
+    display:block;
+    margin-bottom:4px;
+    font-size:1rem;
+}
+
+/* ALERTA DE VÍNCULOS - AMARELO */
+.vinculos-alert{
+    background:#fffbeb;
+    border:1px solid #fcd34d;
+    color:#92400e;
+    padding:20px;
+    border-radius:10px;
+    font-size:.9rem;
+    margin-bottom:24px;
+}
+
+.vinculos-alert strong{
+    display:block;
+    margin-bottom:12px;
+    font-size:1.1rem;
+    color:#78350f;
+}
+
+.vinculo-grupo{
+    background:rgba(251, 191, 36, 0.1);
+    border:1px solid rgba(251, 191, 36, 0.3);
+    border-radius:8px;
+    padding:12px 16px;
+    margin-bottom:12px;
+}
+
+.vinculo-grupo:last-child{
+    margin-bottom:0;
+}
+
+.vinculo-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:8px;
+    font-weight:600;
+    color:#78350f;
+}
+
+.vinculo-count{
+    background:#f59e0b;
+    color:white;
+    padding:2px 8px;
+    border-radius:12px;
+    font-size:0.75rem;
+    font-weight:700;
+}
+
+.vinculo-lista{
+    margin:0;
+    padding:0;
+    list-style:none;
+}
+
+.vinculo-lista li{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 0;
+    border-bottom:1px solid rgba(251, 191, 36, 0.2);
+    gap:12px;
+}
+
+.vinculo-lista li:last-child{
+    border-bottom:none;
+}
+
+.vinculo-info{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex:1;
+}
+
+.vinculo-icone{
+    font-size:1.1rem;
+}
+
+.vinculo-texto{
+    color:#92400e;
+    font-size:0.9rem;
+}
+
+.vinculo-link{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    padding:4px 10px;
+    background:white;
+    border:1px solid #fcd34d;
+    border-radius:6px;
+    color:#b45309;
+    text-decoration:none;
+    font-size:0.8rem;
+    font-weight:500;
+    transition:all .2s;
+    white-space:nowrap;
+}
+
+.vinculo-link:hover{
+    background:#fbbf24;
+    color:#78350f;
+    transform:translateY(-1px);
+}
+
+.vinculo-link::after{
+    content:"→";
+    font-size:1rem;
+}
+
+.ver-todos-link{
+    display:block;
+    text-align:center;
+    margin-top:10px;
+    padding:8px;
+    background:rgba(251, 191, 36, 0.2);
+    border-radius:6px;
+    color:#92400e;
+    text-decoration:none;
+    font-weight:500;
+    font-size:0.85rem;
+    transition:all .2s;
+}
+
+.ver-todos-link:hover{
+    background:rgba(251, 191, 36, 0.4);
+    color:#78350f;
+}
+
+.acao-necessaria{
+    margin-top:16px;
+    padding:12px;
+    background:rgba(220, 38, 38, 0.1);
+    border:1px solid rgba(220, 38, 38, 0.2);
+    border-radius:6px;
+    color:#991b1b;
+    font-size:0.85rem;
+    text-align:center;
+}
+
+/* INFO DO OBJETO */
+.object-info{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    padding:16px 20px;
+    border-radius:8px;
+    margin-bottom:24px;
+}
+
+.object-info h3{
+    margin:0 0 8px 0;
+    color:#1e293b;
+    font-size:1.1rem;
+}
+
+.object-info p{
+    margin:0;
+    color:#64748b;
+    font-size:.9rem;
+}
+
+/* FORM */
+.form-modern{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+/* AÇÕES */
+.form-actions{
+    display:flex;
+    gap:12px;
+    margin-top:10px;
+    justify-content: flex-end;
+}
+
+/* BOTÃO DE PERIGO/DELETE - VERMELHO */
+.btn-danger{
+    padding:0.65rem 1.4rem;
+    border-radius:10px;
+    font-size:.85rem;
+    font-weight:500;
+    text-decoration:none;
+    background:#dc2626;
+    color:#ffffff;
+    border:1px solid #b91c1c;
+    cursor:pointer;
+    transition:all .2s;
+}
+
+.btn-danger:hover{
+    background:#b91c1c;
+    transform:translateY(-1px);
+    box-shadow:0 4px 6px -1px rgba(220,38,38,0.2);
+}
+
+.btn-danger:active{
+    transform:translateY(0);
+}
+
+/* BOTÃO DESABILITADO */
+.btn-danger:disabled,
+.btn-danger:disabled:hover{
+    background:#9ca3af;
+    border-color:#6b7280;
+    cursor:not-allowed;
+    transform:none;
+    box-shadow:none;
+    opacity:0.7;
+}
+
+/* BOTÃO SECUNDÁRIO */
+.btn-secondary{
+    padding:0.65rem 1.4rem;
+    border-radius:10px;
+    font-size:.85rem;
+    font-weight:500;
+    text-decoration:none;
+    background:#f1f5f9;
+    color:#334155;
+    border:1px solid #cbd5e1;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.btn-secondary:hover{
+    background:#e2e8f0;
+    color:#1e293b;
+}
+
+/* TÍTULO */
+.page-title{
+    color:#1e293b;
+    font-size:1.5rem;
+    margin-bottom:8px;
+    font-weight:600;
+}
+
+.page-subtitle{
+    color:#64748b;
+    font-size:.9rem;
+    margin-bottom:24px;
+}
+</style>
+
+<div class="form-container">
+    
+    <h1 class="page-title">Confirmar Exclusão</h1>
+    <p class="page-subtitle">Você está prestes a remover um registro do sistema</p>
+    
+    {% if tem_vinculos %}
+    <!-- Alerta de Vínculos com Links -->
+    <div class="vinculos-alert">
+        <strong>🔗 Este registro possui vínculos ativos</strong>
+        
+        <p style="margin-bottom:16px; color:#92400e;">
+            Não é possível excluir <strong>"{{ object.nome }}"</strong> porque ele está sendo utilizado nos seguintes registros:
+        </p>
+        
+        {% for vinculo in vinculos %}
+        <div class="vinculo-grupo">
+            <div class="vinculo-header">
+                <span>{{ vinculo.icone }} {{ vinculo.tipo }}</span>
+                <span class="vinculo-count">{{ vinculo.quantidade }} vinculado(s)</span>
+            </div>
+            
+            <ul class="vinculo-lista">
+                {% for item in vinculo.detalhes %}
+                <li>
+                    <div class="vinculo-info">
+                        <span class="vinculo-icone">•</span>
+                        <span class="vinculo-texto">{{ item.texto }}</span>
+                    </div>
+                    <a href="{{ item.url }}" class="vinculo-link" target="_blank" title="Abrir registro em nova aba">
+                        Acessar
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            
+            {% if vinculo.quantidade > 5 %}
+            <a href="{{ vinculo.listagem_url }}" class="ver-todos-link">
+                Ver todos os {{ vinculo.quantidade }} registros →
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        <div class="acao-necessaria">
+            <strong>⚠️ Ação necessária:</strong> Acesse os registros acima e remova a associação com <strong>"{{ object.nome }}"</strong> antes de excluir.
+        </div>
+    </div>
+    
+    {% else %}
+    <!-- Alerta de Exclusão Normal -->
+    <div class="delete-alert">
+        <div>
+            <strong>Atenção: Ação Irreversível</strong>
+            Você está prestes a excluir permanentemente o Tipo de Refeição <strong>"{{ object.nome|default:object }}"</strong>. 
+            Esta ação não poderá ser desfeita e todos os dados associados serão removidos do sistema.
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Informações do Objeto -->
+    <div class="object-info">
+        <h3>🍽️ {{ object.nome|default:object }}</h3>
+        <p>Tipo de Refeição cadastrado no sistema</p>
+        {% if object.descricao %}
+        <p style="margin-top:8px; font-style:italic;">{{ object.descricao }}</p>
+        {% endif %}
+    </div>
+    
+    <!-- Formulário de Confirmação -->
+    <form method="post" class="form-modern">
+        {% csrf_token %}
+        
+        <div class="form-actions">
+            <a href="{% url 'merendaEscolar:tipo_refeicao_list' %}" class="btn-secondary">
+                ← Cancelar e Voltar
+            </a>
+            
+            <button type="submit" class="btn-danger" {% if tem_vinculos %}disabled title="Remova os vínculos antes de excluir"{% endif %}>
+                {% if tem_vinculos %}
+                🔒 Exclusão Bloqueada
+                {% else %}
+                🗑️ Sim, Excluir Permanentemente
+                {% endif %}
+            </button>
+        </div>
+    </form>
+    
+</div>
+
+{% endblock %}

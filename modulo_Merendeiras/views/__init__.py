@@ -10,6 +10,9 @@ from .transferenciaEscolaDetailView import *
 from .cardápioHoje.cardapioHojeView import CardapioHojeView
 from .cardápioHoje.receitaDetailView import ReceitaDetailView
 
+# Executa o cardaio
+from .executarCardapio.executaCardapio import *
+
 # Estoque Escola
 from .estoque.estoqueEscolaListView import *
 

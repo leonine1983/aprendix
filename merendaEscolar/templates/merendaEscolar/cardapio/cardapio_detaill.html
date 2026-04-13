@@ -1,0 +1,63 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h1>{{ cardapio.nome }}</h1>
+
+    <a href="{% url 'merendaEscolar:cardapio_update' cardapio.id %}" class="btn btn-warning">
+        Editar
+    </a>
+
+    <a href="{% url 'merendaEscolar:cardapio_delete' cardapio.id %}" class="btn btn-danger">
+        Excluir
+    </a>
+
+    <hr>
+
+    <a href="{% url 'merendaEscolar:semana_create' cardapio.id %}" class="btn btn-primary">
+        + Adicionar Semana
+    </a>
+
+    <hr>
+
+    {% for semana in cardapio.semanas.all %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <strong>Semana {{ semana.numero }}</strong>
+
+                <a href="{% url 'merendaEscolar:semana_delete' semana.id %}" class="btn btn-sm btn-danger float-end">
+                    Excluir
+                </a>
+            </div>
+
+            <div class="card-body">
+
+                <a href="{% url 'merendaEscolar:dia_create' semana.id %}" class="btn btn-sm btn-success mb-2">
+                    + Dia
+                </a>
+
+                <ul>
+                    {% for dia in semana.dias.all %}
+                        <li>
+                            {{ dia.get_dia_semana_display }}
+
+                            <a href="{% url 'merendaEscolar:dia_delete' dia.id %}" class="text-danger">
+                                (Excluir)
+                            </a>
+                        </li>
+                    {% empty %}
+                        <li>Nenhum dia cadastrado</li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+    {% empty %}
+        <p>Nenhuma semana cadastrada.</p>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

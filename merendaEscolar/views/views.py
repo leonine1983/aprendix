@@ -310,6 +310,10 @@ class CategoriaProdutoDeleteView(LoginRequiredMixin, DeleteView):
 from django.db.models import Q
 from django.db.models import Exists, OuterRef
 from ..models import EstoqueEscola, MovimentacaoEstoque, ReceitaIngrediente, TransferenciaItem
+# Produtos
+from django.db.models import Q
+from django.db.models import Exists, OuterRef
+from ..models import EstoqueEscola, MovimentacaoEstoque, ReceitaIngrediente, TransferenciaItem
 
 class ProdutoListView(
     LoginRequiredMixin,
