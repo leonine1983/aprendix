@@ -2,36 +2,194 @@
 
 {% block content %}
 
-<h1>Tipos de Refeição</h1>
+<!--
+  DECISÃO UX: Container fluido garante responsividade em telas institucionais 
+  (muitas vezes acessadas em monitores antigos ou notebooks pequenos)
+-->
+<div class="container-fluid px-4 py-3">
 
-<a href="{% url 'merendaEscolar:tipo_refeicao_create' %}" class="btn btn-success">
-    + Novo Tipo
-</a>
+  <!-- 
+    ÁREA DE FEEDBACK AO USUÁRIO 
+    Prioridade: Alta - Usuários precisam confirmar que ações (salvar/excluir) funcionaram
+  -->
+  {% if messages %}
+  <div class="row mb-4">
+    <div class="col-12">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm border-start border-4 border-{{ message.tags|default:'info' }}" role="alert">
+        <div class="d-flex align-items-center">
+          <i class="bi bi-check-circle-fill me-2 fs-5" aria-hidden="true"></i>
+          <div>
+            <strong>{% if message.tags == 'success' %}Sucesso!{% elif message.tags == 'error' %}Atenção!{% else %}Informação{% endif %}</strong><br>
+            <span class="small">{{ message }}</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar notificação"></button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
 
-<hr>
+  <!-- 
+    CARD PRINCIPAL 
+    Agrupamento lógico: isola o contexto da página do restante do sistema
+    Sombra sutil (shadow-sm) para não competir visualmente com o conteúdo
+  -->
+  <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+    
+    <!-- 
+      HEADER DO CARD 
+      Hierarquia: Título descritivo + subtítulo explicativo + ação primária
+      Padrão Z de leitura: Olho vai do título (esquerda) para o botão (direita)
+    -->
+    <div class="card-header bg-white border-bottom py-4 px-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+        
+        <!-- Título com ícone (padrão institucional) -->
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+            <i class="bi bi-collection-fill text-primary fs-4" aria-hidden="true"></i>
+          </div>
+          <div>
+            <h1 class="h3 mb-1 fw-bold text-gray-800">Tipos de Refeição</h1>
+            <p class="mb-0 text-muted small fs-5">
+              <i class="bi bi-info-circle me-1" aria-hidden="true"></i>
+              Gerencie as categorias de refeições servidas nas unidades escolares (ex: Almoço, Lanche, Café)
+            </p>
+          </div>
+        </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Nome</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for tipo in object_list %}
-        <tr>
-            <td>{{ tipo.nome }}</td>
-            <td>
-                <a href="{% url 'merendaEscolar:tipo_refeicao_update' tipo.id %}">Editar</a>
-                <a href="{% url 'merendaEscolar:tipo_refeicao_delete' tipo.id %}">Excluir</a>
-            </td>
-        </tr>
-    {% empty %}
-        <tr><td colspan="2">Nenhum tipo cadastrado</td></tr>
-    {% endfor %}
-    </tbody>
-</table>
+        <!-- 
+          AÇÃO PRIMÁRIA 
+          Destaque: Botão sólido (btn-primary) com ícone + texto (nunca ícone sozinho)
+          Posição: Topo direito, acesso imediato
+        -->
+        <a href="{% url 'merendaEscolar:tipo_refeicao_create' %}" 
+           class="btn btn-primary btn-lg d-inline-flex align-items-center gap-2 shadow-sm"
+           aria-label="Cadastrar novo tipo de refeição">
+          <i class="bi bi-plus-lg" aria-hidden="true"></i>
+          <span>Novo Tipo</span>
+        </a>
+      </div>
+    </div>
 
-<a href="{% url 'merendaEscolar:cardapio_list' %}">← Voltar</a>
+    <!-- 
+      CORPO DO CARD 
+      Redução de fricção: Tabela com ações visíveis, sem necessidade de hover para descobrir
+    -->
+    <div class="card-body p-0">
+      
+      {% if object_list %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+            <tr>
+              <th scope="col" class="ps-4 py-3 fw-semibold text-uppercase text-muted small letter-spacing-1" style="width: 60%;">
+                Nome do Tipo
+              </th>
+              <th scope="col" class="text-center py-3 fw-semibold text-uppercase text-muted small letter-spacing-1" style="width: 40%;">
+                Ações Disponíveis
+              </th>
+            </tr>
+          </thead>
+          <tbody class="border-top-0">
+            {% for tipo in object_list %}
+            <tr class="position-relative">
+              <td class="ps-4 py-3">
+                <!-- 
+                  Destaque visual no nome: 
+                  Facilita scanning visual quando há muitos itens
+                -->
+                <span class="fw-medium text-dark fs-6">{{ tipo.nome }}</span>
+              </td>
+              <td class="text-center py-3">
+                <!-- 
+                  GRUPO DE AÇÕES 
+                  Principio de proximidade: botões agrupados semanticamente
+                  Acessibilidade: aria-label descreve a ação + contexto
+                -->
+                <div class="btn-group" role="group" aria-label="Ações para {{ tipo.nome }}">
+                  
+                  <!-- 
+                    AÇÃO SECUNDÁRIA: Editar 
+                    Estilo: Outline (menos destaque que primária, mais que perigo)
+                    Cor: Azul (padrão institucional para edição)
+                  -->
+                  <a href="{% url 'merendaEscolar:tipo_refeicao_update' tipo.id %}" 
+                     class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1 px-3"
+                     aria-label="Editar tipo de refeição {{ tipo.nome }}">
+                    <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                    <span>Editar</span>
+                  </a>
+                  
+                  <!-- 
+                    AÇÃO DE RISCO: Excluir 
+                    Estilo: Vermelho outline (alerta visual sem ser agressivo demais)
+                    Segurança: Confirmação JS obrigatória para evitar exclusão acidental
+                    Texto claro: "Excluir" (evitar termos ambíguos como "Deletar" ou apenas ícone)
+                  -->
+                  <a href="{% url 'merendaEscolar:tipo_refeicao_delete' tipo.id %}" 
+                     class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1 px-3"
+                     onclick="return confirm('⚠️ ATENÇÃO: Deseja realmente excluir o tipo \"{{ tipo.nome }}\"?\n\nEsta ação não poderá ser desfeita e pode afetar cardápios existentes.')"
+                     aria-label="Excluir tipo de refeição {{ tipo.nome }}">
+                    <i class="bi bi-trash" aria-hidden="true"></i>
+                    <span>Excluir</span>
+                  </a>
+                  
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% else %}
+      <!-- 
+        ESTADO VAZIO (Empty State)
+        Redução de fricção: Em vez de tabela vazia, mensagem orientativa com CTA
+        Evita frustração: Explica o que fazer e dá o caminho direto
+      -->
+      <div class="text-center py-5 my-5">
+        <div class="mb-4">
+          <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+            <i class="bi bi-inbox text-muted" style="font-size: 2.5rem;" aria-hidden="true"></i>
+          </div>
+          <h2 class="h4 text-gray-700 mb-2">Nenhum tipo de refeição cadastrado</h2>
+          <p class="text-muted mb-4 mx-auto" style="max-width: 400px;">
+            Para começar a montar cardápios, cadastre os tipos de refeições disponíveis 
+            (Almoço, Lanche da Manhã, etc.)
+          </p>
+          <!-- CTA Repetido: Reduz cliques necessários quando lista está vazia -->
+          <a href="{% url 'merendaEscolar:tipo_refeicao_create' %}" 
+             class="btn btn-primary d-inline-flex align-items-center gap-2">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            <span>Cadastrar Primeiro Tipo</span>
+          </a>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+    
+    <!-- 
+      FOOTER DO CARD 
+      Navegação terciária: Discreta mas localizável (padrão: canto inferior esquerdo)
+      Estilo: Outline secundário (não compete com ações primárias da página)
+    -->
+    <div class="card-footer bg-light border-top py-3 px-4">
+      <a href="{% url 'merendaEscolar:cardapio_list' %}" 
+         class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2"
+         aria-label="Voltar para lista de cardápios">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+        <span>Voltar para Cardápios</span>
+      </a>
+    </div>
+    
+  </div>
+
+</div>
 
 {% endblock %}
+

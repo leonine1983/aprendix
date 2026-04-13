@@ -1,298 +1,711 @@
+```html
 {% extends "merendaEscolar/estoque_base.html" %}
 
 {% block content %}
 
 <style>
-    /* ====== Bloco Informativo ====== */
-.page-intro {
-    background: #f8fafc;
-    padding: 1.2rem 1.5rem;
-    border-radius: 10px;
-    margin-bottom: 1.8rem;
-    border-left: 4px solid #2563eb;
-}
+    /* ====== DESIGN SYSTEM - INSTITUCIONAL ====== */
+    :root {
+        --color-primary: #2563eb;
+        --color-primary-dark: #1d4ed8;
+        --color-success: #059669;
+        --color-warning: #d97706;
+        --color-danger: #dc2626;
+        --color-danger-hover: #b91c1c;
+        --color-neutral-50: #f8fafc;
+        --color-neutral-100: #f1f5f9;
+        --color-neutral-200: #e2e8f0;
+        --color-neutral-400: #94a3b8;
+        --color-neutral-600: #475569;
+        --color-neutral-800: #1e293b;
+        --color-neutral-900: #0f172a;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --radius-sm: 6px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --transition-base: all 0.2s ease-in-out;
+    }
 
-.page-intro p {
-    margin: 0 0 0.8rem 0;
-    color: #475569;
-    font-size: 0.95rem;
-}
+    /* ====== FEEDBACK AO USUÁRIO (Django Messages) ====== */
+    .container-messages {
+        margin-bottom: 1.5rem;
+    }
 
-.example-tags small {
-    display: block;
-    font-size: 0.8rem;
-    margin-bottom: 0.6rem;
-    color: #64748b;
-    font-weight: 500;
-}
+    .alert {
+        border: none;
+        border-radius: var(--radius-md);
+        padding: 1rem 1.25rem;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
 
-.tags-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
+    .alert-success {
+        background-color: #d1fae5;
+        color: #065f46;
+        border-left: 4px solid var(--color-success);
+    }
 
-.tag {
-    background: #e2e8f0;
-    padding: 0.35rem 0.7rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    color: #334155;
-    font-weight: 500;
-}
+    .alert-error, .alert-danger {
+        background-color: #fee2e2;
+        color: #991b1b;
+        border-left: 4px solid var(--color-danger);
+    }
 
-    /* ====== Layout Header ====== */
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
+    .alert-warning {
+        background-color: #fef3c7;
+        color: #92400e;
+        border-left: 4px solid var(--color-warning);
+    }
 
-.page-header h2 {
-    font-weight: 600;
-    font-size: 1.6rem;
-    color: #1e293b;
-    margin: 0;
-}
+    .alert-info {
+        background-color: #dbeafe;
+        color: #1e40af;
+        border-left: 4px solid var(--color-primary);
+    }
 
-/* ====== Botão Primário Institucional ====== */
-.btn-primary {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    border: none;
-    padding: 0.55rem 1.2rem;
-    font-weight: 500;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
+    .btn-close {
+        opacity: 0.5;
+        transition: var(--transition-base);
+    }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
-}
+    .btn-close:hover {
+        opacity: 1;
+    }
 
-/* ====== Tabela Moderna ====== */
-.table-modern {
-    background: #ffffff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-}
+    /* ====== BREADCRUMB (NAVEGAÇÃO CONTEXTUAL) ====== */
+    .breadcrumb-nav {
+        margin-bottom: 0.75rem;
+    }
 
-.table-modern thead {
-    background: #f1f5f9;
-}
+    .breadcrumb {
+        font-size: 0.875rem;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+    }
 
-.table-modern th {
-    font-weight: 600;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #475569;
-    padding: 1rem;
-}
+    .breadcrumb-item a {
+        color: var(--color-neutral-600);
+        text-decoration: none;
+        transition: var(--transition-base);
+    }
 
-.table-modern td {
-    padding: 1rem;
-    vertical-align: middle;
-    color: #334155;
-}
+    .breadcrumb-item a:hover {
+        color: var(--color-primary);
+        text-decoration: underline;
+    }
 
-.table-modern tbody tr {
-    transition: background 0.2s ease;
-}
+    .breadcrumb-item.active {
+        color: var(--color-neutral-800);
+        font-weight: 500;
+    }
 
-.table-modern tbody tr:hover {
-    background: #f8fafc;
-}
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--color-neutral-400);
+    }
 
-/* ====== Botão Outline Refinado ====== */
-.btn-outline-secondary {
-    border-radius: 6px;
-    padding: 0.35rem 0.8rem;
-    font-size: 0.85rem;
-    transition: all 0.2s ease;
-}
+    /* ====== CABEÇALHO DA PÁGINA ====== */
+    .page-header-section {
+        margin-bottom: 2rem;
+    }
 
-.btn-outline-secondary:hover {
-    background-color: #e2e8f0;
-    border-color: #cbd5e1;
-}
+    .title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
 
-/* ====== Estado Vazio ====== */
-.empty-state {
-    padding: 2rem;
-    text-align: center;
-    color: #64748b;
-    font-style: italic;
-}
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--color-neutral-900);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
 
-/* ====== Paginação Moderna ====== */
-.pagination {
-    margin-top: 2rem;
-    justify-content: center;
-}
+    .page-title i {
+        color: var(--color-primary);
+        font-size: 1.5rem;
+    }
 
-.page-link {
-    border-radius: 8px !important;
-    margin: 0 4px;
-    color: #1e293b;
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s ease;
-}
+    /* ====== BOTÕES DE AÇÃO ====== */
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        font-weight: 500;
+        border-radius: var(--radius-md);
+        transition: var(--transition-base);
+        border: none;
+        text-decoration: none;
+        font-size: 0.95rem;
+    }
 
-.page-link:hover {
-    background: #f1f5f9;
-}
+    /* Ação Primária: Cadastrar */
+    .btn-primary {
+        background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+    }
 
-.page-item.active .page-link {
-    background: #2563eb;
-    border-color: #2563eb;
-    color: #fff;
-}
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        color: white;
+        text-decoration: none;
+    }
 
-/* ====== Responsividade ====== */
-@media (max-width: 768px) {
+    .btn-primary:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
 
-    .table-modern thead {
-        display: none;
+    /* Ação Secundária: Editar */
+    .btn-action-secondary {
+        background-color: white;
+        color: var(--color-neutral-600);
+        border: 1px solid var(--color-neutral-200);
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-action-secondary:hover {
+        background-color: var(--color-neutral-50);
+        border-color: var(--color-neutral-400);
+        color: var(--color-neutral-800);
+        text-decoration: none;
+    }
+
+    .btn-action-secondary i {
+        font-size: 0.875rem;
+    }
+
+    /* Ação Perigosa: Excluir */
+    .btn-action-danger {
+        background-color: white;
+        color: var(--color-danger);
+        border: 1px solid #fecaca;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-action-danger:hover {
+        background-color: var(--color-danger);
+        color: white;
+        border-color: var(--color-danger);
+        text-decoration: none;
+    }
+
+    /* Estado Desabilitado (Categoria em uso) */
+    .btn-action-disabled {
+        background-color: var(--color-neutral-100);
+        color: var(--color-neutral-400);
+        border: 1px dashed var(--color-neutral-200);
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        cursor: not-allowed;
+        opacity: 0.8;
+    }
+
+    /* ====== CARD INFORMATIVO ====== */
+    .info-card {
+        background: linear-gradient(to right, #eff6ff, #ffffff);
+        border: 1px solid #dbeafe;
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-left: 4px solid var(--color-primary);
+    }
+
+    .info-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--color-primary);
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .info-text {
+        color: var(--color-neutral-600);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .tags-container {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .tag-label {
+        font-size: 0.8rem;
+        color: var(--color-neutral-600);
+        font-weight: 500;
+    }
+
+    .tags-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .tag {
+        background: white;
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        color: var(--color-neutral-700);
+        border: 1px solid var(--color-neutral-200);
+        font-weight: 500;
+    }
+
+    /* ====== CARD PRINCIPAL - TABELA ====== */
+    .main-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--color-neutral-200);
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--color-neutral-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--color-neutral-50);
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--color-neutral-800);
+        margin: 0;
+    }
+
+    .record-count {
+        font-size: 0.875rem;
+        color: var(--color-neutral-600);
+        background: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        border: 1px solid var(--color-neutral-200);
+    }
+
+    /* ====== TABELA MODERNA ====== */
+    .table-modern {
+        margin: 0;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .table-modern thead th {
+        background-color: var(--color-neutral-50);
+        color: var(--color-neutral-600);
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--color-neutral-200);
+        white-space: nowrap;
     }
 
     .table-modern tbody tr {
-        display: block;
-        margin-bottom: 1rem;
-        border-bottom: 1px solid #e2e8f0;
-        padding-bottom: 1rem;
+        transition: background-color 0.15s ease;
     }
 
-    .table-modern tbody td {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.6rem 0;
+    .table-modern tbody tr:hover {
+        background-color: #fafafa;
     }
 
-    .table-modern tbody td::before {
-        content: attr(data-label);
+    .table-modern td {
+        padding: 1.25rem 1.5rem;
+        vertical-align: middle;
+        color: var(--color-neutral-800);
+        border-bottom: 1px solid var(--color-neutral-100);
+        font-size: 0.95rem;
+    }
+
+    .table-modern tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Células específicas */
+    .cell-nome {
         font-weight: 600;
-        color: #475569;
+        color: var(--color-neutral-900);
     }
 
-    .text-end {
-        text-align: left !important;
+    .cell-descricao {
+        color: var(--color-neutral-600);
+        max-width: 300px;
     }
-}
 
+    /* ====== BADGES DE STATUS ====== */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.5rem 0.875rem;
+        border-radius: 20px;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        border: none;
+    }
+
+    .badge-success {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .badge-warning {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    /* ====== GRUPO DE AÇÕES ====== */
+    .action-group {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+
+    /* ====== ESTADO VAZIO ====== */
+    .empty-state-cell {
+        padding: 3rem 1.5rem;
+        text-align: center;
+    }
+
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        color: var(--color-neutral-500);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: var(--color-neutral-300);
+    }
+
+    .empty-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--color-neutral-700);
+        margin: 0;
+    }
+
+    .empty-text {
+        font-size: 0.95rem;
+        color: var(--color-neutral-500);
+        margin: 0;
+        max-width: 400px;
+    }
+
+    /* ====== RODAPÉ DA TABELA (LEGENDA) ====== */
+    .table-footer {
+        padding: 1rem 1.5rem;
+        background-color: var(--color-neutral-50);
+        border-top: 1px solid var(--color-neutral-200);
+    }
+
+    .actions-legend {
+        color: var(--color-neutral-600);
+        font-size: 0.875rem;
+    }
+
+    .actions-legend i {
+        color: var(--color-primary);
+    }
+
+    /* ====== RESPONSIVIDADE ====== */
+    @media (max-width: 768px) {
+        .title-row {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .page-title {
+            font-size: 1.4rem;
+        }
+
+        .info-card {
+            padding: 1rem;
+        }
+
+        .table-modern thead {
+            display: none;
+        }
+
+        .table-modern tbody tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid var(--color-neutral-200);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .table-modern td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--color-neutral-100);
+        }
+
+        .table-modern td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--color-neutral-600);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .cell-actions {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 0.75rem;
+        }
+
+        .action-group {
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        .btn-action-secondary,
+        .btn-action-danger,
+        .btn-action-disabled {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .badge {
+            align-self: flex-start;
+        }
+    }
+
+    /* ====== FOCO VISÍVEL (ACESSIBILIDADE) ====== */
+    *:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+
+    /* Reduzir movimento para preferências de acessibilidade */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
 </style>
 
-<div class="page-header">
+<!-- 
+  DECISÕES DE UX:
+  1. Área de Mensagens: Posicionada no topo para feedback imediato após ações (sucesso/erro).
+  2. Breadcrumb: Contextualiza o usuário no sistema (Estoque > Categorias).
+  3. Hierarquia Visual: Título principal com ícone reforça identidade da página.
+  4. Botão Primário: "Nova Categoria" em destaque com ícone + texto (nunca ícone só).
+  5. Card Informativo: Separado do conteúdo principal para não poluir a interface, mas acessível.
+  6. Tabela: Cabeçalho fixo visualmente distinto, status com cores semânticas claras.
+  7. Ações: Agrupadas logicamente. Excluir só aparece se total_produtos == 0.
+  8. Estado Desabilitado: Quando há vínculos, mostra botão desabilitado com tooltip explicativo (claridade sobre por que não pode excluir).
+  9. Empty State: Mensagem amigável + CTA direto para cadastro.
+  10. Legenda: Explicação explícita sobre regra do botão Excluir (conforme solicitado).
+-->
 
-    <div class="page-intro">
-        <p>
-            As categorias organizam os produtos do estoque em grupos estratégicos,
-            facilitando relatórios, auditorias e planejamento de compras.
-            Utilize nomenclaturas padronizadas para manter a consistência institucional.
-        </p>
+<!-- Área de Mensagens do Django -->
+{% if messages %}
+<div class="container-messages" role="region" aria-label="Mensagens do sistema">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <span>{{ message }}</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar notificação"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
 
-        <div class="example-tags">
-            <small>Exemplos de categorias utilizadas na merenda escolar:</small>
-            <div class="tags-wrapper">
-                <span class="tag">Grãos e Cereais</span>
-                <span class="tag">Hortifruti</span>
-                <span class="tag">Laticínios</span>
-                <span class="tag">Carnes</span>
-                <span class="tag">Bebidas</span>
-                <span class="tag">Condimentos</span>
-                <span class="tag">Panificação</span>
-            </div>
+<!-- Cabeçalho da Página -->
+<section class="page-header-section" aria-labelledby="page-title">
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'merendaEscolar:merenda_inicio' %}">Estoque</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Categorias</li>
+        </ol>
+    </nav>
+    
+    <div class="title-row">
+        <h1 id="page-title" class="page-title">
+            <i class="bi bi-folder-check" aria-hidden="true"></i>
+            Categorias de Produto
+        </h1>
+        <a href="{% url 'merendaEscolar:categoria_produto_create' %}" class="btn btn-action btn-primary">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            Nova Categoria
+        </a>
+    </div>
+</section>
+
+<!-- Card Informativo -->
+<div class="info-card" role="region" aria-labelledby="info-title">
+    <div class="info-header">
+        <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+        <span id="info-title">Orientações de Cadastro</span>
+    </div>
+    <p class="info-text">
+        As categorias organizam os produtos do estoque em grupos estratégicos, 
+        facilitando relatórios, auditorias e planejamento de compras. 
+        Utilize nomenclaturas padronizadas para manter a consistência institucional.
+    </p>
+    <div class="tags-container">
+        <span class="tag-label">Exemplos de categorias:</span>
+        <div class="tags-wrapper">
+            <span class="tag">Grãos e Cereais</span>
+            <span class="tag">Hortifruti</span>
+            <span class="tag">Laticínios</span>
+            <span class="tag">Carnes</span>
+            <span class="tag">Bebidas</span>
+            <span class="tag">Condimentos</span>
+            <span class="tag">Panificação</span>
         </div>
     </div>
-
-
-    <h2>Categorias de Produto</h2>
-    <a href="{% url 'merendaEscolar:categoria_produto_create' %}" class="btn btn-primary">
-        Nova Categoria
-    </a>
 </div>
 
-<div class="table-responsive table-modern">
-    <table class="table align-middle mb-0">
-
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Descrição</th>
-                <th>Uso no Estoque</th>
-                <th class="text-end">Ações</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-        {% for categoria in categorias %}
-
-            <tr>
-
-                <td data-label="Nome">
-                    <strong>{{ categoria.nome }}</strong>
-                </td>
-
-                <td data-label="Descrição">
-                    {{ categoria.descricao|default:"—" }}
-                </td>
-
-                <td data-label="Uso">
-
-                    {% if categoria.total_produtos > 0 %}
-                        <span class="badge bg-secondary">
-                            <i class="bi bi-box-seam"></i>
-                            Em uso ({{ categoria.total_produtos }})
+<!-- Card Principal - Listagem -->
+<div class="main-card" role="region" aria-labelledby="table-title">
+    <div class="card-header">
+        <h2 id="table-title" class="card-title">Categorias Cadastradas</h2>
+        {% if categorias %}
+        <span class="record-count">{{ categorias|length }} registro{{ categorias|length|pluralize:"s" }}</span>
+        {% endif %}
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-modern" role="table" aria-label="Lista de categorias de produtos">
+            <thead>
+                <tr>
+                    <th scope="col" class="col-nome">Nome da Categoria</th>
+                    <th scope="col" class="col-descricao">Descrição</th>
+                    <th scope="col" class="col-status">Status de Vínculo</th>
+                    <th scope="col" class="col-actions text-end">Ações Disponíveis</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for categoria in categorias %}
+                <tr>
+                    <td data-label="Categoria" class="cell-nome">
+                        {{ categoria.nome }}
+                    </td>
+                    <td data-label="Descrição" class="cell-descricao">
+                        {{ categoria.descricao|default:"Não informada" }}
+                    </td>
+                    <td data-label="Status" class="cell-status">
+                        {% if categoria.total_produtos > 0 %}
+                        <span class="badge badge-warning" role="status">
+                            <i class="bi bi-link-45deg" aria-hidden="true"></i>
+                            Em uso ({{ categoria.total_produtos }} produto{{ categoria.total_produtos|pluralize:"s" }})
                         </span>
-                    {% else %}
-                        <span class="badge bg-success">
-                            <i class="bi bi-check-circle"></i>
-                            Disponível
+                        {% else %}
+                        <span class="badge badge-success" role="status">
+                            <i class="bi bi-check-circle" aria-hidden="true"></i>
+                            Disponível para uso
                         </span>
-                    {% endif %}
+                        {% endif %}
+                    </td>
+                    <td data-label="Ações" class="cell-actions text-end">
+                        <div class="action-group" role="group" aria-label="Ações para a categoria {{ categoria.nome }}">
+                            
+                            <!-- Ação Primária: Editar -->
+                            <a href="{% url 'merendaEscolar:categoria_produto_update' categoria.id %}" 
+                               class="btn btn-action-secondary" 
+                               aria-label="Editar categoria {{ categoria.nome }}"
+                               title="Alterar dados da categoria">
+                                <i class="bi bi-pencil" aria-hidden="true"></i>
+                                <span>Editar</span>
+                            </a>
 
-                </td>
-
-                <td data-label="Ações" class="text-end">
-
-                    <a href="{% url 'merendaEscolar:categoria_produto_update' categoria.id %}"
-                    class="btn btn-sm btn-outline-secondary">
-                        <i class="bi bi-pencil-square me-1"></i>
-                        Editar
-                    </a>
-
-                    {% if categoria.total_produtos == 0 %}
-                    
-                    <a href="{% url 'merendaEscolar:categoria_produto_delete' categoria.id %}"
-                    class="btn-outline-danger-modern">
-                        <i class="bi bi-trash me-1"></i>
-                        Excluir
-                    </a>
-                    {% endif %}
-
-                </td>
-
-            </tr>
-
-        {% empty %}
-
-            <tr>
-                <td colspan="4" class="empty-state">
-                    Nenhuma categoria cadastrada.
-                </td>
-            </tr>
-
-        {% endfor %}
-
-        </tbody>
-
-    </table>
+                            <!-- 
+                                DECISÃO UX: Botão Excluir 
+                                Só é exibido se a categoria não tiver vínculos (total_produtos == 0).
+                                Caso contrário, exibe estado desabilitado com ícone de cadeado
+                                para evitar frustração do usuário (ele sabe que existe ação, 
+                                mas entende que está bloqueada por motivo de segurança/integridade).
+                            -->
+                            {% if categoria.total_produtos == 0 %}
+                            <a href="{% url 'merendaEscolar:categoria_produto_delete' categoria.id %}" 
+                               class="btn btn-action-danger" 
+                               aria-label="Excluir categoria {{ categoria.nome }}"
+                               title="Remover permanentemente esta categoria"
+                               onclick="return confirm('Confirma a exclusão da categoria \"{{ categoria.nome }}\"? Esta ação não poderá ser desfeita.')">
+                                <i class="bi bi-trash" aria-hidden="true"></i>
+                                <span>Excluir</span>
+                            </a>
+                            {% else %}
+                            <button type="button" 
+                                    class="btn btn-action-disabled" 
+                                    disabled 
+                                    aria-label="Não é possível excluir: categoria possui {{ categoria.total_produtos }} produto{{ categoria.total_produtos|pluralize:'s' }} vinculado{{ categoria.total_produtos|pluralize:'s' }}"
+                                    title="Esta categoria não pode ser excluída pois possui produtos vinculados ao estoque. Remova os vínculos primeiro.">
+                                <i class="bi bi-lock-fill" aria-hidden="true"></i>
+                                <span>Vinculada</span>
+                            </button>
+                            {% endif %}
+                            
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="empty-state-cell">
+                        <div class="empty-state" role="status">
+                            <i class="bi bi-inbox" aria-hidden="true"></i>
+                            <p class="empty-title">Nenhuma categoria cadastrada</p>
+                            <p class="empty-text">Cadastre categorias para organizar os produtos do estoque de merenda escolar.</p>
+                            <a href="{% url 'merendaEscolar:categoria_produto_create' %}" class="btn btn-action btn-primary">
+                                <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                                Cadastrar Primeira Categoria
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Explicação sobre regras de exclusão -->
+    <div class="table-footer">
+        <div class="actions-legend">
+            <i class="bi bi-info-circle" aria-hidden="true"></i>
+            <strong>Nota sobre exclusão:</strong> 
+            O botão <em>Excluir</em> só é exibido para categorias que ainda não foram vinculadas a nenhum produto no estoque. 
+            Categorias em uso (indicadas pelo selo amarelo "Em uso") possuem vínculos ativos e não podem ser removidas 
+            para preservar a integridade dos registros históricos. Para excluir, desvincule todos os produtos primeiro.
+        </div>
+    </div>
 </div>
-
 
 {% endblock %}
