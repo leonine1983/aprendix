@@ -13,6 +13,13 @@ from django.forms import inlineformset_factory
 from ...models import Receita, ReceitaIngrediente, CardapioItem, ExecucaoReceita
 
 
+from django.shortcuts import redirect
+from django.forms import inlineformset_factory
+from django.db.models import Q
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.views.generic import ListView
+from ...models import Receita, ReceitaIngrediente, CardapioItem, ExecucaoReceita
+
 class ReceitaListView(
     LoginRequiredMixin,
     GroupRequiredMixin,
@@ -21,11 +28,46 @@ class ReceitaListView(
 ):
     model = Receita
     template_name = "merendaEscolar/receitas/receita_lista.html"
-    context_object_name = "receitas"
-    paginate_by = 20
+    context_object_name = "receitas"  # Mantém compatibilidade com seu template
+    paginate_by = 5                # Define 20 itens por página
+    ordering = ['-criada_em']         # Ordenação padrão
 
     permission_required = "merendaEscolar.view_receita"
     group_required = NUTRICIONISTA_GROUPS
+
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related('criada_por')
+        
+        # Filtro de busca
+        self.search_query = self.request.GET.get('q', '').strip()
+        if self.search_query:
+            queryset = queryset.filter(
+                Q(nome__icontains=self.search_query) | 
+                Q(descricao__icontains=self.search_query)
+            )
+        
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        # IMPORTANTE: Chamar super() primeiro para incluir page_obj no contexto
+        context = super().get_context_data(**kwargs)
+        
+        # Preserva o termo de busca para o template
+        context['search_query'] = getattr(self, 'search_query', '')
+        
+        # Contadores (usando count() no queryset completo, não apenas na página)
+        base_qs = Receita.objects.all()
+        if getattr(self, 'search_query', ''):
+            base_qs = base_qs.filter(
+                Q(nome__icontains=self.search_query) | 
+                Q(descricao__icontains=self.search_query)
+            )
+            
+        context['total_receitas'] = base_qs.count()
+        context['receitas_ativas'] = base_qs.filter(ativa=True).count()
+        
+        return context
+
 
 
 class ReceitaDetailView(

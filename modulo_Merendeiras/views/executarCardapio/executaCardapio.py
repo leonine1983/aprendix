@@ -45,31 +45,58 @@ class CardapioHojeView(BaseMerendeiraView, TemplateView):
     """
     Dashboard principal: mostra o cardápio do dia atual e status de execução.
     """
-    template_name = "modulo_merendeiras/cardapio/cardapio_hoje.html"
+    template_name = "modulo_merendeiras/cadapioHoje/cardapio_hoje.html"
     
-    def get_cardapio_do_dia(self, escola, hoje):
-        """
-        Busca o cardápio baseado no dia da semana (1-7, Segunda=1, Domingo=7)
-        """
-        # Converte data para dia da semana (1=Segunda, 7=Domingo)
-        dia_semana = hoje.isoweekday()
+    # modulo_Merendeiras/views/executarCardapio/executaCardapio.py
+
+    # modulo_Merendeiras/views/executarCardapio/executaCardapio.py
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        escola = self.get_escola_usuario()
         
-        # Busca semana ativa da escola
-        # Se tiver campos de data_inicio/data_fim na semana, descomente abaixo:
-        semana = CardapioSemana.objects.filter(
+        if not escola:
+            messages.error(self.request, "Você não está vinculada a nenhuma escola.")
+            return ctx
+        
+        hoje = timezone.now().date()
+        
+        # Busca cardápio planejado para hoje
+        cardapio_hoje = self.get_cardapio_do_dia(escola, hoje)
+        
+        # Busca execução existente
+        execucao_existente = ExecucaoCardapioDia.objects.filter(
             escola=escola,
-            ativo=True,
-            # data_inicio__lte=hoje,  # descomente se existir
-            # data_fim__gte=hoje       # descomente se existir
-        ).first()
+            data=hoje
+        ).prefetch_related('itens_executados__receita', 'itens_executados__tipo_refeicao').first()
         
-        if not semana:
-            return None
+        # Prepara dados do cardápio
+        itens_cardapio = []
+        if cardapio_hoje and not execucao_existente:
+            itens = CardapioItem.objects.filter(
+                dia=cardapio_hoje  # ✅ CORRIGIDO: campo é 'dia', não 'cardapio_dia'
+            ).select_related('receita', 'tipo_refeicao')
             
-        return CardapioDia.objects.filter(
-            semana=semana,
-            dia_semana=dia_semana
-        ).select_related('semana').first()
+            for item in itens:
+                disponivel, info = verificar_disponibilidade_ingredientes(
+                    escola, item.receita, item.receita.rendimento
+                )
+                item.estoque_ok = disponivel
+                item.detalhes_estoque = info
+                itens_cardapio.append(item)
+        
+        ctx.update({
+            'hoje': hoje,
+            'cardapio': cardapio_hoje,
+            'execucao': execucao_existente,
+            'itens_cardapio': itens_cardapio,
+            'pode_executar': cardapio_hoje and not execucao_existente and itens_cardapio,
+            'escola': escola,
+        })
+        
+        return ctx
+
+
     
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
