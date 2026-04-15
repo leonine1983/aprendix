@@ -236,3 +236,34 @@ def soma_float(value, arg):
         return float(value) + float(arg)
     except (ValueError, TypeError):
         return value
+    
+
+@register.filter
+def divide(valor, divisor):
+    """
+    Divide o valor pelo divisor, retornando 0 em caso de erro ou divisão por zero.
+    
+    Exemplo:
+        {{ 100|divide:4 }} → 25
+        {{ porcoes_maximas|divide:porcoes_sugeridas|multiplica:100 }} → percentual
+    """
+    try:
+        if float(divisor) == 0:
+            return 0
+        return float(valor) / float(divisor)
+    except (ValueError, TypeError, ZeroDivisionError):
+        return 0
+
+
+@register.filter
+def subtrai(valor, subtrator):
+    """
+    Subtrai o subtrator do valor.
+    
+    Exemplo:
+        {{ total_itens|subtrai:itens_com_estoque }} → restante
+    """
+    try:
+        return float(valor) - float(subtrator)
+    except (ValueError, TypeError):
+        return 0

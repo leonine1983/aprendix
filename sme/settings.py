@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',    
     'widget_tweaks',
+    'django.contrib.humanize',
 
 ]
 

@@ -795,13 +795,17 @@ class DivergenciaEntrega(models.Model):
 class Receita(models.Model):
     """
     Receita institucional proposta pela Secretaria.
-    Não executa estoque. Apenas define composição técnica.
     """
-
     nome = models.CharField(max_length=150)
     descricao = RichTextField()
     modo_preparo = RichTextField()
     ativa = models.BooleanField(default=True)
+    
+    # ADICIONAR ESTE CAMPO:
+    rendimento = models.PositiveIntegerField(
+        default=100,
+        help_text="Quantidade de porções que a receita produz (padrão)"
+    )
 
     criada_por = models.ForeignKey(User, on_delete=models.PROTECT)
     criada_em = models.DateTimeField(auto_now_add=True)
@@ -811,6 +815,7 @@ class Receita(models.Model):
 
     def __str__(self):
         return self.nome
+
    
 
 class ReceitaIngrediente(models.Model):

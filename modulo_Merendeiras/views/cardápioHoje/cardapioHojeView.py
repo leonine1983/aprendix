@@ -25,33 +25,28 @@ class CardapioHojeView(MerendeirasRequiredMixin, BaseMerendeiraView, TemplateVie
         return (delta // 7) + 1
 
     # ------------------------------------------------------------------ #
-    # Contexto principal                                                 #
+    # NOVO MÉTODO EXTRAÍDO                                               #
     # ------------------------------------------------------------------ #
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        hoje = timezone.localdate()
+    def get_cardapio_do_dia(self, escola, hoje):
+        """
+        Recupera o cardápio do dia para a escola especificada.
+        Retorna um dicionário com o contexto do cardápio.
+        """
         dia_semana_iso = hoje.isoweekday()  # 1=Segunda … 7=Domingo
-
-        # ── 1. Escola (via BaseMerendeiraView) ─────────────────────────
-        escola = self.get_escola_usuario()
-
-        context["escola"] = escola
-        context["hoje"] = hoje
-        context["dia_semana_iso"] = dia_semana_iso
 
         # 🚫 Fim de semana
         if dia_semana_iso > 5:
-            context["sem_cardapio"] = True
-            context["motivo"] = "Hoje é fim de semana. Não há merenda escolar."
-            return context
+            return {
+                "sem_cardapio": True,
+                "motivo": "Hoje é fim de semana. Não há merenda escolar."
+            }
 
         # 🚫 Usuário sem escola
         if not escola:
-            context["sem_cardapio"] = True
-            context["motivo"] = "Seu usuário não está vinculado a nenhuma escola."
-            return context
+            return {
+                "sem_cardapio": True,
+                "motivo": "Seu usuário não está vinculado a nenhuma escola."
+            }
 
         # ── 2. Cardápio ativo ─────────────────────────────────────────
         vinculo = (
@@ -67,36 +62,34 @@ class CardapioHojeView(MerendeirasRequiredMixin, BaseMerendeiraView, TemplateVie
         )
 
         if not vinculo:
-            context["sem_cardapio"] = True
-            context["motivo"] = "Não há cardápio ativo para hoje."
-            return context
+            return {
+                "sem_cardapio": True,
+                "motivo": "Não há cardápio ativo para hoje."
+            }
 
         cardapio = vinculo.cardapio
 
         # ── 3. Semana atual ───────────────────────────────────────────
         numero_semana = self._calcular_semana(cardapio.data_inicio, hoje)
-
         semana = cardapio.semanas.filter(numero=numero_semana).first()
 
         if not semana:
-            context.update({
+            return {
                 "sem_cardapio": True,
                 "motivo": f"Semana {numero_semana} não cadastrada.",
                 "cardapio": cardapio,
-            })
-            return context
+            }
 
         # ── 4. Dia da semana ──────────────────────────────────────────
         dia = semana.dias.filter(dia_semana=dia_semana_iso).first()
 
         if not dia:
-            context.update({
+            return {
                 "sem_cardapio": True,
                 "motivo": "Não há cardápio para hoje.",
                 "cardapio": cardapio,
                 "semana": semana,
-            })
-            return context
+            }
 
         # ── 5. Itens do dia ───────────────────────────────────────────
         itens = (
@@ -115,8 +108,8 @@ class CardapioHojeView(MerendeirasRequiredMixin, BaseMerendeiraView, TemplateVie
             tipo = item.tipo_refeicao.nome
             refeicoes.setdefault(tipo, []).append(item)
 
-        # ── 6. Contexto final ─────────────────────────────────────────
-        context.update({
+        # ── 6. Retorno do contexto ────────────────────────────────────
+        return {
             "cardapio": cardapio,
             "semana": semana,
             "dia": dia,
@@ -126,6 +119,23 @@ class CardapioHojeView(MerendeirasRequiredMixin, BaseMerendeiraView, TemplateVie
                 "Nenhuma refeição cadastrada para hoje."
                 if not refeicoes else None
             ),
-        })
+        }
+
+    # ------------------------------------------------------------------ #
+    # Contexto principal (atualizado)                                    #
+    # ------------------------------------------------------------------ #
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        hoje = timezone.localdate()
+        escola = self.get_escola_usuario()
+
+        # Dados base sempre disponíveis
+        context["escola"] = escola
+        context["hoje"] = hoje
+        context["dia_semana_iso"] = hoje.isoweekday()
+
+        # Adiciona dados do cardápio chamando o novo método
+        context.update(self.get_cardapio_do_dia(escola, hoje))
 
         return context

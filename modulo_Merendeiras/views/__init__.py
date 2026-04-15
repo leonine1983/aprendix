@@ -12,6 +12,7 @@ from .cardápioHoje.receitaDetailView import ReceitaDetailView
 
 # Executa o cardaio
 from .executarCardapio.executaCardapio import *
+from .executarCardapio.prepararExecucaoView import *
 
 # Estoque Escola
 from .estoque.estoqueEscolaListView import *

@@ -1,0 +1,411 @@
+{% extends "modulo_merendeiras/base_merendeira.html" %}
+{% load static %}
+
+{% block title %}Preparação de Execução | {{ escola.nome }}{% endblock %}
+
+{% block content %}
+<style>
+:root {
+  --primary-green: #2E7D32;
+  --warning-amber: #F57C00;
+  --danger-red: #D32F2F;
+  --surface-bg: #F5F7FA;
+  --card-bg: #FFFFFF;
+  --text-primary: #1A202C;
+  --text-secondary: #4A5568;
+  --border-subtle: #E2E8F0;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+.prep-header {
+  background: linear-gradient(135deg, var(--primary-green) 0%, #1B5E20 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.prep-header__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.prep-header__meta {
+  display: flex;
+  gap: 1.5rem;
+  opacity: 0.95;
+  font-size: 0.95rem;
+  flex-wrap: wrap;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  background: white;
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid var(--border-subtle);
+  border-left: 4px solid var(--primary-green);
+}
+
+.kpi-card--warning { border-left-color: var(--warning-amber); }
+
+.kpi-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.portion-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface-bg);
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.portion-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--text-secondary);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.portion-btn:hover:not(:disabled) {
+  background: var(--primary-green);
+  color: white;
+}
+
+.portion-input {
+  width: 60px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.prep-item {
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.prep-item--ok { border-left: 4px solid var(--primary-green); }
+.prep-item--limited { border-left: 4px solid var(--warning-amber); }
+.prep-item--blocked { border-left: 4px solid var(--danger-red); }
+
+.prep-item__header {
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.stock-bar {
+  padding: 0 1.25rem 1.25rem;
+  border-top: 1px solid var(--border-subtle);
+  background: #FAFBFC;
+}
+
+.stock-bar__track {
+  height: 8px;
+  background: #E2E8F0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.stock-bar__fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.stock-bar__fill--ok { background: var(--primary-green); }
+.stock-bar__fill--warning { background: var(--warning-amber); }
+.stock-bar__fill--danger { background: var(--danger-red); }
+
+.ingredients-panel {
+  padding: 1.25rem;
+  background: var(--surface-bg);
+  border-top: 1px solid var(--border-subtle);
+  display: none;
+}
+
+.ingredients-panel.show { display: block; }
+
+.action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid var(--border-subtle);
+  padding: 1rem 2rem;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-execute {
+  background: var(--primary-green);
+  color: white;
+  border: none;
+  padding: 0.875rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.btn-execute:disabled {
+  background: #A0AEC0;
+  cursor: not-allowed;
+}
+
+.btn-secondary-action {
+  background: white;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  padding: 0.875rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  margin-right: 0.75rem;
+  text-decoration: none;
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .prep-item__header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .action-bar { flex-direction: column; gap: 1rem; }
+}
+</style>
+
+<div class="prep-header">
+  <div class="prep-header__title">🍽️ Preparação de Execução</div>
+  <div class="prep-header__meta">
+    <span><i class="far fa-calendar me-2"></i>{{ hoje|date:"l, d \d\e F \d\e Y"|capfirst }}</span>
+    <span><i class="fas fa-utensils me-2"></i>{{ total_itens }} receita{{ total_itens|pluralize }}</span>
+  </div>
+</div>
+
+<div class="kpi-grid">
+  <!-- Card de Status com widthratio -->
+  <div class="kpi-card {% if itens_com_estoque == total_itens %}{% else %}kpi-card--warning{% endif %}">
+    <div class="kpi-value">{{ itens_com_estoque }}/{{ total_itens }}</div>
+    <div style="font-size: 0.875rem; color: var(--text-secondary);">Prontas para Execução</div>
+    <div style="font-size: 0.8rem; margin-top: 0.5rem;">
+      {% if itens_com_estoque == total_itens %}
+        <span class="text-success"><i class="fas fa-check-circle"></i> Estoque OK</span>
+      {% else %}
+        <span class="text-warning"><i class="fas fa-exclamation-circle"></i> {{ total_itens|add:"-"|add:itens_com_estoque }} com restrições</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-value" id="kpi-porcoes">0</div>
+    <div style="font-size: 0.875rem; color: var(--text-secondary);">Porções Totais</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-value">{{ cardapio.semana.numero }}ª</div>
+    <div style="font-size: 0.875rem; color: var(--text-secondary);">Semana do Cardápio</div>
+  </div>
+
+  <!-- USANDO WIDTHRATIO para calcular porcentagem -->
+  <div class="kpi-card">
+    <div class="kpi-value">{% widthratio itens_com_estoque total_itens 100 %}%</div>
+    <div style="font-size: 0.875rem; color: var(--text-secondary);">Disponibilidade</div>
+    <div class="progress" style="height: 6px; margin-top: 8px;">
+      <div class="progress-bar {% if itens_com_estoque == total_itens %}bg-success{% else %}bg-warning{% endif %}" 
+           style="width: {% widthratio itens_com_estoque total_itens 100 %}%"></div>
+    </div>
+  </div>
+</div>
+
+<form method="post" id="formExecucao" style="margin-bottom: 100px;">
+  {% csrf_token %}
+  
+  {% for item_data in itens %}
+  <div class="prep-item {% if item_data.estoque_ok %}prep-item--ok{% elif item_data.porcoes_maximas > 0 %}prep-item--limited{% else %}prep-item--blocked{% endif %}"
+       data-receita-id="{{ item_data.item.receita.id }}"
+       data-maximo="{{ item_data.porcoes_maximas|default:item_data.porcoes_sugeridas }}"
+       data-sugerido="{{ item_data.porcoes_sugeridas }}">
+    
+    <div class="prep-item__header" onclick="toggleDetails({{ item_data.item.receita.id }})">
+      <div>
+        <h5 style="margin: 0; font-weight: 600;">{{ item_data.item.receita.nome }}</h5>
+        <span class="badge bg-secondary">{{ item_data.item.tipo_refeicao.nome }}</span>
+        {% if not item_data.estoque_ok %}
+          <span class="badge bg-warning text-dark">Estoque Limitado</span>
+        {% endif %}
+      </div>
+      
+      <div class="portion-control" onclick="event.stopPropagation()">
+        <button type="button" class="portion-btn" onclick="ajustarPorcao({{ item_data.item.receita.id }}, -10)" 
+                {% if item_data.porcoes_maximas == 0 %}disabled{% endif %}>-</button>
+        <input type="number" 
+               name="porcoes_{{ item_data.item.receita.id }}" 
+               id="input_{{ item_data.item.receita.id }}"
+               class="portion-input" 
+               value="{% if item_data.porcoes_maximas == 0 %}0{% else %}{{ item_data.porcoes_sugeridas }}{% endif %}" 
+               min="0" 
+               max="{{ item_data.porcoes_maximas|default:item_data.porcoes_sugeridas }}"
+               onchange="atualizarTotal()"
+               {% if item_data.porcoes_maximas == 0 %}disabled{% endif %}>
+        <button type="button" class="portion-btn" onclick="ajustarPorcao({{ item_data.item.receita.id }}, 10)"
+                {% if item_data.porcoes_maximas == 0 %}disabled{% endif %}>+</button>
+      </div>
+    </div>
+    
+    <div class="stock-bar">
+      <div style="display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.5rem;">
+        <span>
+          <i class="fas fa-box-open me-1"></i> 
+          Disponibilidade de Ingredientes
+          {% if not item_data.estoque_ok %}
+            <span class="text-danger fw-bold">(Máx: {{ item_data.porcoes_maximas }} porções)</span>
+          {% endif %}
+        </span>
+        <span id="pct-text-{{ item_data.item.receita.id }}" class="{% if item_data.estoque_ok %}text-success{% else %}text-warning{% endif %}">
+          <!-- USANDO WIDTHRATIO para percentual do item -->
+          {% if item_data.estoque_ok %}100{% else %}{% widthratio item_data.porcoes_maximas item_data.porcoes_sugeridas 100 %}{% endif %}%
+        </span>
+      </div>
+      <div class="stock-bar__track">
+        <div class="stock-bar__fill {% if item_data.estoque_ok %}stock-bar__fill--ok{% elif item_data.porcoes_maximas > 0 %}stock-bar__fill--warning{% else %}stock-bar__fill--danger{% endif %}" 
+             id="bar-{{ item_data.item.receita.id }}"
+             style="width: {% if item_data.estoque_ok %}100{% else %}{% widthratio item_data.porcoes_maximas item_data.porcoes_sugeridas 100 %}{% endif %}%">
+        </div>
+      </div>
+      
+      <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem; cursor: pointer;" 
+           onclick="toggleDetails({{ item_data.item.receita.id }})">
+        <i class="fas fa-chevron-down" id="icon-{{ item_data.item.receita.id }}"></i> Ver detalhes dos ingredientes
+      </div>
+    </div>
+
+    <div class="ingredients-panel" id="details-{{ item_data.item.receita.id }}">
+      <h6 style="font-weight: 600; margin-bottom: 1rem;">Ingredientes Necessários:</h6>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 0.75rem;">
+        {% for ing in item_data.ingredientes %}
+        <div style="padding: 0.75rem; background: white; border-radius: 8px; border: 1px solid var(--border-subtle); {% if not ing.saldo_ok %}border-color: #FECACA; background: #FEE2E2;{% endif %}">
+          <div style="font-weight: 500; margin-bottom: 0.25rem;">{{ ing.produto }}</div>
+          <div style="font-size: 0.875rem; color: var(--text-secondary);">
+            Nec: <strong>{{ ing.necessario|floatformat:2 }} {{ ing.unidade }}</strong> | 
+            Disp: {{ ing.disponivel|floatformat:2 }} {{ ing.unidade }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      
+      {% if item_data.faltantes %}
+      <div class="alert alert-danger mt-3 mb-0 py-2">
+        <i class="fas fa-times-circle me-2"></i>
+        <small><strong>Faltando:</strong> {{ item_data.faltantes|join:", " }}</small>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</form>
+
+<div class="action-bar">
+  <div style="font-weight: 600;">
+    Total: <span id="total-porcoes-display" style="font-size: 1.25rem;">0</span> porções
+    <span class="mx-3">|</span>
+    <span id="resumo-receitas" style="color: var(--text-secondary); font-size: 0.9rem;">0 receitas</span>
+  </div>
+  <div>
+    <a href="{% url 'modulo_merendeiras:cardapio_hoje' %}" class="btn-secondary-action">Voltar</a>
+    <button type="button" class="btn-secondary-action" onclick="ajustarTudoParaMaximo()">Usar Máximo Viável</button>
+    <button type="submit" class="btn-execute" id="btn-executar" disabled>Executar Cardápio</button>
+  </div>
+</div>
+
+<script>
+function ajustarPorcao(id, delta) {
+  const input = document.getElementById('input_' + id);
+  const card = document.querySelector('[data-receita-id="' + id + '"]');
+  const maximo = parseInt(card.dataset.maximo) || 0;
+  
+  let valor = parseInt(input.value) || 0;
+  valor = Math.max(0, Math.min(valor + delta, maximo));
+  
+  input.value = valor;
+  atualizarTotal();
+}
+
+function atualizarTotal() {
+  const inputs = document.querySelectorAll('.portion-input');
+  let total = 0;
+  let receitasAtivas = 0;
+  
+  inputs.forEach(input => {
+    const val = parseInt(input.value) || 0;
+    total += val;
+    if (val > 0) receitasAtivas++;
+  });
+  
+  document.getElementById('total-porcoes-display').textContent = total;
+  document.getElementById('resumo-receitas').textContent = receitasAtivas + ' receita' + (receitasAtivas !== 1 ? 's' : '');
+  document.getElementById('kpi-porcoes').textContent = total;
+  document.getElementById('btn-executar').disabled = total === 0;
+}
+
+function ajustarTudoParaMaximo() {
+  document.querySelectorAll('.prep-item').forEach(card => {
+    const maximo = parseInt(card.dataset.maximo) || 0;
+    const input = card.querySelector('.portion-input');
+    if (maximo > 0 && input) {
+      input.value = maximo;
+    }
+  });
+  atualizarTotal();
+}
+
+function toggleDetails(id) {
+  const panel = document.getElementById('details-' + id);
+  const icon = document.getElementById('icon-' + id);
+  panel.classList.toggle('show');
+  icon.style.transform = panel.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+document.getElementById('formExecucao').addEventListener('submit', function(e) {
+  if (!confirm('Confirmar execução do cardápio? Os ingredientes serão debitados do estoque.')) {
+    e.preventDefault();
+  }
+});
+
+atualizarTotal();
+</script>
+{% endblock %}
