@@ -1,105 +1,809 @@
 {% extends "merendaEscolar/estoque_base.html" %}
+{% load static %}
 
 {% block content %}
 
-<div class="module-card">
+<style>
+    /* Design System Moderno - Redução de Fricção */
+    :root {
+        --surface: #ffffff;
+        --background: #f8fafc;
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --border: #e2e8f0;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --radius: 12px;
+        --radius-sm: 8px;
+        --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-    <!-- HEADER INSTITUCIONAL -->
-    <div class="module-header">
+    /* Container Principal */
+    .escolas-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
 
-        <h2 class="module-title">
-            Dashboards de Estoque por Escola
-        </h2>
+    /* Header Institucional */
+    .page-header {
+        margin-bottom: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
 
-        <p class="module-subtitle">
-            Selecione uma unidade escolar para visualizar indicadores estratégicos de estoque.
-        </p>
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
 
-        <!-- Busca Institucional -->
-        <form method="get" style="margin-top:20px; max-width:420px;">
-            <div style="position:relative;">
-                <i class="fas fa-search"
-                   style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#94a3b8;">
-                </i>
-                <input
-                    type="text"
-                    name="q"
-                    value="{{ request.GET.q }}"
-                    placeholder="Buscar escola..."
-                    style="
-                        width:100%;
-                        padding:10px 14px 10px 38px;
-                        border-radius:12px;
-                        border:1px solid var(--border);
-                        font-size:.9rem;
-                        outline:none;
-                    ">
+    .title-section h1 {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        line-height: 1.2;
+        letter-spacing: -0.025em;
+    }
+
+    .subtitle {
+        color: var(--text-secondary);
+        margin-top: 0.5rem;
+        font-size: 1rem;
+        max-width: 600px;
+    }
+
+    /* Barra de Busca Moderna - Fricção Zero */
+    .search-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 480px;
+    }
+
+    .search-input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+
+    .search-input-group:focus-within {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1), var(--shadow);
+        transform: translateY(-1px);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        color: var(--text-secondary);
+        pointer-events: none;
+        transition: var(--transition);
+    }
+
+    .search-input-group:focus-within .search-icon {
+        color: var(--primary);
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.875rem 1rem 0.875rem 2.75rem;
+        border: none;
+        background: transparent;
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        outline: none;
+    }
+
+    .search-input::placeholder {
+        color: var(--text-secondary);
+    }
+
+    /* Botão Limpar Busca */
+    .clear-search {
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #f1f5f9;
+        border: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        cursor: pointer;
+        opacity: 0;
+        transition: var(--transition);
+        font-size: 0.75rem;
+    }
+
+    .search-input-group:hover .clear-search,
+    .search-input:not(:placeholder-shown) + .clear-search {
+        opacity: 1;
+    }
+
+    .clear-search:hover {
+        background: #e2e8f0;
+        color: var(--text-primary);
+    }
+
+    /* KPIs Cards - Informação em Glance */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--primary);
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+
+    .kpi-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 0.75rem;
+    }
+
+    .kpi-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .kpi-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-sm);
+        background: rgba(var(--primary-rgb), 0.1);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.125rem;
+    }
+
+    .kpi-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1;
+        margin-top: 0.25rem;
+    }
+
+    .kpi-trend {
+        font-size: 0.875rem;
+        color: #10b981;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Grid de Escolas - Cards Interativos */
+    .escolas-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .escola-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        cursor: pointer;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .escola-card:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-4px);
+    }
+
+    .escola-card:active {
+        transform: translateY(-2px);
+    }
+
+    /* Status Indicator */
+    .status-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .status-normal {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-alerta {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-critico {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .escola-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding-right: 80px; /* espaço para o badge */
+    }
+
+    .escola-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(var(--primary-rgb), 0.1);
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .escola-info h3 {
+        margin: 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .escola-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: auto;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .meta-item i {
+        color: var(--primary);
+        width: 16px;
+        text-align: center;
+    }
+
+    /* Barra de Progresso Visual (Estoque) */
+    .estoque-bar {
+        margin-top: 0.5rem;
+    }
+
+    .estoque-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.25rem;
+    }
+
+    .progress-bg {
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), #60a5fa);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+
+    /* Ação Primária - Botão Fantasma que aparece no hover */
+    .card-action {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-dashboard {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+        border-radius: var(--radius-sm);
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-dashboard:hover {
+        filter: brightness(1.1);
+        transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.4);
+    }
+
+    /* Paginação Moderna */
+    .pagination-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .pagination-info {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    .pagination-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--surface);
+        padding: 0.5rem;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .page-btn {
+        min-width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+    }
+
+    .page-btn:hover:not(:disabled) {
+        background: #f1f5f9;
+        color: var(--text-primary);
+    }
+
+    .page-btn.active {
+        background: var(--primary);
+        color: white;
+        font-weight: 600;
+    }
+
+    .page-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .page-btn.nav-btn {
+        padding: 0 1rem;
+        gap: 0.5rem;
+    }
+
+    /* Empty State Ilustrativo */
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--surface);
+        border-radius: var(--radius);
+        border: 2px dashed var(--border);
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: #cbd5e1;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state h3 {
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .escolas-container {
+            padding: 1rem;
+        }
+        
+        .escolas-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .header-content {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .search-wrapper {
+            max-width: 100%;
+        }
+    }
+
+    /* Micro-interação: Skeleton Loading */
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .skeleton {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        background: #e2e8f0;
+        border-radius: var(--radius-sm);
+    }
+</style>
+
+<div class="escolas-container">
+
+    <!-- Header com Busca Institucional -->
+    <header class="page-header">
+        <div class="header-content">
+            <div class="title-section">
+                <h1>Unidades Escolares</h1>
+                <p class="subtitle">
+                    Gestão estratégica de estoque. Selecione uma unidade para visualizar indicadores 
+                    em tempo real e tomar decisões baseadas em dados.
+                </p>
             </div>
-        </form>
-
-    </div>
-
-    <!-- KPIs ESTRATÉGICOS -->
-    <div class="kpi-row" style="padding:24px 32px 0 32px;">
-
-        <div class="kpi-card kpi-normal">
-            <div class="kpi-label">Total de Escolas</div>
-            <div class="kpi-value">{{ escolas|length }}</div>
+            
+            <!-- Busca com Redução de Fricção: placeholder dinâmico, clear button, focus state -->
+            <form method="get" class="search-wrapper" id="searchForm">
+                <div class="search-input-group">
+                    <i class="fas fa-search search-icon"></i>
+                    <input 
+                        type="text" 
+                        name="q" 
+                        class="search-input" 
+                        placeholder="Buscar por nome da escola..." 
+                        value="{{ termo_busca }}"
+                        autocomplete="off"
+                        aria-label="Buscar escolas"
+                    >
+                    {% if termo_busca %}
+                    <button type="button" class="clear-search" onclick="window.location.href='{% url 'merendaEscolar:lista_escolas' %}'" title="Limpar busca">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    {% endif %}
+                </div>
+                {% if termo_busca %}
+                <small style="display: block; margin-top: 0.5rem; color: var(--text-secondary);">
+                    {{ paginator.count }} resultado{{ paginator.count|pluralize:"s" }} para <strong>"{{ termo_busca }}"</strong>
+                </small>
+                {% endif %}
+            </form>
         </div>
 
-        <div class="kpi-card kpi-alerta">
-            <div class="kpi-label">Com Estoque Crítico</div>
-            <div class="kpi-value">--</div>
+        <!-- KPIs Estratégicos - Visão de Helicóptero -->
+        <!-- KPIs com Dados Reais -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <div>
+                <div class="kpi-label">Total de Unidades</div>
+                <div class="kpi-value">{{ paginator.count }}</div>
+            </div>
+            <div class="kpi-icon">
+                <i class="fas fa-school"></i>
+            </div>
         </div>
-
-        <div class="kpi-card kpi-critico">
-            <div class="kpi-label">Itens Abaixo do Mínimo</div>
-            <div class="kpi-value">--</div>
+        <div class="kpi-trend">
+            <span>{{ escolas_metricas|length }} visíveis nesta página</span>
         </div>
-
     </div>
 
-    <!-- LISTAGEM -->
-    <div class="table-wrapper" style="padding:28px 32px 32px 32px;">
-
-        <table class="tabela-estoque">
-            <thead>
-                <tr>
-                    <th>Unidade Escolar</th>
-                    <th style="text-align:right;">Acessar</th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                {% for escola in escolas %}
-                <tr>
-                    <td class="col-produto">
-                        <i class="fas fa-school" style="margin-right:10px; color:var(--primary);"></i>
-                        {{ escola.nome_escola }}
-                    </td>
-
-                    <td style="text-align:right;">
-                        <a href="{% url 'merendaEscolar:estoque_escola_dashboard' escola.id %}"
-                           class="btn-acao"
-                           title="Visualizar Dashboard">
-                            <i class="fas fa-chart-line"></i>
-                        </a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="2" class="empty-state">
-                        Nenhuma escola encontrada.
-                    </td>
-                </tr>
-                {% endfor %}
-
-            </tbody>
-        </table>
-
+    <div class="kpi-card" style="--primary: #f59e0b; --primary-rgb: 245, 158, 11;">
+        <div class="kpi-header">
+            <div>
+                <div class="kpi-label">Estoque Alerta</div>
+                <div class="kpi-value">{{ kpi_escolas_alerta }}</div>
+            </div>
+            <div class="kpi-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+        </div>
+        <div class="kpi-trend" style="color: #f59e0b;">
+            <span>Próximas do vencimento</span>
+        </div>
     </div>
+
+    <div class="kpi-card" style="--primary: #ef4444; --primary-rgb: 239, 68, 68;">
+        <div class="kpi-header">
+            <div>
+                <div class="kpi-label">Críticos / Abaixo Mín.</div>
+                <div class="kpi-value">{{ kpi_escolas_criticas }}</div>
+            </div>
+            <div class="kpi-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                <i class="fas fa-chart-line"></i>
+            </div>
+        </div>
+        <div class="kpi-trend" style="color: #ef4444;">
+            <span>{{ kpi_itens_abaixo_minimo }} itens abaixo do mínimo</span>
+        </div>
+    </div>
+</div>
+    </header>
+
+    <!-- Grid de Cards - Interface sem Fricção -->
+    <!-- Grid de Cards com Dados Reais -->
+<div class="escolas-grid">
+    {% for item in escolas_metricas %}
+    <article class="escola-card" onclick="window.location.href='{% url 'merendaEscolar:estoque_escola_dashboard' item.escola.id %}'">
+        
+        <!-- Status Badge Dinâmico -->
+        <span class="status-badge status-{{ item.status_class }}">
+            <span class="status-dot"></span>
+            {{ item.status_label }}
+        </span>
+
+        <div class="escola-header">
+            <div class="escola-icon">
+                <i class="fas fa-school"></i>
+            </div>
+            <div class="escola-info">
+                <h3>{{ item.escola.nome_escola }}</h3>
+            </div>
+        </div>
+
+        <!-- Metadados Reais -->
+        <div class="escola-meta">
+            <div class="meta-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>{{ item.escola.endereco|default:"Endereço não cadastrado" }}</span>
+            </div>
+            <div class="meta-item">
+                <i class="fas fa-boxes"></i>
+                <span>
+                    {% if item.total_itens > 0 %}
+                        {{ item.total_itens }} {{ item.total_itens|pluralize:"unidade,unidades" }} / 
+                        {{ item.total_produtos }} {{ item.total_produtos|pluralize:"produto,produtos" }}
+                    {% else %}
+                        Estoque vazio
+                    {% endif %}
+                </span>
+            </div>
+            <div class="meta-item">
+                <i class="fas fa-clock"></i>
+                <span>Atualizado {{ item.ultima_atualizacao }}</span>
+            </div>
+            
+            <!-- Alertas específicos visuais -->
+            {% if item.abaixo_minimo > 0 %}
+            <div class="meta-item" style="color: #ef4444; font-weight: 600;">
+                <i class="fas fa-arrow-down"></i>
+                <span>{{ item.abaixo_minimo }} produto{{ item.abaixo_minimo|pluralize }} abaixo do mínimo</span>
+            </div>
+            {% endif %}
+            
+            {% if item.vencidos > 0 %}
+            <div class="meta-item" style="color: #dc2626; font-weight: 600;">
+                <i class="fas fa-calendar-times"></i>
+                <span>{{ item.vencidos }} produto{{ item.vencidos|pluralize }} vencido{{ item.vencidos|pluralize }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Barra de Progresso Real -->
+        <div class="estoque-bar">
+            <div class="estoque-header">
+                <span>Saúde do Estoque</span>
+                <span style="color: {{ item.cor_progresso }}; font-weight: 600;">
+                    {% if item.ocupacao >= 80 %}Ótimo{% elif item.ocupacao >= 50 %}Bom{% else %}Atenção{% endif %}
+                </span>
+            </div>
+            <div class="progress-bg">
+                <div class="progress-fill" 
+                     style="width: {{ item.ocupacao }}%; background: linear-gradient(90deg, {{ item.cor_progresso }}, {{ item.cor_progresso }}aa);">
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 0.75rem; color: var(--text-secondary);">
+                <span>{{ item.ocupacao }}% índice de saúde</span>
+                {% if item.criticos > 0 %}
+                <span style="color: #f59e0b;">{{ item.criticos }} próx. venc.</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card-action">
+            <span class="btn-dashboard">
+                Ver Dashboard <i class="fas fa-arrow-right"></i>
+            </span>
+        </div>
+    </article>
+
+    {% empty %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-search"></i>
+        </div>
+        <h3>Nenhuma escola encontrada</h3>
+        <p>
+            {% if termo_busca %}
+            Não encontramos resultados para <strong>"{{ termo_busca }}"</strong>.
+            {% else %}
+            Não há escolas cadastradas no sistema.
+            {% endif %}
+        </p>
+    </div>
+    {% endfor %}
+</div>
+
+    <!-- Paginação Inteligente - Preserva Busca -->
+    {% if is_paginated %}
+    <nav class="pagination-container" aria-label="Navegação de páginas">
+        <div class="pagination-info">
+            Página {{ page_obj.number }} de {{ paginator.num_pages }} 
+            <span style="color: var(--border); margin: 0 0.5rem;">|</span>
+            {{ paginator.count }} escolas no total
+        </div>
+
+        <div class="pagination-controls">
+            <!-- Anterior -->
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if termo_busca %}&q={{ termo_busca|urlencode }}{% endif %}" 
+               class="page-btn nav-btn" aria-label="Página anterior">
+                <i class="fas fa-chevron-left"></i> Anterior
+            </a>
+            {% else %}
+            <button class="page-btn nav-btn" disabled aria-label="Página anterior">
+                <i class="fas fa-chevron-left"></i> Anterior
+            </button>
+            {% endif %}
+
+            <!-- Números de Página com Elipses -->
+            {% for num in paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <span class="page-btn active" aria-current="page">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% if termo_busca %}&q={{ termo_busca|urlencode }}{% endif %}" 
+                       class="page-btn">{{ num }}</a>
+                {% elif num == 1 or num == paginator.num_pages %}
+                    <a href="?page={{ num }}{% if termo_busca %}&q={{ termo_busca|urlencode }}{% endif %}" 
+                       class="page-btn">{{ num }}</a>
+                {% elif num == page_obj.number|add:'-4' or num == page_obj.number|add:'4' %}
+                    <span class="page-btn" style="cursor: default;">...</span>
+                {% endif %}
+            {% endfor %}
+
+            <!-- Próxima -->
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if termo_busca %}&q={{ termo_busca|urlencode }}{% endif %}" 
+               class="page-btn nav-btn" aria-label="Próxima página">
+                Próxima <i class="fas fa-chevron-right"></i>
+            </a>
+            {% else %}
+            <button class="page-btn nav-btn" disabled aria-label="Próxima página">
+                Próxima <i class="fas fa-chevron-right"></i>
+            </button>
+            {% endif %}
+        </div>
+    </nav>
+    {% endif %}
 
 </div>
+
+<!-- Debounce Search - Redução de Fricção: busca automática ao digitar (opcional) -->
+<script>
+    // Busca automática após parar de digitar por 500ms
+    let searchTimeout;
+    const searchInput = document.querySelector('.search-input');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            if (this.value.length === 0 || this.value.length > 2) {
+                searchTimeout = setTimeout(() => {
+                    document.getElementById('searchForm').submit();
+                }, 800); // Ajuste conforme necessidade
+            }
+        });
+        
+        // Focus no input ao carregar se houver busca
+        if (searchInput.value) {
+            searchInput.focus();
+        }
+    }
+    
+    // Card click feedback
+    document.querySelectorAll('.escola-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.zIndex = '10';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.zIndex = '1';
+        });
+    });
+</script>
 
 {% endblock %}
