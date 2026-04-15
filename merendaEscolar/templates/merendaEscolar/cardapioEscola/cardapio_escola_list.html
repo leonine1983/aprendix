@@ -8,26 +8,41 @@
     --card: #ffffff;
     --border: #e3e8ee;
     --primary: #2d7ff9;
+    --primary-hover: #1a68d8;
+    --primary-light: #e8f4ff;
     --danger: #e74c3c;
+    --text: #1f2937;
+    --text-secondary: #6b7280;
     --radius: 10px;
 }
 
 .container-box {
     background: var(--card);
-    padding: 20px;
+    padding: 24px;
     border-radius: var(--radius);
     border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 
 .header h2 {
     margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.header small {
+    color: var(--text-secondary);
+    font-size: 14px;
 }
 
 .actions a {
@@ -35,11 +50,16 @@
 }
 
 .btn {
-    padding: 8px 14px;
+    padding: 10px 18px;
     border-radius: 6px;
     border: none;
     cursor: pointer;
     font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .btn-primary {
@@ -47,33 +67,156 @@
     color: white;
 }
 
+.btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(45, 127, 249, 0.25);
+}
+
 .btn-danger {
     background: var(--danger);
     color: white;
+    padding: 8px 14px;
+    font-size: 13px;
+}
+
+.btn-danger:hover {
+    background: #d32f2f;
 }
 
 .table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 16px;
 }
 
 .table th,
 .table td {
-    padding: 10px;
-    border-bottom: 1px solid var(--border);
+    padding: 14px 16px;
     text-align: left;
+    border-bottom: 1px solid var(--border);
 }
 
 .table th {
     background: #f9fbfd;
     font-weight: 600;
+    color: var(--text);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.table tr:hover td {
+    background: #f8fafc;
+}
+
+.table td {
+    color: var(--text-secondary);
+    font-size: 14px;
 }
 
 .empty-state {
     text-align: center;
-    padding: 30px;
-    color: #777;
+    padding: 40px;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Paginação Moderna */
+.pagination-wrapper {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.pagination-info strong {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.pagination-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pagination-nav a,
+.pagination-nav span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text);
+    transition: all 0.2s;
+}
+
+.pagination-nav a:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(45, 127, 249, 0.15);
+}
+
+.pagination-nav .page-active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(45, 127, 249, 0.3);
+}
+
+.pagination-nav .page-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pagination-nav .page-nav {
+    padding: 0;
+    width: 40px;
+}
+
+@media (min-width: 640px) {
+    .pagination-wrapper {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 640px) {
+    .container-box {
+        padding: 16px;
+    }
+    
+    .header h2 {
+        font-size: 20px;
+    }
+    
+    .table th,
+    .table td {
+        padding: 12px;
+    }
 }
 </style>
 
@@ -90,7 +233,7 @@
             <a href="{% url 'merendaEscolar:cardapio_escola_create' %}" 
                class="btn btn-primary"
                title="Criar novo vínculo">
-               + Novo Vínculo
+               <span>+</span> Novo Vínculo
             </a>
         </div>
     </div>
@@ -108,11 +251,12 @@
         <tbody>
             {% for v in vinculos %}
             <tr>
-                <td>{{ v.cardapio }}</td>
+                <td style="font-weight: 500; color: var(--text);">{{ v.cardapio }}</td>
                 <td>{{ v.escola }}</td>
                 <td>
                     <a href="{% url 'merendaEscolar:cardapio_escola_delete' v.id %}" 
                        class="btn btn-danger"
+                       onclick="return confirm('Tem certeza que deseja remover este vínculo?')"
                        title="Remover vínculo">
                        Excluir
                     </a>
@@ -121,12 +265,71 @@
             {% empty %}
             <tr>
                 <td colspan="3" class="empty-state">
-                    Nenhum vínculo encontrado.
+                    <div style="font-size: 48px; margin-bottom: 16px;">📭</div>
+                    <div>Nenhum vínculo encontrado.</div>
+                    <div style="font-size: 13px; margin-top: 8px; opacity: 0.8;">Clique em "Novo Vínculo" para começar</div>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- PAGINAÇÃO MODERNA -->
+    {% if is_paginated %}
+    <div class="pagination-wrapper">
+        <div class="pagination-info">
+            Mostrando <strong>{{ page_obj.start_index }}</strong>–<strong>{{ page_obj.end_index }}</strong> 
+            de <strong>{{ paginator.count }}</strong> vínculos
+        </div>
+
+        <ul class="pagination-nav">
+            <!-- Anterior -->
+            {% if page_obj.has_previous %}
+            <li>
+                <a href="?page={{ page_obj.previous_page_number }}" class="page-nav" aria-label="Página anterior">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                </a>
+            </li>
+            {% else %}
+            <li><span class="page-nav page-disabled" aria-label="Página anterior">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"/>
+                </svg>
+            </span></li>
+            {% endif %}
+
+            <!-- Páginas -->
+            {% for num in page_obj.paginator.page_range %}
+                {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                    {% if page_obj.number == num %}
+                    <li><span class="page-active">{{ num }}</span></li>
+                    {% else %}
+                    <li><a href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            <!-- Próximo -->
+            {% if page_obj.has_next %}
+            <li>
+                <a href="?page={{ page_obj.next_page_number }}" class="page-nav" aria-label="Próxima página">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </a>
+            </li>
+            {% else %}
+            <li><span class="page-nav page-disabled" aria-label="Próxima página">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"/>
+                </svg>
+            </span></li>
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
 
 </div>
 

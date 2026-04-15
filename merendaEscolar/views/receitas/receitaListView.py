@@ -29,7 +29,7 @@ class ReceitaListView(
     model = Receita
     template_name = "merendaEscolar/receitas/receita_lista.html"
     context_object_name = "receitas"  # Mantém compatibilidade com seu template
-    paginate_by = 5                # Define 20 itens por página
+    paginate_by = 4                # Define 20 itens por página
     ordering = ['-criada_em']         # Ordenação padrão
 
     permission_required = "merendaEscolar.view_receita"

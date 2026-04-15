@@ -214,4 +214,238 @@
 
 </div>
 
+<!--Paginação-->
+<!-- ========================= -->
+<!-- PAGINAÇÃO MODERNA         -->
+<!-- ========================= -->
+{% if is_paginated %}
+<div class="pagination-wrapper mt-4 mb-2">
+    <div class="pagination-card">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            
+            <!-- Info de resultados -->
+            <div class="pagination-meta">
+                <span class="text-muted small">
+                    <i class="fas fa-layer-group me-2 text-primary"></i>
+                    Mostrando <strong class="text-dark">{{ page_obj.start_index }}</strong>–<strong class="text-dark">{{ page_obj.end_index }}</strong> 
+                    de <strong class="text-dark">{{ paginator.count }}</strong> itens
+                </span>
+            </div>
+
+            <!-- Navegação -->
+            <nav aria-label="Navegação">
+                <ul class="pagination pagination-custom mb-0">
+                    
+                    <!-- Anterior -->
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link page-nav" 
+                           href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                           aria-label="Página anterior" title="Anterior">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link page-nav" aria-label="Página anterior">
+                            <i class="fas fa-chevron-left"></i>
+                        </span>
+                    </li>
+                    {% endif %}
+
+                    <!-- Primeira página + reticências -->
+                    {% if page_obj.number > 3 %}
+                    <li class="page-item d-none d-sm-block">
+                        <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">1</a>
+                    </li>
+                    {% if page_obj.number > 4 %}
+                    <li class="page-item disabled d-none d-sm-block">
+                        <span class="page-link pagination-dots">…</span>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+
+                    <!-- Páginas vizinhas -->
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link current-page">{{ num }}</span>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- Última página + reticências -->
+                    {% if page_obj.number < paginator.num_pages|add:'-2' %}
+                        {% if page_obj.number < paginator.num_pages|add:'-3' %}
+                        <li class="page-item disabled d-none d-sm-block">
+                            <span class="page-link pagination-dots">…</span>
+                        </li>
+                        {% endif %}
+                        <li class="page-item d-none d-sm-block">
+                            <a class="page-link" href="?page={{ paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ paginator.num_pages }}</a>
+                        </li>
+                    {% endif %}
+
+                    <!-- Próximo -->
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link page-nav" 
+                           href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                           aria-label="Próxima página" title="Próximo">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link page-nav" aria-label="Próxima página">
+                            <i class="fas fa-chevron-right"></i>
+                        </span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+
+            <!-- Ir para página (única para muitas páginas) -->
+            {% if paginator.num_pages > 10 %}
+            <div class="page-jumper d-none d-lg-block">
+                <div class="input-group input-group-sm" style="width: 130px;">
+                    <input type="number" class="form-control form-control-sm" id="jumpInput" 
+                           placeholder="Pág" min="1" max="{{ paginator.num_pages }}">
+                    <button class="btn btn-outline-primary btn-sm" type="button" onclick="jumpToPage()">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .pagination-wrapper {
+        animation: fadeIn 0.4s ease-in;
+    }
+    
+    .pagination-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        border: 1px solid rgba(0,0,0,0.04);
+    }
+    
+    .pagination-custom {
+        gap: 4px;
+    }
+    
+    .pagination-custom .page-link {
+        border: none;
+        border-radius: 8px;
+        min-width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        font-weight: 500;
+        font-size: 0.9rem;
+        background-color: #f1f5f9;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 0 12px;
+    }
+    
+    .pagination-custom .page-link:hover:not(.current-page) {
+        background-color: #e2e8f0;
+        color: #334155;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .pagination-custom .page-item.active .page-link {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        transform: scale(1.05);
+    }
+    
+    .pagination-custom .page-item.disabled .page-link {
+        background-color: #f8fafc;
+        color: #cbd5e1;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .pagination-custom .page-nav {
+        width: 36px;
+        padding: 0;
+        background-color: #fff;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .pagination-custom .page-nav:hover {
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
+    }
+    
+    .pagination-dots {
+        background-color: transparent !important;
+        cursor: default;
+        pointer-events: none;
+    }
+    
+    .page-jumper .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Responsivo */
+    @media (max-width: 768px) {
+        .pagination-card {
+            padding: 0.75rem;
+        }
+        .pagination-custom .page-link {
+            min-width: 32px;
+            height: 32px;
+            font-size: 0.85rem;
+        }
+    }
+</style>
+
+<script>
+    function jumpToPage() {
+        const input = document.getElementById('jumpInput');
+        const page = parseInt(input.value);
+        const maxPage = {{ paginator.num_pages }};
+        
+        if (page && page >= 1 && page <= maxPage) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('page', page);
+            window.location.href = url.toString();
+        } else {
+            input.classList.add('is-invalid');
+            setTimeout(() => input.classList.remove('is-invalid'), 2000);
+        }
+    }
+    
+    document.getElementById('jumpInput')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') jumpToPage();
+    });
+</script>
+{% endif %}
+
+
 {% endblock content %}

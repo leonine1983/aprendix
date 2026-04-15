@@ -15,7 +15,7 @@ class TransferenciaListView(
     model = Transferencia
     template_name = "merendaEscolar/transferencia/transferencia_list.html"
     context_object_name = "transferencias"
-    paginate_by = 20
+    paginate_by = 4
     
     group_required = NUTRICIONISTA_GROUPS
     permission_required = "merendaEscolar.view_estoquecentral"

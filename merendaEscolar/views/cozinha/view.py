@@ -31,6 +31,8 @@ class CardapioForm(forms.ModelForm):
 class CardapioListView(NutricionistaRequiredMixin, ListView):
     model = Cardapio
     template_name = "merendaEscolar/cardapio/cardapio_list.html"
+    paginate_by = 3
+
 
    
 
@@ -432,13 +434,11 @@ class ItemDeleteView(NutricionistaRequiredMixin, DeleteView):
 # CARDAPIO ESCOLA
 # =========================
 
-# =========================
-# CARDAPIO ESCOLA LIST
-# =========================
 class CardapioEscolaListView(NutricionistaRequiredMixin, ListView):
     model = CardapioEscola
     template_name = "merendaEscolar/cardapioEscola/cardapio_escola_list.html"
     context_object_name = "vinculos"
+    paginate_by = 2  # Exibe 20 vínculos por página (ajuste conforme necessidade)
 
 
 class CardapioEscolaCreateView(NutricionistaRequiredMixin, CreateView):
@@ -502,6 +502,7 @@ class CardapioEscolaUploadView(NutricionistaRequiredMixin, View):
 class CardapioEscolaDeleteView(NutricionistaRequiredMixin, DeleteView):
     model = CardapioEscola
     success_url = reverse_lazy("merendaEscolar:cardapio_list")
+    template_name = "merendaEscolar/cardapioEscola/cardapio_escola_delete.html"
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "Vínculo removido!")

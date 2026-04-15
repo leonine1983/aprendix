@@ -1,24 +1,404 @@
 {% extends "merendaEscolar/estoque_base.html" %}
 {% block content %}
 
-<h2>⚠️ Confirmar exclusão</h2>
+<style>
+.delete-confirm-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
 
-<p>
-Deseja remover o vínculo entre:
-</p>
+.confirm-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
 
-<ul>
-    <li><strong>Cardápio:</strong> {{ object.cardapio }}</li>
-    <li><strong>Escola:</strong> {{ object.escola }}</li>
-</ul>
+.confirm-header {
+    background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+    border-bottom: 1px solid #fee2e2;
+    padding: 32px;
+    text-align: center;
+}
 
-<form method="post">
-    {% csrf_token %}
+.warning-icon {
+    width: 72px;
+    height: 72px;
+    background: #fee2e2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: #dc2626;
+    border: 4px solid #fecaca;
+    animation: pulse 2s infinite;
+}
+
+.confirm-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.02em;
+}
+
+.confirm-subtitle {
+    font-size: 16px;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.confirm-body {
+    padding: 32px;
+}
+
+.info-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.info-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+    margin: 0 0 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.item-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.item-row:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.item-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.item-icon.cardapio {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.item-icon.escola {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.item-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+    margin: 0 0 4px 0;
+}
+
+.item-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+    word-break: break-word;
+    line-height: 1.4;
+}
+
+.unlink-icon {
+    width: 32px;
+    height: 32px;
+    color: #cbd5e1;
+    flex-shrink: 0;
+    animation: breakLink 0.5s ease-out 0.3s both;
+}
+
+/* Alerta informativo */
+.safe-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.safe-icon {
+    color: #0284c7;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.safe-text {
+    font-size: 14px;
+    color: #0369a1;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.safe-text strong {
+    color: #0c4a6e;
+}
+
+/* Ações */
+.confirm-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    width: 100%;
+    font-family: inherit;
+}
+
+.btn-danger {
+    background: #dc2626;
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.1), 0 2px 4px -1px rgba(220, 38, 38, 0.06);
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.2);
+}
+
+.btn-secondary {
+    background: white;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-secondary:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e2e8f0;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+@keyframes breakLink {
+    0% { transform: rotate(0); }
+    25% { transform: rotate(-10deg); }
+    50% { transform: rotate(10deg); }
+    75% { transform: rotate(-5deg); }
+    100% { transform: rotate(0); }
+}
+
+@media (min-width: 640px) {
+    .confirm-actions {
+        flex-direction: row-reverse;
+    }
     
-    <button class="btn btn-danger">Sim, excluir</button>
-    <a href="{% url 'merendaEscolar:cardapio_escola_list' %}">
-        Cancelar
-    </a>
-</form>
+    .btn {
+        width: auto;
+        flex: 1;
+    }
+    
+    .btn-secondary {
+        flex: 0 0 auto;
+    }
+}
+</style>
+
+<div class="delete-confirm-container">
+
+    <div class="confirm-card">
+        
+        <!-- Cabeçalho com Ícone -->
+        <div class="confirm-header">
+            <div class="warning-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+            </div>
+            <h1 class="confirm-title">Remover vínculo?</h1>
+            <p class="confirm-subtitle">
+                Você está prestes a desassociar um cardápio de uma escola. Esta ação pode ser revertida criando um novo vínculo.
+            </p>
+        </div>
+
+        <div class="confirm-body">
+            
+            <!-- Aviso de Segurança -->
+            <div class="safe-notice">
+                <svg class="safe-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <p class="safe-text">
+                    <strong>Nenhum dado será perdido.</strong> O cardápio continuará existindo no sistema, assim como a escola. 
+                    Apenas a associação entre eles será removida.
+                </p>
+            </div>
+
+            <!-- Detalhes do Vínculo -->
+            <div class="info-box">
+                <h3 class="info-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+                        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                        <polyline points="13 2 13 9 20 9"/>
+                    </svg>
+                    Detalhes do vínculo
+                </h3>
+                
+                <div class="items-list">
+                    <!-- Cardápio -->
+                    <div class="item-row">
+                        <div class="item-icon cardapio">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                            </svg>
+                        </div>
+                        <div class="item-content">
+                            <p class="item-label">Cardápio</p>
+                            <p class="item-value">{{ object.cardapio.nome|default:object.cardapio }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Ícone de conexão sendo quebrada -->
+                    <div style="text-align: center; padding: 4px 0;">
+                        <svg class="unlink-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18.84 12.25l-8.04-8.04-4.06 4.06-4.05-4.05 8.04-8.04 8.04 8.04-4.06 4.06 4.06 4.06z"/>
+                            <path d="M4 4l16 16"/>
+                        </svg>
+                    </div>
+
+                    <!-- Escola -->
+                    <div class="item-row">
+                        <div class="item-icon escola">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                <polyline points="9 22 9 12 15 12 15 22"/>
+                            </svg>
+                        </div>
+                        <div class="item-content">
+                            <p class="item-label">Escola</p>
+                            <p class="item-value">{{ object.escola.nome_escola|default:object.escola }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações -->
+            <form method="post" style="margin: 0;">
+                {% csrf_token %}
+                
+                <div class="confirm-actions">
+                    <button type="submit" class="btn btn-danger">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                        Sim, remover vínculo
+                    </button>
+                    
+                    <a href="{% url 'merendaEscolar:cardapio_escola_list' %}" class="btn btn-secondary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="19" y1="12" x2="5" y2="12"/>
+                            <polyline points="12 19 5 12 12 5"/>
+                        </svg>
+                        Cancelar e voltar
+                    </a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Informação Adicional -->
+    <div style="text-align: center; margin-top: 24px; padding: 0 20px;">
+        <p style="font-size: 13px; color: #94a3b8; margin: 0; line-height: 1.5;">
+            <strong>Precisa de ajuda?</strong> Entre em contato com o suporte técnico ou consulte a documentação do sistema.
+        </p>
+    </div>
+
+</div>
 
 {% endblock %}

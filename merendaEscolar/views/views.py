@@ -628,9 +628,11 @@ from merendaEscolar.models import (
     DivergenciaEntrega,
     Escola
 )
+# Pronteção de acesso
+from core.groups.nutricionista import NutricionistaRequiredMixin
 
 
-class EstoqueCentralListView(LoginRequiredMixin, ListView):
+class EstoqueCentralListView(NutricionistaRequiredMixin, ListView):
     """
     Dashboard institucional do estoque central da merenda escolar.
 
@@ -650,7 +652,7 @@ class EstoqueCentralListView(LoginRequiredMixin, ListView):
     model = EstoqueCentral
     template_name = "merendaEscolar/estoque/estoque.html"
     context_object_name = "produtos"
-    paginate_by = 50
+    paginate_by = 4
 
     # ====================================
     # QUERYSET PRINCIPAL (ESTOQUE ATIVO)
