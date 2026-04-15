@@ -14,12 +14,6 @@ from modulo_Merendeiras.models import (
 from django.shortcuts import redirect
 from django.contrib import messages
 
-from modulo_Merendeiras.models import (
-    ExecucaoCardapioDia,
-    # services
-    executar_cardapio_do_dia,
-    verificar_disponibilidade_ingredientes
-)
 class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
     template_name = "modulo_merendeiras/cadapioHoje/preparar_execucao.html"
     
@@ -88,7 +82,7 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
         
         # CORREÇÃO: Usar campo 'dia' ao invés de 'cardapio_dia'
         itens = CardapioItem.objects.filter(
-            dia=cardapio_dia  # <-- CAMPO CORRETO
+            dia=cardapio_dia
         ).select_related('receita', 'tipo_refeicao')
         
         # Verifica disponibilidade para cada item
@@ -97,15 +91,24 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
             # CORREÇÃO: Usar rendimento padrão 100 se não existir
             rendimento_padrao = getattr(item.receita, 'rendimento', 100)
             
+            # Verifica disponibilidade para o rendimento padrão (100 porções)
             disponivel, info = verificar_disponibilidade_ingredientes(
                 escola, item.receita, rendimento_padrao
             )
+            
+            # CALCULA O MÁXIMO REAL baseado no estoque disponível
+            # Agora calculamos SEMPRE, não apenas quando não está disponível
+            maximo_calculado = self._calcular_maximo_porcoes(info, rendimento_padrao)
+            
+            # Se o cálculo retornar 0 mas tiver estoque, usa o rendimento padrão ou 1000
+            if maximo_calculado == 0 and disponivel:
+                maximo_calculado = 1000  # Ou um número alto suficiente
             
             itens_preparados.append({
                 'item': item,
                 'estoque_ok': disponivel,
                 'porcoes_sugeridas': rendimento_padrao,
-                'porcoes_maximas': self._calcular_maximo_porcoes(info) if not disponivel else rendimento_padrao,
+                'porcoes_maximas': maximo_calculado,  # AGORA SEMPRE TEM O VALOR REAL DO ESTOQUE
                 'faltantes': info.get('faltantes', []),
                 'ingredientes': info['ingredientes']
             })
@@ -120,15 +123,39 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
         
         return ctx
     
-    def _calcular_maximo_porcoes(self, detalhes):
-        """Calcula o máximo de porções possível com estoque atual"""
+    def _calcular_maximo_porcoes(self, detalhes, rendimento_base=100):
+        """
+        Calcula o máximo de porções possível com estoque atual.
+        
+        O 'detalhes' contém os ingredientes calculados para 'rendimento_base' porções.
+        Portanto, se temos estoque para X vezes o necessário para 100 porções,
+        podemos fazer X * 100 porções.
+        """
+        if not detalhes or not detalhes.get('ingredientes'):
+            return rendimento_base  # Retorna o padrão se não houver dados
+        
         min_ratio = float('inf')
+        
         for ing in detalhes['ingredientes']:
-            if ing['necessario'] > 0:
-                ratio = ing['disponivel'] / ing['necessario']
+            necessario = ing.get('necessario', 0)
+            disponivel = ing.get('disponivel', 0)
+            
+            # Evita divisão por zero
+            if necessario > 0:
+                # Ratio = quantas vezes cabe o necessário no disponível
+                ratio = disponivel / necessario
                 if ratio < min_ratio:
                     min_ratio = ratio
-        return int(min_ratio) if min_ratio != float('inf') else 0
+        
+        # Se min_ratio for infinito (não entrou no loop ou sem ingredientes), retorna padrão
+        if min_ratio == float('inf'):
+            return rendimento_base
+        
+        # Multiplica pelo rendimento base (pois o necessário é para 'rendimento_base' porções)
+        max_porcoes = int(min_ratio * rendimento_base)
+        
+        # Limita a 1000 (máximo do sistema) ou retorna o valor real
+        return min(max_porcoes, 1000)
     
     def post(self, request, *args, **kwargs):
         escola = self.get_escola_usuario()
