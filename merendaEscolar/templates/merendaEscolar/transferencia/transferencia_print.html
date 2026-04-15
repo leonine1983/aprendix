@@ -344,7 +344,7 @@ body{
     margin-bottom: 20px;
     display: block;
     text-align: left;
-    font-size: 9pt;
+    font-size:9pt;
     height: 20px;
 }
 
@@ -517,25 +517,21 @@ body{
 <div class="signatures-container">
     <div class="signatures-row">
         <div class="signature-block">
-            <span class="signature-label">ASSINATURA DO ENTREGADOR</span>
+            <span class="signature-label">ASSIN. DO ENTREGADOR</span>
             <div class="signature-line">
-                {% if transferencia.enviado_por %}
-                {{ transferencia.enviado_por.get_full_name|default:transferencia.enviado_por.username }}
-                {% endif %}
+                
             </div>
         </div>
         
         <div class="signature-block">
-            <span class="signature-label">ASSINATURA DO RESPONSÁVEL PELO RECEBIMENTO</span>
+            <span class="signature-label">ASSIN. DO RESP. PELO RECEBIMENTO</span>
             <div class="signature-line"></div>
         </div>
         
         <div class="signature-block">
-            <span class="signature-label">ASSINATURA DO RESPONSÁVEL PELA ESCOLA</span>
+            <span class="signature-label">ASSIN. DO RESP. PELA ESCOLA</span>
             <div class="signature-line">
-                {% if transferencia.criado_por %}
-                {{ transferencia.criado_por.get_full_name|default:transferencia.criado_por.username }}
-                {% endif %}
+                
             </div>
         </div>
     </div>
