@@ -2,530 +2,715 @@
 {% block title %}Cadastro de Receita{% endblock %}
 
 {% block content %}
-<div class="container py-4">
 
-    <div class="row justify-content-center">
-        <div class="col-lg-10 col-xl-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap');
 
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
+  :root {
+    --cream:   #faf8f4;
+    --ink:     #1a1a1a;
+    --muted:   #6b6760;
+    --border:  #e0dcd4;
+    --green:   #2d6a4f;
+    --green-light: #d8f0e4;
+    --green-mid:   #52b788;
+    --red:     #c0392b;
+    --red-light: #fdecea;
+    --card-bg: #ffffff;
+    --shadow:  0 2px 20px rgba(0,0,0,.07);
+    --radius:  14px;
+    --radius-sm: 8px;
+  }
 
-                    <!-- CABEÇALHO INSTITUCIONAL -->
-                    <div class="mb-4 pb-3 border-bottom">
-                        <div class="d-flex align-items-center gap-3">
+  body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(--ink); margin: 0; padding: 0; }
 
-                            <div class="bg-primary bg-opacity-10 text-primary 
-                                        rounded-3 d-flex align-items-center 
-                                        justify-content-center"
-                                style="width:40px; height:40px;">
-                                <i class="bi bi-journal-text fs-5"></i>
-                            </div>
+  /* ── PAGE LAYOUT ── */
+  .rf-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem 4rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
 
-                            <div>
-                                <h1 class="h5 fw-semibold mb-1">
-                                    {% if object %}
-                                        Editar Receita Institucional
-                                    {% else %}
-                                        Nova Receita Institucional
-                                    {% endif %}
-                                </h1>
+  /* ── HEADER ── */
+  .rf-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.1rem;
+    margin-bottom: 2.2rem;
+  }
+  .rf-header-icon {
+    width: 48px; height: 48px;
+    background: var(--green);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(45,106,79,.25);
+  }
+  .rf-header-icon i { color: #fff; font-size: 1.2rem; }
+  .rf-header-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.65rem;
+    line-height: 1.2;
+    margin: 0 0 .25rem;
+  }
+  .rf-header-sub {
+    font-size: .82rem;
+    color: var(--muted);
+    margin: 0;
+    max-width: 600px;
+  }
 
-                                <section class="text-muted small mb-0" style="max-width:600px;">
-                                    Documento técnico utilizado para padronização alimentar nas unidades escolares.
-                                </section>
-                            </div>
+  /* ── CARD ── */
+  .rf-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    width: 100%;
+  }
+  .rf-card-body { padding: 2rem 2.5rem; }
 
-                        </div>
-                    </div>
+  /* ── GRID PARA CONTEÚDO ── */
+  .rf-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+  }
+  
+  .rf-main-column {
+    min-width: 0;
+  }
+  
+  .rf-side-column {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
 
-                    <form method="post" novalidate id="receita-form">
-                        {% if form.errors or formset.errors or formset.non_form_errors %}
-                        <div class="alert alert-danger mb-4">
+  /* ── SECTION LABEL ── */
+  .rf-section {
+    margin-bottom: 2rem;
+  }
+  .rf-section:last-child {
+    margin-bottom: 0;
+  }
+  .rf-section-label {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.2rem;
+    padding-bottom: .55rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .rf-section-label-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green-mid);
+    flex-shrink: 0;
+  }
 
-                            <div class="d-flex align-items-center mb-2">
-                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                <strong>Erro ao salvar a receita</strong>
-                            </div>
+  /* ── FORM FIELDS ── */
+  .rf-field { margin-bottom: 1.2rem; }
+  .rf-field:last-child { margin-bottom: 0; }
+  .rf-label {
+    display: block;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: .4rem;
+  }
+  .rf-label .req { color: var(--red); margin-left: 2px; }
+  .rf-hint {
+    font-size: .75rem;
+    color: var(--muted);
+    margin-top: .35rem;
+    line-height: 1.5;
+  }
+  .rf-error {
+    font-size: .75rem;
+    color: var(--red);
+    margin-top: .3rem;
+  }
 
-                            <p class="mb-2 small">
-                                Corrija os campos abaixo antes de continuar.
-                            </p>
+  /* override Django widget styles */
+  #receita-form input[type="text"],
+  #receita-form input[type="number"],
+  #receita-form select,
+  #receita-form textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .55rem .85rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .88rem;
+    color: var(--ink);
+    background: var(--cream);
+    transition: border-color .18s, box-shadow .18s;
+    outline: none;
+    box-sizing: border-box;
+  }
+  #receita-form input[type="text"]:focus,
+  #receita-form input[type="number"]:focus,
+  #receita-form select:focus,
+  #receita-form textarea:focus {
+    border-color: var(--green-mid);
+    box-shadow: 0 0 0 3px rgba(82,183,136,.15);
+    background: #fff;
+  }
 
-                            <ul class="mb-0 small">
+  /* rich-text editor wrapper */
+  .rf-editor-wrap {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--cream);
+    overflow: hidden;
+    transition: border-color .18s, box-shadow .18s;
+  }
+  .rf-editor-wrap:focus-within {
+    border-color: var(--green-mid);
+    box-shadow: 0 0 0 3px rgba(82,183,136,.15);
+  }
+  .rf-editor-wrap .p-2 { padding: .5rem !important; }
 
-                                {% for field in form %}
-                                    {% for error in field.errors %}
-                                        <li><strong>{{ field.label }}:</strong> {{ error }}</li>
-                                    {% endfor %}
-                                {% endfor %}
+  /* toggle switch */
+  .rf-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .85rem 1rem;
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+  .rf-toggle-row input[type="checkbox"] {
+    width: 2.6rem !important;
+    height: 1.4rem !important;
+    padding: 0 !important;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--green);
+  }
+  .rf-toggle-label { font-size: .85rem; font-weight: 500; }
 
-                                {% for error in form.non_field_errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
+  /* ── INGREDIENTES ── */
+  .rf-ingredient-row {
+    display: grid;
+    grid-template-columns: 1fr 140px 44px;
+    gap: .75rem;
+    align-items: end;
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .9rem 1rem;
+    margin-bottom: .65rem;
+    transition: border-color .18s, box-shadow .18s;
+    animation: slideIn .22s ease-out;
+  }
+  .rf-ingredient-row:hover { border-color: #c9c4bc; }
+  .rf-ingredient-row.border-danger { border-color: var(--red) !important; }
 
-                                {% for form_ingrediente in formset %}
-                                    {% for field in form_ingrediente %}
-                                        {% for error in field.errors %}
-                                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
-                                        {% endfor %}
-                                    {% endfor %}
-                                {% endfor %}
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-                                {% for error in formset.non_form_errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
+  .rf-ingredient-row .rf-label { margin-bottom: .3rem; }
 
-                            </ul>
-                        </div>
-                        {% endif %}
-                        {% if form.non_field_errors %}
-                        <div class="alert alert-danger">
-                            {{ form.non_field_errors }}
-                        </div>
-                        {% endif %}
-                        {% csrf_token %}
-                        {{ form.media }}
+  .rf-btn-remove {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background .15s, border-color .15s, color .15s;
+    flex-shrink: 0;
+  }
+  .rf-btn-remove:hover {
+    background: var(--red-light);
+    border-color: var(--red);
+    color: var(--red);
+  }
 
-                        <!-- BLOCO 1 – IDENTIFICAÇÃO -->
-                        <fieldset class="mb-4">
-                            <legend class="h6 text-uppercase text-muted mb-3 fw-semibold">
-                                Identificação
-                            </legend>
+  .rf-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    font-size: .73rem;
+    font-weight: 600;
+    padding: .2rem .6rem;
+    border-radius: 20px;
+    background: var(--green-light);
+    color: var(--green);
+    letter-spacing: .02em;
+  }
 
-                            <div class="mb-3">
-                                <label for="{{ form.nome.id_for_label }}" 
-                                       class="form-label fw-semibold">
-                                    Nome da Receita
-                                </label>
+  /* ── ADD BUTTON ── */
+  .rf-btn-add {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .83rem;
+    font-weight: 600;
+    padding: .55rem 1.1rem;
+    border-radius: 30px;
+    border: 1.5px dashed var(--green-mid);
+    background: transparent;
+    color: var(--green);
+    cursor: pointer;
+    transition: background .15s, border-style .15s;
+  }
+  .rf-btn-add:hover { background: var(--green-light); border-style: solid; }
 
-                                {{ form.nome }}
+  /* ── DIVIDER ── */
+  .rf-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1.8rem 0;
+  }
 
-                                <div class="form-text">
-                                    Utilize nome padronizado e objetivo.
-                                    Exemplo: <strong>Arroz Integral com Legumes</strong>.
-                                    Esse nome será exibido nos relatórios e planejamentos.
-                                </div>
+  /* ── ACTION BAR ── */
+  .rf-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    margin-top: 1.5rem;
+  }
+  .rf-btn-cancel {
+    font-size: .83rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    padding: .5rem .85rem;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    background: transparent;
+    transition: background .15s, color .15s;
+  }
+  .rf-btn-cancel:hover { background: var(--cream); color: var(--ink); }
 
-                                {% if form.nome.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ form.nome.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </fieldset>
+  .rf-btn-save {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .88rem;
+    font-weight: 600;
+    padding: .65rem 1.6rem;
+    border-radius: 30px;
+    border: none;
+    background: var(--green);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(45,106,79,.28);
+    transition: background .15s, transform .12s, box-shadow .15s;
+  }
+  .rf-btn-save:hover {
+    background: #235c3f;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(45,106,79,.32);
+  }
+  .rf-btn-save:active { transform: translateY(0); }
 
-                        <!-- BLOCO 2 – CONTEÚDO TÉCNICO -->
-                        <fieldset class="mb-4">
-                            <legend class="h6 text-uppercase text-muted mb-3 fw-semibold">
-                                Conteúdo Técnico
-                            </legend>
+  /* ── ALERT ── */
+  .rf-alert {
+    display: flex;
+    gap: .75rem;
+    align-items: flex-start;
+    background: var(--red-light);
+    border: 1px solid #f0c4c0;
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.1rem;
+    margin-bottom: 1.5rem;
+  }
+  .rf-alert i { color: var(--red); flex-shrink: 0; font-size: 1rem; margin-top: 1px; }
+  .rf-alert-body strong { font-size: .85rem; color: var(--red); }
+  .rf-alert-body ul { margin: .4rem 0 0 1rem; padding: 0; font-size: .8rem; color: #7a1a1a; }
 
-                            <div class="mb-4">
-                                <label class="form-label fw-semibold">
-                                    Descrição Técnica
-                                </label>
+  /* ── RESPONSIVE ── */
+  @media (max-width: 968px) {
+    .rf-content-grid {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .rf-page {
+      padding: 1.5rem 1.5rem 4rem;
+    }
+  }
+  
+  @media (max-width: 540px) {
+    .rf-page {
+      padding: 1rem 1rem 4rem;
+    }
+    .rf-card-body { padding: 1.25rem 1rem; }
+    .rf-ingredient-row { grid-template-columns: 1fr 100px 36px; gap: .5rem; }
+    .rf-actions { flex-direction: column-reverse; gap: .75rem; align-items: stretch; }
+    .rf-btn-save { justify-content: center; }
+    .rf-header {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+  
+  @media (min-width: 1600px) {
+    .rf-ingredient-row {
+      grid-template-columns: 1fr 200px 44px;
+    }
+  }
+</style>
 
-                                <div class="border rounded p-2 bg-light">
-                                    {{ form.descricao }}
-                                </div>
+<div class="rf-page">
 
-                                <div class="form-text">
-                                    Descreva objetivo nutricional, público-alvo e características relevantes.
-                                    Exemplo: fonte de fibras, preparo com baixo teor de sódio,
-                                    adequado para ensino fundamental.
-                                </div>
+  <!-- HEADER -->
+  <div class="rf-header">
+    <div class="rf-header-icon">
+      <i class="bi bi-journal-text"></i>
+    </div>
+    <div>
+      <h1 class="rf-header-title">
+        {% if object %}Editar Receita{% else %}Nova Receita{% endif %}
+      </h1>
+      <p class="rf-header-sub">
+        Documento técnico para padronização alimentar nas unidades escolares.
+      </p>
+    </div>
+  </div>
 
-                                {% if form.descricao.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ form.descricao.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
+  <!-- CARD -->
+  <div class="rf-card">
+    <div class="rf-card-body">
 
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">
-                                    Modo de Preparo
-                                </label>
+      <!-- ERROS -->
+      {% if form.errors or formset.errors or formset.non_form_errors %}
+      <div class="rf-alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div class="rf-alert-body">
+          <strong>Corrija os campos abaixo antes de continuar</strong>
+          <ul>
+            {% for field in form %}{% for error in field.errors %}
+              <li><b>{{ field.label }}:</b> {{ error }}</li>
+            {% endfor %}{% endfor %}
+            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+            {% for fi in formset %}{% for field in fi %}{% for error in field.errors %}
+              <li><b>{{ field.label }}:</b> {{ error }}</li>
+            {% endfor %}{% endfor %}{% endfor %}
+            {% for error in formset.non_form_errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
 
-                                <div class="border rounded p-2 bg-light">
-                                    {{ form.modo_preparo }}
-                                </div>
+      <form method="post" novalidate id="receita-form">
+        {% csrf_token %}
+        {{ form.media }}
 
-                                <div class="form-text">
-                                    Liste as etapas de execução operacional em ordem lógica.
-                                    Inclua tempo médio, técnicas aplicadas e observações importantes.
-                                    Isso garante padronização entre unidades.
-                                </div>
+        <div class="rf-content-grid">
+          
+          <!-- COLUNA PRINCIPAL -->
+          <div class="rf-main-column">
+            
+            <!-- 1 · IDENTIFICAÇÃO -->
+            <div class="rf-section">
+              <div class="rf-section-label">
+                <span class="rf-section-label-dot"></span>
+                Identificação
+              </div>
 
-                                {% if form.modo_preparo.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ form.modo_preparo.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </fieldset>
+              <div class="rf-field">
+                <label for="{{ form.nome.id_for_label }}" class="rf-label">Nome da Receita</label>
+                {{ form.nome }}
+                <p class="rf-hint">Nome padronizado exibido em relatórios. Ex.: <strong>Arroz Integral com Legumes</strong>.</p>
+                {% if form.nome.errors %}<div class="rf-error">{{ form.nome.errors }}</div>{% endif %}
+              </div>
 
-                        <!-- BLOCO 3 – STATUS -->
-                        <fieldset class="mb-4">
-                            <legend class="h6 text-uppercase text-muted mb-3 fw-semibold">
-                                Status Institucional
-                            </legend>
-
-                            <div class="form-check form-switch">
-                                {{ form.ativa }}
-                                <label class="form-check-label fw-semibold"
-                                       for="{{ form.ativa.id_for_label }}">
-                                    Receita ativa para planejamento alimentar
-                                </label>
-                            </div>
-
-                            <div class="form-text mt-1">
-                                Receitas ativas podem ser utilizadas no planejamento semanal.
-                                Desative apenas quando a receita não estiver mais em vigência.
-                            </div>
-                        </fieldset>
-
-                        <!-- BLOCO 4 – INGREDIENTES -->
-                        <fieldset class="mb-4">
-                            <legend class="h6 text-uppercase text-muted mb-3 fw-semibold d-flex justify-content-between align-items-center">
-                                <span>Ingredientes da Receita</span>
-                                <span class="badge bg-secondary" id="contador-ingredientes">0 itens</span>
-                            </legend>
-
-                            {{ formset.management_form }}
-
-                            <div id="ingredientes-container">
-                                {% for f in formset %}
-                                <div class="row mb-3 border rounded p-3 bg-light ingrediente-form" data-index="{{ forloop.counter0 }}">
-                                    {% if formset.non_form_errors and forloop.first %}
-                                    <div class="alert alert-danger col-12">
-                                        {{ formset.non_form_errors }}
-                                    </div>
-                                    {% endif %}
-
-                                    {{ f.id }}
-
-                                    <!-- PRODUTO -->
-                                    <div class="col-md-6 mb-2 mb-md-0">
-                                        <label class="form-label fw-semibold small text-muted">
-                                            Produto <span class="text-danger">*</span>
-                                        </label>
-                                        {{ f.produto }}
-
-                                        {% if f.produto.errors %}
-                                            <div class="text-danger small mt-1">
-                                                {{ f.produto.errors }}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-
-                                    <!-- QUANTIDADE -->
-                                    <div class="col-md-4 mb-2 mb-md-0">
-                                        <label class="form-label fw-semibold small text-muted">
-                                            Quantidade <span class="text-danger">*</span>
-                                        </label>
-                                        {{ f.quantidade }}
-
-                                        {% if f.quantidade.errors %}
-                                            <div class="text-danger small mt-1">
-                                                {{ f.quantidade.errors }}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-
-                                    <!-- REMOVER -->
-                                    <div class="col-md-2 d-flex align-items-end justify-content-end">
-                                        {% if f.instance.pk %}
-                                            <div class="d-none">
-                                                {{ f.DELETE }}
-                                            </div>
-                                        {% endif %}
-                                        <button type="button" class="btn btn-outline-danger btn-sm remove-ingrediente" title="Remover ingrediente">
-                                            <i class="bi bi-trash"></i>
-                                            <span class="d-none d-md-inline ms-1">Remover</span>
-                                        </button>
-                                    </div>
-
-                                </div>
-                                {% empty %}
-                                <!-- Se não houver formulários iniciais, o empty_form será usado pelo JS -->
-                                {% endfor %}
-                            </div>
-
-                            <!-- Template vazio para clonagem (escondido) - ESTRUTURA CORRIGIDA -->
-                            <div id="empty-form-template" class="d-none">
-                                <div class="row mb-3 border rounded p-3 bg-light ingrediente-form">
-                                    {{ formset.empty_form.id }}
-                                    
-                                    <div class="col-md-6 mb-2 mb-md-0">
-                                        <label class="form-label fw-semibold small text-muted">
-                                            Produto <span class="text-danger">*</span>
-                                        </label>
-                                        {{ formset.empty_form.produto }}
-                                    </div>
-
-                                    <div class="col-md-4 mb-2 mb-md-0">
-                                        <label class="form-label fw-semibold small text-muted">
-                                            Quantidade <span class="text-danger">*</span>
-                                        </label>
-                                        {{ formset.empty_form.quantidade }}
-                                    </div>
-
-                                    <div class="col-md-2 d-flex align-items-end justify-content-end">
-                                        <button type="button" class="btn btn-outline-danger btn-sm remove-ingrediente" title="Remover ingrediente">
-                                            <i class="bi bi-trash"></i>
-                                            <span class="d-none d-md-inline ms-1">Remover</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <button type="button" id="add-ingrediente" class="btn btn-outline-primary">
-                                    <i class="bi bi-plus-lg me-1"></i>
-                                    Adicionar Ingrediente
-                                </button>
-                                
-                                <div class="form-text text-end mb-0" style="max-width: 400px;">
-                                    Adicione todos os insumos necessários. Clique em "Adicionar" para incluir novos produtos.
-                                </div>
-                            </div>
-                        </fieldset>
-
-                        <!-- AÇÕES -->
-                        <div class="d-flex justify-content-between align-items-center 
-                                    mt-4 pt-3 border-top">
-
-                            <a href="{% url 'merendaEscolar:receita_lista' %}" 
-                               class="btn btn-outline-secondary">
-                                Cancelar
-                            </a>
-
-                            <button type="submit" class="btn btn-primary px-4">
-                                {% if object %}
-                                    Atualizar Receita
-                                {% else %}
-                                    Salvar Receita
-                                {% endif %}
-                            </button>
-
-                        </div>
-
-                    </form>
-
+              <div class="rf-field">
+                <label class="rf-label">Descrição Técnica</label>
+                <div class="rf-editor-wrap">
+                  <div class="p-2">{{ form.descricao }}</div>
                 </div>
+                <p class="rf-hint">Objetivo nutricional, público-alvo e características relevantes.</p>
+                {% if form.descricao.errors %}<div class="rf-error">{{ form.descricao.errors }}</div>{% endif %}
+              </div>
             </div>
 
-        </div>
-    </div>
+            <!-- 2 · CONTEÚDO TÉCNICO -->
+            <div class="rf-section">
+              <div class="rf-section-label">
+                <span class="rf-section-label-dot"></span>
+                Modo de Preparo
+              </div>
 
+              <div class="rf-field">
+                <div class="rf-editor-wrap">
+                  <div class="p-2">{{ form.modo_preparo }}</div>
+                </div>
+                <p class="rf-hint">Etapas de execução em ordem lógica. Inclua tempo médio e observações.</p>
+                {% if form.modo_preparo.errors %}<div class="rf-error">{{ form.modo_preparo.errors }}</div>{% endif %}
+              </div>
+            </div>
+
+            <!-- 3 · STATUS -->
+            <div class="rf-section">
+              <div class="rf-section-label">
+                <span class="rf-section-label-dot"></span>
+                Status Institucional
+              </div>
+
+              <div class="rf-toggle-row">
+                {{ form.ativa }}
+                <label class="rf-toggle-label" for="{{ form.ativa.id_for_label }}">
+                  Receita ativa para planejamento alimentar
+                </label>
+              </div>
+              <p class="rf-hint" style="margin-top:.5rem;">
+                Receitas ativas podem ser utilizadas no planejamento semanal.
+              </p>
+            </div>
+            
+          </div>
+
+          <!-- COLUNA LATERAL -->
+          <div class="rf-side-column">
+            
+            <!-- 4 · INGREDIENTES -->
+            <div class="rf-section" style="flex: 1;">
+              <div class="rf-section-label" style="justify-content: space-between;">
+                <span style="display:flex;align-items:center;gap:.55rem;">
+                  <span class="rf-section-label-dot"></span>
+                  Ingredientes da Receita
+                </span>
+                <span class="rf-badge" id="contador-ingredientes">
+                  <i class="bi bi-box-seam" style="font-size:.7rem;"></i>
+                  0 itens
+                </span>
+              </div>
+
+              {{ formset.management_form }}
+
+              <div id="ingredientes-container">
+                {% for f in formset %}
+                <div class="rf-ingredient-row ingrediente-form" data-index="{{ forloop.counter0 }}">
+                  {{ f.id }}
+
+                  <div>
+                    <label class="rf-label">Produto <span class="req">*</span></label>
+                    {{ f.produto }}
+                    {% if f.produto.errors %}<div class="rf-error">{{ f.produto.errors }}</div>{% endif %}
+                  </div>
+
+                  <div>
+                    <label class="rf-label">Quantidade <span class="req">*</span></label>
+                    {{ f.quantidade }}
+                    {% if f.quantidade.errors %}<div class="rf-error">{{ f.quantidade.errors }}</div>{% endif %}
+                  </div>
+
+                  <div>
+                    {% if f.instance.pk %}
+                      <div class="d-none">{{ f.DELETE }}</div>
+                    {% endif %}
+                    <button type="button" class="rf-btn-remove remove-ingrediente" title="Remover">
+                      <i class="bi bi-x-lg" style="font-size:.8rem;"></i>
+                    </button>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+
+              <!-- Template vazio para clonagem -->
+              <div id="empty-form-template" class="d-none">
+                <div class="rf-ingredient-row ingrediente-form">
+                  {{ formset.empty_form.id }}
+
+                  <div>
+                    <label class="rf-label">Produto <span class="req">*</span></label>
+                    {{ formset.empty_form.produto }}
+                  </div>
+
+                  <div>
+                    <label class="rf-label">Quantidade <span class="req">*</span></label>
+                    {{ formset.empty_form.quantidade }}
+                  </div>
+
+                  <div>
+                    <button type="button" class="rf-btn-remove remove-ingrediente" title="Remover">
+                      <i class="bi bi-x-lg" style="font-size:.8rem;"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:.9rem;">
+                <button type="button" id="add-ingrediente" class="rf-btn-add">
+                  <i class="bi bi-plus-lg"></i>
+                  Adicionar Ingrediente
+                </button>
+              </div>
+            </div>
+            
+          </div>
+          
+        </div>
+
+        <!-- AÇÕES -->
+        <div class="rf-actions">
+          <a href="{% url 'merendaEscolar:receita_lista' %}" class="rf-btn-cancel">
+            Cancelar
+          </a>
+          <button type="submit" class="rf-btn-save">
+            <i class="bi bi-check-lg"></i>
+            {% if object %}Atualizar Receita{% else %}Salvar Receita{% endif %}
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
 </div>
 
-<!-- JAVASCRIPT EMBUTIDO (funciona mesmo se extra_js não existir) -->
+<!-- JAVASCRIPT (mesma lógica, nenhuma funcionalidade removida) -->
 <script>
-(function() {
-    'use strict';
-    
-    console.log('Inicializando formset...');
-    
-    const container = document.getElementById('ingredientes-container');
-    const addBtn = document.getElementById('add-ingrediente');
-    const emptyTemplateDiv = document.getElementById('empty-form-template');
-    const contadorBadge = document.getElementById('contador-ingredientes');
-    
-    // Verificações de segurança
-    if (!container || !addBtn || !emptyTemplateDiv) {
-        console.error('Elementos necessários não encontrados:', {
-            container: !!container,
-            addBtn: !!addBtn,
-            emptyTemplateDiv: !!emptyTemplateDiv
-        });
-        return;
+(function () {
+  'use strict';
+
+  const container        = document.getElementById('ingredientes-container');
+  const addBtn           = document.getElementById('add-ingrediente');
+  const emptyTemplateDiv = document.getElementById('empty-form-template');
+  const contadorBadge    = document.getElementById('contador-ingredientes');
+
+  if (!container || !addBtn || !emptyTemplateDiv) return;
+
+  const emptyTemplate = emptyTemplateDiv.innerHTML;
+
+  let totalFormsInput =
+    document.querySelector('input[name="ingredientes-TOTAL_FORMS"]') ||
+    document.querySelector('input[name="form-TOTAL_FORMS"]') ||
+    document.querySelector('input[name$="-TOTAL_FORMS"]');
+
+  if (!totalFormsInput) return;
+
+  function atualizarContador() {
+    const n = container.querySelectorAll('.ingrediente-form').length;
+    if (contadorBadge) {
+      contadorBadge.innerHTML =
+        '<i class="bi bi-box-seam" style="font-size:.7rem;"></i> ' +
+        n + ' ' + (n === 1 ? 'item' : 'itens');
     }
-    
-    // Obtém o HTML do template vazio (apenas o conteúdo interno da div #empty-form-template)
-    const emptyTemplate = emptyTemplateDiv.innerHTML;
-    
-    // Encontra o input TOTAL_FORMS (com prefixo dinâmico ou fixo)
-    let totalFormsInput = document.querySelector('input[name="ingredientes-TOTAL_FORMS"]') ||
-                         document.querySelector('input[name="form-TOTAL_FORMS"]') ||
-                         document.querySelector('input[name$="-TOTAL_FORMS"]');
-    
-    if (!totalFormsInput) {
-        console.error('Input TOTAL_FORMS não encontrado');
-        // Tenta criar um fallback (não ideal, mas evita crash)
-        return;
-    }
-    
-    console.log('Prefixo detectado:', totalFormsInput.name.replace('-TOTAL_FORMS', ''));
-    
-    function atualizarContador() {
-        const visiveis = container.querySelectorAll('.ingrediente-form').length;
-        if (contadorBadge) {
-            contadorBadge.textContent = visiveis + ' ' + (visiveis === 1 ? 'item' : 'itens');
-        }
-    }
-    
-    // Atualiza contador inicial
+  }
+
+  atualizarContador();
+
+  addBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    const formCount = parseInt(totalFormsInput.value) || 0;
+    const newHtml   = emptyTemplate.replace(/__prefix__/g, formCount);
+    const tempDiv   = document.createElement('div');
+    tempDiv.innerHTML = newHtml;
+    const newForm   = tempDiv.firstElementChild;
+    if (!newForm) return;
+
+    newForm.style.opacity = '0';
+    container.appendChild(newForm);
+    requestAnimationFrame(function () {
+      newForm.style.transition = 'opacity .2s ease';
+      newForm.style.opacity    = '1';
+    });
+
+    totalFormsInput.value = formCount + 1;
     atualizarContador();
-    
-    // Adicionar novo ingrediente
-    addBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        const formCount = parseInt(totalFormsInput.value) || 0;
-        
-        // Substitui __prefix__ pelo número atual
-        const newHtml = emptyTemplate.replace(/__prefix__/g, formCount);
-        
-        // Cria elemento temporário
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = newHtml;
-        const newForm = tempDiv.firstElementChild;
-        
-        if (!newForm) {
-            console.error('Erro ao criar novo formulário');
-            return;
-        }
-        
-        // Adiciona ao container com animação
-        newForm.style.opacity = '0';
-        container.appendChild(newForm);
-        
-        setTimeout(function() {
-            newForm.style.transition = 'opacity 0.2s ease-in';
-            newForm.style.opacity = '1';
-        }, 10);
-        
-        // Incrementa contador
-        totalFormsInput.value = formCount + 1;
+
+    const firstSelect = newForm.querySelector('select');
+    if (firstSelect) firstSelect.focus();
+  });
+
+  container.addEventListener('click', function (e) {
+    const removeBtn = e.target.closest('.remove-ingrediente');
+    if (!removeBtn) return;
+    const formRow   = removeBtn.closest('.ingrediente-form');
+    if (!formRow)   return;
+
+    const deleteCheckbox = formRow.querySelector('input[type="checkbox"][name$="-DELETE"]');
+    const hiddenId       = formRow.querySelector('input[type="hidden"][name$="-id"]');
+
+    function fadeOut(el, cb) {
+      el.style.transition = 'opacity .18s ease, transform .18s ease';
+      el.style.opacity    = '0';
+      el.style.transform  = 'translateX(6px)';
+      setTimeout(cb, 200);
+    }
+
+    if (hiddenId && hiddenId.value && deleteCheckbox) {
+      deleteCheckbox.checked = true;
+      fadeOut(formRow, function () {
+        formRow.style.display = 'none';
         atualizarContador();
-        
-        // Foca no primeiro select do novo formulário
-        const firstSelect = newForm.querySelector('select');
-        if (firstSelect) {
-            firstSelect.focus();
+      });
+    } else {
+      fadeOut(formRow, function () {
+        formRow.remove();
+        reindexarFormularios();
+        atualizarContador();
+      });
+    }
+  });
+
+  function reindexarFormularios() {
+    const forms = container.querySelectorAll('.ingrediente-form');
+    forms.forEach(function (form, index) {
+      form.setAttribute('data-index', index);
+      form.querySelectorAll('input, select, textarea').forEach(function (el) {
+        if (el.name && el.name.includes('-DELETE')) return;
+        if (el.name) {
+          const m = el.name.match(/(.+)-\d+-(.+)/);
+          if (m) el.name = m[1] + '-' + index + '-' + m[2];
         }
-        
-        console.log('Formulário adicionado. Total:', totalFormsInput.value);
+        if (el.id) {
+          const m = el.id.match(/id_(.+)-\d+-(.+)/);
+          if (m) el.id = 'id_' + m[1] + '-' + index + '-' + m[2];
+        }
+      });
+      form.querySelectorAll('label').forEach(function (lbl) {
+        if (lbl.htmlFor) {
+          const m = lbl.htmlFor.match(/id_(.+)-\d+-(.+)/);
+          if (m) lbl.htmlFor = 'id_' + m[1] + '-' + index + '-' + m[2];
+        }
+      });
     });
-    
-    // Remover ingrediente (delegação de eventos)
-    container.addEventListener('click', function(e) {
-        const removeBtn = e.target.closest('.remove-ingrediente');
-        if (!removeBtn) return;
-        
-        const formRow = removeBtn.closest('.ingrediente-form');
-        if (!formRow) return;
-        
-        // Verifica se é registro existente (tem ID e checkbox DELETE)
-        const deleteCheckbox = formRow.querySelector('input[type="checkbox"][name$="-DELETE"]');
-        const hiddenId = formRow.querySelector('input[type="hidden"][name$="-id"]');
-        
-        if (hiddenId && hiddenId.value && deleteCheckbox) {
-            // Registro existente: marca para deleção e esconde
-            deleteCheckbox.checked = true;
-            formRow.style.transition = 'opacity 0.2s ease-out';
-            formRow.style.opacity = '0';
-            
-            setTimeout(function() {
-                formRow.style.display = 'none';
-                atualizarContador();
-            }, 200);
+    totalFormsInput.value = forms.length;
+  }
+
+  const receitaForm = document.getElementById('receita-form');
+  if (receitaForm) {
+    receitaForm.addEventListener('submit', function (e) {
+      let hasError = false;
+      container.querySelectorAll('.ingrediente-form').forEach(function (row) {
+        const del = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+        if ((del && del.checked) || row.style.display === 'none') return;
+        const produto = row.querySelector('select[name$="-produto"]');
+        if (produto && !produto.value) {
+          row.classList.add('border-danger');
+          hasError = true;
         } else {
-            // Registro novo: remove do DOM e reindexa
-            formRow.style.transition = 'opacity 0.2s ease-out';
-            formRow.style.opacity = '0';
-            
-            setTimeout(function() {
-                formRow.remove();
-                reindexarFormularios();
-                atualizarContador();
-            }, 200);
+          row.classList.remove('border-danger');
         }
+      });
+      if (hasError) {
+        e.preventDefault();
+        alert('Preencha o produto em todos os ingredientes ou remova as linhas vazias.');
+      }
     });
-    
-    // Reindexa formulários após remoção
-    function reindexarFormularios() {
-        const forms = container.querySelectorAll('.ingrediente-form');
-        
-        forms.forEach(function(form, index) {
-            form.setAttribute('data-index', index);
-            
-            // Atualiza name e id de todos os inputs
-            form.querySelectorAll('input, select, textarea').forEach(function(element) {
-                // Pula os campos hidden de DELETE que já estão corretos
-                if (element.name && element.name.includes('-DELETE')) return;
-                
-                // Atualiza name: form-0-produto -> form-1-produto
-                if (element.name) {
-                    const match = element.name.match(/(.+)-\d+-(.+)/);
-                    if (match) {
-                        const prefix = match[1];
-                        const suffix = match[2];
-                        element.name = prefix + '-' + index + '-' + suffix;
-                    }
-                }
-                
-                // Atualiza id: id_form-0-produto -> id_form-1-produto
-                if (element.id) {
-                    const match = element.id.match(/id_(.+)-\d+-(.+)/);
-                    if (match) {
-                        const prefix = match[1];
-                        const suffix = match[2];
-                        element.id = 'id_' + prefix + '-' + index + '-' + suffix;
-                    }
-                }
-            });
-            
-            // Atualiza labels
-            form.querySelectorAll('label').forEach(function(label) {
-                if (label.htmlFor) {
-                    const match = label.htmlFor.match(/id_(.+)-\d+-(.+)/);
-                    if (match) {
-                        const prefix = match[1];
-                        const suffix = match[2];
-                        label.htmlFor = 'id_' + prefix + '-' + index + '-' + suffix;
-                    }
-                }
-            });
-        });
-        
-        totalFormsInput.value = forms.length;
-        console.log('Reindexado. Total forms:', forms.length);
-    }
-    
-    // Validação ao submeter
-    const form = document.getElementById('receita-form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            let hasError = false;
-            const forms = container.querySelectorAll('.ingrediente-form');
-            
-            forms.forEach(function(formRow) {
-                // Ignora se está marcado para deleção
-                const deleteCb = formRow.querySelector('input[type="checkbox"][name$="-DELETE"]');
-                if (deleteCb && deleteCb.checked) return;
-                if (formRow.style.display === 'none') return;
-                
-                // Valida produto preenchido
-                const produto = formRow.querySelector('select[name$="-produto"]');
-                if (produto && !produto.value) {
-                    formRow.classList.add('border-danger');
-                    hasError = true;
-                } else {
-                    formRow.classList.remove('border-danger');
-                }
-            });
-            
-            if (hasError) {
-                e.preventDefault();
-                alert('Preencha o produto em todos os ingredientes ou remova as linhas vazias.');
-            }
-        });
-    }
-    
-    console.log('Formset inicializado com sucesso');
+  }
 })();
 </script>
 
