@@ -314,15 +314,6 @@ button[type="submit"]:hover {
   <rect width="100%" height="100%" fill="url(#eduTechOutline)" />
 </svg>
 
-{% if messages %}
-<div class="messages" aria-live="polite">
-    {% for message in messages %}
-        <div class="message {{ message.tags }}" role="alert">
-            {{ message|safe }}
-        </div>
-    {% endfor %}
-</div>
-{% endif %}
 <main class="login-container" role="main">
     
     <div class="logo">

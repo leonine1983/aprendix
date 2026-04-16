@@ -38,7 +38,7 @@
                         </div>
                     </div>
 
-                    <form method="post" novalidate>
+                    <form method="post" novalidate id="receita-form">
                         {% if form.errors or formset.errors or formset.non_form_errors %}
                         <div class="alert alert-danger mb-4">
 
@@ -187,73 +187,108 @@
 
                         <!-- BLOCO 4 – INGREDIENTES -->
                         <fieldset class="mb-4">
-                            <legend class="h6 text-uppercase text-muted mb-3 fw-semibold">
-                                Ingredientes da Receita
+                            <legend class="h6 text-uppercase text-muted mb-3 fw-semibold d-flex justify-content-between align-items-center">
+                                <span>Ingredientes da Receita</span>
+                                <span class="badge bg-secondary" id="contador-ingredientes">0 itens</span>
                             </legend>
 
-                            <!-- ESSENCIAL -->
                             {{ formset.management_form }}
 
-                            <div id="ingredientes-list">
-
+                            <div id="ingredientes-container">
                                 {% for f in formset %}
-                                <div class="row mb-3 border rounded p-3 bg-light">
-                                    {% if formset.non_form_errors %}
-                                    <div class="alert alert-danger">
+                                <div class="row mb-3 border rounded p-3 bg-light ingrediente-form" data-index="{{ forloop.counter0 }}">
+                                    {% if formset.non_form_errors and forloop.first %}
+                                    <div class="alert alert-danger col-12">
                                         {{ formset.non_form_errors }}
                                     </div>
                                     {% endif %}
 
-                                      {{ f.id }} 
+                                    {{ f.id }}
 
                                     <!-- PRODUTO -->
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">
-                                            Produto
+                                    <div class="col-md-6 mb-2 mb-md-0">
+                                        <label class="form-label fw-semibold small text-muted">
+                                            Produto <span class="text-danger">*</span>
                                         </label>
                                         {{ f.produto }}
 
                                         {% if f.produto.errors %}
-                                            <div class="text-danger small">
+                                            <div class="text-danger small mt-1">
                                                 {{ f.produto.errors }}
                                             </div>
                                         {% endif %}
                                     </div>
 
                                     <!-- QUANTIDADE -->
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-semibold">
-                                            Quantidade
+                                    <div class="col-md-4 mb-2 mb-md-0">
+                                        <label class="form-label fw-semibold small text-muted">
+                                            Quantidade <span class="text-danger">*</span>
                                         </label>
                                         {{ f.quantidade }}
 
                                         {% if f.quantidade.errors %}
-                                            <div class="text-danger small">
+                                            <div class="text-danger small mt-1">
                                                 {{ f.quantidade.errors }}
                                             </div>
                                         {% endif %}
                                     </div>
 
                                     <!-- REMOVER -->
-                                    <div class="col-md-2 d-flex align-items-end">
+                                    <div class="col-md-2 d-flex align-items-end justify-content-end">
                                         {% if f.instance.pk %}
-                                            <div class="form-check">
+                                            <div class="d-none">
                                                 {{ f.DELETE }}
-                                                <label class="form-check-label small">
-                                                    Remover
-                                                </label>
                                             </div>
                                         {% endif %}
+                                        <button type="button" class="btn btn-outline-danger btn-sm remove-ingrediente" title="Remover ingrediente">
+                                            <i class="bi bi-trash"></i>
+                                            <span class="d-none d-md-inline ms-1">Remover</span>
+                                        </button>
                                     </div>
 
                                 </div>
+                                {% empty %}
+                                <!-- Se não houver formulários iniciais, o empty_form será usado pelo JS -->
                                 {% endfor %}
-
                             </div>
 
-                            <div class="form-text">
-                                Adicione todos os insumos necessários para execução da receita.
-                                Esses dados serão utilizados para controle de estoque e planejamento alimentar.
+                            <!-- Template vazio para clonagem (escondido) - ESTRUTURA CORRIGIDA -->
+                            <div id="empty-form-template" class="d-none">
+                                <div class="row mb-3 border rounded p-3 bg-light ingrediente-form">
+                                    {{ formset.empty_form.id }}
+                                    
+                                    <div class="col-md-6 mb-2 mb-md-0">
+                                        <label class="form-label fw-semibold small text-muted">
+                                            Produto <span class="text-danger">*</span>
+                                        </label>
+                                        {{ formset.empty_form.produto }}
+                                    </div>
+
+                                    <div class="col-md-4 mb-2 mb-md-0">
+                                        <label class="form-label fw-semibold small text-muted">
+                                            Quantidade <span class="text-danger">*</span>
+                                        </label>
+                                        {{ formset.empty_form.quantidade }}
+                                    </div>
+
+                                    <div class="col-md-2 d-flex align-items-end justify-content-end">
+                                        <button type="button" class="btn btn-outline-danger btn-sm remove-ingrediente" title="Remover ingrediente">
+                                            <i class="bi bi-trash"></i>
+                                            <span class="d-none d-md-inline ms-1">Remover</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <button type="button" id="add-ingrediente" class="btn btn-outline-primary">
+                                    <i class="bi bi-plus-lg me-1"></i>
+                                    Adicionar Ingrediente
+                                </button>
+                                
+                                <div class="form-text text-end mb-0" style="max-width: 400px;">
+                                    Adicione todos os insumos necessários. Clique em "Adicionar" para incluir novos produtos.
+                                </div>
                             </div>
                         </fieldset>
 
@@ -285,4 +320,213 @@
     </div>
 
 </div>
+
+<!-- JAVASCRIPT EMBUTIDO (funciona mesmo se extra_js não existir) -->
+<script>
+(function() {
+    'use strict';
+    
+    console.log('Inicializando formset...');
+    
+    const container = document.getElementById('ingredientes-container');
+    const addBtn = document.getElementById('add-ingrediente');
+    const emptyTemplateDiv = document.getElementById('empty-form-template');
+    const contadorBadge = document.getElementById('contador-ingredientes');
+    
+    // Verificações de segurança
+    if (!container || !addBtn || !emptyTemplateDiv) {
+        console.error('Elementos necessários não encontrados:', {
+            container: !!container,
+            addBtn: !!addBtn,
+            emptyTemplateDiv: !!emptyTemplateDiv
+        });
+        return;
+    }
+    
+    // Obtém o HTML do template vazio (apenas o conteúdo interno da div #empty-form-template)
+    const emptyTemplate = emptyTemplateDiv.innerHTML;
+    
+    // Encontra o input TOTAL_FORMS (com prefixo dinâmico ou fixo)
+    let totalFormsInput = document.querySelector('input[name="ingredientes-TOTAL_FORMS"]') ||
+                         document.querySelector('input[name="form-TOTAL_FORMS"]') ||
+                         document.querySelector('input[name$="-TOTAL_FORMS"]');
+    
+    if (!totalFormsInput) {
+        console.error('Input TOTAL_FORMS não encontrado');
+        // Tenta criar um fallback (não ideal, mas evita crash)
+        return;
+    }
+    
+    console.log('Prefixo detectado:', totalFormsInput.name.replace('-TOTAL_FORMS', ''));
+    
+    function atualizarContador() {
+        const visiveis = container.querySelectorAll('.ingrediente-form').length;
+        if (contadorBadge) {
+            contadorBadge.textContent = visiveis + ' ' + (visiveis === 1 ? 'item' : 'itens');
+        }
+    }
+    
+    // Atualiza contador inicial
+    atualizarContador();
+    
+    // Adicionar novo ingrediente
+    addBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const formCount = parseInt(totalFormsInput.value) || 0;
+        
+        // Substitui __prefix__ pelo número atual
+        const newHtml = emptyTemplate.replace(/__prefix__/g, formCount);
+        
+        // Cria elemento temporário
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = newHtml;
+        const newForm = tempDiv.firstElementChild;
+        
+        if (!newForm) {
+            console.error('Erro ao criar novo formulário');
+            return;
+        }
+        
+        // Adiciona ao container com animação
+        newForm.style.opacity = '0';
+        container.appendChild(newForm);
+        
+        setTimeout(function() {
+            newForm.style.transition = 'opacity 0.2s ease-in';
+            newForm.style.opacity = '1';
+        }, 10);
+        
+        // Incrementa contador
+        totalFormsInput.value = formCount + 1;
+        atualizarContador();
+        
+        // Foca no primeiro select do novo formulário
+        const firstSelect = newForm.querySelector('select');
+        if (firstSelect) {
+            firstSelect.focus();
+        }
+        
+        console.log('Formulário adicionado. Total:', totalFormsInput.value);
+    });
+    
+    // Remover ingrediente (delegação de eventos)
+    container.addEventListener('click', function(e) {
+        const removeBtn = e.target.closest('.remove-ingrediente');
+        if (!removeBtn) return;
+        
+        const formRow = removeBtn.closest('.ingrediente-form');
+        if (!formRow) return;
+        
+        // Verifica se é registro existente (tem ID e checkbox DELETE)
+        const deleteCheckbox = formRow.querySelector('input[type="checkbox"][name$="-DELETE"]');
+        const hiddenId = formRow.querySelector('input[type="hidden"][name$="-id"]');
+        
+        if (hiddenId && hiddenId.value && deleteCheckbox) {
+            // Registro existente: marca para deleção e esconde
+            deleteCheckbox.checked = true;
+            formRow.style.transition = 'opacity 0.2s ease-out';
+            formRow.style.opacity = '0';
+            
+            setTimeout(function() {
+                formRow.style.display = 'none';
+                atualizarContador();
+            }, 200);
+        } else {
+            // Registro novo: remove do DOM e reindexa
+            formRow.style.transition = 'opacity 0.2s ease-out';
+            formRow.style.opacity = '0';
+            
+            setTimeout(function() {
+                formRow.remove();
+                reindexarFormularios();
+                atualizarContador();
+            }, 200);
+        }
+    });
+    
+    // Reindexa formulários após remoção
+    function reindexarFormularios() {
+        const forms = container.querySelectorAll('.ingrediente-form');
+        
+        forms.forEach(function(form, index) {
+            form.setAttribute('data-index', index);
+            
+            // Atualiza name e id de todos os inputs
+            form.querySelectorAll('input, select, textarea').forEach(function(element) {
+                // Pula os campos hidden de DELETE que já estão corretos
+                if (element.name && element.name.includes('-DELETE')) return;
+                
+                // Atualiza name: form-0-produto -> form-1-produto
+                if (element.name) {
+                    const match = element.name.match(/(.+)-\d+-(.+)/);
+                    if (match) {
+                        const prefix = match[1];
+                        const suffix = match[2];
+                        element.name = prefix + '-' + index + '-' + suffix;
+                    }
+                }
+                
+                // Atualiza id: id_form-0-produto -> id_form-1-produto
+                if (element.id) {
+                    const match = element.id.match(/id_(.+)-\d+-(.+)/);
+                    if (match) {
+                        const prefix = match[1];
+                        const suffix = match[2];
+                        element.id = 'id_' + prefix + '-' + index + '-' + suffix;
+                    }
+                }
+            });
+            
+            // Atualiza labels
+            form.querySelectorAll('label').forEach(function(label) {
+                if (label.htmlFor) {
+                    const match = label.htmlFor.match(/id_(.+)-\d+-(.+)/);
+                    if (match) {
+                        const prefix = match[1];
+                        const suffix = match[2];
+                        label.htmlFor = 'id_' + prefix + '-' + index + '-' + suffix;
+                    }
+                }
+            });
+        });
+        
+        totalFormsInput.value = forms.length;
+        console.log('Reindexado. Total forms:', forms.length);
+    }
+    
+    // Validação ao submeter
+    const form = document.getElementById('receita-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            let hasError = false;
+            const forms = container.querySelectorAll('.ingrediente-form');
+            
+            forms.forEach(function(formRow) {
+                // Ignora se está marcado para deleção
+                const deleteCb = formRow.querySelector('input[type="checkbox"][name$="-DELETE"]');
+                if (deleteCb && deleteCb.checked) return;
+                if (formRow.style.display === 'none') return;
+                
+                // Valida produto preenchido
+                const produto = formRow.querySelector('select[name$="-produto"]');
+                if (produto && !produto.value) {
+                    formRow.classList.add('border-danger');
+                    hasError = true;
+                } else {
+                    formRow.classList.remove('border-danger');
+                }
+            });
+            
+            if (hasError) {
+                e.preventDefault();
+                alert('Preencha o produto em todos os ingredientes ou remova as linhas vazias.');
+            }
+        });
+    }
+    
+    console.log('Formset inicializado com sucesso');
+})();
+</script>
+
 {% endblock %}

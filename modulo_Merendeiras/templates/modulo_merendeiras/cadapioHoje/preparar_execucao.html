@@ -519,10 +519,39 @@
         </div>
       </div>
       
-      <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem; cursor: pointer;" 
-           onclick="toggleDetails({{ item_data.item.receita.id }})">
-        <i class="fas fa-chevron-down" id="icon-{{ item_data.item.receita.id }}"></i> Ver ingredientes
-      </div>
+          <!-- Botão chamativo para ver ingredientes -->
+    <div style="padding: 0 1.25rem 1.25rem; background: #FAFBFC; border-top: 1px solid var(--border-subtle);">
+      <button type="button" 
+              onclick="toggleDetails({{ item_data.item.receita.id }})"
+              style="background: var(--primary-green); 
+                     color: white; 
+                     border: none; 
+                     padding: 0.75rem 1.5rem; 
+                     border-radius: var(--radius-md); 
+                     font-weight: 600; 
+                     font-size: 0.95rem;
+                     cursor: pointer;
+                     display: inline-flex;
+                     align-items: center;
+                     gap: 0.5rem;
+                     box-shadow: 0 4px 6px rgba(46, 125, 50, 0.3);
+                     transition: all 0.2s;
+                     margin-top: 0.75rem;"
+              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 8px rgba(46, 125, 50, 0.4)'"
+              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(46, 125, 50, 0.3)'">
+        <i class="fas fa-utensils" id="icon-{{ item_data.item.receita.id }}" style="font-size: 1rem;"></i>
+        <span>Ver ingredientes e estoque</span>
+        <i class="fas fa-chevron-down" style="font-size: 0.8rem; margin-left: 0.5rem;"></i>
+      </button>
+      
+      <!-- Badge de alerta se houver problemas -->
+      {% if not item_data.estoque_ok %}
+      <span style="background: var(--danger-red); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-left: 0.75rem; animation: pulse 2s infinite;">
+        <i class="fas fa-exclamation-circle me-1"></i>Verificar estoque
+      </span>
+      {% endif %}
+    </div>
+
     </div>
 
     <!-- SEÇÃO DE INGREDIENTES COM EXPLICAÇÕES -->

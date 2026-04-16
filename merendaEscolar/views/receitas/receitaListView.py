@@ -13,12 +13,7 @@ from django.forms import inlineformset_factory
 from ...models import Receita, ReceitaIngrediente, CardapioItem, ExecucaoReceita
 
 
-from django.shortcuts import redirect
-from django.forms import inlineformset_factory
 from django.db.models import Q
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.views.generic import ListView
-from ...models import Receita, ReceitaIngrediente, CardapioItem, ExecucaoReceita
 
 class ReceitaListView(
     LoginRequiredMixin,
@@ -93,13 +88,17 @@ NUTRICIONISTA_GROUPS = ("Nutricionista", "Admin")
 # ==============================
 # FORMSET DE INGREDIENTES
 # ==============================
+
 ReceitaIngredienteFormSet = inlineformset_factory(
-    Receita,
+    Receita, 
     ReceitaIngrediente,
-    fields=["produto", "quantidade"],
-    extra=3,              # quantidade inicial de linhas
-    can_delete=True
+    fields=['produto', 'quantidade'],
+    extra=1,
+    can_delete=True,
+    min_num=1,
+    validate_min=True
 )
+
 
 
 # ==============================
@@ -127,10 +126,13 @@ class ReceitaCreateView(
 
         if self.request.POST:
             context["formset"] = ReceitaIngredienteFormSet(
-                self.request.POST
+                self.request.POST,
+                prefix='ingredientes' 
             )
         else:
-            context["formset"] = ReceitaIngredienteFormSet()
+            context["formset"] = ReceitaIngredienteFormSet(
+                prefix='ingredientes' 
+            )
 
         return context
 

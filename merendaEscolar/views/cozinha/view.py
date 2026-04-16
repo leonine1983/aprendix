@@ -9,6 +9,9 @@ from core.groups.nutricionista import NutricionistaRequiredMixin
 from django.core.exceptions import ValidationError
 
 
+from django.http import HttpResponseRedirect
+
+
 from django import forms
 
 class CardapioForm(forms.ModelForm):
@@ -409,25 +412,67 @@ class ItemCreateView(NutricionistaRequiredMixin, CreateView):
         ).select_related("tipo_refeicao", "receita").order_by("tipo_refeicao", "ordem")
 
         return context
+    
+    def get_success_url(self):
+        cardapio_id = self.object.dia.semana.cardapio_id
+        return reverse_lazy("merendaEscolar:cardapio_detail", kwargs={'pk': cardapio_id})
+
 
 
 class ItemUpdateView(NutricionistaRequiredMixin, UpdateView):
     model = CardapioItem
-    fields = "__all__"
+    fields = ['tipo_refeicao','receita', 'ordem']
+
     success_url = reverse_lazy("merendaEscolar:cardapio_list")
+    template_name = "merendaEscolar/cardapio/form/item_form.html"
 
     def form_valid(self, form):
         messages.success(self.request, "Item atualizado!")
         return super().form_valid(form)
+    
+    def get_success_url(self):
+        cardapio_id = self.object.dia.semana.cardapio_id
+        return reverse_lazy("merendaEscolar:cardapio_detail", kwargs={'pk': cardapio_id})
+
 
 
 class ItemDeleteView(NutricionistaRequiredMixin, DeleteView):
     model = CardapioItem
-    success_url = reverse_lazy("merendaEscolar:cardapio_list")
-
+    template_name = "merendaEscolar/cardapio/form/cardapioitem_confirm_delete.html"
+    
     def delete(self, request, *args, **kwargs):
-        messages.success(self.request, "Item removido!")
-        return super().delete(request, *args, **kwargs)
+        # Guarda referências antes de deletar
+        self.object = self.get_object()
+        nome_receita = self.object.receita.nome
+        tipo_refeicao = self.object.tipo_refeicao.nome
+        
+        # Executa a deleção
+        self.object.delete()
+        
+        # Adiciona mensagem de sucesso personalizada
+        messages.success(
+            self.request, 
+            f'"{nome_receita}" ({tipo_refeicao}) foi removido do cardápio com sucesso!'
+        )
+        
+        # Redireciona para a URL de sucesso
+        return HttpResponseRedirect(self.get_success_url())
+    
+    def get_success_url(self):
+        cardapio_id = self.object.dia.semana.cardapio_id
+        return reverse_lazy("merendaEscolar:cardapio_detail", kwargs={'pk': cardapio_id})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Acessando o Cardápio através dos relacionamentos
+        cardapio = self.object.dia.semana.cardapio
+        context['cardapio'] = cardapio
+        context['cardapio_id'] = cardapio.id
+        context['semana_numero'] = self.object.dia.semana.numero
+        context['dia_semana'] = self.object.dia.get_dia_semana_display()
+        
+        return context
 
 
 # =========================
