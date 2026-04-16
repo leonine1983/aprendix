@@ -2049,12 +2049,12 @@
               <span class="session-text">Sessão ativa · 3h 22min</span>
             </div>
             <div class="panel__divider" aria-hidden="true"></div>
-            <a href="#" class="user-panel__item user-panel__item--logout">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M15 3H19C19.55 3 20 3.45 20 4V20C20 20.55 19.55 21 19 21H15M10 17L15 12L10 7M15 12H3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              Sair do Sistema
-            </a>
+            <form method="post" action="{% url 'admin_acessos:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;">
+                                    Sair
+                                </button>
+                            </form>
           </div>
         </div>
       </div>
