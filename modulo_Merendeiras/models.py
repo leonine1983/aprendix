@@ -1,3 +1,5 @@
+
+# Models do app modulo_merendeiras
 from django.db import models, transaction, IntegrityError
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
@@ -183,6 +185,21 @@ class ExecucaoCardapioDia(models.Model):
         related_name='execucoes'
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PLANEJADO')
+    quantidade_alunos_previstos = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Número de alunos previstos para este dia"
+    )
+    quantidade_alunos_fonte = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        choices=(
+            ('MATRICULAS', 'Buscado das matrículas'),
+            ('MANUAL', 'Informado manualmente pela merendeira'),
+        ),
+        help_text="Indica como a quantidade de alunos foi obtida"
+    )
     
     # Execução
     executado_por = models.ForeignKey(User, on_delete=models.PROTECT, related_name='cardapios_executados')

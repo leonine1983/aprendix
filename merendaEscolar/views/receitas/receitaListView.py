@@ -111,7 +111,7 @@ class ReceitaCreateView(
     CreateView
 ):
     model = Receita
-    fields = ["nome", "descricao", "modo_preparo", "ativa"]
+    fields = ["nome", "descricao", "modo_preparo", "ativa", 'rendimento']
     template_name = "merendaEscolar/receitas/receita_form.html"
     success_url = reverse_lazy("merendaEscolar:receita_lista")
 
@@ -188,7 +188,7 @@ class ReceitaUpdateView(
     UpdateView
 ):
     model = Receita
-    fields = ["nome", "descricao", "modo_preparo", "ativa"]
+    fields = ["nome", "descricao", "modo_preparo", "ativa", 'rendimento']
     template_name = "merendaEscolar/receitas/receita_form.html"
     success_url = reverse_lazy("merendaEscolar:receita_lista")
 

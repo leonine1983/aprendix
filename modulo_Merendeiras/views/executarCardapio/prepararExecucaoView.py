@@ -58,6 +58,52 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
             semana=semana,
             dia_semana=dia_semana
         ).first()
+    
+    # Analisa a quantidade de alunos disponivel no modulo gestão_escolar
+    def _get_quantidade_alunos_por_turno(self, escola, hoje):
+        """
+        Busca a quantidade de alunos matriculados por turno para a escola.
+        Retorna um dict com totais por turno e o total geral,
+        ou None se não houver matrículas cadastradas.
+        
+        Tenta importar do gestao_escolar. Se o app não estiver disponível,
+        retorna None silenciosamente para que a merendeira informe manualmente.
+        """
+        try:
+            from gestao_escolar.models import Matriculas
+
+            # Alunos ativos por turno (exclui desistentes, transferidos, etc.)
+            matriculas = Matriculas.objects.filter(
+                turma__escola=escola,
+                turma__ano_letivo__ativo=True,  # ajuste o campo conforme seu AnoLetivo
+                desistente=False,
+                transferido=False,
+            ).select_related('turma')
+
+            if not matriculas.exists():
+                return None
+
+            # Agrupa por turno
+            from django.db.models import Count
+            por_turno = (
+                matriculas
+                .values('turma__turno')
+                .annotate(total=Count('id'))
+                .order_by('turma__turno')
+            )
+
+            turnos = {item['turma__turno']: item['total'] for item in por_turno}
+            total = sum(turnos.values())
+
+            return {
+                'por_turno': turnos,
+                'total': total,
+                'fonte': 'matriculas',  # indica que veio do sistema
+            }
+
+        except Exception:
+            # App gestao_escolar não instalado ou erro inesperado
+            return None
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -113,14 +159,21 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
                 'ingredientes': info['ingredientes']
             })
         
+        # ── NOVO: Quantidade de alunos ──────────────────────────────
+        dados_alunos = self._get_quantidade_alunos_por_turno(escola, hoje)
+        
         ctx.update({
             'cardapio': cardapio_dia,
             'itens': itens_preparados,
             'hoje': hoje,
             'total_itens': len(itens_preparados),
             'itens_com_estoque': sum(1 for i in itens_preparados if i['estoque_ok']),
+            # Novos campos:
+            'quantidade_alunos': dados_alunos['total'] if dados_alunos else None,
+            'alunos_por_turno': dados_alunos['por_turno'] if dados_alunos else None,
+            'alunos_fonte_matriculas': dados_alunos is not None,  # True = veio do sistema
         })
-        
+
         return ctx
     
     def _calcular_maximo_porcoes(self, detalhes, rendimento_base=100):
@@ -180,6 +233,15 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
             messages.error(request, "Cardápio não encontrado.")
             return redirect('modulo_merendeiras:cardapio_hoje')
         
+        # ── NOVO: Captura quantidade informada manualmente (se não veio de matrículas)
+        quantidade_alunos_manual = None
+        try:
+            val = int(request.POST.get('quantidade_alunos_manual', 0))
+            if val > 0:
+                quantidade_alunos_manual = val
+        except (ValueError, TypeError):
+            pass
+
         try:
             with transaction.atomic():
                 resultado = executar_cardapio_do_dia(
@@ -187,7 +249,8 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
                     data=hoje,
                     usuario=request.user,
                     cardapio_dia=cardapio_dia,
-                    porcoes_override=porcoes_override if porcoes_override else None
+                    porcoes_override=porcoes_override if porcoes_override else None,
+                    quantidade_alunos=quantidade_alunos_manual,  # repasse para o serviço se quiser salvar
                 )
                 
                 execucao_id = resultado['execucao_dia_id']

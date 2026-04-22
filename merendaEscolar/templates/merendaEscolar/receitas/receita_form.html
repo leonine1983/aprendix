@@ -432,7 +432,35 @@
                 {{ form.nome }}
                 <p class="rf-hint">Nome padronizado exibido em relatórios. Ex.: <strong>Arroz Integral com Legumes</strong>.</p>
                 {% if form.nome.errors %}<div class="rf-error">{{ form.nome.errors }}</div>{% endif %}
+
+                <div id="preview-rendimento"
+              style="margin-top: .5rem; font-size: .75rem; color: var(--green); display:none;">
+              <i class="bi bi-calculator"></i>
+              Base de cálculo para consumo por porção definida 
               </div>
+
+              </div>
+
+              
+              <div class="rf-field">
+                <label for="{{ form.rendimento.id_for_label }}" class="rf-label">
+                Rendimento (porções) <span class="req">*</span>
+                </label>
+
+                {{ form.rendimento }}
+
+                <p class="rf-hint">
+                Quantidade de porções que esta receita produz no padrão.
+                Este valor é usado para calcular o consumo proporcional dos ingredientes.
+                Ex.: Se a receita rende <strong>100 porções</strong>, todos os insumos estão dimensionados para esse volume.
+                </p>
+
+                {% if form.rendimento.errors %}
+                <div class="rf-error">{{ form.rendimento.errors }}</div>
+                {% endif %}
+              </div>
+
+              
 
               <div class="rf-field">
                 <label class="rf-label">Descrição Técnica</label>
@@ -712,6 +740,20 @@
     });
   }
 })();
+</script>
+<script>
+const rendimentoInput = document.getElementById("{{ form.rendimento.id_for_label }}");
+const preview = document.getElementById("preview-rendimento");
+
+if (rendimentoInput && preview) {
+    rendimentoInput.addEventListener("input", function () {
+        if (parseInt(this.value) > 0) {
+            preview.style.display = "block";
+        } else {
+            preview.style.display = "none";
+        }
+    });
+}
 </script>
 
 {% endblock %}

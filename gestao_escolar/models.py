@@ -1,3 +1,4 @@
+# models do gesta_escolar
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta, date, datetime

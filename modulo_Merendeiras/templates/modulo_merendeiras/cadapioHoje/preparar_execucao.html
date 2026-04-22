@@ -393,15 +393,88 @@
 </div>
 
 <!-- Alerta de capacidade -->
-<div class="scale-alert" style="background: #E3F2FD; border: 1px solid #90CAF9; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
-  <i class="fas fa-users" style="font-size: 1.5rem; color: #1976D2;"></i>
-  <div>
-    <strong>Modo Alta Capacidade</strong>
-    <div style="font-size: 0.9rem; color: var(--text-secondary);">
-      Você pode planejar até 1000 porções. O sistema avisará se exceder o estoque disponível.
+
+<!-- ── Bloco de quantidade de alunos ─────────────────────────── -->
+{% if alunos_fonte_matriculas %}
+  <!-- Veio do sistema: exibe resumo e usa como sugestão -->
+  <div style="background: #E8F5E9; border: 1px solid #A5D6A7; border-radius: 12px; 
+              padding: 1rem 1.25rem; margin-bottom: 1.5rem; 
+              display: flex; align-items: flex-start; gap: 1rem;">
+    <i class="fas fa-users" style="font-size: 1.5rem; color: #2E7D32; margin-top: 2px;"></i>
+    <div style="flex: 1;">
+      <strong style="color: #1B5E20;">
+        👥 {{ quantidade_alunos }} aluno{{ quantidade_alunos|pluralize }} 
+        matriculado{{ quantidade_alunos|pluralize }} hoje
+      </strong>
+      <div style="font-size: 0.875rem; color: #4A5568; margin-top: 0.25rem;">
+        Fonte: sistema de matrículas
+        {% if alunos_por_turno %}
+          —
+          {% for turno, qtd in alunos_por_turno.items %}
+            <span style="background: #C8E6C9; padding: 0.1rem 0.5rem; border-radius: 4px; margin-left: 4px; font-size: 0.8rem;">
+              {{ turno }}: {{ qtd }}
+            </span>
+          {% endfor %}
+        {% endif %}
+      </div>
+      <div style="font-size: 0.8rem; color: #558B2F; margin-top: 0.35rem;">
+        <i class="fas fa-info-circle me-1"></i>
+        As porções foram pré-configuradas com base neste número.
+      </div>
     </div>
   </div>
-</div>
+  <!-- Campo hidden para o POST saber a fonte -->
+  <input type="hidden" name="quantidade_alunos_fonte" value="MATRICULAS">
+  <input type="hidden" name="quantidade_alunos_manual" value="{{ quantidade_alunos }}">
+
+{% else %}
+  <!-- Não há matrículas: merendeira informa manualmente -->
+  <div style="background: #FFF8E1; border: 1px solid #FFD54F; border-radius: 12px; 
+              padding: 1rem 1.25rem; margin-bottom: 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+      <i class="fas fa-user-edit" style="font-size: 1.4rem; color: #F57C00;"></i>
+      <strong style="color: #E65100;">Informe a quantidade de alunos que serão atendidos hoje</strong>
+    </div>
+    <div style="font-size: 0.85rem; color: #5D4037; margin-bottom: 0.75rem;">
+      Não foram encontradas matrículas ativas nesta escola. 
+      Digite o número de alunos para que o sistema pré-configure as porções.
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+      <label style="font-weight: 600; font-size: 0.9rem; color: #4A5568; white-space: nowrap;">
+        Nº de alunos:
+      </label>
+      <input type="number"
+             id="quantidade_alunos_manual"
+             name="quantidade_alunos_manual"
+             min="1" max="2000"
+             placeholder="Ex: 320"
+             style="width: 130px; padding: 0.5rem 0.75rem; border: 2px solid #FFD54F; 
+                    border-radius: 8px; font-size: 1.1rem; font-weight: 700; 
+                    text-align: center; outline: none;"
+             oninput="aplicarQuantidadeAlunos(this.value)">
+      <button type="button"
+              onclick="aplicarQuantidadeAlunos(document.getElementById('quantidade_alunos_manual').value)"
+              style="background: #F57C00; color: white; border: none; padding: 0.5rem 1.25rem;
+                     border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
+        <i class="fas fa-magic me-1"></i>Aplicar nas porções
+      </button>
+    </div>
+    <input type="hidden" name="quantidade_alunos_fonte" value="MANUAL">
+  </div>
+{% endif %}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <div class="kpi-grid">
   <div class="kpi-card {% if itens_com_estoque == total_itens %}{% else %}kpi-card--warning{% endif %}">
@@ -713,29 +786,69 @@
     </button>
   </div>
 </div>
-
 <script>
+// ─────────────────────────────────────────────────────────────
+// CONTROLE DE QUANTIDADE DE ALUNOS
+// ─────────────────────────────────────────────────────────────
+
+// Armazena a quantidade de alunos definida (por matrícula ou manual)
+let quantidadeAlunosDefinida = 0;
+
+/**
+ * Chamada ao carregar a página quando a quantidade vem das matrículas,
+ * ou ao clicar em "Aplicar" quando informada manualmente.
+ * Pré-preenche todos os inputs de porção respeitando estoque e teto.
+ */
+function aplicarQuantidadeAlunos(valor) {
+  const qtd = parseInt(valor) || 0;
+  if (qtd <= 0) {
+    showToast('Informe uma quantidade válida de alunos.', 'warning');
+    return;
+  }
+
+  quantidadeAlunosDefinida = qtd;
+
+  document.querySelectorAll('.prep-item').forEach(card => {
+    const maximoEstoque = parseInt(card.dataset.maximoEstoque) || 0;
+    const id = card.dataset.receitaId;
+    const input = document.getElementById('input_' + id);
+    if (!input || input.disabled) return;
+
+    // Respeita: (1) quantidade de alunos, (2) máximo do estoque, (3) teto de 1000
+    let porcoes = qtd;
+    if (porcoes > 1000) porcoes = 1000;
+    // Não limita pelo estoque automaticamente — apenas avisa visualmente
+
+    input.value = porcoes;
+    validarVisualEstoque(id, porcoes, maximoEstoque);
+  });
+
+  atualizarTotal();
+  showToast(`Porções ajustadas para ${qtd.toLocaleString('pt-BR')} alunos`, 'success');
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// CONTROLE DE PORÇÕES POR RECEITA
+// ─────────────────────────────────────────────────────────────
+
 function ajustarPorcao(id, delta) {
   const input = document.getElementById('input_' + id);
   const card = document.querySelector('[data-receita-id="' + id + '"]');
   const maximoEstoque = parseInt(card.dataset.maximoEstoque) || 0;
-  
+
   let valor = parseInt(input.value) || 0;
   let novoValor = valor + delta;
-  
-  // Limite absoluto de 1000
+
   if (novoValor > 1000) {
     novoValor = 1000;
     showToast('Limite máximo: 1000 porções', 'warning');
   }
-  
+
   if (novoValor < 0) novoValor = 0;
-  
+
   input.value = novoValor;
-  
-  // Verificar se excede estoque
   validarVisualEstoque(id, novoValor, maximoEstoque);
-  
   atualizarTotal();
 }
 
@@ -743,11 +856,10 @@ function definirPorcao(id, valor) {
   const input = document.getElementById('input_' + id);
   const card = document.querySelector('[data-receita-id="' + id + '"]');
   const maximoEstoque = parseInt(card.dataset.maximoEstoque) || 0;
-  
+
   if (valor > 1000) valor = 1000;
-  
+
   input.value = valor;
-  
   validarVisualEstoque(id, valor, maximoEstoque);
   atualizarTotal();
 }
@@ -756,75 +868,104 @@ function validarPorcao(input) {
   const id = input.name.replace('porcoes_', '');
   const card = document.querySelector('[data-receita-id="' + id + '"]');
   const maximoEstoque = parseInt(card.dataset.maximoEstoque) || 0;
-  
+
   let valor = parseInt(input.value) || 0;
-  
-  // Limite de 1000
+
   if (valor > 1000) {
     valor = 1000;
     input.value = 1000;
     showToast('Limite máximo: 1000 porções', 'warning');
   }
-  
+
   if (valor < 0) {
     valor = 0;
     input.value = 0;
   }
-  
+
   validarVisualEstoque(id, valor, maximoEstoque);
   atualizarTotal();
 }
+
+
+// ─────────────────────────────────────────────────────────────
+// VALIDAÇÃO VISUAL DE ESTOQUE
+// ─────────────────────────────────────────────────────────────
 
 function validarVisualEstoque(id, valor, maximoEstoque) {
   const input = document.getElementById('input_' + id);
   const info = document.getElementById('info-' + id);
   const bar = document.getElementById('bar-' + id);
-  
+
   if (maximoEstoque > 0 && valor > maximoEstoque) {
-    // Excede estoque - alerta visual
+    // Excede estoque — alerta visual
     input.classList.add('exceeds-stock');
-    info.innerHTML = '<span class="excess-warning"><i class="fas fa-exclamation-triangle"></i> Excede estoque em ' + (valor - maximoEstoque) + ' porções</span>';
-    
-    // Barra vermelha
+    info.innerHTML =
+      '<span class="excess-warning">' +
+      '<i class="fas fa-exclamation-triangle"></i> ' +
+      'Excede estoque em ' + (valor - maximoEstoque) + ' porções' +
+      '</span>';
+
     if (bar) {
       bar.className = 'stock-bar__fill stock-bar__fill--danger';
       bar.style.width = '100%';
     }
-    
-    // Toast apenas se for um incremento grande (>50)
+
+    // Toast apenas para excedentes grandes (> 50)
     if (valor - maximoEstoque > 50) {
-      showToast('Atenção: Quantidade excede o estoque disponível (' + maximoEstoque + ')', 'warning');
+      showToast(
+        'Atenção: Quantidade excede o estoque disponível (' + maximoEstoque + ')',
+        'warning'
+      );
     }
+
   } else {
     // Dentro do limite
     input.classList.remove('exceeds-stock');
-    
+
     if (maximoEstoque > 0) {
-      info.innerHTML = '<span style="color: var(--primary-green);">✓ Dentro do limite do estoque</span>';
-      
-      // Barra normal
+      // Avisa se a porção ficou abaixo da quantidade de alunos
+      if (quantidadeAlunosDefinida > 0 && valor < quantidadeAlunosDefinida && valor > 0) {
+        info.innerHTML =
+          '<span style="color: var(--warning-amber);">' +
+          '<i class="fas fa-exclamation-circle"></i> ' +
+          'Abaixo da previsão (' + quantidadeAlunosDefinida.toLocaleString('pt-BR') + ' alunos)' +
+          '</span>';
+      } else {
+        info.innerHTML =
+          '<span style="color: var(--primary-green);">✓ Dentro do limite do estoque</span>';
+      }
+
       if (bar) {
         const pct = Math.min(100, Math.round((valor / maximoEstoque) * 100));
-        bar.className = 'stock-bar__fill ' + (pct > 90 ? 'stock-bar__fill--ok' : 'stock-bar__fill--warning');
+        bar.className =
+          'stock-bar__fill ' +
+          (pct > 90 ? 'stock-bar__fill--ok' : 'stock-bar__fill--warning');
         bar.style.width = pct + '%';
       }
+
     } else {
-      info.innerHTML = '<span style="color: var(--text-secondary);">Sem estoque disponível</span>';
+      info.innerHTML =
+        '<span style="color: var(--text-secondary);">Sem estoque disponível</span>';
     }
   }
 }
+
+
+// ─────────────────────────────────────────────────────────────
+// TOTALIZADOR E KPIs
+// ─────────────────────────────────────────────────────────────
 
 function atualizarTotal() {
   const inputs = document.querySelectorAll('.portion-input');
   let total = 0;
   let receitasAtivas = 0;
   let excedentes = 0;
-  
+
   inputs.forEach(input => {
     const val = parseInt(input.value) || 0;
     const card = input.closest('.prep-item');
     const maximo = parseInt(card.dataset.maximoEstoque) || 0;
-    
+
     total += val;
     if (val > 0) {
       receitasAtivas++;
@@ -833,31 +974,37 @@ function atualizarTotal() {
       }
     }
   });
-  
-  // Atualizar display
+
   document.getElementById('resumo-porcoes').textContent = total.toLocaleString('pt-BR');
   document.getElementById('resumo-receitas').textContent = receitasAtivas;
   document.getElementById('resumo-excedentes').textContent = excedentes;
   document.getElementById('kpi-porcoes').textContent = total.toLocaleString('pt-BR');
-  
+
   // Cor do contador de excedentes
   const excEl = document.getElementById('resumo-excedentes');
-  if (excedentes > 0) {
-    excEl.style.color = 'var(--danger-red)';
-  } else {
-    excEl.style.color = 'var(--text-secondary)';
+  excEl.style.color = excedentes > 0 ? 'var(--danger-red)' : 'var(--text-secondary)';
+
+  // Atualiza KPI de alunos previstos na action bar (se o elemento existir)
+  const kpiAlunos = document.getElementById('kpi-alunos-previstos');
+  if (kpiAlunos && quantidadeAlunosDefinida > 0) {
+    kpiAlunos.textContent = quantidadeAlunosDefinida.toLocaleString('pt-BR');
   }
-  
-  // Habilitar/desabilitar botão (permite executar mesmo excedendo, mas avisa)
+
+  // Habilita o botão somente se houver porções configuradas
   document.getElementById('btn-executar').disabled = total === 0;
 }
+
+
+// ─────────────────────────────────────────────────────────────
+// AÇÃO EM LOTE: AJUSTAR TUDO PARA O MÁXIMO DO ESTOQUE
+// ─────────────────────────────────────────────────────────────
 
 function ajustarTudoParaMaximo() {
   document.querySelectorAll('.prep-item').forEach(card => {
     const maximoEstoque = parseInt(card.dataset.maximoEstoque) || 0;
     const id = card.dataset.receitaId;
     const input = document.getElementById('input_' + id);
-    
+
     if (maximoEstoque > 0 && input) {
       input.value = maximoEstoque;
       validarVisualEstoque(id, maximoEstoque, maximoEstoque);
@@ -867,46 +1014,108 @@ function ajustarTudoParaMaximo() {
   showToast('Todas as receitas ajustadas para o máximo do estoque', 'success');
 }
 
+
+// ─────────────────────────────────────────────────────────────
+// DETALHES DE INGREDIENTES (TOGGLE)
+// ─────────────────────────────────────────────────────────────
+
 function toggleDetails(id) {
   const panel = document.getElementById('details-' + id);
   const icon = document.getElementById('icon-' + id);
   panel.classList.toggle('show');
-  icon.style.transform = panel.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
+  icon.style.transform = panel.classList.contains('show')
+    ? 'rotate(180deg)'
+    : 'rotate(0deg)';
 }
+
+
+// ─────────────────────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────────────────────
 
 function showToast(message, type = 'info') {
   const existing = document.querySelector('.toast-message');
   if (existing) existing.remove();
-  
+
   const toast = document.createElement('div');
   toast.className = 'toast-message alert alert-' + type;
   toast.innerHTML = '<i class="fas fa-info-circle me-2"></i>' + message;
   document.body.appendChild(toast);
-  
+
   setTimeout(() => {
     if (toast.parentNode) toast.remove();
   }, 3000);
 }
 
-document.getElementById('formExecucao').addEventListener('submit', function(e) {
-  const excedentes = parseInt(document.getElementById('resumo-excedentes').textContent) || 0;
-  const total = parseInt(document.getElementById('resumo-porcoes').textContent.replace(/\./g, '')) || 0;
-  
-  let mensagem = 'Confirmar execução do cardápio com ' + total + ' porções totais?\n\n';
-  
-  if (excedentes > 0) {
-    mensagem = '⚠️ ATENÇÃO: ' + excedentes + ' receita(s) excedem o estoque disponível.\n\n' + mensagem;
-    mensagem += '\nVocê está ciente de que faltarão ingredientes para preparar todas as porções?\n\n';
+
+// ─────────────────────────────────────────────────────────────
+// SUBMIT COM CONFIRMAÇÃO
+// ─────────────────────────────────────────────────────────────
+
+document.getElementById('formExecucao').addEventListener('submit', function (e) {
+  const excedentes =
+    parseInt(document.getElementById('resumo-excedentes').textContent) || 0;
+  const total =
+    parseInt(
+      document.getElementById('resumo-porcoes').textContent.replace(/\./g, '')
+    ) || 0;
+
+  let mensagem = '';
+
+  // Avisa se o total de porções difere da previsão de alunos
+  if (quantidadeAlunosDefinida > 0 && total !== quantidadeAlunosDefinida) {
+    const diff = Math.abs(total - quantidadeAlunosDefinida);
+    const direcao = total < quantidadeAlunosDefinida ? 'abaixo' : 'acima';
+    mensagem +=
+      '⚠️ O total de porções (' + total.toLocaleString('pt-BR') + ') está ' +
+      diff.toLocaleString('pt-BR') + ' porção(ões) ' + direcao +
+      ' da previsão de alunos (' + quantidadeAlunosDefinida.toLocaleString('pt-BR') + ').\n\n';
   }
-  
-  mensagem += 'Os ingredientes serão debitados do estoque conforme possível.';
-  
+
+  if (excedentes > 0) {
+    mensagem +=
+      '⚠️ ATENÇÃO: ' + excedentes +
+      ' receita(s) excedem o estoque disponível.\n' +
+      'Você está ciente de que faltarão ingredientes?\n\n';
+  }
+
+  mensagem +=
+    'Confirmar execução do cardápio com ' +
+    total.toLocaleString('pt-BR') +
+    ' porções totais?\n\nOs ingredientes serão debitados do estoque conforme possível.';
+
   if (!confirm(mensagem)) {
     e.preventDefault();
   }
 });
 
-// Inicializar
-atualizarTotal();
+
+// ─────────────────────────────────────────────────────────────
+// INICIALIZAÇÃO
+// ─────────────────────────────────────────────────────────────
+
+(function init() {
+  // Se a quantidade de alunos veio das matrículas (campo hidden no template),
+  // aplica automaticamente ao carregar a página.
+  const campoAlunos = document.getElementById('quantidade_alunos_manual');
+  if (campoAlunos && campoAlunos.type === 'hidden') {
+    const qtd = parseInt(campoAlunos.value) || 0;
+    if (qtd > 0) {
+      quantidadeAlunosDefinida = qtd;
+      // Aplica sem toast para não poluir o carregamento
+      document.querySelectorAll('.prep-item').forEach(card => {
+        const maximoEstoque = parseInt(card.dataset.maximoEstoque) || 0;
+        const id = card.dataset.receitaId;
+        const input = document.getElementById('input_' + id);
+        if (!input || input.disabled) return;
+        let porcoes = qtd > 1000 ? 1000 : qtd;
+        input.value = porcoes;
+        validarVisualEstoque(id, porcoes, maximoEstoque);
+      });
+    }
+  }
+
+  atualizarTotal();
+})();
 </script>
 {% endblock %}
