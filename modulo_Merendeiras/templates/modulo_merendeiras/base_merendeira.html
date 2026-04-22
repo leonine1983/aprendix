@@ -1604,6 +1604,94 @@
   }
 }
 
+
+
+/* ── MESSAGES OVERLAY ──────────────────────────────────────── */
+.messages-overlay {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+}
+
+.messages-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.messages-container .alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 18px;
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Outfit', sans-serif;
+  box-shadow: var(--sh-lg);
+  border: 1px solid transparent;
+  min-width: 280px;
+  max-width: 480px;
+  animation: slide-down 0.3s var(--ease-spring) both;
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-16px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)     scale(1);    }
+}
+
+.messages-container .alert-text {
+  flex: 1;
+  line-height: 1.5;
+}
+
+.messages-container .alert-close {
+  flex-shrink: 0;
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: var(--r-xs);
+  opacity: 0.5;
+  transition: opacity var(--t-fast);
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+}
+.messages-container .alert-close:hover { opacity: 1; }
+
+/* Variantes Django */
+.alert-success {
+  background: var(--color-success-light);
+  color: var(--color-success);
+  border-color: rgba(46,125,50,0.2);
+}
+.alert-error, .alert-danger {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-color: rgba(198,40,40,0.2);
+}
+.alert-warning {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+  border-color: rgba(230,81,0,0.2);
+}
+.alert-info {
+  background: var(--color-info-light);
+  color: var(--color-info);
+  border-color: rgba(2,119,189,0.2);
+}
+
   </style>
 </head>
 <body>
@@ -1651,19 +1739,7 @@
         </span>
         <span class="sb-item__label">Cardápio do </span>
         <span class="sb-item__dot" aria-hidden="true"></span>
-      </a>
-
-      <a href="#" class="sb-item sb-item--active" aria-current="page" title="Dashboard">
-        <span class="sb-item__icon" aria-hidden="true">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
-            <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
-            <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
-            <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
-          </svg>
-        </span>
-        <span class="sb-item__label">Painel</span>
-      </a>
+      </a>     
 
       <!--
       <a href="#" class="sb-item" title="Calendário">
@@ -1709,8 +1785,22 @@
         <a href="#" class="sb-sub-item">Coordenadorias</a>
       </div>-->
 
+      
+
       <!-- ── Módulo Merendeiras ── -->
-      <div class="sb-section">Merendeiras</div>      
+      <div class="sb-section">Merendeiras</div>  
+
+      <a href="#" class="sb-item " aria-current="page" title="Dashboard">
+        <span class="sb-item__icon" aria-hidden="true">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+            <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+            <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+            <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+        </span>
+        <span class="sb-item__label">Painel</span>
+      </a>   
 
       <a href="{% url 'modulo_merendeiras:estoque_list_escola' %}" class="sb-item" data-page="estoque" title="Estoque">
         <span class="sb-item__icon" aria-hidden="true">
@@ -1776,12 +1866,9 @@
 
       <div class="sb-section">executa cardapio</div>      
 
-      <a href="{% url 'modulo_merendeiras:cardapio_hoje' %}" class="sb-item" data-page="estoque" title="Estoque">
-        <span class="sb-item__icon" aria-hidden="true">
-          <!-- Caixa 3D / Estoque de mantimentos -->
-          <svg fill="#b8b8b8" height="200px" width="200px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve" stroke="#b8b8b8"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M444.861,38.849h-33.998L400.505,7.774C398.958,3.131,394.612,0,389.719,0h-96.674c-4.893,0-9.238,3.131-10.786,7.774 L271.9,38.849h-31.795L229.746,7.774C228.199,3.131,223.855,0,218.96,0h-96.674c-4.893,0-9.238,3.131-10.786,7.774l-10.358,31.075 H67.145c-6.279,0-11.369,5.09-11.369,11.369v118.304c0,0.041-0.006,0.081-0.006,0.122c0,0.041,0.006,0.08,0.006,0.121v302.476 c0,6.279,5.09,11.369,11.369,11.369h34.222v18.021c0,6.279,5.09,11.369,11.369,11.369c6.279,0,11.369-5.09,11.369-11.369V482.61 h263.782v18.021c0,6.279,5.09,11.369,11.369,11.369s11.369-5.09,11.369-11.369V482.61h34.233c6.279,0,11.369-5.09,11.369-11.369 V50.219C456.23,43.939,451.14,38.849,444.861,38.849z M301.238,22.739h80.285l5.37,16.11h-91.026L301.238,22.739z M130.481,22.739 h80.285l5.37,16.11h-91.025L130.481,22.739z M78.515,61.588h30.821H231.91h48.184h122.574h30.823v95.685H78.515V61.588z M433.491,459.871H78.515V180.012h354.977V459.871z"></path> </g> </g> <g> <g> <path d="M352.353,247.092h-3.127c-6.279,0-11.369,5.09-11.369,11.369s5.09,11.369,11.369,11.369h3.127 c6.279,0,11.369-5.09,11.369-11.369S358.633,247.092,352.353,247.092z"></path> </g> </g> <g> <g> <path d="M399.257,247.092H383.76c-6.279,0-11.369,5.09-11.369,11.369s5.09,11.369,11.369,11.369h4.127V415.36H124.105V269.831 h192.86c6.279,0,11.369-5.09,11.369-11.369c0-6.279-5.09-11.369-11.369-11.369H112.737c-6.279,0-11.369,5.09-11.369,11.369 v168.268c0,6.279,5.09,11.369,11.369,11.369h286.521c6.279,0,11.369-5.09,11.369-11.369V258.461 C410.626,252.182,405.536,247.092,399.257,247.092z"></path> </g> </g> <g> <g> <path d="M399.257,203.32h-286.52c-6.279,0-11.369,5.09-11.369,11.369s5.09,11.369,11.369,11.369h286.521 c6.279,0,11.369-5.09,11.369-11.369S405.536,203.32,399.257,203.32z"></path> </g> </g> <g> <g> <path d="M155.348,99.005c-6.279,0-11.369,5.09-11.369,11.369c0,5.479-4.458,9.937-9.937,9.937s-9.937-4.457-9.937-9.937 c0-5.48,4.457-9.937,9.937-9.937c6.279,0,11.369-5.09,11.369-11.369c0-6.279-5.09-11.369-11.369-11.369 c-18.017,0-32.676,14.659-32.676,32.676s14.659,32.676,32.676,32.676c18.018,0,32.676-14.659,32.676-32.676 C166.718,104.095,161.627,99.005,155.348,99.005z"></path> </g> </g> <g> <g> <path d="M236.652,99.005c-6.279,0-11.369,5.09-11.369,11.369c0,5.479-4.457,9.937-9.937,9.937c-5.48,0-9.937-4.457-9.937-9.937 c0-5.48,4.458-9.937,9.937-9.937c6.279,0,11.369-5.09,11.369-11.369c0-6.279-5.09-11.369-11.369-11.369 c-18.017,0-32.676,14.659-32.676,32.676s14.659,32.676,32.676,32.676s32.676-14.659,32.676-32.676 C248.022,104.095,242.931,99.005,236.652,99.005z"></path> </g> </g> <g> <g> <path d="M317.954,99.005c-6.279,0-11.369,5.09-11.369,11.369c0,5.479-4.458,9.937-9.937,9.937s-9.937-4.457-9.937-9.937 c0-5.48,4.457-9.937,9.937-9.937c6.279,0,11.369-5.09,11.369-11.369c0-6.279-5.09-11.369-11.369-11.369 c-18.017,0-32.676,14.659-32.676,32.676s14.659,32.676,32.676,32.676s32.676-14.659,32.676-32.676 C329.323,104.095,324.233,99.005,317.954,99.005z"></path> </g> </g> <g> <g> <path d="M399.258,99.005c-6.279,0-11.369,5.09-11.369,11.369c0,5.479-4.457,9.937-9.937,9.937s-9.937-4.457-9.937-9.937 c0-5.48,4.458-9.937,9.937-9.937c6.279,0,11.369-5.09,11.369-11.369c0-6.279-5.09-11.369-11.369-11.369 c-18.018,0-32.676,14.659-32.676,32.676s14.657,32.676,32.676,32.676c18.017,0,32.676-14.659,32.676-32.676 C410.627,104.095,405.537,99.005,399.258,99.005z"></path> </g> </g> </g></svg>
-        </span>
-        <span class="sb-item__label">Cozinha</span>
+      <a href="{% url 'modulo_merendeiras:historico_execucoes' %}">
+        <!--falta um svg-->
+        <span class="sb-item__label">Histórico de Exec.</span>  
       </a>
 
      
@@ -1863,6 +1950,46 @@
 
     <!-- HEADER -->
     <header class="header" role="banner">
+      
+      {% if messages %}
+  <div class="messages-overlay" role="status" aria-live="polite">
+    <div class="messages-container">
+      {% for message in messages %}
+        <div class="alert {{ message.tags }}">
+          <span class="alert-text">{{ message }}</span>
+          <button class="alert-close" aria-label="Fechar"
+            onclick="
+              const el = this.closest('.alert');
+              el.style.transition = 'opacity 0.2s, transform 0.2s';
+              el.style.opacity = '0';
+              el.style.transform = 'translateY(-8px)';
+              setTimeout(() => {
+                el.remove();
+                const c = document.querySelector('.messages-overlay');
+                if (c && !c.querySelector('.alert')) c.remove();
+              }, 200);
+            ">✕</button>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+<script>
+  document.querySelectorAll('.messages-container .alert').forEach(function(el) {
+    setTimeout(function() {
+      el.style.transition = 'opacity 0.4s, transform 0.4s';
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(-8px)';
+      setTimeout(function() {
+        el.remove();
+        const c = document.querySelector('.messages-overlay');
+        if (c && !c.querySelector('.alert')) c.remove();
+      }, 4000);
+    }, 50000);
+  });
+</script>
+
+
       <div class="header__start">
 
         <button class="hdr-toggle" id="menuToggle" aria-label="Abrir ou fechar menu" aria-controls="sidebar" aria-expanded="false">

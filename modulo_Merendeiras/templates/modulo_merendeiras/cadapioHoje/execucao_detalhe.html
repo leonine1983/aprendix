@@ -1,0 +1,420 @@
+quero que melhore o template considerando responsividade, baixa fricção, muitas informações
+
+{% extends "modulo_merendeiras/base_merendeira.html" %}
+
+{% block title %}Detalhes da Execução do Cardápio{% endblock %}
+
+{% block content %}
+
+<style>
+/* ==============================
+   🎯 PADRÃO VISUAL INSTITUCIONAL
+   ============================== */
+
+:root {
+    --primary-color: #2E7D32;
+    --secondary-color: #1976D2;
+    --accent-color: #43A047;
+    --neutral-light: #f5f7fa;
+    --text-muted: #6c757d;
+}
+
+/* ==============================
+   🧠 MELHORIA DE LEGIBILIDADE
+   ============================== */
+
+.card-body small {
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* ==============================
+   📊 KPI - ALUNOS ATENDIDOS
+   ============================== */
+
+.kpi-alunos {
+    background: linear-gradient(135deg, #E3F2FD, #FFFFFF);
+    border-left: 5px solid var(--secondary-color);
+    border-radius: 12px;
+    padding: 16px 18px;
+    transition: all 0.25s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-alunos::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    background: rgba(25, 118, 210, 0.08);
+    border-radius: 50%;
+    transform: translate(20px, -20px);
+}
+
+.kpi-alunos:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* Ícone */
+.kpi-alunos i {
+    color: var(--secondary-color);
+    font-size: 1rem;
+}
+
+/* Valor principal */
+.kpi-alunos .valor {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    line-height: 1.2;
+}
+
+/* Label */
+.kpi-alunos .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* ==============================
+   📦 PADRONIZAÇÃO DOS CARDS
+   ============================== */
+
+.card {
+    border-radius: 12px;
+    border: none;
+}
+
+.card-header {
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* ==============================
+   📊 TABELAS MAIS LIMPAS
+   ============================== */
+
+.table thead th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #495057;
+    letter-spacing: 0.5px;
+}
+
+.table tbody td {
+    font-size: 0.9rem;
+}
+
+/* ==============================
+   🎯 BADGE DE STATUS
+   ============================== */
+
+.badge {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+    border-radius: 8px;
+}
+
+/* ==============================
+   🖨️ IMPRESSÃO OTIMIZADA
+   ============================== */
+
+@media print {
+    .btn {
+        display: none !important;
+    }
+
+    .card {
+        box-shadow: none !important;
+    }
+
+    .kpi-alunos {
+        border: 1px solid #ccc;
+    }
+}
+
+/* 🔥 Espaçamento consistente entre blocos internos */
+.card-body .row > div {
+    margin-bottom: 12px;
+}
+
+/* 🎯 Destaque do KPI com respiro real */
+.kpi-alunos {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+/* 📦 Melhor distribuição vertical */
+.card-body {
+    padding: 20px 24px;
+}
+
+/* 🧠 Evita "grudar" label com valor */
+.card-body small {
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* 🎯 Linha separadora sutil (opcional, mas forte UX) */
+.card-body .row > div:not(:last-child) {
+    position: relative;
+}
+
+.card-body .row > div:not(:last-child)::after {
+    content: "";
+    display: block;
+    height: 1px;
+    background: #f1f3f5;
+    margin-top: 10px;
+}
+</style>
+
+<div class="container-fluid py-4">
+
+    <!-- 🔷 CABEÇALHO -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3">
+                <i class="fas fa-clipboard-check text-success me-2"></i>
+                Execução do Cardápio - {{ execucao.get_turno_display }}
+            </h1>
+            <p class="text-muted mb-0">
+                {{ execucao.escola.nome }} • {{ execucao.data|date:"d/m/Y" }}
+            </p>
+        </div>
+
+        <div>
+            <a href="{% url 'modulo_merendeiras:cardapio_hoje' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i> Imprimir
+            </button>
+        </div>
+    </div>
+
+    <!-- 🔷 KPIs -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-start border-primary border-4">
+                <div class="card-body">
+                    <small class="text-muted">Total de Itens</small>
+                    <h4>{{ total_itens }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-start border-success border-4">
+                <div class="card-body">
+                    <small class="text-muted">Executados</small>
+                    <h4>{{ total_executados }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-start border-warning border-4">
+                <div class="card-body">
+                    <small class="text-muted">Pendentes</small>
+                    <h4>{{ total_pendentes }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-start border-danger border-4">
+                <div class="card-body">
+                    <small class="text-muted">Cancelados</small>
+                    <h4>{{ total_cancelados }}</h4>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 🔷 DADOS INSTITUCIONAIS -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                <i class="fas fa-school me-2"></i> Dados da Execução
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+
+                <div class="col-md-4">
+                    <small class="text-muted">Escola</small>
+                    <div class="fw-bold">{{ execucao.escola.nome }}</div>
+                </div>
+
+                <div class="col-md-2">
+                    <small class="text-muted">Data</small>
+                    <div>{{ execucao.data|date:"d/m/Y" }}</div>
+                </div>
+
+                <div class="col-md-2">
+                    <small class="text-muted">Turno</small>
+                    <div>{{ execucao.get_turno_display }}</div>
+                </div>
+
+                <div class="col-md-4">
+                    <small class="text-muted">Executado por</small>
+                    <div class="fw-bold">
+                        {{ execucao.executado_por.get_full_name|default:execucao.executado_por.username }}
+                    </div>
+                </div>
+
+                <!-- 🔥 NOVO BLOCO (POSIÇÃO ESTRATÉGICA) -->
+                <div class="col-12 mt-3">
+    <div class="kpi-alunos">
+        <div class="label">
+            <i class="fas fa-users me-1"></i> Alunos Atendidos
+        </div>
+        <div class="valor">
+            {{ execucao.quantidade_alunos|default:"--" }}
+        </div>
+    </div>
+</div>
+
+                <div class="col-md-4 mt-3">
+                    <small class="text-muted">Criado em</small>
+                    <div>{{ execucao.criado_em|date:"d/m/Y H:i" }}</div>
+                </div>
+
+                <div class="col-md-4 mt-3">
+                    <small class="text-muted">Finalizado em</small>
+                    <div>
+                        {{ execucao.finalizado_em|date:"d/m/Y H:i"|default:"Em andamento" }}
+                    </div>
+                </div>
+
+                <div class="col-md-4 mt-3 text-end">
+                    <span class="badge 
+                        {% if execucao.status == 'EXECUTADO' %}bg-success
+                        {% elif execucao.status == 'PARCIAL' %}bg-warning text-dark
+                        {% elif execucao.status == 'CANCELADO' %}bg-danger
+                        {% else %}bg-secondary{% endif %}">
+                        {{ execucao.get_status_display }}
+                    </span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 🔷 ITENS EXECUTADOS -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+            <i class="fas fa-check-circle"></i> Itens Executados
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Receita</th>
+                        <th>Tipo</th>
+                        <th class="text-center">Planejado</th>
+                        <th class="text-center">Executado</th>
+                        <th class="text-center">Diferença</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in itens_executados %}
+                    <tr>
+                        <td>{{ item.receita.nome }}</td>
+                        <td>{{ item.tipo_refeicao.nome }}</td>
+                        <td class="text-center">{{ item.porcoes_planejadas }}</td>
+                        <td class="text-center">{{ item.porcoes_executadas }}</td>
+                        <td class="text-center fw-bold">
+                            {{ item.diferenca|default:"-" }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-3">
+                            Nenhum item executado
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 🔷 PENDÊNCIAS -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-warning text-dark">
+            <i class="fas fa-exclamation-triangle"></i> Pendências / Falhas
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>Receita</th>
+                        <th>Motivo</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in itens_pendentes %}
+                    <tr>
+                        <td>{{ item.receita.nome }}</td>
+                        <td class="text-danger">
+                            {{ item.motivo_falha|default:"Não informado" }}
+                        </td>
+                        <td>{{ item.get_status_display }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-3">
+                            Sem pendências
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 🔷 CANCELADOS -->
+    {% if itens_cancelados %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-danger text-white">
+            <i class="fas fa-times-circle"></i> Itens Cancelados
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>Receita</th>
+                        <th>Motivo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in itens_cancelados %}
+                    <tr>
+                        <td>{{ item.receita.nome }}</td>
+                        <td>{{ item.motivo_falha|default:"Não informado" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -121,7 +121,6 @@
   transition: color 0.3s;
 }
 
-/* Classe para quando excede estoque */
 .portion-input.exceeds-stock {
   color: var(--danger-red) !important;
   background: #FFEBEE !important;
@@ -153,12 +152,6 @@
 .preset-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.preset-btn.exceeds {
-  background: #FFF3E0;
-  color: #E65100;
-  border-color: #FFB74D;
 }
 
 .portion-info {
@@ -291,6 +284,9 @@
   color: var(--text-primary);
 }
 
+/* ── CORREÇÃO 3: btn-execute NÃO começa disabled.             ──
+   JS adiciona/remove a classe .btn-execute--inactive para UX,
+   mas o botão permanece funcional mesmo sem JS.               */
 .btn-execute {
   background: var(--primary-green);
   color: white;
@@ -303,14 +299,17 @@
   transition: all 0.2s;
 }
 
-.btn-execute:hover:not(:disabled) {
+.btn-execute:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4);
 }
 
-.btn-execute:disabled {
+/* Apenas visual — não desabilita o botão */
+.btn-execute--inactive {
   background: #A0AEC0;
-  cursor: not-allowed;
+  cursor: default;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .btn-secondary-action {
@@ -346,17 +345,17 @@
 
 .toast-message.alert-success { background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; }
 .toast-message.alert-warning { background: #FFF3E0; color: #E65100; border: 1px solid #FFB74D; }
-.toast-message.alert-danger { background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A; }
-.toast-message.alert-info { background: #E3F2FD; color: #1565C0; border: 1px solid #90CAF9; }
+.toast-message.alert-danger  { background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A; }
+.toast-message.alert-info    { background: #E3F2FD; color: #1565C0; border: 1px solid #90CAF9; }
 
 @keyframes slideIn {
   from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(0);    opacity: 1; }
 }
 
 @media (max-width: 768px) {
-  .prep-item__header { 
-    flex-direction: column; 
+  .prep-item__header {
+    flex-direction: column;
     align-items: stretch;
     gap: 1rem;
   }
@@ -367,8 +366,8 @@
   .portion-control {
     justify-content: center;
   }
-  .action-bar { 
-    flex-direction: column; 
+  .action-bar {
+    flex-direction: column;
     gap: 1rem;
     padding: 1rem;
   }
@@ -392,132 +391,126 @@
   </div>
 </div>
 
-<!-- Alerta de capacidade -->
-
-<!-- ── Bloco de quantidade de alunos ─────────────────────────── -->
-{% if alunos_fonte_matriculas %}
-  <!-- Veio do sistema: exibe resumo e usa como sugestão -->
-  <div style="background: #E8F5E9; border: 1px solid #A5D6A7; border-radius: 12px; 
-              padding: 1rem 1.25rem; margin-bottom: 1.5rem; 
-              display: flex; align-items: flex-start; gap: 1rem;">
-    <i class="fas fa-users" style="font-size: 1.5rem; color: #2E7D32; margin-top: 2px;"></i>
-    <div style="flex: 1;">
-      <strong style="color: #1B5E20;">
-        👥 {{ quantidade_alunos }} aluno{{ quantidade_alunos|pluralize }} 
-        matriculado{{ quantidade_alunos|pluralize }} hoje
-      </strong>
-      <div style="font-size: 0.875rem; color: #4A5568; margin-top: 0.25rem;">
-        Fonte: sistema de matrículas
-        {% if alunos_por_turno %}
-          —
-          {% for turno, qtd in alunos_por_turno.items %}
-            <span style="background: #C8E6C9; padding: 0.1rem 0.5rem; border-radius: 4px; margin-left: 4px; font-size: 0.8rem;">
-              {{ turno }}: {{ qtd }}
-            </span>
-          {% endfor %}
-        {% endif %}
-      </div>
-      <div style="font-size: 0.8rem; color: #558B2F; margin-top: 0.35rem;">
-        <i class="fas fa-info-circle me-1"></i>
-        As porções foram pré-configuradas com base neste número.
-      </div>
-    </div>
-  </div>
-  <!-- Campo hidden para o POST saber a fonte -->
-  <input type="hidden" name="quantidade_alunos_fonte" value="MATRICULAS">
-  <input type="hidden" name="quantidade_alunos_manual" value="{{ quantidade_alunos }}">
-
-{% else %}
-  <!-- Não há matrículas: merendeira informa manualmente -->
-  <div style="background: #FFF8E1; border: 1px solid #FFD54F; border-radius: 12px; 
-              padding: 1rem 1.25rem; margin-bottom: 1.5rem;">
-    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-      <i class="fas fa-user-edit" style="font-size: 1.4rem; color: #F57C00;"></i>
-      <strong style="color: #E65100;">Informe a quantidade de alunos que serão atendidos hoje</strong>
-    </div>
-    <div style="font-size: 0.85rem; color: #5D4037; margin-bottom: 0.75rem;">
-      Não foram encontradas matrículas ativas nesta escola. 
-      Digite o número de alunos para que o sistema pré-configure as porções.
-    </div>
-    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-      <label style="font-weight: 600; font-size: 0.9rem; color: #4A5568; white-space: nowrap;">
-        Nº de alunos:
-      </label>
-      <input type="number"
-             id="quantidade_alunos_manual"
-             name="quantidade_alunos_manual"
-             min="1" max="2000"
-             placeholder="Ex: 320"
-             style="width: 130px; padding: 0.5rem 0.75rem; border: 2px solid #FFD54F; 
-                    border-radius: 8px; font-size: 1.1rem; font-weight: 700; 
-                    text-align: center; outline: none;"
-             oninput="aplicarQuantidadeAlunos(this.value)">
-      <button type="button"
-              onclick="aplicarQuantidadeAlunos(document.getElementById('quantidade_alunos_manual').value)"
-              style="background: #F57C00; color: white; border: none; padding: 0.5rem 1.25rem;
-                     border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
-        <i class="fas fa-magic me-1"></i>Aplicar nas porções
-      </button>
-    </div>
-    <input type="hidden" name="quantidade_alunos_fonte" value="MANUAL">
-  </div>
-{% endif %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="kpi-grid">
-  <div class="kpi-card {% if itens_com_estoque == total_itens %}{% else %}kpi-card--warning{% endif %}">
-    <div class="kpi-value">{{ itens_com_estoque }}/{{ total_itens }}</div>
-    <div style="font-size: 0.875rem; color: var(--text-secondary);">Prontas para Execução</div>
-    <div style="font-size: 0.8rem; margin-top: 0.5rem;">
-      {% if itens_com_estoque == total_itens %}
-        <span class="text-success"><i class="fas fa-check-circle"></i> Estoque OK</span>
-      {% else %}
-        <span class="text-warning"><i class="fas fa-exclamation-circle"></i> {{ total_itens|add:"-"|add:itens_com_estoque }} com restrições</span>
-      {% endif %}
-    </div>
-  </div>
-
-  <div class="kpi-card">
-    <div class="kpi-value" id="kpi-porcoes">0</div>
-    <div style="font-size: 0.875rem; color: var(--text-secondary);">Porções Totais</div>
-  </div>
-
-  <div class="kpi-card">
-    <div class="kpi-value">{% widthratio itens_com_estoque total_itens 100 %}%</div>
-    <div style="font-size: 0.875rem; color: var(--text-secondary);">Disponibilidade de Estoque</div>
-    <div class="progress" style="height: 6px; margin-top: 8px;">
-      <div class="progress-bar {% if itens_com_estoque == total_itens %}bg-success{% else %}bg-warning{% endif %}" 
-           style="width: {% widthratio itens_com_estoque total_itens 100 %}%"></div>
-    </div>
-  </div>
-
-  <div class="kpi-card">
-    <div class="kpi-value">{{ cardapio.semana.numero }}ª</div>
-    <div style="font-size: 0.875rem; color: var(--text-secondary);">Semana Atual</div>
-  </div>
-</div>
-
+<!-- ═══════════════════════════════════════════════════════════════════
+     CORREÇÃO 1 + 2: Todo o conteúdo que gera dados para POST está
+     DENTRO de <form>. Campos de quantidade de alunos (fonte + valor)
+     existem UMA única vez, como hidden inputs sincronizados por JS.
+     ═══════════════════════════════════════════════════════════════════ -->
 <form method="post" id="formExecucao" style="margin-bottom: 120px;">
   {% csrf_token %}
-  
+
+  <!-- ── Campos hidden únicos que o backend precisa receber ──────── -->
+  <!-- CORREÇÃO 2: um único campo para cada dado; sem duplicidade de name -->
+  <input type="hidden" id="h_quantidade_alunos_fonte"  name="quantidade_alunos_fonte"  value="{% if alunos_fonte_matriculas %}MATRICULAS{% else %}MANUAL{% endif %}">
+  <input type="hidden" id="h_quantidade_alunos_manual" name="quantidade_alunos_manual" value="{{ quantidade_alunos|default:0 }}">
+
+  <!-- ── Bloco de quantidade de alunos ──────────────────────────── -->
+  {% if alunos_fonte_matriculas %}
+    <div style="background: #E8F5E9; border: 1px solid #A5D6A7; border-radius: 12px;
+                padding: 1rem 1.25rem; margin-bottom: 1.5rem;
+                display: flex; align-items: flex-start; gap: 1rem;">
+      <i class="fas fa-users" style="font-size: 1.5rem; color: #2E7D32; margin-top: 2px;"></i>
+      <div style="flex: 1;">
+        <strong style="color: #1B5E20;">
+          👥 {{ quantidade_alunos }} aluno{{ quantidade_alunos|pluralize }}
+          matriculado{{ quantidade_alunos|pluralize }} hoje
+        </strong>
+        <div style="font-size: 0.875rem; color: #4A5568; margin-top: 0.25rem;">
+          Fonte: sistema de matrículas
+          {% if alunos_por_turno %}
+            —
+            {% for turno, qtd in alunos_por_turno.items %}
+              <span style="background: #C8E6C9; padding: 0.1rem 0.5rem; border-radius: 4px; margin-left: 4px; font-size: 0.8rem;">
+                {{ turno }}: {{ qtd }}
+              </span>
+            {% endfor %}
+          {% endif %}
+        </div>
+        <div style="font-size: 0.8rem; color: #558B2F; margin-top: 0.35rem;">
+          <i class="fas fa-info-circle me-1"></i>
+          As porções foram pré-configuradas com base neste número.
+        </div>
+      </div>
+    </div>
+
+  {% else %}
+    <!-- Não há matrículas: merendeira informa manualmente -->
+    <div style="background: #FFF8E1; border: 1px solid #FFD54F; border-radius: 12px;
+                padding: 1rem 1.25rem; margin-bottom: 1.5rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+        <i class="fas fa-user-edit" style="font-size: 1.4rem; color: #F57C00;"></i>
+        <strong style="color: #E65100;">Informe a quantidade de alunos que serão atendidos hoje</strong>
+      </div>
+      <div style="font-size: 0.85rem; color: #5D4037; margin-bottom: 0.75rem;">
+        Não foram encontradas matrículas ativas nesta escola.
+        Digite o número de alunos para que o sistema pré-configure as porções.
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+        <label for="campo_alunos_manual" style="font-weight: 600; font-size: 0.9rem; color: #4A5568; white-space: nowrap;">
+          Nº de alunos:
+        </label>
+        <!-- CORREÇÃO 2: este input NÃO tem name (evita duplicidade).
+             O JS copia seu valor para o hidden #h_quantidade_alunos_manual
+             antes de qualquer uso, e esse hidden é quem vai no POST.     -->
+        <input type="number"
+               id="campo_alunos_manual"
+               min="1" max="2000"
+               placeholder="Ex: 320"
+               style="width: 130px; padding: 0.5rem 0.75rem; border: 2px solid #FFD54F;
+                      border-radius: 8px; font-size: 1.1rem; font-weight: 700;
+                      text-align: center; outline: none;"
+               oninput="aplicarQuantidadeAlunos(this.value)">
+        <button type="button"
+                onclick="aplicarQuantidadeAlunos(document.getElementById('campo_alunos_manual').value)"
+                style="background: #F57C00; color: white; border: none; padding: 0.5rem 1.25rem;
+                       border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
+          <i class="fas fa-magic me-1"></i>Aplicar nas porções
+        </button>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- ── KPIs ──────────────────────────────────────────────────── -->
+  <div class="kpi-grid">
+    <div class="kpi-card {% if itens_com_estoque == total_itens %}{% else %}kpi-card--warning{% endif %}">
+      <div class="kpi-value">{{ itens_com_estoque }}/{{ total_itens }}</div>
+      <div style="font-size: 0.875rem; color: var(--text-secondary);">Prontas para Execução</div>
+      <div style="font-size: 0.8rem; margin-top: 0.5rem;">
+        {% if itens_com_estoque == total_itens %}
+          <span class="text-success"><i class="fas fa-check-circle"></i> Estoque OK</span>
+        {% else %}
+          <span class="text-warning"><i class="fas fa-exclamation-circle"></i> {{ total_itens|add:"-"|add:itens_com_estoque }} com restrições</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-value" id="kpi-porcoes">0</div>
+      <div style="font-size: 0.875rem; color: var(--text-secondary);">Porções Totais</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-value">{% widthratio itens_com_estoque total_itens 100 %}%</div>
+      <div style="font-size: 0.875rem; color: var(--text-secondary);">Disponibilidade de Estoque</div>
+      <div class="progress" style="height: 6px; margin-top: 8px;">
+        <div class="progress-bar {% if itens_com_estoque == total_itens %}bg-success{% else %}bg-warning{% endif %}"
+             style="width: {% widthratio itens_com_estoque total_itens 100 %}%"></div>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-value">{{ cardapio.semana.numero }}ª</div>
+      <div style="font-size: 0.875rem; color: var(--text-secondary);">Semana Atual</div>
+    </div>
+  </div>
+
+  <!-- ── Receitas ───────────────────────────────────────────────── -->
   {% for item_data in itens %}
   <div class="prep-item {% if item_data.estoque_ok %}prep-item--ok{% elif item_data.porcoes_maximas > 0 %}prep-item--limited{% else %}prep-item--blocked{% endif %}"
        data-receita-id="{{ item_data.item.receita.id }}"
        data-maximo-estoque="{{ item_data.porcoes_maximas|default:0 }}"
        data-sugerido="{{ item_data.porcoes_sugeridas }}">
-    
+
     <div class="prep-item__header" onclick="toggleDetails({{ item_data.item.receita.id }})">
       <div class="prep-item__main">
         <h5>{{ item_data.item.receita.nome }}</h5>
@@ -528,35 +521,33 @@
           {% endif %}
         </div>
       </div>
-      
+
       <div class="portion-control-wrapper" onclick="event.stopPropagation()">
         <div class="portion-control">
-          <button type="button" class="portion-btn" onclick="ajustarPorcao({{ item_data.item.receita.id }}, -50)" 
+          <button type="button" class="portion-btn" onclick="ajustarPorcao({{ item_data.item.receita.id }}, -50)"
                   title="Diminuir 50" {% if item_data.porcoes_maximas == 0 %}disabled{% endif %}>-50</button>
-          <button type="button" class="portion-btn" onclick="ajustarPorcao({{ item_data.item.receita.id }}, -10)" 
+          <button type="button" class="portion-btn" onclick="ajustarPorcao({{ item_data.item.receita.id }}, -10)"
                   title="Diminuir 10" {% if item_data.porcoes_maximas == 0 %}disabled{% endif %}>-10</button>
-          
-          <!-- IMPORTANTE: max="1000" fixo, independente do estoque -->
-          <input type="number" 
-                 name="porcoes_{{ item_data.item.receita.id }}" 
+
+          <input type="number"
+                 name="porcoes_{{ item_data.item.receita.id }}"
                  id="input_{{ item_data.item.receita.id }}"
-                 class="portion-input" 
-                 value="{% if item_data.porcoes_maximas == 0 %}0{% else %}{{ item_data.porcoes_sugeridas }}{% endif %}" 
-                 min="0" 
+                 class="portion-input"
+                 value="{% if item_data.porcoes_maximas == 0 %}0{% else %}{{ item_data.porcoes_sugeridas }}{% endif %}"
+                 min="0"
                  max="1000"
                  step="1"
                  onchange="validarPorcao(this)"
                  {% if item_data.porcoes_maximas == 0 %}disabled{% endif %}>
-          
-          <button type="button" class="portion-btn" onclick="ajustarPorcao({{ item_data.item.receita.id }}, 10)" 
+
+          <button type="button" class="portion-btn" onclick="ajustarPorcao({{ item_data.item.receita.id }}, 10)"
                   title="Aumentar 10" {% if item_data.porcoes_maximas == 0 %}disabled{% endif %}>+10</button>
-          <button type="button" class="portion-btn" onclick="ajustarPorcao({{ item_data.item.receita.id }}, 50)" 
+          <button type="button" class="portion-btn" onclick="ajustarPorcao({{ item_data.item.receita.id }}, 50)"
                   title="Aumentar 50" {% if item_data.porcoes_maximas == 0 %}disabled{% endif %}>+50</button>
-          <button type="button" class="portion-btn" onclick="ajustarPorcao({{ item_data.item.receita.id }}, 100)" 
+          <button type="button" class="portion-btn" onclick="ajustarPorcao({{ item_data.item.receita.id }}, 100)"
                   title="Aumentar 100" {% if item_data.porcoes_maximas == 0 %}disabled{% endif %}>+100</button>
         </div>
-        
-        <!-- Botões de atalho - sempre habilitados se houver estoque -->
+
         <div class="quick-preset">
           <button type="button" class="preset-btn" onclick="definirPorcao({{ item_data.item.receita.id }}, 100)"
                   {% if item_data.porcoes_maximas == 0 %}disabled{% endif %}>100</button>
@@ -567,7 +558,7 @@
           <button type="button" class="preset-btn" onclick="definirPorcao({{ item_data.item.receita.id }}, 1000)"
                   {% if item_data.porcoes_maximas == 0 %}disabled{% endif %}>1000</button>
         </div>
-        
+
         <div class="portion-info" id="info-{{ item_data.item.receita.id }}">
           {% if not item_data.estoque_ok %}
             <span style="color: var(--warning-amber);">Estoque máximo: {{ item_data.porcoes_maximas }} porções</span>
@@ -577,7 +568,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="stock-bar">
       <div class="stock-bar__header">
         <span><i class="fas fa-box-open me-1"></i> Disponibilidade de Ingredientes</span>
@@ -586,68 +577,63 @@
         </span>
       </div>
       <div class="stock-bar__track">
-        <div class="stock-bar__fill {% if item_data.estoque_ok %}stock-bar__fill--ok{% elif item_data.porcoes_maximas > 0 %}stock-bar__fill--warning{% else %}stock-bar__fill--danger{% endif %}" 
+        <div class="stock-bar__fill {% if item_data.estoque_ok %}stock-bar__fill--ok{% elif item_data.porcoes_maximas > 0 %}stock-bar__fill--warning{% else %}stock-bar__fill--danger{% endif %}"
              id="bar-{{ item_data.item.receita.id }}"
              style="width: {% if item_data.estoque_ok %}100{% else %}{% widthratio item_data.porcoes_maximas item_data.porcoes_sugeridas 100 %}{% endif %}%">
         </div>
       </div>
-      
-          <!-- Botão chamativo para ver ingredientes -->
-    <div style="padding: 0 1.25rem 1.25rem; background: #FAFBFC; border-top: 1px solid var(--border-subtle);">
-      <button type="button" 
-              onclick="toggleDetails({{ item_data.item.receita.id }})"
-              style="background: var(--primary-green); 
-                     color: white; 
-                     border: none; 
-                     padding: 0.75rem 1.5rem; 
-                     border-radius: var(--radius-md); 
-                     font-weight: 600; 
-                     font-size: 0.95rem;
-                     cursor: pointer;
-                     display: inline-flex;
-                     align-items: center;
-                     gap: 0.5rem;
-                     box-shadow: 0 4px 6px rgba(46, 125, 50, 0.3);
-                     transition: all 0.2s;
-                     margin-top: 0.75rem;"
-              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 8px rgba(46, 125, 50, 0.4)'"
-              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(46, 125, 50, 0.3)'">
-        <i class="fas fa-utensils" id="icon-{{ item_data.item.receita.id }}" style="font-size: 1rem;"></i>
-        <span>Ver ingredientes e estoque</span>
-        <i class="fas fa-chevron-down" style="font-size: 0.8rem; margin-left: 0.5rem;"></i>
-      </button>
-      
-      <!-- Badge de alerta se houver problemas -->
-      {% if not item_data.estoque_ok %}
-      <span style="background: var(--danger-red); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-left: 0.75rem; animation: pulse 2s infinite;">
-        <i class="fas fa-exclamation-circle me-1"></i>Verificar estoque
-      </span>
-      {% endif %}
+
+      <div style="padding: 0 0 0; background: #FAFBFC; border-top: 1px solid var(--border-subtle);">
+        <button type="button"
+                onclick="toggleDetails({{ item_data.item.receita.id }})"
+                style="background: var(--primary-green);
+                       color: white;
+                       border: none;
+                       padding: 0.75rem 1.5rem;
+                       border-radius: var(--radius-md);
+                       font-weight: 600;
+                       font-size: 0.95rem;
+                       cursor: pointer;
+                       display: inline-flex;
+                       align-items: center;
+                       gap: 0.5rem;
+                       box-shadow: 0 4px 6px rgba(46, 125, 50, 0.3);
+                       transition: all 0.2s;
+                       margin-top: 0.75rem;"
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 8px rgba(46, 125, 50, 0.4)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(46, 125, 50, 0.3)'">
+          <i class="fas fa-utensils" id="icon-{{ item_data.item.receita.id }}" style="font-size: 1rem;"></i>
+          <span>Ver ingredientes e estoque</span>
+          <i class="fas fa-chevron-down" style="font-size: 0.8rem; margin-left: 0.5rem;"></i>
+        </button>
+
+        {% if not item_data.estoque_ok %}
+        <span style="background: var(--danger-red); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-left: 0.75rem;">
+          <i class="fas fa-exclamation-circle me-1"></i>Verificar estoque
+        </span>
+        {% endif %}
+      </div>
     </div>
 
-    </div>
-
-    <!-- SEÇÃO DE INGREDIENTES COM EXPLICAÇÕES -->
+    <!-- SEÇÃO DE INGREDIENTES -->
     <div class="ingredients-panel" id="details-{{ item_data.item.receita.id }}">
-      
-      <!-- Box explicativo -->
+
       <div style="background: #E3F2FD; border-left: 4px solid #1976D2; padding: 1rem; margin-bottom: 1rem; border-radius: 8px;">
         <h6 style="font-weight: 700; margin-bottom: 0.5rem; color: #1565C0;">
           <i class="fas fa-info-circle me-2"></i>Entenda o cálculo do estoque
         </h6>
         <p style="font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-secondary);">
-          Esta receita está cadastrada para produzir <strong>{{ item_data.porcoes_sugeridas }} porções</strong> 
-          usando os ingredientes abaixo. O sistema calcula automaticamente quantas porções extras são possíveis 
+          Esta receita está cadastrada para produzir <strong>{{ item_data.porcoes_sugeridas }} porções</strong>
+          usando os ingredientes abaixo. O sistema calcula automaticamente quantas porções extras são possíveis
           com o estoque disponível.
         </p>
         <p style="font-size: 0.85rem; margin-bottom: 0; color: #D32F2F; font-weight: 500;">
           <i class="fas fa-exclamation-triangle me-1"></i>
-          <strong>Importante:</strong> Se o estoque parece menor do que deveria, verifique se as quantidades 
+          <strong>Importante:</strong> Se o estoque parece menor do que deveria, verifique se as quantidades
           na receita estão corretas (ex: se está em gramas ou quilos).
         </p>
       </div>
 
-      <!-- Legenda -->
       <div style="display: flex; gap: 2rem; margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-secondary); flex-wrap: wrap;">
         <div>
           <span style="display: inline-block; width: 12px; height: 12px; background: #FEE2E2; border: 1px solid #FECACA; border-radius: 2px; margin-right: 0.5rem;"></span>
@@ -662,48 +648,35 @@
       <h6 style="font-weight: 600; margin-bottom: 1rem; border-bottom: 2px solid var(--border-subtle); padding-bottom: 0.5rem;">
         Ingredientes para {{ item_data.porcoes_sugeridas }} porções (padrão da receita):
       </h6>
-      
+
       <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 0.75rem;">
         {% for ing in item_data.ingredientes %}
         <div style="padding: 1rem; background: white; border-radius: 8px; border: 1px solid var(--border-subtle); {% if not ing.saldo_ok %}border-color: #FECACA; background: #FFEBEE;{% endif %}">
-          
-          <!-- Nome do produto -->
           <div style="font-weight: 600; margin-bottom: 0.5rem; font-size: 1rem;">
             {{ ing.produto }}
           </div>
-          
-          <!-- Detalhamento -->
           <div style="font-size: 0.85rem; color: var(--text-secondary);">
-            
-            <!-- Necessário -->
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
               <span>Necessário para {{ item_data.porcoes_sugeridas }} porções:</span>
               <span style="font-weight: 600;">{{ ing.necessario|floatformat:2 }} {{ ing.unidade }}</span>
             </div>
-            
-            <!-- Disponível -->
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
               <span>Estoque disponível:</span>
               <span class="{% if ing.disponivel < ing.necessario %}text-danger fw-bold{% else %}text-success{% endif %}">
                 {{ ing.disponivel|floatformat:2 }} {{ ing.unidade }}
               </span>
             </div>
-            
-            <!-- Consumo por porção (cálculo manual) -->
             <div style="display: flex; justify-content: space-between; border-top: 1px dashed #ccc; padding-top: 0.25rem; margin-top: 0.25rem;">
               <span>Consumo por porção:</span>
               <span style="font-family: monospace; font-size: 0.8rem;">
-                <!-- Mostra o valor base calculado pela view -->
                 {{ ing.necessario|floatformat:3 }} {{ ing.unidade }} para {{ item_data.porcoes_sugeridas }} porções
               </span>
             </div>
           </div>
-          
-          <!-- Status visual -->
           {% if ing.disponivel < ing.necessario %}
           <div style="background: #D32F2F; color: white; padding: 0.5rem; border-radius: 4px; font-size: 0.8rem; margin-top: 0.5rem;">
             <i class="fas fa-exclamation-triangle me-1"></i>
-            Faltam {{ ing.necessario|add:"-"|add:ing.disponivel|floatformat:2 }} {{ ing.unidade }} 
+            Faltam {{ ing.necessario|add:"-"|add:ing.disponivel|floatformat:2 }} {{ ing.unidade }}
             para completar {{ item_data.porcoes_sugeridas }} porções
           </div>
           {% else %}
@@ -715,7 +688,7 @@
         </div>
         {% endfor %}
       </div>
-      
+
       {% if item_data.faltantes %}
       <div class="alert alert-danger mt-3 mb-0">
         <h6 style="font-weight: 700; margin-bottom: 0.5rem;">
@@ -730,13 +703,12 @@
           {% endfor %}
         </ul>
         <p style="margin-top: 0.5rem; margin-bottom: 0; font-size: 0.9rem;">
-          <strong>Sugestão:</strong> Reduza a quantidade de porções ou clique em 
+          <strong>Sugestão:</strong> Reduza a quantidade de porções ou clique em
           <strong>"Máximo Viável"</strong> para ajustar automaticamente ao estoque disponível.
         </p>
       </div>
       {% endif %}
-      
-      <!-- Resumo do cálculo -->
+
       <div style="background: #F5F5F5; padding: 1rem; border-radius: 8px; margin-top: 1rem; border: 1px solid #E0E0E0;">
         <h6 style="font-weight: 600; margin-bottom: 0.5rem;">
           <i class="fas fa-clipboard-check me-2"></i>Resumo do cálculo:
@@ -758,46 +730,82 @@
     </div>
   </div>
   {% endfor %}
-</form>
 
-<div class="action-bar">
-  <div class="action-bar__summary">
-    <div class="action-bar__stat">
-      <span class="action-bar__stat-value" id="resumo-porcoes">0</span>
-      <span style="font-size: 0.75rem; color: var(--text-secondary);">TOTAL DE PORÇÕES</span>
+  <!-- ── Action bar dentro do form ─────────────────────────────── -->
+  <!-- CORREÇÃO 1: action bar e seu botão submit estão dentro de <form> -->
+  <div class="action-bar">
+    <div class="action-bar__summary">
+      <div class="action-bar__stat">
+        <span class="action-bar__stat-value" id="resumo-porcoes">0</span>
+        <span style="font-size: 0.75rem; color: var(--text-secondary);">TOTAL DE PORÇÕES</span>
+      </div>
+      <div class="action-bar__stat">
+        <span class="action-bar__stat-value" id="resumo-receitas" style="color: var(--text-secondary);">0</span>
+        <span style="font-size: 0.75rem; color: var(--text-secondary);">RECEITAS ATIVAS</span>
+      </div>
+      <div class="action-bar__stat">
+        <span class="action-bar__stat-value" id="resumo-excedentes" style="color: var(--text-secondary);">0</span>
+        <span style="font-size: 0.75rem; color: var(--text-secondary);">EXCEDEM ESTOQUE</span>
+      </div>
     </div>
-    <div class="action-bar__stat">
-      <span class="action-bar__stat-value" id="resumo-receitas" style="color: var(--text-secondary);">0</span>
-      <span style="font-size: 0.75rem; color: var(--text-secondary);">RECEITAS ATIVAS</span>
-    </div>
-    <div class="action-bar__stat">
-      <span class="action-bar__stat-value" id="resumo-excedentes" style="color: var(--text-secondary);">0</span>
-      <span style="font-size: 0.75rem; color: var(--text-secondary);">EXCEDEM ESTOQUE</span>
-    </div>
-  </div>
 
-  <div style="display: flex; gap: 0.5rem;">
-    <a href="{% url 'modulo_merendeiras:cardapio_hoje' %}" class="btn-secondary-action">Voltar</a>
-    <button type="button" class="btn-secondary-action" onclick="ajustarTudoParaMaximo()">
-      <i class="fas fa-magic me-2"></i>Máximo Viável
-    </button>
-    <button type="submit" class="btn-execute" id="btn-executar" disabled>
-      <i class="fas fa-play me-2"></i>Executar Cardápio
-    </button>
-  </div>
+    <div style="display: flex; gap: 0.5rem;">
+      <a href="{% url 'modulo_merendeiras:cardapio_hoje' %}" class="btn-secondary-action">Voltar</a>
+      <button type="button" class="btn-secondary-action" onclick="ajustarTudoParaMaximo()">
+        <i class="fas fa-magic me-2"></i>Máximo Viável
+      </button>
+      <!-- CORREÇÃO 3: botão NÃO usa disabled nativo — JS só adiciona classe visual.
+           O submit sempre funciona; a confirmação server-side garante integridade. -->
+           <!-- Turno já executados (informativo) -->
+{% if turnos_executados %}
+<div class="alert-message info" style="margin-bottom: 16px;">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+    <path d="M12 12V16M12 8H12.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  </svg>
+  <span>
+    Turnos já executados hoje:
+    <strong>
+      {% for t in turnos_executados %}{{ t }}{% if not forloop.last %}, {% endif %}{% endfor %}
+    </strong>
+  </span>
 </div>
-<script>
-// ─────────────────────────────────────────────────────────────
-// CONTROLE DE QUANTIDADE DE ALUNOS
-// ─────────────────────────────────────────────────────────────
+{% endif %}
 
-// Armazena a quantidade de alunos definida (por matrícula ou manual)
-let quantidadeAlunosDefinida = 0;
+<!-- Seletor de turno -->
+<div class="form-group" style="margin-bottom: 20px;">
+  <label class="form-label" for="turno">Turno desta execução *</label>
+  <select name="turno" id="turno" class="form-select" required>
+    <option value="">— Selecione o turno —</option>
+    {% for turno in turnos_disponiveis %}
+      <option value="{{ turno.valor }}">{{ turno.label }}</option>
+    {% endfor %}
+  </select>
+</div>
+      <button type="submit" class="btn-execute btn-execute--inactive" id="btn-executar">
+        <i class="fas fa-play me-2"></i>Executar Cardápio
+      </button>
+    </div>
+  </div>
+
+</form>{# ← fecha o <form> APÓS a action bar #}
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// CORREÇÃO 3: quantidadeAlunosDefinida começa com o valor do
+// contexto Django (se vier de matrículas) para que a lógica de
+// aviso funcione mesmo sem interação manual do usuário.
+// ═══════════════════════════════════════════════════════════════════
+let quantidadeAlunosDefinida = parseInt('{{ quantidade_alunos|default:0 }}') || 0;
+
+
+// ─────────────────────────────────────────────────────────────────
+// QUANTIDADE DE ALUNOS
+// ─────────────────────────────────────────────────────────────────
 
 /**
- * Chamada ao carregar a página quando a quantidade vem das matrículas,
- * ou ao clicar em "Aplicar" quando informada manualmente.
- * Pré-preenche todos os inputs de porção respeitando estoque e teto.
+ * Aplica a quantidade de alunos em todos os inputs de porção e
+ * sincroniza com o campo hidden que será enviado no POST.
  */
 function aplicarQuantidadeAlunos(valor) {
   const qtd = parseInt(valor) || 0;
@@ -808,44 +816,37 @@ function aplicarQuantidadeAlunos(valor) {
 
   quantidadeAlunosDefinida = qtd;
 
+  // CORREÇÃO 2: atualiza o hidden único — sem duplicidade de name
+  document.getElementById('h_quantidade_alunos_manual').value = qtd;
+
   document.querySelectorAll('.prep-item').forEach(card => {
     const maximoEstoque = parseInt(card.dataset.maximoEstoque) || 0;
     const id = card.dataset.receitaId;
     const input = document.getElementById('input_' + id);
     if (!input || input.disabled) return;
 
-    // Respeita: (1) quantidade de alunos, (2) máximo do estoque, (3) teto de 1000
-    let porcoes = qtd;
-    if (porcoes > 1000) porcoes = 1000;
-    // Não limita pelo estoque automaticamente — apenas avisa visualmente
-
+    let porcoes = qtd > 1000 ? 1000 : qtd;
     input.value = porcoes;
     validarVisualEstoque(id, porcoes, maximoEstoque);
   });
 
   atualizarTotal();
-  showToast(`Porções ajustadas para ${qtd.toLocaleString('pt-BR')} alunos`, 'success');
+  showToast('Porções ajustadas para ' + qtd.toLocaleString('pt-BR') + ' alunos', 'success');
 }
 
 
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
 // CONTROLE DE PORÇÕES POR RECEITA
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
 
 function ajustarPorcao(id, delta) {
   const input = document.getElementById('input_' + id);
-  const card = document.querySelector('[data-receita-id="' + id + '"]');
+  const card  = document.querySelector('[data-receita-id="' + id + '"]');
   const maximoEstoque = parseInt(card.dataset.maximoEstoque) || 0;
 
-  let valor = parseInt(input.value) || 0;
-  let novoValor = valor + delta;
-
-  if (novoValor > 1000) {
-    novoValor = 1000;
-    showToast('Limite máximo: 1000 porções', 'warning');
-  }
-
-  if (novoValor < 0) novoValor = 0;
+  let novoValor = (parseInt(input.value) || 0) + delta;
+  if (novoValor > 1000) { novoValor = 1000; showToast('Limite máximo: 1000 porções', 'warning'); }
+  if (novoValor < 0)    { novoValor = 0; }
 
   input.value = novoValor;
   validarVisualEstoque(id, novoValor, maximoEstoque);
@@ -854,11 +855,10 @@ function ajustarPorcao(id, delta) {
 
 function definirPorcao(id, valor) {
   const input = document.getElementById('input_' + id);
-  const card = document.querySelector('[data-receita-id="' + id + '"]');
+  const card  = document.querySelector('[data-receita-id="' + id + '"]');
   const maximoEstoque = parseInt(card.dataset.maximoEstoque) || 0;
 
   if (valor > 1000) valor = 1000;
-
   input.value = valor;
   validarVisualEstoque(id, valor, maximoEstoque);
   atualizarTotal();
@@ -870,34 +870,24 @@ function validarPorcao(input) {
   const maximoEstoque = parseInt(card.dataset.maximoEstoque) || 0;
 
   let valor = parseInt(input.value) || 0;
-
-  if (valor > 1000) {
-    valor = 1000;
-    input.value = 1000;
-    showToast('Limite máximo: 1000 porções', 'warning');
-  }
-
-  if (valor < 0) {
-    valor = 0;
-    input.value = 0;
-  }
+  if (valor > 1000) { valor = 1000; input.value = 1000; showToast('Limite máximo: 1000 porções', 'warning'); }
+  if (valor < 0)    { valor = 0;    input.value = 0; }
 
   validarVisualEstoque(id, valor, maximoEstoque);
   atualizarTotal();
 }
 
 
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
 // VALIDAÇÃO VISUAL DE ESTOQUE
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
 
 function validarVisualEstoque(id, valor, maximoEstoque) {
   const input = document.getElementById('input_' + id);
-  const info = document.getElementById('info-' + id);
-  const bar = document.getElementById('bar-' + id);
+  const info  = document.getElementById('info-' + id);
+  const bar   = document.getElementById('bar-'  + id);
 
   if (maximoEstoque > 0 && valor > maximoEstoque) {
-    // Excede estoque — alerta visual
     input.classList.add('exceeds-stock');
     info.innerHTML =
       '<span class="excess-warning">' +
@@ -910,20 +900,14 @@ function validarVisualEstoque(id, valor, maximoEstoque) {
       bar.style.width = '100%';
     }
 
-    // Toast apenas para excedentes grandes (> 50)
     if (valor - maximoEstoque > 50) {
-      showToast(
-        'Atenção: Quantidade excede o estoque disponível (' + maximoEstoque + ')',
-        'warning'
-      );
+      showToast('Atenção: Quantidade excede o estoque disponível (' + maximoEstoque + ')', 'warning');
     }
 
   } else {
-    // Dentro do limite
     input.classList.remove('exceeds-stock');
 
     if (maximoEstoque > 0) {
-      // Avisa se a porção ficou abaixo da quantidade de alunos
       if (quantidadeAlunosDefinida > 0 && valor < quantidadeAlunosDefinida && valor > 0) {
         info.innerHTML =
           '<span style="color: var(--warning-amber);">' +
@@ -937,74 +921,65 @@ function validarVisualEstoque(id, valor, maximoEstoque) {
 
       if (bar) {
         const pct = Math.min(100, Math.round((valor / maximoEstoque) * 100));
-        bar.className =
-          'stock-bar__fill ' +
-          (pct > 90 ? 'stock-bar__fill--ok' : 'stock-bar__fill--warning');
+        bar.className = 'stock-bar__fill ' + (pct > 90 ? 'stock-bar__fill--ok' : 'stock-bar__fill--warning');
         bar.style.width = pct + '%';
       }
 
     } else {
-      info.innerHTML =
-        '<span style="color: var(--text-secondary);">Sem estoque disponível</span>';
+      info.innerHTML = '<span style="color: var(--text-secondary);">Sem estoque disponível</span>';
     }
   }
 }
 
 
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
 // TOTALIZADOR E KPIs
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
 
 function atualizarTotal() {
   const inputs = document.querySelectorAll('.portion-input');
-  let total = 0;
-  let receitasAtivas = 0;
-  let excedentes = 0;
+  let total = 0, receitasAtivas = 0, excedentes = 0;
 
   inputs.forEach(input => {
-    const val = parseInt(input.value) || 0;
-    const card = input.closest('.prep-item');
+    const val    = parseInt(input.value) || 0;
+    const card   = input.closest('.prep-item');
     const maximo = parseInt(card.dataset.maximoEstoque) || 0;
 
     total += val;
     if (val > 0) {
       receitasAtivas++;
-      if (maximo > 0 && val > maximo) {
-        excedentes++;
-      }
+      if (maximo > 0 && val > maximo) excedentes++;
     }
   });
 
-  document.getElementById('resumo-porcoes').textContent = total.toLocaleString('pt-BR');
-  document.getElementById('resumo-receitas').textContent = receitasAtivas;
+  document.getElementById('resumo-porcoes').textContent    = total.toLocaleString('pt-BR');
+  document.getElementById('resumo-receitas').textContent   = receitasAtivas;
   document.getElementById('resumo-excedentes').textContent = excedentes;
-  document.getElementById('kpi-porcoes').textContent = total.toLocaleString('pt-BR');
+  document.getElementById('kpi-porcoes').textContent       = total.toLocaleString('pt-BR');
 
   // Cor do contador de excedentes
-  const excEl = document.getElementById('resumo-excedentes');
-  excEl.style.color = excedentes > 0 ? 'var(--danger-red)' : 'var(--text-secondary)';
+  document.getElementById('resumo-excedentes').style.color =
+    excedentes > 0 ? 'var(--danger-red)' : 'var(--text-secondary)';
 
-  // Atualiza KPI de alunos previstos na action bar (se o elemento existir)
-  const kpiAlunos = document.getElementById('kpi-alunos-previstos');
-  if (kpiAlunos && quantidadeAlunosDefinida > 0) {
-    kpiAlunos.textContent = quantidadeAlunosDefinida.toLocaleString('pt-BR');
+  // CORREÇÃO 3: usa apenas classe visual, NÃO o atributo disabled.
+  const btn = document.getElementById('btn-executar');
+  if (total === 0) {
+    btn.classList.add('btn-execute--inactive');
+  } else {
+    btn.classList.remove('btn-execute--inactive');
   }
-
-  // Habilita o botão somente se houver porções configuradas
-  document.getElementById('btn-executar').disabled = total === 0;
 }
 
 
-// ─────────────────────────────────────────────────────────────
-// AÇÃO EM LOTE: AJUSTAR TUDO PARA O MÁXIMO DO ESTOQUE
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
+// AÇÃO EM LOTE
+// ─────────────────────────────────────────────────────────────────
 
 function ajustarTudoParaMaximo() {
   document.querySelectorAll('.prep-item').forEach(card => {
     const maximoEstoque = parseInt(card.dataset.maximoEstoque) || 0;
     const id = card.dataset.receitaId;
     const input = document.getElementById('input_' + id);
-
     if (maximoEstoque > 0 && input) {
       input.value = maximoEstoque;
       validarVisualEstoque(id, maximoEstoque, maximoEstoque);
@@ -1015,23 +990,21 @@ function ajustarTudoParaMaximo() {
 }
 
 
-// ─────────────────────────────────────────────────────────────
-// DETALHES DE INGREDIENTES (TOGGLE)
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
+// TOGGLE INGREDIENTES
+// ─────────────────────────────────────────────────────────────────
 
 function toggleDetails(id) {
   const panel = document.getElementById('details-' + id);
-  const icon = document.getElementById('icon-' + id);
+  const icon  = document.getElementById('icon-'    + id);
   panel.classList.toggle('show');
-  icon.style.transform = panel.classList.contains('show')
-    ? 'rotate(180deg)'
-    : 'rotate(0deg)';
+  icon.style.transform = panel.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
 }
 
 
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
 // TOAST
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
 
 function showToast(message, type = 'info') {
   const existing = document.querySelector('.toast-message');
@@ -1041,30 +1014,29 @@ function showToast(message, type = 'info') {
   toast.className = 'toast-message alert alert-' + type;
   toast.innerHTML = '<i class="fas fa-info-circle me-2"></i>' + message;
   document.body.appendChild(toast);
-
-  setTimeout(() => {
-    if (toast.parentNode) toast.remove();
-  }, 3000);
+  setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3000);
 }
 
 
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
 // SUBMIT COM CONFIRMAÇÃO
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
 
 document.getElementById('formExecucao').addEventListener('submit', function (e) {
-  const excedentes =
-    parseInt(document.getElementById('resumo-excedentes').textContent) || 0;
-  const total =
-    parseInt(
-      document.getElementById('resumo-porcoes').textContent.replace(/\./g, '')
-    ) || 0;
+  const total      = parseInt(document.getElementById('resumo-porcoes').textContent.replace(/\./g, '')) || 0;
+  const excedentes = parseInt(document.getElementById('resumo-excedentes').textContent) || 0;
+
+  // CORREÇÃO 3: bloqueia via JS apenas se total for zero — avisa o usuário
+  if (total === 0) {
+    e.preventDefault();
+    showToast('Configure ao menos uma porção antes de executar.', 'warning');
+    return;
+  }
 
   let mensagem = '';
 
-  // Avisa se o total de porções difere da previsão de alunos
   if (quantidadeAlunosDefinida > 0 && total !== quantidadeAlunosDefinida) {
-    const diff = Math.abs(total - quantidadeAlunosDefinida);
+    const diff    = Math.abs(total - quantidadeAlunosDefinida);
     const direcao = total < quantidadeAlunosDefinida ? 'abaixo' : 'acima';
     mensagem +=
       '⚠️ O total de porções (' + total.toLocaleString('pt-BR') + ') está ' +
@@ -1090,29 +1062,26 @@ document.getElementById('formExecucao').addEventListener('submit', function (e) 
 });
 
 
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
 // INICIALIZAÇÃO
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
 
 (function init() {
-  // Se a quantidade de alunos veio das matrículas (campo hidden no template),
-  // aplica automaticamente ao carregar a página.
-  const campoAlunos = document.getElementById('quantidade_alunos_manual');
-  if (campoAlunos && campoAlunos.type === 'hidden') {
-    const qtd = parseInt(campoAlunos.value) || 0;
-    if (qtd > 0) {
-      quantidadeAlunosDefinida = qtd;
-      // Aplica sem toast para não poluir o carregamento
-      document.querySelectorAll('.prep-item').forEach(card => {
-        const maximoEstoque = parseInt(card.dataset.maximoEstoque) || 0;
-        const id = card.dataset.receitaId;
-        const input = document.getElementById('input_' + id);
-        if (!input || input.disabled) return;
-        let porcoes = qtd > 1000 ? 1000 : qtd;
+  // Se veio de matrículas, quantidadeAlunosDefinida já está definida acima
+  // via template tag. Aplica visualmente sem toast.
+  if (quantidadeAlunosDefinida > 0) {
+    document.querySelectorAll('.prep-item').forEach(card => {
+      const maximoEstoque = parseInt(card.dataset.maximoEstoque) || 0;
+      const id  = card.dataset.receitaId;
+      const input = document.getElementById('input_' + id);
+      if (!input || input.disabled) return;
+      const porcoes = quantidadeAlunosDefinida > 1000 ? 1000 : quantidadeAlunosDefinida;
+      // Só sobrescreve se o template não já definiu um valor diferente
+      if (parseInt(input.value) !== porcoes) {
         input.value = porcoes;
-        validarVisualEstoque(id, porcoes, maximoEstoque);
-      });
-    }
+      }
+      validarVisualEstoque(id, parseInt(input.value), maximoEstoque);
+    });
   }
 
   atualizarTotal();

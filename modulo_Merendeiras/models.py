@@ -162,82 +162,50 @@ class DescarteEstoqueEscola(models.Model):
     def __str__(self):
         return f"Descarte {self.produto.nome} ({self.get_motivo_display()}) - {self.escola}"
 
-
 class ExecucaoCardapioDia(models.Model):
-    """
-    Registra a execução completa do cardápio em uma data específica.
-    """
-    STATUS_CHOICES = (
-        ('PLANEJADO', 'Planejado'),
-        ('EM_EXECUCAO', 'Em Execução'),
-        ('EXECUTADO', 'Executado'),
-        ('PARCIAL', 'Parcial'),
-        ('CANCELADO', 'Cancelado'),
+
+    TURNO_CHOICES = (
+        ("MANHA",  "Manhã"),
+        ("TARDE",  "Tarde"),
+        ("NOITE",  "Noite"),
+        ("INTEGRAL", "Integral"),
     )
-    
-    escola = models.ForeignKey(Escola, on_delete=models.PROTECT, related_name='execucoes_cardapio')
-    data = models.DateField()
+
+    escola  = models.ForeignKey(Escola, on_delete=models.PROTECT)
+    data    = models.DateField()
+    turno   = models.CharField(max_length=20, choices=TURNO_CHOICES)  # ← NOVO
     cardapio_dia = models.ForeignKey(
-        CardapioDia,
+        'merendaEscolar.CardapioDia',
         on_delete=models.PROTECT,
-        null=True, 
-        blank=True,
-        related_name='execucoes'
+        null=True, blank=True
     )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PLANEJADO')
-    quantidade_alunos_previstos = models.PositiveIntegerField(
+    quantidade_alunos = models.PositiveIntegerField(
         null=True,
         blank=True,
-        help_text="Número de alunos previstos para este dia"
+        help_text="Quantidade de alunos atendidos na execução"
     )
-    quantidade_alunos_fonte = models.CharField(
-        max_length=20,
-        null=True,
-        blank=True,
-        choices=(
-            ('MATRICULAS', 'Buscado das matrículas'),
-            ('MANUAL', 'Informado manualmente pela merendeira'),
-        ),
-        help_text="Indica como a quantidade de alunos foi obtida"
+    executado_por = models.ForeignKey(User, on_delete=models.PROTECT)
+    criado_em     = models.DateTimeField(auto_now_add=True)
+
+    status = models.CharField(
+        max_length=20, 
+        default='EM_EXECUCAO', 
+        choices=(('EM_EXECUCAO', 'Em Execução'), ('EXECUTADO', 'Executado'), ('PARCIAL', 'Parcial'), ('CANCELADO', 'Cancelado'))
     )
-    
-    # Execução
-    executado_por = models.ForeignKey(User, on_delete=models.PROTECT, related_name='cardapios_executados')
-    executado_em = models.DateTimeField(auto_now_add=True)
     finalizado_em = models.DateTimeField(null=True, blank=True)
-    
-    # Controle de qualidade
-    quantidade_atendidos = models.PositiveIntegerField(
-        null=True, 
-        blank=True, 
-        help_text="Número real de pessoas atendidas"
-    )
-    observacao = models.TextField(blank=True, help_text="Observações sobre a execução do dia")
-    
+
     class Meta:
+        ordering = ["-data"]
         constraints = [
             models.UniqueConstraint(
-                fields=['escola', 'data'], 
-                name='unique_execucao_diaria_escola'
+                fields=["escola", "data", "turno"],   # ← agora único por turno
+                name="unique_execucao_por_escola_data_turno"
             )
         ]
-        ordering = ['-data']
-        verbose_name = "Execução de Cardápio do Dia"
-        verbose_name_plural = "Execuções de Cardápio do Dia"
-
-    def clean(self):
-        """Validações de integridade"""
-        if self.data > timezone.now().date():
-            raise ValidationError("Não é possível registrar execução para datas futuras.")
-        
-        # Verifica se já existe execução para esta data (redundância ao constraint)
-        if self.pk is None:  # Novo registro
-            if ExecucaoCardapioDia.objects.filter(escola=self.escola, data=self.data).exists():
-                raise ValidationError("Já existe execução registrada para esta data.")
 
     def __str__(self):
-        return f"Cardápio {self.data.strftime('%d/%m/%Y')} - {self.escola} [{self.get_status_display()}]"
-
+        return f"{self.escola} | {self.data} | {self.get_turno_display()}"
+    
 
 class ExecucaoCardapioItem(models.Model):
     """
@@ -409,37 +377,27 @@ def retirar_ingrediente_receita(execucao, produto, quantidade, usuario, lote_esp
 
 
 @transaction.atomic
-def executar_cardapio_do_dia(escola, data, usuario, cardapio_dia=None, porcoes_override=None):
+def executar_cardapio_do_dia(escola, data, usuario, cardapio_dia=None, porcoes_override=None, turno=None, quantidade_alunos=None):
     """
     Orquestra a execução completa do cardápio do dia.
-    
-    Fluxo:
-    1. Cria registro de execução
-    2. Para cada item do cardápio:
-       a. Verifica estoque
-       b. Cria ExecucaoReceitaCozinha
-       c. Retira ingredientes (FEFO)
-       d. Vincula ao cardápio
-    3. Atualiza status geral
-    
-    Args:
-        porcoes_override: Dict {receita_id: quantidade} para sobrescrever rendimento padrão
     """
-    # 1. Cria registro mestre
+    # 1. Cria registro mestre (Agora passando o TURNO)
     try:
         execucao_dia = ExecucaoCardapioDia.objects.create(
             escola=escola,
             data=data,
+            turno=turno,  # <--- Adicionado aqui
             cardapio_dia=cardapio_dia,
             status='EM_EXECUCAO',
-            executado_por=usuario
+            executado_por=usuario,
+            quantidade_alunos=quantidade_alunos
         )
     except IntegrityError:
-        raise ValidationError("Já existe execução registrada para esta data nesta escola.")
+        raise ValidationError("Já existe execução registrada para esta data, turno e escola.")
     
     itens_cardapio = []
     if cardapio_dia:
-        itens_cardapio = CardapioItem.objects.filter(cardapio_dia=cardapio_dia).select_related('receita', 'tipo_refeicao')
+        itens_cardapio = CardapioItem.objects.filter(dia=cardapio_dia).select_related('receita', 'tipo_refeicao')
     
     if not itens_cardapio:
         raise ValidationError("Nenhum item encontrado para execução neste cardápio.")
@@ -452,14 +410,21 @@ def executar_cardapio_do_dia(escola, data, usuario, cardapio_dia=None, porcoes_o
     
     for item in itens_cardapio:
         try:
-            # Define quantidade de porções
-            porcoes = porcoes_override.get(item.receita.id, item.receita.rendimento) if porcoes_override else item.receita.rendimento
+            # Lógica de definição de porções:
+            # 1. Se houver override manual por receita -> usa override
+            # 2. Se houver quantidade de alunos global -> usa quantidade de alunos
+            # 3. Caso contrário -> usa rendimento padrão da receita
+            if porcoes_override and item.receita.id in porcoes_override:
+                porcoes = porcoes_override[item.receita.id]
+            elif quantidade_alunos:
+                porcoes = quantidade_alunos
+            else:
+                porcoes = item.receita.rendimento
             
             # Pré-verificação de estoque
             disponivel, detalhes = verificar_disponibilidade_ingredientes(escola, item.receita, porcoes)
             
             if not disponivel:
-                # Cria item como falha sem tentar retirar
                 ExecucaoCardapioItem.objects.create(
                     execucao_cardapio=execucao_dia,
                     receita=item.receita,
@@ -484,16 +449,14 @@ def executar_cardapio_do_dia(escola, data, usuario, cardapio_dia=None, porcoes_o
             )
             
             # 3. Retira ingredientes
-            ingredientes_retirados = []
             for ingrediente in item.receita.ingredientes.all():
                 quantidade_necessaria = ingrediente.quantidade * porcoes
-                movs = retirar_ingrediente_receita(
+                retirar_ingrediente_receita(
                     execucao=exec_receita,
                     produto=ingrediente.produto,
                     quantidade=quantidade_necessaria,
                     usuario=usuario
                 )
-                ingredientes_retirados.extend(movs)
             
             # 4. Vincula ao cardápio do dia
             exec_item = ExecucaoCardapioItem.objects.create(
@@ -505,7 +468,7 @@ def executar_cardapio_do_dia(escola, data, usuario, cardapio_dia=None, porcoes_o
                 porcoes_planejadas=porcoes
             )
             
-            # Finaliza execução da receita automaticamente (ou pode ser manual)
+            # Finaliza automaticamente
             exec_receita.finalizar(usuario, rendimento_real=porcoes)
             exec_item.status = 'EXECUTADO'
             exec_item.porcoes_executadas = porcoes
@@ -518,18 +481,14 @@ def executar_cardapio_do_dia(escola, data, usuario, cardapio_dia=None, porcoes_o
             })
             
         except Exception as e:
-            resultados['falhas'].append({
-                'receita': item.receita.nome,
-                'motivo': str(e)
-            })
-            # Cria registro de falha
+            resultados['falhas'].append({'receita': item.receita.nome, 'motivo': str(e)})
             ExecucaoCardapioItem.objects.create(
                 execucao_cardapio=execucao_dia,
                 receita=item.receita,
                 tipo_refeicao=item.tipo_refeicao,
                 status='CANCELADO',
                 motivo_falha=str(e),
-                porcoes_planejadas=porcoes
+                porcoes_planejadas=porcoes if 'porcoes' in locals() else 0
             )
     
     # Atualiza status geral do dia
@@ -546,6 +505,11 @@ def executar_cardapio_do_dia(escola, data, usuario, cardapio_dia=None, porcoes_o
     
     execucao_dia.save()
     return resultados
+
+
+
+
+
 
 
 @transaction.atomic

@@ -1,0 +1,231 @@
+{% extends "modulo_merendeiras/base_merendeira.html" %}
+
+{% block title %}Histórico de Execuções{% endblock %}
+
+{% block content %}
+
+<style>
+:root {
+    --primary: #2E7D32;
+    --success: #4CAF50;
+    --warning: #FF9800;
+    --danger: #D32F2F;
+    --bg: #f4f6f9;
+}
+
+body {
+    background: var(--bg);
+}
+
+/* 🔷 Header */
+.header-box {
+    background: #fff;
+    padding: 18px 22px;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+}
+
+/* 📦 Card */
+.execucao-card {
+    border-radius: 16px;
+    border: none;
+    transition: all .2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 🔥 Indicador lateral por status */
+.execucao-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 6px;
+}
+
+.status-executado::before { background: var(--success); }
+.status-parcial::before { background: var(--warning); }
+.status-cancelado::before { background: var(--danger); }
+
+/* Hover */
+.execucao-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+}
+
+/* Status */
+.badge-status {
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 8px;
+}
+
+/* Progress */
+.progress {
+    height: 6px;
+    border-radius: 10px;
+    background: #eee;
+}
+
+/* Métricas */
+.metric {
+    font-size: 13px;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .header-box {
+        text-align: center;
+    }
+}
+</style>
+
+<div class="container-fluid py-4">
+
+    <!-- 🔷 CABEÇALHO -->
+    <div class="header-box mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h4 class="mb-1">📊 Histórico de Execuções</h4>
+            <small class="text-muted">{{ nome_escola }}</small>
+        </div>
+
+        <div>
+            <span class="badge bg-light text-dark">
+                {{ page_obj.paginator.count }} registros
+            </span>
+        </div>
+    </div>
+
+    <!-- 📦 LISTAGEM -->
+    <div class="row">
+
+        {% for execucao in execucoes %}
+        <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+
+            <div class="card execucao-card shadow-sm h-100
+                {% if execucao.status == 'EXECUTADO' %}status-executado
+                {% elif execucao.status == 'PARCIAL' %}status-parcial
+                {% elif execucao.status == 'CANCELADO' %}status-cancelado
+                {% endif %}">
+
+                <div class="card-body">
+
+                    <!-- 📅 DATA + STATUS -->
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="fw-bold mb-1">
+                                {{ execucao.data|date:"d/m/Y" }}
+                            </h6>
+                            <small class="text-muted">
+                                {{ execucao.get_turno_display }}
+                            </small>
+                        </div>
+
+                        <span class="badge badge-status
+                            {% if execucao.status == 'EXECUTADO' %}bg-success
+                            {% elif execucao.status == 'PARCIAL' %}bg-warning text-dark
+                            {% elif execucao.status == 'CANCELADO' %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
+                            {{ execucao.get_status_display }}
+                        </span>
+                    </div>
+
+                    <!-- 👤 RESPONSÁVEL -->
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            👩‍🍳 {{ execucao.executado_por }}
+                        </small>
+                    </div>
+
+                    <!-- 📊 MÉTRICAS -->
+                    <div class="mt-3">
+                        <div class="metric">
+                            📦 Total: <strong>{{ execucao.total_itens }}</strong>
+                        </div>
+                        <div class="metric text-success">
+                            ✔ Executados: <strong>{{ execucao.total_executados }}</strong>
+                        </div>
+                        <div class="metric text-danger">
+                            ⚠ Falhas: <strong>{{ execucao.total_falhas }}</strong>
+                        </div>
+                    </div>
+
+                    <!-- 📈 PROGRESSO -->
+                    <div class="mt-3">
+                        <div class="progress">
+                            <div class="progress-bar bg-success"
+                                 style="width:
+                                 {% if execucao.total_itens > 0 %}
+                                     {% widthratio execucao.total_executados execucao.total_itens 100 %}
+                                 {% else %}
+                                     0
+                                 {% endif %}%;">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 🔘 AÇÃO -->
+                <div class="card-footer text-end">
+                    <a href="{% url 'modulo_merendeiras:execucao_detalhe' execucao.id %}"
+                       class="btn btn-sm btn-outline-success">
+                        🔍 Ver detalhes
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center shadow-sm">
+                Nenhuma execução encontrada.
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <!-- 📄 PAGINAÇÃO -->
+    {% if is_paginated %}
+    <div class="d-flex justify-content-center mt-4">
+
+        <nav>
+            <ul class="pagination">
+
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ page_obj.previous_page_number }}">
+                        ← Anterior
+                    </a>
+                </li>
+                {% endif %}
+
+                <li class="page-item disabled">
+                    <span class="page-link">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ page_obj.next_page_number }}">
+                        Próxima →
+                    </a>
+                </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -47,7 +47,7 @@ class ExecucaoCardapioDetailView(BaseMerendeiraView, DetailView):
     Mostra o resultado detalhado da execução do cardápio.
     """
     model = ExecucaoCardapioDia
-    template_name = "modulo_merendeiras/cardapio/execucao_detalhe.html"
+    template_name = "modulo_merendeiras/cadapioHoje/execucao_detalhe.html"
     context_object_name = 'execucao'
     
     def get_queryset(self):
@@ -58,20 +58,24 @@ class ExecucaoCardapioDetailView(BaseMerendeiraView, DetailView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         execucao = self.object
-        
+
         itens = ExecucaoCardapioItem.objects.filter(
             execucao_cardapio=execucao
         ).select_related('receita', 'tipo_refeicao', 'execucao_receita')
-        
-        # Separa por status
+
+        itens_executados = itens.filter(status='EXECUTADO')
+        itens_pendentes = itens.filter(status__in=['PENDENTE', 'FALTANDO_ESTOQUE'])
+        itens_cancelados = itens.filter(status='CANCELADO')
+
+        total_itens = itens.count()
+
         ctx.update({
-            'itens_executados': itens.filter(status='EXECUTADO'),
-            'itens_pendentes': itens.filter(status__in=['PENDENTE', 'FALTANDO_ESTOQUE']),
-            'itens_cancelados': itens.filter(status='CANCELADO'),
-            'pode_finalizar': execucao.status == 'EM_EXECUCAO',
-            'pode_cancelar': execucao.status in ['EM_EXECUCAO', 'PLANEJADO'],
+            'itens_executados': itens_executados,
+            'itens_pendentes': itens_pendentes,
+            'itens_cancelados': itens_cancelados,
+            'total_itens': total_itens,
         })
-        
+
         return ctx
 
 
