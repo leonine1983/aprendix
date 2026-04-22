@@ -161,6 +161,8 @@ class DescarteEstoqueEscola(models.Model):
 
     def __str__(self):
         return f"Descarte {self.produto.nome} ({self.get_motivo_display()}) - {self.escola}"
+    
+    
 
 class ExecucaoCardapioDia(models.Model):
 
@@ -247,6 +249,135 @@ class ExecucaoCardapioItem(models.Model):
 
     def __str__(self):
         return f"{self.receita.nome} - {self.tipo_refeicao} ({self.get_status_display()})"
+    
+
+
+from django.db import models
+from django.contrib.auth import get_user_model
+from ckeditor.fields import RichTextField
+
+User = get_user_model()
+
+
+class FichaDiaria(models.Model):
+    """
+    Representa o registro institucional da Ficha Diária da Alimentação Escolar.
+    Preenchida pela merendeira após a execução do cardápio.
+    """
+
+    ACEITABILIDADE_CHOICES = (
+        ("OTIMA", "Ótima"),
+        ("BOA", "Boa"),
+        ("REGULAR", "Regular"),
+        ("BAIXA", "Baixa"),
+    )
+
+    SOBRAS_CHOICES = (
+        ("NAO", "Não houve"),
+        ("PEQUENA", "Pequena quantidade"),
+        ("GRANDE", "Grande quantidade"),
+    )
+
+    execucao = models.OneToOneField(
+        "modulo_Merendeiras.ExecucaoCardapioDia",
+        on_delete=models.CASCADE,
+        related_name="ficha_diaria"
+    )
+
+    # 🔹 IDENTIFICAÇÃO
+    escola = models.ForeignKey("rh.Escola", on_delete=models.PROTECT)
+    data = models.DateField()
+    turno = models.CharField(max_length=20)
+
+    alunos_atendidos = models.PositiveIntegerField(null=True, blank=True)
+
+    tecnico_responsavel = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        related_name="fichas_diarias"
+    )
+
+    # 🔹 CARDÁPIO
+    cardapio_previsto = RichTextField(blank=True, null=True)
+    houve_alteracao_cardapio = models.BooleanField(default=False)
+    cardapio_executado = RichTextField(blank=True, null=True)
+
+    # 🔹 ACEITABILIDADE
+    aceitabilidade = models.CharField(
+        max_length=10,
+        choices=ACEITABILIDADE_CHOICES,
+        blank=True,
+        null=True
+    )
+
+    # 🔹 SOBRAS
+    houve_sobras = models.CharField(
+        max_length=10,
+        choices=SOBRAS_CHOICES,
+        blank=True,
+        null=True
+    )
+
+    motivo_sobras = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True
+    )
+
+    # 🔹 OCORRÊNCIAS
+    falta_alimento = models.BooleanField(default=False)
+    problema_equipamento = models.BooleanField(default=False)
+    falta_gas = models.BooleanField(default=False)
+    outra_ocorrencia = models.CharField(max_length=200, blank=True, null=True)
+
+    # 🔹 OBSERVAÇÕES
+    observacoes = RichTextField(blank=True, null=True)
+
+    # 🔹 ASSINATURAS (REGISTRO DIGITAL)
+    assinado_por_direcao = models.BooleanField(default=False)
+
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-data"]
+        indexes = [
+            models.Index(fields=["data"]),
+            models.Index(fields=["escola"]),
+        ]
+
+    def __str__(self):
+        return f"Ficha Diária - {self.escola} - {self.data}"
+    
+
+class FichaDiariaItem(models.Model):
+    """
+    Representa os alimentos utilizados no dia (controle de gêneros).
+    """
+
+    ficha = models.ForeignKey(
+        FichaDiaria,
+        on_delete=models.CASCADE,
+        related_name="itens"
+    )
+
+    produto = models.ForeignKey(
+        "merendaEscolar.Produto",
+        on_delete=models.PROTECT
+    )
+
+    unidade = models.ForeignKey(
+        "merendaEscolar.UnidadeMedida",
+        on_delete=models.PROTECT
+    )
+
+    quantidade_usada = models.DecimalField(
+        max_digits=14,
+        decimal_places=2
+    )
+
+    class Meta:
+        verbose_name = "Item da Ficha Diária"
+        verbose_name_plural = "Itens da Ficha Diária"
 
 
 # =========================================================
