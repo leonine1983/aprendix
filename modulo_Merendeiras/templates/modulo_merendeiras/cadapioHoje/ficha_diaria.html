@@ -1,0 +1,112 @@
+{% extends "modulo_merendeiras/base_merendeira.html" %}
+
+{% block title %}Ficha Diária{% endblock %}
+
+{% block content %}
+
+<style>
+.card-section {
+    border-radius: 16px;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.form-check {
+    margin-bottom: 8px;
+}
+
+button {
+    border-radius: 10px;
+}
+</style>
+
+<div class="container-fluid py-4">
+
+    <!-- 🔷 CABEÇALHO -->
+    <div class="card-section">
+        <h5>📋 Ficha Diária</h5>
+        <small class="text-muted">
+            {{ execucao.data|date:"d/m/Y" }} • {{ execucao.get_turno_display }}
+        </small>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- 👥 ALUNOS -->
+        <div class="card-section">
+            <div class="section-title">👥 Atendimento</div>
+            {{ form.alunos_atendidos }}
+        </div>
+
+        <!-- 🍽 CARDÁPIO -->
+        <div class="card-section">
+            <div class="section-title">🍽 Cardápio</div>
+
+            <div class="form-check">
+                {{ form.houve_alteracao_cardapio }} 
+                <label>Houve alteração no cardápio</label>
+            </div>
+
+            {{ form.cardapio_executado }}
+        </div>
+
+        <!-- 📊 ACEITABILIDADE -->
+        <div class="card-section">
+            <div class="section-title">📊 Aceitabilidade</div>
+            {{ form.aceitabilidade }}
+        </div>
+
+        <!-- 🍛 SOBRAS -->
+        <div class="card-section">
+            <div class="section-title">🍛 Sobras</div>
+
+            {{ form.houve_sobras }}
+            {{ form.motivo_sobras }}
+
+        </div>
+
+        <!-- ⚠️ OCORRÊNCIAS -->
+        <div class="card-section">
+            <div class="section-title">⚠️ Ocorrências</div>
+
+            <div class="form-check">
+                {{ form.falta_alimento }} <label>Falta de alimento</label>
+            </div>
+
+            <div class="form-check">
+                {{ form.problema_equipamento }} <label>Problema com equipamento</label>
+            </div>
+
+            <div class="form-check">
+                {{ form.falta_gas }} <label>Falta de gás</label>
+            </div>
+
+            {{ form.outra_ocorrencia }}
+        </div>
+
+        <!-- 📝 OBSERVAÇÕES -->
+        <div class="card-section">
+            <div class="section-title">📝 Observações</div>
+            {{ form.observacoes }}
+        </div>
+
+        <!-- 🔘 AÇÃO -->
+        <div class="text-end">
+            <button type="submit" class="btn btn-success">
+                💾 Salvar Ficha
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
