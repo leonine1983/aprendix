@@ -1,0 +1,84 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+{% load static %}
+
+{% block title %}Configurações do Sistema{% endblock %}
+
+{% block content %}
+
+<style>
+/* 🎯 PADRÃO INSTITUCIONAL */
+
+.config-card {
+    max-width: 600px;
+    margin: auto;
+    border-radius: 16px;
+    border: 1px solid #e0e0e0;
+    padding: 28px;
+    background: #fff;
+}
+
+.config-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.config-description {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.btn-save {
+    background: #2E7D32;
+    color: white;
+    border-radius: 10px;
+    padding: 10px 20px;
+}
+</style>
+
+<div class="container py-4">
+
+    <div class="config-card shadow-sm">
+
+        <!-- 🔷 TÍTULO -->
+        <div class="config-title mb-2">
+            ⚙️ Configurações do Sistema
+        </div>
+
+        <div class="config-description">
+            Defina parâmetros que impactam diretamente o funcionamento do sistema de alimentação escolar.
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- 🔷 CAMPO -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">
+                    📄 Quantidade de registros por página (Lista de Cardápios)
+                </label>
+
+                {{ form.pagina_CardapiosEscolares }}
+
+                <div class="form-text">
+                    Controla quantos registros serão exibidos por página nas listagens.
+                </div>
+            </div>
+
+            <!-- 🔷 AÇÃO -->
+            <div class="text-end">
+                <button type="submit" class="btn btn-save">
+                    💾 Salvar Configuração
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

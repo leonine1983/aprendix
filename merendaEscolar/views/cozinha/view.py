@@ -6,6 +6,7 @@ from ...models import (
     TipoRefeicao, CardapioItem, CardapioEscola
 )
 from core.groups.nutricionista import NutricionistaRequiredMixin
+from core.views.baseNutricionista import BaseNutricionistaView
 from django.core.exceptions import ValidationError
 
 
@@ -31,13 +32,53 @@ class CardapioForm(forms.ModelForm):
         }
 
 
-class CardapioListView(NutricionistaRequiredMixin, ListView):
+
+
+
+
+from django.views.generic import ListView
+from core.models import ConfiguraPessoal
+from merendaEscolar.models import Cardapio
+from core.views.baseNutricionista import BaseNutricionistaView
+
+
+class CardapioListView(BaseNutricionistaView, ListView):
     model = Cardapio
     template_name = "merendaEscolar/cardapio/cardapio_list.html"
-    paginate_by = 3
+    context_object_name = "cardapios"
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        🔒 Garante que a configuração esteja disponível
+        antes de qualquer processamento da view
+        """
+        self.configuracao, _ = ConfiguraPessoal.objects.get_or_create(pk=1)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_paginate_by(self, queryset):
+        """
+        🔷 Paginação dinâmica baseada na configuração
+        """
+        return self.configuracao.pagina_CardapiosEscolares
+
+    def get_context_data(self, **kwargs):
+        """
+        🔷 Injeta a configuração no contexto do template
+
+        Motivo arquitetural:
+        - Evita acoplamento com request.user
+        - Permite reuso (admin, APIs, relatórios)
+        - Mantém previsibilidade do template
+        """
+        context = super().get_context_data(**kwargs)
+
+        context["configuracao"] = self.configuracao
+        context["pagina_cardapios"] = self.configuracao.pagina_CardapiosEscolares
+
+        return context
 
 
-   
+    
 
 
 class CardapioCreateView(NutricionistaRequiredMixin, CreateView):

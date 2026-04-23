@@ -490,7 +490,7 @@
     </div>
   </div>
 
-  <!-- Card de Instruções -->
+   <!-- Card de Instruções -->
   <div class="gc-help-card">
     <div class="gc-help-header">
       <div class="gc-help-icon">
@@ -549,9 +549,66 @@
     </div>
   </div>
 
+
+  <!-- ⚙️ Configuração de paginação -->
+  <div style="
+    background: var(--gc-surface);
+    border: 1px solid var(--gc-border);
+    border-radius: var(--gc-radius);
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  ">
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--gc-primary);">
+        <path d="M3 6h18M3 12h18M3 18h18"/>
+      </svg>
+      <strong style="font-size: 14px; color: var(--gc-text);">
+        Itens por página  
+      </strong>
+    </div>
+
+    <form method="post" action="{% url 'merendaEscolar:configuracao_pessoal' %}" style="display: flex; gap: 8px; align-items: center;">
+      {% csrf_token %}
+      
+      <!-- mantém contexto da página atual -->
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      
+      <input 
+        type="number" 
+        name="pagina_CardapiosEscolares"
+        value="{{pagina_cardapios}}"
+        min="1"
+        max="50"
+        style="
+          width: 80px;
+          height: 36px;
+          border-radius: 8px;
+          border: 1px solid var(--gc-border);
+          padding: 0 10px;
+          font-size: 14px;
+        "
+      >
+
+      <button type="submit" class="gc-btn gc-btn--primary">
+        Aplicar
+      </button>
+    </form>
+
+  </div>
+
+
+
+ 
+
   <!-- Grid de Cardápios -->
   <div class="gc-grid">
-    {% for cardapio in object_list %}
+    {% for cardapio in cardapios %}
     
     <div class="gc-card {% if not cardapio.ativo %}inativo{% endif %}">
       

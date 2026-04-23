@@ -725,10 +725,10 @@ body {
                 </a>
 
                 <!-- 📋 FICHA DIÁRIA -->
-                <a href="{% url 'modulo_merendeiras:ficha_diaria' execucao.id %}"
+                <a href="{% url 'modulo_merendeiras:ficha_diaria' execucao.id execucao.turno %}"
                 class="btn-detail"
                 style="background:#EEF7F1; border-color:#74C69D;">
-                    📋 Ficha
+                    📋 Ficha  
                 </a>
 
             </div>

@@ -38,3 +38,5 @@ from .receitas.receitaListView import *
 from .relatorios.relatorioEstoqueCentralView import *
 
 from .cozinha.view import *
+
+from .configuraPessoal.configuracaoPessoalUpdateView import *

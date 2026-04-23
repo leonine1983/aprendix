@@ -1030,10 +1030,16 @@ body{
         <div class="submenu-wrapper">
             <a href="#" class="submenu-toggle">
                 <i class="fas fa-cog"></i>
-                Configuração
+                Configuração 
                 <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
             </a>
             <div class="submenu">
+
+                
+                <a href="{% url 'merendaEscolar:configuracao_pessoal' %}">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                    Configuração do sistema
+                </a>
                 <a href="{% url 'merendaEscolar:unidade_medida_list' %}">
                     <i class="fas fa-balance-scale"></i>
                     Unidades de Medida

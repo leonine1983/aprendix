@@ -5,6 +5,12 @@ from . views import *
 
 app_name = 'merendaEscolar'
 urlpatterns = [ 
+
+    path(
+        "configuracoes/",
+        ConfiguracaoPessoalUpdateView.as_view(),
+        name="configuracao_pessoal",
+    ),
     
     path('', DashboardNutricionalView.as_view()  , name='merenda_inicio'),   
     path("unidades/", UnidadeMedidaListView.as_view(), name="unidade_medida_list"),

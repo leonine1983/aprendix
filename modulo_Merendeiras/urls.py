@@ -111,7 +111,7 @@ urlpatterns = [
     ),
     
     path(
-    "cardapio/execucao/<int:execucao_id>/ficha/",
+    "cardapio/execucao/<int:execucao_id>/ficha/<str:turno>/",
     views.FichaDiariaCreateView.as_view(),
     name="ficha_diaria"
 ),

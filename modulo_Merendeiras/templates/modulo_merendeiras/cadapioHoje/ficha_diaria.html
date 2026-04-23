@@ -487,7 +487,7 @@
             <div class="campo-linha">
               <label>Cardápio previsto:</label>
               <span style="flex:1;border-bottom:1px solid #999;min-height:20px;font-size:13px;padding:1px 4px;color:#555;">
-                {{ execucao.cardapio_dia|default:"—" }}
+                {{ execucao.cardapio_dia.itens.receita|default:"—" }}
               </span>
             </div>
 

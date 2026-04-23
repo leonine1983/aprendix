@@ -68,10 +68,15 @@ class FichaDiariaCreateView(BaseMerendeiraView, CreateView):
     template_name = "modulo_merendeiras/cadapioHoje/ficha_diaria.html"
 
     def dispatch(self, request, *args, **kwargs):
+        self.turno = self.kwargs.get("turno")
+
         self.execucao = ExecucaoCardapioDia.objects.select_related(
             "escola",
-            "cardapio_dia"  # ✅ campo correto
-        ).get(pk=self.kwargs["execucao_id"])
+            "cardapio_dia"
+        ).get(
+            pk=self.kwargs["execucao_id"],
+            turno=self.turno  # 🔥 filtro por turno
+        )
 
         self.ficha_existente = FichaDiaria.objects.filter(
             execucao=self.execucao
@@ -88,7 +93,7 @@ class FichaDiariaCreateView(BaseMerendeiraView, CreateView):
         if not self.ficha_existente:
             initial.update({
                 "cardapio_executado": str(self.execucao.cardapio_dia),
-                "alunos_atendidos": 0,
+                "alunos_atendidos": str(self.execucao.quantidade_alunos),                
             })
             
 
