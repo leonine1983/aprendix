@@ -109,14 +109,12 @@ urlpatterns = [
         views.HistoricoExecucoesView.as_view(),
         name="historico_execucoes"
     ),
+    
     path(
-    "cardapio/historico/",
-    views.HistoricoExecucoesView.as_view(),
-    name="historico_execucoes"
+    "cardapio/execucao/<int:execucao_id>/ficha/",
+    views.FichaDiariaCreateView.as_view(),
+    name="ficha_diaria"
 ),
-
-
-
 
 
 ]

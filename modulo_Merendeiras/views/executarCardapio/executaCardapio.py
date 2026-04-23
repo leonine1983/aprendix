@@ -110,25 +110,9 @@ class FinalizarExecucaoView(BaseMerendeiraView, View):
         return redirect('modulo_merendeiras:execucao_detalhe', pk=pk)
 
 
-class HistoricoExecucoesView(BaseMerendeiraView, ListView):
-    """
-    Histórico de execuções anteriores.
-    """
-    model = ExecucaoCardapioDia
-    template_name = "modulo_merendeiras/cardapio/historico_execucoes.html"
-    context_object_name = 'execucoes'
-    paginate_by = 10
-    
-    def get_queryset(self):
-        escola = self.get_escola_usuario()
-        return ExecucaoCardapioDia.objects.filter(
-            escola=escola
-        ).select_related('cardapio_dia').order_by('-data')
-    
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['hoje'] = timezone.now().date()
-        return ctx
+
+
+
 
 
 class CancelarReceitaView(BaseMerendeiraView, View):

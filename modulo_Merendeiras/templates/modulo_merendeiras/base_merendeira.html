@@ -1868,7 +1868,7 @@
 
       <a href="{% url 'modulo_merendeiras:historico_execucoes' %}">
         <!--falta um svg-->
-        <span class="sb-item__label">Histórico de Exec.</span>  
+        <span class="sb-item__label">Histórico</span>  
       </a>
 
      
@@ -1956,7 +1956,7 @@
     <div class="messages-container">
       {% for message in messages %}
         <div class="alert {{ message.tags }}">
-          <span class="alert-text">{{ message }}</span>
+          <span class="alert-text">{{ message|safe }}</span>
           <button class="alert-close" aria-label="Fechar"
             onclick="
               const el = this.closest('.alert');
@@ -1984,8 +1984,8 @@
         el.remove();
         const c = document.querySelector('.messages-overlay');
         if (c && !c.querySelector('.alert')) c.remove();
-      }, 4000);
-    }, 50000);
+      }, 600);
+    }, 700);
   });
 </script>
 

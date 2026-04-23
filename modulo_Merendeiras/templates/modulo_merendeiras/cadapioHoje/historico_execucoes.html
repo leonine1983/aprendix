@@ -5,225 +5,770 @@
 {% block content %}
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap');
+
 :root {
-    --primary: #2E7D32;
-    --success: #4CAF50;
-    --warning: #FF9800;
-    --danger: #D32F2F;
-    --bg: #f4f6f9;
+    --green-900: #1B4332;
+    --green-700: #2D6A4F;
+    --green-500: #40916C;
+    --green-300: #74C69D;
+    --green-100: #D8F3DC;
+    --amber:     #F59E0B;
+    --amber-lt:  #FEF3C7;
+    --red:       #DC2626;
+    --red-lt:    #FEE2E2;
+    --surface:   #FAFAF8;
+    --card-bg:   #FFFFFF;
+    --border:    #E8EAE6;
+    --text-main: #1C1C1A;
+    --text-muted:#6B7280;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,.10);
+    --radius:    16px;
 }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--text-main);
+    min-height: 100vh;
 }
 
-/* 🔷 Header */
-.header-box {
-    background: #fff;
-    padding: 18px 22px;
-    border-radius: 14px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.04);
-}
-
-/* 📦 Card */
-.execucao-card {
-    border-radius: 16px;
-    border: none;
-    transition: all .2s ease;
+/* ── Decorative background ───────────────────── */
+.page-wrapper {
     position: relative;
+    padding: 32px 24px 64px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.page-wrapper::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 60% 40% at 80% 10%, rgba(116,198,157,.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 10% 80%, rgba(45,106,79,.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ── Header ──────────────────────────────────── */
+.page-header {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.page-header-left {}
+
+.page-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--green-500);
+    margin-bottom: 8px;
+}
+
+.page-label span {
+    display: inline-block;
+    width: 18px;
+    height: 2px;
+    background: var(--green-300);
+    border-radius: 2px;
+}
+
+.page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(24px, 4vw, 36px);
+    font-weight: 400;
+    color: var(--green-900);
+    line-height: 1.15;
+}
+
+.page-subtitle {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.page-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--green-100);
+    color: var(--green-700);
+    border: 1px solid var(--green-300);
+}
+
+/* ── Cards grid ──────────────────────────────── */
+.cards-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+/* ── Execução card ───────────────────────────── */
+.exec-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    animation: fadeUp .35s ease both;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+{% for i in "123456789" %}
+.exec-card:nth-child({{ i }}) { animation-delay: {{ forloop.counter0 }}0ms; }
+{% endfor %}
+
+.exec-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--green-300);
+}
+
+/* Status stripe */
+.exec-card__stripe {
+    height: 4px;
+    width: 100%;
+}
+.exec-card--executado .exec-card__stripe { background: linear-gradient(90deg, var(--green-500), var(--green-300)); }
+.exec-card--parcial   .exec-card__stripe { background: linear-gradient(90deg, var(--amber), #FDE68A); }
+.exec-card--cancelado .exec-card__stripe { background: linear-gradient(90deg, var(--red), #FCA5A5); }
+.exec-card--outro     .exec-card__stripe { background: var(--border); }
+
+/* Body */
+.exec-card__body {
+    padding: 20px 20px 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Top row */
+.exec-card__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.exec-card__date {
+    font-size: 18px;
+    font-family: 'DM Serif Display', serif;
+    color: var(--green-900);
+    line-height: 1;
+}
+
+.exec-card__turno {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 3px;
+    font-weight: 400;
+}
+
+/* Status badge */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    white-space: nowrap;
+}
+
+.status-badge--executado { background: var(--green-100); color: var(--green-700); }
+.status-badge--parcial   { background: var(--amber-lt);  color: #92400E; }
+.status-badge--cancelado { background: var(--red-lt);    color: #991B1B; }
+.status-badge--outro     { background: #F3F4F6;           color: #4B5563; }
+
+.status-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.status-badge--executado::before { background: var(--green-500); }
+.status-badge--parcial::before   { background: var(--amber); }
+.status-badge--cancelado::before { background: var(--red); }
+.status-badge--outro::before     { background: #9CA3AF; }
+
+/* Responsible */
+.exec-card__resp {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    padding: 8px 10px;
+    background: var(--surface);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.exec-card__resp-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--green-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.exec-card__resp-name {
+    font-weight: 500;
+    color: var(--text-main);
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Metrics */
+.exec-card__metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+}
+
+.metric-chip {
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.metric-chip__value {
+    font-size: 20px;
+    font-family: 'DM Serif Display', serif;
+    line-height: 1;
+    color: var(--text-main);
+}
+
+.metric-chip__label {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-weight: 500;
+}
+
+.metric-chip--success .metric-chip__value { color: var(--green-500); }
+.metric-chip--danger  .metric-chip__value { color: var(--red); }
+
+/* Progress */
+.exec-card__progress {}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.progress-track {
+    height: 5px;
+    background: var(--border);
+    border-radius: 100px;
     overflow: hidden;
 }
 
-/* 🔥 Indicador lateral por status */
-.execucao-card::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
+.progress-fill {
     height: 100%;
-    width: 6px;
+    border-radius: 100px;
+    background: linear-gradient(90deg, var(--green-500), var(--green-300));
+    transition: width .6s ease;
 }
 
-.status-executado::before { background: var(--success); }
-.status-parcial::before { background: var(--warning); }
-.status-cancelado::before { background: var(--danger); }
+.progress-fill--partial { background: linear-gradient(90deg, var(--amber), #FDE68A); }
+.progress-fill--low     { background: linear-gradient(90deg, var(--red), #FCA5A5); }
 
-/* Hover */
-.execucao-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+/* Footer */
+.exec-card__footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    background: #FCFCFB;
+    display: flex;
+    justify-content: flex-end;
 }
 
-/* Status */
-.badge-status {
-    font-size: 11px;
-    padding: 6px 10px;
-    border-radius: 8px;
+.btn-detail {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    color: var(--green-700);
+    background: var(--green-100);
+    border: 1px solid var(--green-300);
+    text-decoration: none;
+    transition: background .18s, color .18s, transform .18s;
 }
 
-/* Progress */
-.progress {
-    height: 6px;
-    border-radius: 10px;
-    background: #eee;
+.btn-detail:hover {
+    background: var(--green-500);
+    color: #fff;
+    border-color: var(--green-500);
+    transform: scale(1.03);
 }
 
-/* Métricas */
-.metric {
+.btn-detail svg {
+    width: 13px;
+    height: 13px;
+}
+
+/* ── Empty state ─────────────────────────────── */
+.empty-state {
+    position: relative;
+    z-index: 1;
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 64px 32px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px dashed var(--border);
+}
+
+.empty-state__icon { font-size: 48px; margin-bottom: 16px; }
+.empty-state__title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--green-900); margin-bottom: 6px; }
+.empty-state__sub   { font-size: 14px; color: var(--text-muted); }
+
+/* ── Pagination ──────────────────────────────── */
+.pager {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 40px;
+}
+
+.pager__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: 100px;
     font-size: 13px;
+    font-weight: 500;
+    color: var(--green-700);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    transition: all .18s;
+    box-shadow: var(--shadow-sm);
 }
 
-/* Responsivo */
-@media (max-width: 768px) {
-    .header-box {
-        text-align: center;
-    }
+.pager__btn:hover {
+    background: var(--green-500);
+    color: #fff;
+    border-color: var(--green-500);
+}
+
+.pager__info {
+    padding: 9px 18px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 640px) {
+    .page-wrapper { padding: 20px 16px 48px; }
+    .page-header  { flex-direction: column; align-items: flex-start; }
+}
+
+
+/* ── Filters bar ─────────────────────────────── */
+.filters-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+    padding: 16px 20px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+.filter-search {
+    position: relative;
+    flex: 1 1 200px;
+    min-width: 180px;
+}
+
+.filter-search__icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.filter-search__input {
+    width: 100%;
+    padding: 9px 12px 9px 36px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text-main);
+    outline: none;
+    transition: border-color .18s, box-shadow .18s;
+}
+
+.filter-search__input:focus {
+    border-color: var(--green-300);
+    box-shadow: 0 0 0 3px rgba(116,198,157,.2);
+}
+
+.filter-select,
+.filter-date {
+    padding: 9px 14px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text-main);
+    outline: none;
+    cursor: pointer;
+    transition: border-color .18s, box-shadow .18s;
+}
+
+.filter-select:focus,
+.filter-date:focus {
+    border-color: var(--green-300);
+    box-shadow: 0 0 0 3px rgba(116,198,157,.2);
+}
+
+.filter-dates {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.filter-dates__sep {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.btn-filter {
+    padding: 9px 20px;
+    border-radius: 100px;
+    border: none;
+    background: var(--green-500);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .18s, transform .18s;
+}
+
+.btn-filter:hover {
+    background: var(--green-700);
+    transform: scale(1.03);
+}
+
+.btn-clear {
+    padding: 9px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all .18s;
+}
+
+.btn-clear:hover {
+    border-color: var(--red);
+    color: var(--red);
+    background: var(--red-lt);
+}
+
+@media (max-width: 640px) {
+    .filters-bar { flex-direction: column; align-items: stretch; }
+    .filter-search { min-width: 100%; }
+    .filter-dates  { flex-direction: column; }
 }
 </style>
 
-<div class="container-fluid py-4">
+<div class="page-wrapper">
 
-    <!-- 🔷 CABEÇALHO -->
-    <div class="header-box mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <div>
-            <h4 class="mb-1">📊 Histórico de Execuções</h4>
-            <small class="text-muted">{{ nome_escola }}</small>
+    <!-- ── HEADER ── -->
+    <header class="page-header">
+        <div class="page-header-left">
+            <div class="page-label">
+                <span></span>
+                Merenda Escolar
+            </div>
+            <h1 class="page-title">Histórico de Execuções</h1>
+            <p class="page-subtitle">{{ nome_escola }}</p>
         </div>
 
-        <div>
-            <span class="badge bg-light text-dark">
-                {{ page_obj.paginator.count }} registros
+        <div class="page-header-right">
+            <span class="pill">
+                📋 {{ page_obj.paginator.count }} registro{{ page_obj.paginator.count|pluralize }}
             </span>
         </div>
+    </header>
+
+    <!-- ── FILTROS ── -->
+<form method="get" class="filters-bar">
+    <!-- Busca textual -->
+    <div class="filter-search">
+        <svg class="filter-search__icon" viewBox="0 0 20 20" fill="none"
+             stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <circle cx="9" cy="9" r="6"/><path d="M15 15l-3.5-3.5"/>
+        </svg>
+        <input type="text" name="q" value="{{ filtros.q }}"
+               placeholder="Buscar por responsável…" class="filter-search__input">
     </div>
 
-    <!-- 📦 LISTAGEM -->
-    <div class="row">
+    <!-- Status -->
+    <select name="status" class="filter-select">
+        <option value="">Todos os status</option>
+        {% for val, label in status_choices %}
+        <option value="{{ val }}" {% if filtros.status == val %}selected{% endif %}>
+            {{ label }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <!-- Turno -->
+    <select name="turno" class="filter-select">
+        <option value="">Todos os turnos</option>
+        {% for val, label in turno_choices %}
+        <option value="{{ val }}" {% if filtros.turno == val %}selected{% endif %}>
+            {{ label }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <!-- Período -->
+    <div class="filter-dates">
+        <input type="date" name="data_de"  value="{{ filtros.data_de }}"
+               class="filter-date" title="Data inicial">
+        <span class="filter-dates__sep">→</span>
+        <input type="date" name="data_ate" value="{{ filtros.data_ate }}"
+               class="filter-date" title="Data final">
+    </div>
+
+    <button type="submit" class="btn-filter">Filtrar</button>
+
+    {% if filtros.q or filtros.status or filtros.turno or filtros.data_de or filtros.data_ate %}
+    <a href="{% url 'modulo_merendeiras:historico_execucoes' %}" class="btn-clear">
+        ✕ Limpar
+    </a>
+    {% endif %}
+</form>
+
+    <!-- ── CARDS ── -->
+    <div class="cards-grid">
 
         {% for execucao in execucoes %}
-        <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
 
-            <div class="card execucao-card shadow-sm h-100
-                {% if execucao.status == 'EXECUTADO' %}status-executado
-                {% elif execucao.status == 'PARCIAL' %}status-parcial
-                {% elif execucao.status == 'CANCELADO' %}status-cancelado
-                {% endif %}">
+        {% with pct=execucao.total_executados|default:0 %}
 
-                <div class="card-body">
+        <article class="exec-card
+            {% if execucao.status == 'EXECUTADO' %}exec-card--executado
+            {% elif execucao.status == 'PARCIAL' %}exec-card--parcial
+            {% elif execucao.status == 'CANCELADO' %}exec-card--cancelado
+            {% else %}exec-card--outro{% endif %}">
 
-                    <!-- 📅 DATA + STATUS -->
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="fw-bold mb-1">
-                                {{ execucao.data|date:"d/m/Y" }}
-                            </h6>
-                            <small class="text-muted">
-                                {{ execucao.get_turno_display }}
-                            </small>
-                        </div>
+            <div class="exec-card__stripe"></div>
 
-                        <span class="badge badge-status
-                            {% if execucao.status == 'EXECUTADO' %}bg-success
-                            {% elif execucao.status == 'PARCIAL' %}bg-warning text-dark
-                            {% elif execucao.status == 'CANCELADO' %}bg-danger
-                            {% else %}bg-secondary{% endif %}">
-                            {{ execucao.get_status_display }}
-                        </span>
+            <div class="exec-card__body">
+
+                <!-- Data + Status -->
+                <div class="exec-card__top">
+                    <div>
+                        <div class="exec-card__date">{{ execucao.data|date:"d/m/Y" }}</div>
+                        <div class="exec-card__turno">{{ execucao.get_turno_display }}</div>
                     </div>
 
-                    <!-- 👤 RESPONSÁVEL -->
-                    <div class="mt-2">
-                        <small class="text-muted">
-                            👩‍🍳 {{ execucao.executado_por }}
-                        </small>
-                    </div>
-
-                    <!-- 📊 MÉTRICAS -->
-                    <div class="mt-3">
-                        <div class="metric">
-                            📦 Total: <strong>{{ execucao.total_itens }}</strong>
-                        </div>
-                        <div class="metric text-success">
-                            ✔ Executados: <strong>{{ execucao.total_executados }}</strong>
-                        </div>
-                        <div class="metric text-danger">
-                            ⚠ Falhas: <strong>{{ execucao.total_falhas }}</strong>
-                        </div>
-                    </div>
-
-                    <!-- 📈 PROGRESSO -->
-                    <div class="mt-3">
-                        <div class="progress">
-                            <div class="progress-bar bg-success"
-                                 style="width:
-                                 {% if execucao.total_itens > 0 %}
-                                     {% widthratio execucao.total_executados execucao.total_itens 100 %}
-                                 {% else %}
-                                     0
-                                 {% endif %}%;">
-                            </div>
-                        </div>
-                    </div>
-
+                    <span class="status-badge
+                        {% if execucao.status == 'EXECUTADO' %}status-badge--executado
+                        {% elif execucao.status == 'PARCIAL' %}status-badge--parcial
+                        {% elif execucao.status == 'CANCELADO' %}status-badge--cancelado
+                        {% else %}status-badge--outro{% endif %}">
+                        {{ execucao.get_status_display }}
+                    </span>
                 </div>
 
-                <!-- 🔘 AÇÃO -->
-                <div class="card-footer text-end">
-                    <a href="{% url 'modulo_merendeiras:execucao_detalhe' execucao.id %}"
-                       class="btn btn-sm btn-outline-success">
-                        🔍 Ver detalhes
-                    </a>
+                <!-- Responsável -->
+                <div class="exec-card__resp">
+                    <div class="exec-card__resp-icon">👩‍🍳</div>
+                    <div class="exec-card__resp-name">{{ execucao.executado_por }}</div>
+                </div>
+
+                <!-- Métricas -->
+                <div class="exec-card__metrics">
+                    <div class="metric-chip">
+                        <div class="metric-chip__value">{{ execucao.total_itens }}</div>
+                        <div class="metric-chip__label">Total</div>
+                    </div>
+                    <div class="metric-chip metric-chip--success">
+                        <div class="metric-chip__value">{{ execucao.total_executados }}</div>
+                        <div class="metric-chip__label">Feitos</div>
+                    </div>
+                    <div class="metric-chip metric-chip--danger">
+                        <div class="metric-chip__value">{{ execucao.total_falhas }}</div>
+                        <div class="metric-chip__label">Falhas</div>
+                    </div>
+                </div>
+
+                <!-- Progresso -->
+                <div class="exec-card__progress">
+                    {% if execucao.total_itens > 0 %}
+                        {% with pct=execucao.total_executados|default:0 %}
+                        {% widthratio execucao.total_executados execucao.total_itens 100 as pct_val %}
+                    <div class="progress-header">
+                        <span>Progresso</span>
+                        <span>{{ pct_val }}%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill
+                            {% if pct_val >= 80 %}
+                            {% elif pct_val >= 40 %}progress-fill--partial
+                            {% else %}progress-fill--low{% endif %}"
+                            style="width: {{ pct_val }}%">
+                        </div>
+                    </div>
+                        {% endwith %}
+                    {% else %}
+                    <div class="progress-header">
+                        <span>Progresso</span>
+                        <span>—</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width:0%"></div>
+                    </div>
+                    {% endif %}
                 </div>
 
             </div>
 
-        </div>
+            <!-- Footer -->
+            <div class="exec-card__footer" style="display:flex; gap:8px; flex-wrap:wrap;">
 
+                <!-- 🔍 DETALHE -->
+                <a href="{% url 'modulo_merendeiras:execucao_detalhe' execucao.id %}"
+                class="btn-detail">
+                    🔍 Detalhes
+                </a>
+
+                <!-- 📋 FICHA DIÁRIA -->
+                <a href="{% url 'modulo_merendeiras:ficha_diaria' execucao.id %}"
+                class="btn-detail"
+                style="background:#EEF7F1; border-color:#74C69D;">
+                    📋 Ficha
+                </a>
+
+            </div>
+
+        </article>
+
+        {% endwith %}
         {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info text-center shadow-sm">
-                Nenhuma execução encontrada.
-            </div>
+
+        <div class="empty-state">
+            <div class="empty-state__icon">🍽️</div>
+            <div class="empty-state__title">Nenhuma execução encontrada</div>
+            <p class="empty-state__sub">As execuções registradas aparecerão aqui.</p>
         </div>
+
         {% endfor %}
 
     </div>
 
-    <!-- 📄 PAGINAÇÃO -->
+    <!-- ── PAGINAÇÃO ── -->
     {% if is_paginated %}
-    <div class="d-flex justify-content-center mt-4">
+    <nav class="pager" aria-label="Paginação">
 
-        <nav>
-            <ul class="pagination">
+        {% if page_obj.has_previous %}
+        <a class="pager__btn" href="?page={{ page_obj.previous_page_number }}">
+            ← Anterior
+        </a>
+        {% endif %}
 
-                {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link"
-                       href="?page={{ page_obj.previous_page_number }}">
-                        ← Anterior
-                    </a>
-                </li>
-                {% endif %}
+        <span class="pager__info">
+            {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+        </span>
 
-                <li class="page-item disabled">
-                    <span class="page-link">
-                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                    </span>
-                </li>
+        {% if page_obj.has_next %}
+        <a class="pager__btn" href="?page={{ page_obj.next_page_number }}">
+            Próxima →
+        </a>
+        {% endif %}
 
-                {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link"
-                       href="?page={{ page_obj.next_page_number }}">
-                        Próxima →
-                    </a>
-                </li>
-                {% endif %}
-
-            </ul>
-        </nav>
-
-    </div>
+    </nav>
     {% endif %}
 
 </div>

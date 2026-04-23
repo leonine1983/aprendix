@@ -60,18 +60,53 @@ class FichaDiariaForm(forms.ModelForm):
         }
 
 
+from django.core.paginator import Paginator
+
 class FichaDiariaCreateView(BaseMerendeiraView, CreateView):
     model = FichaDiaria
     form_class = FichaDiariaForm
     template_name = "modulo_merendeiras/cadapioHoje/ficha_diaria.html"
 
     def dispatch(self, request, *args, **kwargs):
-        self.execucao = ExecucaoCardapioDia.objects.get(pk=self.kwargs["execucao_id"])
+        self.execucao = ExecucaoCardapioDia.objects.select_related(
+            "escola",
+            "cardapio_dia"  # ✅ campo correto
+        ).get(pk=self.kwargs["execucao_id"])
+
+        self.ficha_existente = FichaDiaria.objects.filter(
+            execucao=self.execucao
+        ).first()
+
         return super().dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        """
+        🔥 PRÉ-PREENCHIMENTO INTELIGENTE (reduz fricção cognitiva)
+        """
+        initial = super().get_initial()
+
+        if not self.ficha_existente:
+            initial.update({
+                "cardapio_executado": str(self.execucao.cardapio_dia),
+                "alunos_atendidos": 0,
+            })
+            
+
+        return initial
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        # 🔥 MODO UPDATE automático
+        if self.ficha_existente:
+            kwargs["instance"] = self.ficha_existente
+
+        return kwargs
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["execucao"] = self.execucao
+        ctx["modo_edicao"] = bool(self.ficha_existente)
         return ctx
 
     def form_valid(self, form):
@@ -79,17 +114,25 @@ class FichaDiariaCreateView(BaseMerendeiraView, CreateView):
             with transaction.atomic():
 
                 ficha = form.save(commit=False)
+
                 ficha.execucao = self.execucao
                 ficha.escola = self.execucao.escola
                 ficha.data = self.execucao.data
                 ficha.turno = self.execucao.turno
                 ficha.tecnico_responsavel = self.request.user
+
                 ficha.save()
 
-                messages.success(
-                    self.request,
-                    "Ficha diária registrada com sucesso."
-                )
+                if self.ficha_existente:
+                    messages.success(
+                        self.request,
+                        "Ficha atualizada com sucesso."
+                    )
+                else:
+                    messages.success(
+                        self.request,
+                        "Ficha registrada com sucesso."
+                    )
 
         except Exception as e:
             messages.error(self.request, f"Erro ao salvar ficha: {str(e)}")
@@ -98,4 +141,4 @@ class FichaDiariaCreateView(BaseMerendeiraView, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy("modulo_merendeiras:historico_execucoes")
+        return self.request.path

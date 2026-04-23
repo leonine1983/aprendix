@@ -1,348 +1,659 @@
-quero que melhore o template considerando responsividade, baixa fricção, muitas informações
-
 {% extends "modulo_merendeiras/base_merendeira.html" %}
 
-{% block title %}Detalhes da Execução do Cardápio{% endblock %}
+{% block title %}Detalhes da Execução{% endblock %}
 
 {% block content %}
 
 <style>
-/* ==============================
-   🎯 PADRÃO VISUAL INSTITUCIONAL
-   ============================== */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
 
 :root {
-    --primary-color: #2E7D32;
-    --secondary-color: #1976D2;
-    --accent-color: #43A047;
-    --neutral-light: #f5f7fa;
-    --text-muted: #6c757d;
+    --green-900: #1B4332;
+    --green-700: #2D6A4F;
+    --green-500: #40916C;
+    --green-300: #74C69D;
+    --green-100: #D8F3DC;
+    --green-50:  #F0FAF4;
+    --blue-700:  #1D4ED8;
+    --blue-100:  #DBEAFE;
+    --amber:     #F59E0B;
+    --amber-lt:  #FEF3C7;
+    --red:       #DC2626;
+    --red-lt:    #FEE2E2;
+    --surface:   #FAFAF8;
+    --card-bg:   #FFFFFF;
+    --border:    #E8EAE6;
+    --text-main: #1C1C1A;
+    --text-muted:#6B7280;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,.10);
+    --radius:    16px;
+    --radius-sm: 10px;
 }
 
-/* ==============================
-   🧠 MELHORIA DE LEGIBILIDADE
-   ============================== */
+*, *::before, *::after { box-sizing: border-box; }
 
-.card-body small {
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    color: var(--text-muted);
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--text-main);
 }
 
-/* ==============================
-   📊 KPI - ALUNOS ATENDIDOS
-   ============================== */
-
-.kpi-alunos {
-    background: linear-gradient(135deg, #E3F2FD, #FFFFFF);
-    border-left: 5px solid var(--secondary-color);
-    border-radius: 12px;
-    padding: 16px 18px;
-    transition: all 0.25s ease-in-out;
+/* ── Page wrapper ── */
+.page-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px 72px;
     position: relative;
-    overflow: hidden;
 }
 
-.kpi-alunos::before {
+.page-wrapper::before {
     content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 60px;
-    height: 60px;
-    background: rgba(25, 118, 210, 0.08);
-    border-radius: 50%;
-    transform: translate(20px, -20px);
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 50% 35% at 90% 5%, rgba(116,198,157,.10) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 5%  90%, rgba(45,106,79,.07)  0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
 }
 
-.kpi-alunos:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+/* ── Section z-index ── */
+.page-header, .kpi-row, .info-card, .section-card, .pager-row {
+    position: relative;
+    z-index: 1;
 }
 
-/* Ícone */
-.kpi-alunos i {
-    color: var(--secondary-color);
-    font-size: 1rem;
+/* ════════════════════════════
+   HEADER
+════════════════════════════ */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    animation: fadeUp .3s ease both;
 }
 
-/* Valor principal */
-.kpi-alunos .valor {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--secondary-color);
-    line-height: 1.2;
-}
-
-/* Label */
-.kpi-alunos .label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: var(--text-muted);
-}
-
-/* ==============================
-   📦 PADRONIZAÇÃO DOS CARDS
-   ============================== */
-
-.card {
-    border-radius: 12px;
-    border: none;
-}
-
-.card-header {
+.header-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.3px;
-}
-
-/* ==============================
-   📊 TABELAS MAIS LIMPAS
-   ============================== */
-
-.table thead th {
-    font-size: 0.75rem;
+    letter-spacing: .12em;
     text-transform: uppercase;
-    color: #495057;
-    letter-spacing: 0.5px;
-}
-
-.table tbody td {
-    font-size: 0.9rem;
-}
-
-/* ==============================
-   🎯 BADGE DE STATUS
-   ============================== */
-
-.badge {
-    font-size: 0.75rem;
-    padding: 6px 10px;
-    border-radius: 8px;
-}
-
-/* ==============================
-   🖨️ IMPRESSÃO OTIMIZADA
-   ============================== */
-
-@media print {
-    .btn {
-        display: none !important;
-    }
-
-    .card {
-        box-shadow: none !important;
-    }
-
-    .kpi-alunos {
-        border: 1px solid #ccc;
-    }
-}
-
-/* 🔥 Espaçamento consistente entre blocos internos */
-.card-body .row > div {
-    margin-bottom: 12px;
-}
-
-/* 🎯 Destaque do KPI com respiro real */
-.kpi-alunos {
-    margin-top: 8px;
+    color: var(--green-500);
     margin-bottom: 8px;
 }
 
-/* 📦 Melhor distribuição vertical */
-.card-body {
-    padding: 20px 24px;
+.header-eyebrow span {
+    display: inline-block;
+    width: 18px; height: 2px;
+    background: var(--green-300);
+    border-radius: 2px;
 }
 
-/* 🧠 Evita "grudar" label com valor */
-.card-body small {
-    display: block;
-    margin-bottom: 4px;
+.page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(22px, 3.5vw, 32px);
+    font-weight: 400;
+    color: var(--green-900);
+    line-height: 1.15;
+    margin: 0 0 4px;
 }
 
-/* 🎯 Linha separadora sutil (opcional, mas forte UX) */
-.card-body .row > div:not(:last-child) {
+.page-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+    align-items: center;
+    padding-top: 6px;
+}
+
+.btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all .18s;
+    box-shadow: var(--shadow-sm);
+}
+.btn-ghost:hover { background: var(--surface); color: var(--text-main); border-color: #ccc; }
+
+.btn-primary-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--green-500);
+    border: 1px solid var(--green-500);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .18s;
+}
+.btn-primary-action:hover { background: var(--green-700); border-color: var(--green-700); }
+
+/* Status badge */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+.status-badge::before {
+    content: ""; width: 6px; height: 6px;
+    border-radius: 50%; flex-shrink: 0;
+}
+.badge--executado { background: var(--green-100); color: var(--green-700); }
+.badge--executado::before { background: var(--green-500); }
+.badge--parcial   { background: var(--amber-lt);  color: #92400E; }
+.badge--parcial::before { background: var(--amber); }
+.badge--cancelado { background: var(--red-lt);    color: #991B1B; }
+.badge--cancelado::before { background: var(--red); }
+.badge--outro     { background: #F3F4F6;           color: #4B5563; }
+.badge--outro::before { background: #9CA3AF; }
+
+/* ════════════════════════════
+   KPI ROW
+════════════════════════════ */
+.kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.kpi-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: var(--shadow-sm);
+    transition: transform .2s, box-shadow .2s;
+    animation: fadeUp .35s ease both;
+    overflow: hidden;
     position: relative;
 }
 
-.card-body .row > div:not(:last-child)::after {
+.kpi-card::after {
     content: "";
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+}
+.kpi-card--total::after   { background: linear-gradient(90deg, var(--blue-700), #60A5FA); }
+.kpi-card--exec::after    { background: linear-gradient(90deg, var(--green-500), var(--green-300)); }
+.kpi-card--pend::after    { background: linear-gradient(90deg, var(--amber), #FDE68A); }
+.kpi-card--cancel::after  { background: linear-gradient(90deg, var(--red), #FCA5A5); }
+.kpi-card--alunos::after  { background: linear-gradient(90deg, #7C3AED, #A78BFA); }
+
+.kpi-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+
+.kpi-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+}
+.kpi-icon--blue   { background: var(--blue-100);  }
+.kpi-icon--green  { background: var(--green-100); }
+.kpi-icon--amber  { background: var(--amber-lt);  }
+.kpi-icon--red    { background: var(--red-lt);    }
+.kpi-icon--purple { background: #EDE9FE;           }
+
+.kpi-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    line-height: 1;
+    color: var(--text-main);
+}
+.kpi-value--blue   { color: var(--blue-700);  }
+.kpi-value--green  { color: var(--green-700); }
+.kpi-value--amber  { color: #92400E;          }
+.kpi-value--red    { color: var(--red);       }
+.kpi-value--purple { color: #5B21B6;          }
+
+.kpi-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* ════════════════════════════
+   INFO CARD (Dados da Execução)
+════════════════════════════ */
+.info-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 24px;
+    animation: fadeUp .4s ease both;
+    overflow: hidden;
+}
+
+.info-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--green-50);
+}
+
+.info-card__title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--green-700);
+}
+
+.info-card__body {
+    padding: 24px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.info-field {}
+
+.info-field__label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
     display: block;
-    height: 1px;
-    background: #f1f3f5;
-    margin-top: 10px;
+}
+
+.info-field__value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.info-field__value--muted { color: var(--text-muted); font-style: italic; font-weight: 400; }
+
+/* ════════════════════════════
+   SECTION CARDS (Tabelas)
+════════════════════════════ */
+.section-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 24px;
+    overflow: hidden;
+    animation: fadeUp .45s ease both;
+}
+
+.section-card__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+}
+
+.section-card__header--green  { background: linear-gradient(90deg, var(--green-700), var(--green-500)); }
+.section-card__header--amber  { background: linear-gradient(90deg, #D97706, var(--amber)); }
+.section-card__header--red    { background: linear-gradient(90deg, #B91C1C, var(--red)); }
+
+.section-card__icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+}
+
+.section-card__title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.section-card__count {
+    margin-left: auto;
+    background: rgba(255,255,255,.2);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 100px;
+}
+
+/* Table */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead th {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 10px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.data-table tbody tr {
+    border-bottom: 1px solid #F0F2EE;
+    transition: background .15s;
+}
+.data-table tbody tr:last-child { border-bottom: none; }
+.data-table tbody tr:hover { background: var(--surface); }
+
+.data-table tbody td {
+    font-size: 13.5px;
+    padding: 12px 20px;
+    color: var(--text-main);
+    vertical-align: middle;
+}
+
+.data-table .cell-muted { color: var(--text-muted); font-style: italic; }
+.data-table .cell-center { text-align: center; }
+.data-table .cell-bold { font-weight: 600; }
+
+/* Diferença chip */
+.diff-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.diff-chip--pos  { background: var(--green-100); color: var(--green-700); }
+.diff-chip--neg  { background: var(--red-lt);    color: var(--red); }
+.diff-chip--zero { background: #F3F4F6;           color: var(--text-muted); }
+
+/* Motivo tag */
+.motivo-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    background: var(--red-lt);
+    color: #991B1B;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Receita name */
+.receita-name {
+    font-weight: 600;
+    color: var(--text-main);
+}
+.receita-tipo {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 1px;
+}
+
+/* Empty row */
+.empty-row td {
+    text-align: center;
+    padding: 36px 20px;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+.empty-row__icon { font-size: 28px; display: block; margin-bottom: 6px; }
+
+/* ── Animations ── */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.kpi-card:nth-child(1) { animation-delay: .05s; }
+.kpi-card:nth-child(2) { animation-delay: .10s; }
+.kpi-card:nth-child(3) { animation-delay: .15s; }
+.kpi-card:nth-child(4) { animation-delay: .20s; }
+.kpi-card:nth-child(5) { animation-delay: .25s; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    .page-wrapper { padding: 20px 16px 56px; }
+    .page-header { flex-direction: column; }
+    .header-actions { width: 100%; justify-content: flex-start; }
+    .info-grid { grid-template-columns: 1fr 1fr; }
+    .data-table thead { display: none; }
+    .data-table tbody td { display: block; padding: 6px 16px; }
+    .data-table tbody td::before {
+        content: attr(data-label);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        display: block;
+        margin-bottom: 2px;
+    }
+    .data-table tbody tr { padding: 10px 0; display: block; }
+}
+
+/* ── Print ── */
+@media print {
+    body { background: #fff; }
+    .page-wrapper::before { display: none; }
+    .header-actions { display: none; }
+    .section-card, .info-card, .kpi-card { box-shadow: none !important; }
+    .section-card__header--green  { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .section-card__header--amber  { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .section-card__header--red    { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 </style>
 
-<div class="container-fluid py-4">
+<div class="page-wrapper">
 
-    <!-- 🔷 CABEÇALHO -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- ════ HEADER ════ -->
+    <header class="page-header">
         <div>
-            <h1 class="h3">
-                <i class="fas fa-clipboard-check text-success me-2"></i>
-                Execução do Cardápio - {{ execucao.get_turno_display }}
+            <div class="header-eyebrow">
+                <span></span>
+                Merenda Escolar
+            </div>
+            <h1 class="page-title">
+                Execução — {{ execucao.get_turno_display }}
             </h1>
-            <p class="text-muted mb-0">
-                {{ execucao.escola.nome }} • {{ execucao.data|date:"d/m/Y" }}
+            <p class="page-subtitle">
+                {{ execucao}} &nbsp;·&nbsp; {{ execucao.data|date:"d/m/Y" }}
+                &nbsp;·&nbsp;
+                <span class="status-badge
+                    {% if execucao.status == 'EXECUTADO' %}badge--executado
+                    {% elif execucao.status == 'PARCIAL' %}badge--parcial
+                    {% elif execucao.status == 'CANCELADO' %}badge--cancelado
+                    {% else %}badge--outro{% endif %}">
+                    {{ execucao.get_status_display }}
+                </span>
             </p>
         </div>
 
-        <div>
-            <a href="{% url 'modulo_merendeiras:cardapio_hoje' %}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left"></i> Voltar
+        <div class="header-actions">
+            <a href="{% url 'modulo_merendeiras:cardapio_hoje' %}" class="btn-ghost">
+                ← Voltar
             </a>
-            <button class="btn btn-primary" onclick="window.print()">
-                <i class="fas fa-print"></i> Imprimir
+            <button class="btn-primary-action" onclick="window.print()">
+                🖨 Imprimir
             </button>
         </div>
-    </div>
+    </header>
 
-    <!-- 🔷 KPIs -->
-    <div class="row g-3 mb-4">
+    <!-- ════ KPIs ════ -->
+    <div class="kpi-row">
 
-        <div class="col-md-3">
-            <div class="card shadow-sm border-start border-primary border-4">
-                <div class="card-body">
-                    <small class="text-muted">Total de Itens</small>
-                    <h4>{{ total_itens }}</h4>
-                </div>
-            </div>
+        <div class="kpi-card kpi-card--total">
+            <div class="kpi-icon kpi-icon--blue">📦</div>
+            <div class="kpi-value kpi-value--blue">{{ total_itens }}</div>
+            <div class="kpi-label">Total de itens</div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card shadow-sm border-start border-success border-4">
-                <div class="card-body">
-                    <small class="text-muted">Executados</small>
-                    <h4>{{ total_executados }}</h4>
-                </div>
-            </div>
+        <div class="kpi-card kpi-card--exec">
+            <div class="kpi-icon kpi-icon--green">✔</div>
+            <div class="kpi-value kpi-value--green">{{ total_executados }}</div>
+            <div class="kpi-label">Executados</div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card shadow-sm border-start border-warning border-4">
-                <div class="card-body">
-                    <small class="text-muted">Pendentes</small>
-                    <h4>{{ total_pendentes }}</h4>
-                </div>
-            </div>
+        <div class="kpi-card kpi-card--pend">
+            <div class="kpi-icon kpi-icon--amber">⏳</div>
+            <div class="kpi-value kpi-value--amber">{{ total_pendentes }}</div>
+            <div class="kpi-label">Pendentes</div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card shadow-sm border-start border-danger border-4">
-                <div class="card-body">
-                    <small class="text-muted">Cancelados</small>
-                    <h4>{{ total_cancelados }}</h4>
-                </div>
-            </div>
+        <div class="kpi-card kpi-card--cancel">
+            <div class="kpi-icon kpi-icon--red">✖</div>
+            <div class="kpi-value kpi-value--red">{{ total_cancelados }}</div>
+            <div class="kpi-label">Cancelados</div>
+        </div>
+
+        <div class="kpi-card kpi-card--alunos">
+            <div class="kpi-icon kpi-icon--purple">👥</div>
+            <div class="kpi-value kpi-value--purple">{{ execucao.quantidade_alunos|default:"—" }}</div>
+            <div class="kpi-label">Alunos atendidos</div>
         </div>
 
     </div>
 
-    <!-- 🔷 DADOS INSTITUCIONAIS -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-white">
-            <h5 class="mb-0">
-                <i class="fas fa-school me-2"></i> Dados da Execução
-            </h5>
+    <!-- ════ DADOS DA EXECUÇÃO ════ -->
+    <div class="info-card">
+        <div class="info-card__header">
+            <span class="info-card__title">🏫 Dados da Execução</span>
         </div>
+        <div class="info-card__body">
+            <div class="info-grid">
 
-        <div class="card-body">
-            <div class="row">
-
-                <div class="col-md-4">
-                    <small class="text-muted">Escola</small>
-                    <div class="fw-bold">{{ execucao.escola.nome }}</div>
+                <div class="info-field" style="grid-column: span 2;">
+                    <span class="info-field__label">Escola</span>
+                    <div class="info-field__value">{{ execucao.escola}} </div>
                 </div>
 
-                <div class="col-md-2">
-                    <small class="text-muted">Data</small>
-                    <div>{{ execucao.data|date:"d/m/Y" }}</div>
+                <div class="info-field">
+                    <span class="info-field__label">Data</span>
+                    <div class="info-field__value">{{ execucao.data|date:"d/m/Y" }}</div>
                 </div>
 
-                <div class="col-md-2">
-                    <small class="text-muted">Turno</small>
-                    <div>{{ execucao.get_turno_display }}</div>
+                <div class="info-field">
+                    <span class="info-field__label">Turno</span>
+                    <div class="info-field__value">{{ execucao.get_turno_display }}</div>
                 </div>
 
-                <div class="col-md-4">
-                    <small class="text-muted">Executado por</small>
-                    <div class="fw-bold">
+                <div class="info-field">
+                    <span class="info-field__label">Executado por</span>
+                    <div class="info-field__value">
                         {{ execucao.executado_por.get_full_name|default:execucao.executado_por.username }}
                     </div>
                 </div>
 
-                <!-- 🔥 NOVO BLOCO (POSIÇÃO ESTRATÉGICA) -->
-                <div class="col-12 mt-3">
-    <div class="kpi-alunos">
-        <div class="label">
-            <i class="fas fa-users me-1"></i> Alunos Atendidos
-        </div>
-        <div class="valor">
-            {{ execucao.quantidade_alunos|default:"--" }}
-        </div>
-    </div>
-</div>
-
-                <div class="col-md-4 mt-3">
-                    <small class="text-muted">Criado em</small>
-                    <div>{{ execucao.criado_em|date:"d/m/Y H:i" }}</div>
+                <div class="info-field">
+                    <span class="info-field__label">Criado em</span>
+                    <div class="info-field__value">{{ execucao.criado_em|date:"d/m/Y H:i" }}</div>
                 </div>
 
-                <div class="col-md-4 mt-3">
-                    <small class="text-muted">Finalizado em</small>
-                    <div>
+                <div class="info-field">
+                    <span class="info-field__label">Finalizado em</span>
+                    <div class="info-field__value
+                        {% if not execucao.finalizado_em %}info-field__value--muted{% endif %}">
                         {{ execucao.finalizado_em|date:"d/m/Y H:i"|default:"Em andamento" }}
                     </div>
-                </div>
-
-                <div class="col-md-4 mt-3 text-end">
-                    <span class="badge 
-                        {% if execucao.status == 'EXECUTADO' %}bg-success
-                        {% elif execucao.status == 'PARCIAL' %}bg-warning text-dark
-                        {% elif execucao.status == 'CANCELADO' %}bg-danger
-                        {% else %}bg-secondary{% endif %}">
-                        {{ execucao.get_status_display }}
-                    </span>
                 </div>
 
             </div>
         </div>
     </div>
 
-
-    <!-- 🔷 ITENS EXECUTADOS -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-success text-white">
-            <i class="fas fa-check-circle"></i> Itens Executados
+    <!-- ════ ITENS EXECUTADOS ════ -->
+    <div class="section-card">
+        <div class="section-card__header section-card__header--green">
+            <div class="section-card__icon">✅</div>
+            <span class="section-card__title">Itens Executados</span>
+            <span class="section-card__count">{{ itens_executados|length }}</span>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-                <thead class="table-light">
+            <table class="data-table">
+                <thead>
                     <tr>
                         <th>Receita</th>
-                        <th>Tipo</th>
-                        <th class="text-center">Planejado</th>
-                        <th class="text-center">Executado</th>
-                        <th class="text-center">Diferença</th>
+                        <th class="cell-center">Planejado</th>
+                        <th class="cell-center">Executado</th>
+                        <th class="cell-center">Diferença</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in itens_executados %}
                     <tr>
-                        <td>{{ item.receita.nome }}</td>
-                        <td>{{ item.tipo_refeicao.nome }}</td>
-                        <td class="text-center">{{ item.porcoes_planejadas }}</td>
-                        <td class="text-center">{{ item.porcoes_executadas }}</td>
-                        <td class="text-center fw-bold">
-                            {{ item.diferenca|default:"-" }}
+                        <td data-label="Receita">
+                            <div class="receita-name">{{ item.receita.nome }}</div>
+                            <div class="receita-tipo">{{ item.tipo_refeicao.nome }}</div>
+                        </td>
+                        <td class="cell-center" data-label="Planejado">{{ item.porcoes_planejadas }}</td>
+                        <td class="cell-center cell-bold" data-label="Executado">{{ item.porcoes_executadas }}</td>
+                        <td class="cell-center" data-label="Diferença">
+                            {% with diff=item.diferenca %}
+                            {% if diff %}
+                                {% if diff > 0 %}
+                                <span class="diff-chip diff-chip--pos">+{{ diff }}</span>
+                                {% elif diff < 0 %}
+                                <span class="diff-chip diff-chip--neg">{{ diff }}</span>
+                                {% else %}
+                                <span class="diff-chip diff-chip--zero">0</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="diff-chip diff-chip--zero">—</span>
+                            {% endif %}
+                            {% endwith %}
                         </td>
                     </tr>
                     {% empty %}
-                    <tr>
-                        <td colspan="5" class="text-center text-muted py-3">
+                    <tr class="empty-row">
+                        <td colspan="4">
+                            <span class="empty-row__icon">🍽️</span>
                             Nenhum item executado
                         </td>
                     </tr>
@@ -352,14 +663,16 @@ quero que melhore o template considerando responsividade, baixa fricção, muita
         </div>
     </div>
 
-    <!-- 🔷 PENDÊNCIAS -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-warning text-dark">
-            <i class="fas fa-exclamation-triangle"></i> Pendências / Falhas
+    <!-- ════ PENDÊNCIAS ════ -->
+    <div class="section-card">
+        <div class="section-card__header section-card__header--amber">
+            <div class="section-card__icon">⚠️</div>
+            <span class="section-card__title">Pendências / Falhas</span>
+            <span class="section-card__count">{{ itens_pendentes|length }}</span>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-sm mb-0">
+            <table class="data-table">
                 <thead>
                     <tr>
                         <th>Receita</th>
@@ -370,16 +683,21 @@ quero que melhore o template considerando responsividade, baixa fricção, muita
                 <tbody>
                     {% for item in itens_pendentes %}
                     <tr>
-                        <td>{{ item.receita.nome }}</td>
-                        <td class="text-danger">
-                            {{ item.motivo_falha|default:"Não informado" }}
+                        <td data-label="Receita">
+                            <div class="receita-name">{{ item.receita.nome }}</div>
                         </td>
-                        <td>{{ item.get_status_display }}</td>
+                        <td data-label="Motivo">
+                            <span class="motivo-tag">
+                                ⚠ {{ item.motivo_falha|default:"Não informado" }}
+                            </span>
+                        </td>
+                        <td data-label="Status">{{ item.get_status_display }}</td>
                     </tr>
                     {% empty %}
-                    <tr>
-                        <td colspan="3" class="text-center text-muted py-3">
-                            Sem pendências
+                    <tr class="empty-row">
+                        <td colspan="3">
+                            <span class="empty-row__icon">🎉</span>
+                            Sem pendências registradas
                         </td>
                     </tr>
                     {% endfor %}
@@ -388,15 +706,17 @@ quero que melhore o template considerando responsividade, baixa fricção, muita
         </div>
     </div>
 
-    <!-- 🔷 CANCELADOS -->
+    <!-- ════ CANCELADOS ════ -->
     {% if itens_cancelados %}
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-danger text-white">
-            <i class="fas fa-times-circle"></i> Itens Cancelados
+    <div class="section-card">
+        <div class="section-card__header section-card__header--red">
+            <div class="section-card__icon">🚫</div>
+            <span class="section-card__title">Itens Cancelados</span>
+            <span class="section-card__count">{{ itens_cancelados|length }}</span>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-sm mb-0">
+            <table class="data-table">
                 <thead>
                     <tr>
                         <th>Receita</th>
@@ -406,8 +726,14 @@ quero que melhore o template considerando responsividade, baixa fricção, muita
                 <tbody>
                     {% for item in itens_cancelados %}
                     <tr>
-                        <td>{{ item.receita.nome }}</td>
-                        <td>{{ item.motivo_falha|default:"Não informado" }}</td>
+                        <td data-label="Receita">
+                            <div class="receita-name">{{ item.receita.nome }}</div>
+                        </td>
+                        <td data-label="Motivo">
+                            <span class="motivo-tag">
+                                ✖ {{ item.motivo_falha|default:"Não informado" }}
+                            </span>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -417,4 +743,5 @@ quero que melhore o template considerando responsividade, baixa fricção, muita
     {% endif %}
 
 </div>
+
 {% endblock %}

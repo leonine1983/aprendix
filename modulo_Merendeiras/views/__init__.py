@@ -15,6 +15,9 @@ from .executarCardapio.executaCardapio import *
 from .executarCardapio.prepararExecucaoView import *
 from .executarCardapio.historicoExecucoesView import *
 
+# Ficha
+from .executarCardapio.fichaDiariaCreateView import *
+
 # Estoque Escola
 from .estoque.estoqueEscolaListView import *
 
