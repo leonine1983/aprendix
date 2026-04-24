@@ -550,6 +550,171 @@
   </div>
 
 
+  <!-- Bloco de Busca e Filtros -->
+<div style="
+  background: var(--gc-surface);
+  border: 1px solid var(--gc-border);
+  border-radius: var(--gc-radius);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+">
+  <form method="get" action="" id="form-busca">
+
+    <!-- Linha 1: busca textual + status -->
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px;">
+
+      <!-- Campo de texto -->
+      <div style="flex: 2; min-width: 220px; position: relative;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--gc-text-3); pointer-events: none;">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          type="text"
+          name="q"
+          value="{{ filtros.q }}"
+          placeholder="Buscar por nome ou descrição..."
+          style="
+            width: 100%;
+            height: 40px;
+            padding: 0 12px 0 38px;
+            border-radius: 8px;
+            border: 1px solid var(--gc-border);
+            font-size: 14px;
+            font-family: var(--gc-font);
+            box-sizing: border-box;
+          "
+        >
+      </div>
+
+      <!-- Status -->
+      <div style="flex: 1; min-width: 160px;">
+        <select name="status" style="
+          width: 100%;
+          height: 40px;
+          padding: 0 12px;
+          border-radius: 8px;
+          border: 1px solid var(--gc-border);
+          font-size: 14px;
+          font-family: var(--gc-font);
+          background: white;
+          box-sizing: border-box;
+        ">
+          <option value="" {% if not filtros.status %}selected{% endif %}>Todos os status</option>
+          <option value="ativo" {% if filtros.status == "ativo" %}selected{% endif %}>Somente ativos</option>
+          <option value="inativo" {% if filtros.status == "inativo" %}selected{% endif %}>Somente inativos</option>
+        </select>
+      </div>
+
+      <!-- Ordenação -->
+      <div style="flex: 1; min-width: 200px;">
+        <select name="ordem" style="
+          width: 100%;
+          height: 40px;
+          padding: 0 12px;
+          border-radius: 8px;
+          border: 1px solid var(--gc-border);
+          font-size: 14px;
+          font-family: var(--gc-font);
+          background: white;
+          box-sizing: border-box;
+        ">
+          <option value="-criado_em" {% if filtros.ordem == "-criado_em" %}selected{% endif %}>Mais recentes</option>
+          <option value="criado_em"  {% if filtros.ordem == "criado_em" %}selected{% endif %}>Mais antigos</option>
+          <option value="nome"       {% if filtros.ordem == "nome" %}selected{% endif %}>Nome A → Z</option>
+          <option value="-nome"      {% if filtros.ordem == "-nome" %}selected{% endif %}>Nome Z → A</option>
+          <option value="data_inicio" {% if filtros.ordem == "data_inicio" %}selected{% endif %}>Início mais antigo</option>
+          <option value="-data_inicio" {% if filtros.ordem == "-data_inicio" %}selected{% endif %}>Início mais recente</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Linha 2: filtro de período -->
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+
+      <span style="font-size: 13px; color: var(--gc-text-3); white-space: nowrap; display: flex; align-items: center; gap: 6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--gc-primary);">
+          <rect x="3" y="4" width="18" height="18" rx="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Período de início:
+      </span>
+
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <input
+          type="date"
+          name="data_inicio"
+          value="{{ filtros.data_inicio }}"
+          style="
+            height: 36px;
+            padding: 0 10px;
+            border-radius: 8px;
+            border: 1px solid var(--gc-border);
+            font-size: 13px;
+            font-family: var(--gc-font);
+          "
+        >
+        <span style="font-size: 13px; color: var(--gc-text-3);">até</span>
+        <input
+          type="date"
+          name="data_fim"
+          value="{{ filtros.data_fim }}"
+          style="
+            height: 36px;
+            padding: 0 10px;
+            border-radius: 8px;
+            border: 1px solid var(--gc-border);
+            font-size: 13px;
+            font-family: var(--gc-font);
+          "
+        >
+      </div>
+
+      <div style="margin-left: auto; display: flex; gap: 8px;">
+        {% if filtro_ativo %}
+        <a href="{% url 'merendaEscolar:cardapio_list' %}" class="gc-btn gc-btn--secondary" style="height: 36px; font-size: 13px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+          Limpar filtros
+        </a>
+        {% endif %}
+        <button type="submit" class="gc-btn gc-btn--primary" style="height: 36px; font-size: 13px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Filtrar
+        </button>
+      </div>
+    </div>
+
+  </form>
+
+  <!-- Resumo dos resultados quando há filtro ativo -->
+  {% if filtro_ativo %}
+  <div style="
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--gc-border);
+    font-size: 13px;
+    color: var(--gc-text-3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  ">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gc-primary)" stroke-width="2">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    Exibindo <strong style="color: var(--gc-text);">{{ page_obj.paginator.count }}</strong> cardápio{{ page_obj.paginator.count|pluralize }} encontrado{{ page_obj.paginator.count|pluralize }}
+    {% if filtros.q %}com <strong style="color: var(--gc-text);">"{{ filtros.q }}"</strong>{% endif %}
+  </div>
+  {% endif %}
+
+</div>
+
+
   <!-- ⚙️ Configuração de paginação -->
   <div style="
     background: var(--gc-surface);

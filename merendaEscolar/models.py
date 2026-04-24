@@ -940,7 +940,12 @@ class Cardapio(models.Model):
     """
 
     nome = models.CharField(max_length=150)
-    descricao = models.TextField(blank=True)
+    descricao = RichTextField(
+    blank=True,
+    null=True,
+    config_name="default",
+    help_text="Descrição técnica do cardápio alimentar."
+)
 
     data_inicio = models.DateField()
     data_fim = models.DateField()

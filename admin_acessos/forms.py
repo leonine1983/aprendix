@@ -20,12 +20,12 @@ class MessageUserForm(forms.ModelForm):
 
 
 from django.contrib.auth.models import User
-from .models import AtualizacaoNotificacao
+from .models import AtualizacaoNotificacaoSistema
 from ckeditor.widgets import CKEditorWidget
 
 class NotificacaoForm(forms.Form):
     titulo = forms.CharField(max_length=200, label="Título")
     mensagem = forms.CharField(widget=CKEditorWidget(), required=False, label="Mensagem")
-    tipo = forms.ChoiceField(choices=AtualizacaoNotificacao.TIPO_CHOICES, label="Tipo de Notificação")
+    tipo = forms.ChoiceField(choices=AtualizacaoNotificacaoSistema.TIPO_CHOICES, label="Tipo de Notificação")
     user = forms.ModelChoiceField(queryset=User.objects.all(), required=False, label="Usuário (opcional, deixa em branco para todos)")
 

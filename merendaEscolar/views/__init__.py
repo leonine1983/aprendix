@@ -40,3 +40,5 @@ from .relatorios.relatorioEstoqueCentralView import *
 from .cozinha.view import *
 
 from .configuraPessoal.configuracaoPessoalUpdateView import *
+
+from .notificaçõesNutricao.notificacoes_views import *

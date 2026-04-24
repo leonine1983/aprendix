@@ -516,7 +516,7 @@
     {% for semana in cardapio.semanas.all %}
 
     {% with n=semana.numero %}
-    <div class="gc-semana gc-semana--{% if n == 1 %}1{% elif n == 2 %}2{% elif n == 3 %}3{% else %}4{% endif %} open"
+    <div class="gc-semana gc-semana--{% if n == 1 %}1{% elif n == 2 %}2{% elif n == 3 %}3{% else %}4{% endif %}"
          id="sem-{{ semana.id }}"
          tabindex="0"
          role="button"

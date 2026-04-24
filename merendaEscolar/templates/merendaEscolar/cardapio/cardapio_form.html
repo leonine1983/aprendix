@@ -2,137 +2,212 @@
 
 {% block content %}
 
+<style>
+:root {
+    --primary: #2E7D32;
+    --secondary: #6c757d;
+    --bg-soft: #f8f9fa;
+    --border-soft: #e5e7eb;
+}
+
+.page-header {
+    background: linear-gradient(135deg, #2E7D32, #43A047);
+    color: white;
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.page-header h2 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.card-institucional {
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    background: white;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.section-title {
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #374151;
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.form-check {
+    background: var(--bg-soft);
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+.btn-success {
+    background: var(--primary);
+    border: none;
+    padding: 10px 18px;
+    font-weight: 500;
+}
+
+.btn-secondary {
+    padding: 10px 18px;
+}
+
+.info-box {
+    background: #eef6ff;
+    border-left: 4px solid #0d6efd;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+</style>
+
 <div class="container mt-4">
 
-    <h2>
-        {% if object %}
-            ✏️ Editar Cardápio
-        {% else %}
-            📋 Novo Cardápio
-        {% endif %}
-    </h2>
-
-    <hr>
-
-    <!-- DESCRIÇÃO DA TELA -->
-    <div class="alert alert-info">
-        <strong>📌 Sobre esta tela:</strong><br>
-        Aqui você cadastra um <b>cardápio escolar</b>, que representa um período de alimentação
-        (ex: mensal, bimestral ou específico).<br><br>
-
-        <b>Como preencher:</b>
-        <ul>
-            <li><b>Nome:</b> Identificação do cardápio (ex: "Fundamental II - Março/2026")</li>
-            <li><b>Descrição:</b> Informações adicionais (opcional)</li>
-            <li><b>Data Início / Fim:</b> Período de validade do cardápio</li>
-            <li><b>Ativo:</b> Define se o cardápio está em uso</li>
-            <li><b>Gerar execução automática:</b> Cria automaticamente os registros diários de refeições</li>
-        </ul>
-
-        ⚠️ <b>Atenção:</b> A data final não pode ser menor que a data inicial.
+    <!-- 🔷 HEADER -->
+    <div class="page-header">
+        <h2>
+            {% if object %}
+                ✏️ Editar Cardápio
+            {% else %}
+                📋 Novo Cardápio
+            {% endif %}
+        </h2>
+        <small>Gestão institucional de planejamento alimentar escolar</small>
     </div>
 
-    <!-- MENSAGENS -->
+    <!-- 🔷 INFORMAÇÃO -->
+    <div class="info-box">
+        <strong>📌 Orientação:</strong><br>
+        Defina o período e características do cardápio. Caso ativado, o sistema poderá gerar automaticamente
+        as execuções diárias com base no intervalo informado.
+    </div>
+
+    <!-- 🔷 MENSAGENS -->
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-success">
+            <div class="alert alert-success shadow-sm">
                 {{ message }}
             </div>
         {% endfor %}
     {% endif %}
 
-    <form method="post">
-    {% csrf_token %}
+    <div class="card-institucional">
 
-    <!-- ERROS GERAIS -->
-    {% if form.non_field_errors %}
-        <div class="alert alert-danger">
-            <strong>Erro:</strong>
-            <ul>
-                {% for error in form.non_field_errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{form.media}}
 
-    <!-- NOME -->
-    <div class="mb-3">
-        <label class="form-label">Nome</label>
-        {{ form.nome }}
-        
-        {% if form.nome.errors %}
-            <div class="text-danger mt-1">
-                {% for error in form.nome.errors %}
-                    <small>⚠️ {{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
-
-    <!-- DESCRIÇÃO -->
-    <div class="mb-3">
-        <label class="form-label">Descrição</label>
-        {{ form.descricao }}
-
-        {% if form.descricao.errors %}
-            <div class="text-danger mt-1">
-                {% for error in form.descricao.errors %}
-                    <small>⚠️ {{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
-
-    <!-- DATAS -->
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label class="form-label">Data Início</label>
-            {{ form.data_inicio }}
-
-            {% if form.data_inicio.errors %}
-                <div class="text-danger mt-1">
-                    {% for error in form.data_inicio.errors %}
-                        <small>⚠️ {{ error }}</small><br>
-                    {% endfor %}
+            <!-- 🔴 ERROS GERAIS -->
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    <strong>Erro de validação:</strong>
+                    <ul>
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
                 </div>
             {% endif %}
-        </div>
 
-        <div class="col-md-6 mb-3">
-            <label class="form-label">Data Fim</label>
-            {{ form.data_fim }}
+            <!-- 🔷 IDENTIFICAÇÃO -->
+            <div class="mb-4">
+                <div class="section-title">📌 Identificação do Cardápio</div>
 
-            {% if form.data_fim.errors %}
-                <div class="text-danger mt-1">
-                    {% for error in form.data_fim.errors %}
-                        <small>⚠️ {{ error }}</small><br>
-                    {% endfor %}
+                <div class="mb-3">
+                    <label class="form-label">Nome</label>
+                    {{ form.nome }}
+                    {% if form.nome.errors %}
+                        <div class="text-danger mt-1">
+                            {% for error in form.nome.errors %}
+                                <small>⚠️ {{ error }}</small><br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
-            {% endif %}
-        </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Descrição</label><br>
+                    {{ form.descricao }}
+                    {% if form.descricao.errors %}
+                        <div class="text-danger mt-1">
+                            {% for error in form.descricao.errors %}
+                                <small>⚠️ {{ error }}</small><br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- 🔷 PERÍODO -->
+            <div class="mb-4">
+                <div class="section-title">📅 Período de Vigência</div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Data Início</label>
+                        {{ form.data_inicio }}
+                        {% if form.data_inicio.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.data_inicio.errors %}
+                                    <small>⚠️ {{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Data Fim</label>
+                        {{ form.data_fim }}
+                        {% if form.data_fim.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.data_fim.errors %}
+                                    <small>⚠️ {{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🔷 CONFIGURAÇÕES -->
+            <div class="mb-4">
+                <div class="section-title">⚙️ Configurações</div>
+
+                <div class="form-check mb-2">
+                    {{ form.ativo }}
+                    <label class="form-check-label ms-2">
+                        Ativar este cardápio para uso no sistema
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    {{ form.gerar_execucao }}
+                    <label class="form-check-label ms-2">
+                        Gerar automaticamente execuções diárias
+                    </label>
+                </div>
+            </div>
+
+            <!-- 🔷 AÇÕES -->
+            <div class="d-flex justify-content-between mt-4">
+                <a href="javascript:history.back()" class="btn btn-secondary">
+                    ← Voltar
+                </a>
+
+                <button type="submit" class="btn btn-success">
+                    💾 Salvar Cardápio
+                </button>
+            </div>
+
+        </form>
     </div>
-
-    <!-- CHECKBOX -->
-    <div class="form-check mb-2">
-        {{ form.ativo }} 
-        <label class="form-check-label">Ativo</label>
-    </div>
-
-    <div class="form-check mb-3">
-        {{ form.gerar_execucao }} 
-        <label class="form-check-label">Gerar execução automática</label>
-    </div>
-
-    <button type="submit" class="btn btn-success">
-        💾 Salvar
-    </button>
-
-    <a href="javascript:history.back()" class="btn btn-secondary">
-        ← Voltar
-    </a>
-
-</form>
 
 </div>
 

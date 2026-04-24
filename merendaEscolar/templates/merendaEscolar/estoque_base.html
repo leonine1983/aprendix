@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Controle de Estoque | Merenda Escolar</title>
+<meta name="csrf-token" content="{{ csrf_token }}"> 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="{% static 'meredeiras/nutri_aprend.png' %}">
 
@@ -224,6 +225,10 @@ body{
     align-items: center;
     justify-content: center;
 }
+.icon-wrapper .fas{
+    font-size: 1.5rem;
+}
+
 
 /* O Menu em si - Renomeado para não conflitar com Bootstrap */
 .custom-dropdown {
@@ -893,6 +898,244 @@ body{
 }
 
 
+
+
+
+
+/* ── PAINEL DE NOTIFICAÇÕES ── */
+.notif-panel {
+    width: 360px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.notif-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.notif-title {
+    font-weight: 600;
+    font-size: .95rem;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.notif-title i { color: var(--primary); }
+
+.notif-action-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: .75rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all .2s;
+}
+
+.notif-action-btn:hover {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.notif-action-btn.danger:hover {
+    background: #fef2f2;
+    border-color: #dc2626;
+    color: #dc2626;
+}
+
+/* ── Abas ── */
+.notif-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: #f8fafc;
+}
+
+.notif-tab {
+    flex: 1;
+    padding: 10px;
+    font-size: .82rem;
+    font-weight: 500;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.notif-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: #fff;
+}
+
+.tab-count {
+    background: var(--primary);
+    color: #fff;
+    font-size: .65rem;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+/* ── Lista ── */
+.notif-body {
+    max-height: 340px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.notif-lidas-actions {
+    padding: 10px 14px 4px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background .15s;
+    position: relative;
+}
+
+.notif-item:last-child { border-bottom: none; }
+
+.notif-item.unread { background: #f0fafb; }
+.notif-item.read   { background: #fff; opacity: .85; }
+
+.notif-item:hover { background: #e8f5f5; }
+
+/* Bolinha colorida */
+.notif-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+}
+
+.dot-urgente { background: #dc2626; box-shadow: 0 0 0 3px #fecaca; }
+.dot-aviso   { background: #d97706; box-shadow: 0 0 0 3px #fde68a; }
+.dot-info    { background: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.dot-lida    { background: #94a3b8; }
+
+/* Conteúdo */
+.notif-content { flex: 1; min-width: 0; }
+
+.notif-item-title {
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notif-item-msg {
+    font-size: .78rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+    line-height: 1.4;
+}
+
+.notif-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.notif-time {
+    font-size: .7rem;
+    color: var(--text-muted);
+}
+
+/* Tipo badge */
+.tipo-badge {
+    font-size: .65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+    letter-spacing: .04em;
+}
+
+.tipo-urgente  { background: #fef2f2; color: #b91c1c; }
+.tipo-aviso    { background: #fffbeb; color: #92400e; }
+.tipo-info     { background: #eff6ff; color: #1e40af; }
+.tipo-atualizado { background: #f0fdf4; color: #166534; }
+
+/* Botões de ação por item */
+.notif-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity .2s;
+}
+
+.notif-item:hover .notif-actions { opacity: 1; }
+
+.btn-notif-lida,
+.btn-notif-del {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #fff;
+    cursor: pointer;
+    font-size: .7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s;
+}
+
+.btn-notif-lida:hover { background: #dcfce7; border-color: #16a34a; color: #16a34a; }
+.btn-notif-del:hover  { background: #fef2f2; border-color: #dc2626; color: #dc2626; }
+
+/* Estado vazio */
+.notif-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.notif-empty i {
+    font-size: 2rem;
+    opacity: .3;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.notif-empty p { font-size: .85rem; }
+
+/* Fade ao remover item */
+.notif-item.removing {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all .25s ease;
+    pointer-events: none;
+}
 </style>
 </head>
 
@@ -1081,59 +1324,168 @@ body{
             </div>
         </div>
 
+
+
         <div class="topbar-icons">
 
-            <div class="icon-wrapper" id="notifToggle">
-                <i class="fas fa-bell"></i>
-                <span class="badge">3</span>
-                <div class="custom-dropdown">
-                    <h4>Notificações</h4>
-                    <ul>
-                        <li>Estoque baixo de Feijão</li>
-                        <li>Novo envio para Escola João XXIII</li>
-                        <li>Produto próximo da validade</li>
-                    </ul>
-                </div>
+    {# ── NOTIFICAÇÕES ── #}
+    <div class="icon-wrapper" id="notifWrapper">
+        <i class="fas fa-bell" id="notifBell"></i>
+        {% if total_nao_lidas %}
+            <span class="badge" id="notif-badge">{{ total_nao_lidas }}</span>
+        {% endif %}
+
+        <div class="custom-dropdown notif-panel" id="notifDropdown">
+
+            <div class="notif-header">
+                <span class="notif-title">
+                    <i class="fas fa-bell"></i> Notificações
+                </span>
+                {% if total_nao_lidas %}
+                <button class="notif-action-btn" id="btnMarcarTodas">
+                    <i class="fas fa-check-double"></i> Marcar todas
+                </button>
+                {% endif %}
             </div>
 
-            <div class="icon-wrapper" id="msgToggle">
-                <i class="fas fa-envelope"></i>
-                <span class="badge">2</span>
-                <div class="custom-dropdown">
-                    <h4>Mensagens</h4>
-                    <ul>
-                        <li>Coordenação solicitou relatório</li>
-                        <li>Confirmação de entrega</li>
-                    </ul>
-                </div>
+            <div class="notif-tabs">
+                <button class="notif-tab active" data-tab="nao-lidas">
+                    Novas
+                    {% if total_nao_lidas %}
+                        <span class="tab-count" id="tab-count-badge">{{ total_nao_lidas }}</span>
+                    {% endif %}
+                </button>
+                <button class="notif-tab" data-tab="lidas">Lidas</button>
             </div>
 
-            <div class="icon-wrapper" id="userToggle">
-                <i class="fas fa-user-circle"></i>
-                <div class="custom-dropdown">
-                    <h4>Minha Conta</h4>
-                    <ul>
-                        <li>
-                            <a href="{% url 'core:meu-perfil' %}">Meu Perfil</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'core:alterar-senha' %}">Alterar Senha</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'core:configuracoes' %}">Configurações</a>
-                        </li>
-                        <li style="color:#dc2626;font-weight:600;">
-                            <form method="post" action="{% url 'admin_acessos:logout' %}">
-                                {% csrf_token %}
-                                <button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;">
-                                    Sair
-                                </button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
+            <div class="notif-body" id="tab-nao-lidas">
+                {% if notificacoes_nao_lidas %}
+                    {% for n in notificacoes_nao_lidas %}
+                    <div class="notif-item unread" id="notif-{{ n.pk }}" data-pk="{{ n.pk }}">
+                        <div class="notif-dot
+                            {% if n.tipo == 'urgente' %}dot-urgente
+                            {% elif n.tipo == 'aviso' %}dot-aviso
+                            {% else %}dot-info{% endif %}">
+                        </div>
+                        <div class="notif-content">
+                            <div class="notif-item-title">{{ n.titulo }}</div>
+                            <div class="notif-item-msg">{{ n.mensagem|striptags|truncatechars:90 }}</div>
+                            <div class="notif-item-meta">
+                                <span class="tipo-badge tipo-{{ n.tipo }}">{{ n.get_tipo_display }}</span>
+                                <span class="notif-time">{{ n.criada_em|timesince }} atrás</span>
+                            </div>
+                        </div>
+                        <div class="notif-actions">
+                            <button class="btn-notif-lida" title="Marcar como lida" data-pk="{{ n.pk }}">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn-notif-del" title="Excluir" data-pk="{{ n.pk }}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="notif-empty">
+                        <i class="fas fa-bell-slash"></i>
+                        <p>Nenhuma notificação nova</p>
+                    </div>
+                {% endif %}
             </div>
 
+            <div class="notif-body" id="tab-lidas" style="display:none;">
+                {% if notificacoes_lidas %}
+                    <div class="notif-lidas-actions">
+                        <button class="notif-action-btn danger" id="btnExcluirLidas">
+                            <i class="fas fa-trash-alt"></i> Excluir todas lidas
+                        </button>
+                    </div>
+                    {% for n in notificacoes_lidas %}
+                    <div class="notif-item read" id="notif-{{ n.pk }}" data-pk="{{ n.pk }}">
+                        <div class="notif-dot dot-lida"></div>
+                        <div class="notif-content">
+                            <div class="notif-item-title">{{ n.titulo }}</div>
+                            <div class="notif-item-msg">{{ n.mensagem|striptags|truncatechars:90 }}</div>
+                            <div class="notif-item-meta">
+                                <span class="tipo-badge tipo-{{ n.tipo }}">{{ n.get_tipo_display }}</span>
+                                <span class="notif-time">{{ n.criada_em|timesince }} atrás</span>
+                            </div>
+                        </div>
+                        <div class="notif-actions">
+                            <button class="btn-notif-del" title="Excluir" data-pk="{{ n.pk }}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="notif-empty">
+                        <i class="fas fa-inbox"></i>
+                        <p>Nenhuma notificação lida</p>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>{# /notifDropdown #}
+    </div>{# /notifWrapper — UM ÚNICO div, sem duplicata #}
+
+    {# ── MENSAGENS ── #}
+    <div class="icon-wrapper" id="msgToggle">
+        <i class="fas fa-envelope"></i>
+        <span class="badge"></span>
+        <div class="custom-dropdown">
+            <h4>Mensagens</h4>
+            <ul>
+                <li></li>
+                <li></li>
+            </ul>
+        </div>
+    </div>
+
+    {# ── USUÁRIO ── #}
+    <div class="icon-wrapper" id="userToggle">
+        <i class="fas fa-user-circle"></i>
+        <div class="custom-dropdown">
+            <h4>Minha Conta</h4>
+            <ul>
+                <li><a href="{% url 'core:meu-perfil' %}">Meu Perfil</a></li>
+                <li><a href="{% url 'core:alterar-senha' %}">Alterar Senha</a></li>
+                <li><a href="{% url 'core:configuracoes' %}">Configurações</a></li>
+                <li style="color:#dc2626;font-weight:600;">
+                    <form method="post" action="{% url 'admin_acessos:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;">
+                            Sair
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>{# /topbar-icons #}
+
+{# ── URLs para o JS ── #}
+<div id="notif-urls"
+     data-lida="{% url 'merendaEscolar:notif-marcar-lida' pk=1 %}"
+     data-excluir="{% url 'merendaEscolar:notif-excluir' pk=1 %}"
+     data-todas-lidas="{% url 'merendaEscolar:notif-todas-lidas' %}"
+     data-excluir-lidas="{% url 'merendaEscolar:notif-excluir-lidas' %}"
+     style="display:none;">
+</div>
+
+
+
+
+
+        
+        {# URLs base para o JS — geradas com segurança pelo Django #}
+        <div id="notif-urls"
+            data-lida="{% url 'merendaEscolar:notif-marcar-lida' pk=1 %}"
+            data-excluir="{% url 'merendaEscolar:notif-excluir' pk=1 %}"
+            data-todas-lidas="{% url 'merendaEscolar:notif-todas-lidas' %}"
+            data-excluir-lidas="{% url 'merendaEscolar:notif-excluir-lidas' %}"
+            style="display:none;">
         </div>
     </header>
 
@@ -1209,34 +1561,6 @@ overlay.onclick=()=>{
 };
 </script>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    const toggles = [
-        { btn: "notifToggle", menu: "notifToggle" },
-        { btn: "msgToggle", menu: "msgToggle" },
-        { btn: "userToggle", menu: "userToggle" }
-    ];
-
-    function closeAll() {
-        document.querySelectorAll(".custom-dropdown").forEach(d => d.classList.remove("show"));
-    }
-
-    toggles.forEach(item => {
-        const el = document.getElementById(item.btn);
-        if (el) {
-            el.addEventListener("click", (e) => {
-                e.stopPropagation();
-                const menu = el.querySelector(".custom-dropdown");
-                const isOpened = menu.classList.contains("show");
-                closeAll();
-                if (!isOpened) menu.classList.add("show");
-            });
-        }
-    });
-
-    document.addEventListener("click", closeAll);
-});
-</script>
 
 <script>
 const submenuToggles = document.querySelectorAll('.submenu-toggle');
@@ -1264,6 +1588,157 @@ submenuToggles.forEach(toggle => {
         }
     });
 });
+</script>
+
+<!--script de notificação-->
+
+
+
+
+{# ── Script: dropdown da topbar ── #}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    // Mapeamento: id do wrapper → id do dropdown interno
+    const pares = [
+        { wrapperId: "notifWrapper",  dropdownId: "notifDropdown" },
+        { wrapperId: "msgToggle",     dropdownId: null },  // busca o primeiro .custom-dropdown
+        { wrapperId: "userToggle",    dropdownId: null },
+    ];
+
+    function closeAll() {
+        document.querySelectorAll(".custom-dropdown")
+                .forEach(d => d.classList.remove("show"));
+    }
+
+    pares.forEach(({ wrapperId, dropdownId }) => {
+        const wrapper = document.getElementById(wrapperId);
+        if (!wrapper) return;
+
+        wrapper.addEventListener("click", (e) => {
+            // Cliques nos botões de ação não devem abrir/fechar o dropdown
+            if (e.target.closest('.btn-notif-lida, .btn-notif-del, .notif-tab, #btnMarcarTodas, #btnExcluirLidas')) return;
+
+            e.stopPropagation();
+            const menu = dropdownId
+                ? document.getElementById(dropdownId)
+                : wrapper.querySelector(".custom-dropdown");
+
+            if (!menu) return;
+            const aberto = menu.classList.contains("show");
+            closeAll();
+            if (!aberto) menu.classList.add("show");
+        });
+    });
+
+    document.addEventListener("click", closeAll);
+});
+</script>
+
+{# ── Script: notificações ── #}
+<script>
+(function () {
+
+    const _urls = document.getElementById('notif-urls');
+    if (!_urls) return; // segurança
+
+    function urlComPk(attr, pk) {
+        return _urls.dataset[attr].replace('/1/', `/${pk}/`);
+    }
+
+    const URLS = {
+        marcarLida:   (pk) => urlComPk('lida', pk),
+        excluir:      (pk) => urlComPk('excluir', pk),
+        todasLidas:   _urls.dataset.todasLidas,
+        excluirLidas: _urls.dataset.excluirLidas,
+    };
+
+    const CSRF = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+    function post(url) {
+        return fetch(url, {
+            method:  'POST',
+            headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' },
+        });
+    }
+
+    function removeItem(el) {
+        if (!el) return;
+        el.classList.add('removing');
+        setTimeout(() => { el.remove(); atualizarBadge(); verificarVazio(); }, 250);
+    }
+
+    function atualizarBadge() {
+        const total    = document.querySelectorAll('#tab-nao-lidas .notif-item').length;
+        const badge    = document.getElementById('notif-badge');
+        const tabCount = document.getElementById('tab-count-badge');
+
+        if (badge)    { badge.textContent    = total; badge.style.display    = total ? '' : 'none'; }
+        if (tabCount) { tabCount.textContent = total; tabCount.style.display = total ? '' : 'none'; }
+    }
+
+    function verificarVazio() {
+        [['nao-lidas','<i class="fas fa-bell-slash"></i><p>Nenhuma notificação nova</p>'],
+         ['lidas',    '<i class="fas fa-inbox"></i><p>Nenhuma notificação lida</p>']
+        ].forEach(([tab, html]) => {
+            const body = document.getElementById('tab-' + tab);
+            if (!body || body.querySelector('.notif-item') || body.querySelector('.notif-empty')) return;
+            const div = document.createElement('div');
+            div.className = 'notif-empty';
+            div.innerHTML = html;
+            body.appendChild(div);
+        });
+    }
+
+    // ── Delegação de eventos nos botões ─────────────────────────────────
+    document.addEventListener('click', async (e) => {
+
+        const btnLida = e.target.closest('.btn-notif-lida');
+        if (btnLida) {
+            e.stopPropagation();
+            const pk  = btnLida.dataset.pk;
+            const res = await post(URLS.marcarLida(pk));
+            if (res.ok) removeItem(document.getElementById('notif-' + pk));
+            return;
+        }
+
+        const btnDel = e.target.closest('.btn-notif-del');
+        if (btnDel) {
+            e.stopPropagation();
+            const pk  = btnDel.dataset.pk;
+            const res = await post(URLS.excluir(pk));
+            if (res.ok) removeItem(document.getElementById('notif-' + pk));
+            return;
+        }
+
+        if (e.target.closest('#btnMarcarTodas')) {
+            e.stopPropagation();
+            const res = await post(URLS.todasLidas);
+            if (res.ok) document.querySelectorAll('#tab-nao-lidas .notif-item').forEach(removeItem);
+            return;
+        }
+
+        if (e.target.closest('#btnExcluirLidas')) {
+            e.stopPropagation();
+            const res = await post(URLS.excluirLidas);
+            if (res.ok) document.querySelectorAll('#tab-lidas .notif-item').forEach(removeItem);
+            return;
+        }
+    });
+
+    // ── Troca de abas ────────────────────────────────────────────────────
+    document.querySelectorAll('.notif-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const alvo = tab.dataset.tab;
+            document.getElementById('tab-nao-lidas').style.display = alvo === 'nao-lidas' ? 'block' : 'none';
+            document.getElementById('tab-lidas').style.display     = alvo === 'lidas'     ? 'block' : 'none';
+        });
+    });
+
+})();
 </script>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">

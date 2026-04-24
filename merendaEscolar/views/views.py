@@ -481,6 +481,7 @@ from django.contrib import messages
 from django.db.models import Sum, Count, Avg
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
+from core.views.baseNutricionista import BaseNutricionistaView
 
 from merendaEscolar.models import (
     Produto,
@@ -492,7 +493,7 @@ from merendaEscolar.models import (
     CategoriaProduto
 )
 
-class DashboardNutricionalView(TemplateView):
+class DashboardNutricionalView(BaseNutricionistaView, TemplateView):
 
     template_name = "merendaEscolar/dashboard_nutricionista.html"
 

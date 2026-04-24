@@ -1,15 +1,36 @@
-from django.shortcuts import  redirect, get_object_or_404, render
-from django.urls import reverse_lazy, reverse
-from django.contrib.auth import logout
-from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
-from django.views.generic import TemplateView, CreateView, ListView, UpdateView, DeleteView, DetailView
-from django.views import View
+# Django core
 from django import forms
-from ckeditor.widgets import CKEditorWidget
-from .models import MessageUser, PaletaCores
+from django.http import JsonResponse
+from django.urls import reverse, reverse_lazy
+from django.shortcuts import redirect, get_object_or_404, render
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+# Auth
+from django.contrib.auth import logout
 from django.contrib.auth.models import User, Group
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView, LogoutView
+
+# Messages
+from django.contrib import messages
+
+# Class-based views
+from django.views import View
+from django.views.generic import (
+    TemplateView, CreateView, ListView,
+    UpdateView, DeleteView, DetailView, FormView
+)
+
+# Decorators
+from django.views.decorators.http import require_POST
+
+# Third-party
+from ckeditor.widgets import CKEditorWidget
+
+# Local apps
+from .models import MessageUser, PaletaCores, AtualizacaoNotificacaoSistema
+from .forms import NotificacaoForm
 from rh.models import Prefeitura
 
 # Login
@@ -384,14 +405,7 @@ class CreateUsers(LoginRequiredMixin, CreateView):
             context['all_user_school'] = User.objects.all()  
         else:
             context['all_user_school'] = User.objects.filter(related_UserEscola__escola=pk_school)  
-        return context
-    
-
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
-from .models import AtualizacaoNotificacao
-
+        return context  
 
 @require_POST
 @login_required
@@ -407,14 +421,6 @@ def marcar_notificacao_como_lida(request):
 
 
 
-from django.views.generic import FormView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
-from django.contrib import messages
-from .models import AtualizacaoNotificacao
-from .forms import NotificacaoForm
-from django.contrib.auth.models import User
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 class EnviarNotificacaoView(LoginRequiredMixin, FormView):
     template_name = 'Escola/inicio.html'

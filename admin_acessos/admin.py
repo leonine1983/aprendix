@@ -7,5 +7,5 @@ from django.contrib.auth.forms import UserChangeForm
 admin.site.register(NomeclaturaJanelas)
 admin.site.register(MessageUser)
 admin.site.register(PaletaCores)
-admin.site.register(AtualizacaoNotificacao)
+admin.site.register(AtualizacaoNotificacaoSistema)
 admin.site.register(Notificacao)

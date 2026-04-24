@@ -41,6 +41,12 @@ from core.models import ConfiguraPessoal
 from merendaEscolar.models import Cardapio
 from core.views.baseNutricionista import BaseNutricionistaView
 
+from django.views.generic import ListView
+from django.db.models import Q
+from core.models import ConfiguraPessoal
+from merendaEscolar.models import Cardapio
+from core.views.baseNutricionista import BaseNutricionistaView
+
 
 class CardapioListView(BaseNutricionistaView, ListView):
     model = Cardapio
@@ -48,35 +54,71 @@ class CardapioListView(BaseNutricionistaView, ListView):
     context_object_name = "cardapios"
 
     def dispatch(self, request, *args, **kwargs):
-        """
-        🔒 Garante que a configuração esteja disponível
-        antes de qualquer processamento da view
-        """
         self.configuracao, _ = ConfiguraPessoal.objects.get_or_create(pk=1)
         return super().dispatch(request, *args, **kwargs)
 
     def get_paginate_by(self, queryset):
-        """
-        🔷 Paginação dinâmica baseada na configuração
-        """
         return self.configuracao.pagina_CardapiosEscolares
 
+    def get_queryset(self):
+        qs = Cardapio.objects.all()
+
+        # Busca textual (nome ou descrição)
+        q = self.request.GET.get("q", "").strip()
+        if q:
+            qs = qs.filter(
+                Q(nome__icontains=q) | Q(descricao__icontains=q)
+            )
+
+        # Filtro de status
+        status = self.request.GET.get("status", "")
+        if status == "ativo":
+            qs = qs.filter(ativo=True)
+        elif status == "inativo":
+            qs = qs.filter(ativo=False)
+
+        # Filtro por período — data_inicio maior ou igual
+        data_inicio = self.request.GET.get("data_inicio", "").strip()
+        if data_inicio:
+            qs = qs.filter(data_inicio__gte=data_inicio)
+
+        # Filtro por período — data_fim menor ou igual
+        data_fim = self.request.GET.get("data_fim", "").strip()
+        if data_fim:
+            qs = qs.filter(data_fim__lte=data_fim)
+
+        # Ordenação
+        ordem = self.request.GET.get("ordem", "-criado_em")
+        opcoes_validas = {
+            "nome": "nome",
+            "-nome": "-nome",
+            "data_inicio": "data_inicio",
+            "-data_inicio": "-data_inicio",
+            "criado_em": "criado_em",
+            "-criado_em": "-criado_em",
+        }
+        qs = qs.order_by(opcoes_validas.get(ordem, "-criado_em"))
+
+        return qs
+
     def get_context_data(self, **kwargs):
-        """
-        🔷 Injeta a configuração no contexto do template
-
-        Motivo arquitetural:
-        - Evita acoplamento com request.user
-        - Permite reuso (admin, APIs, relatórios)
-        - Mantém previsibilidade do template
-        """
         context = super().get_context_data(**kwargs)
-
         context["configuracao"] = self.configuracao
         context["pagina_cardapios"] = self.configuracao.pagina_CardapiosEscolares
 
-        return context
+        # Repassa os filtros ativos para o template (manter estado do form)
+        context["filtros"] = {
+            "q": self.request.GET.get("q", ""),
+            "status": self.request.GET.get("status", ""),
+            "data_inicio": self.request.GET.get("data_inicio", ""),
+            "data_fim": self.request.GET.get("data_fim", ""),
+            "ordem": self.request.GET.get("ordem", "-criado_em"),
+        }
 
+        # Flag para o template saber se há filtro ativo
+        context["filtro_ativo"] = any(context["filtros"].values())
+
+        return context
 
     
 

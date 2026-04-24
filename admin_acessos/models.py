@@ -2,6 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from ckeditor.fields import RichTextField
 from django.utils import timezone
+   
+from django.contrib.auth import get_user_model
+from rh.models import Escola
+
+User = get_user_model()
 
 
 class MessageUser(models.Model):
@@ -23,29 +28,7 @@ class MessageUser(models.Model):
         return self.assunto
 
 
-class PaletaCores(models.Model):
-    nome_paleta = models.CharField(max_length=20, default='Paleta Branca')
-    cor_primaria = models.CharField(max_length=7, default='#fff')
-    cor_secundaria = models.CharField(max_length=7, default='#fff')
-    cor_sucesso = models.CharField(max_length=7, default='#fff')
-    cor_info = models.CharField(max_length=7, default='#fff')
-    cor_aviso = models.CharField(max_length=7, default='#fff')
-    cor_perigo = models.CharField(max_length=7, default='#ffffff')
-    cor_texto = models.CharField(max_length=7, default='#000')
-
-    def __str__(self):
-        return self.nome_paleta
-
-
-class NomeclaturaJanelas(models.Model):
-    nome_disciplina = models.CharField(max_length=50, default='')
-    notas = models.CharField(max_length=20, default='')
-
-    def __str__(self):
-        return self.nome_disciplina
-
-
-class AtualizacaoNotificacao(models.Model):
+class AtualizacaoNotificacaoSistema(models.Model):
     TIPO_CHOICES = [
         ('info', 'Informação'),
         ('aviso', 'Aviso'),
@@ -67,20 +50,8 @@ class AtualizacaoNotificacao(models.Model):
         verbose_name_plural = 'Notificações de Atualizações'
 
     def __str__(self):
-        return f'{self.titulo} - {"Lida" if self.lida else "Não lida"}'
-    
+        return f'{self.titulo} - {"Lida" if self.lida else "Não lida"}'    
 
-
-    
-
-# notificacoes de merenda escolar
-
-from django.db import models
-from django.contrib.auth import get_user_model
-from django.utils import timezone
-from rh.models import Escola
-
-User = get_user_model()
 
 class Notificacao(models.Model):
 
@@ -112,4 +83,29 @@ class Notificacao(models.Model):
 
     def __str__(self):
         return f"{self.titulo} - {self.usuario}"
+    
+
+
+# Anlisar se vale a pena manter ------------------------------------------
+class PaletaCores(models.Model):
+    nome_paleta = models.CharField(max_length=20, default='Paleta Branca')
+    cor_primaria = models.CharField(max_length=7, default='#fff')
+    cor_secundaria = models.CharField(max_length=7, default='#fff')
+    cor_sucesso = models.CharField(max_length=7, default='#fff')
+    cor_info = models.CharField(max_length=7, default='#fff')
+    cor_aviso = models.CharField(max_length=7, default='#fff')
+    cor_perigo = models.CharField(max_length=7, default='#ffffff')
+    cor_texto = models.CharField(max_length=7, default='#000')
+
+    def __str__(self):
+        return self.nome_paleta
+
+
+class NomeclaturaJanelas(models.Model):
+    nome_disciplina = models.CharField(max_length=50, default='')
+    notas = models.CharField(max_length=20, default='')
+
+    def __str__(self):
+        return self.nome_disciplina
+
 

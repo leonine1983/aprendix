@@ -163,8 +163,10 @@ urlpatterns = [
     path("cardapio-escola/upload/", CardapioEscolaUploadView.as_view(), name="cardapio_escola_upload"),
     path("cardapio-escola/novo/", CardapioEscolaCreateView.as_view(), name="cardapio_escola_create"),
     path("cardapio-escola/<int:pk>/deletar/", CardapioEscolaDeleteView.as_view(), name="cardapio_escola_delete"),
-
-
-     
     
+    # ... notficações...
+    path("notificacoes/<int:pk>/lida/",       marcar_lida,           name="notif-marcar-lida"),
+    path("notificacoes/todas-lidas/",          marcar_todas_lidas,    name="notif-todas-lidas"),
+    path("notificacoes/<int:pk>/excluir/",     excluir_notificacao,   name="notif-excluir"),
+    path("notificacoes/excluir-lidas/",        excluir_todas_lidas,   name="notif-excluir-lidas"),
 ]

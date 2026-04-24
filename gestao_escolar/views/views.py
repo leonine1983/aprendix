@@ -4,7 +4,7 @@ from gestao_escolar.models import *
 from django.views.generic import TemplateView
 from rh.models import Escola, Encaminhamentos
 from gestao_escolar.models import Alunos, Turmas
-from admin_acessos.models import AtualizacaoNotificacao
+from admin_acessos.models import AtualizacaoNotificacaoSistema
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 import plotly.graph_objects as go
