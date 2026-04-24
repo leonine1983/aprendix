@@ -36,6 +36,14 @@ from rh.models import Prefeitura
 # Login
 import random
 
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
+from django.urls import reverse_lazy
+from django.contrib import messages
+import random
+from core.groups.merenda import MERENDEIRA_GROUPS
+from core.groups.nutricionista import NUTRICIONISTA_GROUPS
+
 def startSme(request):
     return render(request, 'Admin_Acessos/starSme.html')
 
@@ -44,14 +52,6 @@ def startSme(request):
 def loginMerendaEscolar(request):
     return render(request, 'Admin_Acessos/index_merendaEscolar.html')
 
-
-from django.conf import settings
-from django.core.exceptions import PermissionDenied
-from django.urls import reverse_lazy
-from django.contrib import messages
-import random
-from core.groups.merenda import MERENDEIRA_GROUPS
-from core.groups.nutricionista import NUTRICIONISTA_GROUPS
 
 class CreateLoginView(LoginView):
     template_name = 'Admin_Acessos/starSme.html'
@@ -218,17 +218,9 @@ class CreateLoginView(LoginView):
 class LogoutView_logout(LogoutView):
     """
     View responsável por encerrar a sessão do usuário
-    e redirecionar para a tela de login com feedback institucional.
-    """
-
+    e redirecionar para a tela de login com feedback institucional. """
     next_page = reverse_lazy('admin_acessos:login_create')
 
-    def dispatch(self, request, *args, **kwargs):
-        messages.success(
-            request,
-            "Sessão encerrada com sucesso. Para acessar novamente, realize um novo login."
-        )
-        return super().dispatch(request, *args, **kwargs)
     
 
 # Painel de Acesso

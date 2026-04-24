@@ -15,7 +15,10 @@ from django.http import HttpResponseRedirect
 
 from django import forms
 
+
+
 class CardapioForm(forms.ModelForm):
+
     class Meta:
         model = Cardapio
         fields = [
@@ -27,10 +30,28 @@ class CardapioForm(forms.ModelForm):
             "gerar_execucao",
         ]
         widgets = {
-            "data_inicio": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
-            "data_fim": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "data_inicio": forms.DateInput(
+                format="%Y-%m-%d",
+                attrs={
+                    "type": "date",
+                    "class": "form-control"
+                }
+            ),
+            "data_fim": forms.DateInput(
+                format="%Y-%m-%d",
+                attrs={
+                    "type": "date",
+                    "class": "form-control"
+                }
+            ),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # 🔒 Garante compatibilidade com input HTML5 (type="date")
+        self.fields["data_inicio"].input_formats = ["%Y-%m-%d"]
+        self.fields["data_fim"].input_formats = ["%Y-%m-%d"]
 
 
 
@@ -251,11 +272,11 @@ class CardapioDetailView(NutricionistaRequiredMixin, DetailView):
 
 
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 
 class SemanaCreateView(NutricionistaRequiredMixin, CreateView):
     model = CardapioSemana
     fields = ['numero']
-    success_url = reverse_lazy("merendaEscolar:cardapio_list")
     template_name = "merendaEscolar/cardapio/form/semana_form.html"
 
     def dispatch(self, request, *args, **kwargs):
@@ -268,29 +289,37 @@ class SemanaCreateView(NutricionistaRequiredMixin, CreateView):
         return initial
 
     def get_form(self, form_class=None):
-        form = super().get_form(form_class)       
-
-        # 🔥 já define o valor
+        form = super().get_form(form_class)
         form.instance.cardapio = self.cardapio
-
         return form
 
     def form_valid(self, form):
-        form.instance.cardapio = self.cardapio  # segurança extra
+        form.instance.cardapio = self.cardapio
 
         messages.success(self.request, "Semana adicionada com sucesso!")
         return super().form_valid(form)
 
+    def get_success_url(self):
+        return reverse(
+            "merendaEscolar:cardapio_detail",
+            kwargs={"pk": self.cardapio.pk}
+        )
+    
 
 class SemanaUpdateView(NutricionistaRequiredMixin, UpdateView):
     model = CardapioSemana
     fields = ['numero']
-    success_url = reverse_lazy("merendaEscolar:cardapio_list")
     template_name = "merendaEscolar/cardapio/form/semana_form.html"
 
     def form_valid(self, form):
         messages.success(self.request, "Semana atualizada!")
         return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse(
+            "merendaEscolar:cardapio_detail",
+            kwargs={"pk": self.cardapio.pk}
+        )
 
 
 class SemanaDeleteView(DeleteView):
