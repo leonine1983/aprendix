@@ -851,7 +851,7 @@ class ReceitaIngrediente(models.Model):
 
     quantidade = models.DecimalField(
         max_digits=14,
-        decimal_places=2,
+        decimal_places=3,
         validators=[MinValueValidator(0)]
     )
 
