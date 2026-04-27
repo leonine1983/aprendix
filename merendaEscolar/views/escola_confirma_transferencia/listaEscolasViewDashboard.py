@@ -4,13 +4,23 @@ from django.utils import timezone
 from datetime import timedelta
 from rh.models import Escola
 from merendaEscolar.models import EstoqueEscola, MovimentacaoEstoque
+from core.models import ConfiguraPessoal
+from core.views.baseNutricionista import BaseNutricionistaView
 
 class ListaEscolasView(ListView):
     model = Escola
     template_name = "merendaEscolar/escola/escolas_list.html"
     context_object_name = "escolas"
     ordering = ["nome_escola"]
-    paginate_by = 12
+
+    # Faz com o que os dados de configuração sejam carregados antes de todo o conteudo da view
+    def dispatch(self, request, *args, **kwargs):
+        self.configuracao, _ = ConfiguraPessoal.objects.get_or_create(pk=1)
+        return super().dispatch(request, *args, **kwargs)
+
+    # Define a quantidade de registros na tela
+    def get_paginate_by(self, queryset):
+        return self.configuracao.pagina_dashboardEscola 
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -136,6 +146,9 @@ class ListaEscolasView(ListView):
         context['kpi_escolas_criticas'] = sum(1 for e in escolas_com_metricas if e['status_class'] == 'critico')
         context['kpi_escolas_alerta'] = sum(1 for e in escolas_com_metricas if e['status_class'] == 'alerta')
         context['kpi_itens_abaixo_minimo'] = total_abaixo_minimo
+        context["pagina_transferencia"] = self.configuracao.pagina_dashboardEscola 
+        # 🔷 Fonte única de verdade (governança)
+        context["page_size_options"] = [5,10, 20, 30, 50]
         
         return context
     

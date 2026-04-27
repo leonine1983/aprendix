@@ -4,6 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib import messages
 
 from core.groups.nutricionista import NUTRICIONISTA_GROUPS
+from core.views.baseNutricionista import BaseNutricionistaView
 from core.permissions import GroupRequiredMixin
 
 
@@ -11,24 +12,25 @@ from core.permissions import GroupRequiredMixin
 from django.shortcuts import redirect
 from django.forms import inlineformset_factory
 from ...models import Receita, ReceitaIngrediente, CardapioItem, ExecucaoReceita
-
+from core.models import ConfiguraPessoal
 
 from django.db.models import Q
 
-class ReceitaListView(
-    LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
-    ListView
-):
+class ReceitaListView(BaseNutricionistaView, ListView):
     model = Receita
     template_name = "merendaEscolar/receitas/receita_lista.html"
-    context_object_name = "receitas"  # Mantém compatibilidade com seu template
-    paginate_by = 4                # Define 20 itens por página
+    context_object_name = "receitas"  # Mantém compatibilidade com seu template            
     ordering = ['-criada_em']         # Ordenação padrão
 
-    permission_required = "merendaEscolar.view_receita"
-    group_required = NUTRICIONISTA_GROUPS
+    # Faz com o que os dados de configuração sejam carregados antes de todo o conteudo da view
+    def dispatch(self, request, *args, **kwargs):
+        self.configuracao, _ = ConfiguraPessoal.objects.get_or_create(pk=1)
+        return super().dispatch(request, *args, **kwargs)
+
+    # Define a quantidade de registros na tela
+    def get_paginate_by(self, queryset):
+        return self.configuracao.pagina_receitas  
+
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related('criada_por')
@@ -60,8 +62,13 @@ class ReceitaListView(
             
         context['total_receitas'] = base_qs.count()
         context['receitas_ativas'] = base_qs.filter(ativa=True).count()
+        context["pagina_transferencia"] = self.configuracao.pagina_receitas  
+        # 🔷 Fonte única de verdade (governança)
+        context["page_size_options"] = [10, 20, 30, 50]
         
         return context
+    
+
 
 
 

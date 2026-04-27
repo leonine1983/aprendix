@@ -2,441 +2,826 @@
 {% load static %}
 
 {% block content %}
+
 <style>
-.status {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    display: inline-block;
+/* ── Variáveis ─────────────────────────────────── */
+:root {
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --primary: #2d7ff9;
+    --primary-light: #eff6ff;
+    --success: #059669;
+    --success-light: #d1fae5;
+    --warning: #d97706;
+    --warning-light: #fef3c7;
+    --neutral: #6b7280;
+    --neutral-light: #f3f4f6;
+    --text: #111827;
+    --text-muted: #6b7280;
+    --radius: 12px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
 }
 
-.status.alerta {
-    background-color: #e5e7eb;
-    color: #374151;
-}
-
-.status.pendente {
-    background-color: #fef3c7;
-    color: #92400e;
-}
-
-.status.ok {
-    background-color: #d1fae5;
-    color: #065f46;
-}
-
-.legenda-box {
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 16px;
+/* ── Layout principal ──────────────────────────── */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
     margin-bottom: 24px;
 }
 
+.page-header-text h2 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--verde-principal, #059669);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-header-text p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+/* ── Botão ─────────────────────────────────────── */
+.btn-novo {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--primary);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+    box-shadow: 0 2px 6px rgba(45,127,249,0.2);
+    white-space: nowrap;
+}
+
+.btn-novo:hover {
+    background: #1a68d8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(45,127,249,0.3);
+    color: white;
+}
+
+/* ── Alert descritivo ──────────────────────────── */
+.info-box {
+    background: #f8faff;
+    border: 1px solid #dbeafe;
+    border-left: 4px solid var(--primary);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.info-box strong {
+    color: var(--text);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* ── Legenda ───────────────────────────────────── */
+.legenda-box {
+    background: var(--neutral-light);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    align-items: center;
+}
+
+.legenda-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    width: 100%;
+}
+
 .legenda-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* ── Badges de status ──────────────────────────── */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-rascunho {
+    background: var(--neutral-light);
+    color: #374151;
+}
+.status-rascunho::before { background: #9ca3af; }
+
+.status-enviado {
+    background: var(--warning-light);
+    color: #92400e;
+}
+.status-enviado::before { background: var(--warning); }
+
+.status-recebido {
+    background: var(--success-light);
+    color: #065f46;
+}
+.status-recebido::before { background: var(--success); }
+
+/* ── KPIs ──────────────────────────────────────── */
+.kpi-strip {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.kpi-card {
+    flex: 1;
+    min-width: 140px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+.kpi-card .kpi-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
     margin-bottom: 6px;
+}
+
+.kpi-card .kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+}
+
+.kpi-card.kpi-warning .kpi-value { color: var(--warning); }
+.kpi-card.kpi-success .kpi-value { color: var(--success); }
+
+/* ── Toolbar (page-size) ────────────────────────── */
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: linear-gradient(135deg, #e8f5f0 0%, #f9fafb 100%);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+}
+
+.toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.toolbar-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: rgba(5,150,105,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--success);
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.toolbar-left strong {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 14px;
+    display: block;
+}
+
+.page-size-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-size-form label {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.page-size-select {
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text);
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.page-size-select:hover  { border-color: var(--success); }
+.page-size-select:focus  {
+    outline: none;
+    border-color: var(--success);
+    box-shadow: 0 0 0 3px rgba(5,150,105,0.12);
+}
+
+/* ── Tabela ─────────────────────────────────────── */
+.table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+}
+
+.tabela {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 560px;
+}
+
+.tabela thead {
+    background: #f9fbfd;
+}
+
+.tabela th {
+    padding: 13px 16px;
+    text-align: left;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border);
+}
+
+.tabela td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: var(--text-muted);
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.tabela tbody tr:last-child td { border-bottom: none; }
+
+.tabela tbody tr {
+    transition: background 0.15s;
+}
+
+.tabela tbody tr:hover td { background: #f8fafc; }
+
+.td-numero {
+    font-weight: 700;
+    color: var(--text) !important;
+    font-family: monospace;
+    font-size: 15px !important;
+}
+
+.td-origem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 13px !important;
+}
+
+.origem-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    flex-shrink: 0;
+}
+
+.td-destino {
+    font-weight: 500;
+    color: var(--text) !important;
+}
+
+/* ── Botão de ação ──────────────────────────────── */
+.btn-ver {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.18s;
+    white-space: nowrap;
+}
+
+.btn-ver:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* ── Estado vazio ───────────────────────────────── */
+.empty-state {
+    text-align: center;
+    padding: 56px 24px;
+}
+
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state h3 { font-size: 16px; font-weight: 600; color: var(--text); margin: 0 0 6px; }
+.empty-state p  { font-size: 13px; color: var(--text-muted); margin: 0; }
+
+/* ── Paginação ──────────────────────────────────── */
+.pagination-wrapper {
+    margin-top: 24px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    animation: fadeUp 0.3s ease;
+}
+
+.pagination-info {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.pagination-info strong { color: var(--text); }
+
+.pagination-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+.pagination-nav a,
+.pagination-nav span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    background: #f1f5f9;
+    color: #475569;
+    border: none;
+    transition: all 0.18s;
+}
+
+.pagination-nav a:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+    transform: translateY(-1px);
+}
+
+.pagination-nav .page-active {
+    background: linear-gradient(135deg, var(--success) 0%, #047857 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(5,150,105,0.3);
+    transform: scale(1.05);
+}
+
+.pagination-nav .page-disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.pagination-nav .page-dots {
+    background: transparent;
+    cursor: default;
+    pointer-events: none;
+    color: #94a3b8;
+}
+
+/* Page jumper */
+.page-jumper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.page-jumper label {
+    font-size: 13px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.page-jumper input {
+    width: 68px;
+    height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 8px 0 0 8px;
+    padding: 0 10px;
+    font-size: 13px;
+    text-align: center;
+    color: var(--text);
+    transition: border-color 0.2s;
+}
+
+.page-jumper input:focus {
+    outline: none;
+    border-color: var(--success);
+    box-shadow: 0 0 0 3px rgba(5,150,105,0.12);
+}
+
+.page-jumper input.is-invalid { border-color: #ef4444; }
+
+.page-jumper button {
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 0 8px 8px 0;
+    background: var(--success);
+    color: white;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.18s;
+}
+
+.page-jumper button:hover { background: #047857; }
+
+/* ── Animações ──────────────────────────────────── */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsivo ─────────────────────────────────── */
+@media (max-width: 640px) {
+    .page-header-text h2 { font-size: 18px; }
+    .kpi-strip { gap: 10px; }
+    .kpi-card .kpi-value { font-size: 24px; }
+    .pagination-wrapper { justify-content: center; }
+    .page-jumper { display: none; }
+    .toolbar { flex-direction: column; align-items: flex-start; }
+    .page-size-form { width: 100%; }
+    .page-size-select { flex: 1; }
 }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 style="color:var(--verde-principal); font-weight:600;">
+
+{# ── HEADER ──────────────────────────────────────── #}
+<div class="page-header">
+    <div class="page-header-text">
+        <h2>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14"/><path d="M12 5l7 7-7 7"/>
+            </svg>
             Transferências
         </h2>
-        <small class="text-muted">
-            Gestão de envios do estoque central para unidades escolares
-        </small>
+        <p>Gestão de envios do estoque central para unidades escolares</p>
     </div>
 
-    <a href="{% url 'merendaEscolar:transferencia-create' %}"
-       class="btn btn-primary">
-        <i class="fas fa-plus"></i>
+    <a href="{% url 'merendaEscolar:transferencia-create' %}" class="btn-novo">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
         Nova Transferência
     </a>
 </div>
 
 
-<!-- TEXTO EXPLICATIVO DA FUNCIONALIDADE -->
-<div class="alert alert-light border shadow-sm mb-4">
-    <h6 class="fw-semibold mb-2">Sobre esta funcionalidade</h6>
-    <p class="mb-0 text-muted">
-        Esta janela permite o acompanhamento completo das transferências de gêneros
-        alimentícios do estoque central para as escolas.
-        Aqui é possível visualizar o status operacional de cada envio,
-        monitorar o fluxo logístico e garantir rastreabilidade no processo
-        de distribuição da merenda escolar.
-    </p>
+{# ── INFO BOX ────────────────────────────────────── #}
+<div class="info-box">
+    <strong>Sobre esta funcionalidade</strong>
+    Acompanhe o ciclo completo das transferências de gêneros alimentícios — do estoque central
+    às escolas. Monitore o status operacional de cada envio e garanta rastreabilidade no processo
+    de distribuição da merenda escolar.
 </div>
 
 
-<!-- LEGENDA DE STATUS -->
-<div class="legenda-box">
-    <h6 class="fw-semibold mb-3">Legenda de Situação</h6>
+{# ── LEGENDA ─────────────────────────────────────── #}
+<div class="legenda-box" role="note" aria-label="Legenda de situação">
+    <span class="legenda-label">Legenda de situação</span>
 
     <div class="legenda-item">
-        <span class="status alerta">Rascunho</span>
-        <small class="text-muted ms-2">
-            Transferência em fase de preparação. Ainda não foi enviada à escola.
-        </small>
+        <span class="status-badge status-rascunho">Rascunho</span>
+        <span>Em preparação — ainda não enviada</span>
     </div>
 
     <div class="legenda-item">
-        <span class="status pendente">Enviado</span>
-        <small class="text-muted ms-2">
-            Transferência já despachada pelo estoque central e aguardando conferência pela escola.
-        </small>
+        <span class="status-badge status-enviado">Enviado</span>
+        <span>Despachado — aguardando conferência da escola</span>
     </div>
 
     <div class="legenda-item">
-        <span class="status ok">Recebido</span>
-        <small class="text-muted ms-2">
-            Conferência finalizada pela escola, com ou sem registro de divergências.
-        </small>
+        <span class="status-badge status-recebido">Recebido</span>
+        <span>Conferência finalizada pela escola</span>
     </div>
 </div>
 
-<div class="module-card">
 
-    <div class="module-header">
-        <h3 class="module-title">Gestão de Transferências</h3>
-        <p class="module-subtitle">
-            Controle e rastreabilidade das movimentações entre estoque central e unidades escolares
-        </p>
+{# ── KPIs ────────────────────────────────────────── #}
+<div class="kpi-strip">
+    <div class="kpi-card">
+        <div class="kpi-label">Total registrado</div>
+        <div class="kpi-value">{{ paginator.count|default:transferencias|length }}</div>
+    </div>
 
-        <div class="kpi-row">
-            <div class="kpi-card">
-                <div class="kpi-label">Total Registrado</div>
-                <div class="kpi-value">{{ transferencias|length }}</div>
-            </div>
+    <div class="kpi-card kpi-warning">
+        <div class="kpi-label">Pendentes de confirmação</div>
+        <div class="kpi-value">{{ pendentes }}</div>
+    </div>
+</div>
 
-            <div class="kpi-card">
-                <div class="kpi-label">Pendentes de Confirmação</div>
-                <div class="kpi-value">{{ pendentes }}</div>
-            </div>
+
+{# ── TOOLBAR: itens por página ───────────────────── #}
+<div class="toolbar">
+    <div class="toolbar-left">
+        <div class="toolbar-icon" aria-hidden="true">
+            <i class="fas fa-layer-group"></i>
+        </div>
+        <div>
+            <strong>Registros por página</strong>
+            <span>Exibindo {{ pagina_transferencia }} itens</span>
         </div>
     </div>
 
-    <div class="table-wrapper">
-        <table class="tabela-estoque">
-            <thead>
-                <tr>
-                    <th>Nº</th>
-                    <th>Origem</th>
-                    <th>Destino</th>
-                    <th>Status</th>
-                    <th>Data</th>
-                    <th style="width:100px;">Ações</th>
-                </tr>
-            </thead>
+    <form method="post"
+          action="{% url 'merendaEscolar:configuracao_pessoal' %}"
+          class="page-size-form"
+          id="pageSizeForm">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <label for="pageSizeSelect">Exibir:</label>
+        <select id="pageSizeSelect"
+                name="pagina_transferencia"
+                class="page-size-select"
+                onchange="this.form.submit()"
+                aria-label="Itens por página">
+            {% for size in page_size_options %}
+                <option value="{{ size }}" {% if pagina_transferencia == size %}selected{% endif %}>
+                    {{ size }} por página
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
 
-            <tbody>
-                {% for transferencia in transferencias %}
-                <tr>
 
-                    <td class="col-numero" data-label="Nº">
-                        {{ transferencia.numero }}
-                    </td>
+{# ── TABELA ──────────────────────────────────────── #}
+<div class="table-wrap">
+    <table class="tabela" aria-label="Lista de transferências">
+        <thead>
+            <tr>
+                <th scope="col">Nº</th>
+                <th scope="col">Origem</th>
+                <th scope="col">Destino</th>
+                <th scope="col">Status</th>
+                <th scope="col">Data</th>
+                <th scope="col" style="width:100px; text-align:center;">Ações</th>
+            </tr>
+        </thead>
 
-                    <td data-label="Origem">
+        <tbody>
+            {% for transferencia in transferencias %}
+            <tr>
+                <td class="td-numero" data-label="Nº">
+                    #{{ transferencia.numero }}
+                </td>
+
+                <td data-label="Origem">
+                    <div class="td-origem">
+                        <span class="origem-dot" aria-hidden="true"></span>
                         Estoque Central
-                    </td>
+                    </div>
+                </td>
 
-                    <td data-label="Destino">
-                        {{ transferencia.escola_destino }}
-                    </td>
+                <td class="td-destino" data-label="Destino">
+                    {{ transferencia.escola_destino }}
+                </td>
 
-                    <td data-label="Status">
-                        <span class="status-badge
-                            {% if transferencia.status == 'RASCUNHO' %}status-rascunho{% endif %}
-                            {% if transferencia.status == 'ENVIADO' %}status-enviado{% endif %}
-                            {% if transferencia.status == 'RECEBIDO' %}status-recebido{% endif %}
-                        ">
-                            {{ transferencia.get_status_display }}
-                        </span>
-                    </td>
+                <td data-label="Status">
+                    <span class="status-badge
+                        {% if transferencia.status == 'RASCUNHO' %}status-rascunho
+                        {% elif transferencia.status == 'ENVIADO' %}status-enviado
+                        {% elif transferencia.status == 'RECEBIDO' %}status-recebido
+                        {% endif %}">
+                        {{ transferencia.get_status_display }}
+                    </span>
+                </td>
 
-                    <td data-label="Data">
-                        {{ transferencia.criado_em|date:"d/m/Y H:i" }}
-                    </td>
+                <td data-label="Data" style="white-space:nowrap;">
+                    {{ transferencia.criado_em|date:"d/m/Y H:i" }}
+                </td>
 
-                    <td data-label="Ações">
-                        <a href="{% url 'merendaEscolar:transferencia-detail' transferencia.pk %}"
-                           class="btn-acao"
-                           title="Visualizar Detalhes">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                    </td>
+                <td data-label="Ações" style="text-align:center;">
+                    <a href="{% url 'merendaEscolar:transferencia-detail' transferencia.pk %}"
+                       class="btn-ver"
+                       aria-label="Ver detalhes da transferência #{{ transferencia.numero }}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        Detalhar
+                    </a>
+                </td>
+            </tr>
 
-                </tr>
-
-                {% empty %}
-                <tr>
-                    <td colspan="6">
-                        <div class="empty-state">
-                            Nenhuma transferência registrada até o momento.
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
+            {% empty %}
+            <tr>
+                <td colspan="6">
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <h3>Nenhuma transferência registrada</h3>
+                        <p>Clique em <strong>Nova Transferência</strong> para começar.</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 
-<!--Paginação-->
+{# ── PAGINAÇÃO ───────────────────────────────────── #}
 {% if is_paginated %}
-<!-- ========================= -->
-<!-- PAGINAÇÃO MODERNA         -->
-<!-- ========================= -->
-<div class="pagination-wrapper mt-4 mb-2">
-    <div class="pagination-card">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-            
-            <!-- Info de resultados -->
-            <div class="pagination-meta">
-                <span class="text-muted small">
-                    <i class="fas fa-layer-group me-2 text-primary"></i>
-                    Mostrando <strong class="text-dark">{{ page_obj.start_index }}</strong>–<strong class="text-dark">{{ page_obj.end_index }}</strong> 
-                    de <strong class="text-dark">{{ paginator.count }}</strong> transferências
+{# Macro para preservar todos os GET params exceto 'page' #}
+{% with base_qs="" %}
+
+<div class="pagination-wrapper mt-4">
+
+    <p class="pagination-info">
+        Mostrando
+        <strong>{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
+        de <strong>{{ paginator.count }}</strong>
+        transferência{{ paginator.count|pluralize }}
+    </p>
+
+    <ul class="pagination-nav" role="navigation" aria-label="Paginação">
+
+        {# Anterior #}
+        <li>
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                   aria-label="Página anterior">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </a>
+            {% else %}
+                <span class="page-disabled" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 </span>
-            </div>
-
-            <!-- Navegação numérica -->
-            <nav aria-label="Navegação de transferências">
-                <ul class="pagination pagination-custom mb-0">
-                    
-                    <!-- Anterior -->
-                    {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link page-nav" 
-                           href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
-                           aria-label="Página anterior" title="Anterior">
-                            <i class="fas fa-chevron-left"></i>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link page-nav" aria-label="Página anterior">
-                            <i class="fas fa-chevron-left"></i>
-                        </span>
-                    </li>
-                    {% endif %}
-
-                    <!-- Primeira página + reticências -->
-                    {% if page_obj.number > 3 %}
-                    <li class="page-item d-none d-sm-block">
-                        <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">1</a>
-                    </li>
-                    {% if page_obj.number > 4 %}
-                    <li class="page-item disabled d-none d-sm-block">
-                        <span class="page-link pagination-dots">…</span>
-                    </li>
-                    {% endif %}
-                    {% endif %}
-
-                    <!-- Páginas vizinhas -->
-                    {% for num in page_obj.paginator.page_range %}
-                        {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
-                            {% if page_obj.number == num %}
-                            <li class="page-item active">
-                                <span class="page-link current-page">{{ num }}</span>
-                            </li>
-                            {% else %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
-                            </li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-
-                    <!-- Última página + reticências -->
-                    {% if page_obj.number < paginator.num_pages|add:'-2' %}
-                        {% if page_obj.number < paginator.num_pages|add:'-3' %}
-                        <li class="page-item disabled d-none d-sm-block">
-                            <span class="page-link pagination-dots">…</span>
-                        </li>
-                        {% endif %}
-                        <li class="page-item d-none d-sm-block">
-                            <a class="page-link" href="?page={{ paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ paginator.num_pages }}</a>
-                        </li>
-                    {% endif %}
-
-                    <!-- Próximo -->
-                    {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link page-nav" 
-                           href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
-                           aria-label="Próxima página" title="Próximo">
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link page-nav" aria-label="Próxima página">
-                            <i class="fas fa-chevron-right"></i>
-                        </span>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-
-            <!-- Ir para página (quando há muitas páginas) -->
-            {% if paginator.num_pages > 10 %}
-            <div class="page-jumper d-none d-lg-block">
-                <div class="input-group input-group-sm" style="width: 130px;">
-                    <input type="number" class="form-control form-control-sm" id="jumpInput" 
-                           placeholder="Pág" min="1" max="{{ paginator.num_pages }}">
-                    <button class="btn btn-outline-primary btn-sm" type="button" onclick="jumpToPageTransferencia()">
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
             {% endif %}
+        </li>
 
-        </div>
+        {# Primeira página + reticências #}
+        {% if page_obj.number > 3 %}
+            <li class="d-none d-sm-block">
+                <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">1</a>
+            </li>
+            {% if page_obj.number > 4 %}
+            <li><span class="page-dots">…</span></li>
+            {% endif %}
+        {% endif %}
+
+        {# Janela de páginas ±2 #}
+        {% for num in page_obj.paginator.page_range %}
+            {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+            <li>
+                {% if page_obj.number == num %}
+                    <span class="page-active" aria-current="page">{{ num }}</span>
+                {% else %}
+                    <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                       aria-label="Página {{ num }}">{{ num }}</a>
+                {% endif %}
+            </li>
+            {% endif %}
+        {% endfor %}
+
+        {# Última página + reticências #}
+        {% if page_obj.number < paginator.num_pages|add:"-2" %}
+            {% if page_obj.number < paginator.num_pages|add:"-3" %}
+            <li><span class="page-dots">…</span></li>
+            {% endif %}
+            <li class="d-none d-sm-block">
+                <a href="?page={{ paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    {{ paginator.num_pages }}
+                </a>
+            </li>
+        {% endif %}
+
+        {# Próxima #}
+        <li>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                   aria-label="Próxima página">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+            {% else %}
+                <span class="page-disabled" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </span>
+            {% endif %}
+        </li>
+
+    </ul>
+
+    {# Ir para página (só quando há muitas páginas) #}
+    {% if paginator.num_pages > 10 %}
+    <div class="page-jumper" id="pageJumper">
+        <label for="jumpInput">Ir para:</label>
+        <input type="number"
+               id="jumpInput"
+               placeholder="Pág"
+               min="1"
+               max="{{ paginator.num_pages }}"
+               aria-label="Número da página">
+        <button type="button" onclick="jumpToPage()" aria-label="Navegar para página">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
     </div>
+    {% endif %}
+
 </div>
 
-<style>
-    .pagination-wrapper {
-        animation: fadeIn 0.4s ease-in;
-    }
-    
-    .pagination-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1rem 1.5rem;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        border: 1px solid rgba(0,0,0,0.04);
-        width: 100%;
-    }
-    
-    .pagination-custom {
-        gap: 4px;
-        margin-bottom: 0;
-    }
-    
-    .pagination-custom .page-link {
-        border: none;
-        border-radius: 8px;
-        min-width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #64748b;
-        font-weight: 500;
-        font-size: 0.9rem;
-        background-color: #f1f5f9;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        padding: 0 12px;
-    }
-    
-    .pagination-custom .page-link:hover:not(.current-page) {
-        background-color: #e2e8f0;
-        color: #334155;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    
-    .pagination-custom .page-item.active .page-link {
-        background: linear-gradient(135deg, #059669 0%, #047857 100%);
-        color: white;
-        font-weight: 600;
-        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
-        transform: scale(1.05);
-    }
-    
-    .pagination-custom .page-item.disabled .page-link {
-        background-color: #f8fafc;
-        color: #cbd5e1;
-        cursor: not-allowed;
-        transform: none;
-        box-shadow: none;
-    }
-    
-    .pagination-custom .page-nav {
-        width: 36px;
-        padding: 0;
-        background-color: #fff;
-        border: 1px solid #e2e8f0;
-    }
-    
-    .pagination-custom .page-nav:hover {
-        background-color: #f8fafc;
-        border-color: #cbd5e1;
-    }
-    
-    .pagination-dots {
-        background-color: transparent !important;
-        cursor: default;
-        pointer-events: none;
-        color: #94a3b8 !important;
-    }
-    
-    .page-jumper .form-control {
-        border-radius: 6px 0 0 6px;
-        border-color: #e2e8f0;
-    }
-    
-    .page-jumper .btn {
-        border-radius: 0 6px 6px 0;
-    }
-    
-    .page-jumper .form-control:focus {
-        border-color: #059669;
-        box-shadow: 0 0 0 0.2rem rgba(5, 150, 105, 0.15);
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    /* Responsivo */
-    @media (max-width: 768px) {
-        .pagination-card {
-            padding: 0.75rem;
-        }
-        .pagination-custom .page-link {
-            min-width: 32px;
-            height: 32px;
-            font-size: 0.85rem;
-            padding: 0 8px;
-        }
-        .pagination-meta {
-            font-size: 0.8rem;
-        }
-    }
-</style>
-
-<script>
-    function jumpToPageTransferencia() {
-        const input = document.getElementById('jumpInput');
-        const page = parseInt(input.value);
-        const maxPage = {{ paginator.num_pages }};
-        
-        if (page && page >= 1 && page <= maxPage) {
-            // Mantém os parâmetros existentes na URL
-            const url = new URL(window.location.href);
-            url.searchParams.set('page', page);
-            window.location.href = url.toString();
-        } else {
-            input.classList.add('is-invalid');
-            setTimeout(() => input.classList.remove('is-invalid'), 2000);
-        }
-    }
-    
-    // Permite pressionar Enter no campo de input
-    document.getElementById('jumpInput')?.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') jumpToPageTransferencia();
-    });
-</script>
+{% endwith %}
 {% endif %}
 
+
+<script>
+function jumpToPage() {
+    const input = document.getElementById('jumpInput');
+    const page  = parseInt(input.value);
+    const max   = {{ paginator.num_pages|default:1 }};
+
+    if (page && page >= 1 && page <= max) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', page);
+        window.location.href = url.toString();
+    } else {
+        input.classList.add('is-invalid');
+        setTimeout(() => input.classList.remove('is-invalid'), 2000);
+    }
+}
+
+document.getElementById('jumpInput')?.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') jumpToPage();
+});
+</script>
+
 {% endblock content %}
-
-

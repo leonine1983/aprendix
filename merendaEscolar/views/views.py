@@ -631,9 +631,11 @@ from merendaEscolar.models import (
 )
 # Pronteção de acesso
 from core.groups.nutricionista import NutricionistaRequiredMixin
+from core.views.baseNutricionista import BaseNutricionistaView
+from core.models import ConfiguraPessoal
 
 
-class EstoqueCentralListView(NutricionistaRequiredMixin, ListView):
+class EstoqueCentralListView(BaseNutricionistaView, ListView):
     """
     Dashboard institucional do estoque central da merenda escolar.
 
@@ -653,7 +655,15 @@ class EstoqueCentralListView(NutricionistaRequiredMixin, ListView):
     model = EstoqueCentral
     template_name = "merendaEscolar/estoque/estoque.html"
     context_object_name = "produtos"
-    paginate_by = 4
+    
+    # Faz com o que os dados de configuração sejam carregados antes de todo o conteudo da view
+    def dispatch(self, request, *args, **kwargs):
+        self.configuracao, _ = ConfiguraPessoal.objects.get_or_create(pk=1)
+        return super().dispatch(request, *args, **kwargs)
+
+    # Define a quantidade de registros na tela
+    def get_paginate_by(self, queryset):
+        return self.configuracao.pagina_estoqueCentral
 
     # ====================================
     # QUERYSET PRINCIPAL (ESTOQUE ATIVO)
@@ -729,6 +739,14 @@ class EstoqueCentralListView(NutricionistaRequiredMixin, ListView):
         )
 
         context["escolas_atendidas"] = Escola.objects.count()
+
+        context["pagina_transferencia"] = self.configuracao.pagina_estoqueCentral
+        # 🔷 Fonte única de verdade (governança)
+        context["page_size_options"] = [5,10, 20, 30, 50]
+        
+
+
+
 
         # =========================
         # INDICADORES LOGÍSTICOS

@@ -11,133 +11,338 @@
     --primary-hover: #1a68d8;
     --primary-light: #e8f4ff;
     --danger: #e74c3c;
+    --danger-hover: #c0392b;
+    --success: #059669;
     --text: #1f2937;
     --text-secondary: #6b7280;
-    --radius: 10px;
+    --radius: 12px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 14px rgba(0,0,0,0.08);
 }
 
+/* ── Layout ────────────────────────────────────── */
 .container-box {
     background: var(--card);
-    padding: 24px;
+    padding: 28px;
     border-radius: var(--radius);
     border: 1px solid var(--border);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: var(--shadow-sm);
 }
 
+/* ── Header ────────────────────────────────────── */
 .header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 24px;
     flex-wrap: wrap;
     gap: 16px;
 }
 
-.header h2 {
-    margin: 0;
-    font-size: 24px;
+.header-title h2 {
+    margin: 0 0 4px;
+    font-size: 22px;
     font-weight: 700;
     color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.header small {
+.header-title p {
+    margin: 0;
     color: var(--text-secondary);
     font-size: 14px;
 }
 
-.actions a {
-    text-decoration: none;
-}
-
+/* ── Buttons ───────────────────────────────────── */
 .btn {
     padding: 10px 18px;
-    border-radius: 6px;
+    border-radius: 8px;
     border: none;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
-    transition: all 0.2s;
+    transition: all 0.18s ease;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    text-decoration: none;
+    white-space: nowrap;
 }
 
 .btn-primary {
     background: var(--primary);
     color: white;
+    box-shadow: 0 2px 6px rgba(45,127,249,0.2);
 }
 
 .btn-primary:hover {
     background: var(--primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(45, 127, 249, 0.25);
+    box-shadow: 0 4px 12px rgba(45,127,249,0.3);
+    color: white;
 }
 
 .btn-danger {
-    background: var(--danger);
-    color: white;
-    padding: 8px 14px;
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid #fca5a5;
+    padding: 6px 12px;
     font-size: 13px;
+    border-radius: 6px;
 }
 
 .btn-danger:hover {
-    background: #d32f2f;
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+}
+
+/* ── Toolbar (search + page-size) ──────────────── */
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: #f9fafb;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+}
+
+/* Busca */
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 220px;
+    max-width: 380px;
+}
+
+.search-input-wrap {
+    position: relative;
+    flex: 1;
+}
+
+.search-input-wrap svg {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+.search-input {
+    width: 100%;
+    height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0 12px 0 34px;
+    font-size: 14px;
+    color: var(--text);
+    background: white;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(45,127,249,0.12);
+}
+
+.search-input::placeholder {
+    color: #9ca3af;
+}
+
+.btn-search {
+    height: 38px;
+    padding: 0 14px;
+    border-radius: 8px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.18s;
+    white-space: nowrap;
+}
+
+.btn-search:hover {
+    background: var(--primary-hover);
+}
+
+.clear-search {
+    font-size: 13px;
+    color: var(--danger);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.clear-search:hover { text-decoration: underline; }
+
+/* Página por tamanho */
+.page-size-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-size-wrap label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.page-size-select {
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text);
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.page-size-select:focus {
+    outline: none;
+    border-color: var(--success);
+    box-shadow: 0 0 0 3px rgba(5,150,105,0.12);
+}
+
+.page-size-select:hover { border-color: var(--success); }
+
+/* ── Resultado da busca ─────────────────────────── */
+.search-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+/* ── Tabela ─────────────────────────────────────── */
+.table-wrap {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border);
 }
 
 .table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    margin-top: 16px;
+    border-collapse: collapse;
+    min-width: 480px;
 }
 
-.table th,
-.table td {
-    padding: 14px 16px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
+.table thead {
+    background: #f9fbfd;
 }
 
 .table th {
-    background: #f9fbfd;
+    padding: 13px 16px;
+    text-align: left;
     font-weight: 600;
     color: var(--text);
-    font-size: 13px;
+    font-size: 12px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.table tr:hover td {
-    background: #f8fafc;
+    letter-spacing: 0.06em;
+    border-bottom: 2px solid var(--border);
 }
 
 .table td {
-    color: var(--text-secondary);
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
     font-size: 14px;
+    color: var(--text-secondary);
+    vertical-align: middle;
 }
 
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table tbody tr {
+    transition: background 0.15s;
+}
+
+.table tbody tr:hover td {
+    background: #f8fafc;
+}
+
+.td-cardapio {
+    font-weight: 600;
+    color: var(--text) !important;
+}
+
+.td-escola {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.escola-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    flex-shrink: 0;
+}
+
+/* ── Estado vazio ───────────────────────────────── */
 .empty-state {
     text-align: center;
-    padding: 40px;
+    padding: 56px 24px;
     color: var(--text-secondary);
-    font-style: italic;
 }
 
-/* Paginação Moderna */
+.empty-icon {
+    font-size: 52px;
+    margin-bottom: 12px;
+    line-height: 1;
+}
+
+.empty-state h3 {
+    margin: 0 0 6px;
+    font-size: 16px;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 13px;
+}
+
+/* ── Paginação ──────────────────────────────────── */
 .pagination-wrapper {
-    margin-top: 32px;
-    padding-top: 24px;
+    margin-top: 24px;
+    padding-top: 20px;
     border-top: 1px solid var(--border);
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     align-items: center;
+    justify-content: space-between;
     gap: 16px;
 }
 
 .pagination-info {
-    font-size: 14px;
+    font-size: 13px;
     color: var(--text-secondary);
-    font-weight: 500;
 }
 
 .pagination-info strong {
@@ -148,7 +353,7 @@
 .pagination-nav {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -159,174 +364,241 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 40px;
-    height: 40px;
-    padding: 0 12px;
+    min-width: 38px;
+    height: 38px;
+    padding: 0 10px;
     border-radius: 8px;
     text-decoration: none;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     border: 1px solid var(--border);
     background: white;
     color: var(--text);
-    transition: all 0.2s;
+    transition: all 0.18s;
 }
 
 .pagination-nav a:hover {
     border-color: var(--primary);
     background: var(--primary-light);
     color: var(--primary);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(45, 127, 249, 0.15);
+    transform: translateY(-1px);
 }
 
 .pagination-nav .page-active {
     background: var(--primary);
     border-color: var(--primary);
     color: white;
-    box-shadow: 0 4px 12px rgba(45, 127, 249, 0.3);
+    box-shadow: 0 3px 10px rgba(45,127,249,0.3);
 }
 
 .pagination-nav .page-disabled {
-    opacity: 0.4;
+    opacity: 0.35;
     cursor: not-allowed;
+    pointer-events: none;
 }
 
-.pagination-nav .page-nav {
-    padding: 0;
-    width: 40px;
-}
-
-@media (min-width: 640px) {
-    .pagination-wrapper {
-        flex-direction: row;
-        justify-content: space-between;
-    }
-}
-
+/* ── Responsivo ─────────────────────────────────── */
 @media (max-width: 640px) {
-    .container-box {
-        padding: 16px;
-    }
-    
-    .header h2 {
-        font-size: 20px;
-    }
-    
-    .table th,
-    .table td {
-        padding: 12px;
-    }
+    .container-box { padding: 16px; }
+    .header-title h2 { font-size: 18px; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .search-form { max-width: 100%; }
+    .page-size-wrap { justify-content: flex-end; }
+    .pagination-wrapper { justify-content: center; }
 }
 </style>
 
 <div class="container-box">
 
-    <!-- HEADER -->
+    {# ── HEADER ──────────────────────────────────────── #}
     <div class="header">
-        <div>
-            <h2>📚 Vínculos Cardápio x Escola</h2>
-            <small>Gerencie quais cardápios estão vinculados a cada escola</small>
+        <div class="header-title">
+            <h2>
+                <span>📚</span> Vínculos Cardápio × Escola
+            </h2>
+            <p>Gerencie quais cardápios estão vinculados a cada escola</p>
         </div>
 
-        <div class="actions">
-            <a href="{% url 'merendaEscolar:cardapio_escola_create' %}" 
-               class="btn btn-primary"
-               title="Criar novo vínculo">
-               <span>+</span> Novo Vínculo
-            </a>
-        </div>
+        <a href="{% url 'merendaEscolar:cardapio_escola_create' %}"
+           class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Novo Vínculo
+        </a>
     </div>
 
-    <!-- TABELA -->
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Cardápio</th>
-                <th>Escola</th>
-                <th style="width:120px;">Ações</th>
-            </tr>
-        </thead>
+    {# ── TOOLBAR: busca + itens por página ───────────── #}
+    <div class="toolbar">
 
-        <tbody>
-            {% for v in vinculos %}
-            <tr>
-                <td style="font-weight: 500; color: var(--text);">{{ v.cardapio }}</td>
-                <td>{{ v.escola }}</td>
-                <td>
-                    <a href="{% url 'merendaEscolar:cardapio_escola_delete' v.id %}" 
-                       class="btn btn-danger"
-                       onclick="return confirm('Tem certeza que deseja remover este vínculo?')"
-                       title="Remover vínculo">
-                       Excluir
-                    </a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3" class="empty-state">
-                    <div style="font-size: 48px; margin-bottom: 16px;">📭</div>
-                    <div>Nenhum vínculo encontrado.</div>
-                    <div style="font-size: 13px; margin-top: 8px; opacity: 0.8;">Clique em "Novo Vínculo" para começar</div>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        {# Busca #}
+        <form method="get" action="" class="search-form" role="search">
+            <div class="search-input-wrap">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="search"
+                       name="q"
+                       value="{{ search_query }}"
+                       placeholder="Buscar por cardápio ou escola…"
+                       class="search-input"
+                       aria-label="Buscar vínculos">
+            </div>
+            <button type="submit" class="btn-search">Buscar</button>
+            {% if search_query %}
+                <a href="{% url 'merendaEscolar:cardapio_escola_list' %}" class="clear-search" title="Limpar busca">✕ Limpar</a>
+            {% endif %}
+        </form>
 
-    <!-- PAGINAÇÃO MODERNA -->
+        {# Itens por página #}
+        <form method="post"
+              action="{% url 'merendaEscolar:configuracao_pessoal' %}"
+              id="pageSizeForm">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+            <div class="page-size-wrap">
+                <label for="pageSizeSelect">Exibir:</label>
+                <select id="pageSizeSelect"
+                        name="pagina_cardapioXescola"
+                        class="page-size-select"
+                        onchange="this.form.submit()"
+                        aria-label="Itens por página">
+                    {% for size in page_size_options %}
+                        <option value="{{ size }}" {% if pagina_cardapioXescola == size %}selected{% endif %}>
+                            {{ size }} por página
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
+    </div>
+
+    {# Badge de busca ativa #}
+    {% if search_query %}
+    <div class="search-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Filtrando por: <strong>"{{ search_query }}"</strong> — {{ paginator.count }} resultado{{ paginator.count|pluralize }}
+    </div>
+    {% endif %}
+
+    {# ── TABELA ──────────────────────────────────────── #}
+    <div class="table-wrap">
+        <table class="table" aria-label="Lista de vínculos cardápio-escola">
+            <thead>
+                <tr>
+                    <th scope="col">Cardápio</th>
+                    <th scope="col">Escola</th>
+                    <th scope="col" style="width:110px; text-align:center;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in vinculos %}
+                <tr>
+                    <td class="td-cardapio">{{ v.cardapio }}</td>
+                    <td>
+                        <div class="td-escola">
+                            <span class="escola-dot" aria-hidden="true"></span>
+                            {{ v.escola }}
+                        </div>
+                    </td>
+                    <td style="text-align:center;">
+                        <a href="{% url 'merendaEscolar:cardapio_escola_delete' v.id %}"
+                           class="btn btn-danger"
+                           onclick="return confirm('Tem certeza que deseja remover o vínculo entre \"{{ v.cardapio }}\" e \"{{ v.escola }}\"?')"
+                           aria-label="Excluir vínculo {{ v.cardapio }} – {{ v.escola }}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+                            </svg>
+                            Excluir
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                {% if search_query %}🔍{% else %}📭{% endif %}
+                            </div>
+                            {% if search_query %}
+                                <h3>Nenhum resultado para "{{ search_query }}"</h3>
+                                <p>Tente outros termos ou <a href="{% url 'merendaEscolar:cardapio_escola_list' %}">limpe o filtro</a>.</p>
+                            {% else %}
+                                <h3>Nenhum vínculo cadastrado</h3>
+                                <p>Clique em <strong>Novo Vínculo</strong> para começar.</p>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {# ── PAGINAÇÃO ───────────────────────────────────── #}
     {% if is_paginated %}
     <div class="pagination-wrapper">
-        <div class="pagination-info">
-            Mostrando <strong>{{ page_obj.start_index }}</strong>–<strong>{{ page_obj.end_index }}</strong> 
-            de <strong>{{ paginator.count }}</strong> vínculos
-        </div>
+        <p class="pagination-info">
+            Mostrando <strong>{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
+            de <strong>{{ paginator.count }}</strong> vínculo{{ paginator.count|pluralize }}
+        </p>
 
-        <ul class="pagination-nav">
-            <!-- Anterior -->
-            {% if page_obj.has_previous %}
+        <ul class="pagination-nav" role="navigation" aria-label="Paginação">
+
+            {# Anterior #}
             <li>
-                <a href="?page={{ page_obj.previous_page_number }}" class="page-nav" aria-label="Página anterior">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="15 18 9 12 15 6"/>
-                    </svg>
-                </a>
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}"
+                       aria-label="Página anterior">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"/>
+                        </svg>
+                    </a>
+                {% else %}
+                    <span class="page-disabled" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"/>
+                        </svg>
+                    </span>
+                {% endif %}
             </li>
-            {% else %}
-            <li><span class="page-nav page-disabled" aria-label="Página anterior">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="15 18 9 12 15 6"/>
-                </svg>
-            </span></li>
-            {% endif %}
 
-            <!-- Páginas -->
+            {# Números de páginas (janela de ±2) #}
             {% for num in page_obj.paginator.page_range %}
-                {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+                <li>
                     {% if page_obj.number == num %}
-                    <li><span class="page-active">{{ num }}</span></li>
+                        <span class="page-active" aria-current="page">{{ num }}</span>
                     {% else %}
-                    <li><a href="?page={{ num }}">{{ num }}</a></li>
+                        <a href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}"
+                           aria-label="Página {{ num }}">{{ num }}</a>
                     {% endif %}
+                </li>
                 {% endif %}
             {% endfor %}
 
-            <!-- Próximo -->
-            {% if page_obj.has_next %}
+            {# Próxima #}
             <li>
-                <a href="?page={{ page_obj.next_page_number }}" class="page-nav" aria-label="Próxima página">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                </a>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}"
+                       aria-label="Próxima página">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </a>
+                {% else %}
+                    <span class="page-disabled" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </span>
+                {% endif %}
             </li>
-            {% else %}
-            <li><span class="page-nav page-disabled" aria-label="Próxima página">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="9 18 15 12 9 6"/>
-                </svg>
-            </span></li>
-            {% endif %}
+
         </ul>
     </div>
     {% endif %}

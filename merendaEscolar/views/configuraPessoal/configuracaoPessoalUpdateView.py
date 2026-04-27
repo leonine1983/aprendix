@@ -10,7 +10,7 @@ from core.views.baseNutricionista import BaseNutricionistaView
 
 class ConfiguracaoPessoalUpdateView(BaseNutricionistaView, UpdateView):
     model = ConfiguraPessoal
-    fields = ["pagina_CardapiosEscolares"]
+    fields =  '__all__'
     template_name = "merendaEscolar/configuraSistem/configuraPessoal.html"
     # success_url = reverse_lazy("merendaEscolar:configuracao_pessoal")
 

@@ -1,19 +1,27 @@
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View
-from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView, View
+from django.urls import reverse, reverse_lazy
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
-from ...models import (
-    Cardapio, CardapioSemana, CardapioDia,
-    TipoRefeicao, CardapioItem, CardapioEscola
-)
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from django.http import HttpResponseRedirect
+from django.db.models import Q
+from django import forms
+
+import csv
+
+from core.models import ConfiguraPessoal
 from core.groups.nutricionista import NutricionistaRequiredMixin
 from core.views.baseNutricionista import BaseNutricionistaView
-from django.core.exceptions import ValidationError
 
-
-from django.http import HttpResponseRedirect
-
-
-from django import forms
+from merendaEscolar.models import (
+    Cardapio,
+    CardapioSemana,
+    CardapioDia,
+    CardapioItem,
+    TipoRefeicao,
+    CardapioEscola,
+)
 
 
 
@@ -53,20 +61,6 @@ class CardapioForm(forms.ModelForm):
         self.fields["data_inicio"].input_formats = ["%Y-%m-%d"]
         self.fields["data_fim"].input_formats = ["%Y-%m-%d"]
 
-
-
-
-
-from django.views.generic import ListView
-from core.models import ConfiguraPessoal
-from merendaEscolar.models import Cardapio
-from core.views.baseNutricionista import BaseNutricionistaView
-
-from django.views.generic import ListView
-from django.db.models import Q
-from core.models import ConfiguraPessoal
-from merendaEscolar.models import Cardapio
-from core.views.baseNutricionista import BaseNutricionistaView
 
 
 class CardapioListView(BaseNutricionistaView, ListView):
@@ -140,8 +134,7 @@ class CardapioListView(BaseNutricionistaView, ListView):
         context["filtro_ativo"] = any(context["filtros"].values())
 
         return context
-
-    
+   
 
 
 class CardapioCreateView(NutricionistaRequiredMixin, CreateView):
@@ -187,12 +180,6 @@ class CardapioDeleteView(NutricionistaRequiredMixin, DeleteView):
 #  VIEW  ·  CardapioDetailView
 #  Arquivo: merendaEscolar/views.py  (trecho)
 # ─────────────────────────────────────────────
-
-from django.views.generic import DetailView
-from django.utils import timezone
-from ...models import Cardapio, CardapioSemana, CardapioDia, CardapioItem
-
-
 class CardapioDetailView(NutricionistaRequiredMixin, DetailView):
     """
     Exibe o detalhamento completo de um cardápio institucional.
@@ -260,20 +247,11 @@ class CardapioDetailView(NutricionistaRequiredMixin, DetailView):
         ctx["total_dias"] = total_dias
         ctx["total_refeicoes"] = total_refeicoes
 
-        return ctx
-
-    
-
-
+        return ctx  
 
 # =========================
 # SEMANA
 # =========================
-
-
-from django.shortcuts import get_object_or_404
-from django.urls import reverse
-
 class SemanaCreateView(NutricionistaRequiredMixin, CreateView):
     model = CardapioSemana
     fields = ['numero']
@@ -410,10 +388,8 @@ class TipoRefeicaoUpdateView(NutricionistaRequiredMixin, UpdateView):
     def form_valid(self, form):
         messages.success(self.request, "Tipo atualizado!")
         return super().form_valid(form)
+    
 
-
-from django.shortcuts import get_object_or_404
-from django.urls import reverse
 
 class TipoRefeicaoDeleteView(NutricionistaRequiredMixin, DeleteView):
     model = TipoRefeicao
@@ -463,14 +439,6 @@ class TipoRefeicaoDeleteView(NutricionistaRequiredMixin, DeleteView):
 # =========================
 # ITEM
 # =========================
-
-from django.shortcuts import get_object_or_404
-
-from django.shortcuts import get_object_or_404
-from django.contrib import messages
-from django.views.generic import CreateView
-
-from merendaEscolar.models import CardapioItem, CardapioDia
 
 
 class ItemCreateView(NutricionistaRequiredMixin, CreateView):
@@ -595,8 +563,25 @@ class CardapioEscolaListView(NutricionistaRequiredMixin, ListView):
     model = CardapioEscola
     template_name = "merendaEscolar/cardapioEscola/cardapio_escola_list.html"
     context_object_name = "vinculos"
-    paginate_by = 2  # Exibe 20 vínculos por página (ajuste conforme necessidade)
+    
+    # Faz com o que os dados de configuração sejam carregados antes de todo o conteudo da view
+    def dispatch(self, request, *args, **kwargs):
+        self.configuracao, _ = ConfiguraPessoal.objects.get_or_create(pk=1)
+        return super().dispatch(request, *args, **kwargs)
 
+    # Define a quantidade de registros na tela
+    def get_paginate_by(self, queryset):
+        return self.configuracao.pagina_cardapioXescola
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["pagina_cardapioXescola"] = self.configuracao.pagina_transferencia   
+        # 🔷 Fonte única de verdade (governança)
+        context["page_size_options"] = [10, 20, 30, 50]
+
+        return context
+    
+    
 
 class CardapioEscolaCreateView(NutricionistaRequiredMixin, CreateView):
     model = CardapioEscola
@@ -613,12 +598,9 @@ class CardapioEscolaCreateView(NutricionistaRequiredMixin, CreateView):
             return self.form_invalid(form)
 
         messages.success(self.request, "Cardápio vinculado à escola!")
-        return super().form_valid(form)
-    
+        return super().form_valid(form)    
 
-import csv
-from django.shortcuts import redirect
-from django.contrib import messages
+
 
 class CardapioEscolaUploadView(NutricionistaRequiredMixin, View):
 
