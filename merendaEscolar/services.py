@@ -5,7 +5,7 @@ from datetime import timedelta
 
 # merendaEscolar/services/estoque_service.py
 
-from admin_acessos.models import Notificacao
+from admin_acessos.models import NotificacaoProduto
 from django.db.models import Sum
 from merendaEscolar.models import EstoqueEscola, Produto
 
@@ -23,7 +23,7 @@ def verificar_estoque_baixo(escola):
 
         if produto.estoque_minimo and total <= produto.estoque_minimo:
 
-            ja_existe = Notificacao.objects.filter(
+            ja_existe = NotificacaoProduto.objects.filter(
                 escola=escola,
                 tipo="ESTOQUE_BAIXO",
                 lida=False,
@@ -31,7 +31,7 @@ def verificar_estoque_baixo(escola):
             ).exists()
 
             if not ja_existe:
-                Notificacao.objects.create(
+                NotificacaoProduto.objects.create(
                     usuario=escola.responsavel,
                     escola=escola,
                     titulo="Estoque Baixo Detectado",

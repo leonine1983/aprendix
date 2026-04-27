@@ -43,6 +43,7 @@ class AtualizacaoNotificacaoSistema(models.Model):
     lida = models.BooleanField(default=False)
     criada_em = models.DateTimeField(default=timezone.now)
     atualizada_em = models.DateTimeField(auto_now=True)
+    event_key = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         ordering = ['-criada_em']
@@ -53,7 +54,7 @@ class AtualizacaoNotificacaoSistema(models.Model):
         return f'{self.titulo} - {"Lida" if self.lida else "Não lida"}'    
 
 
-class Notificacao(models.Model):
+class NotificacaoProduto(models.Model):
 
     TIPO_CHOICES = (
         ("ESTOQUE_BAIXO", "Estoque Baixo"),
@@ -71,6 +72,7 @@ class Notificacao(models.Model):
 
     tipo = models.CharField(max_length=30, choices=TIPO_CHOICES)
     lida = models.BooleanField(default=False)
+    event_key = models.CharField(max_length=255, null=True, blank=True)
 
     criado_em = models.DateTimeField(auto_now_add=True)
 

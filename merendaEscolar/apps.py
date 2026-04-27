@@ -6,4 +6,4 @@ class MerendaescolarConfig(AppConfig):
     name = 'merendaEscolar'
 
     def ready(self):
-        import merendaEscolar.notifications
+        import merendaEscolar.notifications_cardapio

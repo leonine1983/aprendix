@@ -483,6 +483,7 @@ class Transferencia(models.Model):
         """
         from django.utils import timezone
 
+
         if self.status != "RASCUNHO":
             raise ValidationError("Apenas transferências em rascunho podem ser enviadas.")
 
@@ -521,6 +522,12 @@ class Transferencia(models.Model):
         self.enviado_por = usuario
         self.enviado_em = timezone.now()
         self.save()
+        from merendaEscolar.notificacoes_produto import notificar_transferencia_enviada
+        notificar_transferencia_enviada(self)
+        from merendaEscolar.notificacoes_produto import notificar_transferencia_recebida
+        notificar_transferencia_recebida(self)
+    
+    
         
     @transaction.atomic
     def receber(self, usuario):
@@ -789,6 +796,15 @@ class DivergenciaEntrega(models.Model):
     def __str__(self):
         return f"Divergência - {self.transferencia.numero} - {self.produto.nome}"
     
+    def save(self, *args, **kwargs):
+        is_novo = self.pk is None  # 🔐 evita disparar em update
+
+        super().save(*args, **kwargs)
+
+        if is_novo:
+            from merendaEscolar.notificacoes_produto import notificar_divergencia
+            notificar_divergencia(self)
+        
 
 
 ################# RECEITA ##########################
