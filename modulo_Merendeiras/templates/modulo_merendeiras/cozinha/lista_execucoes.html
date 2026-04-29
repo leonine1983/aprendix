@@ -1,0 +1,219 @@
+{% extends "modulo_merendeiras/base_merendeira.html" %}
+{% load static %}
+
+{% block title %}Execuções de Receitas{% endblock %}
+
+{% block content %}
+
+<style>
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .page-title {
+    font-size: 22px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .execucao-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+
+  .execucao-card {
+    border-radius: 16px;
+    padding: 16px;
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    transition: all .2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .execucao-card:hover {
+    transform: translateY(-3px);
+  }
+
+  .status {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    width: fit-content;
+  }
+
+  .status-aberta {
+    background: #e3f2fd;
+    color: #1565c0;
+  }
+
+  .status-preparo {
+    background: #fff3e0;
+    color: #ef6c00;
+  }
+
+  .status-finalizada {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  .info {
+    font-size: 13px;
+    color: #555;
+  }
+
+  .metricas {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+
+  .metricas div {
+    text-align: center;
+  }
+
+  .acoes {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .btn {
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: #1976d2;
+    color: #fff;
+  }
+
+  .btn-outline {
+    border: 1px solid #ccc;
+    background: #fff;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #777;
+  }
+
+</style>
+
+<div class="page-header">
+  <div class="page-title">
+    🍳 Execuções de Receitas
+  </div>
+
+    ➕ Nova Execução
+</div>
+
+{% if execucoes %}
+
+<div class="execucao-grid">
+
+  {% for execucao in execucoes %}
+  <div class="execucao-card">
+
+    <!-- STATUS -->
+    <div>
+      {% if execucao.status == "ABERTA" %}
+        <span class="status status-aberta">Aberta</span>
+      {% elif execucao.status == "EM_PREPARO" %}
+        <span class="status status-preparo">Em preparo</span>
+      {% elif execucao.status == "FINALIZADA" %}
+        <span class="status status-finalizada">Finalizada</span>
+      {% endif %}
+    </div>
+
+    <!-- RECEITA -->
+    <div style="font-weight:600; font-size:15px;">
+      {{ execucao.receita.nome }}
+    </div>
+
+    <!-- INFORMAÇÕES -->
+    <div class="info">
+      👤 Iniciado por: {{ execucao.iniciado_por }}
+    </div>
+
+    <div class="info">
+      🕒 {{ execucao.iniciado_em|date:"d/m/Y H:i" }}
+    </div>
+
+    {% if execucao.finalizado_em %}
+    <div class="info">
+      ✅ Finalizado em: {{ execucao.finalizado_em|date:"d/m/Y H:i" }}
+    </div>
+    {% endif %}
+
+    <!-- MÉTRICAS -->
+    <div class="metricas">
+      <div>
+        <strong>{{ execucao.total_movimentacoes|default:"0" }}</strong><br>
+        Mov.
+      </div>
+      <div>
+        <strong>{{ execucao.total_retirado|default:"0" }}</strong><br>
+        Retirado
+      </div>
+      <div>
+        <strong>{{ execucao.total_devolvido|default:"0" }}</strong><br>
+        Devolvido
+      </div>
+    </div>
+
+    <!-- AÇÕES -->
+    <div class="acoes">
+        🔎 Abrir
+   
+
+        ✔ Finalizar
+      </a>
+    </div>
+
+  </div>
+  {% endfor %}
+
+</div>
+
+<!-- PAGINAÇÃO -->
+<div style="margin-top:20px; text-align:center;">
+  {% if is_paginated %}
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}">← Anterior</a>
+    {% endif %}
+
+    <span style="margin:0 10px;">
+      Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}">Próxima →</a>
+    {% endif %}
+  {% endif %}
+</div>
+
+{% else %}
+
+<div class="empty-state">
+  📭 Nenhuma execução registrada ainda.
+</div>
+
+{% endif %}
+
+{% endblock %}

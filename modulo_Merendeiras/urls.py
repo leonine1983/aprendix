@@ -10,6 +10,8 @@ urlpatterns = [
     path("dashboard/", views.DashboardMerendeiraView.as_view(), name="dashboard_merendeira"),
     
     # ROTAS USADAS ------------------------------------------------
+    path("estoque/", views.EstoqueEscolaListView.as_view(), name="estoque_list_escola" ),
+
     # Execução do Cardápio do Dia
     path("", views.CardapioHojeView.as_view(), name="cardapio_hoje"),
     path("receita/<int:pk>/", views.ReceitaDetailView.as_view(), name="receita_detail"),
@@ -50,23 +52,10 @@ urlpatterns = [
 
 
     
-
-    
-    # ESTOQUE ESCOLA ----------------------------------------------
-    # 📦 Estoque da escola (visão da merendeira)
-    path("estoque/", views.EstoqueEscolaListView.as_view(), name="estoque_list_escola" ),
-
-       
-    
-
+    path("cozinha/execucoes/", views.ExecucaoListView.as_view(), name="lista_execucoes"),
       
-
-    # 🔍 Detalhe da movimentação
-    path(
-        "estoque/movimentacoes/<int:pk>/",
-        views.MovimentacaoEstoqueDetailView.as_view(),
-        name="movimentacao_estoque_detail"
-    ),
+    path("cozinha/execucao/<int:pk>/", views.PainelExecucaoView.as_view(), name="painel_execucao"),
+    
 
     # COZINHA - EXCECUÇAÕ DAS RECEITAS
     # 🔍 Detalhe da movimentação
@@ -74,10 +63,6 @@ urlpatterns = [
     ),
 
 
-
-    # Executar o cardapio
-      
-    
     
     
     
