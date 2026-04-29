@@ -9,16 +9,13 @@ from django.contrib import messages
 from django.db.models import Q
 from core.permissions import GroupRequiredMixin
 from core.groups.nutricionista import NUTRICIONISTA_GROUPS
+from core.views.baseNutricionista import BaseNutricionistaView
 
 from ...models import Transferencia
+import traceback
 
 
-class TransferenciaEnviarView(
-    LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
-    View,
-):
+class TransferenciaEnviarView(BaseNutricionistaView, View):
     
     """
     Responsável por executar o envio formal da transferência.
@@ -27,8 +24,6 @@ class TransferenciaEnviarView(
     - Chama método institucional do model.
     - Garante integridade do fluxo.
     """
-    group_required = NUTRICIONISTA_GROUPS
-    permission_required = "merendaEscolar.change_transferencia"
 
     def post(self, request, pk):
 
@@ -42,13 +37,17 @@ class TransferenciaEnviarView(
             )
 
         except ValidationError as e:
-            messages.error(request, e.message)
-
+            messages.error(request, e.message)       
+       
         
-        except Exception:
+
+        except Exception as e:
+            print("ERRO REAL >>>>>>>>>>>>>>>")
+            traceback.print_exc()
+
             messages.error(
                 request,
-                "Erro inesperado ao enviar a transferência."
+                f"Erro inesperado: {str(e)}"
             )
 
         #return redirect(reverse("merendaEscolar:transferencia-detail", args=[pk]))

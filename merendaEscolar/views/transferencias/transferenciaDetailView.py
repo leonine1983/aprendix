@@ -6,16 +6,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
-from core.permissions import GroupRequiredMixin
-from core.groups.nutricionista import NUTRICIONISTA_GROUPS
+from core.views.baseNutricionista import BaseNutricionistaView
 
-class TransferenciaDetailView(
-    LoginRequiredMixin,
-    PermissionRequiredMixin,
-    DetailView
-):
+class TransferenciaDetailView(BaseNutricionistaView, DetailView):
     model = Transferencia
     template_name = "merendaEscolar/transferencia/transferencia_detail.html"
     context_object_name = "transferencia"
-    permission_required = "merendaEscolar.view_transferencia"
-    group_required = NUTRICIONISTA_GROUPS
+    

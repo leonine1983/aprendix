@@ -2,6 +2,7 @@
 from .views import *
 # Estoque Central
 from .entrada_central import *
+from .estoqueCentral.estoqueCentralAjaxView import *
 from .estoqueCentral.registrarDescarteView import *
 from .estoqueCentral.notaDescarteView import *
 from .estoqueCentral.descarte_relatorio import *

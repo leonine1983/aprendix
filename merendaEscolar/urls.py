@@ -39,6 +39,7 @@ urlpatterns = [
 
     # Estoque ----------------
     path("central/",EstoqueCentralListView.as_view(), name="estoque-central"  ),
+    path("api/estoque-central/", EstoqueCentralAjaxView.as_view(), name="api-estoque-central"),
 
     # Entrada de produtos no estoque central
     path("central/entrada/", EntradaEstoqueCentralView.as_view(), name="entrada-central"),

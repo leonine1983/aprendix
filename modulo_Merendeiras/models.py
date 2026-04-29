@@ -476,6 +476,7 @@ def retirar_ingrediente_receita(execucao, produto, quantidade, usuario, lote_esp
             usuario=usuario,
             observacao=f"Retirada para receita: {execucao.receita.nome} (Execução #{execucao.id})"
         )
+        
 
         # Registra movimentação interna da cozinha
         mov_cozinha = MovimentacaoCozinha.objects.create(
@@ -747,14 +748,12 @@ def descartar_produto_escola(estoque, quantidade, motivo, usuario, descricao=Non
 
     # Movimento contábil
     MovimentacaoEstoque.objects.create(
-        produto=estoque.produto,
-        escola=estoque.escola,
-        quantidade=quantidade,
-        tipo="SAIDA_ESCOLA",
-        usuario=usuario,
-        observacao=f"Descarte ({motivo}) - lote {estoque.lote}",
-        movimentacao_relacionada_tipo='DESCARTE',
-        movimentacao_relacionada_id=descarte.id
-    )
+    produto=estoque.produto,
+    escola=estoque.escola,
+    quantidade=quantidade,
+    tipo="SAIDA_ESCOLA",
+    usuario=usuario,
+    observacao=f"Descarte ({motivo}) - lote {estoque.lote} | ID descarte: {descarte.id}"
+)
 
     return descarte

@@ -3,67 +3,1045 @@
 
 {% block content %}
 
-<div class="container-fluid mt-4">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
+  :root {
+    --verde: #2e7d32;
+    --verde-mid: #388e3c;
+    --verde-light: #43a047;
+    --verde-pale: #e8f5e9;
+    --verde-pale2: #f1f8f1;
+    --amarelo: #f57f17;
+    --amarelo-pale: #fffde7;
+    --vermelho: #c62828;
+    --vermelho-pale: #fff5f5;
+    --cinza-border: #e4e8ec;
+    --cinza-bg: #f7f9fb;
+    --text-main: #1a1f2e;
+    --text-muted: #6b7280;
+    --text-light: #9ca3af;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+    --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,.1), 0 2px 8px rgba(0,0,0,.05);
+    --transition: .2s cubic-bezier(.4,0,.2,1);
+  }
 
-            <div class="mb-4">
-                <h5 class="fw-semibold"
-                    style="color:var(--verde-principal);">
-                    Adicionar Item à Transferência
-                </h5>
-                <small class="text-muted">
-                    Informe o produto e a quantidade que será enviada.
-                </small>
-                <hr>
-            </div>
+  * { box-sizing: border-box; }
 
-            <form method="post" novalidate>
-                {% csrf_token %}
+  body { font-family: 'DM Sans', sans-serif; }
 
-                <div class="row g-3">
+  /* ── Layout geral ── */
+  .page-wrapper {
+    min-height: 100vh;
+    background: var(--cinza-bg);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
 
-                    <div class="col-md-6">
-                        <label class="form-label">Produto</label>
-                        {{ form.produto }}
-                        {% if form.produto.errors %}
-                            <div class="text-danger small">
-                                {{ form.produto.errors }}
-                            </div>
-                        {% endif %}
-                    </div>
+  /* ── Barra de contexto (topo) ── */
+  .ctx-bar {
+    background: linear-gradient(135deg, var(--verde) 0%, var(--verde-light) 100%);
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+  }
 
-                    <div class="col-md-6">
-                        <label class="form-label">Quantidade</label>
-                        {{ form.quantidade }}
-                        {% if form.quantidade.errors %}
-                            <div class="text-danger small">
-                                {{ form.quantidade.errors }}
-                            </div>
-                        {% endif %}
-                    </div>
+  .ctx-bar::before,
+  .ctx-bar::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,.06);
+    pointer-events: none;
+  }
+  .ctx-bar::before { width: 280px; height: 280px; top: -120px; right: -60px; }
+  .ctx-bar::after  { width: 160px; height: 160px; bottom: -80px; left: 30%; }
 
-                </div>
+  .ctx-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background: rgba(255,255,255,.16);
+    border: 1px solid rgba(255,255,255,.28);
+    color: rgba(255,255,255,.95);
+    font-size: .72rem;
+    font-weight: 700;
+    border-radius: 20px;
+    padding: .3rem .85rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-bottom: .6rem;
+    backdrop-filter: blur(4px);
+  }
 
-                <div class="mt-4 d-flex gap-2">
-                    <button type="submit"
-                            class="btn btn-success px-4">
-                        <i class="bi bi-check-circle me-1"></i>
-                        Salvar Item
-                    </button>
+  .ctx-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: -.01em;
+  }
 
-                    <a href="{% url 'merendaEscolar:transferencia-detail' view.kwargs.pk %}"
-                       class="btn btn-outline-secondary px-4">
-                        Cancelar
-                    </a>
-                </div>
+  .ctx-sub {
+    font-size: .82rem;
+    color: rgba(255,255,255,.78);
+    margin: .3rem 0 0;
+    max-width: 560px;
+    line-height: 1.5;
+  }
 
-            </form>
+  .ctx-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .5rem 1.2rem;
+    margin-top: .8rem;
+  }
 
+  .ctx-meta-item {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    font-size: .8rem;
+    color: rgba(255,255,255,.85);
+    background: rgba(0,0,0,.12);
+    border-radius: 8px;
+    padding: .3rem .7rem;
+    border: 1px solid rgba(255,255,255,.12);
+  }
+
+  .ctx-meta-item i { opacity: .75; font-size: .9rem; }
+
+  .ctx-meta-item strong { font-weight: 700; }
+
+  /* Breadcrumb no topo direito */
+  .ctx-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    font-size: .75rem;
+    color: rgba(255,255,255,.6);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .ctx-breadcrumb a {
+    color: rgba(255,255,255,.75);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+  .ctx-breadcrumb a:hover { color: #fff; }
+  .ctx-breadcrumb .sep { opacity: .4; }
+
+  /* ── Corpo do formulário ── */
+  .form-canvas {
+    flex: 1;
+    width: 100%;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* ── Seção do form ── */
+  .form-section {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    border: 1.5px solid var(--cinza-border);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: box-shadow var(--transition);
+  }
+
+  .form-section:focus-within {
+    box-shadow: var(--shadow-md);
+    border-color: #c8e6c9;
+  }
+
+  .section-head {
+    padding: .9rem 1.5rem;
+    background: var(--verde-pale2);
+    border-bottom: 1.5px solid #e0eee0;
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+  }
+
+  .section-head-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(46,125,50,.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--verde);
+    font-size: .85rem;
+    flex-shrink: 0;
+  }
+
+  .section-head-title {
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--verde);
+    margin: 0;
+  }
+
+  .section-body {
+    padding: 1.5rem;
+  }
+
+  /* ── Labels ── */
+  .fi-label {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: .55rem;
+  }
+
+  .fi-label-req {
+    color: var(--vermelho);
+    font-size: .65rem;
+    line-height: 1;
+  }
+
+  /* ── Inputs / Selects ── */
+  .form-control,
+  .form-select {
+    font-family: 'DM Sans', sans-serif;
+    width: 100%;
+    border: 1.5px solid var(--cinza-border);
+    border-radius: var(--radius-md);
+    padding: .75rem 1.1rem;
+    font-size: .95rem;
+    font-weight: 500;
+    color: var(--text-main);
+    background: var(--cinza-bg);
+    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .form-control:hover,
+  .form-select:hover {
+    border-color: #b0c9b1;
+    background: #fff;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    border-color: var(--verde);
+    box-shadow: 0 0 0 4px rgba(46,125,50,.1);
+    background: #fff;
+  }
+
+  .form-control::placeholder { color: var(--text-light); font-weight: 400; }
+
+  /* Select com ícone chevron */
+  .select-wrap {
+    position: relative;
+  }
+
+  .select-wrap .form-select {
+    padding-right: 2.8rem;
+    cursor: pointer;
+  }
+
+  .select-wrap::after {
+    content: "\F282"; /* bootstrap-icons chevron-down */
+    font-family: "bootstrap-icons";
+    position: absolute;
+    right: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--verde);
+    font-size: .9rem;
+    pointer-events: none;
+    transition: transform var(--transition);
+  }
+
+  .select-wrap:focus-within::after {
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+  /* Input número com destaque */
+  .qty-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .qty-input-wrap .form-control {
+    padding-right: 3.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 1.05rem;
+    font-weight: 500;
+    letter-spacing: .01em;
+  }
+
+  .qty-unit-badge {
+    position: absolute;
+    right: .7rem;
+    background: var(--verde-pale);
+    color: var(--verde);
+    font-size: .72rem;
+    font-weight: 700;
+    padding: .22rem .55rem;
+    border-radius: 6px;
+    border: 1px solid #c8e6c9;
+    pointer-events: none;
+    white-space: nowrap;
+    transition: opacity var(--transition);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: .04em;
+  }
+
+  .qty-unit-badge.hidden { opacity: 0; }
+
+  /* Mensagens de erro */
+  .field-error {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    margin-top: .45rem;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--vermelho);
+    padding: .45rem .75rem;
+    background: #fff5f5;
+    border-radius: 8px;
+    border-left: 3px solid var(--vermelho);
+    animation: slideInError .18s ease;
+  }
+
+  @keyframes slideInError {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Painel de Estoque ── */
+  .estoque-panel {
+    background: var(--verde-pale2);
+    border: 1.5px solid #d0e8d0;
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.4rem;
+    transition: all var(--transition);
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+  }
+
+  .estoque-panel > * { width: 100%; }
+
+  .estoque-panel.state-alert  { background: var(--amarelo-pale); border-color: #ffe082; }
+  .estoque-panel.state-danger { background: var(--vermelho-pale); border-color: #ffcdd2; }
+  .estoque-panel.state-empty  { background: #fff5f5; border-color: #ffcdd2; }
+
+  /* Hint */
+  .hint-state {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    color: var(--text-light);
+    font-size: .88rem;
+    font-weight: 500;
+  }
+
+  .hint-state .hint-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e8e8e8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    color: #aaa;
+  }
+
+  /* Loading */
+  .loading-state { display: flex; align-items: center; gap: .75rem; }
+
+  .spinner-verde {
+    width: 22px;
+    height: 22px;
+    border: 2.5px solid #c8e6c9;
+    border-top-color: var(--verde);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-size: .85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* Skeleton */
+  .skel {
+    background: linear-gradient(90deg, #ddd 25%, #eee 50%, #ddd 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+    border-radius: 6px;
+  }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  /* Dados estado */
+  .dados-state { animation: fadeIn .25s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+  .estoque-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .75rem 2rem;
+    align-items: center;
+  }
+
+  @media (max-width: 480px) {
+    .estoque-grid { grid-template-columns: 1fr; }
+  }
+
+  .estoque-num-wrap { }
+
+  .estoque-num-label {
+    font-size: .65rem;
+    font-weight: 800;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: .15rem;
+  }
+
+  .estoque-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 2.1rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--verde);
+    letter-spacing: -.02em;
+    transition: color var(--transition);
+  }
+
+  .estoque-num.num-zero  { color: var(--vermelho); }
+  .estoque-num.num-baixo { color: var(--amarelo); }
+
+  .estoque-unid {
+    font-size: .75rem;
+    color: var(--text-light);
+    font-weight: 600;
+    margin-top: .15rem;
+  }
+
+  /* Barra */
+  .barra-wrap { }
+  .barra-label {
+    font-size: .65rem;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: .45rem;
+  }
+
+  .barra-track {
+    height: 8px;
+    border-radius: 99px;
+    background: rgba(0,0,0,.08);
+    overflow: hidden;
+  }
+
+  .barra-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: var(--verde);
+    transition: width .5s cubic-bezier(.4,0,.2,1);
+  }
+  .barra-fill.f-baixo { background: var(--amarelo); }
+  .barra-fill.f-zero  { background: var(--vermelho); }
+
+  /* Lotes */
+  .lotes-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin-top: .85rem;
+  }
+
+  .lote-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    font-size: .72rem;
+    font-weight: 600;
+    padding: .3rem .7rem;
+    border-radius: 20px;
+    background: rgba(46,125,50,.08);
+    color: var(--verde);
+    border: 1px solid rgba(46,125,50,.2);
+    font-family: 'DM Mono', monospace;
+    transition: transform var(--transition);
+    cursor: default;
+  }
+
+  .lote-chip:hover { transform: translateY(-1px); }
+  .lote-chip.c-alert { background: rgba(245,127,23,.08); color: var(--amarelo); border-color: rgba(245,127,23,.25); }
+  .lote-chip.c-danger { background: rgba(198,40,40,.08); color: var(--vermelho); border-color: rgba(198,40,40,.2); }
+
+  .lote-tag {
+    font-weight: 800;
+    font-size: .65rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    opacity: .6;
+  }
+
+  /* Info FEFO */
+  .fefo-info {
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+    margin-top: .75rem;
+    padding: .65rem .9rem;
+    background: rgba(255,255,255,.7);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(0,0,0,.06);
+    font-size: .78rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .fefo-info i { color: var(--verde); opacity: .7; flex-shrink: 0; margin-top: .1rem; }
+  .fefo-info strong { color: var(--text-main); }
+
+  /* Vazio */
+  .empty-state {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    color: var(--vermelho);
+    font-size: .88rem;
+    font-weight: 600;
+  }
+
+  .empty-state .empty-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(198,40,40,.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1rem;
+  }
+
+  /* ── Ações ── */
+  .actions-bar {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary-save {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    background: var(--verde);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: .8rem 2rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: .9rem;
+    letter-spacing: .01em;
+    cursor: pointer;
+    transition: filter var(--transition), transform .1s, box-shadow var(--transition);
+    box-shadow: 0 2px 8px rgba(46,125,50,.3);
+    white-space: nowrap;
+  }
+
+  .btn-primary-save:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 4px 16px rgba(46,125,50,.35);
+    color: #fff;
+  }
+
+  .btn-primary-save:active { transform: scale(.97); }
+
+  .btn-primary-save .btn-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .75rem;
+  }
+
+  .btn-secondary-cancel {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background: #fff;
+    color: var(--text-muted);
+    border: 1.5px solid var(--cinza-border);
+    border-radius: var(--radius-md);
+    padding: .8rem 1.5rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: .9rem;
+    text-decoration: none;
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
+    white-space: nowrap;
+  }
+
+  .btn-secondary-cancel:hover {
+    background: var(--cinza-bg);
+    color: var(--text-main);
+    border-color: #c0cdd0;
+  }
+
+  .actions-divider {
+    flex: 1;
+  }
+
+  .actions-hint {
+    font-size: .75rem;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+  }
+
+  /* ── Responsividade ── */
+  @media (max-width: 768px) {
+    .ctx-bar { padding: 1.25rem 1.25rem; }
+    .form-canvas { padding: 1rem; gap: 1rem; }
+    .section-body { padding: 1.1rem; }
+    .ctx-breadcrumb { display: none; }
+    .estoque-num { font-size: 1.7rem; }
+    .actions-hint { display: none; }
+    .btn-primary-save { flex: 1; justify-content: center; }
+    .btn-secondary-cancel { flex: 1; justify-content: center; }
+  }
+
+  @media (max-width: 480px) {
+    .ctx-title { font-size: 1.1rem; }
+    .form-canvas { padding: .75rem; }
+    .section-body { padding: 1rem; }
+    .estoque-panel { padding: 1rem; }
+  }
+
+  /* ── Two-col grid para produto + qtd ── */
+  .fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  @media (max-width: 600px) {
+    .fields-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Estoque dentro da seção */
+  .estoque-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: .75rem;
+    gap: .5rem;
+    flex-wrap: wrap;
+  }
+
+  .estoque-section-label {
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+  }
+
+  .estoque-section-label i { color: var(--verde); opacity: .8; }
+
+  .estoque-fefo-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    font-size: .65rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--verde);
+    background: var(--verde-pale);
+    border: 1px solid #c8e6c9;
+    border-radius: 20px;
+    padding: .25rem .65rem;
+  }
+</style>
+
+<div class="page-wrapper">
+
+  {# ── Barra de contexto ── #}
+  <div class="ctx-bar">
+    <div style="flex:1; min-width:0;">
+      <div class="ctx-pill">
+        <i class="bi bi-box-arrow-in-right"></i>
+        Nova Transferência
+      </div>
+      <h1 class="ctx-title">Adicionar Item à Transferência</h1>
+      <p class="ctx-sub">
+        Selecione o produto e informe a quantidade. O lote será escolhido automaticamente pela estratégia <strong style="color:#fff;">FEFO</strong> (primeiro a vencer, primeiro a sair).
+      </p>
+      <div class="ctx-meta">
+        <div class="ctx-meta-item">
+          <i class="bi bi-building"></i>
+          <span><strong>Destino:</strong> {{ view.transferencia.escola_destino }}</span>
         </div>
+        <div class="ctx-meta-item">
+          <i class="bi bi-hash"></i>
+          <span>Transferência <strong>{{ view.transferencia.numero }}</strong></span>
+        </div>
+      </div>
     </div>
 
-</div>
+    <nav class="ctx-breadcrumb" aria-label="Breadcrumb">
+      <a href="#">Início</a>
+      <span class="sep">›</span>
+      <a href="#">Transferências</a>
+      <span class="sep">›</span>
+      <a href="{% url 'merendaEscolar:transferencia-detail' view.kwargs.pk %}">#{{ view.transferencia.numero }}</a>
+      <span class="sep">›</span>
+      <span style="color:rgba(255,255,255,.9)">Novo Item</span>
+    </nav>
+  </div>
+
+  {# ── Canvas do formulário ── #}
+  <div class="form-canvas">
+    <form method="post" novalidate id="form-item">
+      {% csrf_token %}
+
+      {# Seção 1: Produto e Quantidade #}
+      <div class="form-section">
+        <div class="section-head">
+          <div class="section-head-icon"><i class="bi bi-pencil-square"></i></div>
+          <span class="section-head-title">Dados do Item</span>
+        </div>
+        <div class="section-body">
+          <div class="fields-grid">
+
+            {# Produto #}
+            <div>
+              <label class="fi-label" for="{{ form.produto.id_for_label }}">
+                <i class="bi bi-box-seam" style="color:var(--verde);"></i>
+                Produto
+                <span class="fi-label-req" title="Obrigatório">●</span>
+              </label>
+              <div class="select-wrap">
+                {{ form.produto }}
+              </div>
+              {% if form.produto.errors %}
+                <div class="field-error">
+                  <i class="bi bi-exclamation-circle-fill"></i>
+                  {{ form.produto.errors|join:", " }}
+                </div>
+              {% endif %}
+            </div>
+
+            {# Quantidade #}
+            <div>
+              <label class="fi-label" for="{{ form.quantidade.id_for_label }}">
+                <i class="bi bi-123" style="color:var(--verde);"></i>
+                Quantidade
+                <span class="fi-label-req" title="Obrigatório">●</span>
+              </label>
+              <div class="qty-input-wrap">
+                {{ form.quantidade }}
+                <span class="qty-unit-badge hidden" id="qty-unit-badge">un</span>
+              </div>
+              {% if form.quantidade.errors %}
+                <div class="field-error">
+                  <i class="bi bi-exclamation-circle-fill"></i>
+                  {{ form.quantidade.errors|join:", " }}
+                </div>
+              {% endif %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {# Seção 2: Estoque Disponível #}
+      <div class="form-section">
+        <div class="section-head">
+          <div class="section-head-icon"><i class="bi bi-layers"></i></div>
+          <span class="section-head-title">Estoque Central Disponível</span>
+        </div>
+        <div class="section-body">
+          <div class="estoque-section-head">
+            <span class="estoque-section-label">
+              <i class="bi bi-database"></i>
+              Saldo por lote
+            </span>
+            <span class="estoque-fefo-tag">
+              <i class="bi bi-arrow-down-up"></i>
+              Estratégia FEFO
+            </span>
+          </div>
+
+          <div class="estoque-panel" id="painel-estoque">
+
+            {# Hint #}
+            <div id="estado-hint">
+              <div class="hint-state">
+                <div class="hint-icon"><i class="bi bi-arrow-up-circle"></i></div>
+                <span>Selecione um produto acima para visualizar o saldo disponível.</span>
+              </div>
+            </div>
+
+            {# Loading #}
+            <div id="estado-loading" style="display:none;">
+              <div class="loading-state">
+                <div class="spinner-verde"></div>
+                <span class="loading-text">Consultando estoque central…</span>
+              </div>
+            </div>
+
+            {# Dados #}
+            <div id="estado-dados" style="display:none;" class="dados-state">
+              <div class="estoque-grid">
+                <div class="estoque-num-wrap">
+                  <div class="estoque-num-label">Saldo disponível</div>
+                  <div class="estoque-num" id="val-quantidade">—</div>
+                  <div class="estoque-unid" id="val-unidade"></div>
+                </div>
+                <div class="barra-wrap">
+                  <div class="barra-label">Proporção · lote mais recente vs. maior</div>
+                  <div class="barra-track">
+                    <div class="barra-fill" id="qty-bar" style="width:0%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="lotes-row" id="lotes-container"></div>
+
+              <div id="val-info"></div>
+            </div>
+
+            {# Vazio #}
+            <div id="estado-vazio" style="display:none;">
+              <div class="empty-state">
+                <div class="empty-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                <div>
+                  <div>Sem saldo disponível para este produto no estoque central.</div>
+                  <div style="font-size:.78rem;font-weight:400;color:var(--text-muted);margin-top:.2rem;">Verifique entradas pendentes ou selecione outro produto.</div>
+                </div>
+              </div>
+            </div>
+
+          </div>{# /estoque-panel #}
+        </div>
+      </div>
+
+      {# Seção 3: Ações #}
+      <div class="actions-bar">
+        <button type="submit" class="btn-primary-save">
+          <span class="btn-icon"><i class="bi bi-check"></i></span>
+          Salvar Item
+        </button>
+        <a href="{% url 'merendaEscolar:transferencia-detail' view.kwargs.pk %}"
+           class="btn-secondary-cancel">
+          <i class="bi bi-x"></i>
+          Cancelar
+        </a>
+        <div class="actions-divider"></div>
+        <span class="actions-hint">
+          <i class="bi bi-shield-check" style="color:var(--verde);"></i>
+          Campos marcados com <span style="color:var(--vermelho);font-weight:800;margin:0 .2rem;">●</span> são obrigatórios
+        </span>
+      </div>
+
+    </form>
+  </div>{# /form-canvas #}
+</div>{# /page-wrapper #}
+
+<script>
+(function () {
+  "use strict";
+
+  const produtoSelect = document.getElementById("{{ form.produto.id_for_label }}");
+  const painel   = document.getElementById("painel-estoque");
+  const eHint    = document.getElementById("estado-hint");
+  const eLoading = document.getElementById("estado-loading");
+  const eDados   = document.getElementById("estado-dados");
+  const eVazio   = document.getElementById("estado-vazio");
+
+  const valQtd    = document.getElementById("val-quantidade");
+  const valUnid   = document.getElementById("val-unidade");
+  const valInfo   = document.getElementById("val-info");
+  const qtyBar    = document.getElementById("qty-bar");
+  const lotesWrap = document.getElementById("lotes-container");
+  const qtyUnitBadge = document.getElementById("qty-unit-badge");
+
+  let debounceTimer = null;
+
+  function mostrar(estado) {
+    [eHint, eLoading, eDados, eVazio].forEach(el => el.style.display = "none");
+    painel.classList.remove("state-alert", "state-danger", "state-empty");
+    if (estado) estado.style.display = "";
+  }
+
+  function chipClass(status) {
+    if (status === "CRITICO" || status === "VENCIDO") return "c-danger";
+    if (status === "ALERTA") return "c-alert";
+    return "";
+  }
+
+  function statusLabel(status) {
+    const map = {
+      NORMAL:       "✔ Validade normal",
+      ALERTA:       "⚠ Vence em 30 dias",
+      CRITICO:      "🔴 Vence em 7 dias",
+      VENCIDO:      "❌ Vencido",
+      SEM_VALIDADE: "Sem validade",
+    };
+    return map[status] || status;
+  }
+
+  async function buscarEstoque(produtoId) {
+    mostrar(eLoading);
+
+    try {
+      const resp = await fetch(
+        `{% url 'merendaEscolar:api-estoque-central' %}?produto_id=${produtoId}`,
+        { headers: { "X-Requested-With": "XMLHttpRequest" } }
+      );
+
+      if (!resp.ok) throw new Error("Erro na requisição");
+
+      const data  = await resp.json();
+      const lotes = data.lotes || [];
+      const total = parseFloat(data.total || 0);
+
+      // Atualiza badge de unidade no input de quantidade
+      if (data.unidade) {
+        qtyUnitBadge.textContent = data.unidade;
+        qtyUnitBadge.classList.remove("hidden");
+      } else {
+        qtyUnitBadge.classList.add("hidden");
+      }
+
+      if (!lotes.length || total <= 0) {
+        mostrar(eVazio);
+        painel.classList.add("state-empty");
+        return;
+      }
+
+      // Número
+      valQtd.textContent  = total.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+      valUnid.textContent = data.unidade || "";
+      valQtd.className = "estoque-num";
+      if (total === 0) valQtd.classList.add("num-zero");
+
+      // Barra
+      const piorStatus = lotes[0]?.status_validade;
+      const maxLote = Math.max(...lotes.map(l => parseFloat(l.quantidade)));
+      const pct = maxLote > 0 ? Math.min((parseFloat(lotes[0]?.quantidade) / maxLote) * 100, 100) : 0;
+      qtyBar.style.width  = pct + "%";
+      qtyBar.className = "barra-fill";
+      if (piorStatus === "CRITICO" || piorStatus === "VENCIDO") qtyBar.classList.add("f-zero");
+      else if (piorStatus === "ALERTA") qtyBar.classList.add("f-baixo");
+
+      // Estado do painel
+      if (piorStatus === "CRITICO" || piorStatus === "VENCIDO") painel.classList.add("state-danger");
+      else if (piorStatus === "ALERTA") painel.classList.add("state-alert");
+
+      // Chips de lotes
+      lotesWrap.innerHTML = "";
+      lotes.forEach(l => {
+        const cls = chipClass(l.status_validade);
+        const chip = document.createElement("div");
+        chip.className = `lote-chip ${cls}`;
+        const qty = parseFloat(l.quantidade).toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+        chip.innerHTML = `
+          <span class="lote-tag">Lote</span>
+          <strong>${l.lote || "S/L"}</strong>
+          <span style="opacity:.5">·</span>
+          <span>${qty} ${data.unidade || ""}</span>
+          ${l.data_validade ? `<span style="opacity:.55;font-size:.68rem;">val.&nbsp;${l.data_validade}</span>` : ""}
+        `;
+        lotesWrap.appendChild(chip);
+      });
+
+      // Info FEFO
+      if (lotes[0]) {
+        const p = lotes[0];
+        valInfo.innerHTML = `
+          <div class="fefo-info">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>
+              O sistema utilizará o lote <strong>${p.lote || "S/L"}</strong> primeiro (FEFO).
+              ${p.status_validade ? `<span style="margin-left:.3rem;opacity:.75;">${statusLabel(p.status_validade)}</span>` : ""}
+            </span>
+          </div>
+        `;
+      } else {
+        valInfo.innerHTML = "";
+      }
+
+      mostrar(eDados);
+
+    } catch (err) {
+      mostrar(eHint);
+      console.error("Erro ao buscar estoque:", err);
+    }
+  }
+
+  if (produtoSelect) {
+    produtoSelect.addEventListener("change", function () {
+      clearTimeout(debounceTimer);
+      const id = this.value;
+      if (!id) {
+        mostrar(eHint);
+        qtyUnitBadge.classList.add("hidden");
+        return;
+      }
+      debounceTimer = setTimeout(() => buscarEstoque(id), 250);
+    });
+
+    if (produtoSelect.value) {
+      buscarEstoque(produtoSelect.value);
+    }
+  }
+})();
+</script>
 
 {% endblock content %}

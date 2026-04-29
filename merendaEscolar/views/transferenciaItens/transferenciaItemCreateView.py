@@ -64,59 +64,7 @@ class TransferenciaItemForm(forms.ModelForm):
             if not self.instance.pk and qs.exists():
                 self.initial["estoque_origem"] = qs.first()
 
-"""
-class TransferenciaItemCreateView(CreateView):
-    model = TransferenciaItem
-    form_class = TransferenciaItemForm
-    template_name = "merendaEscolar/transferencia/transferencia_item_form.html"
-    LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
 
-    permission_required = "estoque.add_unidademedida"
-    group_required = NUTRICIONISTA_GROUPS
-
-    def dispatch(self, request, *args, **kwargs):
-        self.transferencia = get_object_or_404(
-            Transferencia, pk=self.kwargs["pk"]
-        )
-        return super().dispatch(request, *args, **kwargs)
-
-    @transaction.atomic
-    def form_valid(self, form):
-        produto = form.cleaned_data["produto"]
-        quantidade = form.cleaned_data["quantidade"]
-
-        # Buscar lote automaticamente (FEFO)
-        lote = (
-            EstoqueCentral.objects
-            .select_for_update()  # 🔒 trava concorrência
-            .filter(produto=produto, quantidade__gt=0)
-            .order_by("data_validade")
-            .first()
-        )
-
-        if not lote:
-            form.add_error(
-                "produto", "Não há saldo disponível no estoque central para este produto."
-            )
-            return self.form_invalid(form)
-
-        if quantidade > lote.quantidade:
-            form.add_error(
-                "quantidade", f"Saldo disponível no lote: {lote.quantidade}."
-            )
-            return self.form_invalid(form)
-
-        form.instance.transferencia = self.transferencia
-        form.instance.estoque_origem = lote
-
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse_lazy(
-            "merendaEscolar:transferencia-detail", kwargs={"pk": self.transferencia.pk}
-        )"""
 
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
@@ -190,6 +138,21 @@ class TransferenciaItemCreateView(
             )
             return self.form_invalid(form)
 
+        # 🔒 Regra de unicidade
+        item_existente = TransferenciaItem.objects.filter(
+            transferencia=self.transferencia,
+            estoque_origem=lote
+        ).first()
+
+        if item_existente:
+            messages.error(
+                self.request,
+                "Este lote já foi incluído nesta transferência. "
+                "Edite o item existente para alterar a quantidade."
+            )
+            return self.form_invalid(form)
+
+        # ✅ Persistência
         form.instance.transferencia = self.transferencia
         form.instance.estoque_origem = lote
 
@@ -206,4 +169,31 @@ class TransferenciaItemCreateView(
             kwargs={"pk": self.transferencia.pk}
         )
     
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        # Produto selecionado via GET/POST
+        produto_id = self.request.POST.get("produto") or self.request.GET.get("produto")
+
+        lote_fefo = None
+        saldo_disponivel = None
+        total_lotes = 0
+
+        if produto_id:
+            lotes = (
+                EstoqueCentral.objects
+                .filter(produto_id=produto_id, quantidade__gt=0)
+                .order_by("data_validade")
+            )
+            total_lotes = lotes.count()
+            lote_fefo = lotes.first()
+
+            if lote_fefo:
+                saldo_disponivel = lote_fefo.quantidade
+
+        ctx["lote_fefo"] = lote_fefo
+        ctx["saldo_disponivel"] = saldo_disponivel
+        ctx["total_lotes"] = total_lotes
+        return ctx
+        
     

@@ -149,7 +149,7 @@ def notificar_transferencia_enviada(transferencia: Transferencia):
     titulo = f"Transferência enviada: {transferencia.numero}"
 
     mensagem = (
-        f"Transferência enviada para {transferencia.escola_destino.nome}"
+        f"Transferência enviada para {transferencia.escola_destino.nome_escola}"
     )
 
     for usuario in _usuarios_escola(transferencia.escola_destino):
