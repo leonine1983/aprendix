@@ -1033,8 +1033,8 @@ class TipoRefeicao(models.Model):
 
 class CardapioItem(models.Model):
     dia = models.ForeignKey(CardapioDia, on_delete=models.CASCADE, related_name="itens")
-    tipo_refeicao = models.ForeignKey(TipoRefeicao, on_delete=models.PROTECT)
-    receita = models.ForeignKey(Receita, on_delete=models.PROTECT)
+    tipo_refeicao = models.ForeignKey(TipoRefeicao, on_delete=models.PROTECT, related_name="tipoRefeicaoRelated")
+    receita = models.ForeignKey(Receita, on_delete=models.PROTECT, related_name="receitaRelated")
     ordem = models.IntegerField(default=0)
 
     class Meta:

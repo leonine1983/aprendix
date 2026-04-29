@@ -73,9 +73,11 @@ class FichaDiariaCreateView(BaseMerendeiraView, CreateView):
         self.execucao = ExecucaoCardapioDia.objects.select_related(
             "escola",
             "cardapio_dia"
+        ).prefetch_related(
+            "cardapio_dia__itens__receita"
         ).get(
             pk=self.kwargs["execucao_id"],
-            turno=self.turno  # 🔥 filtro por turno
+            turno=self.turno  
         )
 
         self.ficha_existente = FichaDiaria.objects.filter(
@@ -85,18 +87,20 @@ class FichaDiariaCreateView(BaseMerendeiraView, CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_initial(self):
-        """
-        🔥 PRÉ-PREENCHIMENTO INTELIGENTE (reduz fricção cognitiva)
-        """
         initial = super().get_initial()
 
         if not self.ficha_existente:
-            initial.update({
-                "cardapio_executado": str(self.execucao.cardapio_dia),
-                "alunos_atendidos": str(self.execucao.quantidade_alunos),                
-            })
-            
 
+            # 🔹 Busca otimizada das receitas do dia            
+
+            itens = self.execucao.cardapio_dia.itens.select_related("receita", "tipo_refeicao")
+            lista_receitas = "\n\n".join([f"Tipo de refeição: {item.tipo_refeicao.nome.upper()}\n Receita: {item.receita.nome.upper()}" for item in itens])
+            cardapio_texto = f"{lista_receitas}"            
+
+            initial.update({
+                "cardapio_executado": cardapio_texto,
+                "alunos_atendidos": str(self.execucao.quantidade_alunos),
+            })
         return initial
 
     def get_form_kwargs(self):
@@ -107,11 +111,34 @@ class FichaDiariaCreateView(BaseMerendeiraView, CreateView):
             kwargs["instance"] = self.ficha_existente
 
         return kwargs
+    
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+
         ctx["execucao"] = self.execucao
         ctx["modo_edicao"] = bool(self.ficha_existente)
+
+        # 🔥 LISTA DE ALIMENTOS (SEMPRE DISPONÍVEL)
+        itens = []
+
+        if self.ficha_existente:
+            # edição → usa o que já foi salvo
+            itens = self.ficha_existente.itens.select_related(
+                "produto", "unidade"
+            )
+        else:
+            # criação → monta a partir da execução do cardápio
+            for item in self.execucao.itens_executados.select_related("receita"):
+                for ingrediente in item.receita.ingredientes.all():
+                    itens.append({
+                        "produto_nome": ingrediente.produto.nome,
+                        "unidade": ingrediente.produto.unidade_medida,
+                        "quantidade": ingrediente.quantidade,
+                    })
+
+        ctx["itens_alimentos"] = itens
+
         return ctx
 
     def form_valid(self, form):

@@ -113,7 +113,7 @@
 
   .id-field .underline-input.long { min-width: 220px; }
   .id-field .underline-input.escola { min-width: 460px; }
-  .id-field .underline-input.tecnico { min-width: 200px; }
+  .id-field .underline-input.tecnico { min-width: 200px; text-transform: capitalize; }
 
   /* ── TURNOS (checkboxes) ── */
   .turno-row {
@@ -434,7 +434,7 @@
             <label>Unidade Escolar:</label>
             <input type="text"
                    class="underline-input escola"
-                   value="{{ nome_escola|default:'' }}"
+                   value="{{ execucao.escola|default:nome_escola }}"
                    readonly
                    style="flex:1;">
           </div>
@@ -486,8 +486,15 @@
 
             <div class="campo-linha">
               <label>Cardápio previsto:</label>
+
               <span style="flex:1;border-bottom:1px solid #999;min-height:20px;font-size:13px;padding:1px 4px;color:#555;">
-                {{ execucao.cardapio_dia.itens.receita|default:"—" }}
+
+                {% for item in execucao.cardapio_dia.itens.all %}
+                    {{ item.tipo_refeicao.nome }}: {{ item.receita.nome }}{% if not forloop.last %} | {% endif %}
+                {% empty %}
+                    —
+                {% endfor %}
+
               </span>
             </div>
 
@@ -502,6 +509,7 @@
               <label style="white-space:nowrap;">Cardápio executado:</label>
             </div>
             {{ form.cardapio_executado }}
+            
 
           </div>
         </div>
@@ -519,11 +527,27 @@
                 </tr>
               </thead>
               <tbody>
-                {% for item in execucao.ficha_diaria.itens.all %}
+                {% for item in itens_alimentos %}
                 <tr>
-                  <td><input type="text" value="{{ item.produto.nome }}" readonly></td>
-                  <td><input type="text" value="{{ item.unidade }}" readonly style="text-align:center;"></td>
-                  <td><input type="text" value="{{ item.quantidade_usada }}" readonly style="text-align:center;"></td>
+                  <td>
+                    <input type="text"
+                          value="{{ item.produto.nome|default:item.produto_nome }}"
+                          readonly>
+                  </td>
+
+                  <td>
+                    <input type="text"
+                          value="{{ item.unidade|default:item.unidade }}"
+                          readonly
+                          style="text-align:center;">
+                  </td>
+
+                  <td>
+                    <input type="text"
+                          value="{{ item.quantidade_usada|default:item.quantidade }}"
+                          readonly
+                          style="text-align:center;">
+                  </td>
                 </tr>
                 {% empty %}
                 {# 15 linhas em branco para preenchimento #}
@@ -644,7 +668,8 @@
         <div class="ass-row">
           <div class="ass-campo">
             <label>Ass. Técnico(a) em Alimentação Escolar:</label>
-            <div class="ass-linha"></div>
+            <div class="ass-linha"></div>            
+            <i style="text-transform: capitalize;">{{ usuario_nome|default:'' }}</i>
           </div>
           <div class="ass-campo">
             <label>
