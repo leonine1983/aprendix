@@ -381,7 +381,7 @@
     .app-stamp { display:flex; align-items:center; gap:10px; padding:6px 12px; border-radius:var(--r-md); background: rgba(27,107,58,0.06); border:1px solid rgba(27,107,58,0.12); width: fit-content; }
     .app-stamp__logo { height:30px; width:auto; object-fit:contain; }
     .app-stamp__text { display:flex; flex-direction:column; line-height:1.2; }
-
+    
     .app-stamp__org { font-size:10px; font-weight:500; color: var(--color-text-3); letter-spacing:0.04em; }
     .app-stamp__app { font-size:13px; font-weight:800; color: var(--color-primary); letter-spacing:-0.02em; }
     .app-stamp__app .plus { color: var(--color-accent); }
@@ -844,7 +844,7 @@
       <!-- ── Cozinha ── -->
       <div class="sb-section">Cozinha</div>
 
-      <a class="sb-item" title="Execuções de Cardápio">
+      <a href="{% url 'modulo_merendeiras:lista_execucoes' %}" class="sb-item" title="Execuções de Cardápio">
         <span class="sb-item__icon" aria-hidden="true">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <path d="M3 2h2l2.5 9H18l2-7H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
