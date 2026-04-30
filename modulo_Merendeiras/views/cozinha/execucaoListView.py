@@ -11,9 +11,7 @@ class ExecucaoListView( BaseMerendeiraView, ListView):
     model = ExecucaoReceitaCozinha
     template_name = "modulo_merendeiras/cozinha/lista_execucoes.html"
     context_object_name = "execucoes"
-    paginate_by = 10
-
-    
+    paginate_by = 10   
 
 
     def get_queryset(self):
