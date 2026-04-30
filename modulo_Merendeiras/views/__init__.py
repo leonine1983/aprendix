@@ -32,4 +32,4 @@ from .movimentacaoEstoque.movimentacaoEstoqueListView import *
 
 # cOZINHA
 from .cozinha.painelExecucaoView import PainelExecucaoView
-from .cozinha.execucaoListView import ExecucaoListView
+from .cozinha.execucaoListView import *
