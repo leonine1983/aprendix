@@ -21,6 +21,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from core.permissions import GroupRequiredMixin
 from core.groups.nutricionista import NUTRICIONISTA_GROUPS
 from django.core.exceptions import PermissionDenied
+from core.views.baseNutricionista import BaseNutricionistaView
 
 
 
@@ -36,17 +37,11 @@ class ErrorMessageMixin:
 # ENTRADA DE ESTOQUE CENTRAL
 # ===============================
 
-class EntradaEstoqueCentralView(
-    LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionDenied,
-    SuccessMessageMixin,
+class EntradaEstoqueCentralView(BaseNutricionistaView, SuccessMessageMixin,
     ErrorMessageMixin,
     FormView,
 ):
-    group_required = NUTRICIONISTA_GROUPS
-    raise_exception = True  
-    
+    raise_exception = True      
 
     template_name = "merendaEscolar/estoque/entrada_central_form.html"
     form_class = EntradaEstoqueCentralForm

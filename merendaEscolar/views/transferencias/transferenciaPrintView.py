@@ -11,13 +11,9 @@ from django.utils.http import urlencode
 import qrcode
 import base64
 from io import BytesIO
+from core.views.baseNutricionista import BaseNutricionistaView
 
-class TransferenciaPrintView(
-    LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
-    DetailView
-):
+class TransferenciaPrintView(BaseNutricionistaView, DetailView):
     model = Transferencia
     template_name = "merendaEscolar/transferencia/transferencia_print.html"
     context_object_name = "transferencia"

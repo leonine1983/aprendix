@@ -2,8 +2,9 @@ from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rh.models import Escola
 from ...models import Transferencia
+from core.views.baseNutricionista import BaseNutricionistaView
 
-class ListaEscolasRecebimentoView(LoginRequiredMixin, ListView):
+class ListaEscolasRecebimentoView(BaseNutricionistaView, ListView):
     """
     Exibe todas as escolas para que o usuário selecione qual deseja receber transferências.
     """

@@ -129,7 +129,10 @@
 
   {% for execucao in execucoes %}
   <div class="execucao-card">
-
+dddddddddddddddddddd  {{config}}
+<div class="info">
+  📄 Itens por página configurados: {{ config.pagina_CardapiosEscolares }}
+</div>
     <!-- STATUS -->
     <div>
       {% if execucao.status == "ABERTA" %}

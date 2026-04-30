@@ -250,7 +250,6 @@
 
 .ingredients-panel.show { display: block; }
 
-/* Banner de porções atual no painel de ingredientes */
 .porcoes-banner {
   background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
   color: white;
@@ -616,12 +615,10 @@
     </div>
 
     <!-- ══════════════════════════════════════════════════════════════
-         SEÇÃO DE INGREDIENTES — com dados embutidos em data-* para
-         recálculo dinâmico via JavaScript conforme porções mudam.
+         SEÇÃO DE INGREDIENTES
          ══════════════════════════════════════════════════════════════ -->
     <div class="ingredients-panel" id="details-{{ item_data.item.receita.id }}">
 
-      <!-- Banner dinâmico mostrando para quantas porções está calculando -->
       <div class="porcoes-banner" id="banner-porcoes-{{ item_data.item.receita.id }}">
         <i class="fas fa-calculator"></i>
         <span>
@@ -673,7 +670,6 @@
 
         {% for ing in item_data.ingredientes %}
         {% with rid=item_data.item.receita.id iid=forloop.counter rendbase=item_data.porcoes_sugeridas %}
-        {# Cada card de ingrediente recebe os dados base em atributos data-* #}
         <div class="ing-card"
              id="ing-card-{{ rid }}-{{ iid }}"
              data-receita-id="{{ rid }}"
@@ -681,6 +677,7 @@
              data-disponivel="{{ ing.disponivel }}"
              data-rendimento-base="{{ rendbase }}"
              data-unidade="{{ ing.unidade }}"
+             data-nome-produto="{{ ing.produto }}"
              style="padding: 1rem; background: {% if not ing.saldo_ok %}#FFEBEE{% else %}white{% endif %};
                     border-radius: 8px;
                     border: 1px solid {% if not ing.saldo_ok %}#FECACA{% else %}var(--border-subtle){% endif %};
@@ -692,7 +689,6 @@
 
           <div style="font-size: 0.85rem; color: var(--text-secondary);">
 
-            <!-- Linha: Necessário para N porções -->
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem; font-size:1rem;">
               <span>
                 Necessário para
@@ -707,7 +703,6 @@
               </span>
             </div>
 
-            <!-- Linha: Estoque disponível (fixo — não muda com porções) -->
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
               <span>Estoque disponível:</span>
               <span id="ing-disponivel-classe-{{ rid }}-{{ iid }}"
@@ -716,15 +711,12 @@
               </span>
             </div>
 
-            <!-- Linha: Consumo por porção unitária -->
             <div style="display: flex; justify-content: space-between; border-top: 1px dashed #ccc;
                         padding-top: 0.25rem; margin-top: 0.25rem;">
               <span>Consumo por porção:</span>
               <span style="font-family: monospace; font-size: 0.8rem;"
                     id="ing-consumo-{{ rid }}-{{ iid }}">
-                {# consumo unitário = necessario / rendimento_base #}
                 {% if rendbase > 0 %}
-                  {# Django não tem divisão direta, mas usamos o valor base para exibição inicial #}
                   {{ ing.necessario|floatformat:3 }} {{ ing.unidade }} ÷ {{ rendbase }} porções
                 {% else %}
                   —
@@ -733,7 +725,6 @@
             </div>
           </div>
 
-          <!-- Alerta de falta ou suficiência -->
           <div id="ing-alerta-{{ rid }}-{{ iid }}"
                style="padding: 0.5rem; border-radius: 4px; font-size: 0.8rem; margin-top: 0.5rem;
                       background: {% if ing.disponivel < ing.necessario %}#D32F2F{% else %}#E8F5E9{% endif %};
@@ -741,16 +732,12 @@
             {% if ing.disponivel < ing.necessario %}
               <i class="fas fa-exclamation-triangle me-1"></i>
               Faltam
-              <strong id="ing-alerta-falta-{{ rid }}-{{ iid }}">
-                {% widthratio ing.necessario 1 1 as nec_int %}{{ ing.necessario|floatformat:2 }}
-              </strong>
+              <strong>{{ ing.necessario|floatformat:2 }}</strong>
               {{ ing.unidade }} necessários — estoque tem apenas {{ ing.disponivel|floatformat:2 }} {{ ing.unidade }}
             {% else %}
               <i class="fas fa-check-circle me-1"></i>
               Estoque suficiente para as
-              <span id="ing-alerta-qtd-{{ rid }}-{{ iid }}">
-                {{ rendbase }}
-              </span>
+              <span id="ing-alerta-qtd-{{ rid }}-{{ iid }}">{{ rendbase }}</span>
               porções
             {% endif %}
           </div>
@@ -760,19 +747,54 @@
 
       </div>{# fim ing-grid #}
 
+      <!-- ══════════════════════════════════════════════════════════
+           ALERTA DE FALTANTES — corrigido para exibir dict corretamente
+           e atualizado dinamicamente via JS conforme porções mudam.
+           ══════════════════════════════════════════════════════════ -->
       {% if item_data.faltantes %}
-      <div class="alert alert-danger mt-3 mb-0">
+      <div class="alert alert-danger mt-3 mb-0"
+           id="alerta-faltantes-{{ item_data.item.receita.id }}">
         <h6 style="font-weight: 700; margin-bottom: 0.5rem;">
           <i class="fas fa-times-circle me-2"></i>Atenção: Itens em falta
         </h6>
-        <p style="margin-bottom: 0.5rem;" id="faltantes-msg-{{ item_data.item.receita.id }}">
+        <p style="margin-bottom: 0.5rem;">
           Os seguintes ingredientes não têm estoque suficiente para a quantidade solicitada:
         </p>
         <ul style="margin-bottom: 0;" id="faltantes-lista-{{ item_data.item.receita.id }}">
           {% for faltante in item_data.faltantes %}
-          <li>{{ faltante }}</li>
+          <li>
+            <strong>{{ faltante.produto }}</strong>:
+            faltam
+            <strong>
+              {{ faltante.faltando|floatformat:2 }}
+              {% if faltante.unidade.simbolo %}
+                {{ faltante.unidade.simbolo }}
+              {% elif faltante.unidade.abreviacao %}
+                {{ faltante.unidade.abreviacao }}
+              {% else %}
+                {{ faltante.unidade }}
+              {% endif %}
+            </strong>
+          </li>
           {% endfor %}
         </ul>
+        <p style="margin-top: 0.5rem; margin-bottom: 0; font-size: 0.9rem;">
+          <strong>Sugestão:</strong> Reduza a quantidade de porções ou clique em
+          <strong>"Máximo Viável"</strong> para ajustar automaticamente ao estoque disponível.
+        </p>
+      </div>
+      {% else %}
+      {# Container vazio que o JS usa para inserir alertas dinâmicos #}
+      <div id="alerta-faltantes-{{ item_data.item.receita.id }}"
+           class="alert alert-danger mt-3 mb-0"
+           style="display: none;">
+        <h6 style="font-weight: 700; margin-bottom: 0.5rem;">
+          <i class="fas fa-times-circle me-2"></i>Atenção: Itens em falta
+        </h6>
+        <p style="margin-bottom: 0.5rem;">
+          Os seguintes ingredientes não têm estoque suficiente para a quantidade solicitada:
+        </p>
+        <ul style="margin-bottom: 0;" id="faltantes-lista-{{ item_data.item.receita.id }}"></ul>
         <p style="margin-top: 0.5rem; margin-bottom: 0; font-size: 0.9rem;">
           <strong>Sugestão:</strong> Reduza a quantidade de porções ou clique em
           <strong>"Máximo Viável"</strong> para ajustar automaticamente ao estoque disponível.
@@ -825,7 +847,6 @@
         <i class="fas fa-magic me-2"></i>Máximo Viável
       </button>
 
-      <!-- Turnos já executados -->
       {% if turnos_executados %}
       <div style="background: #E3F2FD; border: 1px solid #90CAF9; border-radius: 8px;
                   padding: 0.5rem 1rem; font-size: 0.85rem; color: #1565C0; display: flex; align-items: center; gap: 0.5rem;">
@@ -837,7 +858,6 @@
       </div>
       {% endif %}
 
-      <!-- Seletor de turno -->
       <div>
         <label for="turno" style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem; font-weight: 600;">
           TURNO DESTA EXECUÇÃO *
@@ -889,7 +909,6 @@ function aplicarQuantidadeAlunos(valor) {
     let porcoes = qtd > 1000 ? 1000 : qtd;
     input.value = porcoes;
     validarVisualEstoque(id, porcoes, maximoEstoque);
-    // ← NOVO: recalcula ingredientes
     atualizarIngredientes(id, porcoes);
   });
 
@@ -913,7 +932,6 @@ function ajustarPorcao(id, delta) {
 
   input.value = novoValor;
   validarVisualEstoque(id, novoValor, maximoEstoque);
-  // ← NOVO
   atualizarIngredientes(id, novoValor);
   atualizarTotal();
 }
@@ -926,7 +944,6 @@ function definirPorcao(id, valor) {
   if (valor > 1000) valor = 1000;
   input.value = valor;
   validarVisualEstoque(id, valor, maximoEstoque);
-  // ← NOVO
   atualizarIngredientes(id, valor);
   atualizarTotal();
 }
@@ -941,16 +958,13 @@ function validarPorcao(input) {
   if (valor < 0)    { valor = 0;    input.value = 0; }
 
   validarVisualEstoque(id, valor, maximoEstoque);
-  // ← NOVO
   atualizarIngredientes(id, valor);
   atualizarTotal();
 }
 
 
 // ─────────────────────────────────────────────────────────────────
-// ATUALIZAÇÃO DINÂMICA DOS INGREDIENTES  ← NOVO
-// Recalcula todos os valores exibidos no painel de ingredientes
-// de uma receita conforme o número de porções muda em tempo real.
+// ATUALIZAÇÃO DINÂMICA DOS INGREDIENTES E DO ALERTA DE FALTANTES
 // ─────────────────────────────────────────────────────────────────
 
 function atualizarIngredientes(receitaId, porcoesSolicitadas) {
@@ -962,40 +976,44 @@ function atualizarIngredientes(receitaId, porcoesSolicitadas) {
   if (elBannerLabel) elBannerLabel.textContent = porcoesSolicitadas;
   if (elTitulo)      elTitulo.textContent      = porcoesSolicitadas;
 
+  // Lista de faltantes acumulada durante a iteração dos cards
+  const faltantesAgora = [];
+
   // Percorre todos os cards de ingredientes dessa receita
   const cards = document.querySelectorAll('.ing-card[data-receita-id="' + receitaId + '"]');
 
   cards.forEach(function(card, idx) {
-    var iid          = idx + 1;
-    var rendBase     = parseFloat(card.dataset.rendimentoBase) || 1;
-    var necBase      = parseFloat(card.dataset.necessarioBase) || 0;
-    var disponivel   = parseFloat(card.dataset.disponivel)     || 0;
-    var unidade      = card.dataset.unidade || '';
+    const iid        = idx + 1;
+    const rendBase   = parseFloat(card.dataset.rendimentoBase) || 1;
+    const necBase    = parseFloat(card.dataset.necessarioBase) || 0;
+    const disponivel = parseFloat(card.dataset.disponivel)     || 0;
+    const unidade    = card.dataset.unidade    || '';
+    const nomeProd   = card.dataset.nomeProduto || '';
 
-    // Consumo unitário por porção (calculado a partir da receita base)
-    var consumoPorPorcao = rendBase > 0 ? necBase / rendBase : 0;
+    // Consumo unitário por porção
+    const consumoPorPorcao = rendBase > 0 ? necBase / rendBase : 0;
 
     // Quantidade necessária para as porções solicitadas
-    var necessarioAgora = consumoPorPorcao * porcoesSolicitadas;
+    const necessarioAgora = consumoPorPorcao * porcoesSolicitadas;
 
-    // ── Atualiza label de porções dentro do card ────────────────
-    var elLabel = document.getElementById('ing-label-porcoes-' + receitaId + '-' + iid);
+    // ── Atualiza label de porções dentro do card ─────────────────
+    const elLabel = document.getElementById('ing-label-porcoes-' + receitaId + '-' + iid);
     if (elLabel) elLabel.textContent = porcoesSolicitadas;
 
-    // ── Atualiza "Necessário para N porções" ────────────────────
-    var elNec = document.getElementById('ing-necessario-' + receitaId + '-' + iid);
+    // ── Atualiza "Necessário para N porções" ─────────────────────
+    const elNec = document.getElementById('ing-necessario-' + receitaId + '-' + iid);
     if (elNec) elNec.textContent = necessarioAgora.toFixed(2) + ' ' + unidade;
 
-    // ── Atualiza linha de consumo por porção ────────────────────
-    var elConsumo = document.getElementById('ing-consumo-' + receitaId + '-' + iid);
+    // ── Atualiza linha de consumo por porção ─────────────────────
+    const elConsumo = document.getElementById('ing-consumo-' + receitaId + '-' + iid);
     if (elConsumo) {
       elConsumo.textContent =
         consumoPorPorcao.toFixed(3) + ' ' + unidade + ' × ' +
         porcoesSolicitadas + ' porções';
     }
 
-    // ── Cor do estoque disponível (vermelho/verde) ───────────────
-    var elDispClasse = document.getElementById('ing-disponivel-classe-' + receitaId + '-' + iid);
+    // ── Cor do estoque disponível (vermelho/verde) ────────────────
+    const elDispClasse = document.getElementById('ing-disponivel-classe-' + receitaId + '-' + iid);
     if (elDispClasse) {
       if (necessarioAgora > disponivel) {
         elDispClasse.className = 'text-danger fw-bold';
@@ -1004,10 +1022,10 @@ function atualizarIngredientes(receitaId, porcoesSolicitadas) {
       }
     }
 
-    // ── Alerta de falta / suficiência ───────────────────────────
-    var elAlerta = document.getElementById('ing-alerta-' + receitaId + '-' + iid);
+    // ── Alerta de falta / suficiência ────────────────────────────
+    const elAlerta = document.getElementById('ing-alerta-' + receitaId + '-' + iid);
     if (elAlerta) {
-      var falta = necessarioAgora - disponivel;
+      const falta = necessarioAgora - disponivel;
       if (falta > 0) {
         elAlerta.style.background = '#D32F2F';
         elAlerta.style.color      = 'white';
@@ -1016,6 +1034,10 @@ function atualizarIngredientes(receitaId, porcoesSolicitadas) {
           'Faltam <strong>' + falta.toFixed(2) + ' ' + unidade + '</strong>' +
           ' — necessário: ' + necessarioAgora.toFixed(2) +
           ' | disponível: ' + disponivel.toFixed(2) + ' ' + unidade;
+
+        // Acumula para o alerta global de faltantes
+        faltantesAgora.push({ produto: nomeProd, falta: falta, unidade: unidade });
+
       } else {
         elAlerta.style.background = '#E8F5E9';
         elAlerta.style.color      = '#2E7D32';
@@ -1026,7 +1048,7 @@ function atualizarIngredientes(receitaId, porcoesSolicitadas) {
       }
     }
 
-    // ── Borda e fundo do card (vermelho se insuficiente) ────────
+    // ── Borda e fundo do card (vermelho se insuficiente) ─────────
     if (necessarioAgora > disponivel) {
       card.style.borderColor = '#FECACA';
       card.style.background  = '#FFEBEE';
@@ -1035,6 +1057,35 @@ function atualizarIngredientes(receitaId, porcoesSolicitadas) {
       card.style.background  = 'white';
     }
   });
+
+  // ── Atualiza (ou oculta) o alerta global de faltantes ────────
+  atualizarAlertaFaltantes(receitaId, faltantesAgora);
+}
+
+
+// ─────────────────────────────────────────────────────────────────
+// ALERTA GLOBAL DE FALTANTES — atualizado dinamicamente pelo JS
+// ─────────────────────────────────────────────────────────────────
+
+function atualizarAlertaFaltantes(receitaId, faltantesAgora) {
+  const alertaEl = document.getElementById('alerta-faltantes-' + receitaId);
+  if (!alertaEl) return;
+
+  const listaEl = document.getElementById('faltantes-lista-' + receitaId);
+
+  if (faltantesAgora.length > 0) {
+    // Reconstrói a lista de faltantes com valores atuais
+    if (listaEl) {
+      listaEl.innerHTML = faltantesAgora.map(function(f) {
+        return '<li><strong>' + f.produto + '</strong>: faltam <strong>' +
+               f.falta.toFixed(2) + ' ' + f.unidade + '</strong></li>';
+      }).join('');
+    }
+    alertaEl.style.display = '';
+  } else {
+    // Sem faltantes: esconde o bloco
+    alertaEl.style.display = 'none';
+  }
 }
 
 
@@ -1141,7 +1192,6 @@ function ajustarTudoParaMaximo() {
     if (maximoEstoque > 0 && input) {
       input.value = maximoEstoque;
       validarVisualEstoque(id, maximoEstoque, maximoEstoque);
-      // ← NOVO
       atualizarIngredientes(id, maximoEstoque);
     }
   });
@@ -1232,15 +1282,12 @@ document.getElementById('formExecucao').addEventListener('submit', function(e) {
     const id  = card.dataset.receitaId;
     const input = document.getElementById('input_' + id);
     if (!input || input.disabled) {
-      // Mesmo desabilitado, zera os ingredientes para 0
       atualizarIngredientes(id, 0);
       return;
     }
 
     let porcoes = parseInt(input.value) || 0;
 
-    // Se veio de matrículas e o campo ainda está no valor do rendimento base,
-    // ajusta para a quantidade de alunos
     if (quantidadeAlunosDefinida > 0) {
       porcoes = quantidadeAlunosDefinida > 1000 ? 1000 : quantidadeAlunosDefinida;
       if (parseInt(input.value) !== porcoes) {
@@ -1249,7 +1296,6 @@ document.getElementById('formExecucao').addEventListener('submit', function(e) {
     }
 
     validarVisualEstoque(id, porcoes, maximoEstoque);
-    // ← NOVO: calcula ingredientes com o valor inicial
     atualizarIngredientes(id, porcoes);
   });
 

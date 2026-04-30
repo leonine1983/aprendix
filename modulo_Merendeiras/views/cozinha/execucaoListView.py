@@ -13,6 +13,8 @@ class ExecucaoListView( BaseMerendeiraView, ListView):
     context_object_name = "execucoes"
     paginate_by = 10
 
+    
+
 
     def get_queryset(self):
         """

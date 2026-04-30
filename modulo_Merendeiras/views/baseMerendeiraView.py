@@ -1,6 +1,7 @@
 
 from core.permissions import GroupRequiredMixin
 from core.groups.merenda import MERENDEIRA_GROUPS
+from core.models import ConfiguraPessoal
 
 class BaseMerendeiraView(GroupRequiredMixin):
     group_required = MERENDEIRA_GROUPS

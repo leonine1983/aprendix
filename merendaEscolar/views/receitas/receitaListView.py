@@ -67,29 +67,15 @@ class ReceitaListView(BaseNutricionistaView, ListView):
         context["page_size_options"] = [10, 20, 30, 50]
         
         return context
-    
 
 
-
-
-class ReceitaDetailView(
-    LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
-    DetailView
-):
+class ReceitaDetailView(BaseNutricionistaView, DetailView):
     model = Receita
     template_name = "merendaEscolar/receitas/receitar_detalhe.html"
     context_object_name = "receita"
 
     permission_required = "merendaEscolar.view_receita"
     group_required = NUTRICIONISTA_GROUPS
-
-
-
-
-# ajuste conforme seu projeto
-NUTRICIONISTA_GROUPS = ("Nutricionista", "Admin")
 
 
 # ==============================
@@ -111,19 +97,11 @@ ReceitaIngredienteFormSet = inlineformset_factory(
 # ==============================
 # CREATE VIEW COMPLETA
 # ==============================
-class ReceitaCreateView(
-    LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
-    CreateView
-):
+class ReceitaCreateView(BaseNutricionistaView, CreateView):
     model = Receita
     fields = ["nome", "descricao", "modo_preparo", "ativa", 'rendimento']
     template_name = "merendaEscolar/receitas/receita_form.html"
     success_url = reverse_lazy("merendaEscolar:receita_lista")
-
-    permission_required = "merendaEscolar.add_receita"
-    group_required = NUTRICIONISTA_GROUPS
 
     # ==============================
     # CONTEXTO COM FORMSET
@@ -187,13 +165,9 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.db import transaction
+from core.views.baseNutricionista import BaseNutricionistaView
 
-class ReceitaUpdateView(
-    LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
-    UpdateView
-):
+class ReceitaUpdateView(BaseNutricionistaView, UpdateView):
     model = Receita
     fields = ["nome", "descricao", "modo_preparo", "ativa", 'rendimento']
     template_name = "merendaEscolar/receitas/receita_form.html"
@@ -270,19 +244,10 @@ class ReceitaUpdateView(
 # DELETAR RECEITA --------------------   
 
 from django.urls import reverse
-
-class ReceitaDeleteView(
-    LoginRequiredMixin,
-    GroupRequiredMixin,
-    PermissionRequiredMixin,
-    DeleteView
-):
+class ReceitaDeleteView(BaseNutricionistaView, DeleteView):
     model = Receita
     template_name = "merendaEscolar/receitas/receita_excluir.html"
     success_url = reverse_lazy("merendaEscolar:receita_lista")
-
-    permission_required = "merendaEscolar.delete_receita"
-    group_required = NUTRICIONISTA_GROUPS
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

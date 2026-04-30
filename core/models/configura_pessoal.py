@@ -9,4 +9,7 @@ class ConfiguraPessoal(models.Model):
     pagina_dashboardEscola = models.IntegerField(default=5, verbose_name="Lista de Cardápios", null=True, blank=True)
     pagina_estoqueCentral = models.IntegerField(default=5, verbose_name="Lista de Cardápios", null=True, blank=True)
 
+    # App Merendeiras
+    pagina_ExecutaReceitas = models.IntegerField(default=5, verbose_name="Lista de Cardápios", null=True, blank=True)
+
     
