@@ -46,11 +46,7 @@ urlpatterns = [
     path("receitas/<int:pk>/", views.ReceitaDetailView.as_view(), name="receita_detalhe"),
 
     path("execucoes/", views.ExecucaoListView.as_view(), name="execucao_lista"),
-    path("execucoes/<int:pk>/executar/", views.ExecutarReceitaView.as_view(), name="executar_receita"),
-
-   
-
-
+    path("execucoes/<int:pk>/executar/", views.ExecutarReceitaView.as_view(), name="executar_receita"), 
     
     path("cozinha/execucoes/", views.ExecucaoListView.as_view(), name="lista_execucoes"),
       
