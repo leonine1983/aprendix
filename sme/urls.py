@@ -39,5 +39,7 @@ urlpatterns = [
     path('escola_merenda/', include('modulo_Merendeiras.urls')),
     
     # extras
-    path('ckeditor/', include("ckeditor_uploader.urls"))
+    path('ckeditor/', include("ckeditor_uploader.urls")),
+
+    path("arquitetura/", include("arquitetura.urls")),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

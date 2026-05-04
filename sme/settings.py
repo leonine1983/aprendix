@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'ckeditor_uploader',    
     'widget_tweaks',
     'django.contrib.humanize',
+    "django_extensions",
+    "arquitetura"
 
 ]
 

@@ -5,6 +5,10 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from merendaEscolar.models import ExecucaoReceita, EstoqueEscola, MovimentacaoEstoque
 from django.db.models import F
+from merendaEscolar.models import Receita
+from modulo_Merendeiras.models import ExecucaoCardapioDia
+from modulo_Merendeiras.models import (ExecucaoCardapioDia, executar_cardapio_do_dia, verificar_disponibilidade_ingredientes)
+
 
 @transaction.atomic
 def executar_receita(execucao: ExecucaoReceita, usuario):
@@ -73,3 +77,7 @@ def executar_receita(execucao: ExecucaoReceita, usuario):
     execucao.executada_por = usuario
     execucao.data_execucao = hoje
     execucao.save(update_fields=["status", "executada_por", "data_execucao"])
+
+
+
+

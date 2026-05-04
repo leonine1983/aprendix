@@ -267,3 +267,10 @@ def subtrai(valor, subtrator):
         return float(valor) - float(subtrator)
     except (ValueError, TypeError):
         return 0
+    
+
+@register.filter
+def dict_get(d, key):
+    if isinstance(d, dict):
+        return d.get(key, [])
+    return []

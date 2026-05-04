@@ -389,39 +389,61 @@ class EstoqueInsuficienteError(ValidationError):
     pass
 
 
+from django.db import models
+from django.utils import timezone
+
 def verificar_disponibilidade_ingredientes(escola, receita, porcoes):
-    """
-    Pré-validação: Verifica se há estoque suficiente antes de iniciar execução.
-    Retorna tupla: (disponivel: bool, detalhes: dict)
-    """
     ingredientes_necessarios = []
     faltantes = []
-    
+
     for ingrediente in receita.ingredientes.all():
         quantidade_necessaria = ingrediente.quantidade * porcoes
-        
-        # Soma estoque disponível FEFO
-        estoque_disponivel = EstoqueEscola.objects.filter(
-            escola=escola,
-            produto=ingrediente.produto,
-            quantidade__gt=0,
-            data_validade__gte=timezone.now().date()
-        ).aggregate(total=models.Sum('quantidade'))['total'] or 0
-        
+
+        # 🔥 pega estoques ordenados por validade (FEFO)
+        estoques = list(
+            EstoqueEscola.objects.filter(
+                escola=escola,
+                produto=ingrediente.produto,
+                quantidade__gt=0,
+                data_validade__gte=timezone.now().date()
+            ).order_by('data_validade')
+        )
+
+        restante = quantidade_necessaria
+        estoque_total = 0
+        estoques_usados = []
+
+        for estoque in estoques:
+            if restante <= 0:
+                break
+
+            consumir = min(estoque.quantidade, restante)
+
+            estoques_usados.append({
+                'estoque_obj': estoque,
+                'quantidade_usada': consumir
+            })
+
+            restante -= consumir
+            estoque_total += estoque.quantidade
+
+        suficiente = restante <= 0
+
         ingredientes_necessarios.append({
             'produto': ingrediente.produto,
             'necessario': quantidade_necessaria,
-            'disponivel': estoque_disponivel,
-            'suficiente': estoque_disponivel >= quantidade_necessaria
+            'disponivel': estoque_total,
+            'suficiente': suficiente,
+            'estoques_usados': estoques_usados  # 🔥 ESSENCIAL
         })
-        
-        if estoque_disponivel < quantidade_necessaria:
+
+        if not suficiente:
             faltantes.append({
                 'produto': ingrediente.produto.nome,
-                'faltando': quantidade_necessaria - estoque_disponivel,
+                'faltando': restante,
                 'unidade': ingrediente.produto.unidade_medida
             })
-    
+
     return (len(faltantes) == 0), {
         'ingredientes': ingredientes_necessarios,
         'faltantes': faltantes
@@ -757,3 +779,6 @@ def descartar_produto_escola(estoque, quantidade, motivo, usuario, descricao=Non
 )
 
     return descarte
+
+
+

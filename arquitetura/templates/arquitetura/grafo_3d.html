@@ -1,0 +1,574 @@
+{% extends "merendaEscolar/estoque_base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  #grafo-wrapper {
+    position: relative;
+    width: 100%;
+    height: 90vh;
+    background: #060d1a;
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+  }
+
+  #grafo-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  #grafo-header {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: 10px 16px;
+    background: rgba(6,13,26,0.85);
+    border-bottom: 1px solid #1e3a5f;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    backdrop-filter: blur(6px);
+  }
+
+  #grafo-header h2 {
+    margin: 0;
+    color: #7dd3fc;
+    font-size: 15px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  #grafo-header a {
+    background: #0ea5e9;
+    padding: 6px 14px;
+    border-radius: 4px;
+    color: white;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  #grafo-header a:hover { background: #38bdf8; }
+
+  #grafo-tooltip {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(6,13,26,0.92);
+    border: 1px solid #1e3a5f;
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: #e2e8f0;
+    font-size: 12px;
+    max-width: 280px;
+    z-index: 10;
+    pointer-events: none;
+    display: none;
+  }
+
+  #grafo-tooltip .tt-title {
+    color: #7dd3fc;
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  #grafo-tooltip .tt-app {
+    color: #94a3b8;
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+
+  #grafo-tooltip .tt-rel {
+    color: #a5f3fc;
+    font-size: 11px;
+  }
+
+  #grafo-legend {
+    position: absolute;
+    top: 60px;
+    right: 16px;
+    background: rgba(6,13,26,0.85);
+    border: 1px solid #1e3a5f;
+    border-radius: 6px;
+    padding: 10px 14px;
+    z-index: 10;
+    max-height: 70vh;
+    overflow-y: auto;
+    font-size: 11px;
+  }
+
+  #grafo-legend .leg-title {
+    color: #7dd3fc;
+    font-weight: bold;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+
+  .leg-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 5px;
+    color: #cbd5e1;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background 0.15s;
+  }
+
+  .leg-item:hover { background: rgba(125,211,252,0.08); }
+
+  .leg-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  #grafo-controls {
+    position: absolute;
+    bottom: 20px;
+    right: 16px;
+    color: #475569;
+    font-size: 10px;
+    text-align: right;
+    z-index: 10;
+    line-height: 1.8;
+  }
+
+  #grafo-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #7dd3fc;
+    font-size: 14px;
+    letter-spacing: 2px;
+    z-index: 20;
+  }
+
+  .loading-spinner {
+    width: 36px;
+    height: 36px;
+    border: 2px solid #1e3a5f;
+    border-top-color: #0ea5e9;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 14px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<div id="grafo-wrapper">
+  <div id="grafo-loading">
+    <div class="loading-spinner"></div>
+    CARREGANDO GRAFO...
+  </div>
+
+  <div id="grafo-header">
+    <h2>🧠 Arquitetura do Sistema</h2>
+    <a href="{% url 'arquitetura_system:atualizar_grafo' %}">🔄 Atualizar Grafo</a>
+  </div>
+
+  <canvas id="grafo-canvas"></canvas>
+
+  <div id="grafo-tooltip">
+    <div class="tt-title" id="tt-title"></div>
+    <div class="tt-app" id="tt-app"></div>
+    <div class="tt-rel" id="tt-rel"></div>
+  </div>
+
+  <div id="grafo-legend">
+    <div class="leg-title">Apps</div>
+    <div id="leg-items"></div>
+  </div>
+
+  <div id="grafo-controls">
+    🖱️ Arrastar: rotacionar<br>
+    🖱️ Scroll: zoom<br>
+    🖱️ Botão direito: pan<br>
+    🖱️ Hover: detalhes
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+(function() {
+
+// ─── PALETA DE CORES POR APP ───────────────────────────────────────────────
+const APP_COLORS = {
+  'django.contrib.admin':        '#f97316',
+  'django.contrib.auth':         '#a855f7',
+  'django.contrib.contenttypes': '#ec4899',
+  'django.contrib.sessions':     '#6366f1',
+  'rh':                          '#22c55e',
+  'admin_acessos':               '#eab308',
+  'gestao_escolar':              '#06b6d4',
+  'controle_estoque':            '#f43f5e',
+  'modulo_professor':            '#84cc16',
+  'core':                        '#fb923c',
+  'merendaEscolar':              '#38bdf8',
+  'modulo_Merendeiras':          '#c084fc',
+};
+
+function getColor(appName) {
+  return APP_COLORS[appName] || '#94a3b8';
+}
+
+// ─── PARSE DO JSON ────────────────────────────────────────────────────────
+function parseGrafo(data) {
+  const nodeMap = {};  // name -> node object
+  const links = [];
+
+  data.graphs.forEach(graph => {
+    const appName = graph.app_name;
+    graph.models.forEach(model => {
+      const id = model.name;
+      if (!nodeMap[id]) {
+        nodeMap[id] = {
+          id,
+          app: appName,
+          relations: [],
+          color: getColor(appName),
+        };
+      }
+      if (model.relations) {
+        model.relations.forEach(rel => {
+          if (rel.target && rel.target !== model.name) {
+            nodeMap[id].relations.push({ target: rel.target, type: rel.type });
+            links.push({ source: id, target: rel.target, type: rel.type });
+          }
+        });
+      }
+    });
+  });
+
+  return { nodes: Object.values(nodeMap), links };
+}
+
+// ─── LAYOUT: FORCE-DIRECTED SIMPLES (SEM FÍSICA COMPLEXA) ─────────────────
+function computeLayout(nodes, links, iterations = 120) {
+  const N = nodes.length;
+  const pos = {};
+
+  // Inicializa posições em esfera
+  nodes.forEach((n, i) => {
+    const phi = Math.acos(-1 + (2 * i) / N);
+    const theta = Math.sqrt(N * Math.PI) * phi;
+    const r = 300;
+    pos[n.id] = {
+      x: r * Math.sin(phi) * Math.cos(theta),
+      y: r * Math.sin(phi) * Math.sin(theta),
+      z: r * Math.cos(phi),
+    };
+  });
+
+  const vel = {};
+  nodes.forEach(n => { vel[n.id] = { x: 0, y: 0, z: 0 }; });
+
+  // Cria mapa de adjacência
+  const adj = {};
+  nodes.forEach(n => { adj[n.id] = new Set(); });
+  links.forEach(l => {
+    if (adj[l.source] && adj[l.target]) {
+      adj[l.source].add(l.target);
+      adj[l.target].add(l.source);
+    }
+  });
+
+  const REPULSION = 18000;
+  const ATTRACTION = 0.03;
+  const DAMPING = 0.8;
+  const IDEAL = 80;
+
+  for (let iter = 0; iter < iterations; iter++) {
+    const force = {};
+    nodes.forEach(n => { force[n.id] = { x: 0, y: 0, z: 0 }; });
+
+    // Repulsão entre todos
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i], b = nodes[j];
+        const pa = pos[a.id], pb = pos[b.id];
+        const dx = pa.x - pb.x, dy = pa.y - pb.y, dz = pa.z - pb.z;
+        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) || 0.1;
+        const f = REPULSION / (dist * dist);
+        const fx = (dx / dist) * f;
+        const fy = (dy / dist) * f;
+        const fz = (dz / dist) * f;
+        force[a.id].x += fx; force[a.id].y += fy; force[a.id].z += fz;
+        force[b.id].x -= fx; force[b.id].y -= fy; force[b.id].z -= fz;
+      }
+    }
+
+    // Atração por links
+    links.forEach(l => {
+      const pa = pos[l.source], pb = pos[l.target];
+      if (!pa || !pb) return;
+      const dx = pb.x - pa.x, dy = pb.y - pa.y, dz = pb.z - pa.z;
+      const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) || 0.1;
+      const f = ATTRACTION * (dist - IDEAL);
+      const fx = (dx / dist) * f;
+      const fy = (dy / dist) * f;
+      const fz = (dz / dist) * f;
+      force[l.source].x += fx; force[l.source].y += fy; force[l.source].z += fz;
+      force[l.target].x -= fx; force[l.target].y -= fy; force[l.target].z -= fz;
+    });
+
+    nodes.forEach(n => {
+      vel[n.id].x = (vel[n.id].x + force[n.id].x) * DAMPING;
+      vel[n.id].y = (vel[n.id].y + force[n.id].y) * DAMPING;
+      vel[n.id].z = (vel[n.id].z + force[n.id].z) * DAMPING;
+      pos[n.id].x += vel[n.id].x * 0.1;
+      pos[n.id].y += vel[n.id].y * 0.1;
+      pos[n.id].z += vel[n.id].z * 0.1;
+    });
+  }
+
+  return pos;
+}
+
+// ─── RENDERIZAÇÃO THREE.JS ─────────────────────────────────────────────────
+function initScene(nodes, links, positions) {
+  const canvas = document.getElementById('grafo-canvas');
+  const wrapper = document.getElementById('grafo-wrapper');
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
+  renderer.setClearColor(0x060d1a, 1);
+
+  const scene = new THREE.Scene();
+
+  // Névoa
+  scene.fog = new THREE.FogExp2(0x060d1a, 0.002);
+
+  // Câmera
+  const camera = new THREE.PerspectiveCamera(60, wrapper.clientWidth / wrapper.clientHeight, 1, 3000);
+  camera.position.set(0, 0, 700);
+
+  // Luz ambiente
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  const dirLight = new THREE.DirectionalLight(0x7dd3fc, 1);
+  dirLight.position.set(1, 1, 1);
+  scene.add(dirLight);
+
+  // ── ARESTAS ──
+  const edgeMat = new THREE.LineBasicMaterial({ color: 0x1e3a5f, transparent: true, opacity: 0.4 });
+  const edgeInheritMat = new THREE.LineBasicMaterial({ color: 0x334155, transparent: true, opacity: 0.25, linewidth: 1 });
+
+  links.forEach(link => {
+    const pa = positions[link.source];
+    const pb = positions[link.target];
+    if (!pa || !pb) return;
+    const geo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(pa.x, pa.y, pa.z),
+      new THREE.Vector3(pb.x, pb.y, pb.z),
+    ]);
+    const mat = link.type === 'inheritance' ? edgeInheritMat : edgeMat;
+    scene.add(new THREE.Line(geo, mat));
+  });
+
+  // ── NÓS ──
+  const sphereGeo = new THREE.SphereGeometry(5, 16, 16);
+  const nodeMeshes = [];
+  const nodeData = {};
+
+  nodes.forEach(node => {
+    const p = positions[node.id];
+    if (!p) return;
+
+    const mat = new THREE.MeshPhongMaterial({
+      color: parseInt(node.color.replace('#', '0x')),
+      emissive: parseInt(node.color.replace('#', '0x')),
+      emissiveIntensity: 0.3,
+      shininess: 80,
+    });
+
+    const mesh = new THREE.Mesh(sphereGeo, mat);
+    mesh.position.set(p.x, p.y, p.z);
+    mesh.userData = { node };
+    scene.add(mesh);
+    nodeMeshes.push(mesh);
+    nodeData[node.id] = { mesh, node };
+  });
+
+  // ── PARTÍCULAS DE FUNDO ──
+  const starGeo = new THREE.BufferGeometry();
+  const starVerts = [];
+  for (let i = 0; i < 800; i++) {
+    starVerts.push(
+      (Math.random() - 0.5) * 2000,
+      (Math.random() - 0.5) * 2000,
+      (Math.random() - 0.5) * 2000,
+    );
+  }
+  starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starVerts, 3));
+  const starMat = new THREE.PointsMaterial({ color: 0x1e3a5f, size: 1.5, transparent: true, opacity: 0.6 });
+  scene.add(new THREE.Points(starGeo, starMat));
+
+  // ── CONTROLES ORBITAIS MANUAIS ──
+  let isDragging = false, isPanning = false;
+  let lastX = 0, lastY = 0;
+  let rotX = 0, rotY = 0;
+  let panX = 0, panY = 0;
+  let zoom = 700;
+
+  canvas.addEventListener('mousedown', e => {
+    if (e.button === 2) { isPanning = true; }
+    else { isDragging = true; }
+    lastX = e.clientX; lastY = e.clientY;
+  });
+
+  window.addEventListener('mouseup', () => { isDragging = false; isPanning = false; });
+
+  window.addEventListener('mousemove', e => {
+    if (isDragging) {
+      rotY += (e.clientX - lastX) * 0.005;
+      rotX += (e.clientY - lastY) * 0.005;
+      lastX = e.clientX; lastY = e.clientY;
+    }
+    if (isPanning) {
+      panX += (e.clientX - lastX) * 0.5;
+      panY -= (e.clientY - lastY) * 0.5;
+      lastX = e.clientX; lastY = e.clientY;
+    }
+  });
+
+  canvas.addEventListener('wheel', e => {
+    zoom += e.deltaY * 0.5;
+    zoom = Math.max(100, Math.min(1800, zoom));
+  });
+
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+  // ── RAYCASTING / TOOLTIP ──
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  const tooltip = document.getElementById('grafo-tooltip');
+  let hoveredMesh = null;
+
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const hits = raycaster.intersectObjects(nodeMeshes);
+
+    if (hits.length > 0) {
+      const hit = hits[0];
+      if (hoveredMesh !== hit.object) {
+        if (hoveredMesh) hoveredMesh.scale.set(1, 1, 1);
+        hoveredMesh = hit.object;
+        hoveredMesh.scale.set(1.8, 1.8, 1.8);
+      }
+      const { node } = hit.object.userData;
+      const relCount = node.relations ? node.relations.length : 0;
+      document.getElementById('tt-title').textContent = node.id;
+      document.getElementById('tt-app').textContent = '📦 ' + node.app;
+      document.getElementById('tt-rel').textContent = relCount > 0
+        ? '🔗 ' + relCount + ' relação(ões): ' + node.relations.slice(0, 3).map(r => r.target).join(', ') + (relCount > 3 ? '...' : '')
+        : '— sem relações externas';
+      tooltip.style.display = 'block';
+      canvas.style.cursor = 'pointer';
+    } else {
+      if (hoveredMesh) { hoveredMesh.scale.set(1, 1, 1); hoveredMesh = null; }
+      tooltip.style.display = 'none';
+      canvas.style.cursor = 'default';
+    }
+  });
+
+  // ── PIVOT PARA ROTAÇÃO ──
+  const pivot = new THREE.Object3D();
+  scene.add(pivot);
+  nodeMeshes.forEach(m => pivot.add(m));
+
+  // ── LOOP ──
+  function animate() {
+    requestAnimationFrame(animate);
+
+    pivot.rotation.x = rotX;
+    pivot.rotation.y = rotY;
+
+    camera.position.set(panX, panY, zoom);
+    camera.lookAt(panX, panY, 0);
+
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // ── RESIZE ──
+  window.addEventListener('resize', () => {
+    const w = wrapper.clientWidth, h = wrapper.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  });
+}
+
+// ─── LEGENDA ──────────────────────────────────────────────────────────────
+function buildLegend(apps) {
+  const container = document.getElementById('leg-items');
+  Object.entries(apps).forEach(([app, color]) => {
+    const shortName = app.split('.').pop();
+    const item = document.createElement('div');
+    item.className = 'leg-item';
+    item.innerHTML = `<div class="leg-dot" style="background:${color}"></div><span>${shortName}</span>`;
+    container.appendChild(item);
+  });
+}
+
+// ─── MAIN ─────────────────────────────────────────────────────────────────
+fetch("{% static 'arquitetura/grafo.json' %}")
+  .then(res => {
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  })
+  .then(data => {
+    const { nodes, links } = parseGrafo(data);
+
+    if (nodes.length === 0) throw new Error('Nenhum modelo encontrado no JSON');
+
+    console.log(`✅ ${nodes.length} nós | ${links.length} links`);
+
+    // Layout assíncrono para não travar UI
+    setTimeout(() => {
+      const positions = computeLayout(nodes, links, 150);
+
+      // Descobrir apps presentes
+      const appsPresentes = {};
+      nodes.forEach(n => { appsPresentes[n.app] = n.color; });
+      buildLegend(appsPresentes);
+
+      initScene(nodes, links, positions);
+
+      document.getElementById('grafo-loading').style.display = 'none';
+    }, 50);
+  })
+  .catch(err => {
+    document.getElementById('grafo-loading').innerHTML = `
+      <div style="color:#f87171;text-align:center;padding:20px;">
+        ❌ Erro ao carregar grafo<br>
+        <small style="color:#94a3b8">${err.message}</small><br><br>
+        <a href="{% url 'arquitetura_system:atualizar_grafo' %}" 
+           style="color:#7dd3fc;font-size:12px;">
+          🔄 Clique aqui para gerar o grafo
+        </a>
+      </div>
+    `;
+  });
+
+})();
+</script>
+
+{% endblock %}
