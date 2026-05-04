@@ -649,32 +649,49 @@
 let QTD_ALUNOS = parseInt('{{ quantidade_alunos|default:0 }}') || 0;
 
 /* ── Toast ───────────────────────────────────────────── */
-function toast(msg, t) {
+function toast(msg, t = 'i') {
   document.querySelector('.toast')?.remove();
+
   const el = document.createElement('div');
-  el.className = 'toast toast--' + (t || 'i');
-  el.innerHTML = '<i class="fas fa-info-circle me-2"></i>' + msg;
+  el.className = 'toast toast--' + t;
+  el.innerHTML = msg;
+
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 3500);
+  setTimeout(() => el.remove(), 3000);
 }
 
-/* ── Toggle ingredientes ─────────────────────────────── */
+/* ── Toggle ingredientes (CORRIGIDO) ─────────────────── */
 function toggleIng(id) {
-  const p = document.getElementById('ing-' + id);
-  const c = document.getElementById('chevron-' + id);
-  p.classList.toggle('show');
-  c.style.transform = p.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
+  const panel = document.getElementById(`ing-${id}`);
+  const chevron = document.getElementById(`chevron-${id}`);
+
+  if (!panel) return;
+
+  panel.classList.toggle('show');
+
+  if (chevron) {
+    chevron.style.transform = panel.classList.contains('show')
+      ? 'rotate(180deg)'
+      : 'rotate(0deg)';
+  }
 }
 
 /* ── Controle de porções ─────────────────────────────── */
 function ajustar(id, delta) {
-  const inp = document.getElementById('inp-' + id);
-  const form = document.getElementById('form-receita-' + id);
-  const max  = parseInt(form.dataset.maximoEstoque) || 0;
+  const inp = document.getElementById(`inp-${id}`);
+  const form = document.getElementById(`form-receita-${id}`);
+
+  if (!inp || !form) return;
+
+  const max = parseInt(form.dataset.maximoEstoque) || 0;
 
   let v = (parseInt(inp.value) || 0) + delta;
 
-  if (v > 1000) { v = 1000; toast('Limite: 1000 porções', 'w'); }
+  if (v > 1000) {
+    v = 1000;
+    toast('Limite: 1000 porções', 'w');
+  }
+
   if (v < 0) v = 0;
 
   inp.value = v;
@@ -682,131 +699,91 @@ function ajustar(id, delta) {
 }
 
 function definir(id, valor) {
-  const form = document.getElementById('form-receita-' + id);
-  const max  = parseInt(form.dataset.maximoEstoque) || 0;
+  const form = document.getElementById(`form-receita-${id}`);
+  if (!form) return;
 
-  if (valor > 1000) valor = 1000;
+  const max = parseInt(form.dataset.maximoEstoque) || 0;
 
-  document.getElementById('inp-' + id).value = valor;
+  valor = Math.min(valor, 1000);
+
+  const inp = document.getElementById(`inp-${id}`);
+  inp.value = valor;
+
   onPorcoesChange(id, valor, max);
 }
 
 function validar(inp, id) {
-  const form = document.getElementById('form-receita-' + id);
-  const max  = parseInt(form.dataset.maximoEstoque) || 0;
+  const form = document.getElementById(`form-receita-${id}`);
+  if (!form) return;
+
+  const max = parseInt(form.dataset.maximoEstoque) || 0;
 
   let v = parseInt(inp.value) || 0;
 
-  if (v > 1000) { v = 1000; inp.value = 1000; toast('Limite: 1000 porções', 'w'); }
-  if (v < 0)    { v = 0;    inp.value = 0; }
+  if (v > 1000) {
+    v = 1000;
+    inp.value = 1000;
+  }
+
+  if (v < 0) {
+    v = 0;
+    inp.value = 0;
+  }
 
   onPorcoesChange(id, v, max);
 }
 
-/* ── CORE ────────────────────────────────────────────── */
+/* ── CORE ───────────────────────────────────────────── */
 function onPorcoesChange(id, porcoes, max) {
   atualizarVisualEstoque(id, porcoes, max);
   atualizarIngredientes(id, porcoes);
-  atualizarResumo(id, porcoes, max);
+  atualizarResumo(id, porcoes);
   atualizarBotaoExec(id);
 }
 
-/* ── Visual estoque ───────────────────────────────────── */
+/* ── Estoque ─────────────────────────────────────────── */
 function atualizarVisualEstoque(id, v, max) {
-  const inp  = document.getElementById('inp-' + id);
-  const info = document.getElementById('info-' + id);
-  const bar  = document.getElementById('bar-' + id);
-  const pct  = document.getElementById('pct-' + id);
+  const inp = document.getElementById(`inp-${id}`);
+  const info = document.getElementById(`info-${id}`);
+
+  if (!inp || !info) return;
 
   if (max > 0 && v > max) {
     inp.classList.add('over');
-    info.innerHTML = '<span class="ow">⚠️ Excede em ' + (v - max) + ' porções</span>';
-
-    if (bar) {
-      bar.className = 'sb-fill sb-fill--d';
-      bar.style.width = '100%';
-    }
-
-    if (pct) {
-      pct.textContent = '>100%';
-      pct.className = 'fw-bold text-danger';
-    }
-
+    info.innerHTML = `⚠️ Excede em ${v - max} porções`;
   } else {
     inp.classList.remove('over');
-
-    if (max > 0) {
-      const p = Math.min(100, Math.round((v / max) * 100));
-
-      info.innerHTML =
-        (QTD_ALUNOS > 0 && v < QTD_ALUNOS)
-          ? '<span style="color:var(--amber);">⚠️ Abaixo da previsão (' + QTD_ALUNOS + ')</span>'
-          : '<span style="color:var(--green);">✓ Dentro do limite</span>';
-
-      if (bar) {
-        bar.className = 'sb-fill ' + (p > 90 ? 'sb-fill--ok' : 'sb-fill--w');
-        bar.style.width = p + '%';
-      }
-
-      if (pct) {
-        pct.textContent = p + '%';
-      }
-
-    } else {
-      info.innerHTML = 'Sem estoque';
-    }
+    info.innerHTML = '✓ Dentro do limite';
   }
 }
 
-/* ── Ingredientes + FALTANTES (🔥 CORRIGIDO) ───────────── */
+/* ── Ingredientes (CORRIGIDO PRINCIPAL) ─────────────── */
 function atualizarIngredientes(receitaId, porcoes) {
-  porcoes = parseInt(porcoes) || 0;
+  const cards = document.querySelectorAll(`.ing-card[data-receita-id="${receitaId}"]`);
 
-  const elBL = document.getElementById('label-p-' + receitaId);
-  const elTL = document.getElementById('titulo-p-' + receitaId);
+  cards.forEach((card, index) => {
+    const iid = index + 1;
 
-  if (elBL) elBL.textContent = porcoes;
-  if (elTL) elTL.textContent = porcoes;
+    const base = parseFloat(card.dataset.necBase);
+    const rendimento = parseFloat(card.dataset.rendBase);
+    const disp = parseFloat(card.dataset.disp);
 
-  const faltantes = [];
+    const consumo = rendimento > 0 ? base / rendimento : 0;
+    const necessario = consumo * porcoes;
 
-  document.querySelectorAll('.ing-card[data-receita-id="' + receitaId + '"]').forEach(function(card, idx) {
+    const falta = necessario - disp;
 
-    const iid   = idx + 1;
-    const rBase = parseFloat(card.dataset.rendBase) || 1;
-    const necB  = parseFloat(card.dataset.necBase)  || 0;
-    const disp  = parseFloat(card.dataset.disp)     || 0;
-    const un    = card.dataset.un    || '';
-    const nome  = card.dataset.prod  || '';
+    const elNec = document.getElementById(`inec-${receitaId}-${iid}`);
+    const alert = document.getElementById(`ialert-${receitaId}-${iid}`);
 
-    const consumoPorPorcao = rBase > 0 ? necB / rBase : 0;
-    const necessarioAtual  = consumoPorPorcao * porcoes;
-    const falta            = necessarioAtual - disp;
-
-    const pre = receitaId + '-' + iid;
-
-    const set = (id, val) => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = val;
-    };
-
-    set('ilp-' + pre, porcoes);
-    set('inec-' + pre, necessarioAtual.toFixed(2) + ' ' + un);
-    set('icon-' + pre, consumoPorPorcao.toFixed(3) + ' × ' + porcoes);
-
-    const alert = document.getElementById('ialert-' + pre);
+    if (elNec) {
+      elNec.textContent = necessario.toFixed(2);
+    }
 
     if (alert) {
       if (falta > 0) {
         alert.className = 'ing-alert ing-alert--bad';
-        alert.innerHTML = '❌ Faltam ' + falta.toFixed(2) + ' ' + un;
-
-        faltantes.push({
-          nome: nome,
-          falta: falta,
-          un: un
-        });
-
+        alert.innerHTML = `❌ Faltam ${falta.toFixed(2)}`;
       } else {
         alert.className = 'ing-alert ing-alert--ok';
         alert.innerHTML = '✔ Suficiente';
@@ -815,97 +792,67 @@ function atualizarIngredientes(receitaId, porcoes) {
 
     card.classList.toggle('ing-card--bad', falta > 0);
   });
-
-  const box = document.getElementById('af-' + receitaId);
-  const lista = document.getElementById('afl-' + receitaId);
-
-  if (!box || !lista) return;
-
-  if (faltantes.length > 0) {
-    lista.innerHTML = '';
-
-    faltantes.forEach(f => {
-      const li = document.createElement('li');
-      li.innerHTML = `<strong>${f.nome}</strong>: faltam <strong>${f.falta.toFixed(2)} ${f.un}</strong>`;
-      lista.appendChild(li);
-    });
-
-    box.style.display = 'block';
-
-  } else {
-    box.style.display = 'none';
-  }
 }
 
-/* ── Resumo ───────────────────────────────────────────── */
+/* ── Resumo ─────────────────────────────────────────── */
 function atualizarResumo(id, porcoes) {
-  const el = document.getElementById('res-p-' + id);
+  const el = document.getElementById(`res-p-${id}`);
   if (el) el.textContent = porcoes;
 }
 
-/* ── Botão executar ───────────────────────────────────── */
+/* ── Botão executar (CORRIGIDO) ─────────────────────── */
 function atualizarBotaoExec(id) {
-  const turno = document.getElementById('turno-' + id)?.value;
-  const btn   = document.getElementById('btn-' + id);
-  const por   = parseInt(document.getElementById('inp-' + id)?.value) || 0;
+  const turno = document.getElementById(`turno-${id}`);
+  const btn = document.getElementById(`btn-${id}`);
+  const inp = document.getElementById(`inp-${id}`);
 
-  if (btn) {
-    btn.disabled = (!turno || por <= 0);
-  }
+  if (!btn || !turno || !inp) return;
 
-  const label = document.getElementById('res-t-' + id);
-  if (label && turno) {
-    label.textContent = turno;
-  }
+  const por = parseInt(inp.value) || 0;
+
+  btn.disabled = (!turno.value || por <= 0);
+
+  const label = document.getElementById(`res-t-${id}`);
+  if (label) label.textContent = turno.value || '—';
 }
 
-/* ── Aplicar alunos ───────────────────────────────────── */
+/* ── Aplicar alunos ─────────────────────────────────── */
 function aplicarQuantidadeAlunos(valor) {
-  const qtd = parseInt(valor) || 0;
+  const qtd = parseInt(valor);
 
-  if (qtd <= 0) {
-    toast('Informe uma quantidade válida.', 'w');
+  if (!qtd || qtd <= 0) {
+    toast('Valor inválido', 'w');
     return;
   }
 
   QTD_ALUNOS = qtd;
 
   document.querySelectorAll('[id^="form-receita-"]').forEach(form => {
-    const id  = form.dataset.receitaId;
-    const max = parseInt(form.dataset.maximoEstoque) || 0;
-    const inp = document.getElementById('inp-' + id);
+    const id = form.dataset.receitaId;
+    const inp = document.getElementById(`inp-${id}`);
 
     if (!inp || inp.disabled) return;
 
-    const v = Math.min(qtd, 1000);
-
-    inp.value = v;
-    onPorcoesChange(id, v, max);
+    inp.value = qtd;
+    onPorcoesChange(id, qtd, parseInt(form.dataset.maximoEstoque));
   });
 
-  toast('Porções ajustadas para ' + qtd + ' alunos.', 's');
+  toast('Atualizado com sucesso', 's');
 }
 
-/* ── INIT ─────────────────────────────────────────────── */
-(function init() {
+/* ── INIT (ESSENCIAL) ───────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[id^="form-receita-"]').forEach(form => {
-    const id  = form.dataset.receitaId;
-    const max = parseInt(form.dataset.maximoEstoque) || 0;
-    const inp = document.getElementById('inp-' + id);
+    const id = form.dataset.receitaId;
+    const inp = document.getElementById(`inp-${id}`);
 
     if (!inp || inp.disabled) return;
 
-    let v = parseInt(inp.value) || 0;
-
-    if (QTD_ALUNOS > 0) {
-      v = Math.min(QTD_ALUNOS, 1000);
-      inp.value = v;
-    }
+    const v = parseInt(inp.value) || 0;
+    const max = parseInt(form.dataset.maximoEstoque) || 0;
 
     onPorcoesChange(id, v, max);
   });
-})();
-
-
+});
 </script>
 {% endblock %}
