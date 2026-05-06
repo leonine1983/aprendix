@@ -247,6 +247,8 @@ class ExecucaoCardapioItem(models.Model):
         verbose_name_plural = "Itens de Execução"
         unique_together = ['execucao_cardapio', 'receita', 'tipo_refeicao']
 
+    
+
     def __str__(self):
         return f"{self.receita.nome} - {self.tipo_refeicao} ({self.get_status_display()})"
     
@@ -258,11 +260,10 @@ from ckeditor.fields import RichTextField
 
 User = get_user_model()
 
-
-class FichaDiaria(models.Model):
+class FichaExecucaoReceita(models.Model):
     """
-    Representa o registro institucional da Ficha Diária da Alimentação Escolar.
-    Preenchida pela merendeira após a execução do cardápio.
+    Ficha vinculada a UMA execução do cardápio do dia.
+    Criada automaticamente após execução.
     """
 
     ACEITABILIDADE_CHOICES = (
@@ -278,31 +279,28 @@ class FichaDiaria(models.Model):
         ("GRANDE", "Grande quantidade"),
     )
 
-    execucao = models.OneToOneField(
+    # 🔥 RELAÇÃO PRINCIPAL — agora vinculada ao dia, não à receita individual
+    execucao_cardapio_dia = models.OneToOneField(
         "modulo_Merendeiras.ExecucaoCardapioDia",
         on_delete=models.CASCADE,
-        related_name="ficha_diaria"
+        related_name="ficha",
+        null=True
     )
 
-    # 🔹 IDENTIFICAÇÃO
-    escola = models.ForeignKey("rh.Escola", on_delete=models.PROTECT)
-    data = models.DateField()
-    turno = models.CharField(max_length=20)
-
-    alunos_atendidos = models.PositiveIntegerField(null=True, blank=True)
-
-    tecnico_responsavel = models.ForeignKey(
+    # 🔥 QUEM PREENCHEU A FICHA
+    usuario = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
-        related_name="fichas_diarias"
+        related_name="fichas_execucao"
     )
 
-    # 🔹 CARDÁPIO
-    cardapio_previsto = RichTextField(blank=True, null=True)
-    houve_alteracao_cardapio = models.BooleanField(default=False)
-    cardapio_executado = RichTextField(blank=True, null=True)
+    # 🔥 PRODUÇÃO REAL
+    porcoes_produzidas = models.PositiveIntegerField(
+        null=True,
+        blank=True
+    )
 
-    # 🔹 ACEITABILIDADE
+    # 🔹 AVALIAÇÃO
     aceitabilidade = models.CharField(
         max_length=10,
         choices=ACEITABILIDADE_CHOICES,
@@ -310,7 +308,6 @@ class FichaDiaria(models.Model):
         null=True
     )
 
-    # 🔹 SOBRAS
     houve_sobras = models.CharField(
         max_length=10,
         choices=SOBRAS_CHOICES,
@@ -333,20 +330,16 @@ class FichaDiaria(models.Model):
     # 🔹 OBSERVAÇÕES
     observacoes = RichTextField(blank=True, null=True)
 
-    # 🔹 ASSINATURAS (REGISTRO DIGITAL)
+    # 🔹 ASSINATURA
     assinado_por_direcao = models.BooleanField(default=False)
 
     criado_em = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ["-data"]
-        indexes = [
-            models.Index(fields=["data"]),
-            models.Index(fields=["escola"]),
-        ]
+        ordering = ["-criado_em"]
 
     def __str__(self):
-        return f"Ficha Diária - {self.escola} - {self.data}"
+        return f"Ficha - {self.execucao_cardapio_dia.escola} | {self.execucao_cardapio_dia.data} | {self.execucao_cardapio_dia.get_turno_display()}"
     
 
 class FichaDiariaItem(models.Model):
@@ -355,7 +348,7 @@ class FichaDiariaItem(models.Model):
     """
 
     ficha = models.ForeignKey(
-        FichaDiaria,
+        FichaExecucaoReceita,
         on_delete=models.CASCADE,
         related_name="itens"
     )

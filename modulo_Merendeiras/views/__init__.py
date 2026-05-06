@@ -14,7 +14,6 @@ from .cardápioHoje.receitaDetailView import ReceitaDetailView
 from .executarCardapio.executaCardapio import *
 
 from .executarCardapio.prepararExecucaoView import *
-from .executarCardapio.historicoExecucoesView import *
 
 # Ficha
 from .executarCardapio.fichaDiariaCreateView import *

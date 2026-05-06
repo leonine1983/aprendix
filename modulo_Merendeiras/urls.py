@@ -8,6 +8,11 @@ app_name = "modulo_merendeiras"
 urlpatterns = [
 
     path("dashboard/", views.DashboardMerendeiraView.as_view(), name="dashboard_merendeira"),
+    path(
+        "configuracoes/",
+        views.ConfiguracaoPessoalUpdateView.as_view(),
+        name="configuracao_pessoal",
+    ),
     
     # ROTAS USADAS ------------------------------------------------
     path("estoque/", views.EstoqueEscolaListView.as_view(), name="estoque_list_escola" ),
@@ -17,7 +22,6 @@ urlpatterns = [
     path("receita/<int:pk>/", views.ReceitaDetailView.as_view(), name="receita_detail"),
     path("cardapio/hoje/cozinha", views.CardapioHojeView.as_view(), name="cardapio_hoje" ),
     path("cardapio/executar/", views.PrepararExecucaoView.as_view(), name="preparar_execucao" ),
-    path("cardapio/historico/", views.HistoricoExecucoesView.as_view(), name="historico_execucoes" ),
     path("cardapio/execucao/<int:execucao_id>/ficha/<str:turno>/", views.FichaDiariaCreateView.as_view(), name="ficha_diaria" ),
     path("cardapio/execucao/<int:pk>/", views.ExecucaoCardapioDetailView.as_view(), name="execucao_detalhe"  ),
     path("cardapio/execucao/<int:pk>/finalizar/", views.FinalizarExecucaoView.as_view(), name="finalizar_execucao" ),

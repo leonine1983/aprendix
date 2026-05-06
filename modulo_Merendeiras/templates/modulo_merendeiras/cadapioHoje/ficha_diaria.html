@@ -15,6 +15,7 @@
     --preto: #1a1a1a;
     --branco: #ffffff;
     --verde-ok: #1a7a3c;
+    --amarelo-alerta: #e6a800;
   }
 
   body, .ficha-wrap * {
@@ -32,9 +33,6 @@
   }
 
   /* ── CABEÇALHO ── */
-  .ficha-header {
-  }
-
   .ficha-header img {
     height: 60px;
     object-fit: contain;
@@ -51,30 +49,35 @@
     margin: 0;
   }
 
-  .logo-fnde {
-    font-family: 'Source Serif 4', serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--azul-fnde);
-    text-align: right;
-    letter-spacing: -1px;
-  }
-
-
-  
-
-  .logo-fnde span { color: #e03000; }
-
   /* ── CORPO ── */
   .ficha-body {
     padding: 14px 20px 20px;
   }
 
-  .ficha-body h1 {
-    font-size:2rem;
+  .ficha-body > h1 {
+    font-size: 1.6rem;
     text-align: center;
-
+    font-family: 'Source Serif 4', serif;
+    color: var(--azul-fnde);
+    margin-bottom: 14px;
   }
+
+  /* ── BADGE DE STATUS ── */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .status-ABERTA       { background: #e3f0ff; color: #003580; border: 1px solid #b3d0ff; }
+  .status-EM_PREPARO   { background: #fff8e1; color: #7a5500; border: 1px solid #ffe082; }
+  .status-FINALIZADA   { background: #e6f4ea; color: #1a7a3c; border: 1px solid #a8d5b5; }
+  .status-CANCELADA    { background: #fdecea; color: #b00020; border: 1px solid #f5c0c0; }
 
   /* ── LINHAS DE IDENTIFICAÇÃO ── */
   .id-row {
@@ -111,35 +114,20 @@
     color: var(--preto);
   }
 
-  .id-field .underline-input.long { min-width: 220px; }
-  .id-field .underline-input.escola { min-width: 460px; }
+  .id-field .underline-input.escola  { min-width: 460px; }
   .id-field .underline-input.tecnico { min-width: 200px; text-transform: capitalize; }
+  .id-field .underline-input.receita { min-width: 280px; font-weight: 600; }
 
-  /* ── TURNOS (checkboxes) ── */
-  .turno-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 6px;
+  /* alunos_atendidos gerado pelo form Django */
+  #id_porcoes_produzidas {
+    border: none;
+    border-bottom: 1px solid var(--preto);
+    outline: none;
     font-size: 13px;
-  }
-
-  .turno-row label { font-weight: 600; }
-
-  .check-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 13px;
-    cursor: pointer;
-  }
-
-  .check-item input[type="checkbox"],
-  .check-item input[type="radio"] {
-    accent-color: var(--azul-fnde);
-    width: 14px;
-    height: 14px;
-    cursor: pointer;
+    background: transparent;
+    width: 80px;
+    padding: 1px 4px;
+    text-align: center;
   }
 
   /* ── SEÇÕES ── */
@@ -156,6 +144,9 @@
     text-transform: uppercase;
     letter-spacing: 0.8px;
     padding: 4px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .secao-corpo {
@@ -197,6 +188,45 @@
     width: 100%;
   }
 
+  /* ── INFO BOX (dados somente-leitura da execução) ── */
+  .info-box {
+    background: var(--cinza-bg);
+    border: 1px solid #dde3ed;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #444;
+    margin-bottom: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+  }
+
+  .info-box span { white-space: nowrap; }
+  .info-box strong { color: var(--azul-fnde); }
+
+  /* ── ALUNOS HIGHLIGHT ── */
+  .alunos-destaque {
+    background: #e8eef7;
+    border: 1.5px solid var(--azul-fnde);
+    border-radius: 6px;
+    padding: 6px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--azul-fnde);
+    margin-bottom: 8px;
+  }
+
+  .alunos-destaque .numero {
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'Source Serif 4', serif;
+    line-height: 1;
+  }
+
   /* ── TABELA GÊNEROS ── */
   .tabela-generos {
     width: 100%;
@@ -236,6 +266,8 @@
   .tabela-generos td:nth-child(2) { width: 20%; text-align: center; }
   .tabela-generos td:nth-child(3) { width: 20%; text-align: center; }
 
+  .tabela-generos tbody tr:nth-child(even) td { background: #fafbfd; }
+
   /* ── ACEITABILIDADE ── */
   .aceit-row {
     display: flex;
@@ -253,9 +285,7 @@
     flex-wrap: wrap;
   }
 
-  .motivo-sobras {
-    margin-top: 6px;
-  }
+  .motivo-sobras { margin-top: 6px; }
 
   .motivo-grid {
     display: flex;
@@ -292,8 +322,25 @@
     align-items: center;
   }
 
+  /* ── CHECKBOXES / RADIOS ── */
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .check-item input[type="checkbox"],
+  .check-item input[type="radio"] {
+    accent-color: var(--azul-fnde);
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+  }
+
   /* ── OBSERVAÇÕES ── */
-  .obs-field {
+  #id_observacoes {
     width: 100%;
     min-height: 56px;
     border: 1px solid var(--cinza-linha);
@@ -303,9 +350,6 @@
     resize: vertical;
     background: transparent;
     font-family: inherit;
-  }
-  #id_observacoes{
-    width: 100%;
   }
 
   /* ── ASSINATURAS ── */
@@ -336,15 +380,27 @@
     width: 100%;
   }
 
-  /* ── MODO EDICAO banner ── */
+  /* ── MODO EDIÇÃO banner ── */
   .modo-banner {
     background: #fff3cd;
-    border-left: 4px solid #e6a800;
+    border-left: 4px solid var(--amarelo-alerta);
     padding: 6px 14px;
     font-size: 12px;
     font-weight: 600;
     color: #7a5500;
     margin-bottom: 10px;
+  }
+
+  /* ── ALERTA CANCELADA ── */
+  .alerta-cancelada {
+    background: #fdecea;
+    border-left: 4px solid #b00020;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #b00020;
+    margin-bottom: 10px;
+    border-radius: 0 4px 4px 0;
   }
 
   /* ── BOTÃO SALVAR ── */
@@ -365,6 +421,7 @@
   }
 
   .btn-salvar:hover { background: #145c2e; }
+  .btn-salvar:disabled { background: #999; cursor: not-allowed; }
 
   .form-footer {
     display: flex;
@@ -372,10 +429,7 @@
     margin-top: 18px;
   }
 
-  /* ── Campos hidden do Django Form ── */
-  .hidden-django { display: none; }
-
-  /* checkbox Django reestilizado */
+  /* ── Django form widgets ── */
   .form-check-inline {
     display: flex;
     align-items: center;
@@ -390,24 +444,46 @@
     height: 14px;
   }
 
-  select.form-select-custom {
+  /* cardapio_executado textarea */
+  #id_cardapio_executado {
+    width: 100%;
+    min-height: 60px;
+    border: 1px solid var(--cinza-linha);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 13px;
+    resize: vertical;
+    background: transparent;
+    font-family: inherit;
+  }
+
+  /* motivo_sobras / outra_ocorrencia */
+  #id_motivo_sobras,
+  #id_outra_ocorrencia {
     border: none;
     border-bottom: 1px solid var(--preto);
-    background: transparent;
-    font-size: 13px;
-    padding: 1px 4px;
     outline: none;
-    min-width: 120px;
-    cursor: pointer;
+    font-size: 13px;
+    background: transparent;
+    padding: 1px 4px;
+    flex: 1;
+    min-width: 160px;
   }
 
   @media print {
-    .form-footer, .modo-banner { display: none; }
+    .form-footer, .modo-banner, .alerta-cancelada { display: none; }
     .ficha-wrap { box-shadow: none; border: 1px solid #999; }
   }
 </style>
 
 <div style="padding: 16px 8px;">
+
+  {# ── Banners de contexto ── #}
+  {% if execucao_receita.status == "CANCELADA" %}
+  <div class="alerta-cancelada">
+    ⚠️ Esta execução foi <strong>cancelada</strong>. O registro da ficha é apenas para fins de histórico.
+  </div>
+  {% endif %}
 
   {% if modo_edicao %}
   <div class="modo-banner">✏️ Modo edição — Atualizando ficha existente</div>
@@ -418,57 +494,99 @@
 
     <div class="ficha-wrap">
 
-      <!-- ══ CABEÇALHO ══ -->
+      {# ══ CABEÇALHO ══ #}
       <div class="ficha-header">
-        <!-- Brasão / logo escola (placeholder SVG) -->
         <div style="display:flex;align-items:center;justify-content:center;">
-          <img src="{% static 'meredeiras/FNDE.png' %}" style='width:100%;height:auto;' alt="">   </div>   
+          <img src="{% static 'meredeiras/FNDE.png' %}" style="width:100%;height:auto;" alt="FNDE">
+        </div>
       </div>
 
-      <!-- ══ CORPO ══ -->
+      {# ══ CORPO ══ #}
       <div class="ficha-body">
         <h1>Ficha Diária – Controle da Alimentação Escolar</h1>
-        <!-- Unidade Escolar -->
+
+        {# ── Caixa de info rápida da execução ── #}
+        <div class="info-box">
+          <span>
+            <strong>Receita:</strong>
+            {{ execucao_receita.receita.nome }}
+          </span>
+          <span>
+            <strong>Iniciado em:</strong>
+            {{ execucao_receita.iniciado_em|date:"d/m/Y H:i" }}
+          </span>
+          {% if execucao_receita.finalizado_em %}
+          <span>
+            <strong>Finalizado em:</strong>
+            {{ execucao_receita.finalizado_em|date:"d/m/Y H:i" }}
+          </span>
+          {% endif %}
+          <span>
+            <strong>Status:</strong>
+            <span class="status-badge status-{{ execucao_receita.status }}">
+              {{ execucao_receita.get_status_display }}
+            </span>
+          </span>
+        </div>
+
+        {# ── Unidade Escolar ── #}
         <div class="id-row">
           <div class="id-field" style="width:100%">
             <label>Unidade Escolar:</label>
             <input type="text"
                    class="underline-input escola"
-                   value="{{ execucao.escola|default:nome_escola }}"
+                   value="{{ execucao_receita.escola.nome_escola|default:nome_escola }}"
                    readonly
                    style="flex:1;">
           </div>
         </div>
 
-        <!-- Data / Turno / Alunos / Técnico -->
+        {# ── Receita / Data ── #}
         <div class="id-row">
+          <div class="id-field">
+            <label>Receita executada:</label>
+            <input type="text"
+                   class="underline-input receita"
+                   style="text-transform:capitalize"
+                   value="{{ execucao_receita.receita.nome }}"
+                   readonly>
+          </div>
           <div class="id-field">
             <label>Data:</label>
             <input type="text"
                    class="underline-input"
-                   value="{{ execucao.data|date:'d/m/Y' }}"
+                   value="{{ execucao_receita.iniciado_em|date:'d/m/Y' }}"
                    readonly
                    style="width:90px;">
           </div>
-
-          <div class="turno-row" style="margin-bottom:4px;">
-            <label>Turno:</label>
-            {% for val, label in execucao.TURNO_CHOICES %}
-            <span class="check-item">
-              <input type="checkbox"
-                     {% if execucao.turno == val %}checked{% endif %}
-                     disabled>
-              {{ label }}
-            </span>
-            {% endfor %}
-          </div>
         </div>
 
-        <div class="id-row">
-          <div class="id-field">
-            <label>Alunos atendidos no dia:</label>
-            {{ form.alunos_atendidos }}
+        {# ── Alunos atendidos (rendimento_real) + Técnico ── #}
+        <div class="id-row" style="align-items:flex-start;gap:16px;">
+
+          {# Destaque visual para número de alunos/porções #}
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:13px;font-weight:600;">
+              Alunos atendidos / Porções produzidas:
+            </label>
+            {% if execucao_receita.rendimento_real %}
+            <div class="alunos-destaque">
+              <span>🍽️</span>
+              <div>
+                <div class="numero">{{ execucao_receita.rendimento_real }}</div>
+                <div style="font-size:10px;font-weight:600;opacity:.7;text-transform:uppercase;">porções</div>
+              </div>
+            </div>
+            {% endif %}
+            {# Campo editável do formulário (porcoes_produzidas) #}
+            <div class="id-field" style="margin-right:0;">
+              <label style="font-size:12px;color:#666;">
+                {% if execucao_receita.rendimento_real %}Confirmar / ajustar:{% else %}Informar:{% endif %}
+              </label>
+              {{ form.porcoes_produzidas }}
+            </div>
           </div>
+
           <div class="id-field" style="flex:1;">
             <label>Técnico(a) em Alimentação Escolar:</label>
             <input type="text"
@@ -477,24 +595,48 @@
                    readonly
                    style="flex:1;">
           </div>
+
         </div>
 
-        <!-- ══ CARDÁPIO ══ -->
+        {# ── Iniciado por ── #}
+        <div class="id-row">
+          <div class="id-field">
+            <label>Execução iniciada por:</label>
+            <input type="text"
+                   class="underline-input"
+                   value="{{ execucao_receita.iniciado_por.get_full_name|default:execucao_receita.iniciado_por.username }}"
+                   style="text-transform:capitalize"
+                   readonly
+                   style="min-width:200px;">
+          </div>
+          {% if execucao_receita.finalizado_por %}
+          <div class="id-field">
+            <label>Finalizada por:</label>
+            <input type="text"
+                   class="underline-input"
+                   value="{{ execucao_receita.finalizado_por.get_full_name|default:execucao_receita.finalizado_por.username }}"
+                   style="text-transform:capitalize"
+                   readonly
+                   style="min-width:200px;">
+          </div>
+          {% endif %}
+        </div>
+
+        {# ══ CARDÁPIO ══ #}
         <div class="secao">
-          <div class="secao-titulo">Cardápio</div>
+          <div class="secao-titulo">
+            <span>Cardápio</span>
+          </div>
           <div class="secao-corpo">
 
             <div class="campo-linha">
               <label>Cardápio previsto:</label>
-
-              <span style="flex:1;border-bottom:1px solid #999;min-height:20px;font-size:13px;padding:1px 4px;color:#555;">
-
-                {% for item in execucao.cardapio_dia.itens.all %}
-                    {{ item.tipo_refeicao.nome }}: {{ item.receita.nome }}{% if not forloop.last %} | {% endif %}
+              <span style="flex:1;border-bottom:1px solid #999;min-height:20px;font-size:13px;padding:1px 4px;color:#555;text-transform:capitalize">
+                {% for item in execucao_receita.receita.ingredientes.all %}
+                  {{ item.produto.nome }}{% if not forloop.last %}, {% endif %}
                 {% empty %}
-                    —
+                  {{ execucao_receita.receita.nome }}
                 {% endfor %}
-
               </span>
             </div>
 
@@ -509,14 +651,18 @@
               <label style="white-space:nowrap;">Cardápio executado:</label>
             </div>
             {{ form.cardapio_executado }}
-            
 
           </div>
         </div>
 
-        <!-- ══ CONTROLE DE GÊNEROS ══ -->
+        {# ══ CONTROLE DE GÊNEROS ══ #}
         <div class="secao">
-          <div class="secao-titulo">Controle de Gêneros</div>
+          <div class="secao-titulo">
+            <span>Controle de Gêneros</span>
+            <span style="font-weight:400;font-size:11px;opacity:.8;text-transform:none;letter-spacing:0;">
+              Baseado nas movimentações de estoque desta execução
+            </span>
+          </div>
           <div class="secao-corpo" style="padding:8px 12px;">
             <table class="tabela-generos">
               <thead>
@@ -529,29 +675,28 @@
               <tbody>
                 {% for item in itens_alimentos %}
                 <tr>
-                  <td>
+                  <td >
                     <input type="text"
-                          value="{{ item.produto.nome|default:item.produto_nome }}"
-                          readonly>
+                           value="{{ item.produto_nome }}"
+                            style='text-transform: capitalize;'
+                           readonly>
                   </td>
-
                   <td>
                     <input type="text"
-                          value="{{ item.unidade|default:item.unidade }}"
-                          readonly
-                          style="text-align:center;">
+                           value="{{ item.unidade }}"
+                           readonly
+                           style="text-align:center;">
                   </td>
-
                   <td>
                     <input type="text"
-                          value="{{ item.quantidade_usada|default:item.quantidade }}"
-                          readonly
-                          style="text-align:center;">
+                           value="{{ item.quantidade }}"
+                           readonly
+                           style="text-align:center;">
                   </td>
                 </tr>
                 {% empty %}
-                {# 15 linhas em branco para preenchimento #}
-                {% for i in "123456789012345" %}
+                {# 10 linhas em branco para preenchimento manual #}
+                {% for i in "1234567890" %}
                 <tr>
                   <td><input type="text" placeholder=""></td>
                   <td><input type="text" placeholder=""></td>
@@ -564,7 +709,7 @@
           </div>
         </div>
 
-        <!-- ══ ACEITABILIDADE ══ -->
+        {# ══ ACEITABILIDADE ══ #}
         <div class="secao">
           <div class="secao-titulo">Aceitabilidade</div>
           <div class="secao-corpo">
@@ -585,7 +730,7 @@
           </div>
         </div>
 
-        <!-- ══ SOBRAS DE ALIMENTOS ══ -->
+        {# ══ SOBRAS DE ALIMENTOS ══ #}
         <div class="secao">
           <div class="secao-titulo">Sobras de Alimentos</div>
           <div class="secao-corpo">
@@ -631,7 +776,7 @@
           </div>
         </div>
 
-        <!-- ══ OCORRÊNCIAS ══ -->
+        {# ══ OCORRÊNCIAS ══ #}
         <div class="secao">
           <div class="secao-titulo">Ocorrências</div>
           <div class="secao-corpo">
@@ -656,7 +801,19 @@
           </div>
         </div>
 
-        <!-- ══ OBSERVAÇÕES ══ -->
+        {# ══ OBSERVAÇÕES DA EXECUÇÃO (somente-leitura) ══ #}
+        {% if execucao_receita.observacoes %}
+        <div class="secao">
+          <div class="secao-titulo">Observações da Execução</div>
+          <div class="secao-corpo">
+            <div style="font-size:13px;color:#555;background:#fafbfd;padding:8px;border:1px solid #dde3ed;border-radius:3px;">
+              {{ execucao_receita.observacoes|safe }}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        {# ══ OBSERVAÇÕES DA FICHA ══ #}
         <div class="secao">
           <div class="secao-titulo">Observações</div>
           <div class="secao-corpo">
@@ -664,12 +821,12 @@
           </div>
         </div>
 
-        <!-- ══ ASSINATURAS ══ -->
+        {# ══ ASSINATURAS ══ #}
         <div class="ass-row">
           <div class="ass-campo">
             <label>Ass. Técnico(a) em Alimentação Escolar:</label>
-            <div class="ass-linha"></div>            
-            <i style="text-transform: capitalize;">{{ usuario_nome|default:'' }}</i>
+            <div class="ass-linha"></div>
+            <i style="text-transform:capitalize;">{{ usuario_nome|default:'' }}</i>
           </div>
           <div class="ass-campo">
             <label>
@@ -685,9 +842,11 @@
       </div>{# /ficha-body #}
     </div>{# /ficha-wrap #}
 
-    <!-- BOTÃO SALVAR fora do card -->
+    {# BOTÃO SALVAR fora do card #}
     <div class="form-footer">
-      <button type="submit" class="btn-salvar">
+      <button type="submit"
+              class="btn-salvar"
+              {% if execucao_receita.status == "CANCELADA" %}disabled title="Execução cancelada"{% endif %}>
         💾 {% if modo_edicao %}Atualizar Ficha{% else %}Salvar Ficha{% endif %}
       </button>
     </div>

@@ -20,6 +20,13 @@ class BaseMerendeiraView(LoginRequiredMixin, GroupRequiredMixin):
     # 🔐 CONTROLE DE GRUPO
     # ─────────────────────────────────────────────
 
+    def get_escola_usuario(self):
+        """
+        🔁 Compatibilidade com versões antigas do sistema
+        Permite uso em views antigas que ainda chamam método
+        """
+        return self.escola_usuario
+
     @cached_property
     def _usuario_eh_merendeira(self):
         return self.request.user.groups.filter(

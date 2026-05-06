@@ -3,20 +3,28 @@ from django.urls import reverse_lazy
 from django.db import transaction
 from django.contrib import messages
 
-from ...models import FichaDiaria, ExecucaoCardapioDia
+from ...models import FichaExecucaoReceita, ExecucaoCardapioDia
 from ..baseMerendeiraView import BaseMerendeiraView
 
 from django import forms
+
+from django.core.paginator import Paginator
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from django.db import transaction
+from django.contrib import messages
+from django import forms
+
+from ...models import FichaExecucaoReceita, ExecucaoCardapioDia
+from ..baseMerendeiraView import BaseMerendeiraView
 
 
 class FichaDiariaForm(forms.ModelForm):
 
     class Meta:
-        model = FichaDiaria
+        model = FichaExecucaoReceita
         fields = [
-            "alunos_atendidos",
-            "houve_alteracao_cardapio",
-            "cardapio_executado",
+            "porcoes_produzidas",
             "aceitabilidade",
             "houve_sobras",
             "motivo_sobras",
@@ -28,17 +36,6 @@ class FichaDiariaForm(forms.ModelForm):
         ]
 
         widgets = {
-            "alunos_atendidos": forms.NumberInput(attrs={
-                "class": "form-control",
-                "placeholder": "Quantidade de alunos atendidos"
-            }),
-            "houve_alteracao_cardapio": forms.CheckboxInput(attrs={
-                "class": "form-check-input"
-            }),
-            "cardapio_executado": forms.Textarea(attrs={
-                "class": "form-control",
-                "rows": 3
-            }),
             "aceitabilidade": forms.Select(attrs={
                 "class": "form-select"
             }),
@@ -58,60 +55,43 @@ class FichaDiariaForm(forms.ModelForm):
                 "rows": 3
             }),
         }
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from django.db import transaction
+from django.contrib import messages
 
+from ...models import FichaExecucaoReceita, ExecucaoCardapioDia
+from ..baseMerendeiraView import BaseMerendeiraView
 
-from django.core.paginator import Paginator
 
 class FichaDiariaCreateView(BaseMerendeiraView, CreateView):
-    model = FichaDiaria
+    model = FichaExecucaoReceita
     form_class = FichaDiariaForm
     template_name = "modulo_merendeiras/cadapioHoje/ficha_diaria.html"
 
     def dispatch(self, request, *args, **kwargs):
         self.turno = self.kwargs.get("turno")
 
-        self.execucao = ExecucaoCardapioDia.objects.select_related(
-            "escola",
-            "cardapio_dia"
-        ).prefetch_related(
-            "cardapio_dia__itens__receita"
-        ).get(
+        self.execucao = ExecucaoCardapioDia.objects.get(
             pk=self.kwargs["execucao_id"],
-            turno=self.turno  
+            turno=self.turno
         )
 
-        self.ficha_existente = FichaDiaria.objects.filter(
-            execucao=self.execucao
+        # 🔥 AGORA O FILTRO É POR execucao_cardapio_dia
+        self.ficha_existente = FichaExecucaoReceita.objects.filter(
+            execucao_cardapio_dia=self.execucao
         ).first()
 
         return super().dispatch(request, *args, **kwargs)
 
-    def get_initial(self):
-        initial = super().get_initial()
-
-        if not self.ficha_existente:
-
-            # 🔹 Busca otimizada das receitas do dia            
-
-            itens = self.execucao.cardapio_dia.itens.select_related("receita", "tipo_refeicao")
-            lista_receitas = "\n\n".join([f"Tipo de refeição: {item.tipo_refeicao.nome.upper()}\n Receita: {item.receita.nome.upper()}" for item in itens])
-            cardapio_texto = f"{lista_receitas}"            
-
-            initial.update({
-                "cardapio_executado": cardapio_texto,
-                "alunos_atendidos": str(self.execucao.quantidade_alunos),
-            })
-        return initial
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
 
-        # 🔥 MODO UPDATE automático
+        # 🔥 modo edição
         if self.ficha_existente:
             kwargs["instance"] = self.ficha_existente
 
         return kwargs
-    
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -119,26 +99,36 @@ class FichaDiariaCreateView(BaseMerendeiraView, CreateView):
         ctx["execucao"] = self.execucao
         ctx["modo_edicao"] = bool(self.ficha_existente)
 
-        # 🔥 LISTA DE ALIMENTOS (SEMPRE DISPONÍVEL)
         itens = []
 
         if self.ficha_existente:
-            # edição → usa o que já foi salvo
             itens = self.ficha_existente.itens.select_related(
                 "produto", "unidade"
             )
         else:
-            # criação → monta a partir da execução do cardápio
-            for item in self.execucao.itens_executados.select_related("receita"):
-                for ingrediente in item.receita.ingredientes.all():
+            itens_execucao = self.execucao.itens_executados.select_related(
+                "execucao_receita"
+            ).prefetch_related(
+                "execucao_receita__movimentacoes__produto"
+            )
+
+            for item in itens_execucao:
+                execucao_receita = item.execucao_receita
+
+                if not execucao_receita:
+                    continue
+
+                for mov in execucao_receita.movimentacoes.all():
+                    if mov.tipo != "RETIRADA_RECEITA":
+                        continue
+
                     itens.append({
-                        "produto_nome": ingrediente.produto.nome,
-                        "unidade": ingrediente.produto.unidade_medida,
-                        "quantidade": ingrediente.quantidade,
+                        "produto_nome": mov.produto.nome,
+                        "unidade": mov.produto.unidade_medida,
+                        "quantidade": mov.quantidade,
                     })
 
         ctx["itens_alimentos"] = itens
-
         return ctx
 
     def form_valid(self, form):
@@ -147,24 +137,16 @@ class FichaDiariaCreateView(BaseMerendeiraView, CreateView):
 
                 ficha = form.save(commit=False)
 
-                ficha.execucao = self.execucao
-                ficha.escola = self.execucao.escola
-                ficha.data = self.execucao.data
-                ficha.turno = self.execucao.turno
-                ficha.tecnico_responsavel = self.request.user
+                # 🔥 CAMPOS CORRETOS DO NOVO MODEL
+                ficha.execucao_cardapio_dia = self.execucao
+                ficha.usuario = self.request.user
 
                 ficha.save()
 
                 if self.ficha_existente:
-                    messages.success(
-                        self.request,
-                        "Ficha atualizada com sucesso."
-                    )
+                    messages.success(self.request, "Ficha atualizada com sucesso.")
                 else:
-                    messages.success(
-                        self.request,
-                        "Ficha registrada com sucesso."
-                    )
+                    messages.success(self.request, "Ficha registrada com sucesso.")
 
         except Exception as e:
             messages.error(self.request, f"Erro ao salvar ficha: {str(e)}")
