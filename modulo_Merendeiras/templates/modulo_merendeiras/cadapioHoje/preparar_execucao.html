@@ -50,6 +50,87 @@
 .info-banner--amber .info-banner__title { color:#E65100; }
 .info-banner__sub { font-size: .82rem; color: var(--txt2); margin-top: .2rem; }
 
+/* ── Painel Global SST ──────────────────────────────────── */
+.sst-panel {
+  background: linear-gradient(135deg, #1565C0, #0D47A1);
+  color: white;
+  border-radius: var(--r-lg);
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(21,101,192,.3);
+}
+.sst-panel h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 .75rem;
+  opacity: .92;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.sst-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.sst-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: var(--r-sm);
+  padding: .4rem .75rem;
+}
+.sst-input-wrap label {
+  font-size: .85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: .9;
+}
+#sst-alunos-input {
+  width: 100px;
+  padding: .4rem .5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  background: white;
+  color: #1A202C;
+}
+.sst-apply-btn {
+  background: white;
+  color: #1565C0;
+  border: none;
+  padding: .55rem 1.5rem;
+  border-radius: var(--r-sm);
+  font-weight: 700;
+  font-size: .95rem;
+  cursor: pointer;
+  transition: all .2s;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+}
+.sst-apply-btn:hover {
+  background: #E3F2FD;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,.15);
+}
+.sst-status {
+  font-size: .85rem;
+  opacity: .88;
+  flex: 1;
+}
+.sst-status strong {
+  background: rgba(255,255,255,.2);
+  padding: .15rem .5rem;
+  border-radius: 4px;
+  margin-left: .25rem;
+}
+
 /* ── KPI grid ────────────────────────────────────────────── */
 .kpi-grid {
   display: grid;
@@ -116,25 +197,41 @@
   cursor: pointer;
 }
 
-/* ── Portion control ─────────────────────────────────────── */
-.pc-wrap  { display: flex; flex-direction: column; align-items: flex-end; gap: .4rem; }
-.pc       { display: flex; align-items: center; gap: .4rem; background: var(--surface);
-            padding: .4rem; border-radius: var(--r-sm); border: 1px solid var(--border); }
-.pc-btn   { width: 38px; height: 38px; border: none; background: white; border-radius: 6px;
-            cursor: pointer; font-weight: 700; color: var(--txt2); font-size: 1rem;
-            box-shadow: 0 1px 2px rgba(0,0,0,.05); transition: all .2s; }
-.pc-btn:hover:not(:disabled) { background: var(--green); color: white; }
-.pc-btn:disabled { opacity: .38; cursor: not-allowed; }
-.pc-input { width: 82px; text-align: center; border: none; background: transparent;
-            font-size: 1.4rem; font-weight: 700; padding: .25rem; transition: color .3s; }
-.pc-input.over { color: var(--red) !important; background: #FFEBEE !important; border-radius: 4px; }
-.presets  { display: flex; gap: .25rem; }
-.preset-btn { padding: .2rem .65rem; border: 1px solid var(--border); background: white;
-              border-radius: 4px; font-size: .78rem; cursor: pointer; color: var(--txt2); transition: all .2s; }
-.preset-btn:hover:not(:disabled) { background: var(--green); color: white; border-color: var(--green); }
-.preset-btn:disabled { opacity: .42; cursor: not-allowed; }
-.pc-info  { font-size: .74rem; color: var(--txt2); text-align: right; }
-.pc-info .ow { color: var(--red); font-weight: 600; }
+/* ── Portion display (SST — read only) ──────────────────── */
+.porcoes-display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .5rem;
+}
+.porcoes-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: .6rem 1.2rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--txt);
+  line-height: 1;
+}
+.porcoes-badge.over { background: #FFEBEE; border-color: #FECACA; color: var(--red); }
+.porcoes-badge .label {
+  font-size: .72rem;
+  font-weight: 500;
+  color: var(--txt2);
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+.porcoes-info {
+  font-size: .78rem;
+  color: var(--txt2);
+  text-align: right;
+}
+.porcoes-info .over { color: var(--red); font-weight: 600; }
+.porcoes-info .ok   { color: var(--green); font-weight: 600; }
 
 /* ── Stock bar ───────────────────────────────────────────── */
 .sb { padding: .75rem 1.5rem; border-top: 1px solid var(--border); background: #FAFBFC; }
@@ -249,6 +346,21 @@
 }
 .btn-exec-secondary:hover { background: var(--surface); }
 
+/* ── Exec blocker banner ─────────────────────────────────── */
+.exec-blocker {
+  background: #FFEBEE;
+  border: 1px solid #FECACA;
+  border-radius: 6px;
+  padding: .45rem .85rem;
+  font-size: .8rem;
+  color: var(--red);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+.exec-blocker.hidden { display: none !important; }
+
 /* ── Toast ───────────────────────────────────────────────── */
 .toast {
   position: fixed;
@@ -272,10 +384,10 @@
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 768px) {
   .rc-head { flex-direction: column; }
-  .pc-wrap { align-items: stretch; width: 100%; }
-  .pc { justify-content: center; }
+  .porcoes-display { align-items: stretch; width: 100%; }
   .exec-bar { flex-direction: column; align-items: stretch; }
   .btn-exec, .btn-exec-secondary { width: 100%; justify-content: center; }
+  .sst-controls { flex-direction: column; align-items: stretch; }
 }
 </style>
 
@@ -289,54 +401,44 @@
   </div>
 </div>
 
-{# ────────────────────────────────── ALUNOS ──────────────────────────────── #}
-{% if alunos_fonte_matriculas %}
-<div class="info-banner info-banner--green">
-  <i class="fas fa-users info-banner__icon"></i>
-  <div>
-    <div class="info-banner__title">
-      {{ quantidade_alunos }} aluno{{ quantidade_alunos|pluralize }} matriculado{{ quantidade_alunos|pluralize }} hoje
+{# ───────────────── PAINEL GLOBAL SST (ÚNICA fonte de verdade) ──────────── #}
+<div class="sst-panel" id="sst-panel">
+  <h2>
+    <i class="fas fa-users"></i>
+    Controle Global de Alunos
+  </h2>
+  <div class="sst-controls">
+    <div class="sst-input-wrap">
+      <label for="sst-alunos-input">Nº de alunos:</label>
+      <input
+        type="number"
+        id="sst-alunos-input"
+        min="1"
+        max="2000"
+        placeholder="0"
+        value="{{ quantidade_alunos|default:'' }}"
+        onkeydown="if(event.key==='Enter'){aplicarSST();}"
+      >
     </div>
-    <div class="info-banner__sub">
-      Fonte: sistema de matrículas
-      {% if alunos_por_turno %}
-        —
-        {% for turno, qtd in alunos_por_turno.items %}
-          <span style="background:#C8E6C9;padding:.1rem .5rem;border-radius:4px;margin-left:4px;font-size:.78rem;">{{ turno }}: {{ qtd }}</span>
-        {% endfor %}
+
+ 
+
+    <div class="sst-status" id="sst-status">
+      {% if quantidade_alunos %}
+        Fonte: sistema de matrículas —
+        <strong>{{ quantidade_alunos }} aluno{{ quantidade_alunos|pluralize }}</strong>
+        {% if alunos_por_turno %}
+          &nbsp;|&nbsp;
+          {% for turno, qtd in alunos_por_turno.items %}
+            <span style="background:rgba(255,255,255,.2);padding:.1rem .4rem;border-radius:4px;margin-left:2px;font-size:.78rem;">{{ turno }}: {{ qtd }}</span>
+          {% endfor %}
+        {% endif %}
+      {% else %}
+        Defina o número de alunos para sincronizar todas as receitas automaticamente.
       {% endif %}
     </div>
-    <div style="font-size:.78rem;color:#558B2F;margin-top:.25rem;">
-      <i class="fas fa-info-circle me-1"></i>As porções foram pré-configuradas com base neste número.
-    </div>
   </div>
 </div>
-{% else %}
-<div class="info-banner info-banner--amber">
-  <i class="fas fa-user-edit info-banner__icon"></i>
-  <div style="flex:1;">
-    <div class="info-banner__title">Informe a quantidade de alunos atendidos hoje</div>
-    <div class="info-banner__sub" style="margin-bottom:.6rem;">
-      Não foram encontradas matrículas ativas. O número informado será aplicado a todas as receitas.
-    </div>
-    <div style="display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;">
-      <label for="campo_alunos_manual" style="font-weight:600;font-size:.85rem;color:var(--txt2);white-space:nowrap;">
-        Nº de alunos:
-      </label>
-      <input type="number" id="campo_alunos_manual" min="1" max="2000" placeholder="Ex: 320"
-             style="width:120px;padding:.4rem .65rem;border:2px solid #FFD54F;border-radius:8px;
-                    font-size:1.05rem;font-weight:700;text-align:center;"
-             oninput="aplicarQuantidadeAlunos(this.value)">
-      <button type="button"
-              onclick="aplicarQuantidadeAlunos(document.getElementById('campo_alunos_manual').value)"
-              style="background:var(--amber);color:white;border:none;padding:.4rem 1rem;
-                     border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">
-        <i class="fas fa-magic me-1"></i>Aplicar
-      </button>
-    </div>
-  </div>
-</div>
-{% endif %}
 
 {# ────────────────────────────────── KPIs ────────────────────────────────── #}
 <div class="kpi-grid">
@@ -366,7 +468,6 @@
 {% for item_data in itens %}
 {% with rid=item_data.item.receita.id %}
 
-{# Cada receita é um form independente #}
 <form method="post"
       id="form-receita-{{ rid }}"
       class="rc {% if item_data.estoque_ok %}rc--ok{% elif item_data.porcoes_maximas > 0 %}rc--lim{% else %}rc--blk{% endif %}"
@@ -377,8 +478,9 @@
 
   {% csrf_token %}
   <input type="hidden" name="receita_id" value="{{ rid }}">
-  <input type="hidden" name="quantidade_alunos_manual" id="h-alunos-{{ rid }}"
-         value="{{ quantidade_alunos|default:0 }}">
+  {# SST: porções vêm SEMPRE do estado global — nunca de controles locais #}
+  <input type="hidden" name="porcoes_{{ rid }}" id="hidden-porcoes-{{ rid }}">
+  <input type="hidden" name="quantidade_alunos" id="hidden-alunos-{{ rid }}" value="{{ quantidade_alunos|default:0 }}">
 
   {# ── Header da receita ── #}
   <div class="rc-head">
@@ -388,19 +490,19 @@
       <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;">
         <span class="badge bg-secondary">{{ item_data.item.tipo_refeicao.nome }}</span>
 
-        {% if item_data.estoque_ok %}
-          <span class="badge" style="background:#E8F5E9;color:#2E7D32;">
+        {# Badge de estoque — atualizado dinamicamente via JS #}
+        <span id="estoque-badge-{{ rid }}" class="badge
+          {% if item_data.estoque_ok %}
+            " style="background:#E8F5E9;color:#2E7D32;">
             <i class="fas fa-check-circle me-1"></i>Estoque OK
-          </span>
-        {% elif item_data.porcoes_maximas > 0 %}
-          <span class="badge" style="background:#FFF3E0;color:#E65100;">
+          {% elif item_data.porcoes_maximas > 0 %}
+            " style="background:#FFF3E0;color:#E65100;">
             <i class="fas fa-exclamation-circle me-1"></i>Estoque limitado — máx {{ item_data.porcoes_maximas }} porções
-          </span>
-        {% else %}
-          <span class="badge bg-danger">
+          {% else %}
+            bg-danger">
             <i class="fas fa-times-circle me-1"></i>Sem estoque
-          </span>
-        {% endif %}
+          {% endif %}
+        </span>
 
         {% if item_data.ja_executada %}
           <span class="badge" style="background:#E3F2FD;color:#1565C0;">
@@ -410,11 +512,11 @@
         {% endif %}
       </div>
 
-      {# Seleção de turno — vinculada a esta receita #}
+      {# Turno — único controle local permitido #}
       <div class="turno-row mt-2">
         <label for="turno-{{ rid }}">TURNO *</label>
         <select name="turno" id="turno-{{ rid }}" class="turno-select" required
-                onchange="atualizarBotaoExec({{ rid }})">
+                onchange="recalcularReceita({{ rid }})">
           <option value="">— Selecione —</option>
           {% for turno in turnos_disponiveis_por_receita|dict_get:rid %}
             <option value="{{ turno.valor }}">{{ turno.label }}</option>
@@ -433,49 +535,19 @@
       </div>
     </div>
 
-    {# ── Controle de porções ── #}
-    <div class="pc-wrap" onclick="event.stopPropagation()">
-      <div class="pc">
-        <button type="button" class="pc-btn" onclick="ajustar({{ rid }}, -50)"
-                {% if item_data.porcoes_maximas == 0 %}disabled{% endif %} title="-50">−50</button>
-        <button type="button" class="pc-btn" onclick="ajustar({{ rid }}, -10)"
-                {% if item_data.porcoes_maximas == 0 %}disabled{% endif %} title="-10">−10</button>
-
-        <input type="number"
-               name="porcoes_{{ rid }}"
-               id="inp-{{ rid }}"
-               class="pc-input"
-               value="{% if item_data.porcoes_maximas == 0 %}0{% else %}{{ item_data.porcoes_sugeridas }}{% endif %}"
-               min="0" max="1000" step="1"
-               onchange="validar(this, {{ rid }})"
-               {% if item_data.porcoes_maximas == 0 %}disabled{% endif %}>
-
-        <button type="button" class="pc-btn" onclick="ajustar({{ rid }}, 10)"
-                {% if item_data.porcoes_maximas == 0 %}disabled{% endif %} title="+10">+10</button>
-        <button type="button" class="pc-btn" onclick="ajustar({{ rid }}, 50)"
-                {% if item_data.porcoes_maximas == 0 %}disabled{% endif %} title="+50">+50</button>
-        <button type="button" class="pc-btn" onclick="ajustar({{ rid }}, 100)"
-                {% if item_data.porcoes_maximas == 0 %}disabled{% endif %} title="+100">+100</button>
+    {# ── Display de porções (SST read-only) ── #}
+    <div class="porcoes-display">
+      <div class="porcoes-badge" id="badge-porcoes-{{ rid }}">
+        <span id="val-porcoes-{{ rid }}">{{ quantidade_alunos|default:"—" }}</span>
+        <span class="label">porções</span>
       </div>
-
-      <div class="presets">
-        {% for p in porcoes_presets %}
-        <button type="button" class="preset-btn" onclick="definir({{ rid }}, {{ p }})"
-                {% if item_data.porcoes_maximas == 0 %}disabled{% endif %}>{{ p }}</button>
-        {% endfor %}
-        <button type="button" class="preset-btn"
-                onclick="definir({{ rid }}, {{ item_data.porcoes_maximas }})"
-                {% if item_data.porcoes_maximas == 0 %}disabled{% endif %}
-                title="Ajustar para o máximo viável">Máx</button>
-      </div>
-
-      <div class="pc-info" id="info-{{ rid }}">
+      <div class="porcoes-info" id="info-porcoes-{{ rid }}">
         {% if item_data.porcoes_maximas == 0 %}
-          <span style="color:var(--red);">Sem estoque disponível</span>
+          <span class="over"><i class="fas fa-times-circle me-1"></i>Sem estoque disponível</span>
         {% elif not item_data.estoque_ok %}
-          <span style="color:var(--amber);">Estoque máximo: {{ item_data.porcoes_maximas }} porções</span>
+          <span class="over"><i class="fas fa-exclamation-circle me-1"></i>Estoque máx: {{ item_data.porcoes_maximas }} porções</span>
         {% else %}
-          <span style="color:var(--green);">✓ Estoque disponível</span>
+          <span class="ok"><i class="fas fa-check-circle me-1"></i>Estoque disponível</span>
         {% endif %}
       </div>
     </div>
@@ -504,7 +576,7 @@
       </button>
 
       {% if not item_data.estoque_ok %}
-      <span style="background:var(--amber);color:white;padding:.2rem .65rem;border-radius:20px;font-size:.75rem;font-weight:600;">
+      <span id="warn-lim-{{ rid }}" style="background:var(--amber);color:white;padding:.2rem .65rem;border-radius:20px;font-size:.75rem;font-weight:600;">
         <i class="fas fa-exclamation-circle me-1"></i>Verificar estoque
       </span>
       {% endif %}
@@ -516,15 +588,15 @@
 
     <div class="porcoes-banner">
       <i class="fas fa-calculator" style="font-size:.9rem;"></i>
-      <span>Calculado para <strong id="label-p-{{ rid }}">{{ item_data.porcoes_sugeridas }}</strong> porções</span>
+      <span>Calculado para <strong id="label-p-{{ rid }}">{{ quantidade_alunos|default:0 }}</strong> porções</span>
     </div>
 
     <div style="background:#E3F2FD;border-left:4px solid #1976D2;padding:.75rem 1rem;
                 margin-bottom:1rem;border-radius:8px;font-size:.85rem;">
       <strong style="color:#1565C0;"><i class="fas fa-info-circle me-1"></i>Como funciona o cálculo</strong>
       <p style="margin:.4rem 0 0;color:var(--txt2);">
-        Os valores são recalculados em tempo real conforme você ajusta as porções.
-        O máximo viável é determinado pelo ingrediente com menor disponibilidade relativa.
+        Os valores são recalculados automaticamente sempre que o número de alunos for alterado no painel global acima.
+        O botão "Executar" só é habilitado quando o estoque for suficiente para todos os ingredientes.
       </p>
     </div>
 
@@ -534,7 +606,7 @@
     </div>
 
     <h6 style="font-weight:600;margin-bottom:.75rem;border-bottom:2px solid var(--border);padding-bottom:.4rem;font-size:.9rem;">
-      Ingredientes para <span id="titulo-p-{{ rid }}" style="color:var(--green);">{{ item_data.porcoes_sugeridas }}</span> porções:
+      Ingredientes para <span id="titulo-p-{{ rid }}" style="color:var(--green);">{{ quantidade_alunos|default:0 }}</span> porções:
     </h6>
 
     <div class="ing-grid" id="ing-grid-{{ rid }}">
@@ -552,7 +624,7 @@
         <div class="ing-name">{{ ing.produto }}</div>
 
         <div class="ing-row">
-          <span>Necessário (<span id="ilp-{{ rid }}-{{ iid }}">{{ rendbase }}</span> porções):</span>
+          <span>Necessário (<span id="ilp-{{ rid }}-{{ iid }}">{{ rendbase }}</span> porç.):</span>
           <span class="v" id="inec-{{ rid }}-{{ iid }}" style="color:#1565C0;">{{ ing.necessario|floatformat:2 }} {{ ing.unidade }}</span>
         </div>
         <div class="ing-row">
@@ -583,9 +655,9 @@
       {% endfor %}
     </div>
 
-    {# Alerta global de faltantes #}
-    {% if item_data.faltantes %}
-    <div class="alert alert-danger mt-3 mb-0" id="af-{{ rid }}">
+    {# Alerta global de faltantes — atualizado via JS #}
+    <div id="af-{{ rid }}" class="alert alert-danger mt-3 mb-0"
+         {% if not item_data.faltantes %}style="display:none;"{% endif %}>
       <h6 class="fw-bold mb-1"><i class="fas fa-times-circle me-2"></i>Itens em falta</h6>
       <ul class="mb-0" id="afl-{{ rid }}">
         {% for f in item_data.faltantes %}
@@ -599,15 +671,8 @@
         </li>
         {% endfor %}
       </ul>
-      <p class="mt-2 mb-0 small"><strong>Sugestão:</strong> reduza as porções ou use o botão <strong>Máx</strong> para ajustar ao estoque.</p>
+      <p class="mt-2 mb-0 small"><strong>Sugestão:</strong> reduza o número de alunos ou solicite reposição de estoque.</p>
     </div>
-    {% else %}
-    <div id="af-{{ rid }}" class="alert alert-danger mt-3 mb-0" style="display:none;">
-      <h6 class="fw-bold mb-1"><i class="fas fa-times-circle me-2"></i>Itens em falta</h6>
-      <ul class="mb-0" id="afl-{{ rid }}"></ul>
-      <p class="mt-2 mb-0 small"><strong>Sugestão:</strong> reduza as porções ou use o botão <strong>Máx</strong>.</p>
-    </div>
-    {% endif %}
 
     <div style="background:#F5F5F5;padding:.9rem;border-radius:8px;margin-top:1rem;border:1px solid #E0E0E0;font-size:.85rem;">
       <strong><i class="fas fa-clipboard-check me-1"></i>Resumo:</strong>
@@ -618,22 +683,25 @@
     </div>
   </div>{# /ing-panel #}
 
-  {# ── Barra de execução (por receita) ── #}
+  {# ── Barra de execução ── #}
   <div class="exec-bar">
     <div class="exec-summary">
-      <span>Porções: <strong id="res-p-{{ rid }}">{{ item_data.porcoes_sugeridas }}</strong></span>
+      <span>Porções: <strong id="res-p-{{ rid }}">{{ quantidade_alunos|default:"—" }}</strong></span>
       <span>Turno: <strong id="res-t-{{ rid }}">—</strong></span>
-      <span id="res-warn-{{ rid }}" style="color:var(--red);display:none;">
-        <i class="fas fa-exclamation-triangle me-1"></i>Excede estoque
-      </span>
+    </div>
+
+    {# Bloqueador visual — mostra o motivo quando o botão está desabilitado #}
+    <div class="exec-blocker hidden" id="blocker-{{ rid }}">
+      <i class="fas fa-lock"></i>
+      <span id="blocker-msg-{{ rid }}">Defina o turno e o nº de alunos</span>
     </div>
 
     <a href="{% url 'modulo_merendeiras:cardapio_hoje' %}" class="btn-exec-secondary">
       <i class="fas fa-arrow-left" style="font-size:.85rem;"></i> Cardápio
     </a>
 
-    <button type="submit" id="btn-{{ rid }}" class="btn-exec"
-            {% if item_data.porcoes_maximas == 0 %}disabled title="Sem estoque suficiente"{% endif %}>
+    <button type="submit" id="btn-{{ rid }}" class="btn-exec" disabled
+            title="Defina o turno e verifique o estoque">
       <i class="fas fa-play" style="font-size:.85rem;"></i>
       Executar esta receita
     </button>
@@ -644,215 +712,383 @@
 {% endfor %}
 
 {# ────────────────────────────── JAVASCRIPT ──────────────────────────────── #}
-
 <script>
-let QTD_ALUNOS = parseInt('{{ quantidade_alunos|default:0 }}') || 0;
+/**
+ * ══════════════════════════════════════════════════════════
+ *  SINGLE SOURCE OF TRUTH — Estado centralizado de alunos
+ *  Toda lógica de porções deriva EXCLUSIVAMENTE desta variável.
+ * ══════════════════════════════════════════════════════════
+ */
+const SST = {
+  /** Número de alunos (única fonte de verdade). */
+  qtdAlunos: parseInt('{{ quantidade_alunos|default:0 }}') || 0,
 
-/* ── Toast ───────────────────────────────────────────── */
+  /** IDs de todas as receitas renderizadas na página. */
+  receitaIds: [{% for item_data in itens %}{{ item_data.item.receita.id }}{% if not forloop.last %},{% endif %}{% endfor %}],
+
+  /** Atualiza o estado global e propaga para todas as receitas. */
+  set(valor) {
+    const v = parseInt(valor);
+    if (isNaN(v) || v <= 0) {
+      toast('Informe um número de alunos válido (maior que zero).', 'w');
+      return false;
+    }
+    this.qtdAlunos = v;
+    this.propagarTodas();
+    atualizarStatusSST(v);
+    return true;
+  },
+
+  /** Propaga o valor atual para todas as receitas. */
+  propagarTodas() {
+    this.receitaIds.forEach(rid => recalcularReceita(rid));
+  }
+};
+
+/* ─────────────────── TOAST ──────────────────────────────── */
 function toast(msg, t = 'i') {
   document.querySelector('.toast')?.remove();
-
   const el = document.createElement('div');
   el.className = 'toast toast--' + t;
   el.innerHTML = msg;
-
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 3000);
+  setTimeout(() => el.remove(), 3500);
 }
 
-/* ── Toggle ingredientes (CORRIGIDO) ─────────────────── */
+/* ─────────────────── TOGGLE INGREDIENTES ────────────────── */
 function toggleIng(id) {
   const panel = document.getElementById(`ing-${id}`);
   const chevron = document.getElementById(`chevron-${id}`);
-
   if (!panel) return;
-
   panel.classList.toggle('show');
-
   if (chevron) {
     chevron.style.transform = panel.classList.contains('show')
-      ? 'rotate(180deg)'
-      : 'rotate(0deg)';
+      ? 'rotate(180deg)' : 'rotate(0deg)';
   }
 }
 
-/* ── Controle de porções ─────────────────────────────── */
-function ajustar(id, delta) {
-  const inp = document.getElementById(`inp-${id}`);
-  const form = document.getElementById(`form-receita-${id}`);
-
-  if (!inp || !form) return;
-
-  const max = parseInt(form.dataset.maximoEstoque) || 0;
-
-  let v = (parseInt(inp.value) || 0) + delta;
-
-  if (v > 1000) {
-    v = 1000;
-    toast('Limite: 1000 porções', 'w');
+/* ─────────────────── APLICAR SST ───────────────────────── */
+function aplicarSST() {
+  const input = document.getElementById('sst-alunos-input');
+  const ok = SST.set(input.value);
+  if (ok) {
+    toast(`<i class="fas fa-check-circle me-2"></i>Todas as receitas sincronizadas com <strong>${SST.qtdAlunos} alunos</strong>.`, 's');
   }
-
-  if (v < 0) v = 0;
-
-  inp.value = v;
-  onPorcoesChange(id, v, max);
 }
 
-function definir(id, valor) {
-  const form = document.getElementById(`form-receita-${id}`);
+function atualizarStatusSST(qtd) {
+  const el = document.getElementById('sst-status');
+  if (el) {
+    el.innerHTML = `Sincronizado: <strong>${qtd} aluno${qtd !== 1 ? 's' : ''}</strong> aplicados a todas as receitas.`;
+  }
+}
+
+/* ─────────────────── RECALCULAR RECEITA ────────────────── */
+/**
+ * Recalcula TUDO para uma receita com base em SST.qtdAlunos.
+ * É o único ponto de mutação de estado por receita.
+ */
+function recalcularReceita(rid) {
+  const form = document.getElementById(`form-receita-${rid}`);
   if (!form) return;
 
+  const porcoes = SST.qtdAlunos;
   const max = parseInt(form.dataset.maximoEstoque) || 0;
+  const excede = max > 0 && porcoes > max;
+  const semEstoque = max === 0;
 
-  valor = Math.min(valor, 1000);
+  /* 1 ── Sincroniza hidden inputs (enviados ao servidor) */
+  const hPorcoes = document.getElementById(`hidden-porcoes-${rid}`);
+  const hAlunos  = document.getElementById(`hidden-alunos-${rid}`);
+  if (hPorcoes) hPorcoes.value = porcoes;
+  if (hAlunos)  hAlunos.value  = porcoes;
 
-  const inp = document.getElementById(`inp-${id}`);
-  inp.value = valor;
+  /* 2 ── Atualiza display de porções */
+  const badge = document.getElementById(`badge-porcoes-${rid}`);
+  const valEl = document.getElementById(`val-porcoes-${rid}`);
+  const infoEl = document.getElementById(`info-porcoes-${rid}`);
 
-  onPorcoesChange(id, valor, max);
-}
+  if (valEl) valEl.textContent = porcoes > 0 ? porcoes : '—';
 
-function validar(inp, id) {
-  const form = document.getElementById(`form-receita-${id}`);
-  if (!form) return;
+  if (badge) badge.classList.toggle('over', excede || semEstoque);
 
-  const max = parseInt(form.dataset.maximoEstoque) || 0;
-
-  let v = parseInt(inp.value) || 0;
-
-  if (v > 1000) {
-    v = 1000;
-    inp.value = 1000;
+  if (infoEl) {
+    if (semEstoque) {
+      infoEl.innerHTML = '<span class="over"><i class="fas fa-times-circle me-1"></i>Sem estoque disponível</span>';
+    } else if (excede) {
+      infoEl.innerHTML = `<span class="over"><i class="fas fa-exclamation-circle me-1"></i>Excede em ${porcoes - max} porções</span>`;
+    } else {
+      infoEl.innerHTML = '<span class="ok"><i class="fas fa-check-circle me-1"></i>Estoque disponível</span>';
+    }
   }
 
-  if (v < 0) {
-    v = 0;
-    inp.value = 0;
+  /* 3 ── Atualiza labels dinâmicos */
+  ['label-p-', 'titulo-p-', 'res-p-'].forEach(prefix => {
+    const el = document.getElementById(`${prefix}${rid}`);
+    if (el) el.textContent = porcoes;
+  });
+
+  /* 4 ── Atualiza barra de estoque */
+  atualizarBarraEstoque(rid, porcoes, max);
+
+  /* 5 ── Recalcula ingredientes */
+  const temFaltantes = atualizarIngredientes(rid, porcoes);
+
+  /* 6 ── Atualiza alerta global de faltantes */
+  atualizarAlertaFaltantes(rid, porcoes);
+
+  /* 7 ── Habilita/desabilita botão de execução */
+  atualizarBotaoExec(rid, porcoes, max, temFaltantes);
+
+  /* 8 ── Atualiza resumo do turno */
+  const turnoEl = document.getElementById(`turno-${rid}`);
+  const resTurno = document.getElementById(`res-t-${rid}`);
+  if (resTurno && turnoEl) resTurno.textContent = turnoEl.value || '—';
+}
+
+/* ─────────────────── BARRA DE ESTOQUE ──────────────────── */
+function atualizarBarraEstoque(rid, porcoes, max) {
+  const bar = document.getElementById(`bar-${rid}`);
+  const pct = document.getElementById(`pct-${rid}`);
+  if (!bar) return;
+
+  let pctVal = 0;
+  let cls = 'sb-fill--d';
+
+  if (max > 0) {
+    pctVal = Math.min(100, Math.round((Math.min(porcoes, max) / max) * 100));
+    if (porcoes <= max) cls = 'sb-fill--ok';
+    else cls = 'sb-fill--w';
   }
 
-  onPorcoesChange(id, v, max);
-}
-
-/* ── CORE ───────────────────────────────────────────── */
-function onPorcoesChange(id, porcoes, max) {
-  atualizarVisualEstoque(id, porcoes, max);
-  atualizarIngredientes(id, porcoes);
-  atualizarResumo(id, porcoes);
-  atualizarBotaoExec(id);
-}
-
-/* ── Estoque ─────────────────────────────────────────── */
-function atualizarVisualEstoque(id, v, max) {
-  const inp = document.getElementById(`inp-${id}`);
-  const info = document.getElementById(`info-${id}`);
-
-  if (!inp || !info) return;
-
-  if (max > 0 && v > max) {
-    inp.classList.add('over');
-    info.innerHTML = `⚠️ Excede em ${v - max} porções`;
-  } else {
-    inp.classList.remove('over');
-    info.innerHTML = '✓ Dentro do limite';
+  bar.style.width = pctVal + '%';
+  bar.className = `sb-fill ${cls}`;
+  if (pct) {
+    pct.textContent = pctVal + '%';
+    pct.className = `fw-bold ${porcoes <= max && max > 0 ? 'text-success' : 'text-warning'}`;
   }
 }
 
-/* ── Ingredientes (CORRIGIDO PRINCIPAL) ─────────────── */
-function atualizarIngredientes(receitaId, porcoes) {
-  const cards = document.querySelectorAll(`.ing-card[data-receita-id="${receitaId}"]`);
+/* ─────────────────── INGREDIENTES ──────────────────────── */
+/**
+ * Recalcula cada ingrediente proporcionalmente às porções globais.
+ * Retorna true se houver QUALQUER ingrediente em falta.
+ */
+function atualizarIngredientes(rid, porcoes) {
+  const cards = document.querySelectorAll(`.ing-card[data-receita-id="${rid}"]`);
+  let temFalta = false;
 
   cards.forEach((card, index) => {
     const iid = index + 1;
+    const necBase  = parseFloat(card.dataset.necBase)  || 0;
+    const rendBase = parseFloat(card.dataset.rendBase)  || 1;
+    const disp     = parseFloat(card.dataset.disp)      || 0;
+    const un       = card.dataset.un || '';
 
-    const base = parseFloat(card.dataset.necBase);
-    const rendimento = parseFloat(card.dataset.rendBase);
-    const disp = parseFloat(card.dataset.disp);
-
-    const consumo = rendimento > 0 ? base / rendimento : 0;
-    const necessario = consumo * porcoes;
-
+    /* Consumo por porção (constante) e necessário para `porcoes` */
+    const consumoPorPorcao = necBase / rendBase;
+    const necessario = consumoPorPorcao * porcoes;
     const falta = necessario - disp;
 
-    const elNec = document.getElementById(`inec-${receitaId}-${iid}`);
-    const alert = document.getElementById(`ialert-${receitaId}-${iid}`);
+    /* Nec label */
+    const elNec   = document.getElementById(`inec-${rid}-${iid}`);
+    const elLabel = document.getElementById(`ilp-${rid}-${iid}`);
+    if (elNec)   elNec.textContent = `${necessario.toFixed(2)} ${un}`;
+    if (elLabel) elLabel.textContent = porcoes;
 
-    if (elNec) {
-      elNec.textContent = necessario.toFixed(2);
+    /* Consumo por porção */
+    const elIcon = document.getElementById(`icon-${rid}-${iid}`);
+    if (elIcon) {
+      elIcon.textContent = rendBase > 0
+        ? `${consumoPorPorcao.toFixed(3)} ${un} ÷ porção`
+        : '—';
     }
 
+    /* Disponível — coloração */
+    const elDisp = document.getElementById(`idisp-${rid}-${iid}`);
+    if (elDisp) {
+      elDisp.className = falta > 0 ? 'vd' : 'vs';
+    }
+
+    /* Alert por ingrediente */
+    const alert = document.getElementById(`ialert-${rid}-${iid}`);
     if (alert) {
       if (falta > 0) {
+        temFalta = true;
         alert.className = 'ing-alert ing-alert--bad';
-        alert.innerHTML = `❌ Faltam ${falta.toFixed(2)}`;
+        alert.innerHTML = `<i class="fas fa-exclamation-triangle me-1"></i>Faltam <strong>${falta.toFixed(2)} ${un}</strong>`;
       } else {
         alert.className = 'ing-alert ing-alert--ok';
-        alert.innerHTML = '✔ Suficiente';
+        alert.innerHTML = `<i class="fas fa-check-circle me-1"></i>Estoque suficiente para ${porcoes} porções`;
       }
     }
 
+    /* Card — estado visual */
     card.classList.toggle('ing-card--bad', falta > 0);
   });
+
+  return temFalta;
 }
 
-/* ── Resumo ─────────────────────────────────────────── */
-function atualizarResumo(id, porcoes) {
-  const el = document.getElementById(`res-p-${id}`);
-  if (el) el.textContent = porcoes;
+/* ─────────────────── ALERTA GLOBAL FALTANTES ───────────── */
+function atualizarAlertaFaltantes(rid, porcoes) {
+  const alertBox = document.getElementById(`af-${rid}`);
+  const lista    = document.getElementById(`afl-${rid}`);
+  if (!alertBox || !lista) return;
+
+  const cards = document.querySelectorAll(`.ing-card[data-receita-id="${rid}"]`);
+  const faltantes = [];
+
+  cards.forEach(card => {
+    const necBase  = parseFloat(card.dataset.necBase)  || 0;
+    const rendBase = parseFloat(card.dataset.rendBase)  || 1;
+    const disp     = parseFloat(card.dataset.disp)      || 0;
+    const un       = card.dataset.un || '';
+    const prod     = card.dataset.prod || '';
+
+    const necessario = (necBase / rendBase) * porcoes;
+    const falta = necessario - disp;
+
+    if (falta > 0) {
+      faltantes.push({ prod, falta, un });
+    }
+  });
+
+  if (faltantes.length > 0) {
+    lista.innerHTML = faltantes
+      .map(f => `<li><strong>${f.prod}</strong>: faltam <strong>${f.falta.toFixed(2)} ${f.un}</strong></li>`)
+      .join('');
+    alertBox.style.display = '';
+  } else {
+    alertBox.style.display = 'none';
+  }
 }
 
-/* ── Botão executar (CORRIGIDO) ─────────────────────── */
-function atualizarBotaoExec(id) {
-  const turno = document.getElementById(`turno-${id}`);
-  const btn = document.getElementById(`btn-${id}`);
-  const inp = document.getElementById(`inp-${id}`);
+/* ─────────────────── BOTÃO EXECUTAR ────────────────────── */
+/**
+ * Habilita o botão APENAS quando:
+ *   1. Há porções definidas (> 0)
+ *   2. Turno selecionado
+ *   3. Estoque suficiente (nenhum ingrediente em falta)
+ */
+function atualizarBotaoExec(rid, porcoes, max, temFaltantes) {
+  const btn     = document.getElementById(`btn-${rid}`);
+  const turnoEl = document.getElementById(`turno-${rid}`);
+  const blocker = document.getElementById(`blocker-${rid}`);
+  const blockerMsg = document.getElementById(`blocker-msg-${rid}`);
 
-  if (!btn || !turno || !inp) return;
+  if (!btn || !turnoEl) return;
 
-  const por = parseInt(inp.value) || 0;
+  const turnoOk    = !!turnoEl.value;
+  const porcoesOk  = porcoes > 0;
+  const estoqueOk  = !temFaltantes && max >= porcoes;
+  const semEstoque = max === 0;
 
-  btn.disabled = (!turno.value || por <= 0);
+  const podeExecutar = turnoOk && porcoesOk && estoqueOk && !semEstoque;
 
-  const label = document.getElementById(`res-t-${id}`);
-  if (label) label.textContent = turno.value || '—';
+  btn.disabled = !podeExecutar;
+
+  /* Feedback explicativo */
+  if (blocker && blockerMsg) {
+    if (!podeExecutar) {
+      blocker.classList.remove('hidden');
+      if (semEstoque) {
+        blockerMsg.textContent = 'Sem estoque disponível para esta receita.';
+      } else if (!porcoesOk) {
+        blockerMsg.textContent = 'Defina o número de alunos no painel global.';
+      } else if (!turnoOk) {
+        blockerMsg.textContent = 'Selecione o turno para continuar.';
+      } else if (temFaltantes) {
+        blockerMsg.textContent = 'Ingredientes insuficientes para o nº de alunos.';
+      } else if (max < porcoes) {
+        blockerMsg.textContent = `Estoque cobre apenas ${max} porções (solicitado: ${porcoes}).`;
+      }
+    } else {
+      blocker.classList.add('hidden');
+    }
+  }
+
+  /* Atualiza card border */
+  const form = document.getElementById(`form-receita-${rid}`);
+  if (form) {
+    form.classList.remove('rc--ok', 'rc--lim', 'rc--blk');
+    if (semEstoque || (temFaltantes && max === 0)) {
+      form.classList.add('rc--blk');
+    } else if (temFaltantes || max < porcoes) {
+      form.classList.add('rc--lim');
+    } else {
+      form.classList.add('rc--ok');
+    }
+  }
 }
 
-/* ── Aplicar alunos ─────────────────────────────────── */
-function aplicarQuantidadeAlunos(valor) {
-  const qtd = parseInt(valor);
+/* ─────────────────── CONFIRMAÇÃO DE EXECUÇÃO ───────────── */
+function confirmarExecucao(event, rid) {
+  event.preventDefault();
 
-  if (!qtd || qtd <= 0) {
-    toast('Valor inválido', 'w');
+  const porcoes = SST.qtdAlunos;
+  const turnoEl = document.getElementById(`turno-${rid}`);
+  const turno = turnoEl?.value || '';
+
+  if (!turno) {
+    toast('<i class="fas fa-exclamation-circle me-2"></i>Selecione o turno antes de executar.', 'w');
     return;
   }
 
-  QTD_ALUNOS = qtd;
+  if (porcoes <= 0) {
+    toast('<i class="fas fa-exclamation-circle me-2"></i>Defina o número de alunos no painel global.', 'w');
+    return;
+  }
 
-  document.querySelectorAll('[id^="form-receita-"]').forEach(form => {
-    const id = form.dataset.receitaId;
-    const inp = document.getElementById(`inp-${id}`);
+  /* Verificação de consistência final antes de submeter */
+  const cards = document.querySelectorAll(`.ing-card[data-receita-id="${rid}"]`);
+  let temFalta = false;
 
-    if (!inp || inp.disabled) return;
-
-    inp.value = qtd;
-    onPorcoesChange(id, qtd, parseInt(form.dataset.maximoEstoque));
+  cards.forEach(card => {
+    const necBase  = parseFloat(card.dataset.necBase)  || 0;
+    const rendBase = parseFloat(card.dataset.rendBase)  || 1;
+    const disp     = parseFloat(card.dataset.disp)      || 0;
+    const necessario = (necBase / rendBase) * porcoes;
+    if (necessario > disp) temFalta = true;
   });
 
-  toast('Atualizado com sucesso', 's');
+  if (temFalta) {
+    toast('<i class="fas fa-times-circle me-2"></i>Não é possível executar: ingredientes insuficientes.', 'd');
+    return;
+  }
+
+  const form = document.getElementById(`form-receita-${rid}`);
+  if (form) form.submit();
 }
 
-/* ── INIT (ESSENCIAL) ───────────────────────────────── */
+/* ─────────────────── INICIALIZAÇÃO ─────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('[id^="form-receita-"]').forEach(form => {
-    const id = form.dataset.receitaId;
-    const inp = document.getElementById(`inp-${id}`);
+  /* Se já há alunos definidos pelo servidor, propaga imediatamente */
+  if (SST.qtdAlunos > 0) {
+    SST.propagarTodas();
+  } else {
+    /* Sem alunos: inicializa cards no estado "aguardando" */
+    SST.receitaIds.forEach(rid => recalcularReceita(rid));
+  }
 
-    if (!inp || inp.disabled) return;
+  /* Sincroniza input do painel SST com o valor inicial */
+  const inp = document.getElementById('sst-alunos-input');
+  if (inp && SST.qtdAlunos > 0) inp.value = SST.qtdAlunos;
 
-    const v = parseInt(inp.value) || 0;
-    const max = parseInt(form.dataset.maximoEstoque) || 0;
+  /* ── AUTO-APPLY: aplica automaticamente enquanto o usuário digita ── */
+  if (inp) {
+    let debounceTimer = null;
 
-    onPorcoesChange(id, v, max);
-  });
+    inp.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        const val = parseInt(inp.value);
+        if (val > 0) {
+          aplicarSST();
+        }
+      }, 400); // aguarda 400ms após parar de digitar
+    });
+  }
 });
 </script>
 {% endblock %}
