@@ -163,6 +163,9 @@ class DescarteEstoqueEscola(models.Model):
         return f"Descarte {self.produto.nome} ({self.get_motivo_display()}) - {self.escola}"
     
     
+def get_cardapio_default():
+    from merendaEscolar.models import CardapioDia
+    return CardapioDia.objects.first().pk
 
 class ExecucaoCardapioDia(models.Model):
 
@@ -179,7 +182,7 @@ class ExecucaoCardapioDia(models.Model):
     cardapio_dia = models.ForeignKey(
         'merendaEscolar.CardapioDia',
         on_delete=models.PROTECT,
-        null=True, blank=True
+        default=get_cardapio_default
     )
     quantidade_alunos = models.PositiveIntegerField(
         null=True,
@@ -524,7 +527,7 @@ def retirar_ingrediente_receita(execucao, produto, quantidade, usuario, lote_esp
 
 
 @transaction.atomic
-def executar_cardapio_do_dia(escola, data, usuario, cardapio_dia=None, porcoes_override=None, turno=None, quantidade_alunos=None):
+def executar_cardapio_do_dia(escola, data, usuario, cardapio_dia, porcoes_override=None, turno=None, quantidade_alunos=None):
     """
     Orquestra a execução completa do cardápio do dia.
     """

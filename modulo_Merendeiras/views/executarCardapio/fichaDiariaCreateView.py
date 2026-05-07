@@ -83,54 +83,94 @@ class FichaDiariaCreateView(BaseMerendeiraView, CreateView):
         ).first()
 
         return super().dispatch(request, *args, **kwargs)
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-
-        # 🔥 modo edição
-        if self.ficha_existente:
-            kwargs["instance"] = self.ficha_existente
-
-        return kwargs
-
+    
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
         ctx["execucao"] = self.execucao
         ctx["modo_edicao"] = bool(self.ficha_existente)
+        ctx["usuario_nome"] = self.request.user.get_full_name() or self.request.user.username
 
+        # ── DEBUG — remova depois de confirmar ──
+        itens_exec_qs = self.execucao.itens_executados.select_related(
+            "execucao_receita", "receita"
+        ).prefetch_related("execucao_receita__movimentacoes__produto")
+
+        print(f"\n[DEBUG] execucao.id={self.execucao.id} cardapio_dia={self.execucao.cardapio_dia_id}")
+        print(f"[DEBUG] total itens_executados: {itens_exec_qs.count()}")
+
+        for ie in itens_exec_qs:
+            print(f"  item: {ie.receita.nome} | execucao_receita: {ie.execucao_receita_id}")
+            if ie.execucao_receita:
+                movs = ie.execucao_receita.movimentacoes.all()
+                print(f"    movimentacoes: {movs.count()}")
+                for m in movs:
+                    print(f"      tipo={m.tipo} produto={m.produto} qtd={m.quantidade}")
+
+        # ── Monta itens_alimentos ──
         itens = []
 
         if self.ficha_existente:
-            itens = self.ficha_existente.itens.select_related(
-                "produto", "unidade"
-            )
-        else:
-            itens_execucao = self.execucao.itens_executados.select_related(
-                "execucao_receita"
-            ).prefetch_related(
-                "execucao_receita__movimentacoes__produto"
-            )
+            saved_itens = self.ficha_existente.itens.select_related("produto", "unidade")
+            if saved_itens.exists():
+                itens = list(saved_itens)
 
-            for item in itens_execucao:
-                execucao_receita = item.execucao_receita
+        if not itens:
+            from collections import defaultdict
+            agregado = defaultdict(lambda: {"quantidade": 0, "unidade": "", "produto_nome": ""})
 
-                if not execucao_receita:
+            for ie in itens_exec_qs:
+                if not ie.execucao_receita:
                     continue
-
-                for mov in execucao_receita.movimentacoes.all():
-                    if mov.tipo != "RETIRADA_RECEITA":
+                for mov in ie.execucao_receita.movimentacoes.all():
+                    if mov.tipo != "RETIRADA_RECEITA" or not mov.produto:
                         continue
+                    key = mov.produto.id
+                    agregado[key]["produto_nome"] = mov.produto.nome
+                    # unidade_medida pode ser FK ou CharField — adapta aqui
+                    unidade = getattr(mov.produto, "unidade_medida", None)
+                    if unidade and hasattr(unidade, "simbolo"):
+                        agregado[key]["unidade"] = unidade.simbolo
+                    elif unidade:
+                        agregado[key]["unidade"] = str(unidade)
+                    agregado[key]["quantidade"] += float(mov.quantidade)
 
-                    itens.append({
-                        "produto_nome": mov.produto.nome,
-                        "unidade": mov.produto.unidade_medida,
-                        "quantidade": mov.quantidade,
-                    })
+            itens = list(agregado.values())
+            print(f"[DEBUG] itens_alimentos montados: {itens}")
 
         ctx["itens_alimentos"] = itens
+
+        # ── Receitas executadas para exibir no cabeçalho ──
+        # Independente do cardapio_dia, monta a lista a partir dos itens_executados
+        ctx["receitas_executadas"] = [
+            {
+                "nome": ie.receita.nome,
+                "status": ie.get_status_display(),
+                "porcoes": ie.porcoes_executadas,
+                "motivo_falha": ie.motivo_falha,
+            }
+            for ie in itens_exec_qs
+        ]
+
         return ctx
 
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        if self.ficha_existente:
+            # modo edição: carrega instância existente
+            kwargs["instance"] = self.ficha_existente
+        else:
+            # modo criação: pré-popula porcoes_produzidas com quantidade_alunos da execução
+            if self.request.method == "GET":
+                kwargs["initial"] = {
+                    "porcoes_produzidas": self.execucao.quantidade_alunos,
+                }
+
+        return kwargs
+
+    
     def form_valid(self, form):
         try:
             with transaction.atomic():

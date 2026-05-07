@@ -540,7 +540,7 @@
             <input type="text"
                    class="underline-input receita"
                    style="text-transform:capitalize"
-                   value="{{ execucao.cardapio_dia|default:'Não vinculado' }}"
+                   value="{{ execucao.cardapio_dia |default:'Não vinculado' }}"
                    readonly>
           </div>
           <div class="id-field">
@@ -560,6 +560,33 @@
                    style="width:90px;">
           </div>
         </div>
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         {# ── Receitas executadas no dia (itens_executados) ── #}
         {% with itens_exec=execucao.itens_executados.select_related %}
@@ -686,11 +713,7 @@
                 </tr>
               </thead>
               <tbody>
-                {#
-                  itens_alimentos vem da view get_context_data.
-                  Se ficha_existente: são FichaDiariaItem com .produto, .unidade, .quantidade_usada
-                  Se novo:           são dicts com produto_nome, unidade, quantidade
-                #}
+                
                 {% for item in itens_alimentos %}
                 <tr>
                   <td>

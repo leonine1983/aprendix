@@ -1,61 +1,71 @@
 {% extends "modulo_merendeiras/base_merendeira.html" %}
 {% load static %}
 
-{% block title %}Execuções de Receitas{% endblock %}
+{% block title %}Execuções de Cardápio{% endblock %}
 
 {% block content %}
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  --green:     #2E7D32;
-  --green-lt:  #E8F5E9;
-  --green-mid: #A5D6A7;
-  --amber:     #F57C00;
-  --amber-lt:  #FFF3E0;
-  --blue:      #1565C0;
-  --blue-lt:   #E3F2FD;
-  --red:       #C62828;
-  --red-lt:    #FFEBEE;
-  --surface:   #F7F8FA;
-  --card:      #FFFFFF;
-  --txt:       #1A202C;
-  --txt2:      #64748B;
-  --txt3:      #94A3B8;
-  --border:    #E8ECF0;
-  --shadow:    0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.06);
-  --shadow-hv: 0 4px 8px rgba(0,0,0,.08), 0 12px 28px rgba(0,0,0,.1);
-  --r:         14px;
-  --r-sm:      8px;
-  font-family: 'DM Sans', sans-serif;
+  --green:      #16A34A;
+  --green-lt:   #DCFCE7;
+  --green-mid:  #86EFAC;
+  --amber:      #D97706;
+  --amber-lt:   #FEF3C7;
+  --blue:       #2563EB;
+  --blue-lt:    #DBEAFE;
+  --red:        #DC2626;
+  --red-lt:     #FEE2E2;
+  --purple:     #7C3AED;
+  --purple-lt:  #EDE9FE;
+  --surface:    #F8FAFC;
+  --card:       #FFFFFF;
+  --txt:        #0F172A;
+  --txt2:       #475569;
+  --txt3:       #94A3B8;
+  --border:     #E2E8F0;
+  --shadow:     0 1px 2px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.06);
+  --shadow-hv:  0 8px 24px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.06);
+  --r:          12px;
+  --r-sm:       7px;
+  font-family: 'Sora', sans-serif;
 }
 
 /* ── PAGE HEADER ─────────────────────────────────────────── */
 .ph {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
   margin-bottom: 1.75rem;
   flex-wrap: wrap;
 }
-
-.ph-left h1 {
-  font-size: 1.45rem;
-  font-weight: 700;
-  color: var(--txt);
-  margin: 0 0 .2rem;
+.ph-title {
   display: flex;
   align-items: center;
-  gap: .5rem;
+  gap: .65rem;
+  margin: 0 0 .3rem;
 }
-
-.ph-left .subtitle {
-  font-size: .85rem;
-  color: var(--txt2);
+.ph-title .icon-wrap {
+  width: 40px; height: 40px;
+  background: var(--green-lt);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+}
+.ph-title h1 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--txt);
   margin: 0;
 }
-
+.ph-subtitle {
+  font-size: .82rem;
+  color: var(--txt2);
+  margin: 0;
+  padding-left: .15rem;
+}
 .btn-new {
   display: inline-flex;
   align-items: center;
@@ -63,30 +73,31 @@
   background: var(--green);
   color: white;
   border: none;
-  padding: .65rem 1.35rem;
+  padding: .62rem 1.3rem;
   border-radius: var(--r-sm);
-  font-weight: 600;
-  font-size: .9rem;
+  font-weight: 700;
+  font-size: .84rem;
   cursor: pointer;
   text-decoration: none;
   transition: all .2s;
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(46,125,50,.25);
+  box-shadow: 0 2px 10px rgba(22,163,74,.3);
+  letter-spacing: .01em;
 }
 .btn-new:hover {
-  background: #1B5E20;
+  background: #15803D;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(46,125,50,.35);
+  box-shadow: 0 4px 16px rgba(22,163,74,.4);
   color: white;
   text-decoration: none;
 }
 
-/* ── FILTRO / CONFIG ─────────────────────────────────────── */
+/* ── CONFIG BAR ─────────────────────────────────────────── */
 .config-bar {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  padding: .85rem 1.25rem;
+  padding: .75rem 1.2rem;
   margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
@@ -94,18 +105,18 @@
   flex-wrap: wrap;
 }
 .config-bar label {
-  font-size: .82rem;
+  font-size: .78rem;
   font-weight: 600;
   color: var(--txt2);
   white-space: nowrap;
 }
 .config-bar input[type="number"] {
-  width: 70px;
-  padding: .4rem .6rem;
+  width: 68px;
+  padding: .38rem .6rem;
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
-  font-size: .9rem;
-  font-family: 'DM Mono', monospace;
+  font-size: .88rem;
+  font-family: 'JetBrains Mono', monospace;
   text-align: center;
   color: var(--txt);
   background: var(--surface);
@@ -120,11 +131,11 @@
   display: inline-flex;
   align-items: center;
   gap: .4rem;
-  padding: .4rem 1rem;
+  padding: .38rem .9rem;
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
   background: white;
-  font-size: .82rem;
+  font-size: .78rem;
   font-weight: 600;
   color: var(--txt2);
   cursor: pointer;
@@ -132,32 +143,38 @@
 }
 .btn-save:hover { background: var(--surface); border-color: #bbb; }
 
-/* ── LEGENDA RÁPIDA ──────────────────────────────────────── */
-.legenda {
+/* ── SUMMARY STRIP ───────────────────────────────────────── */
+.summary-strip {
   display: flex;
-  gap: 1.25rem;
+  gap: .75rem;
+  margin-bottom: 1.5rem;
   flex-wrap: wrap;
-  margin-bottom: 1.25rem;
-  font-size: .78rem;
-  color: var(--txt2);
-  align-items: center;
 }
-.legenda-item {
+.sum-chip {
   display: flex;
   align-items: center;
-  gap: .4rem;
+  gap: .5rem;
+  padding: .45rem .9rem;
+  border-radius: 20px;
+  font-size: .78rem;
+  font-weight: 600;
+  border: 1px solid;
 }
-.legenda-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  flex-shrink: 0;
+.sum-chip--total  { background: var(--surface);   border-color: var(--border); color: var(--txt2); }
+.sum-chip--exec   { background: var(--green-lt);  border-color: var(--green-mid); color: var(--green); }
+.sum-chip--parc   { background: var(--amber-lt);  border-color: #FCD34D; color: var(--amber); }
+.sum-chip--cancel { background: var(--red-lt);    border-color: #FCA5A5; color: var(--red); }
+.sum-chip--andando{ background: var(--blue-lt);   border-color: #93C5FD; color: var(--blue); }
+.sum-chip .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .9rem;
+  font-weight: 700;
 }
 
 /* ── GRID ────────────────────────────────────────────────── */
 .execucao-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
   gap: 1rem;
 }
 
@@ -169,7 +186,6 @@
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  gap: 0;
   overflow: hidden;
   transition: box-shadow .2s, transform .2s;
   position: relative;
@@ -178,138 +194,262 @@
   box-shadow: var(--shadow-hv);
   transform: translateY(-2px);
 }
-
-/* Faixa colorida lateral por status */
 .execucao-card::before {
   content: '';
   position: absolute;
   left: 0; top: 0; bottom: 0;
-  width: 4px;
-  border-radius: var(--r) 0 0 var(--r);
+  width: 3px;
 }
-.card--aberta::before   { background: var(--blue); }
-.card--preparo::before  { background: var(--amber); }
-.card--finalizada::before { background: var(--green); }
+.card--executado::before  { background: var(--green); }
+.card--parcial::before    { background: var(--amber); }
+.card--andando::before    { background: var(--blue); }
+.card--cancelado::before  { background: var(--red); }
 
-.card-body {
-  padding: 1.1rem 1.25rem 1.1rem 1.4rem;
+/* ── CARD HEADER ─────────────────────────────────────────── */
+.card-header {
+  padding: .9rem 1.1rem .75rem 1.3rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.card-date-block {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.date-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: .3rem .55rem;
+  text-align: center;
+  min-width: 46px;
+}
+.date-box .day {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--txt);
+  line-height: 1;
+}
+.date-box .month {
+  font-size: .62rem;
+  font-weight: 600;
+  color: var(--txt3);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.date-meta {
   display: flex;
   flex-direction: column;
-  gap: .65rem;
-  flex: 1;
+  gap: .15rem;
 }
-
-/* ── STATUS PILL ─────────────────────────────────────────── */
-.status-pill {
+.date-meta .weekday {
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--txt);
+}
+.date-meta .year-time {
+  font-size: .74rem;
+  color: var(--txt3);
+  font-family: 'JetBrains Mono', monospace;
+}
+.status-badge {
   display: inline-flex;
   align-items: center;
-  gap: .4rem;
-  font-size: .73rem;
+  gap: .35rem;
+  font-size: .7rem;
   font-weight: 700;
-  padding: .25rem .75rem;
+  padding: .22rem .65rem;
   border-radius: 20px;
-  letter-spacing: .02em;
+  letter-spacing: .03em;
   text-transform: uppercase;
-  width: fit-content;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
-.status-pill .dot {
-  width: 6px; height: 6px;
+.status-badge .dot {
+  width: 5px; height: 5px;
   border-radius: 50%;
   flex-shrink: 0;
 }
-.status-aberta   { background: var(--blue-lt);  color: var(--blue);  }
-.status-aberta .dot   { background: var(--blue);  animation: pulse 1.8s infinite; }
-.status-preparo  { background: var(--amber-lt); color: var(--amber); }
-.status-preparo .dot  { background: var(--amber); animation: pulse 1.2s infinite; }
-.status-finalizada { background: var(--green-lt); color: var(--green); }
-.status-finalizada .dot { background: var(--green); }
+.badge--executado  { background: var(--green-lt);  color: var(--green); }
+.badge--executado .dot  { background: var(--green); }
+.badge--parcial    { background: var(--amber-lt);  color: var(--amber); }
+.badge--parcial .dot    { background: var(--amber); animation: blink 1.4s infinite; }
+.badge--andando    { background: var(--blue-lt);   color: var(--blue); }
+.badge--andando .dot    { background: var(--blue); animation: blink 1s infinite; }
+.badge--cancelado  { background: var(--red-lt);    color: var(--red); }
+.badge--cancelado .dot  { background: var(--red); }
 
-@keyframes pulse {
-  0%,100% { opacity:1; transform:scale(1); }
-  50%      { opacity:.5; transform:scale(.7); }
+@keyframes blink {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: .4; transform: scale(.65); }
 }
 
-/* ── NOME RECEITA ────────────────────────────────────────── */
-.card-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--txt);
-  line-height: 1.3;
-  margin: 0;
-}
-
-/* ── META ROW ────────────────────────────────────────────── */
-.meta-row {
+/* ── CARD BODY ───────────────────────────────────────────── */
+.card-body {
+  padding: .9rem 1.1rem .85rem 1.3rem;
   display: flex;
   flex-direction: column;
-  gap: .3rem;
+  gap: .7rem;
+  flex: 1;
+}
+
+/* Turno tag */
+.turno-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .73rem;
+  font-weight: 700;
+  padding: .2rem .6rem;
+  border-radius: 5px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  width: fit-content;
+}
+.turno--manha    { background: #FEF3C7; color: #92400E; }
+.turno--tarde    { background: #FEE2E2; color: #991B1B; }
+.turno--noite    { background: #EDE9FE; color: #5B21B6; }
+.turno--integral { background: #DCFCE7; color: #14532D; }
+
+/* Meta info */
+.meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .35rem;
 }
 .meta-item {
   display: flex;
-  align-items: center;
-  gap: .5rem;
-  font-size: .8rem;
+  align-items: flex-start;
+  gap: .4rem;
+  font-size: .78rem;
   color: var(--txt2);
+  line-height: 1.35;
 }
 .meta-item i {
-  width: 14px;
+  width: 13px;
   text-align: center;
   color: var(--txt3);
-  font-size: .75rem;
+  font-size: .72rem;
   flex-shrink: 0;
+  margin-top: 1px;
 }
 .meta-item strong { color: var(--txt); font-weight: 600; }
+.meta-item.full   { grid-column: 1 / -1; }
 
-/* ── MÉTRICAS ────────────────────────────────────────────── */
+/* Métricas numéricas */
 .metricas {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: .5rem;
+  gap: 0;
   background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--r-sm);
-  padding: .65rem .75rem;
-  margin-top: .1rem;
+  overflow: hidden;
 }
 .metrica {
+  padding: .55rem .5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: .15rem;
+  gap: .1rem;
+  position: relative;
+}
+.metrica + .metrica::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 1px;
+  background: var(--border);
 }
 .metrica-valor {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--txt);
-  font-family: 'DM Mono', monospace;
+  font-family: 'JetBrains Mono', monospace;
   line-height: 1;
 }
+.metrica-valor--green { color: var(--green); }
+.metrica-valor--amber { color: var(--amber); }
 .metrica-label {
-  font-size: .68rem;
+  font-size: .62rem;
   color: var(--txt3);
   text-transform: uppercase;
-  letter-spacing: .04em;
+  letter-spacing: .05em;
   text-align: center;
+}
+
+/* ── RECEITAS LISTA (colapsável) ─────────────────────────── */
+.receitas-section {
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+.receitas-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .5rem .75rem;
+  background: var(--surface);
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--txt2);
+  transition: background .15s;
+  gap: .5rem;
+}
+.receitas-toggle:hover { background: #EEF2F6; }
+.receitas-toggle .label { display: flex; align-items: center; gap: .4rem; }
+.receitas-toggle .arrow {
+  transition: transform .2s;
+  font-size: .65rem;
+  color: var(--txt3);
+}
+.receitas-body { display: none; }
+.receitas-body.open { display: block; }
+
+.receita-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .42rem .75rem;
+  border-top: 1px solid var(--border);
+  gap: .5rem;
+  font-size: .78rem;
+}
+.receita-row:nth-child(even) { background: #FAFBFC; }
+.receita-nome { font-weight: 600; color: var(--txt); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.receita-tipo { font-size: .68rem; color: var(--txt3); white-space: nowrap; }
+.receita-status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.receita-porcoes {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .72rem;
+  color: var(--txt2);
   white-space: nowrap;
 }
-.metrica + .metrica {
-  border-left: 1px solid var(--border);
-}
+.dot--executado  { background: var(--green); }
+.dot--preparo    { background: var(--amber); }
+.dot--faltando   { background: var(--red); }
+.dot--cancelado  { background: #CBD5E1; }
+.dot--pendente   { background: #93C5FD; }
 
-/* ── TOOLTIP MÉTRICAS ────────────────────────────────────── */
-.metricas-help {
-  font-size: .7rem;
-  color: var(--txt3);
-  text-align: center;
-  margin-top: .25rem;
-}
-
-/* ── CARD FOOTER / AÇÕES ─────────────────────────────────── */
+/* ── CARD FOOTER ─────────────────────────────────────────── */
 .card-footer {
-  padding: .75rem 1.25rem .75rem 1.4rem;
+  padding: .65rem 1.1rem .65rem 1.3rem;
   border-top: 1px solid var(--border);
   background: #FAFBFC;
   display: flex;
-  gap: .5rem;
+  gap: .4rem;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -317,54 +457,54 @@
   display: inline-flex;
   align-items: center;
   gap: .4rem;
-  padding: .5rem 1rem;
+  padding: .46rem .95rem;
   border-radius: var(--r-sm);
-  font-size: .82rem;
-  font-weight: 600;
+  font-size: .78rem;
+  font-weight: 700;
   cursor: pointer;
   text-decoration: none;
   transition: all .2s;
-  border: none;
+  border: 1px solid transparent;
   white-space: nowrap;
+  letter-spacing: .01em;
 }
-.btn-action--primary {
+.btn--primary {
   background: var(--blue);
   color: white;
+  border-color: var(--blue);
 }
-.btn-action--primary:hover {
-  background: #0D47A1;
-  color: white;
-  text-decoration: none;
-}
-.btn-action--success {
-  background: var(--green-lt);
-  color: var(--green);
-  border: 1px solid var(--green-mid);
-}
-.btn-action--success:hover {
-  background: var(--green-mid);
-  color: #1B5E20;
-  text-decoration: none;
-}
-.btn-action--ghost {
+.btn--primary:hover { background: #1D4ED8; color: white; text-decoration: none; }
+.btn--outline {
   background: white;
   color: var(--txt2);
-  border: 1px solid var(--border);
+  border-color: var(--border);
 }
-.btn-action--ghost:hover { background: var(--surface); }
+.btn--outline:hover { background: var(--surface); color: var(--txt); text-decoration: none; }
+.btn--green {
+  background: var(--green-lt);
+  color: var(--green);
+  border-color: var(--green-mid);
+}
+.btn--green:hover { background: var(--green-mid); color: #14532D; text-decoration: none; }
+.btn--disabled {
+  background: var(--surface);
+  color: var(--txt3);
+  border-color: var(--border);
+  cursor: default;
+  pointer-events: none;
+}
 
 /* ── EMPTY STATE ─────────────────────────────────────────── */
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
-  color: var(--txt2);
   background: var(--card);
   border: 1px dashed var(--border);
   border-radius: var(--r);
 }
-.empty-state-icon { font-size: 3rem; margin-bottom: 1rem; opacity: .5; }
-.empty-state h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: .5rem; color: var(--txt); }
-.empty-state p { font-size: .88rem; color: var(--txt2); margin: 0; }
+.empty-state-icon { font-size: 2.8rem; margin-bottom: 1rem; opacity: .45; }
+.empty-state h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: .4rem; color: var(--txt); }
+.empty-state p { font-size: .84rem; color: var(--txt2); margin: 0; }
 
 /* ── PAGINAÇÃO ───────────────────────────────────────────── */
 .paginacao {
@@ -372,16 +512,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: .4rem;
+  gap: .35rem;
   flex-wrap: wrap;
 }
 .pg-btn {
   display: inline-flex;
   align-items: center;
   gap: .3rem;
-  padding: .45rem .9rem;
+  padding: .42rem .85rem;
   border-radius: var(--r-sm);
-  font-size: .82rem;
+  font-size: .8rem;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
@@ -390,36 +530,41 @@
   background: white;
   color: var(--txt2);
 }
-.pg-btn:hover { background: var(--surface); border-color: #bbb; text-decoration: none; color: var(--txt); }
+.pg-btn:hover { background: var(--surface); text-decoration: none; color: var(--txt); }
 .pg-btn--active {
   background: var(--green);
   color: white;
   border-color: var(--green);
-  box-shadow: 0 2px 6px rgba(46,125,50,.25);
+  box-shadow: 0 2px 8px rgba(22,163,74,.3);
 }
-.pg-btn--active:hover { background: #1B5E20; color: white; }
+.pg-btn--active:hover { background: #15803D; color: white; }
 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
 @media (max-width: 640px) {
   .execucao-grid { grid-template-columns: 1fr; }
-  .ph { flex-direction: column; align-items: flex-start; }
+  .ph { flex-direction: column; }
   .btn-new { width: 100%; justify-content: center; }
   .card-footer { flex-direction: column; }
   .btn-action { width: 100%; justify-content: center; }
-  .legenda { gap: .75rem; }
+  .meta-grid { grid-template-columns: 1fr; }
+  .summary-strip { gap: .5rem; }
 }
 </style>
 
 {# ── HEADER ── #}
 <div class="ph">
-  <div class="ph-left">
-    <h1>🍳 Execuções de Receitas</h1>
-    <p class="subtitle">
+  <div>
+    <div class="ph-title">
+      <div class="icon-wrap">🍽️</div>
+      <h1>Execuções de Cardápio</h1>
+    </div>
+    <p class="ph-subtitle">
       {% if execucoes %}
-        {{ execucoes|length }} execuç{% if execucoes|length == 1 %}ão{% else %}ões{% endif %} encontrada{% if execucoes|length != 1 %}s{% endif %}
-        — clique em <strong>Abrir</strong> para ver detalhes ou <strong>Finalizar</strong> para encerrar
+        Exibindo {{ page_obj.start_index }}–{{ page_obj.end_index }}
+        de <strong>{{ paginator.count }}</strong> execuç{% if paginator.count == 1 %}ão{% else %}ões{% endif %}
+        — escola <strong>{{ nome_escola }}</strong>
       {% else %}
-        Nenhuma execução registrada ainda
+        Nenhuma execução registrada — escola <strong>{{ nome_escola }}</strong>
       {% endif %}
     </p>
   </div>
@@ -435,7 +580,7 @@
 <form method="post">
   {% csrf_token %}
   <div class="config-bar">
-    <i class="fas fa-sliders-h" style="color:var(--txt3);font-size:.85rem;"></i>
+    <i class="fas fa-sliders-h" style="color:var(--txt3);font-size:.82rem;"></i>
     <label for="itens">Itens por página:</label>
     <input
       type="number"
@@ -448,140 +593,89 @@
     <button class="btn-save" type="submit">
       <i class="fas fa-save"></i> Salvar
     </button>
-    <span style="margin-left:auto;font-size:.78rem;color:var(--txt3);">
-      <i class="fas fa-info-circle me-1"></i>
-      Define quantos cards aparecem por vez
+    <span style="margin-left:auto;font-size:.72rem;color:var(--txt3);">
+      Configuração aplicada somente a você
     </span>
   </div>
 </form>
 
-{# ── LEGENDA ── #}
-<div class="legenda">
-  <span style="font-size:.78rem;font-weight:600;color:var(--txt);">Status:</span>
-  <div class="legenda-item">
-    <div class="legenda-dot" style="background:var(--blue);"></div>
-    Aberta — aguardando início
+{# ── SUMMARY CHIPS ── #}
+<div class="summary-strip">
+  <div class="sum-chip sum-chip--total">
+    <i class="fas fa-list-ul" style="font-size:.8rem;"></i>
+    <span class="num">{{ paginator.count }}</span> no total
   </div>
-  <div class="legenda-item">
-    <div class="legenda-dot" style="background:var(--amber);"></div>
-    Em preparo — em andamento
+  {% with executados=execucoes|length %}
+  <div class="sum-chip sum-chip--exec">
+    <i class="fas fa-check-circle" style="font-size:.8rem;"></i>
+    Executados
   </div>
-  <div class="legenda-item">
-    <div class="legenda-dot" style="background:var(--green);"></div>
-    Finalizada — concluída
+  <div class="sum-chip sum-chip--parc">
+    <i class="fas fa-adjust" style="font-size:.8rem;"></i>
+    Parciais
   </div>
+  <div class="sum-chip sum-chip--andando">
+    <i class="fas fa-spinner" style="font-size:.8rem;"></i>
+    Em execução
+  </div>
+  {% endwith %}
 </div>
 
 {# ── CARDS GRID ── #}
 <div class="execucao-grid">
-  {% for execucao in execucoes %}
+  {% for ex in execucoes %}
 
-  <div class="execucao-card
-    {% if execucao.status == 'ABERTA' %}card--aberta
-    {% elif execucao.status == 'EM_PREPARO' %}card--preparo
-    {% elif execucao.status == 'FINALIZADA' %}card--finalizada
-    {% endif %}">
+  {# Determina classe de status #}
+  {% if ex.status == 'EXECUTADO' %}
+    {% with card_cls="card--executado" badge_cls="badge--executado" badge_lbl="Executado" badge_icon="fas fa-check" %}
+    {% include "modulo_merendeiras/cozinha/execucao_card.html" %}
+    {% endwith %}
+  {% elif ex.status == 'PARCIAL' %}
+    {% with card_cls="card--parcial" badge_cls="badge--parcial" badge_lbl="Parcial" badge_icon="fas fa-adjust" %}
+    {% include "modulo_merendeiras/cozinha/execucao_card.html" %}
+    {% endwith %}
+  {% elif ex.status == 'CANCELADO' %}
+    {% with card_cls="card--cancelado" badge_cls="badge--cancelado" badge_lbl="Cancelado" badge_icon="fas fa-times" %}
+    {% include "modulo_merendeiras/cozinha/execucao_card.html" %}
+    {% endwith %}
+  {% else %}
+    {% with card_cls="card--andando" badge_cls="badge--andando" badge_lbl="Em Execução" badge_icon="fas fa-spinner" %}
+    {% include "modulo_merendeiras/cozinha/execucao_card.html" %}
+    {% endwith %}
+  {% endif %}
 
-    <div class="card-body">
+  {# ── CARD INLINE (evita sub-template se preferir tudo em um arquivo) ── #}
+  {# Remove os includes acima e descomente abaixo para card inline: #}
+ 
 
-      {# Status #}
-      {% if execucao.status == "ABERTA" %}
-        <span class="status-pill status-aberta">
-          <span class="dot"></span> Aberta
-        </span>
-      {% elif execucao.status == "EM_PREPARO" %}
-        <span class="status-pill status-preparo">
-          <span class="dot"></span> Em preparo
-        </span>
-      {% elif execucao.status == "FINALIZADA" %}
-        <span class="status-pill status-finalizada">
-          <span class="dot"></span> Finalizada
-        </span>
-      {% endif %}
-
-      {# Título #}
-      <p class="card-title">{{ execucao.receita.nome|upper }}</p>
-
-      {# Meta #}
-      <div class="meta-row">
-        <div class="meta-item">
-          <i class="fas fa-user-circle"></i>
-          <span>Iniciado por <strong>{{ execucao.iniciado_por }}</strong></span>
-        </div>
-        <div class="meta-item">
-          <i class="far fa-clock"></i>
-          <span>Início: <strong>{{ execucao.iniciado_em|date:"d/m/Y" }}</strong>
-            às <strong>{{ execucao.iniciado_em|date:"H:i" }}</strong>
-          </span>
-        </div>
-        {% if execucao.finalizado_em %}
-        <div class="meta-item">
-          <i class="fas fa-flag-checkered"></i>
-          <span>Fim: <strong>{{ execucao.finalizado_em|date:"d/m/Y H:i" }}</strong></span>
-        </div>
-        {% endif %}
-      </div>
-
-      {# Métricas #}
-      <div class="metricas">
-        <div class="metrica">
-          <span class="metrica-valor">{{ execucao.total_movimentacoes|default:"0" }}</span>
-          <span class="metrica-label">Moviment.</span>
-        </div>
-        <div class="metrica">
-          <span class="metrica-valor">{{ execucao.total_retirado|default:"0" }}</span>
-          <span class="metrica-label">Retirado</span>
-        </div>
-        <div class="metrica">
-          <span class="metrica-valor">{{ execucao.total_devolvido|default:"0" }}</span>
-          <span class="metrica-label">Devolvido</span>
-        </div>
-      </div>
-      <p class="metricas-help">
-        <i class="fas fa-info-circle me-1"></i>
-        Retirado = saída do estoque · Devolvido = retorno ao estoque
-      </p>
-
-    </div>{# /card-body #}
-
-    {# Ações #}
-    <div class="card-footer">
-      <a href="{% url 'modulo_merendeiras:execucao_detalhe' execucao.id %}" class="btn-action btn-action--primary">
-        <i class="fas fa-search" style="font-size:.8rem;"></i>
-        Abrir
-      </a>
-
-
-      <!-- 📋 FICHA DIÁRIA -->
-                <a href="{% url 'modulo_merendeiras:ficha_diaria' execucao.id execucao.turno %}"
-                class="btn-detail"
-                style="background:#EEF7F1; border-color:#74C69D;">
-                    📋 Ficha  
-                </a>
-
-
-      {% if execucao.status != "FINALIZADA" %}
-      <a href="#" class="btn-action btn-action--success">
-        <i class="fas fa-check" style="font-size:.8rem;"></i>
-        Finalizar
-      </a>
-      {% else %}
-      <span class="btn-action btn-action--ghost" style="cursor:default;opacity:.6;">
-        <i class="fas fa-lock" style="font-size:.8rem;"></i>
-        Encerrada
-      </span>
-      {% endif %}
-    </div>
-
-  </div>
+  {% empty %}
+  {# não cai aqui pois o {% if execucoes %} externo cobre #}
   {% endfor %}
 </div>
+
+{# ── NOTA: cards renderizados inline abaixo (alternativa ao include) ── #}
+
+{% comment %}
+Se não quiser sub-templates, substitua o loop acima por:
+{% endcomment %}
+
+<script>
+  // Colapso das receitas
+  document.querySelectorAll('.receitas-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const body = btn.nextElementSibling;
+      const arrow = btn.querySelector('.arrow');
+      body.classList.toggle('open');
+      arrow.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+    });
+  });
+</script>
 
 {# ── PAGINAÇÃO ── #}
 {% if is_paginated %}
 <div class="paginacao">
   {% if page_obj.has_previous %}
-    <a class="pg-btn" href="?page=1" title="Primeira página">
+    <a class="pg-btn" href="?page=1" title="Primeira">
       <i class="fas fa-angle-double-left"></i>
     </a>
     <a class="pg-btn" href="?page={{ page_obj.previous_page_number }}">
@@ -601,7 +695,7 @@
     <a class="pg-btn" href="?page={{ page_obj.next_page_number }}">
       Próxima <i class="fas fa-angle-right"></i>
     </a>
-    <a class="pg-btn" href="?page={{ page_obj.paginator.num_pages }}" title="Última página">
+    <a class="pg-btn" href="?page={{ page_obj.paginator.num_pages }}" title="Última">
       <i class="fas fa-angle-double-right"></i>
     </a>
   {% endif %}
@@ -610,11 +704,10 @@
 
 {% else %}
 
-{# ── EMPTY STATE ── #}
 <div class="empty-state">
   <div class="empty-state-icon">📭</div>
   <h3>Nenhuma execução registrada</h3>
-  <p>Clique em <strong>Nova Execução</strong> para começar a registrar o preparo das receitas.</p>
+  <p>Clique em <strong>Nova Execução</strong> para registrar o cardápio do dia.</p>
 </div>
 
 {% endif %}

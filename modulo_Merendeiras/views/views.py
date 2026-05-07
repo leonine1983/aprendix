@@ -132,15 +132,6 @@ class ReceitaDetailView(BaseMerendeiraView, DetailView):
 # EXECUÇÃO DE RECEITA
 # =========================
 
-class ExecucaoListView(BaseMerendeiraView, ListView):
-    model = ExecucaoReceita
-    template_name = "modulo_merendeiras/execucao_lista.html"
-    context_object_name = "execucoes"
-
-    def get_queryset(self):
-        return ExecucaoReceita.objects.filter(
-            escola=self.request.user.escola
-        )
 
 
 class ExecutarReceitaView(BaseMerendeiraView, View):

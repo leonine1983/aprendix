@@ -1,0 +1,156 @@
+
+
+<div class="execucao-card {{ card_cls }}">
+
+  <!-- HEADER: data + status -->
+  <div class="card-header">
+    <div class="card-date-block">
+      <div class="date-box">
+        <div class="day">{{ ex.data|date:"d" }}</div>
+        <div class="month">{{ ex.data|date:"M" }}</div>
+      </div>
+      <div class="date-meta">
+        <span class="weekday">{{ ex.data|date:"l" }}</span>
+        <span class="year-time">{{ ex.data|date:"Y" }}
+          {% if ex.criado_em %} · {{ ex.criado_em|date:"H:i" }}{% endif %}
+        </span>
+      </div>
+    </div>
+    <span class="status-badge {{ badge_cls }}">
+      <span class="dot"></span>
+      {{ badge_lbl }}
+    </span>
+  </div>
+
+  <!-- BODY -->
+  <div class="card-body">
+
+    <!-- Turno -->
+    {% if ex.turno == 'MANHA' %}
+      <span class="turno-tag turno--manha">☀️ Manhã</span>
+    {% elif ex.turno == 'TARDE' %}
+      <span class="turno-tag turno--tarde">🌤️ Tarde</span>
+    {% elif ex.turno == 'NOITE' %}
+      <span class="turno-tag turno--noite">🌙 Noite</span>
+    {% elif ex.turno == 'INTEGRAL' %}
+      <span class="turno-tag turno--integral">📅 Integral</span>
+    {% endif %}
+
+    <!-- Metadados -->
+    <div class="meta-grid">
+      <div class="meta-item full">
+        <i class="fas fa-school"></i>
+        <span><strong>{{ ex.escola.nome }}</strong></span>
+      </div>
+
+      <div class="meta-item">
+        <i class="fas fa-user-circle"></i>
+        <span>Executado por<br><strong>{{ ex.executado_por.get_full_name|default:ex.executado_por.username }}</strong></span>
+      </div>
+
+      {% if ex.quantidade_alunos %}
+      <div class="meta-item">
+        <i class="fas fa-users"></i>
+        <span>Alunos atendidos<br><strong>{{ ex.quantidade_alunos }}</strong></span>
+      </div>
+      {% endif %}
+
+      {% if ex.cardapio_dia %}
+      <div class="meta-item full">
+        <i class="fas fa-clipboard-list"></i>
+        <span>Cardápio: <strong>{{ ex.cardapio_dia }}</strong></span>
+      </div>
+      {% endif %}
+
+      {% if ex.finalizado_em %}
+      <div class="meta-item full">
+        <i class="fas fa-flag-checkered"></i>
+        <span>Finalizado em <strong>{{ ex.finalizado_em|date:"d/m/Y" }}</strong>
+          às <strong>{{ ex.finalizado_em|date:"H:i" }}</strong>
+        </span>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Métricas agregadas (via annotate na view) -->
+    <div class="metricas">
+      <div class="metrica">
+        <span class="metrica-valor">{{ ex.total_itens|default:"—" }}</span>
+        <span class="metrica-label">Receitas</span>
+      </div>
+      <div class="metrica">
+        <span class="metrica-valor metrica-valor--green">{{ ex.total_executados|default:"0" }}</span>
+        <span class="metrica-label">Executadas</span>
+      </div>
+      <div class="metrica">
+        <span class="metrica-valor metrica-valor--amber">{{ ex.total_porcoes|default:"—" }}</span>
+        <span class="metrica-label">Porções</span>
+      </div>
+    </div>
+
+    <!-- Lista de receitas (itens_executados via prefetch) -->
+    {% if ex.itens_executados.all %}
+    <div class="receitas-section">
+      <button type="button" class="receitas-toggle">
+        <span class="label">
+          <i class="fas fa-utensils" style="font-size:.75rem;"></i>
+          Receitas ({{ ex.itens_executados.all|length }})
+        </span>
+        <i class="fas fa-chevron-down arrow"></i>
+      </button>
+      <div class="receitas-body">
+        {% for item in ex.itens_executados.all %}
+        <div class="receita-row">
+          {% if item.status == 'EXECUTADO' %}
+            <span class="receita-status-dot dot--executado" title="Executado"></span>
+          {% elif item.status == 'EM_PREPARO' %}
+            <span class="receita-status-dot dot--preparo" title="Em preparo"></span>
+          {% elif item.status == 'FALTANDO_ESTOQUE' %}
+            <span class="receita-status-dot dot--faltando" title="Faltando estoque"></span>
+          {% elif item.status == 'CANCELADO' %}
+            <span class="receita-status-dot dot--cancelado" title="Cancelado"></span>
+          {% else %}
+            <span class="receita-status-dot dot--pendente" title="Pendente"></span>
+          {% endif %}
+
+          <span class="receita-nome" title="{{ item.receita.nome }}">{{ item.receita.nome }}</span>
+          <span class="receita-tipo">{{ item.tipo_refeicao.nome }}</span>
+          {% if item.porcoes_executadas %}
+            <span class="receita-porcoes">{{ item.porcoes_executadas }} porç.</span>
+          {% elif item.porcoes_planejadas %}
+            <span class="receita-porcoes" style="color:var(--txt3);">{{ item.porcoes_planejadas }} plan.</span>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- FOOTER: ações -->
+  <div class="card-footer">
+    <a href="{% url 'modulo_merendeiras:execucao_detalhe' ex.id %}" class="btn-action btn--primary">
+      <i class="fas fa-search" style="font-size:.75rem;"></i>
+      Abrir
+    </a>
+
+    <a href="{% url 'modulo_merendeiras:ficha_diaria' ex.id ex.turno %}" class="btn-action btn--outline">
+      <i class="fas fa-clipboard" style="font-size:.75rem;"></i>
+      Ficha
+    </a>
+
+    {% if ex.status == 'EM_EXECUCAO' %}
+    <a  class="btn-action btn--green">
+      <i class="fas fa-check" style="font-size:.75rem;"></i>
+      Finalizar
+    </a>
+    {% else %}
+    <span class="btn-action btn--disabled">
+      <i class="fas fa-lock" style="font-size:.75rem;"></i>
+      Encerrado
+    </span>
+    {% endif %}
+  </div>
+
+</div>

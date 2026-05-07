@@ -43,36 +43,81 @@ def executar_receita_individual(
     receita_id,
     porcoes,
     turno,
+    cardapio_dia=None,
     quantidade_alunos=None
 ):
+    from modulo_Merendeiras.models import (
+        ExecucaoReceitaCozinha,
+        ExecucaoCardapioItem,
+        MovimentacaoCozinha,
+    )
+
+    from merendaEscolar.models import (
+        TipoRefeicao,
+        CardapioItem,
+    )
 
     receita = Receita.objects.get(id=receita_id)
 
     # 🔍 valida disponibilidade
     disponivel, info = verificar_disponibilidade_ingredientes(
-        escola, receita, porcoes
+        escola,
+        receita,
+        porcoes
     )
 
     if not disponivel:
         raise Exception("Estoque insuficiente para esta quantidade.")
 
-    # ✅ cria OU reutiliza execução do turno (resolve UNIQUE)
-    execucao, created = ExecucaoCardapioDia.objects.get_or_create(
+    # =========================================================
+    # 🔥 EXECUÇÃO DO DIA (mestre)
+    # =========================================================
+
+    execucao_dia, created = ExecucaoCardapioDia.objects.get_or_create(
         escola=escola,
         data=data,
         turno=turno,
         defaults={
             'executado_por': usuario,
-            'quantidade_alunos': quantidade_alunos
+            'quantidade_alunos': quantidade_alunos,
+            'status': 'EM_EXECUCAO',
+            'cardapio_dia': cardapio_dia,
         }
     )
 
-    # 🔥 baixa estoque REAL (FEFO)
+    # 🔥 se já existia e ainda não possui cardápio vinculado
+    if cardapio_dia and not execucao_dia.cardapio_dia:
+        execucao_dia.cardapio_dia = cardapio_dia
+        execucao_dia.save(update_fields=['cardapio_dia'])
+
+    # 🔥 atualiza quantidade alunos se necessário
+    if (
+        not created
+        and quantidade_alunos
+        and not execucao_dia.quantidade_alunos
+    ):
+        execucao_dia.quantidade_alunos = quantidade_alunos
+        execucao_dia.save(update_fields=['quantidade_alunos'])
+
+    # =========================================================
+    # 🔥 EXECUÇÃO DA RECEITA
+    # =========================================================
+
+    exec_receita = ExecucaoReceitaCozinha.objects.create(
+        escola=escola,
+        receita=receita,
+        status='EM_PREPARO',
+        iniciado_por=usuario,
+    )
+
+    # =========================================================
+    # 🔥 BAIXA ESTOQUE (FEFO)
+    # =========================================================
+
     for ing in receita.ingredientes.all():
 
         quantidade_necessaria = ing.quantidade * porcoes
 
-        # pega lotes ordenados por validade (FEFO)
         estoques = EstoqueEscola.objects.filter(
             escola=escola,
             produto=ing.produto,
@@ -83,26 +128,154 @@ def executar_receita_individual(
         restante = quantidade_necessaria
 
         for estoque in estoques:
+
             if restante <= 0:
                 break
 
-            if estoque.quantidade >= restante:
-                estoque.quantidade -= restante
-                estoque.save()
-                restante = 0
-            else:
-                restante -= estoque.quantidade
-                estoque.quantidade = 0
-                estoque.save()
+            consumir = min(estoque.quantidade, restante)
 
-        # segurança extra (não deveria acontecer se validou antes)
+            estoque.quantidade -= consumir
+            estoque.save(update_fields=['quantidade'])
+
+            restante -= consumir
+
+            # 🔥 movimentação interna
+            MovimentacaoCozinha.objects.create(
+                escola=escola,
+                produto=ing.produto,
+                lote=estoque.lote,
+                quantidade=consumir,
+                tipo='RETIRADA_RECEITA',
+                usuario=usuario,
+                execucao_receita=exec_receita,
+                observacao=(
+                    f"Lote: {estoque.lote} "
+                    f"(Validade: {estoque.data_validade})"
+                )
+            )
+
         if restante > 0:
-            raise Exception(f"Erro ao debitar estoque de {ing.produto.nome}")
+            raise Exception(
+                f"Erro ao debitar estoque de {ing.produto.nome}"
+            )
+
+    # =========================================================
+    # 🔥 FINALIZA EXECUÇÃO DA RECEITA
+    # =========================================================
+
+    exec_receita.status = 'FINALIZADA'
+    exec_receita.finalizado_em = timezone.now()
+    exec_receita.finalizado_por = usuario
+    exec_receita.rendimento_real = porcoes
+
+    exec_receita.save(
+        update_fields=[
+            'status',
+            'finalizado_em',
+            'finalizado_por',
+            'rendimento_real'
+        ]
+    )
+
+    # =========================================================
+    # 🔥 DESCOBRE TIPO DE REFEIÇÃO
+    # =========================================================
+
+    tipo_refeicao = None
+
+    cardapio_dia_execucao = execucao_dia.cardapio_dia
+
+    if cardapio_dia_execucao:
+
+        ci = CardapioItem.objects.filter(
+            dia=cardapio_dia_execucao,
+            receita=receita
+        ).select_related('tipo_refeicao').first()
+
+        if ci:
+            tipo_refeicao = ci.tipo_refeicao
+
+    # fallback
+    if not tipo_refeicao:
+        tipo_refeicao = TipoRefeicao.objects.first()
+
+    if not tipo_refeicao:
+        raise Exception(
+            "Nenhum TipoRefeicao cadastrado no sistema."
+        )
+
+    # =========================================================
+    # 🔥 ITEM EXECUTADO DO CARDÁPIO
+    # =========================================================
+
+    exec_item, item_created = ExecucaoCardapioItem.objects.get_or_create(
+        execucao_cardapio=execucao_dia,
+        receita=receita,
+        tipo_refeicao=tipo_refeicao,
+        defaults={
+            'execucao_receita': exec_receita,
+            'status': 'EXECUTADO',
+            'porcoes_planejadas': porcoes,
+            'porcoes_executadas': porcoes,
+        }
+    )
+
+    # 🔥 se já existia, atualiza vínculo e status
+    if not item_created:
+
+        alterou = False
+
+        if not exec_item.execucao_receita:
+            exec_item.execucao_receita = exec_receita
+            alterou = True
+
+        if exec_item.status != 'EXECUTADO':
+            exec_item.status = 'EXECUTADO'
+            alterou = True
+
+        if not exec_item.porcoes_executadas:
+            exec_item.porcoes_executadas = porcoes
+            alterou = True
+
+        if alterou:
+            exec_item.save()
+
+    # =========================================================
+    # 🔥 STATUS FINAL DO DIA
+    # =========================================================
+
+    total_itens = execucao_dia.itens_executados.count()
+
+    total_executados = execucao_dia.itens_executados.filter(
+        status='EXECUTADO'
+    ).count()
+
+    if total_itens > 0:
+
+        if total_executados == total_itens:
+            execucao_dia.status = 'EXECUTADO'
+        else:
+            execucao_dia.status = 'PARCIAL'
+
+        execucao_dia.finalizado_em = timezone.now()
+
+        execucao_dia.save(
+            update_fields=[
+                'status',
+                'finalizado_em'
+            ]
+        )
 
     return {
-        'execucao_id': execucao.id,
+        'execucao_id': execucao_dia.id,
         'receita': receita.nome,
-        'porcoes': porcoes
+        'porcoes': porcoes,
+        'turno': turno,
+        'cardapio_dia_id': (
+            execucao_dia.cardapio_dia.id
+            if execucao_dia.cardapio_dia
+            else None
+        ),
     }
 
 
