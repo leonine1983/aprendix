@@ -257,6 +257,7 @@ class ExecucaoCardapioItem(models.Model):
 from django.db import models
 from django.contrib.auth import get_user_model
 from ckeditor.fields import RichTextField
+from modulo_Merendeiras.models import ExecucaoCardapioDia
 
 User = get_user_model()
 
@@ -280,8 +281,7 @@ class FichaExecucaoReceita(models.Model):
     )
 
     # 🔥 RELAÇÃO PRINCIPAL — agora vinculada ao dia, não à receita individual
-    execucao_cardapio_dia = models.OneToOneField(
-        "modulo_Merendeiras.ExecucaoCardapioDia",
+    execucao_cardapio_dia = models.OneToOneField(ExecucaoCardapioDia,
         on_delete=models.CASCADE,
         related_name="ficha",
         null=True

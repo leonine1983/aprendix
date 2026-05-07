@@ -282,8 +282,94 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
                     request,
                     f"Receita executada com sucesso ({porcoes} porções - {turno})."
                 )
+                from django.utils.safestring import mark_safe
+                from django.urls import reverse
+                url_execucoes = reverse('modulo_merendeiras:lista_execucoes')
+                messages.info(
+                    request,
+                    mark_safe(f""" <div style="
+    margin-top:12px;
+    padding:16px;
+    border:1px solid #dbeafe;
+    border-radius:14px;
+    background:#f8fbff;
+    color:#1e293b;
+    line-height:1.6;
+">
+
+    <div style="
+        font-size:15px;
+        font-weight:600;
+        margin-bottom:12px;
+        color:#0f172a;
+    ">
+        📋 Ficha Diária – Controle da Alimentação Escolar
+    </div>
+
+    <div style="margin-bottom:14px;">
+        Após servir a alimentação aos alunos, acesse a área de execuções
+        para preencher a ficha diária referente ao cardápio executado,
+        informando os dados da refeição servida conforme a data e o turno.
+    </div>
+
+    <a href="{url_execucoes}"
+       style="
+            text-decoration:none;
+            display:inline-block;
+       ">
+
+        <div style="
+            display:flex;
+            align-items:center;
+            gap:8px;
+            padding:10px 14px;
+            border:1px solid #cbd5e1;
+            border-radius:10px;
+            background:#ffffff;
+            width:max-content;
+            font-weight:600;
+            color:#334155;
+            transition:all .2s ease;
+            cursor:pointer;
+        ">
+
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M3 2h2l2.5 9H18l2-7H7"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"/>
+                <circle cx="9" cy="20" r="1.5"
+                        stroke="currentColor"
+                        stroke-width="1.8"/>
+                <circle cx="17" cy="20" r="1.5"
+                        stroke="currentColor"
+                        stroke-width="1.8"/>
+            </svg>
+
+            <span class="sb-item__label">
+                Execuções
+            </span>
+        </div>
+    </a>
+
+    <div style="
+        margin-top:14px;
+        font-size:14px;
+        color:#475569;
+    ">
+        Em seguida, localize a execução desejada pela
+        <strong>data</strong> e pelo
+        <strong>turno</strong>,
+        e preencha a ficha correspondente.
+    </div>
+
+</div>
+                    """)
+                )
 
         except Exception as e:
             messages.error(request, f"Erro: {str(e)}")
+
 
         return redirect('modulo_merendeiras:preparar_execucao')

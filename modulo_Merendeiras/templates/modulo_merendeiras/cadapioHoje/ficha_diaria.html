@@ -74,10 +74,10 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
-  .status-ABERTA       { background: #e3f0ff; color: #003580; border: 1px solid #b3d0ff; }
-  .status-EM_PREPARO   { background: #fff8e1; color: #7a5500; border: 1px solid #ffe082; }
-  .status-FINALIZADA   { background: #e6f4ea; color: #1a7a3c; border: 1px solid #a8d5b5; }
-  .status-CANCELADA    { background: #fdecea; color: #b00020; border: 1px solid #f5c0c0; }
+  .status-EM_EXECUCAO { background: #fff8e1; color: #7a5500; border: 1px solid #ffe082; }
+  .status-EXECUTADO   { background: #e6f4ea; color: #1a7a3c; border: 1px solid #a8d5b5; }
+  .status-PARCIAL     { background: #fff3e0; color: #7a4000; border: 1px solid #ffcc80; }
+  .status-CANCELADO   { background: #fdecea; color: #b00020; border: 1px solid #f5c0c0; }
 
   /* ── LINHAS DE IDENTIFICAÇÃO ── */
   .id-row {
@@ -118,7 +118,6 @@
   .id-field .underline-input.tecnico { min-width: 200px; text-transform: capitalize; }
   .id-field .underline-input.receita { min-width: 280px; font-weight: 600; }
 
-  /* alunos_atendidos gerado pelo form Django */
   #id_porcoes_produzidas {
     border: none;
     border-bottom: 1px solid var(--preto);
@@ -188,7 +187,7 @@
     width: 100%;
   }
 
-  /* ── INFO BOX (dados somente-leitura da execução) ── */
+  /* ── INFO BOX ── */
   .info-box {
     background: var(--cinza-bg);
     border: 1px solid #dde3ed;
@@ -444,19 +443,6 @@
     height: 14px;
   }
 
-  /* cardapio_executado textarea */
-  #id_cardapio_executado {
-    width: 100%;
-    min-height: 60px;
-    border: 1px solid var(--cinza-linha);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 13px;
-    resize: vertical;
-    background: transparent;
-    font-family: inherit;
-  }
-
   /* motivo_sobras / outra_ocorrencia */
   #id_motivo_sobras,
   #id_outra_ocorrencia {
@@ -479,7 +465,8 @@
 <div style="padding: 16px 8px;">
 
   {# ── Banners de contexto ── #}
-  {% if execucao_receita.status == "CANCELADA" %}
+  {# execucao é ExecucaoCardapioDia — status: EM_EXECUCAO | EXECUTADO | PARCIAL | CANCELADO #}
+  {% if execucao.status == "CANCELADO" %}
   <div class="alerta-cancelada">
     ⚠️ Esta execução foi <strong>cancelada</strong>. O registro da ficha é apenas para fins de histórico.
   </div>
@@ -505,26 +492,29 @@
       <div class="ficha-body">
         <h1>Ficha Diária – Controle da Alimentação Escolar</h1>
 
-        {# ── Caixa de info rápida da execução ── #}
         <div class="info-box">
           <span>
-            <strong>Receita:</strong>
-            {{ execucao_receita.receita.nome }}
+            <strong>Data:</strong>
+            {{ execucao.data|date:"d/m/Y" }}
           </span>
           <span>
-            <strong>Iniciado em:</strong>
-            {{ execucao_receita.iniciado_em|date:"d/m/Y H:i" }}
+            <strong>Turno:</strong>
+            {{ execucao.get_turno_display }}
           </span>
-          {% if execucao_receita.finalizado_em %}
+          <span>
+            <strong>Registrado em:</strong>
+            {{ execucao.criado_em|date:"d/m/Y H:i" }}
+          </span>
+          {% if execucao.finalizado_em %}
           <span>
             <strong>Finalizado em:</strong>
-            {{ execucao_receita.finalizado_em|date:"d/m/Y H:i" }}
+            {{ execucao.finalizado_em|date:"d/m/Y H:i" }}
           </span>
           {% endif %}
           <span>
             <strong>Status:</strong>
-            <span class="status-badge status-{{ execucao_receita.status }}">
-              {{ execucao_receita.get_status_display }}
+            <span class="status-badge status-{{ execucao.status }}">
+              {{ execucao.get_status_display }}
             </span>
           </span>
         </div>
@@ -533,96 +523,105 @@
         <div class="id-row">
           <div class="id-field" style="width:100%">
             <label>Unidade Escolar:</label>
+            {# execucao.escola é FK para rh.Escola — usa nome_escola ou __str__ #}
             <input type="text"
                    class="underline-input escola"
-                   value="{{ execucao_receita.escola.nome_escola|default:nome_escola }}"
+                   value="{{ execucao.escola.nome_escola|default:execucao.escola }}"
                    readonly
                    style="flex:1;">
           </div>
         </div>
 
-        {# ── Receita / Data ── #}
+        {# ── Cardápio / Data / Turno ── #}
         <div class="id-row">
           <div class="id-field">
-            <label>Receita executada:</label>
+            <label>Cardápio do dia:</label>
+            {# execucao.cardapio_dia pode ser null #}
             <input type="text"
                    class="underline-input receita"
                    style="text-transform:capitalize"
-                   value="{{ execucao_receita.receita.nome }}"
+                   value="{{ execucao.cardapio_dia|default:'Não vinculado' }}"
                    readonly>
           </div>
           <div class="id-field">
             <label>Data:</label>
             <input type="text"
                    class="underline-input"
-                   value="{{ execucao_receita.iniciado_em|date:'d/m/Y' }}"
+                   value="{{ execucao.data|date:'d/m/Y' }}"
+                   readonly
+                   style="width:90px;">
+          </div>
+          <div class="id-field">
+            <label>Turno:</label>
+            <input type="text"
+                   class="underline-input"
+                   value="{{ execucao.get_turno_display }}"
                    readonly
                    style="width:90px;">
           </div>
         </div>
 
-        {# ── Alunos atendidos (rendimento_real) + Técnico ── #}
+        {# ── Receitas executadas no dia (itens_executados) ── #}
+        {% with itens_exec=execucao.itens_executados.select_related %}
+        <div class="id-row" style="margin-bottom:4px;">
+          <div class="id-field" style="width:100%;">
+            <label>Receitas executadas:</label>
+            <span style="font-size:13px;color:#444;padding:1px 4px;">
+              {% for item in execucao.itens_executados.all %}
+                {{ item.receita.nome|capfirst }}{% if not forloop.last %}, {% endif %}
+              {% empty %}
+                —
+              {% endfor %}
+            </span>
+          </div>
+        </div>
+        {% endwith %}
+
+        {# ── Alunos atendidos + Técnico ── #}
         <div class="id-row" style="align-items:flex-start;gap:16px;">
 
-          {# Destaque visual para número de alunos/porções #}
           <div style="display:flex;flex-direction:column;gap:4px;">
             <label style="font-size:13px;font-weight:600;">
               Alunos atendidos / Porções produzidas:
             </label>
-            {% if execucao_receita.rendimento_real %}
+            {# execucao.quantidade_alunos substitui execucao_receita.rendimento_real #}
+            {% if execucao.quantidade_alunos %}
             <div class="alunos-destaque">
               <span>🍽️</span>
               <div>
-                <div class="numero">{{ execucao_receita.rendimento_real }}</div>
-                <div style="font-size:10px;font-weight:600;opacity:.7;text-transform:uppercase;">porções</div>
+                <div class="numero">{{ execucao.quantidade_alunos }}</div>
+                <div style="font-size:10px;font-weight:600;opacity:.7;text-transform:uppercase;">alunos</div>
               </div>
             </div>
             {% endif %}
-            {# Campo editável do formulário (porcoes_produzidas) #}
-            <div class="id-field" style="margin-right:0;">
-              <label style="font-size:12px;color:#666;">
-                {% if execucao_receita.rendimento_real %}Confirmar / ajustar:{% else %}Informar:{% endif %}
-              </label>
-              {{ form.porcoes_produzidas }}
-            </div>
+            
           </div>
 
           <div class="id-field" style="flex:1;">
-            <label>Técnico(a) em Alimentação Escolar:</label>
+            <label>Executado por:</label>
+            {# execucao.executado_por substitui execucao_receita.iniciado_por #}
             <input type="text"
                    class="underline-input tecnico"
-                   value="{{ usuario_nome|default:'' }}"
+                   value="{{ execucao.executado_por.get_full_name|default:execucao.executado_por.username }}"
                    readonly
                    style="flex:1;">
           </div>
 
         </div>
 
-        {# ── Iniciado por ── #}
+        {# ── Usuário que preencheu a ficha (do request.user via view) ── #}
         <div class="id-row">
           <div class="id-field">
-            <label>Execução iniciada por:</label>
+            <label>Técnico(a) em Alimentação Escolar:</label>
             <input type="text"
-                   class="underline-input"
-                   value="{{ execucao_receita.iniciado_por.get_full_name|default:execucao_receita.iniciado_por.username }}"
-                   style="text-transform:capitalize"
+                   class="underline-input tecnico"
+                   value="{{ usuario_nome|default:'' }}"
                    readonly
                    style="min-width:200px;">
           </div>
-          {% if execucao_receita.finalizado_por %}
-          <div class="id-field">
-            <label>Finalizada por:</label>
-            <input type="text"
-                   class="underline-input"
-                   value="{{ execucao_receita.finalizado_por.get_full_name|default:execucao_receita.finalizado_por.username }}"
-                   style="text-transform:capitalize"
-                   readonly
-                   style="min-width:200px;">
-          </div>
-          {% endif %}
         </div>
 
-        {# ══ CARDÁPIO ══ #}
+        {# ══ CARDÁPIO (receitas previstas no cardapio_dia) ══ #}
         <div class="secao">
           <div class="secao-titulo">
             <span>Cardápio</span>
@@ -630,27 +629,41 @@
           <div class="secao-corpo">
 
             <div class="campo-linha">
-              <label>Cardápio previsto:</label>
+              <label>Receitas previstas:</label>
               <span style="flex:1;border-bottom:1px solid #999;min-height:20px;font-size:13px;padding:1px 4px;color:#555;text-transform:capitalize">
-                {% for item in execucao_receita.receita.ingredientes.all %}
-                  {{ item.produto.nome }}{% if not forloop.last %}, {% endif %}
-                {% empty %}
-                  {{ execucao_receita.receita.nome }}
-                {% endfor %}
+                {# Itera os itens do cardapio_dia se disponível #}
+                {% if execucao.cardapio_dia %}
+                  {% for ci in execucao.cardapio_dia.itens.all %}
+                    {{ ci.receita.nome }}{% if not forloop.last %}, {% endif %}
+                  {% empty %}
+                    —
+                  {% endfor %}
+                {% else %}
+                  —
+                {% endif %}
               </span>
             </div>
 
-            <div class="campo-linha" style="margin-bottom:8px;">
-              <label class="form-check-inline" for="{{ form.houve_alteracao_cardapio.id_for_label }}" style="gap:6px;font-weight:600;">
-                {{ form.houve_alteracao_cardapio }}
-                Houve alteração no cardápio?
+            {# Resumo dos itens executados com status #}
+            <div style="margin-top:6px;">
+              <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px;">
+                Itens executados:
               </label>
+              {% for item in execucao.itens_executados.all %}
+              <div style="font-size:12px;color:#444;padding:2px 4px;">
+                • {{ item.receita.nome|capfirst }}
+                — <strong>{{ item.get_status_display }}</strong>
+                {% if item.porcoes_executadas %}
+                  ({{ item.porcoes_executadas }} porções)
+                {% endif %}
+                {% if item.motivo_falha %}
+                  — <span style="color:#b00020;">{{ item.motivo_falha }}</span>
+                {% endif %}
+              </div>
+              {% empty %}
+              <span style="font-size:12px;color:#888;">Nenhum item registrado.</span>
+              {% endfor %}
             </div>
-
-            <div class="campo-linha">
-              <label style="white-space:nowrap;">Cardápio executado:</label>
-            </div>
-            {{ form.cardapio_executado }}
 
           </div>
         </div>
@@ -673,25 +686,35 @@
                 </tr>
               </thead>
               <tbody>
+                {#
+                  itens_alimentos vem da view get_context_data.
+                  Se ficha_existente: são FichaDiariaItem com .produto, .unidade, .quantidade_usada
+                  Se novo:           são dicts com produto_nome, unidade, quantidade
+                #}
                 {% for item in itens_alimentos %}
                 <tr>
-                  <td >
-                    <input type="text"
-                           value="{{ item.produto_nome }}"
-                            style='text-transform: capitalize;'
-                           readonly>
+                  <td>
+                    {% if item.produto_nome %}
+                      {# dict — contexto de criação nova #}
+                      <input type="text" value="{{ item.produto_nome }}" style="text-transform:capitalize;" readonly>
+                    {% else %}
+                      {# FichaDiariaItem — contexto de edição #}
+                      <input type="text" value="{{ item.produto.nome }}" style="text-transform:capitalize;" readonly>
+                    {% endif %}
                   </td>
                   <td>
-                    <input type="text"
-                           value="{{ item.unidade }}"
-                           readonly
-                           style="text-align:center;">
+                    {% if item.unidade %}
+                      <input type="text" value="{{ item.unidade }}" readonly style="text-align:center;">
+                    {% else %}
+                      <input type="text" value="{{ item.unidade.simbolo|default:item.unidade }}" readonly style="text-align:center;">
+                    {% endif %}
                   </td>
                   <td>
-                    <input type="text"
-                           value="{{ item.quantidade }}"
-                           readonly
-                           style="text-align:center;">
+                    {% if item.quantidade %}
+                      <input type="text" value="{{ item.quantidade }}" readonly style="text-align:center;">
+                    {% else %}
+                      <input type="text" value="{{ item.quantidade_usada }}" readonly style="text-align:center;">
+                    {% endif %}
                   </td>
                 </tr>
                 {% empty %}
@@ -801,18 +824,6 @@
           </div>
         </div>
 
-        {# ══ OBSERVAÇÕES DA EXECUÇÃO (somente-leitura) ══ #}
-        {% if execucao_receita.observacoes %}
-        <div class="secao">
-          <div class="secao-titulo">Observações da Execução</div>
-          <div class="secao-corpo">
-            <div style="font-size:13px;color:#555;background:#fafbfd;padding:8px;border:1px solid #dde3ed;border-radius:3px;">
-              {{ execucao_receita.observacoes|safe }}
-            </div>
-          </div>
-        </div>
-        {% endif %}
-
         {# ══ OBSERVAÇÕES DA FICHA ══ #}
         <div class="secao">
           <div class="secao-titulo">Observações</div>
@@ -846,7 +857,7 @@
     <div class="form-footer">
       <button type="submit"
               class="btn-salvar"
-              {% if execucao_receita.status == "CANCELADA" %}disabled title="Execução cancelada"{% endif %}>
+              {% if execucao.status == "CANCELADO" %}disabled title="Execução cancelada"{% endif %}>
         💾 {% if modo_edicao %}Atualizar Ficha{% else %}Salvar Ficha{% endif %}
       </button>
     </div>
