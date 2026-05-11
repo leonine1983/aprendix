@@ -423,13 +423,11 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
             messages.error(request, "Selecione o turno.")
             return redirect('modulo_merendeiras:preparar_execucao')
 
-        # valida turno
         turnos_validos = {t[0] for t in self.TURNOS_DISPONIVEIS}
         if turno not in turnos_validos:
             messages.error(request, "Turno inválido.")
             return redirect('modulo_merendeiras:preparar_execucao')
 
-        # pega porções
         try:
             porcoes = int(request.POST.get(f'porcoes_{receita_id}', 0))
         except ValueError:
@@ -439,9 +437,14 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
             messages.error(request, "Informe ao menos 1 porção.")
             return redirect('modulo_merendeiras:preparar_execucao')
 
+        # ✅ BUSCA O CARDÁPIO ANTES DE EXECUTAR
+        cardapio_dia = self.get_cardapio_do_dia(escola, hoje)
+        if not cardapio_dia:
+            messages.error(request, "Não há cardápio vinculado para hoje.")
+            return redirect('modulo_merendeiras:preparar_execucao')
+
         try:
             with transaction.atomic():
-
                 executar_receita_individual(
                     escola=escola,
                     data=hoje,
@@ -449,6 +452,7 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
                     receita_id=int(receita_id),
                     porcoes=porcoes,
                     turno=turno,
+                    cardapio_dia=cardapio_dia,  # ✅ AGORA SEMPRE PASSADO
                 )
 
                 messages.success(
