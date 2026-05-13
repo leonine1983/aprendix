@@ -63,10 +63,27 @@ urlpatterns = [
     ),
 
 
-    
-    
-    
-    
+     # ------------------------------------------------------------------
+    path(
+        "execucao-avulsa/",
+        views.ExecucaoAvulsaView.as_view(),
+        name="execucao_avulsa",
+    ),
+
+    path(
+        "execucoes/merendaManual",
+        views.ListaExecucoesView.as_view(),
+        name="execucao_lista_Avulsa",
+    ),
+
+   
+    path(
+        "cardapio/execucao/merendaManual/<int:execucao_id>/<str:turno>/ficha/",
+        views.FichaDiariaCreateView.as_view(),
+        name="ficha_diaria",
+    ),
+
+
 
 
 ]

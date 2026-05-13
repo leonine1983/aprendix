@@ -1,0 +1,1226 @@
+{% extends "modulo_merendeiras/base_merendeira.html" %}
+{% load static %}
+
+{% block title %}Execução Avulsa de Receita{% endblock %}
+
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=Outfit:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+  /* ═══════════════════════════════════════════════
+     TOKENS — herda o sistema base, estende localmente
+  ═══════════════════════════════════════════════ */
+  :root {
+    /* Mesclando com a paleta do base */
+    --av-red:         #c0392b;
+    --av-red-deep:    #96281b;
+    --av-red-light:   #fff5f4;
+    --av-red-border:  #f5c6c2;
+    --av-amber:       #d97706;
+    --av-amber-light: #fffbeb;
+    --av-amber-border:#fde68a;
+    --av-green:       #16a34a;
+    --av-green-light: #f0fdf4;
+    --av-green-border:#bbf7d0;
+
+    --av-surface:     #ffffff;
+    --av-bg:          #f5f7f5;
+    --av-border:      #e8ede9;
+    --av-border-sub:  #f1f5f2;
+    --av-text:        #1a2e20;
+    --av-text-2:      #4a6150;
+    --av-text-3:      #8aa090;
+
+    --av-r-sm:  6px;
+    --av-r-md:  12px;
+    --av-r-lg:  18px;
+    --av-r-xl:  24px;
+    --av-r-pill:9999px;
+
+    --av-sh-xs: 0 1px 3px rgba(10,30,15,.05);
+    --av-sh-sm: 0 2px 10px rgba(10,30,15,.07), 0 1px 3px rgba(10,30,15,.04);
+    --av-sh-md: 0 6px 20px rgba(10,30,15,.09), 0 2px 6px rgba(10,30,15,.05);
+    --av-sh-lg: 0 14px 40px rgba(10,30,15,.12), 0 4px 12px rgba(10,30,15,.06);
+    --av-sh-red:0 4px 20px rgba(192,57,43,.22);
+    --av-sh-grn:0 4px 18px rgba(22,163,74,.2);
+
+    --av-ease:       cubic-bezier(.4,0,.2,1);
+    --av-spring:     cubic-bezier(.34,1.56,.64,1);
+    --av-t-fast:     .12s var(--av-ease);
+    --av-t-base:     .22s var(--av-ease);
+    --av-t-slow:     .36s var(--av-ease);
+  }
+
+  /* ═══════════════════════════════════════════════
+     WRAPPER
+  ═══════════════════════════════════════════════ */
+  .avulsa-wrap {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 2rem 2rem 4rem;
+  }
+
+  /* ═══════════════════════════════════════════════
+     HERO — editorial, com gradiente profundo
+  ═══════════════════════════════════════════════ */
+  .av-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--av-r-xl);
+    padding: 2.5rem 3rem;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, #1b6b3a 0%, #0e4726 50%, #071e10 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+    box-shadow: 0 20px 60px rgba(7,30,16,.35), 0 4px 16px rgba(0,0,0,.15);
+  }
+
+  /* Grain texture overlay */
+  .av-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  /* Decorative glow orbs */
+  .av-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 55% 70% at 75% -10%, rgba(0,200,83,.18) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 50% at 100% 110%, rgba(27,107,58,.25) 0%, transparent 55%),
+      radial-gradient(ellipse 25% 40% at 5% 100%, rgba(0,200,83,.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .av-hero__content {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+  }
+
+  .av-hero__icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--av-r-lg);
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(10px);
+    display: grid;
+    place-items: center;
+    font-size: 2rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.15);
+  }
+
+  .av-hero__text h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.85rem;
+    font-weight: 600;
+    line-height: 1.15;
+    margin: 0 0 .5rem;
+    letter-spacing: -.01em;
+    color: #fff;
+  }
+
+  .av-hero__meta {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-family: 'DM Mono', monospace;
+    font-size: .78rem;
+    color: rgba(255,255,255,.55);
+    flex-wrap: wrap;
+  }
+
+  .av-hero__meta .sep { color: rgba(255,255,255,.25); }
+
+  .av-hero__meta .escola-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .2em .7em;
+    background: rgba(0,200,83,.15);
+    border: 1px solid rgba(0,200,83,.25);
+    border-radius: var(--av-r-pill);
+    color: rgba(200,255,210,.85);
+    font-size: .72rem;
+    font-weight: 500;
+  }
+
+  /* Decorative right element */
+  .av-hero__deco {
+    position: absolute;
+    right: 2.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .35rem;
+    pointer-events: none;
+  }
+
+  .av-hero__deco-line {
+    height: 2px;
+    background: linear-gradient(to left, rgba(0,200,83,.5), transparent);
+    border-radius: 2px;
+    animation: lineGrow 1.4s var(--av-ease) both;
+  }
+
+  @keyframes lineGrow {
+    from { width: 0; opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ═══════════════════════════════════════════════
+     ALERTS
+  ═══════════════════════════════════════════════ */
+  .av-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: .85rem;
+    padding: .9rem 1.2rem;
+    border-radius: var(--av-r-md);
+    margin-bottom: 1rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: .875rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+    animation: avSlideDown .3s var(--av-spring) both;
+    box-shadow: var(--av-sh-xs);
+  }
+
+  @keyframes avSlideDown {
+    from { opacity: 0; transform: translateY(-8px) scale(.98); }
+    to   { opacity: 1; transform: translateY(0)   scale(1); }
+  }
+
+  .av-alert__icon { font-size: 1rem; flex-shrink: 0; margin-top: .1rem; }
+  .av-alert__body { flex: 1; line-height: 1.5; }
+  .av-alert__close {
+    margin-left: auto; flex-shrink: 0; cursor: pointer;
+    opacity: .4; font-size: .9rem; padding: .1rem .25rem;
+    border: none; background: transparent; color: inherit;
+    border-radius: 4px; transition: opacity var(--av-t-fast);
+  }
+  .av-alert__close:hover { opacity: 1; }
+
+  .av-alert.success { background: var(--av-green-light); border-color: var(--av-green-border); color: #14532d; }
+  .av-alert.error   { background: var(--av-red-light);   border-color: var(--av-red-border);   color: var(--av-red-deep); }
+  .av-alert.warning { background: var(--av-amber-light); border-color: var(--av-amber-border); color: #78350f; }
+  .av-alert.info    { background: #eff6ff; border-color: #bfdbfe; color: #1e3a5f; }
+
+  /* ═══════════════════════════════════════════════
+     MAIN GRID
+  ═══════════════════════════════════════════════ */
+  .av-grid {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  @media (max-width: 960px) {
+    .av-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ═══════════════════════════════════════════════
+     PANEL (card base)
+  ═══════════════════════════════════════════════ */
+  .av-panel {
+    background: var(--av-surface);
+    border: 1px solid var(--av-border);
+    border-radius: var(--av-r-xl);
+    box-shadow: var(--av-sh-sm);
+    overflow: hidden;
+    animation: avSlideUp .4s var(--av-ease) both;
+  }
+
+  .av-panel:nth-child(2) { animation-delay: .08s; }
+
+  @keyframes avSlideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .av-panel__head {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--av-border-sub);
+    background: linear-gradient(to bottom, #f9fbf9, var(--av-surface));
+  }
+
+  .av-panel__head-icon {
+    width: 32px; height: 32px;
+    border-radius: var(--av-r-sm);
+    background: var(--color-primary-light, #e8f5ec);
+    border: 1px solid rgba(27,107,58,.12);
+    display: grid;
+    place-items: center;
+    font-size: .9rem;
+    flex-shrink: 0;
+  }
+
+  .av-panel__head-text {
+    display: flex;
+    flex-direction: column;
+    gap: .1rem;
+  }
+
+  .av-panel__title {
+    font-family: 'Outfit', sans-serif;
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--av-text);
+    letter-spacing: -.01em;
+  }
+
+  .av-panel__subtitle {
+    font-size: .73rem;
+    color: var(--av-text-3);
+    font-weight: 400;
+  }
+
+  .av-panel__body { padding: 1.5rem; }
+  .av-panel__body--flush { padding: 0; }
+
+  /* ═══════════════════════════════════════════════
+     FORM FIELDS
+  ═══════════════════════════════════════════════ */
+  .av-field { margin-bottom: 1.3rem; }
+  .av-field:last-of-type { margin-bottom: 0; }
+
+  .av-field__label {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: .73rem;
+    font-weight: 700;
+    color: var(--av-text-3);
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    margin-bottom: .5rem;
+  }
+
+  .av-field__label .lbl-ico { font-size: .85rem; }
+
+  /* Override Django widget styles */
+  .av-field input[type=number],
+  .av-field input[type=text],
+  .av-field select,
+  .av-field textarea {
+    width: 100%;
+    padding: .7rem 1rem;
+    border: 1.5px solid var(--av-border);
+    border-radius: var(--av-r-md);
+    font-family: 'Outfit', sans-serif;
+    font-size: .9rem;
+    font-weight: 500;
+    color: var(--av-text);
+    background: var(--av-surface);
+    transition: var(--av-t-base);
+    outline: none;
+    appearance: none;
+    box-shadow: var(--av-sh-xs);
+  }
+
+  .av-field input:focus,
+  .av-field select:focus,
+  .av-field textarea:focus {
+    border-color: var(--color-primary, #1b6b3a);
+    box-shadow: 0 0 0 3.5px rgba(27,107,58,.12);
+    background: #fbfdfb;
+  }
+
+  .av-field textarea {
+    resize: vertical;
+    min-height: 88px;
+    line-height: 1.6;
+  }
+
+  .av-field__hint {
+    margin-top: .4rem;
+    font-size: .75rem;
+    color: var(--av-text-3);
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+  }
+
+  .av-field__error {
+    margin-top: .4rem;
+    font-size: .78rem;
+    color: var(--av-red);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+  }
+
+  /* Num wrap */
+  .av-num-wrap { position: relative; }
+  .av-num-wrap input { padding-right: 3.2rem; }
+  .av-num-unit {
+    position: absolute;
+    right: 1rem; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'DM Mono', monospace;
+    font-size: .72rem;
+    font-weight: 500;
+    color: var(--av-text-3);
+    pointer-events: none;
+  }
+
+  /* ═══════════════════════════════════════════════
+     SUBMIT AREA (sticky)
+  ═══════════════════════════════════════════════ */
+  .av-submit-area {
+    position: sticky;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(255,255,255,1) 80%, rgba(255,255,255,0));
+    padding: 1.25rem 1.5rem 1.5rem;
+    margin: 0 -1.5rem -1.5rem;
+    border-top: 1px solid var(--av-border-sub);
+  }
+
+  .av-btn-exec {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .65rem;
+    width: 100%;
+    padding: .9rem 1.5rem;
+    border: none;
+    border-radius: var(--av-r-md);
+    font-family: 'Outfit', sans-serif;
+    font-size: .95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--av-t-base);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: -.01em;
+  }
+
+  .av-btn-exec--active {
+    background: linear-gradient(135deg, #1b6b3a 0%, #0e4726 100%);
+    color: #fff;
+    box-shadow: var(--av-sh-grn), inset 0 1px 0 rgba(255,255,255,.12);
+  }
+
+  .av-btn-exec--active:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(27,107,58,.35), inset 0 1px 0 rgba(255,255,255,.12);
+  }
+
+  .av-btn-exec--active:active { transform: translateY(0); }
+
+  .av-btn-exec--active::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(255,255,255,.08), transparent);
+    pointer-events: none;
+  }
+
+  .av-btn-exec:disabled {
+    background: linear-gradient(135deg, #d1d9d4, #bdc9c2);
+    color: rgba(255,255,255,.6);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .av-btn-exec__ico { font-size: 1.1rem; line-height: 1; }
+
+  /* ═══════════════════════════════════════════════
+     SEARCH BAR
+  ═══════════════════════════════════════════════ */
+  .av-search-wrap {
+    position: relative;
+    margin-bottom: .9rem;
+  }
+
+  .av-search-ico {
+    position: absolute;
+    left: 1rem; top: 50%;
+    transform: translateY(-50%);
+    color: var(--av-text-3);
+    font-size: .9rem;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  #busca-receita {
+    width: 100%;
+    padding: .7rem 1rem .7rem 2.7rem;
+    border: 1.5px solid var(--av-border);
+    border-radius: var(--av-r-md);
+    font-family: 'Outfit', sans-serif;
+    font-size: .875rem;
+    font-weight: 500;
+    color: var(--av-text);
+    background: var(--av-surface);
+    outline: none;
+    transition: var(--av-t-base);
+    box-shadow: var(--av-sh-xs);
+  }
+
+  #busca-receita:focus {
+    border-color: var(--color-primary, #1b6b3a);
+    box-shadow: 0 0 0 3.5px rgba(27,107,58,.12);
+    background: #fbfdfb;
+  }
+
+  #busca-receita::placeholder { color: var(--av-text-3); font-weight: 400; }
+
+  /* ═══════════════════════════════════════════════
+     COUNTERS
+  ═══════════════════════════════════════════════ */
+  .av-counters {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: 1rem;
+  }
+
+  .av-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .28em .85em;
+    border-radius: var(--av-r-pill);
+    font-family: 'Outfit', sans-serif;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .01em;
+  }
+
+  .av-pill--green {
+    background: var(--av-green-light);
+    color: var(--av-green);
+    border: 1px solid var(--av-green-border);
+  }
+
+  .av-pill--slate {
+    background: var(--av-border-sub);
+    color: var(--av-text-2);
+    border: 1px solid var(--av-border);
+  }
+
+  /* ═══════════════════════════════════════════════
+     RECIPE GRID
+  ═══════════════════════════════════════════════ */
+  #painel-receitas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: .75rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 2px 2px 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--av-border) transparent;
+  }
+
+  #painel-receitas::-webkit-scrollbar { width: 4px; }
+  #painel-receitas::-webkit-scrollbar-track { background: transparent; }
+  #painel-receitas::-webkit-scrollbar-thumb { background: var(--av-border); border-radius: 4px; }
+
+  /* Recipe card */
+  .rc {
+    position: relative;
+    border: 1.5px solid var(--av-border);
+    border-radius: var(--av-r-md);
+    padding: 1rem 1.1rem 1rem;
+    cursor: pointer;
+    background: var(--av-surface);
+    transition: var(--av-t-base);
+    overflow: hidden;
+  }
+
+  /* Left accent bar */
+  .rc::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 10%; bottom: 10%;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: transparent;
+    transition: background var(--av-t-base), top var(--av-t-base), bottom var(--av-t-base);
+  }
+
+  .rc:hover {
+    border-color: rgba(27,107,58,.3);
+    box-shadow: var(--av-sh-md);
+    transform: translateY(-2px);
+    background: #fbfdfb;
+  }
+
+  .rc:hover::before {
+    background: rgba(27,107,58,.4);
+    top: 5%; bottom: 5%;
+  }
+
+  .rc.selecionada {
+    border-color: var(--color-primary, #1b6b3a);
+    background: linear-gradient(135deg, #f0fdf4, #e8f5ec);
+    box-shadow: 0 0 0 3px rgba(27,107,58,.1), var(--av-sh-md);
+    transform: translateY(-1px);
+  }
+
+  .rc.selecionada::before {
+    background: var(--color-primary, #1b6b3a);
+    top: 0; bottom: 0;
+    border-radius: 0;
+  }
+
+  .rc.indisponivel {
+    opacity: .45;
+    cursor: not-allowed;
+    pointer-events: none;
+    filter: grayscale(.5);
+  }
+
+  .rc-nome {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: .875rem;
+    color: var(--av-text);
+    margin-bottom: .25rem;
+    line-height: 1.35;
+    padding-right: 1.8rem;
+  }
+
+  .rc-rend {
+    font-size: .72rem;
+    color: var(--av-text-3);
+    margin-bottom: .65rem;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .rc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .2em .7em;
+    border-radius: var(--av-r-pill);
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+  }
+
+  .rc-badge.ok   { background: var(--av-green-light); color: var(--av-green); border: 1px solid var(--av-green-border); }
+  .rc-badge.fail { background: var(--av-red-light);   color: var(--av-red);   border: 1px solid var(--av-red-border); }
+
+  /* Check circle */
+  .rc-check {
+    position: absolute;
+    top: .75rem; right: .75rem;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--color-primary, #1b6b3a);
+    color: #fff;
+    font-size: .6rem;
+    display: none;
+    place-items: center;
+    box-shadow: 0 2px 8px rgba(27,107,58,.4);
+  }
+
+  .rc.selecionada .rc-check {
+    display: grid;
+    animation: avPopIn .22s var(--av-spring);
+  }
+
+  @keyframes avPopIn {
+    from { transform: scale(0) rotate(-30deg); opacity: 0; }
+    to   { transform: scale(1) rotate(0deg);  opacity: 1; }
+  }
+
+  /* ═══════════════════════════════════════════════
+     DETALHE DE INGREDIENTES
+  ═══════════════════════════════════════════════ */
+  #detalhe-ingredientes {
+    display: none;
+    margin-top: 1.25rem;
+    animation: avFadeUp .3s var(--av-ease);
+  }
+
+  @keyframes avFadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .av-divider {
+    border: none;
+    border-top: 1px solid var(--av-border);
+    margin: 1.25rem 0;
+  }
+
+  .detalhe-header {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .detalhe-nome {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--av-text);
+    margin: 0;
+    letter-spacing: -.01em;
+  }
+
+  /* Stock alert */
+  .av-stock-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    padding: .8rem 1.1rem;
+    border-radius: var(--av-r-md);
+    font-family: 'Outfit', sans-serif;
+    font-size: .82rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    border: 1px solid;
+    line-height: 1.5;
+    box-shadow: var(--av-sh-xs);
+  }
+
+  .av-stock-alert.warn {
+    background: var(--av-amber-light);
+    border-color: var(--av-amber-border);
+    color: #78350f;
+  }
+
+  .av-stock-alert.ok {
+    background: var(--av-green-light);
+    border-color: var(--av-green-border);
+    color: #14532d;
+  }
+
+  .av-stock-alert__ico { flex-shrink: 0; margin-top: .05rem; }
+
+  /* Ingredients table */
+  .ing-table-wrap { overflow-x: auto; border-radius: var(--av-r-md); border: 1px solid var(--av-border); }
+
+  .ing-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Outfit', sans-serif;
+    font-size: .82rem;
+  }
+
+  .ing-table thead tr {
+    background: linear-gradient(to bottom, #f9fbf9, #f5f8f5);
+    border-bottom: 1.5px solid var(--av-border);
+  }
+
+  .ing-table th {
+    padding: .55rem .9rem;
+    text-align: left;
+    font-size: .7rem;
+    font-weight: 700;
+    color: var(--av-text-3);
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .ing-table td {
+    padding: .7rem .9rem;
+    border-bottom: 1px solid var(--av-border-sub);
+    vertical-align: middle;
+    color: var(--av-text-2);
+  }
+
+  .ing-table tr:last-child td { border-bottom: none; }
+  .ing-table tbody tr { transition: background var(--av-t-fast); }
+  .ing-table tbody tr:hover td { background: #f9fbf9; }
+
+  .ing-name {
+    font-weight: 600;
+    color: var(--av-text);
+  }
+
+  .ing-qty {
+    font-family: 'DM Mono', monospace;
+    font-size: .8rem;
+  }
+
+  .ing-qty small {
+    font-size: .68rem;
+    color: var(--av-text-3);
+    margin-left: .15rem;
+  }
+
+  .ing-ok {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--av-green-light);
+    color: var(--av-green);
+    font-size: .75rem;
+    font-weight: 700;
+  }
+
+  .ing-fail {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--av-red-light);
+    color: var(--av-red);
+    font-size: .75rem;
+    font-weight: 700;
+  }
+
+  .ing-falta {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: .68rem;
+    font-weight: 600;
+    background: var(--av-red-light);
+    color: var(--av-red);
+    padding: .12em .55em;
+    border-radius: var(--av-r-pill);
+    margin-left: .35rem;
+    border: 1px solid var(--av-red-border);
+  }
+
+  /* ═══════════════════════════════════════════════
+     EMPTY STATE
+  ═══════════════════════════════════════════════ */
+  .av-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+
+  .av-empty__icon {
+    font-size: 3rem;
+    margin-bottom: .75rem;
+    display: block;
+    opacity: .5;
+  }
+
+  .av-empty p {
+    font-family: 'Outfit', sans-serif;
+    font-size: .875rem;
+    color: var(--av-text-3);
+    margin: 0;
+  }
+
+  /* ═══════════════════════════════════════════════
+     RESPONSIVE
+  ═══════════════════════════════════════════════ */
+  @media (max-width: 768px) {
+    .avulsa-wrap { padding: 1rem 1rem 3rem; }
+    .av-hero { padding: 1.75rem 1.5rem; gap: 1.1rem; }
+    .av-hero__text h1 { font-size: 1.4rem; }
+    .av-hero__deco { display: none; }
+    .av-grid { grid-template-columns: 1fr; }
+    #painel-receitas { grid-template-columns: 1fr 1fr; max-height: 360px; }
+  }
+
+  @media (max-width: 480px) {
+    .av-hero__icon { width: 50px; height: 50px; font-size: 1.6rem; }
+    #painel-receitas { grid-template-columns: 1fr; max-height: 320px; }
+  }
+</style>
+<div class="avulsa-wrap">
+
+  {# ── HERO ── #}
+  <div class="av-hero">
+    <div class="av-hero__content">
+      <div class="av-hero__icon" aria-hidden="true">🍳</div>
+      <div class="av-hero__text">
+        <h1>Execução Avulsa de Receita</h1>
+        <div class="av-hero__meta">
+          <span class="escola-tag">🏫 {{ escola.nome }}</span>
+          <span class="sep">·</span>
+          <span>{{ hoje|date:"d/m/Y" }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="av-hero__deco" aria-hidden="true">
+      <div class="av-hero__deco-line" style="width:80px; animation-delay:.1s"></div>
+      <div class="av-hero__deco-line" style="width:48px; animation-delay:.25s"></div>
+      <div class="av-hero__deco-line" style="width:64px; animation-delay:.4s"></div>
+    </div>
+  </div>
+
+  {# ── DJANGO MESSAGES ── #}
+  {% if messages %}
+    {% for msg in messages %}
+      <div class="av-alert {{ msg.tags|default:'info' }}" role="alert">
+        <span class="av-alert__icon">
+          {% if msg.tags == 'success' %}✔{% elif msg.tags == 'error' %}✖{% elif msg.tags == 'warning' %}⚠{% else %}ℹ{% endif %}
+        </span>
+        <span class="av-alert__body">{{ msg }}</span>
+        <button class="av-alert__close" onclick="this.closest('.av-alert').remove()" aria-label="Fechar">✕</button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" id="form-avulso">
+    {% csrf_token %}
+    <div class="av-grid">
+
+      {# ══ COLUNA ESQUERDA — Formulário ══ #}
+      <div>
+        <div class="av-panel">
+          <div class="av-panel__head">
+            <div class="av-panel__head-icon">📋</div>
+            <div class="av-panel__head-text">
+              <span class="av-panel__title">Informações da Execução</span>
+              <span class="av-panel__subtitle">Preencha os dados antes de executar</span>
+            </div>
+          </div>
+          <div class="av-panel__body">
+
+            <div class="av-field">
+              <label class="av-field__label" for="id_quantidade_alunos">
+                <span class="lbl-ico">👥</span> Número de Alunos
+              </label>
+              <div class="av-num-wrap">
+                {{ form.quantidade_alunos }}
+                <span class="av-num-unit">alunos</span>
+              </div>
+              {% if form.quantidade_alunos.errors %}
+                <div class="av-field__error">⚠ {{ form.quantidade_alunos.errors.0 }}</div>
+              {% endif %}
+              <div class="av-field__hint">💡 Usado para verificar a disponibilidade do estoque</div>
+            </div>
+
+            <div class="av-field">
+              <label class="av-field__label" for="id_turno">
+                <span class="lbl-ico">🕐</span> Turno
+              </label>
+              {{ form.turno }}
+              {% if form.turno.errors %}
+                <div class="av-field__error">⚠ {{ form.turno.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="av-field">
+              <label class="av-field__label" for="id_observacoes">
+                <span class="lbl-ico">📝</span> Observações
+              </label>
+              {{ form.observacoes }}
+            </div>
+
+            {# Campo receita oculto #}
+            <div style="display:none">{{ form.receita }}</div>
+
+          </div>{# /av-panel__body #}
+
+          {# Submit sticky #}
+          <div class="av-submit-area">
+            <button
+              type="submit"
+              class="av-btn-exec"
+              id="btn-submit"
+              disabled
+            >
+              <span class="av-btn-exec__ico">🚀</span>
+              <span id="btn-texto">Selecione uma receita</span>
+            </button>
+          </div>
+
+        </div>{# /av-panel #}
+      </div>
+
+      {# ══ COLUNA DIREITA — Seleção de Receita ══ #}
+      <div>
+        <div class="av-panel">
+          <div class="av-panel__head">
+            <div class="av-panel__head-icon">📖</div>
+            <div class="av-panel__head-text">
+              <span class="av-panel__title">Escolha a Receita</span>
+              <span class="av-panel__subtitle">Clique para selecionar e ver o estoque</span>
+            </div>
+          </div>
+          <div class="av-panel__body">
+
+            {# Busca #}
+            <div class="av-search-wrap">
+              <span class="av-search-ico">🔍</span>
+              <input
+                type="text"
+                id="busca-receita"
+                placeholder="Filtrar por nome…"
+                autocomplete="off"
+              />
+            </div>
+
+            {# Contadores #}
+            <div class="av-counters">
+              <span class="av-pill av-pill--green">
+                ✔ <span id="contagem-disp">–</span> disponível(is)
+              </span>
+              <span class="av-pill av-pill--slate">
+                📚 <span id="contagem-total">–</span> no total
+              </span>
+            </div>
+
+            {# Grade de receitas #}
+            <div id="painel-receitas">
+              {% for r in receitas_info %}
+              <div
+                class="rc {% if not r.disponivel %}indisponivel{% endif %}"
+                data-id="{{ r.receita_id }}"
+                data-nome="{{ r.receita_nome|lower }}"
+                data-disponivel="{{ r.disponivel|yesno:'true,false' }}"
+                onclick="selecionarReceita(this)"
+                role="button"
+                tabindex="0"
+                aria-pressed="false"
+                title="{{ r.receita_nome }}"
+              >
+                <div class="rc-nome">{{ r.receita_nome }}</div>
+                <div class="rc-rend">{{ r.rendimento_padrao }} porção(ões)</div>
+                <span class="rc-badge {% if r.disponivel %}ok{% else %}fail{% endif %}">
+                  {% if r.disponivel %}✔ Disponível{% else %}✘ Insuficiente{% endif %}
+                </span>
+                <div class="rc-check" aria-hidden="true">✓</div>
+              </div>
+              {% empty %}
+              <div class="av-empty">
+                <span class="av-empty__icon">🍽</span>
+                <p>Nenhuma receita ativa cadastrada.</p>
+              </div>
+              {% endfor %}
+            </div>
+
+            {# ── Detalhe de ingredientes ── #}
+            <div id="detalhe-ingredientes">
+              <hr class="av-divider">
+
+              <div class="detalhe-header">
+                <p class="detalhe-nome" id="detalhe-nome"></p>
+              </div>
+
+              <div id="stock-alert" class="av-stock-alert warn" style="display:none">
+                <span class="av-stock-alert__ico">⚠️</span>
+                <span id="stock-alert-msg"></span>
+              </div>
+
+              <div class="ing-table-wrap">
+                <table class="ing-table">
+                  <thead>
+                    <tr>
+                      <th>Ingrediente</th>
+                      <th>Necessário</th>
+                      <th>Em estoque</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="ing-tbody"></tbody>
+                </table>
+              </div>
+
+            </div>{# /detalhe-ingredientes #}
+
+          </div>{# /av-panel__body #}
+        </div>{# /av-panel #}
+      </div>
+
+    </div>{# /av-grid #}
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const RECEITAS = {{ receitas_json|safe }};
+
+  // ── State ─────────────────────────────────────────────────
+  let selectedId = null;
+
+  // ── Select recipe ─────────────────────────────────────────
+  function selecionarReceita(el) {
+    document.querySelectorAll('.rc').forEach(c => {
+      c.classList.remove('selecionada');
+      c.setAttribute('aria-pressed', 'false');
+    });
+    el.classList.add('selecionada');
+    el.setAttribute('aria-pressed', 'true');
+
+    selectedId = parseInt(el.dataset.id);
+
+    const sel = document.querySelector('#id_receita');
+    if (sel) sel.value = selectedId;
+
+    renderDetalhe(selectedId);
+    atualizarBotao();
+  }
+
+  // Keyboard support
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && document.activeElement?.classList?.contains('rc')) {
+      selecionarReceita(document.activeElement);
+    }
+  });
+
+  // ── Render ingredient detail ──────────────────────────────
+  function renderDetalhe(id) {
+    const alunos  = parseInt(document.getElementById('id_quantidade_alunos').value) || 1;
+    const receita = RECEITAS.find(r => r.receita_id === id);
+    if (!receita) return;
+
+    document.getElementById('detalhe-nome').textContent = receita.receita_nome;
+
+    const tbody   = document.getElementById('ing-tbody');
+    tbody.innerHTML = '';
+    let tudo_ok   = true;
+
+    receita.ingredientes.forEach(ing => {
+      const qtdNec = ing.quantidade_base * alunos;
+      const ok     = ing.disponivel_estoque >= qtdNec;
+      if (!ok) tudo_ok = false;
+
+      const faltaHtml = !ok
+        ? `<span class="ing-falta">−${(qtdNec - ing.disponivel_estoque).toFixed(2)}</span>`
+        : '';
+
+      tbody.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td class="ing-name">${ing.produto_nome}</td>
+          <td class="ing-qty">${qtdNec.toFixed(2)} <small>${ing.unidade}</small></td>
+          <td class="ing-qty">${ing.disponivel_estoque.toFixed(2)} <small>${ing.unidade}</small>${faltaHtml}</td>
+          <td>${ok
+            ? '<span class="ing-ok">✔</span>'
+            : '<span class="ing-fail">✘</span>'
+          }</td>
+        </tr>
+      `);
+    });
+
+    const alertEl  = document.getElementById('stock-alert');
+    const alertMsg = document.getElementById('stock-alert-msg');
+
+    alertEl.style.display = 'flex';
+    if (!tudo_ok) {
+      alertEl.className = 'av-stock-alert warn';
+      alertMsg.textContent = `Estoque insuficiente para ${alunos} aluno(s) com esta receita.`;
+    } else {
+      alertEl.className = 'av-stock-alert ok';
+      alertMsg.textContent = `Estoque suficiente para ${alunos} aluno(s). Pronto para executar.`;
+    }
+
+    document.getElementById('detalhe-ingredientes').style.display = 'block';
+  }
+
+  // ── Update submit button ──────────────────────────────────
+  function atualizarBotao() {
+    const btn    = document.getElementById('btn-submit');
+    const txtEl  = document.getElementById('btn-texto');
+    const alunos = parseInt(document.getElementById('id_quantidade_alunos').value) || 0;
+
+    if (!selectedId || alunos < 1) {
+      btn.disabled = true;
+      btn.className = 'av-btn-exec';
+      txtEl.textContent = selectedId ? 'Informe o número de alunos' : 'Selecione uma receita';
+      return;
+    }
+
+    const receita = RECEITAS.find(r => r.receita_id === selectedId);
+    if (!receita) { btn.disabled = true; return; }
+
+    const ok = receita.ingredientes.every(ing =>
+      ing.disponivel_estoque >= ing.quantidade_base * alunos
+    );
+
+    btn.disabled = !ok;
+    btn.className = ok ? 'av-btn-exec av-btn-exec--active' : 'av-btn-exec';
+    txtEl.textContent = ok
+      ? `Executar "${receita.receita_nome}" para ${alunos} aluno(s)`
+      : 'Estoque insuficiente — não é possível executar';
+  }
+
+  // ── Search ────────────────────────────────────────────────
+  document.getElementById('busca-receita').addEventListener('input', function () {
+    const q = this.value.toLowerCase().trim();
+    document.querySelectorAll('.rc').forEach(card => {
+      card.style.display = (!q || card.dataset.nome.includes(q)) ? '' : 'none';
+    });
+    atualizarContadores();
+  });
+
+  // ── Re-render on student count change ────────────────────
+  document.getElementById('id_quantidade_alunos').addEventListener('input', function () {
+    if (selectedId) renderDetalhe(selectedId);
+    atualizarBotao();
+
+    const alunos = parseInt(this.value) || 0;
+    if (alunos < 1) return;
+
+    document.querySelectorAll('.rc').forEach(card => {
+      const id  = parseInt(card.dataset.id);
+      const rec = RECEITAS.find(r => r.receita_id === id);
+      if (!rec) return;
+
+      const ok = rec.ingredientes.every(ing =>
+        ing.disponivel_estoque >= ing.quantidade_base * alunos
+      );
+
+      card.classList.toggle('indisponivel', !ok);
+      card.style.pointerEvents = ok ? '' : 'none';
+
+      const badge = card.querySelector('.rc-badge');
+      if (badge) {
+        badge.className = 'rc-badge ' + (ok ? 'ok' : 'fail');
+        badge.textContent = ok ? '✔ Disponível' : '✘ Insuficiente';
+      }
+    });
+
+    atualizarContadores();
+  });
+
+  function atualizarContadores() {
+    let total = 0, disp = 0;
+    document.querySelectorAll('.rc').forEach(card => {
+      if (card.style.display === 'none') return;
+      total++;
+      if (!card.classList.contains('indisponivel')) disp++;
+    });
+    document.getElementById('contagem-disp').textContent  = disp;
+    document.getElementById('contagem-total').textContent = total;
+  }
+
+  // ── Init ──────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    atualizarContadores();
+
+    // Restaurar seleção após erro de form
+    const val = document.querySelector('#id_receita')?.value;
+    if (val) {
+      const card = document.querySelector(`.rc[data-id="${val}"]`);
+      if (card && !card.classList.contains('indisponivel')) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        selecionarReceita(card);
+      }
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,717 @@
+{% extends "modulo_merendeiras/base_merendeira.html" %}
+{% load static %}
+
+{% block title %}{{ titulo_pagina }} — {{ escola.nome }}{% endblock %}
+
+{% block content %}
+
+<style>
+  /* ─── Tokens ─────────────────────────────────── */
+  :root {
+    --c-bg:        #f7f7f5;
+    --c-surface:   #ffffff;
+    --c-border:    #e8e5df;
+    --c-text:      #1a1917;
+    --c-muted:     #78716c;
+    --c-accent:    #c0392b;
+    --c-accent-dk: #96281b;
+    --c-accent-lt: #fff0ee;
+
+    --c-green:     #16a34a;
+    --c-green-bg:  #f0fdf4;
+    --c-yellow:    #d97706;
+    --c-yellow-bg: #fffbeb;
+    --c-blue:      #2563eb;
+    --c-blue-bg:   #eff6ff;
+    --c-red:       #dc2626;
+    --c-red-bg:    #fef2f2;
+    --c-slate:     #475569;
+    --c-slate-bg:  #f8fafc;
+
+    --radius-sm:   6px;
+    --radius-md:   10px;
+    --radius-lg:   16px;
+
+    --shadow-xs:   0 1px 2px rgba(0,0,0,.05);
+    --shadow-sm:   0 1px 4px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.04);
+    --shadow-md:   0 4px 16px rgba(0,0,0,.09), 0 1px 4px rgba(0,0,0,.05);
+
+    --font-sans: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'DM Mono', 'Fira Mono', monospace;
+  }
+
+  /* ─── Google Fonts ───────────────────────────── */
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  /* ─── Base ───────────────────────────────────── */
+  .ea-page { background: var(--c-bg); min-height: 100vh; font-family: var(--font-sans); }
+
+  /* ─── Header ─────────────────────────────────── */
+  .ea-header {
+    background: var(--c-surface);
+    border-bottom: 1.5px solid var(--c-border);
+    padding: 28px 32px 22px;
+  }
+  .ea-header__eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    margin-bottom: 6px;
+  }
+  .ea-header__title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--c-text);
+    margin: 0 0 2px;
+    line-height: 1.2;
+  }
+  .ea-header__sub {
+    font-size: 13px;
+    color: var(--c-muted);
+    margin: 0;
+  }
+  .ea-badge-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--c-accent-lt);
+    color: var(--c-accent);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid #ffc8c2;
+  }
+  .ea-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--c-accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 9px 18px;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s, transform .1s, box-shadow .15s;
+    box-shadow: 0 2px 8px rgba(192,57,43,.25);
+  }
+  .ea-btn-primary:hover {
+    background: var(--c-accent-dk);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(192,57,43,.35);
+  }
+  .ea-btn-primary:active { transform: translateY(0); }
+
+  /* ─── Métricas ───────────────────────────────── */
+  .ea-metrics { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; }
+  @media (max-width: 1100px) { .ea-metrics { grid-template-columns: repeat(3,1fr); } }
+  @media (max-width: 640px)  { .ea-metrics { grid-template-columns: repeat(2,1fr); } }
+
+  .ea-metric {
+    background: var(--c-surface);
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    transition: box-shadow .18s, border-color .18s;
+    cursor: default;
+  }
+  .ea-metric:hover { box-shadow: var(--shadow-sm); border-color: #d4d0c8; }
+  .ea-metric__icon {
+    width: 32px; height: 32px;
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; margin-bottom: 10px;
+  }
+  .ea-metric__value {
+    font-size: 26px; font-weight: 700; color: var(--c-text);
+    line-height: 1; margin-bottom: 3px;
+  }
+  .ea-metric__label { font-size: 11.5px; color: var(--c-muted); font-weight: 500; }
+
+  .ea-metric--total  .ea-metric__icon { background: #f0f0ee; color: var(--c-text); }
+  .ea-metric--fin    .ea-metric__icon { background: var(--c-green-bg); color: var(--c-green); }
+  .ea-metric--prep   .ea-metric__icon { background: var(--c-yellow-bg); color: var(--c-yellow); }
+  .ea-metric--cancel .ea-metric__icon { background: var(--c-red-bg); color: var(--c-red); }
+  .ea-metric--alunos .ea-metric__icon { background: var(--c-blue-bg); color: var(--c-blue); }
+
+  /* ─── Toolbar ────────────────────────────────── */
+  .ea-toolbar {
+    background: var(--c-surface);
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
+  }
+  .ea-field-wrap { display: flex; flex-direction: column; gap: 4px; }
+  .ea-field-wrap label { font-size: 11px; font-weight: 600; color: var(--c-muted); letter-spacing: .04em; text-transform: uppercase; }
+  .ea-input, .ea-select {
+    height: 36px;
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--radius-sm);
+    padding: 0 10px;
+    font-size: 13px;
+    font-family: var(--font-sans);
+    color: var(--c-text);
+    background: var(--c-bg);
+    transition: border-color .15s, box-shadow .15s;
+    outline: none;
+  }
+  .ea-input { min-width: 220px; padding-right: 36px; }
+  .ea-input:focus, .ea-select:focus {
+    border-color: var(--c-accent);
+    box-shadow: 0 0 0 3px rgba(192,57,43,.12);
+    background: #fff;
+  }
+  .ea-input-wrap { position: relative; }
+  .ea-input-wrap .bi {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--c-muted); font-size: 14px; pointer-events: none;
+  }
+  .ea-select { min-width: 140px; }
+  .ea-btn-ghost {
+    height: 36px;
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--radius-sm);
+    padding: 0 14px;
+    font-size: 13px; font-weight: 500;
+    color: var(--c-muted);
+    background: var(--c-bg);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s, color .15s, border-color .15s;
+    font-family: var(--font-sans);
+  }
+  .ea-btn-ghost:hover { background: var(--c-border); color: var(--c-text); border-color: #ccc; }
+  .ea-btn-filter {
+    height: 36px;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--c-text);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 0 16px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: var(--font-sans);
+    transition: background .15s;
+  }
+  .ea-btn-filter:hover { background: #333; }
+  .ea-toolbar__spacer { flex: 1; }
+
+  /* ─── Tabela desktop ─────────────────────────── */
+  .ea-table-wrap {
+    background: var(--c-surface);
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .ea-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  .ea-table thead th {
+    position: sticky; top: 0; z-index: 2;
+    background: #f7f7f5;
+    border-bottom: 1.5px solid var(--c-border);
+    padding: 11px 14px;
+    font-size: 11px; font-weight: 700; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--c-muted);
+    white-space: nowrap; user-select: none;
+  }
+  .ea-table thead th .sort-link {
+    color: inherit; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .ea-table thead th .sort-link:hover { color: var(--c-text); }
+  .ea-table tbody tr {
+    border-bottom: 1px solid var(--c-border);
+    transition: background .12s;
+  }
+  .ea-table tbody tr:last-child { border-bottom: none; }
+  .ea-table tbody tr:hover { background: #f9f8f6; }
+  .ea-table td {
+    padding: 13px 14px;
+    vertical-align: middle;
+    color: var(--c-text);
+  }
+  .ea-table .td-receita { font-weight: 600; max-width: 200px; }
+  .ea-table .td-receita small { display: block; font-weight: 400; color: var(--c-muted); font-size: 11.5px; margin-top: 1px; }
+  .ea-table .td-mono { font-family: var(--font-mono); font-size: 12.5px; color: var(--c-slate); }
+  .ea-table .td-muted { color: var(--c-muted); font-size: 13px; }
+
+  .ea-actions { display: flex; gap: 6px; }
+  .ea-action-btn {
+    width: 30px; height: 30px;
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--radius-sm);
+    background: var(--c-bg);
+    color: var(--c-muted);
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none;
+    transition: background .15s, color .15s, border-color .15s;
+    font-size: 13px;
+  }
+  .ea-action-btn:hover { background: var(--c-text); color: #fff; border-color: var(--c-text); }
+
+  /* ─── Cards mobile ───────────────────────────── */
+  .ea-card-list { display: flex; flex-direction: column; gap: 10px; }
+  .ea-card {
+    background: var(--c-surface);
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    transition: box-shadow .18s;
+  }
+  .ea-card:hover { box-shadow: var(--shadow-sm); }
+  .ea-card__top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+  .ea-card__title { font-weight: 700; font-size: 15px; line-height: 1.3; }
+  .ea-card__meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; }
+  .ea-card__field small { display: block; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--c-muted); margin-bottom: 2px; }
+  .ea-card__field span { font-size: 13px; font-weight: 500; }
+  .ea-card__obs { background: var(--c-bg); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 12.5px; color: var(--c-muted); margin-top: 12px; border-left: 3px solid var(--c-border); }
+
+  /* ─── Badges ─────────────────────────────────── */
+  .ea-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px; font-weight: 700; letter-spacing: .04em;
+    white-space: nowrap;
+  }
+  .ea-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .ea-badge--fin    { background: var(--c-green-bg);  color: var(--c-green);  } .ea-badge--fin::before  { background: var(--c-green);  }
+  .ea-badge--prep   { background: var(--c-yellow-bg); color: var(--c-yellow); } .ea-badge--prep::before { background: var(--c-yellow); }
+  .ea-badge--open   { background: var(--c-blue-bg);   color: var(--c-blue);   } .ea-badge--open::before { background: var(--c-blue);   }
+  .ea-badge--cancel { background: var(--c-red-bg);    color: var(--c-red);    } .ea-badge--cancel::before { background: var(--c-red);  }
+  .ea-badge--other  { background: var(--c-slate-bg);  color: var(--c-slate);  } .ea-badge--other::before { background: var(--c-slate); }
+
+  /* ─── Paginação ──────────────────────────────── */
+  .ea-pagination { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
+  .ea-page-btn {
+    min-width: 34px; height: 34px;
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--radius-sm);
+    background: var(--c-surface);
+    color: var(--c-text);
+    font-size: 13px; font-weight: 500;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0 10px;
+    text-decoration: none;
+    transition: background .15s, border-color .15s, color .15s;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .ea-page-btn:hover { background: var(--c-bg); border-color: #bbb; }
+  .ea-page-btn--active { background: var(--c-text) !important; color: #fff !important; border-color: var(--c-text) !important; }
+  .ea-page-btn--disabled { opacity: .38; pointer-events: none; }
+  .ea-page-info { font-size: 12.5px; color: var(--c-muted); padding: 0 8px; }
+
+  /* ─── Empty state ────────────────────────────── */
+  .ea-empty {
+    background: var(--c-surface);
+    border: 2px dashed var(--c-border);
+    border-radius: var(--radius-lg);
+    padding: 60px 24px;
+    text-align: center;
+  }
+  .ea-empty__icon { font-size: 3rem; opacity: .45; margin-bottom: 16px; }
+  .ea-empty__title { font-size: 18px; font-weight: 700; color: var(--c-text); margin-bottom: 6px; }
+  .ea-empty__desc { font-size: 14px; color: var(--c-muted); max-width: 360px; margin: 0 auto 20px; }
+
+  /* ─── Alerts ─────────────────────────────────── */
+  .ea-alert {
+    border-left: 3px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 11px 16px;
+    font-size: 13.5px;
+  }
+  .ea-alert.alert-success { border-left-color: var(--c-green); }
+  .ea-alert.alert-danger  { border-left-color: var(--c-red);   }
+  .ea-alert.alert-info    { border-left-color: var(--c-blue);  }
+  .ea-alert.alert-warning { border-left-color: var(--c-yellow);}
+
+  /* ─── Responsive show/hide ───────────────────── */
+  .d-desktop { display: table !important; }
+  .d-mobile  { display: none !important; }
+  @media (max-width: 768px) {
+    .d-desktop { display: none !important; }
+    .d-mobile  { display: block !important; }
+    .ea-header { padding: 20px 16px 16px; }
+    .ea-header__title { font-size: 18px; }
+  }
+
+  /* ─── Util ───────────────────────────────────── */
+  .ea-divider { height: 1px; background: var(--c-border); margin: 0; }
+  .fw-600 { font-weight: 600; }
+</style>
+
+<div class="ea-page">
+<div class="container-fluid px-3 px-md-4 py-4 d-flex flex-column gap-4" style="max-width:1320px; margin:0 auto;">
+
+  {# ── Alertas ─────────────────────────────────── #}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert ea-alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-xs d-flex align-items-center justify-content-between gap-2">
+        <span>{{ message }}</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {# ── Cabeçalho ───────────────────────────────── #}
+  {# ── Cabeçalho ───────────────────────────────── #}
+<div class="ea-header rounded-3 d-flex justify-content-between align-items-start flex-wrap gap-3">
+<div>
+    <div class="ea-header__eyebrow">
+    <i class="bi bi-building me-1"></i>{{ escola.nome }}
+    </div>
+
+    <h1 class="ea-header__title">{{ titulo_pagina }}</h1>
+
+    <p class="ea-header__sub d-flex align-items-center gap-2 mt-1 flex-wrap">
+    Área destinada ao registro e acompanhamento das preparações realizadas fora do cardápio do dia.
+    Quando não houver ingredientes suficientes em estoque para executar o cardápio planejado,
+    a merendeira poderá selecionar uma das receitas disponíveis que possa ser preparada com os
+    produtos atualmente disponíveis na escola.
+
+    <span class="ea-badge-count">
+        <i class="bi bi-list-ul"></i>
+        {{ execucoes_avulsas.paginator.count }} registro{{ execucoes_avulsas.paginator.count|pluralize }}
+    </span>
+    </p>
+</div>
+
+<a href="{% url 'modulo_merendeiras:execucao_avulsa' %}" class="ea-btn-primary">
+    <i class="bi bi-plus-lg"></i>
+    Nova Execução
+</a>
+</div>
+
+  {# ── Métricas ────────────────────────────────── #}
+  <div class="ea-metrics">
+    <div class="ea-metric ea-metric--total" data-bs-toggle="tooltip" title="Total de execuções registradas">
+      <div class="ea-metric__icon"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+      <div class="ea-metric__value">{{ total_execucoes }}</div>
+      <div class="ea-metric__label">Total de Execuções</div>
+    </div>
+    <div class="ea-metric ea-metric--fin" data-bs-toggle="tooltip" title="Execuções concluídas com sucesso">
+      <div class="ea-metric__icon"><i class="bi bi-check-circle-fill"></i></div>
+      <div class="ea-metric__value">{{ total_finalizadas|default:"—" }}</div>
+      <div class="ea-metric__label">Finalizadas</div>
+    </div>
+    <div class="ea-metric ea-metric--prep" data-bs-toggle="tooltip" title="Atualmente em preparação">
+      <div class="ea-metric__icon"><i class="bi bi-fire"></i></div>
+      <div class="ea-metric__value">{{ total_em_preparo|default:"—" }}</div>
+      <div class="ea-metric__label">Em Preparo</div>
+    </div>
+    <div class="ea-metric ea-metric--cancel" data-bs-toggle="tooltip" title="Execuções canceladas">
+      <div class="ea-metric__icon"><i class="bi bi-x-circle-fill"></i></div>
+      <div class="ea-metric__value">{{ total_canceladas|default:"—" }}</div>
+      <div class="ea-metric__label">Canceladas</div>
+    </div>
+    <div class="ea-metric ea-metric--alunos" data-bs-toggle="tooltip" title="Soma de alunos atendidos">
+      <div class="ea-metric__icon"><i class="bi bi-people-fill"></i></div>
+      <div class="ea-metric__value">{{ total_alunos|default:"—" }}</div>
+      <div class="ea-metric__label">Alunos Atendidos</div>
+    </div>
+  </div>
+
+  {# ── Toolbar (busca + filtros) ────────────────── #}
+  <form method="get" action="">
+    <div class="ea-toolbar">
+
+      {# Busca #}
+      <div class="ea-field-wrap" style="flex:1; min-width:200px;">
+        <label for="q"><i class="bi bi-search me-1"></i>Busca</label>
+        <div class="ea-input-wrap">
+          <input id="q" class="ea-input w-100" type="search" name="q"
+                 placeholder="Receita, observação ou usuário…"
+                 value="{{ request.GET.q }}">
+          <i class="bi bi-search"></i>
+        </div>
+      </div>
+
+      {# Status #}
+      <div class="ea-field-wrap">
+        <label for="status"><i class="bi bi-tag me-1"></i>Status</label>
+        <select id="status" class="ea-select" name="status">
+          <option value="">Todos</option>
+          <option value="FINALIZADA"  {% if request.GET.status == 'FINALIZADA' %}selected{% endif %}>✅ Finalizada</option>
+          <option value="EM_PREPARO"  {% if request.GET.status == 'EM_PREPARO' %}selected{% endif %}>🔥 Em Preparo</option>
+          <option value="ABERTA"      {% if request.GET.status == 'ABERTA' %}selected{% endif %}>🔵 Aberta</option>
+          <option value="CANCELADA"   {% if request.GET.status == 'CANCELADA' %}selected{% endif %}>❌ Cancelada</option>
+        </select>
+      </div>
+
+      {# Data inicial #}
+      <div class="ea-field-wrap">
+        <label for="data_ini"><i class="bi bi-calendar-event me-1"></i>De</label>
+        <input id="data_ini" class="ea-input" type="date" name="data_ini"
+               style="min-width:0;width:140px;"
+               value="{{ request.GET.data_ini }}">
+      </div>
+
+      {# Data final #}
+      <div class="ea-field-wrap">
+        <label for="data_fim"><i class="bi bi-calendar-check me-1"></i>Até</label>
+        <input id="data_fim" class="ea-input" type="date" name="data_fim"
+               style="min-width:0;width:140px;"
+               value="{{ request.GET.data_fim }}">
+      </div>
+
+      {# Ordenação #}
+      <div class="ea-field-wrap">
+        <label for="ordem"><i class="bi bi-arrow-down-up me-1"></i>Ordenar</label>
+        <select id="ordem" class="ea-select" name="ordem">
+          <option value="-iniciado_em" {% if request.GET.ordem == '-iniciado_em' or not request.GET.ordem %}selected{% endif %}>Mais recentes</option>
+          <option value="iniciado_em"  {% if request.GET.ordem == 'iniciado_em' %}selected{% endif %}>Mais antigas</option>
+          <option value="receita__nome" {% if request.GET.ordem == 'receita__nome' %}selected{% endif %}>Receita A–Z</option>
+        </select>
+      </div>
+
+      {# Ações #}
+      <div class="ea-field-wrap" style="justify-content:flex-end;">
+        <label style="visibility:hidden;">‎</label>
+        <div class="d-flex gap-2">
+          <button type="submit" class="ea-btn-filter">
+            <i class="bi bi-funnel-fill"></i> Filtrar
+          </button>
+          <a href="{{ request.path }}" class="ea-btn-ghost" data-bs-toggle="tooltip" title="Limpar todos os filtros">
+            <i class="bi bi-x-lg"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+  {# ── Conteúdo principal ───────────────────────── #}
+  {% if execucoes_avulsas %}
+
+    {# TABELA — desktop #}
+    <div class="ea-table-wrap d-desktop">
+      <table class="ea-table">
+        <thead>
+          <tr>
+            <th><a class="sort-link" href="?ordem=receita__nome">Receita <i class="bi bi-arrow-down-up opacity-50 fs-10"></i></a></th>
+            <th>Status</th>
+            <th>Alunos</th>
+            <th>Rendimento</th>
+            <th><a class="sort-link" href="?ordem=-iniciado_em">Início <i class="bi bi-arrow-down-up opacity-50 fs-10"></i></a></th>
+            <th>Finalização</th>
+            <th>Iniciado por</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for execucao in execucoes_avulsas %}
+            <tr>
+              {# Receita #}
+              <td class="td-receita">
+                {{ execucao.receita.nome }}
+              </td>
+
+              {# Status #}
+              <td>
+                {% if execucao.status == 'FINALIZADA' %}
+                  <span class="ea-badge ea-badge--fin">Finalizada</span>
+                {% elif execucao.status == 'EM_PREPARO' %}
+                  <span class="ea-badge ea-badge--prep">Em Preparo</span>
+                {% elif execucao.status == 'ABERTA' %}
+                  <span class="ea-badge ea-badge--open">Aberta</span>
+                {% elif execucao.status == 'CANCELADA' %}
+                  <span class="ea-badge ea-badge--cancel">Cancelada</span>
+                {% else %}
+                  <span class="ea-badge ea-badge--other">{{ execucao.get_status_display }}</span>
+                {% endif %}
+              </td>
+
+              {# Alunos #}
+              <td class="td-mono">
+                {% if execucao.quantidade_alunos %}
+                  {{ execucao.quantidade_alunos }}
+                {% else %}
+                  <span class="td-muted">—</span>
+                {% endif %}
+              </td>
+
+              {# Rendimento #}
+              <td class="td-mono">
+                {% if execucao.rendimento_real %}
+                  {{ execucao.rendimento_real }}
+                {% else %}
+                  <span class="td-muted">—</span>
+                {% endif %}
+              </td>
+
+              {# Início #}
+              <td class="td-mono">{{ execucao.iniciado_em|date:"d/m/Y" }}<br><span style="font-size:11px;opacity:.7;">{{ execucao.iniciado_em|date:"H:i" }}</span></td>
+
+              {# Finalização #}
+              <td class="td-mono">
+                {% if execucao.finalizado_em %}
+                  {{ execucao.finalizado_em|date:"d/m/Y" }}<br><span style="font-size:11px;opacity:.7;">{{ execucao.finalizado_em|date:"H:i" }}</span>
+                {% else %}
+                  <span class="td-muted">—</span>
+                {% endif %}
+              </td>
+
+              {# Responsável #}
+              <td>
+                <span style="font-size:13px;">
+                  {{ execucao.iniciado_por.get_full_name|default:execucao.iniciado_por.username }}
+                </span>
+              </td>
+
+              {# Ações #}
+              <td>
+                <div class="ea-actions">
+                  <a href="#" class="ea-action-btn" data-bs-toggle="tooltip" title="Ver detalhes">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  {% if execucao.status == 'EM_PREPARO' or execucao.status == 'ABERTA' %}
+                  <a href="#" class="ea-action-btn" data-bs-toggle="tooltip" title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {# CARDS — mobile #}
+    <div class="ea-card-list d-mobile">
+      {% for execucao in execucoes_avulsas %}
+        <div class="ea-card">
+          <div class="ea-card__top">
+            <div class="ea-card__title">{{ execucao.receita.nome }}</div>
+            {% if execucao.status == 'FINALIZADA' %}
+              <span class="ea-badge ea-badge--fin">Finalizada</span>
+            {% elif execucao.status == 'EM_PREPARO' %}
+              <span class="ea-badge ea-badge--prep">Em Preparo</span>
+            {% elif execucao.status == 'ABERTA' %}
+              <span class="ea-badge ea-badge--open">Aberta</span>
+            {% elif execucao.status == 'CANCELADA' %}
+              <span class="ea-badge ea-badge--cancel">Cancelada</span>
+            {% else %}
+              <span class="ea-badge ea-badge--other">{{ execucao.get_status_display }}</span>
+            {% endif %}
+          </div>
+          <div class="ea-card__meta">
+            <div class="ea-card__field">
+              <small>👥 Alunos</small>
+              <span>{{ execucao.quantidade_alunos|default:"—" }}</span>
+            </div>
+            <div class="ea-card__field">
+              <small>🍽️ Rendimento</small>
+              <span>{{ execucao.rendimento_real|default:"—" }}</span>
+            </div>
+            <div class="ea-card__field">
+              <small>⏱ Início</small>
+              <span>{{ execucao.iniciado_em|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="ea-card__field">
+              <small>✅ Fim</small>
+              <span>{% if execucao.finalizado_em %}{{ execucao.finalizado_em|date:"d/m/Y H:i" }}{% else %}—{% endif %}</span>
+            </div>
+            <div class="ea-card__field" style="grid-column:span 2;">
+              <small>👤 Iniciado por</small>
+              <span>{{ execucao.iniciado_por.get_full_name|default:execucao.iniciado_por.username }}</span>
+            </div>
+          </div>
+          {% if execucao.observacoes %}
+            <div class="ea-card__obs">{{ execucao.observacoes|safe }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    {# ── Paginação ────────────────────────────────── #}
+    {% if is_paginated %}
+      <nav aria-label="Navegação de páginas">
+        <div class="ea-pagination">
+
+          {# Primeira #}
+          {% if page_obj.has_previous %}
+            <a class="ea-page-btn" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.data_ini %}&data_ini={{ request.GET.data_ini }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}{% if request.GET.ordem %}&ordem={{ request.GET.ordem }}{% endif %}" data-bs-toggle="tooltip" title="Primeira página">
+              <i class="bi bi-chevron-double-left"></i>
+            </a>
+            <a class="ea-page-btn" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.data_ini %}&data_ini={{ request.GET.data_ini }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}{% if request.GET.ordem %}&ordem={{ request.GET.ordem }}{% endif %}">
+              <i class="bi bi-chevron-left"></i> Anterior
+            </a>
+          {% else %}
+            <span class="ea-page-btn ea-page-btn--disabled"><i class="bi bi-chevron-double-left"></i></span>
+            <span class="ea-page-btn ea-page-btn--disabled"><i class="bi bi-chevron-left"></i> Anterior</span>
+          {% endif %}
+
+          {# Número atual #}
+          <span class="ea-page-btn ea-page-btn--active">{{ page_obj.number }}</span>
+          <span class="ea-page-info">de {{ page_obj.paginator.num_pages }}</span>
+
+          {# Próxima / última #}
+          {% if page_obj.has_next %}
+            <a class="ea-page-btn" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.data_ini %}&data_ini={{ request.GET.data_ini }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}{% if request.GET.ordem %}&ordem={{ request.GET.ordem }}{% endif %}">
+              Próxima <i class="bi bi-chevron-right"></i>
+            </a>
+            <a class="ea-page-btn" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.data_ini %}&data_ini={{ request.GET.data_ini }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}{% if request.GET.ordem %}&ordem={{ request.GET.ordem }}{% endif %}" data-bs-toggle="tooltip" title="Última página">
+              <i class="bi bi-chevron-double-right"></i>
+            </a>
+          {% else %}
+            <span class="ea-page-btn ea-page-btn--disabled">Próxima <i class="bi bi-chevron-right"></i></span>
+            <span class="ea-page-btn ea-page-btn--disabled"><i class="bi bi-chevron-double-right"></i></span>
+          {% endif %}
+
+        </div>
+      </nav>
+    {% endif %}
+
+  {% else %}
+
+    {# ── Estado vazio ─────────────────────────────── #}
+    <div class="ea-empty">
+      <div class="ea-empty__icon">🍽️</div>
+      <div class="ea-empty__title">Nenhuma execução encontrada</div>
+      <p class="ea-empty__desc">
+        {% if request.GET.q or request.GET.status or request.GET.data_ini or request.GET.data_fim %}
+          Nenhum resultado para os filtros aplicados. Tente ajustar os critérios de busca.
+        {% else %}
+          Ainda não há execuções avulsas registradas para esta escola.
+        {% endif %}
+      </p>
+      {% if request.GET.q or request.GET.status or request.GET.data_ini or request.GET.data_fim %}
+        <a href="{{ request.path }}" class="ea-btn-ghost me-2">
+          <i class="bi bi-x-lg"></i> Limpar filtros
+        </a>
+      {% endif %}
+      <a href="#" class="ea-btn-primary">
+        <i class="bi bi-plus-lg"></i> Registrar primeira execução
+      </a>
+    </div>
+
+  {% endif %}
+
+</div>
+</div>
+
+<script>
+  // Tooltips Bootstrap
+  document.addEventListener('DOMContentLoaded', function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach(function (el) {
+      new bootstrap.Tooltip(el, { trigger: 'hover' });
+    });
+  });
+</script>
+
+{% endblock %}

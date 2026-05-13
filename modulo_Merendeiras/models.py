@@ -51,6 +51,11 @@ class ExecucaoReceitaCozinha(models.Model):
         on_delete=models.PROTECT, 
         related_name='receitas_finalizadas'
     )
+
+    quantidade_alunos = models.PositiveIntegerField(
+    null=True, blank=True,
+    help_text="Número de alunos atendidos nesta execução de receita"
+)
     
     # Metadados
     rendimento_real = models.PositiveIntegerField(

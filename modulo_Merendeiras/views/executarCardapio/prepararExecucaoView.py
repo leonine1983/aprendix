@@ -35,6 +35,7 @@ from merendaEscolar.models import Receita
 from modulo_Merendeiras.models import ExecucaoCardapioDia
 
 
+
 @transaction.atomic
 def executar_receita_individual(
     escola,
@@ -44,35 +45,23 @@ def executar_receita_individual(
     porcoes,
     turno,
     cardapio_dia=None,
-    quantidade_alunos=None
+    quantidade_alunos=None,
+    criar_execucao_receita=True,   # ← novo parâmetro
 ):
     from modulo_Merendeiras.models import (
         ExecucaoReceitaCozinha,
         ExecucaoCardapioItem,
         MovimentacaoCozinha,
     )
-
-    from merendaEscolar.models import (
-        TipoRefeicao,
-        CardapioItem,
-    )
+    from merendaEscolar.models import TipoRefeicao, CardapioItem
 
     receita = Receita.objects.get(id=receita_id)
 
-    # 🔍 valida disponibilidade
-    disponivel, info = verificar_disponibilidade_ingredientes(
-        escola,
-        receita,
-        porcoes
-    )
-
+    disponivel, info = verificar_disponibilidade_ingredientes(escola, receita, porcoes)
     if not disponivel:
         raise Exception("Estoque insuficiente para esta quantidade.")
 
-    # =========================================================
-    # 🔥 EXECUÇÃO DO DIA (mestre)
-    # =========================================================
-
+    # --- execução do dia (mestre) ---
     execucao_dia, created = ExecucaoCardapioDia.objects.get_or_create(
         escola=escola,
         data=data,
@@ -85,37 +74,26 @@ def executar_receita_individual(
         }
     )
 
-    # 🔥 se já existia e ainda não possui cardápio vinculado
     if cardapio_dia and not execucao_dia.cardapio_dia:
         execucao_dia.cardapio_dia = cardapio_dia
         execucao_dia.save(update_fields=['cardapio_dia'])
 
-    # 🔥 atualiza quantidade alunos se necessário
-    if (
-        not created
-        and quantidade_alunos
-        and not execucao_dia.quantidade_alunos
-    ):
+    if not created and quantidade_alunos and not execucao_dia.quantidade_alunos:
         execucao_dia.quantidade_alunos = quantidade_alunos
         execucao_dia.save(update_fields=['quantidade_alunos'])
 
-    # =========================================================
-    # 🔥 EXECUÇÃO DA RECEITA
-    # =========================================================
+    # --- execução da receita (opcional) ---
+    exec_receita = None
+    if criar_execucao_receita:
+        exec_receita = ExecucaoReceitaCozinha.objects.create(
+            escola=escola,
+            receita=receita,
+            status='EM_PREPARO',
+            iniciado_por=usuario,
+        )
 
-    exec_receita = ExecucaoReceitaCozinha.objects.create(
-        escola=escola,
-        receita=receita,
-        status='EM_PREPARO',
-        iniciado_por=usuario,
-    )
-
-    # =========================================================
-    # 🔥 BAIXA ESTOQUE (FEFO)
-    # =========================================================
-
+    # --- baixa estoque (FEFO) ---
     for ing in receita.ingredientes.all():
-
         quantidade_necessaria = ing.quantidade * porcoes
 
         estoques = EstoqueEscola.objects.filter(
@@ -128,18 +106,13 @@ def executar_receita_individual(
         restante = quantidade_necessaria
 
         for estoque in estoques:
-
             if restante <= 0:
                 break
-
             consumir = min(estoque.quantidade, restante)
-
             estoque.quantidade -= consumir
             estoque.save(update_fields=['quantidade'])
-
             restante -= consumir
 
-            # 🔥 movimentação interna
             MovimentacaoCozinha.objects.create(
                 escola=escola,
                 produto=ing.produto,
@@ -147,7 +120,7 @@ def executar_receita_individual(
                 quantidade=consumir,
                 tipo='RETIRADA_RECEITA',
                 usuario=usuario,
-                execucao_receita=exec_receita,
+                execucao_receita=exec_receita,   # será None se criar_execucao_receita=False
                 observacao=(
                     f"Lote: {estoque.lote} "
                     f"(Validade: {estoque.data_validade})"
@@ -155,59 +128,35 @@ def executar_receita_individual(
             )
 
         if restante > 0:
-            raise Exception(
-                f"Erro ao debitar estoque de {ing.produto.nome}"
-            )
+            raise Exception(f"Erro ao debitar estoque de {ing.produto.nome}")
 
-    # =========================================================
-    # 🔥 FINALIZA EXECUÇÃO DA RECEITA
-    # =========================================================
+    # --- finaliza execução da receita (apenas se foi criada) ---
+    if exec_receita:
+        exec_receita.status = 'FINALIZADA'
+        exec_receita.finalizado_em = timezone.now()
+        exec_receita.finalizado_por = usuario
+        exec_receita.rendimento_real = porcoes
+        exec_receita.save(
+            update_fields=['status', 'finalizado_em', 'finalizado_por', 'rendimento_real']
+        )
 
-    exec_receita.status = 'FINALIZADA'
-    exec_receita.finalizado_em = timezone.now()
-    exec_receita.finalizado_por = usuario
-    exec_receita.rendimento_real = porcoes
-
-    exec_receita.save(
-        update_fields=[
-            'status',
-            'finalizado_em',
-            'finalizado_por',
-            'rendimento_real'
-        ]
-    )
-
-    # =========================================================
-    # 🔥 DESCOBRE TIPO DE REFEIÇÃO
-    # =========================================================
-
+    # --- descobre tipo de refeição ---
     tipo_refeicao = None
-
-    cardapio_dia_execucao = execucao_dia.cardapio_dia
-
-    if cardapio_dia_execucao:
-
+    if execucao_dia.cardapio_dia:
         ci = CardapioItem.objects.filter(
-            dia=cardapio_dia_execucao,
+            dia=execucao_dia.cardapio_dia,
             receita=receita
         ).select_related('tipo_refeicao').first()
-
         if ci:
             tipo_refeicao = ci.tipo_refeicao
 
-    # fallback
     if not tipo_refeicao:
         tipo_refeicao = TipoRefeicao.objects.first()
 
     if not tipo_refeicao:
-        raise Exception(
-            "Nenhum TipoRefeicao cadastrado no sistema."
-        )
+        raise Exception("Nenhum TipoRefeicao cadastrado no sistema.")
 
-    # =========================================================
-    # 🔥 ITEM EXECUTADO DO CARDÁPIO
-    # =========================================================
-
+    # --- item executado do cardápio ---
     exec_item, item_created = ExecucaoCardapioItem.objects.get_or_create(
         execucao_cardapio=execucao_dia,
         receita=receita,
@@ -220,64 +169,36 @@ def executar_receita_individual(
         }
     )
 
-    # 🔥 se já existia, atualiza vínculo e status
     if not item_created:
-
         alterou = False
-
-        if not exec_item.execucao_receita:
+        if exec_receita and not exec_item.execucao_receita:
             exec_item.execucao_receita = exec_receita
             alterou = True
-
         if exec_item.status != 'EXECUTADO':
             exec_item.status = 'EXECUTADO'
             alterou = True
-
         if not exec_item.porcoes_executadas:
             exec_item.porcoes_executadas = porcoes
             alterou = True
-
         if alterou:
             exec_item.save()
 
-    # =========================================================
-    # 🔥 STATUS FINAL DO DIA
-    # =========================================================
-
+    # --- status final do dia ---
     total_itens = execucao_dia.itens_executados.count()
-
-    total_executados = execucao_dia.itens_executados.filter(
-        status='EXECUTADO'
-    ).count()
+    total_executados = execucao_dia.itens_executados.filter(status='EXECUTADO').count()
 
     if total_itens > 0:
-
-        if total_executados == total_itens:
-            execucao_dia.status = 'EXECUTADO'
-        else:
-            execucao_dia.status = 'PARCIAL'
-
+        execucao_dia.status = 'EXECUTADO' if total_executados == total_itens else 'PARCIAL'
         execucao_dia.finalizado_em = timezone.now()
-
-        execucao_dia.save(
-            update_fields=[
-                'status',
-                'finalizado_em'
-            ]
-        )
+        execucao_dia.save(update_fields=['status', 'finalizado_em'])
 
     return {
         'execucao_id': execucao_dia.id,
         'receita': receita.nome,
         'porcoes': porcoes,
         'turno': turno,
-        'cardapio_dia_id': (
-            execucao_dia.cardapio_dia.id
-            if execucao_dia.cardapio_dia
-            else None
-        ),
+        'cardapio_dia_id': execucao_dia.cardapio_dia.id if execucao_dia.cardapio_dia else None,
     }
-
 
 class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
     template_name = "modulo_merendeiras/cadapioHoje/preparar_execucao.html"
@@ -452,9 +373,9 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
                     receita_id=int(receita_id),
                     porcoes=porcoes,
                     turno=turno,
-                    cardapio_dia=cardapio_dia,  # ✅ AGORA SEMPRE PASSADO
+                    cardapio_dia=cardapio_dia,
+                    criar_execucao_receita=False,   # ← sem ExecucaoReceitaCozinha
                 )
-
                 messages.success(
                     request,
                     f"Receita executada com sucesso ({porcoes} porções - {turno})."
