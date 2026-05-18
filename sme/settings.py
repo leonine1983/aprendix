@@ -27,7 +27,7 @@ INSTALLED_APPS = [
     'rh',   
     'admin_acessos',     
     'gestao_escolar',  
-    'controle_estoque', 
+    #'controle_estoque', 
     'docsGestao_Escolar',  
     'modulo_aluno',
     'modulo_professor',
@@ -80,7 +80,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 #'gestao_escolar.context_processors.verifica_sessoes',
                 'gestao_escolar.context_processors.list_turmas',
-                'controle_estoque.msg_context_processors.message_user_contexto',                
+                #'controle_estoque.msg_context_processors.message_user_contexto',                
                 'rh.msg_context_processors.message_user_contexto'
                 
             ],

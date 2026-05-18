@@ -33,34 +33,60 @@ from django.views.generic import ListView
 # ---------------------------------------------------------------------------
 # Lógica de domínio
 # ---------------------------------------------------------------------------
-
 def _estoque_por_produto(escola):
     """
-    Retorna dict {produto_id: Decimal(quantidade_total)} para a escola,
-    considerando apenas lotes com quantidade > 0.
+    Retorna um dicionário no formato:
+        {produto_id: quantidade_total}
+
+    Considera apenas os lotes da escola com quantidade maior que zero.
     """
+    if not escola:
+        return {}
+
     rows = (
         EstoqueEscola.objects
-        .filter(escola=escola, quantidade__gt=0)
+        .filter(
+            escola=escola,
+            quantidade__gt=0,
+        )
         .values('produto_id')
         .annotate(total=Sum('quantidade'))
     )
-    return {row['produto_id']: row['total'] for row in rows}
+
+    return {
+        row['produto_id']: row['total']
+        for row in rows
+    }
 
 
 def _receitas_executaveis(escola, porcoes=1):
     """
-    Retorna lista de dicts com todas as receitas ativas,
-    enriquecidas com disponibilidade de estoque para `porcoes` porções.
+    Retorna uma lista com todas as receitas ativas, indicando se cada uma
+    pode ser executada com base no estoque disponível da escola.
 
-    Cada item:
-        receita_id, receita_nome, rendimento_padrao,
-        disponivel (bool),
-        ingredientes: [{produto_id, produto_nome, unidade,
-                        quantidade_base, quantidade_necessaria,
-                        disponivel_estoque, suficiente}]
+    Estrutura retornada:
+        [
+            {
+                'receita_id': 1,
+                'receita_nome': 'Arroz Doce',
+                'rendimento_padrao': 100,
+                'disponivel': True,
+                'ingredientes': [
+                    {
+                        'produto_id': 3,
+                        'produto_nome': 'Arroz',
+                        'unidade': 'kg',
+                        'quantidade_base': 0.200,
+                        'quantidade_necessaria': 0.200,
+                        'disponivel_estoque': 5.0,
+                        'suficiente': True,
+                    },
+                ],
+            },
+        ]
     """
     estoque_map = _estoque_por_produto(escola)
+
     receitas = (
         Receita.objects
         .filter(ativa=True)
@@ -69,35 +95,40 @@ def _receitas_executaveis(escola, porcoes=1):
     )
 
     resultado = []
+
     for receita in receitas:
         ingredientes_info = []
         receita_ok = True
 
         for ing in receita.ingredientes.all():
-            qtd_base = ing.quantidade                          # por 1 porção
-            qtd_nec  = qtd_base * Decimal(str(porcoes))
-            disp     = estoque_map.get(ing.produto_id, Decimal('0'))
-            suficiente = disp >= qtd_nec
+            qtd_base = ing.quantidade
+            qtd_necessaria = qtd_base * Decimal(str(porcoes))
+            qtd_disponivel = estoque_map.get(
+                ing.produto_id,
+                Decimal('0')
+            )
+
+            suficiente = qtd_disponivel >= qtd_necessaria
 
             if not suficiente:
                 receita_ok = False
 
             ingredientes_info.append({
-                'produto_id':         ing.produto.id,
-                'produto_nome':       ing.produto.nome,
-                'unidade':            ing.produto.unidade_medida.sigla,
-                'quantidade_base':    float(qtd_base),
-                'quantidade_necessaria': float(qtd_nec),
-                'disponivel_estoque': float(disp),
-                'suficiente':         suficiente,
+                'produto_id': ing.produto_id,
+                'produto_nome': ing.produto.nome,
+                'unidade': ing.produto.unidade_medida.sigla,
+                'quantidade_base': float(qtd_base),
+                'quantidade_necessaria': float(qtd_necessaria),
+                'disponivel_estoque': float(qtd_disponivel),
+                'suficiente': suficiente,
             })
 
         resultado.append({
-            'receita_id':       receita.id,
-            'receita_nome':     receita.nome,
+            'receita_id': receita.id,
+            'receita_nome': receita.nome,
             'rendimento_padrao': receita.rendimento,
-            'disponivel':       receita_ok,
-            'ingredientes':     ingredientes_info,
+            'disponivel': receita_ok,
+            'ingredientes': ingredientes_info,
         })
 
     return resultado
@@ -154,62 +185,84 @@ from django.core.exceptions import ValidationError
 from core.views.baseMerendeira import BaseMerendeiraView
 
 
-
-
 class ExecucaoAvulsaView(BaseMerendeiraView, FormView):
     """
     Permite à merendeira executar qualquer receita com estoque disponível,
     independentemente do cardápio do dia.
-
-    Fluxo:
-    1. Carrega todas as receitas ativas com indicação de disponibilidade.
-    2. JS filtra/destaca com base no número de alunos digitado.
-    3. Ao submeter, desconta ingredientes do estoque (FEFO) e registra execução.
     """
+
     template_name = 'modulo_merendeiras/cozinha/execucao_avulsa.html'
-    form_class    = ExecucaoAvulsaForm
-    success_url   = reverse_lazy('modulo_merendeiras:execucao_lista')
+    form_class = ExecucaoAvulsaForm
+    success_url = reverse_lazy('modulo_merendeiras:execucao_lista')
 
     def get_escola(self):
-        return _get_escola_da_merendeira(self.request.user)
+        """
+        Retorna a escola vinculada à merendeira utilizando a infraestrutura
+        já disponibilizada pela BaseMerendeiraView.
+        """
+        return self.escola_usuario
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+
         escola = self.get_escola()
+
+        # Importante:
+        # _receitas_executaveis(escola, porcoes=1) deve retornar
+        # quantidade_base = quantidade necessária para 1 porção/aluno.
+        # O JavaScript do template será responsável por recalcular
+        # as quantidades conforme o número de alunos informado.
         receitas = _receitas_executaveis(escola, porcoes=1)
 
+        # Ordena receitas disponíveis primeiro
+        receitas = sorted(
+            receitas,
+            key=lambda r: (0 if r['disponivel'] else 1, r['receita_nome'])
+        )
+
         import json
-        ctx['escola']       = escola
-        ctx['hoje']         = timezone.now().date()
+
+        ctx['escola'] = escola
+        ctx['hoje'] = timezone.now().date()
         ctx['receitas_info'] = receitas
-        ctx['receitas_json'] = json.dumps(receitas)
+        ctx['receitas_json'] = json.dumps(
+            receitas,
+            ensure_ascii=False
+        )
+
         return ctx
 
     @transaction.atomic
     def form_valid(self, form):
-        escola            = self.get_escola()
-        receita           = form.cleaned_data['receita']
-        quantidade_alunos = form.cleaned_data['quantidade_alunos']
-        turno             = form.cleaned_data['turno']
-        observacoes       = form.cleaned_data.get('observacoes', '')
+        escola = self.get_escola()
 
-        # Valida estoque antes de qualquer desconto
+        receita = form.cleaned_data['receita']
+        quantidade_alunos = form.cleaned_data['quantidade_alunos']
+        turno = form.cleaned_data['turno']
+        observacoes = form.cleaned_data.get('observacoes', '')
+
         estoque_map = _estoque_por_produto(escola)
+
         erros = []
-        for ing in receita.ingredientes.select_related('produto__unidade_medida').all():
+        for ing in receita.ingredientes.select_related(
+            'produto__unidade_medida'
+        ).all():
             qtd_nec = ing.quantidade * Decimal(str(quantidade_alunos))
-            disp    = estoque_map.get(ing.produto_id, Decimal('0'))
+            disp = estoque_map.get(ing.produto_id, Decimal('0'))
+
             if disp < qtd_nec:
                 falta = qtd_nec - disp
                 erros.append(
-                    f"{ing.produto.nome}: necessário {qtd_nec} {ing.produto.unidade_medida.sigla}, "
-                    f"disponível {disp} {ing.produto.unidade_medida.sigla} "
+                    f"{ing.produto.nome}: necessário {qtd_nec} "
+                    f"{ing.produto.unidade_medida.sigla}, "
+                    f"disponível {disp} "
+                    f"{ing.produto.unidade_medida.sigla} "
                     f"(falta {falta:.2f})"
                 )
 
         if erros:
-            for e in erros:
-                messages.error(self.request, e)
+            for erro in erros:
+                messages.error(self.request, erro)
             return self.form_invalid(form)
 
         # Cria registro de execução
@@ -225,14 +278,22 @@ class ExecucaoAvulsaView(BaseMerendeiraView, FormView):
             ),
         )
 
-        # Desconta estoque FEFO por ingrediente
-        for ing in receita.ingredientes.select_related('produto__unidade_medida').all():
-            qtd_restante = ing.quantidade * Decimal(str(quantidade_alunos))
+        # Consumo FEFO por ingrediente
+        for ing in receita.ingredientes.select_related(
+            'produto__unidade_medida'
+        ).all():
+            qtd_restante = (
+                ing.quantidade * Decimal(str(quantidade_alunos))
+            )
 
             lotes = (
                 EstoqueEscola.objects
                 .select_for_update()
-                .filter(escola=escola, produto=ing.produto, quantidade__gt=0)
+                .filter(
+                    escola=escola,
+                    produto=ing.produto,
+                    quantidade__gt=0
+                )
                 .order_by('data_validade', 'id')
             )
 
@@ -241,6 +302,7 @@ class ExecucaoAvulsaView(BaseMerendeiraView, FormView):
                     break
 
                 consumir = min(lote.quantidade, qtd_restante)
+
                 lote.quantidade -= consumir
                 lote.save(update_fields=['quantidade'])
 
@@ -253,7 +315,8 @@ class ExecucaoAvulsaView(BaseMerendeiraView, FormView):
                     observacao=(
                         f"Execução avulsa — {receita.nome} "
                         f"({quantidade_alunos} alunos / {turno}) "
-                        f"| Lote: {lote.lote or 'S/L'} | Exec #{execucao.id}"
+                        f"| Lote: {lote.lote or 'S/L'} "
+                        f"| Exec #{execucao.id}"
                     ),
                 )
 
@@ -265,19 +328,26 @@ class ExecucaoAvulsaView(BaseMerendeiraView, FormView):
                     tipo='RETIRADA_RECEITA',
                     usuario=self.request.user,
                     execucao_receita=execucao,
-                    observacao=f"Lote: {lote.lote} (Validade: {lote.data_validade})",
+                    observacao=(
+                        f"Lote: {lote.lote} "
+                        f"(Validade: {lote.data_validade})"
+                    ),
                 )
 
                 qtd_restante -= consumir
 
-        execucao.finalizar(self.request.user, rendimento_real=quantidade_alunos)
+        execucao.finalizar(
+            self.request.user,
+            rendimento_real=quantidade_alunos
+        )
 
         messages.success(
             self.request,
-            f'✅ Receita "{receita.nome}" executada para {quantidade_alunos} alunos!'
+            f'✅ Receita "{receita.nome}" executada para '
+            f'{quantidade_alunos} alunos!'
         )
+
         return super().form_valid(form)
-    
 
 
 

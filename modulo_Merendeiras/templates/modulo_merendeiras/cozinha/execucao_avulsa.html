@@ -8,11 +8,7 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=Outfit:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 
-  /* ═══════════════════════════════════════════════
-     TOKENS — herda o sistema base, estende localmente
-  ═══════════════════════════════════════════════ */
   :root {
-    /* Mesclando com a paleta do base */
     --av-red:         #c0392b;
     --av-red-deep:    #96281b;
     --av-red-light:   #fff5f4;
@@ -23,7 +19,6 @@
     --av-green:       #16a34a;
     --av-green-light: #f0fdf4;
     --av-green-border:#bbf7d0;
-
     --av-surface:     #ffffff;
     --av-bg:          #f5f7f5;
     --av-border:      #e8ede9;
@@ -31,20 +26,17 @@
     --av-text:        #1a2e20;
     --av-text-2:      #4a6150;
     --av-text-3:      #8aa090;
-
     --av-r-sm:  6px;
     --av-r-md:  12px;
     --av-r-lg:  18px;
     --av-r-xl:  24px;
     --av-r-pill:9999px;
-
     --av-sh-xs: 0 1px 3px rgba(10,30,15,.05);
     --av-sh-sm: 0 2px 10px rgba(10,30,15,.07), 0 1px 3px rgba(10,30,15,.04);
     --av-sh-md: 0 6px 20px rgba(10,30,15,.09), 0 2px 6px rgba(10,30,15,.05);
     --av-sh-lg: 0 14px 40px rgba(10,30,15,.12), 0 4px 12px rgba(10,30,15,.06);
     --av-sh-red:0 4px 20px rgba(192,57,43,.22);
     --av-sh-grn:0 4px 18px rgba(22,163,74,.2);
-
     --av-ease:       cubic-bezier(.4,0,.2,1);
     --av-spring:     cubic-bezier(.34,1.56,.64,1);
     --av-t-fast:     .12s var(--av-ease);
@@ -52,18 +44,12 @@
     --av-t-slow:     .36s var(--av-ease);
   }
 
-  /* ═══════════════════════════════════════════════
-     WRAPPER
-  ═══════════════════════════════════════════════ */
   .avulsa-wrap {
     max-width: 1320px;
     margin: 0 auto;
     padding: 2rem 2rem 4rem;
   }
 
-  /* ═══════════════════════════════════════════════
-     HERO — editorial, com gradiente profundo
-  ═══════════════════════════════════════════════ */
   .av-hero {
     position: relative;
     overflow: hidden;
@@ -78,7 +64,6 @@
     box-shadow: 0 20px 60px rgba(7,30,16,.35), 0 4px 16px rgba(0,0,0,.15);
   }
 
-  /* Grain texture overlay */
   .av-hero::before {
     content: '';
     position: absolute;
@@ -88,7 +73,6 @@
     pointer-events: none;
   }
 
-  /* Decorative glow orbs */
   .av-hero::after {
     content: '';
     position: absolute;
@@ -158,7 +142,6 @@
     font-weight: 500;
   }
 
-  /* Decorative right element */
   .av-hero__deco {
     position: absolute;
     right: 2.5rem;
@@ -184,9 +167,6 @@
     to   { opacity: 1; }
   }
 
-  /* ═══════════════════════════════════════════════
-     ALERTS
-  ═══════════════════════════════════════════════ */
   .av-alert {
     display: flex;
     align-items: flex-start;
@@ -222,9 +202,6 @@
   .av-alert.warning { background: var(--av-amber-light); border-color: var(--av-amber-border); color: #78350f; }
   .av-alert.info    { background: #eff6ff; border-color: #bfdbfe; color: #1e3a5f; }
 
-  /* ═══════════════════════════════════════════════
-     MAIN GRID
-  ═══════════════════════════════════════════════ */
   .av-grid {
     display: grid;
     grid-template-columns: 380px 1fr;
@@ -236,9 +213,6 @@
     .av-grid { grid-template-columns: 1fr; }
   }
 
-  /* ═══════════════════════════════════════════════
-     PANEL (card base)
-  ═══════════════════════════════════════════════ */
   .av-panel {
     background: var(--av-surface);
     border: 1px solid var(--av-border);
@@ -296,11 +270,7 @@
   }
 
   .av-panel__body { padding: 1.5rem; }
-  .av-panel__body--flush { padding: 0; }
 
-  /* ═══════════════════════════════════════════════
-     FORM FIELDS
-  ═══════════════════════════════════════════════ */
   .av-field { margin-bottom: 1.3rem; }
   .av-field:last-of-type { margin-bottom: 0; }
 
@@ -319,7 +289,6 @@
 
   .av-field__label .lbl-ico { font-size: .85rem; }
 
-  /* Override Django widget styles */
   .av-field input[type=number],
   .av-field input[type=text],
   .av-field select,
@@ -372,7 +341,6 @@
     gap: .3rem;
   }
 
-  /* Num wrap */
   .av-num-wrap { position: relative; }
   .av-num-wrap input { padding-right: 3.2rem; }
   .av-num-unit {
@@ -386,9 +354,6 @@
     pointer-events: none;
   }
 
-  /* ═══════════════════════════════════════════════
-     SUBMIT AREA (sticky)
-  ═══════════════════════════════════════════════ */
   .av-submit-area {
     position: sticky;
     bottom: 0;
@@ -447,9 +412,6 @@
 
   .av-btn-exec__ico { font-size: 1.1rem; line-height: 1; }
 
-  /* ═══════════════════════════════════════════════
-     SEARCH BAR
-  ═══════════════════════════════════════════════ */
   .av-search-wrap {
     position: relative;
     margin-bottom: .9rem;
@@ -488,9 +450,6 @@
 
   #busca-receita::placeholder { color: var(--av-text-3); font-weight: 400; }
 
-  /* ═══════════════════════════════════════════════
-     COUNTERS
-  ═══════════════════════════════════════════════ */
   .av-counters {
     display: flex;
     align-items: center;
@@ -522,9 +481,6 @@
     border: 1px solid var(--av-border);
   }
 
-  /* ═══════════════════════════════════════════════
-     RECIPE GRID
-  ═══════════════════════════════════════════════ */
   #painel-receitas {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
@@ -540,7 +496,6 @@
   #painel-receitas::-webkit-scrollbar-track { background: transparent; }
   #painel-receitas::-webkit-scrollbar-thumb { background: var(--av-border); border-radius: 4px; }
 
-  /* Recipe card */
   .rc {
     position: relative;
     border: 1.5px solid var(--av-border);
@@ -552,7 +507,6 @@
     overflow: hidden;
   }
 
-  /* Left accent bar */
   .rc::before {
     content: '';
     position: absolute;
@@ -588,11 +542,13 @@
     border-radius: 0;
   }
 
+  /* ✅ CORRIGIDO: indisponivel é aplicado apenas via JS, nunca hard-coded no HTML */
   .rc.indisponivel {
-    opacity: .45;
-    cursor: not-allowed;
-    pointer-events: none;
-    filter: grayscale(.5);
+  }
+
+  /* Cards indisponíveis ainda precisam ser visíveis/selecionáveis via teclado para acessibilidade */
+  .rc.indisponivel:focus {
+    pointer-events: auto;
   }
 
   .rc-nome {
@@ -600,7 +556,7 @@
     font-weight: 700;
     font-size: .875rem;
     color: var(--av-text);
-    margin-bottom: .25rem;
+    margin-bottom: .2rem;
     line-height: 1.35;
     padding-right: 1.8rem;
   }
@@ -608,8 +564,28 @@
   .rc-rend {
     font-size: .72rem;
     color: var(--av-text-3);
-    margin-bottom: .65rem;
+    margin-bottom: .3rem;
     font-family: 'DM Mono', monospace;
+  }
+
+  .rc-max {
+    font-family: 'DM Mono', monospace;
+    font-size: .7rem;
+    color: var(--av-text-3);
+    margin-bottom: .6rem;
+    transition: color var(--av-t-base);
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+  }
+
+  .rc-max.insuficiente {
+    color: var(--av-red);
+    font-weight: 700;
+  }
+
+  .rc-max .max-val {
+    font-weight: 600;
   }
 
   .rc-badge {
@@ -626,7 +602,6 @@
   .rc-badge.ok   { background: var(--av-green-light); color: var(--av-green); border: 1px solid var(--av-green-border); }
   .rc-badge.fail { background: var(--av-red-light);   color: var(--av-red);   border: 1px solid var(--av-red-border); }
 
-  /* Check circle */
   .rc-check {
     position: absolute;
     top: .75rem; right: .75rem;
@@ -650,9 +625,6 @@
     to   { transform: scale(1) rotate(0deg);  opacity: 1; }
   }
 
-  /* ═══════════════════════════════════════════════
-     DETALHE DE INGREDIENTES
-  ═══════════════════════════════════════════════ */
   #detalhe-ingredientes {
     display: none;
     margin-top: 1.25rem;
@@ -687,7 +659,6 @@
     letter-spacing: -.01em;
   }
 
-  /* Stock alert */
   .av-stock-alert {
     display: flex;
     align-items: flex-start;
@@ -717,7 +688,6 @@
 
   .av-stock-alert__ico { flex-shrink: 0; margin-top: .05rem; }
 
-  /* Ingredients table */
   .ing-table-wrap { overflow-x: auto; border-radius: var(--av-r-md); border: 1px solid var(--av-border); }
 
   .ing-table {
@@ -807,9 +777,6 @@
     border: 1px solid var(--av-red-border);
   }
 
-  /* ═══════════════════════════════════════════════
-     EMPTY STATE
-  ═══════════════════════════════════════════════ */
   .av-empty {
     grid-column: 1 / -1;
     text-align: center;
@@ -830,9 +797,6 @@
     margin: 0;
   }
 
-  /* ═══════════════════════════════════════════════
-     RESPONSIVE
-  ═══════════════════════════════════════════════ */
   @media (max-width: 768px) {
     .avulsa-wrap { padding: 1rem 1rem 3rem; }
     .av-hero { padding: 1.75rem 1.5rem; gap: 1.1rem; }
@@ -847,40 +811,52 @@
     #painel-receitas { grid-template-columns: 1fr; max-height: 320px; }
   }
 </style>
+
 <div class="avulsa-wrap">
 
   {# ── HERO ── #}
   <div class="av-hero">
-    <div class="av-hero__content">
-      <div class="av-hero__icon" aria-hidden="true">🍳</div>
-      <div class="av-hero__text">
-        <h1>Execução Avulsa de Receita</h1>
-        <div class="av-hero__meta">
-          <span class="escola-tag">🏫 {{ escola.nome }}</span>
-          <span class="sep">·</span>
-          <span>{{ hoje|date:"d/m/Y" }}</span>
-        </div>
+  <div class="av-hero__content">
+    <div class="av-hero__icon" aria-hidden="true">🍳</div>
+
+    <div class="av-hero__text">
+      <h1>Preparar Refeição dos Alunos</h1>
+
+      <p style="
+        margin: 0 0 .75rem;
+        font-size: .95rem;
+        line-height: 1.5;
+        color: rgba(255,255,255,.82);
+        max-width: 680px;
+      ">
+        Selecione a quantidade de alunos e visualize apenas as receitas que podem ser preparadas com os ingredientes disponíveis no estoque da escola.
+      </p>
+
+      <div class="av-hero__meta">
+        <span class="escola-tag">🏫 {{ escola.nome }}</span>
+        <span class="sep">·</span>
+        <span>{{ hoje|date:"d/m/Y" }}</span>
       </div>
     </div>
-    <div class="av-hero__deco" aria-hidden="true">
-      <div class="av-hero__deco-line" style="width:80px; animation-delay:.1s"></div>
-      <div class="av-hero__deco-line" style="width:48px; animation-delay:.25s"></div>
-      <div class="av-hero__deco-line" style="width:64px; animation-delay:.4s"></div>
+  </div>
+    
+  </div>
+
+
+  <!-- TEXTO INFORMATIVO -->
+  <div class="av-alert info" role="alert" >
+    <span class="av-alert__icon">ℹ️</span>
+    <div class="av-alert__body">
+      <strong>Como funciona esta página?</strong><br>
+      Esta página permite planejar e registrar a preparação da merenda escolar com base nos ingredientes disponíveis no estoque da sua escola.
+      Ao informar a quantidade de alunos, o sistema calcula automaticamente o consumo de cada ingrediente e exibe somente as receitas que podem ser preparadas com o estoque atual.
+      Dessa forma, você visualiza apenas as opções viáveis para atender à quantidade de alunos informada, garantindo melhor controle dos insumos e evitando a seleção de receitas sem ingredientes suficientes.
     </div>
   </div>
 
-  {# ── DJANGO MESSAGES ── #}
-  {% if messages %}
-    {% for msg in messages %}
-      <div class="av-alert {{ msg.tags|default:'info' }}" role="alert">
-        <span class="av-alert__icon">
-          {% if msg.tags == 'success' %}✔{% elif msg.tags == 'error' %}✖{% elif msg.tags == 'warning' %}⚠{% else %}ℹ{% endif %}
-        </span>
-        <span class="av-alert__body">{{ msg }}</span>
-        <button class="av-alert__close" onclick="this.closest('.av-alert').remove()" aria-label="Fechar">✕</button>
-      </div>
-    {% endfor %}
-  {% endif %}
+
+
+  
 
   <form method="post" id="form-avulso">
     {% csrf_token %}
@@ -909,7 +885,7 @@
               {% if form.quantidade_alunos.errors %}
                 <div class="av-field__error">⚠ {{ form.quantidade_alunos.errors.0 }}</div>
               {% endif %}
-              <div class="av-field__hint">💡 Usado para verificar a disponibilidade do estoque</div>
+              <div class="av-field__hint">💡 Receitas são filtradas conforme o estoque disponível para este número</div>
             </div>
 
             <div class="av-field">
@@ -932,7 +908,7 @@
             {# Campo receita oculto #}
             <div style="display:none">{{ form.receita }}</div>
 
-          </div>{# /av-panel__body #}
+          </div>
 
           {# Submit sticky #}
           <div class="av-submit-area">
@@ -947,7 +923,7 @@
             </button>
           </div>
 
-        </div>{# /av-panel #}
+        </div>
       </div>
 
       {# ══ COLUNA DIREITA — Seleção de Receita ══ #}
@@ -957,12 +933,11 @@
             <div class="av-panel__head-icon">📖</div>
             <div class="av-panel__head-text">
               <span class="av-panel__title">Escolha a Receita</span>
-              <span class="av-panel__subtitle">Clique para selecionar e ver o estoque</span>
+              <span class="av-panel__subtitle">Disponibilidade calculada pelo número de alunos</span>
             </div>
           </div>
           <div class="av-panel__body">
 
-            {# Busca #}
             <div class="av-search-wrap">
               <span class="av-search-ico">🔍</span>
               <input
@@ -973,7 +948,6 @@
               />
             </div>
 
-            {# Contadores #}
             <div class="av-counters">
               <span class="av-pill av-pill--green">
                 ✔ <span id="contagem-disp">–</span> disponível(is)
@@ -983,14 +957,13 @@
               </span>
             </div>
 
-            {# Grade de receitas #}
+            
             <div id="painel-receitas">
               {% for r in receitas_info %}
               <div
-                class="rc {% if not r.disponivel %}indisponivel{% endif %}"
+                class="rc"
                 data-id="{{ r.receita_id }}"
                 data-nome="{{ r.receita_nome|lower }}"
-                data-disponivel="{{ r.disponivel|yesno:'true,false' }}"
                 onclick="selecionarReceita(this)"
                 role="button"
                 tabindex="0"
@@ -998,10 +971,11 @@
                 title="{{ r.receita_nome }}"
               >
                 <div class="rc-nome">{{ r.receita_nome }}</div>
-                <div class="rc-rend">{{ r.rendimento_padrao }} porção(ões)</div>
-                <span class="rc-badge {% if r.disponivel %}ok{% else %}fail{% endif %}">
-                  {% if r.disponivel %}✔ Disponível{% else %}✘ Insuficiente{% endif %}
-                </span>
+                <div class="rc-rend">Rende {{ r.rendimento_padrao }} porção(ões)</div>
+                <div class="rc-max">
+                  📦 Estoque p/ <span class="max-val">{{ r.max_porcoes_estoque }}</span> porção(ões)
+                </div>
+                <span class="rc-badge ok">✔ Disponível</span>
                 <div class="rc-check" aria-hidden="true">✓</div>
               </div>
               {% empty %}
@@ -1012,7 +986,7 @@
               {% endfor %}
             </div>
 
-            {# ── Detalhe de ingredientes ── #}
+            {# Detalhe de ingredientes #}
             <div id="detalhe-ingredientes">
               <hr class="av-divider">
 
@@ -1039,26 +1013,71 @@
                 </table>
               </div>
 
-            </div>{# /detalhe-ingredientes #}
+            </div>
 
-          </div>{# /av-panel__body #}
-        </div>{# /av-panel #}
+          </div>
+        </div>
       </div>
 
-    </div>{# /av-grid #}
+    </div>
   </form>
 </div>
-{% endblock %}
 
-{% block extra_js %}
+
+
+
+
+
+
 <script>
   const RECEITAS = {{ receitas_json|safe }};
-
-  // ── State ─────────────────────────────────────────────────
   let selectedId = null;
 
-  // ── Select recipe ─────────────────────────────────────────
+  // ── Estado de visibilidade: dois motivos independentes para ocultar ──
+  // Um card só aparece se: NÃO está indisponível E NÃO está filtrado pela busca
+  const estadoCards = {}; // { id: { indisponivel: bool, filtrado: bool } }
+
+  function initEstado() {
+    document.querySelectorAll('.rc').forEach(card => {
+      estadoCards[card.dataset.id] = { indisponivel: false, filtrado: false };
+    });
+  }
+
+  function aplicarVisibilidade(card) {
+    const id = card.dataset.id;
+    const estado = estadoCards[id];
+    if (!estado) return;
+    const oculto = estado.indisponivel || estado.filtrado;
+    card.style.display = oculto ? 'none' : '';
+  }
+
+  // ── Calcula o máximo de porções que o estoque permite ──
+  function calcMaxPorcoes(receita) {
+    if (!receita.ingredientes || receita.ingredientes.length === 0) return 0;
+    const maximos = receita.ingredientes.map(ing => {
+      if (ing.quantidade_base <= 0) return 0;
+      return Math.floor(ing.disponivel_estoque / ing.quantidade_base);
+    });
+    return Math.min(...maximos);
+  }
+
+  // ── Verifica se o estoque é suficiente para N alunos ──
+  function receitaDisponivel(receita, alunos) {
+    // Sem número informado = não filtra (mostra tudo)
+    if (!alunos || alunos < 1) return true;
+    // Receita sem ingredientes = não pode executar
+    if (!receita.ingredientes || receita.ingredientes.length === 0) return false;
+    return receita.ingredientes.every(ing => {
+      if (ing.quantidade_base <= 0) return false;
+      return ing.disponivel_estoque >= ing.quantidade_base * alunos;
+    });
+  }
+
+  // ── Selecionar receita ──
   function selecionarReceita(el) {
+    const id = el.dataset.id;
+    if (estadoCards[id]?.indisponivel) return;
+
     document.querySelectorAll('.rc').forEach(c => {
       c.classList.remove('selecionada');
       c.setAttribute('aria-pressed', 'false');
@@ -1066,8 +1085,7 @@
     el.classList.add('selecionada');
     el.setAttribute('aria-pressed', 'true');
 
-    selectedId = parseInt(el.dataset.id);
-
+    selectedId = parseInt(id);
     const sel = document.querySelector('#id_receita');
     if (sel) sel.value = selectedId;
 
@@ -1075,14 +1093,14 @@
     atualizarBotao();
   }
 
-  // Keyboard support
+  // Suporte a teclado
   document.addEventListener('keydown', e => {
     if (e.key === 'Enter' && document.activeElement?.classList?.contains('rc')) {
       selecionarReceita(document.activeElement);
     }
   });
 
-  // ── Render ingredient detail ──────────────────────────────
+  // ── Renderiza tabela de ingredientes ──
   function renderDetalhe(id) {
     const alunos  = parseInt(document.getElementById('id_quantidade_alunos').value) || 1;
     const receita = RECEITAS.find(r => r.receita_id === id);
@@ -1090,9 +1108,9 @@
 
     document.getElementById('detalhe-nome').textContent = receita.receita_nome;
 
-    const tbody   = document.getElementById('ing-tbody');
+    const tbody = document.getElementById('ing-tbody');
     tbody.innerHTML = '';
-    let tudo_ok   = true;
+    let tudo_ok = true;
 
     receita.ingredientes.forEach(ing => {
       const qtdNec = ing.quantidade_base * alunos;
@@ -1108,21 +1126,19 @@
           <td class="ing-name">${ing.produto_nome}</td>
           <td class="ing-qty">${qtdNec.toFixed(2)} <small>${ing.unidade}</small></td>
           <td class="ing-qty">${ing.disponivel_estoque.toFixed(2)} <small>${ing.unidade}</small>${faltaHtml}</td>
-          <td>${ok
-            ? '<span class="ing-ok">✔</span>'
-            : '<span class="ing-fail">✘</span>'
-          }</td>
+          <td>${ok ? '<span class="ing-ok">✔</span>' : '<span class="ing-fail">✘</span>'}</td>
         </tr>
       `);
     });
 
     const alertEl  = document.getElementById('stock-alert');
     const alertMsg = document.getElementById('stock-alert-msg');
+    const maxPorcoes = calcMaxPorcoes(receita);
 
     alertEl.style.display = 'flex';
     if (!tudo_ok) {
       alertEl.className = 'av-stock-alert warn';
-      alertMsg.textContent = `Estoque insuficiente para ${alunos} aluno(s) com esta receita.`;
+      alertMsg.textContent = `Estoque insuficiente para ${alunos} aluno(s). Máximo possível: ${maxPorcoes} porção(ões).`;
     } else {
       alertEl.className = 'av-stock-alert ok';
       alertMsg.textContent = `Estoque suficiente para ${alunos} aluno(s). Pronto para executar.`;
@@ -1131,7 +1147,7 @@
     document.getElementById('detalhe-ingredientes').style.display = 'block';
   }
 
-  // ── Update submit button ──────────────────────────────────
+  // ── Atualiza botão de submit ──
   function atualizarBotao() {
     const btn    = document.getElementById('btn-submit');
     const txtEl  = document.getElementById('btn-texto');
@@ -1147,46 +1163,64 @@
     const receita = RECEITAS.find(r => r.receita_id === selectedId);
     if (!receita) { btn.disabled = true; return; }
 
-    const ok = receita.ingredientes.every(ing =>
-      ing.disponivel_estoque >= ing.quantidade_base * alunos
-    );
-
+    const ok = receitaDisponivel(receita, alunos);
     btn.disabled = !ok;
     btn.className = ok ? 'av-btn-exec av-btn-exec--active' : 'av-btn-exec';
     txtEl.textContent = ok
       ? `Executar "${receita.receita_nome}" para ${alunos} aluno(s)`
-      : 'Estoque insuficiente — não é possível executar';
+      : `Estoque insuficiente — máx. ${calcMaxPorcoes(receita)} porção(ões)`;
   }
 
-  // ── Search ────────────────────────────────────────────────
-  document.getElementById('busca-receita').addEventListener('input', function () {
-    const q = this.value.toLowerCase().trim();
-    document.querySelectorAll('.rc').forEach(card => {
-      card.style.display = (!q || card.dataset.nome.includes(q)) ? '' : 'none';
+  // ── Reordena cards: disponíveis primeiro, depois alfabético ──
+  function reordenarCards() {
+    const painel = document.getElementById('painel-receitas');
+    const cards  = [...painel.querySelectorAll('.rc')];
+    cards.sort((a, b) => {
+      const aInd = estadoCards[a.dataset.id]?.indisponivel ? 1 : 0;
+      const bInd = estadoCards[b.dataset.id]?.indisponivel ? 1 : 0;
+      if (aInd !== bInd) return aInd - bInd;
+      return a.dataset.nome.localeCompare(b.dataset.nome);
     });
-    atualizarContadores();
-  });
+    cards.forEach(c => painel.appendChild(c));
+  }
 
-  // ── Re-render on student count change ────────────────────
-  document.getElementById('id_quantidade_alunos').addEventListener('input', function () {
-    if (selectedId) renderDetalhe(selectedId);
-    atualizarBotao();
-
-    const alunos = parseInt(this.value) || 0;
-    if (alunos < 1) return;
-
+  // ── Recalcula disponibilidade de todos os cards com base em `alunos` ──
+  function recalcularDisponibilidade(alunos) {
     document.querySelectorAll('.rc').forEach(card => {
-      const id  = parseInt(card.dataset.id);
-      const rec = RECEITAS.find(r => r.receita_id === id);
+      const id  = card.dataset.id;
+      const rec = RECEITAS.find(r => r.receita_id === parseInt(id));
       if (!rec) return;
 
-      const ok = rec.ingredientes.every(ing =>
-        ing.disponivel_estoque >= ing.quantidade_base * alunos
-      );
+      const ok = receitaDisponivel(rec, alunos);
+      const maxPorcoes = calcMaxPorcoes(rec);
+      const indisponivel = alunos > 0 && !ok;
 
-      card.classList.toggle('indisponivel', !ok);
-      card.style.pointerEvents = ok ? '' : 'none';
+      // Atualiza estado independente da busca
+      if (estadoCards[id]) estadoCards[id].indisponivel = indisponivel;
+      card.classList.toggle('indisponivel', indisponivel);
 
+      // Aplica visibilidade considerando AMBOS os estados
+      aplicarVisibilidade(card);
+
+      // Se a receita selecionada ficou indisponível, desseleciona
+      if (card.classList.contains('selecionada') && indisponivel) {
+        card.classList.remove('selecionada');
+        card.setAttribute('aria-pressed', 'false');
+        selectedId = null;
+        const sel = document.querySelector('#id_receita');
+        if (sel) sel.value = '';
+        document.getElementById('detalhe-ingredientes').style.display = 'none';
+      }
+
+      // Texto do máximo de porções
+      const maxEl = card.querySelector('.rc-max');
+      if (maxEl) {
+        const valEl = maxEl.querySelector('.max-val');
+        if (valEl) valEl.textContent = maxPorcoes;
+        maxEl.classList.toggle('insuficiente', alunos > 0 && maxPorcoes < alunos);
+      }
+
+      // Badge
       const badge = card.querySelector('.rc-badge');
       if (badge) {
         badge.className = 'rc-badge ' + (ok ? 'ok' : 'fail');
@@ -1194,11 +1228,47 @@
       }
     });
 
+    reordenarCards();
+    if (selectedId) renderDetalhe(selectedId);
+    atualizarBotao();
+    atualizarContadores();
+  }
+
+  // ── Busca por nome — NÃO sobrescreve estado de indisponibilidade ──
+  document.getElementById('busca-receita').addEventListener('input', function () {
+    const q = this.value.toLowerCase().trim();
+    document.querySelectorAll('.rc').forEach(card => {
+      const id = card.dataset.id;
+      const nomeBate = !q || card.dataset.nome.includes(q);
+      if (estadoCards[id]) estadoCards[id].filtrado = !nomeBate;
+      // Só exibe se passar nos DOIS filtros
+      aplicarVisibilidade(card);
+    });
     atualizarContadores();
   });
 
+  // ── Input de alunos: recalcula tudo ──
+  document.getElementById('id_quantidade_alunos').addEventListener('input', function () {
+    recalcularDisponibilidade(parseInt(this.value) || 0);
+  });
+
+  // ── Contadores: conta apenas visíveis e disponíveis ──
   function atualizarContadores() {
     let total = 0, disp = 0;
+    document.querySelectorAll('.rc').forEach(card => {
+      const id = card.dataset.id;
+      const estado = estadoCards[id];
+      if (!estado || estado.filtrado) return; // oculto pela busca = não conta
+      if (estado.indisponivel) {
+        // indisponível mas não filtrado = conta no total, não no disponível
+        // Como está oculto agora por display:none, não conta em nada
+        return;
+      }
+      total++;
+      disp++;
+    });
+    // Reconta de forma mais simples: visível = não filtrado e não indisponível
+    total = 0; disp = 0;
     document.querySelectorAll('.rc').forEach(card => {
       if (card.style.display === 'none') return;
       total++;
@@ -1208,19 +1278,32 @@
     document.getElementById('contagem-total').textContent = total;
   }
 
-  // ── Init ──────────────────────────────────────────────────
+  // ── Init ──
   document.addEventListener('DOMContentLoaded', () => {
-    atualizarContadores();
+    initEstado();
+    const alunosInicial = parseInt(document.getElementById('id_quantidade_alunos').value) || 0;
+    recalcularDisponibilidade(alunosInicial);
 
-    // Restaurar seleção após erro de form
+    // Restaurar seleção após erro de validação do form
     const val = document.querySelector('#id_receita')?.value;
     if (val) {
       const card = document.querySelector(`.rc[data-id="${val}"]`);
-      if (card && !card.classList.contains('indisponivel')) {
+      if (card && !estadoCards[card.dataset.id]?.indisponivel) {
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         selecionarReceita(card);
       }
     }
   });
 </script>
+
+
+
+
+
+
+
+
+
+
 {% endblock %}
+
