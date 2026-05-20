@@ -32,6 +32,7 @@ urlpatterns = [
 
     # 📊 Listagem de movimentações
     path("estoque/movimentacoes/", views.MovimentacaoEstoqueListView.as_view(), name="movimentacao_estoque_list"),
+    path("estoque/movimentacoes/<int:pk>/", views.MovimentacaoEstoqueDetailView.as_view(), name="movimentacao_estoque_detail"),
 
     # Descartes Escola
     path("estoque/<int:pk>/descartar/", views.DescartarEstoqueView.as_view(), name="descartar_estoque" ),   
@@ -76,14 +77,17 @@ urlpatterns = [
         name="execucao_lista_Avulsa",
     ),
 
-   
+    path(
+        "execucao/<int:pk>/ficha-diaria/",
+        views.ExecucaoReceitaCozinhaFichaDiariaView.as_view(),
+        name="execucao_ficha_diaria",
+    ),
+
+    # Ficha via execuçaõ
     path(
         "cardapio/execucao/merendaManual/<int:execucao_id>/<str:turno>/ficha/",
         views.FichaDiariaCreateView.as_view(),
         name="ficha_diaria",
     ),
-
-
-
 
 ]

@@ -1,74 +1,374 @@
 {% extends "modulo_merendeiras/base_merendeira.html" %}
 
 {% block content %}
-<div class="container py-4">
+<style>
+  :root {
+    --verde: #16a34a;
+    --verde-claro: #dcfce7;
+    --vermelho: #dc2626;
+    --vermelho-claro: #fee2e2;
+    --azul: #1d4ed8;
+    --azul-claro: #dbeafe;
+    --cinza-bg: #f8fafc;
+    --cinza-borda: #e2e8f0;
+    --cinza-texto: #64748b;
+    --texto: #0f172a;
+    --card-shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+  }
 
-    <!-- 🧾 Cabeçalho -->
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
-            <div>
-                <h4 class="fw-bold text-primary mb-1">
-                    📦 Movimentações de Estoque
-                </h4>
-                <small class="text-muted">
-                    Histórico completo de entradas e saídas
-                </small>
+  /* ── Layout geral ── */
+  .mv-wrapper { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+
+  /* ── Cabeçalho ── */
+  .mv-header {
+    background: #fff;
+    border: 1px solid var(--cinza-borda);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .mv-header-icon {
+    background: var(--azul-claro);
+    border-radius: 10px;
+    width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .mv-header h1 { font-size: 1.2rem; font-weight: 700; color: var(--texto); margin: 0; }
+  .mv-header p  { font-size: .8rem; color: var(--cinza-texto); margin: .15rem 0 0; }
+
+  /* ── Legenda rápida ── */
+  .mv-legend {
+    background: #fff;
+    border: 1px solid var(--cinza-borda);
+    border-radius: 12px;
+    padding: .75rem 1.25rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1.5rem;
+    align-items: center;
+  }
+  .mv-legend-label { font-size: .72rem; font-weight: 600; color: var(--cinza-texto); text-transform: uppercase; letter-spacing: .05em; margin-right: .25rem; }
+  .legend-pill {
+    display: inline-flex; align-items: center; gap: .35rem;
+    font-size: .78rem; font-weight: 600; border-radius: 999px;
+    padding: .25rem .75rem;
+  }
+  .legend-pill.entrada { background: var(--verde-claro); color: var(--verde); }
+  .legend-pill.saida   { background: var(--vermelho-claro); color: var(--vermelho); }
+
+  /* ── Tabela ── */
+  .mv-card {
+    background: #fff;
+    border: 1px solid var(--cinza-borda);
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+  }
+  .mv-table { width: 100%; border-collapse: collapse; }
+  .mv-table thead tr {
+    background: var(--cinza-bg);
+    border-bottom: 1px solid var(--cinza-borda);
+  }
+  .mv-table th {
+    padding: .65rem 1rem;
+    font-size: .7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--cinza-texto);
+    white-space: nowrap;
+  }
+  .mv-table td {
+    padding: .75rem 1rem;
+    font-size: .85rem;
+    color: var(--texto);
+    border-bottom: 1px solid var(--cinza-borda);
+    vertical-align: middle;
+  }
+  .mv-table tbody tr:last-child td { border-bottom: none; }
+  .mv-table tbody tr:hover { background: #f8fafc; }
+
+  /* ── Cells especiais ── */
+  .cell-id { color: var(--cinza-texto); font-size: .78rem; font-weight: 600; }
+
+  .cell-data { white-space: nowrap; }
+  .data-dia   { font-weight: 600; }
+  .data-hora  { font-size: .74rem; color: var(--cinza-texto); }
+
+  .cell-produto { display: flex; align-items: center; gap: .5rem; }
+  .produto-icone {
+    background: var(--cinza-bg);
+    border: 1px solid var(--cinza-borda);
+    border-radius: 7px;
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .produto-nome { font-weight: 600; }
+
+  /* Badges de tipo */
+  .tipo-badge {
+    display: inline-flex; align-items: center; gap: .35rem;
+    font-size: .75rem; font-weight: 700;
+    border-radius: 999px; padding: .3rem .8rem;
+    white-space: nowrap;
+  }
+  .tipo-badge.entrada { background: var(--verde-claro); color: var(--verde); }
+  .tipo-badge.saida   { background: var(--vermelho-claro); color: var(--vermelho); }
+
+  /* Quantidade */
+  .qty-badge {
+    display: inline-flex; align-items: center; gap: .3rem;
+    font-weight: 700; font-size: .85rem;
+  }
+  .qty-badge.entrada { color: var(--verde); }
+  .qty-badge.saida   { color: var(--vermelho); }
+
+  /* Usuário */
+  .cell-usuario { display: flex; align-items: center; gap: .5rem; }
+  .usuario-avatar {
+    background: var(--azul-claro);
+    color: var(--azul);
+    border-radius: 50%;
+    width: 28px; height: 28px;
+    font-size: .7rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .usuario-nome { font-size: .83rem; }
+
+  /* Botão Ver */
+  .btn-ver {
+    display: inline-flex; align-items: center; gap: .35rem;
+    font-size: .78rem; font-weight: 600;
+    color: var(--azul);
+    background: var(--azul-claro);
+    border: none; border-radius: 8px;
+    padding: .35rem .8rem;
+    text-decoration: none;
+    transition: background .15s;
+    white-space: nowrap;
+  }
+  .btn-ver:hover { background: #bfdbfe; color: var(--azul); }
+
+  /* Vazio */
+  .mv-empty {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--cinza-texto);
+  }
+  .mv-empty svg { opacity: .35; margin-bottom: .75rem; }
+  .mv-empty p { margin: 0; font-size: .9rem; }
+
+  /* Responsivo */
+  @media (max-width: 640px) {
+    .col-id, .col-usuario { display: none; }
+    .mv-table th, .mv-table td { padding: .6rem .65rem; }
+  }
+
+  .avatar-entrada {
+  background: var(--verde-claro);
+  color: var(--verde);
+}
+.avatar-saida {
+  background: var(--vermelho-claro);
+  color: var(--vermelho);
+}
+.usuario-papel {
+  font-size: .68rem;
+  color: var(--cinza-texto);
+  margin-top: .05rem;
+}
+</style>
+
+<div class="mv-wrapper">
+
+  <!-- ── Cabeçalho ── -->
+  <div class="mv-header">
+    <div class="mv-header-icon">
+      <!-- Ícone caixa/estoque -->
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21 8H3M21 8L19 20H5L3 8M21 8L19 4H5L3 8M9 12H15" stroke="#1d4ed8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Movimentações de Estoque</h1>
+      <p>Veja todas as entradas e saídas de produtos registradas</p>
+    </div>
+  </div>
+
+  <!-- ── Legenda ── -->
+  <div class="mv-legend">
+    <span class="mv-legend-label">O que significa:</span>
+
+    <span class="legend-pill entrada">
+      <!-- seta para cima -->
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 13V3M3 8l5-5 5 5" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Entrada — produto chegou ao estoque
+    </span>
+
+    <span class="legend-pill saida">
+      <!-- seta para baixo -->
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8l5 5 5-5" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Saída — produto foi retirado do estoque
+    </span>
+  </div>
+
+  <!-- ── Tabela ── -->
+  <div class="mv-card">
+    <div style="overflow-x:auto;">
+      <table class="mv-table">
+        <thead>
+          <tr>
+            <th class="col-id">#</th>
+            <th>
+              <!-- calendário -->
+              <span style="display:inline-flex;align-items:center;gap:.3rem;">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="#64748b" stroke-width="1.5"/><path d="M5 1v3M11 1v3M2 7h12" stroke="#64748b" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Data
+              </span>
+            </th>
+            <th>
+              <span style="display:inline-flex;align-items:center;gap:.3rem;">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#64748b" stroke-width="1.5"/><path d="M5 8h6M5 5h6M5 11h4" stroke="#64748b" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Produto
+              </span>
+            </th>
+            <th>Tipo</th>
+            <th>
+              <span style="display:inline-flex;align-items:center;gap:.3rem;">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#64748b" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="#64748b" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Qtd.
+              </span>
+            </th>
+            <!-- Cabeçalho -->
+            <th class="col-usuario">
+            <span style="display:inline-flex;align-items:center;gap:.3rem;">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="5" r="3" stroke="#64748b" stroke-width="1.5"/>
+                <path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="#64748b" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                Responsável
+            </span>
+            </th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for m in movimentacoes %}
+          <tr>
+
+            <!-- ID -->
+            <td class="col-id">
+              <span class="cell-id">{{ m.id }}</span>
+            </td>
+
+            <!-- Data — era m.criado_em, correto é m.data_movimentacao -->
+            <td class="cell-data">
+            <div class="data-dia">{{ m.data_movimentacao|date:"d/m/Y" }}</div>
+            <div class="data-hora">{{ m.data_movimentacao|date:"H:i" }}</div>
+            </td>
+
+            <!-- Produto -->
+            <td>
+              <div class="cell-produto">
+                <div class="produto-icone">
+                  <!-- ícone genérico de produto -->
+                  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="#64748b" stroke-width="1.4"/><path d="M5 4V3a3 3 0 0 1 6 0v1" stroke="#64748b" stroke-width="1.4" stroke-linecap="round"/></svg>
+                </div>
+                <span class="produto-nome">{{ m.produto.nome }}</span>
+              </div>
+            </td>
+
+            <!-- Tipo -->
+            <td>
+              {% if is_entrada %}
+                <span class="tipo-badge entrada">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 13V3M3 8l5-5 5 5" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  {{ m.get_tipo_display }}
+                </span>
+              {% else %}
+                <span class="tipo-badge saida">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8l5 5 5-5" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  {{ m.get_tipo_display }}
+                </span>
+              {% endif %}
+            </td>
+
+            <!-- Quantidade -->
+            <td>
+              {% if is_entrada %}
+                <span class="qty-badge entrada">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 13V3M3 8l5-5 5 5" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  +{{ m.quantidade }}
+                </span>
+              {% else %}
+                <span class="qty-badge saida">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8l5 5 5-5" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  −{{ m.quantidade }}
+                </span>
+              {% endif %}
+            </td>
+
+            <!-- Responsável -->
+            <!-- Célula Responsável -->
+            <td class="col-usuario">
+            <div class="cell-usuario">
+                {% with nome=m.usuario.get_full_name|default:m.usuario.username %}
+                <div class="usuario-avatar {% if m.tipo == 'ENTRADA_ESCOLA' %}avatar-entrada{% else %}avatar-saida{% endif %}">
+                {{ nome|slice:":2"|upper }}
+                </div>
+                <div>
+                <span class="usuario-nome">{{ nome }}</span>
+                <div class="usuario-papel">
+                    {% if m.tipo == 'ENTRADA_ESCOLA' %}
+                    Enviou ao estoque
+                    {% else %}
+                    Retirou do estoque
+                    {% endif %}
+                </div>
+                </div>
+                {% endwith %}
             </div>
-        </div>
+            </td>
+
+            <!-- Ação -->
+            <td style="text-align:right;">
+              <a href="{% url 'modulo_merendeiras:movimentacao_estoque_detail' m.id %}" class="btn-ver">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="#1d4ed8" stroke-width="1.6"/><path d="M1.5 8C3 4.5 5.5 2.5 8 2.5S13 4.5 14.5 8C13 11.5 10.5 13.5 8 13.5S3 11.5 1.5 8Z" stroke="#1d4ed8" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                Detalhes
+              </a>
+            </td>
+
+          </tr>
+
+          {% empty %}
+          <tr>
+            <td colspan="7">
+              <div class="mv-empty">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="8" y="14" width="32" height="26" rx="4" stroke="#94a3b8" stroke-width="2.5"/>
+                  <path d="M16 14v-3a8 8 0 0 1 16 0v3" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+                  <path d="M18 26h12M18 32h8" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+                <p>Nenhuma movimentação registrada ainda.</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-
-    <!-- 📊 Tabela -->
-    <div class="card shadow-sm border-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-
-                <thead class="table-light">
-                    <tr>
-                        <th>#</th>
-                        <th>Data</th>
-                        <th>Produto</th>
-                        <th>Tipo</th>
-                        <th>Quantidade</th>
-                        <th>Usuário</th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for m in movimentacoes %}
-                    <tr>
-                        <td>{{ m.id }}</td>
-                        <td>{{ m.criado_em|date:"d/m/Y H:i" }}</td>
-                        <td>{{ m.produto.nome }}</td>
-                        <td>
-                            <span class="badge 
-                                {% if m.tipo == 'ENTRADA_ESCOLA' %}bg-success
-                                {% else %}bg-danger{% endif %}">
-                                {{ m.get_tipo_display }}
-                            </span>
-                        </td>
-                        <td>{{ m.quantidade }}</td>
-                        <td>{{ m.usuario.get_full_name|default:m.usuario.username }}</td>
-
-                        <td class="text-end">
-                            <a href="{% url 'modulo_merendeiras:movimentacao_estoque_detail' m.id %}"
-                               class="btn btn-sm btn-outline-primary">
-                                🔍 Ver
-                            </a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center text-muted py-4">
-                            Nenhuma movimentação registrada.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-
-            </table>
-        </div>
-    </div>
+  </div>
 
 </div>
 {% endblock %}

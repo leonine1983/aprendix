@@ -1,37 +1,104 @@
 from django.views.generic import ListView, DetailView
 from django.contrib import messages
 from django.db.models import F
-from django.contrib.auth.mixins import LoginRequiredMixin
 
-from core.permissions import GroupRequiredMixin
-from core.groups.merenda import MERENDEIRA_GROUPS
+from core.views.baseMerendeira import BaseMerendeiraView
 
 from merendaEscolar.models import MovimentacaoEstoque
 
 
-class MovimentacaoEstoqueListView(
-    LoginRequiredMixin,
-    GroupRequiredMixin,
-    ListView
-):
+class MovimentacaoEstoqueListView(BaseMerendeiraView, ListView):
     model = MovimentacaoEstoque
     template_name = "modulo_merendeiras/movimentaEstoque/movimentacao_list.html"
     context_object_name = "movimentacoes"
-    paginate_by = 20
+    paginate_by = 200
 
-    group_required = MERENDEIRA_GROUPS  # ajustar após sua resposta
-
+    # views.py
     def get_queryset(self):
-        """
-        🔥 Uso de select_related + annotate para performance institucional
-        Evita N+1 queries ao trazer produto e usuário.
-        """
+        escola = self.escola_usuario
+        if not escola:
+            return MovimentacaoEstoque.objects.none()
+
         return (
             MovimentacaoEstoque.objects
             .select_related("produto", "usuario", "escola")
-            .order_by("-id")
+            .filter(
+                escola=escola,
+                tipo__in=["ENTRADA_ESCOLA", "SAIDA_ESCOLA"],
+            )
+            .order_by("-data_movimentacao")  # ← era criado_em, não existe no model
         )
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Adiciona informações calculadas para cada movimentação
+        for movimentacao in context["movimentacoes"]:
+            # Entrada = positivo / Saída = negativo
+            movimentacao.is_entrada = (
+                movimentacao.tipo == "ENTRADA_ESCOLA"
+            )
+
+            movimentacao.sinal = "+" if movimentacao.is_entrada else "−"
+
+            movimentacao.classe_tipo = (
+                "entrada" if movimentacao.is_entrada else "saida"
+            )
+
+            # ==========================================================
+            # RESPONSÁVEL REAL DA MOVIMENTAÇÃO
+            # ==========================================================
+            #
+            # ENTRADA_ESCOLA:
+            #   Quem registra é a merendeira (usuario),
+            #   mas quem efetivamente enviou foi o nutricionista
+            #   (Transferencia.enviado_por).
+            #
+            # SAIDA_ESCOLA:
+            #   Quem realizou a saída é a própria merendeira
+            #   (usuario).
+            # ==========================================================
+
+            usuario_responsavel = movimentacao.usuario
+
+            # Se for entrada, tenta localizar a transferência associada
+            if movimentacao.tipo == "ENTRADA_ESCOLA":
+                observacao = movimentacao.observacao or ""
+
+                # Ex.: "Recebimento da Transferência TRF-2026-00001"
+                if "Transferência" in observacao:
+                    import re
+
+                    match = re.search(
+                        r"(TRF-\d{4}-\d+)",
+                        observacao
+                    )
+
+                    if match:
+                        numero_transferencia = match.group(1)
+
+                        from merendaEscolar.models import Transferencia
+
+                        transferencia = (
+                            Transferencia.objects
+                            .select_related("enviado_por")
+                            .filter(numero=numero_transferencia)
+                            .first()
+                        )
+
+                        # Mostra quem enviou (nutricionista)
+                        if transferencia and transferencia.enviado_por:
+                            usuario_responsavel = (
+                                transferencia.enviado_por
+                            )
+
+            movimentacao.usuario_responsavel = usuario_responsavel
+
+        return context
+
     def get(self, request, *args, **kwargs):
-        messages.info(request, "Listagem de movimentações de estoque carregada.")
+        messages.info(
+            request,
+            "Listagem de movimentações de estoque carregada."
+        )
         return super().get(request, *args, **kwargs)

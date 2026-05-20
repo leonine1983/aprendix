@@ -387,6 +387,9 @@ class MovimentacaoEstoque(models.Model):
         if self.tipo in ["ENTRADA_ESCOLA", "SAIDA_ESCOLA"] and self.escola:
             from merendaEscolar.services import verificar_estoque_baixo
             verificar_estoque_baixo(self.escola)
+    
+    def __str__(self):
+        return f"{self.produto} | resp.: {self.usuario} | tipo: {self.tipo} | escola: {self.escola}"
 
 
 # ==============================

@@ -32,4 +32,7 @@ from .movimentacaoEstoque.movimentacaoEstoqueListView import *
 # cOZINHA
 from .cozinha.painelExecucaoView import PainelExecucaoView
 from .cozinha.execucaoListView import *
-from .cozinha.views_execucao_avulsa import *
+
+from .cozinha.executaAvulsa.execucaoAvulsa import *
+from .cozinha.executaAvulsa.listExecutaAvulsa import *
+from .cozinha.executaAvulsa.ficha_diaria_execucao_view import *

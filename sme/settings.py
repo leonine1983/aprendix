@@ -173,17 +173,30 @@ CKEDITOR_IMAGE_BACKEND = 'pillow'
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 
 # Para responsividade e code snippet
+# Para responsividade e suporte a code snippet
 CKEDITOR_CONFIGS = {
-    'default': {
-        'toolbar': None,
-        'width' :'100%',
-        'extraPlugins': ".".join(
-            [
-                "codesnippet"
-            ]
-        )
-    }
+    "default": {
+        "toolbar": "full",
+        "width": "100%",
+        "height": 300,
+        "extraPlugins": "codesnippet",
+    },
+
+    "minimal": {
+        "toolbar": [
+            ["Bold", "Italic", "Underline"],
+            ["NumberedList", "BulletedList"],
+            ["Link", "Unlink"],
+            ["RemoveFormat"],
+            ["Source"],
+        ],
+        "height": 150,
+        "width": "100%",
+    },
 }
+
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
