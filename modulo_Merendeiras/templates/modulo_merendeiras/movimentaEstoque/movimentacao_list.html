@@ -2,365 +2,322 @@
 
 {% block content %}
 <style>
-  :root {
-    --verde: #16a34a;
-    --verde-claro: #dcfce7;
-    --vermelho: #dc2626;
-    --vermelho-claro: #fee2e2;
-    --azul: #1d4ed8;
-    --azul-claro: #dbeafe;
-    --cinza-bg: #f8fafc;
-    --cinza-borda: #e2e8f0;
-    --cinza-texto: #64748b;
-    --texto: #0f172a;
-    --card-shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
-  }
-
-  /* ── Layout geral ── */
-  .mv-wrapper { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
-
-  /* ── Cabeçalho ── */
-  .mv-header {
-    background: #fff;
-    border: 1px solid var(--cinza-borda);
-    border-radius: 14px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 1rem;
-    box-shadow: var(--card-shadow);
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  .mv-header-icon {
-    background: var(--azul-claro);
-    border-radius: 10px;
-    width: 48px; height: 48px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .mv-header h1 { font-size: 1.2rem; font-weight: 700; color: var(--texto); margin: 0; }
-  .mv-header p  { font-size: .8rem; color: var(--cinza-texto); margin: .15rem 0 0; }
-
-  /* ── Legenda rápida ── */
-  .mv-legend {
-    background: #fff;
-    border: 1px solid var(--cinza-borda);
-    border-radius: 12px;
-    padding: .75rem 1.25rem;
-    margin-bottom: 1.25rem;
-    box-shadow: var(--card-shadow);
-    display: flex;
-    flex-wrap: wrap;
-    gap: .5rem 1.5rem;
-    align-items: center;
-  }
-  .mv-legend-label { font-size: .72rem; font-weight: 600; color: var(--cinza-texto); text-transform: uppercase; letter-spacing: .05em; margin-right: .25rem; }
-  .legend-pill {
-    display: inline-flex; align-items: center; gap: .35rem;
-    font-size: .78rem; font-weight: 600; border-radius: 999px;
-    padding: .25rem .75rem;
-  }
-  .legend-pill.entrada { background: var(--verde-claro); color: var(--verde); }
-  .legend-pill.saida   { background: var(--vermelho-claro); color: var(--vermelho); }
-
-  /* ── Tabela ── */
-  .mv-card {
-    background: #fff;
-    border: 1px solid var(--cinza-borda);
-    border-radius: 14px;
-    box-shadow: var(--card-shadow);
-    overflow: hidden;
-  }
-  .mv-table { width: 100%; border-collapse: collapse; }
-  .mv-table thead tr {
-    background: var(--cinza-bg);
-    border-bottom: 1px solid var(--cinza-borda);
-  }
-  .mv-table th {
-    padding: .65rem 1rem;
-    font-size: .7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: var(--cinza-texto);
-    white-space: nowrap;
-  }
-  .mv-table td {
-    padding: .75rem 1rem;
-    font-size: .85rem;
-    color: var(--texto);
-    border-bottom: 1px solid var(--cinza-borda);
-    vertical-align: middle;
-  }
-  .mv-table tbody tr:last-child td { border-bottom: none; }
-  .mv-table tbody tr:hover { background: #f8fafc; }
-
-  /* ── Cells especiais ── */
-  .cell-id { color: var(--cinza-texto); font-size: .78rem; font-weight: 600; }
-
-  .cell-data { white-space: nowrap; }
-  .data-dia   { font-weight: 600; }
-  .data-hora  { font-size: .74rem; color: var(--cinza-texto); }
-
-  .cell-produto { display: flex; align-items: center; gap: .5rem; }
-  .produto-icone {
-    background: var(--cinza-bg);
-    border: 1px solid var(--cinza-borda);
-    border-radius: 7px;
-    width: 30px; height: 30px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .produto-nome { font-weight: 600; }
-
-  /* Badges de tipo */
-  .tipo-badge {
-    display: inline-flex; align-items: center; gap: .35rem;
-    font-size: .75rem; font-weight: 700;
-    border-radius: 999px; padding: .3rem .8rem;
-    white-space: nowrap;
-  }
-  .tipo-badge.entrada { background: var(--verde-claro); color: var(--verde); }
-  .tipo-badge.saida   { background: var(--vermelho-claro); color: var(--vermelho); }
-
-  /* Quantidade */
-  .qty-badge {
-    display: inline-flex; align-items: center; gap: .3rem;
-    font-weight: 700; font-size: .85rem;
-  }
-  .qty-badge.entrada { color: var(--verde); }
-  .qty-badge.saida   { color: var(--vermelho); }
-
-  /* Usuário */
-  .cell-usuario { display: flex; align-items: center; gap: .5rem; }
-  .usuario-avatar {
-    background: var(--azul-claro);
-    color: var(--azul);
-    border-radius: 50%;
-    width: 28px; height: 28px;
-    font-size: .7rem; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .usuario-nome { font-size: .83rem; }
-
-  /* Botão Ver */
-  .btn-ver {
-    display: inline-flex; align-items: center; gap: .35rem;
-    font-size: .78rem; font-weight: 600;
-    color: var(--azul);
-    background: var(--azul-claro);
-    border: none; border-radius: 8px;
-    padding: .35rem .8rem;
-    text-decoration: none;
-    transition: background .15s;
-    white-space: nowrap;
-  }
-  .btn-ver:hover { background: #bfdbfe; color: var(--azul); }
-
-  /* Vazio */
-  .mv-empty {
-    padding: 3rem 1rem;
-    text-align: center;
-    color: var(--cinza-texto);
-  }
-  .mv-empty svg { opacity: .35; margin-bottom: .75rem; }
-  .mv-empty p { margin: 0; font-size: .9rem; }
-
-  /* Responsivo */
-  @media (max-width: 640px) {
-    .col-id, .col-usuario { display: none; }
-    .mv-table th, .mv-table td { padding: .6rem .65rem; }
-  }
-
-  .avatar-entrada {
-  background: var(--verde-claro);
-  color: var(--verde);
+:root {
+  --mv-blue:       #185FA5;
+  --mv-blue-bg:    #E6F1FB;
+  --mv-green:      #3B6D11;
+  --mv-green-bg:   #EAF3DE;
+  --mv-red:        #A32D2D;
+  --mv-red-bg:     #FCEBEB;
+  --mv-borda:      var(--cinza-borda, #e2e8f0);
+  --mv-bg-sec:     var(--cinza-bg, #f8fafc);
+  --mv-texto:      #0f172a;
+  --mv-muted:      #64748b;
+  --mv-shadow:     0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.04);
 }
-.avatar-saida {
-  background: var(--vermelho-claro);
-  color: var(--vermelho);
+
+.mv-wrapper   { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+
+/* ── Cabeçalho ── */
+.mv-header {
+  background: #fff;
+  border: 1px solid var(--mv-borda);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--mv-shadow);
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  flex-wrap: wrap;
 }
-.usuario-papel {
-  font-size: .68rem;
-  color: var(--cinza-texto);
-  margin-top: .05rem;
+.mv-header-icon {
+  width: 42px; height: 42px;
+  background: var(--mv-blue-bg);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.mv-header h1  { font-size: 1.1rem; font-weight: 700; color: var(--mv-texto); margin: 0; }
+.mv-header p   { font-size: .78rem; color: var(--mv-muted); margin: .1rem 0 0; }
+
+/* ── Legenda ── */
+.mv-legend {
+  background: #fff;
+  border: 1px solid var(--mv-borda);
+  border-radius: 10px;
+  padding: .6rem 1.1rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--mv-shadow);
+  display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; align-items: center;
+  font-size: .75rem; color: var(--mv-muted);
+}
+.pill {
+  display: inline-flex; align-items: center; gap: .3rem;
+  font-size: .75rem; font-weight: 600;
+  border-radius: 999px; padding: .25rem .75rem;
+}
+.pill-green { background: var(--mv-green-bg); color: var(--mv-green); }
+.pill-red   { background: var(--mv-red-bg);   color: var(--mv-red); }
+
+/* ── Tabela ── */
+.mv-table-card {
+  background: #fff;
+  border: 1px solid var(--mv-borda);
+  border-radius: 14px;
+  box-shadow: var(--mv-shadow);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+.mv-pag-info {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: .5rem;
+  padding: .7rem 1.1rem;
+  font-size: .78rem; color: var(--mv-muted);
+  border-bottom: 1px solid var(--mv-borda);
+}
+.mv-pag-info strong { color: var(--mv-texto); }
+
+.mv-table { width: 100%; border-collapse: collapse; }
+.mv-table thead tr {
+  background: var(--mv-bg-sec);
+  border-bottom: 1px solid var(--mv-borda);
+}
+.mv-table th {
+  padding: .6rem 1rem;
+  font-size: .68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: var(--mv-muted); white-space: nowrap; text-align: left;
+}
+.mv-table td {
+  padding: .75rem 1rem;
+  font-size: .84rem; color: var(--mv-texto);
+  border-bottom: 1px solid var(--mv-borda);
+  vertical-align: middle;
+}
+.mv-table tbody tr:last-child td { border-bottom: none; }
+.mv-table tbody tr:hover { background: var(--mv-bg-sec); }
+
+.cell-id   { font-size: .75rem; color: var(--mv-muted); font-weight: 600; }
+.data-dia  { font-weight: 600; font-size: .83rem; }
+.data-hora { font-size: .72rem; color: var(--mv-muted); }
+
+.prod-wrap { display: flex; align-items: center; gap: .5rem; }
+.prod-icon {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: var(--mv-bg-sec); border: 1px solid var(--mv-borda);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+.badge {
+  display: inline-flex; align-items: center; gap: .3rem;
+  font-size: .73rem; font-weight: 700;
+  border-radius: 999px; padding: .28rem .8rem; white-space: nowrap;
+}
+.badge-green { background: var(--mv-green-bg); color: var(--mv-green); }
+.badge-red   { background: var(--mv-red-bg);   color: var(--mv-red); }
+
+.qty { font-weight: 700; font-size: .85rem; }
+.qty-green { color: var(--mv-green); }
+.qty-red   { color: var(--mv-red); }
+
+.resp-wrap { display: flex; align-items: center; gap: .5rem; }
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .68rem; font-weight: 700; flex-shrink: 0;
+}
+.avatar-green { background: var(--mv-green-bg); color: var(--mv-green); }
+.avatar-red   { background: var(--mv-red-bg);   color: var(--mv-red); }
+.resp-nome  { font-size: .82rem; }
+.resp-papel { font-size: .67rem; color: var(--mv-muted); }
+
+.btn-ver {
+  display: inline-flex; align-items: center; gap: .3rem;
+  font-size: .75rem; font-weight: 600;
+  color: var(--mv-blue); background: var(--mv-blue-bg);
+  border: none; border-radius: 8px;
+  padding: .32rem .75rem; text-decoration: none; white-space: nowrap;
+}
+.btn-ver:hover { background: #b5d4f4; color: var(--mv-blue); }
+
+/* ── Paginação ── */
+.mv-pagination { display: flex; justify-content: center; flex-wrap: wrap; gap: .3rem; margin-top: 1.25rem; }
+.page-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 38px; height: 38px; padding: 0 .75rem;
+  border: 1px solid var(--mv-borda);
+  border-radius: 9px; background: #fff;
+  color: var(--mv-blue);
+  font-size: .78rem; font-weight: 600;
+  text-decoration: none; white-space: nowrap;
+  transition: background .12s;
+}
+.page-link:hover { background: var(--mv-blue-bg); }
+.page-link.active { background: var(--mv-blue); border-color: var(--mv-blue); color: #fff; }
+.page-link.disabled { opacity: .45; pointer-events: none; }
+
+/* ── Vazio ── */
+.mv-empty { padding: 3rem 1rem; text-align: center; color: var(--mv-muted); }
+.mv-empty svg { opacity: .3; display: block; margin: 0 auto .75rem; }
+
+/* ── Responsivo ── */
+@media (max-width: 640px) {
+  .col-id, .col-usuario { display: none; }
+  .mv-table th, .mv-table td { padding: .6rem .65rem; }
 }
 </style>
 
 <div class="mv-wrapper">
 
-  <!-- ── Cabeçalho ── -->
+  <!-- Cabeçalho -->
   <div class="mv-header">
     <div class="mv-header-icon">
-      <!-- Ícone caixa/estoque -->
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M21 8H3M21 8L19 20H5L3 8M21 8L19 4H5L3 8M9 12H15" stroke="#1d4ed8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M21 8H3M21 8L19 20H5L3 8M21 8L19 4H5L3 8M9 12H15"
+              stroke="#185FA5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
     <div>
-      <h1>Movimentações de Estoque</h1>
-      <p>Veja todas as entradas e saídas de produtos registradas</p>
+      <h1>Movimentações de estoque</h1>
+      <p>Entradas e saídas de produtos registradas na escola</p>
     </div>
   </div>
 
-  <!-- ── Legenda ── -->
+  <!-- Legenda -->
   <div class="mv-legend">
-    <span class="mv-legend-label">O que significa:</span>
-
-    <span class="legend-pill entrada">
-      <!-- seta para cima -->
-      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 13V3M3 8l5-5 5 5" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Entrada — produto chegou ao estoque
+    <span>Legenda:</span>
+    <span class="pill pill-green">
+      <svg width="10" height="10" viewBox="0 0 16 16" fill="none">
+        <path d="M8 13V3M3 8l5-5 5 5" stroke="#3B6D11" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Entrada
     </span>
-
-    <span class="legend-pill saida">
-      <!-- seta para baixo -->
-      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8l5 5 5-5" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Saída — produto foi retirado do estoque
+    <span class="pill pill-red">
+      <svg width="10" height="10" viewBox="0 0 16 16" fill="none">
+        <path d="M8 3v10M3 8l5 5 5-5" stroke="#A32D2D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Saída
     </span>
   </div>
 
-  <!-- ── Tabela ── -->
-  <div class="mv-card">
+  <!-- Filtros -->
+  {% include "modulo_merendeiras/movimentaEstoque/_movimetacaList_parte.html" %}
+
+  <!-- Tabela -->
+  <div class="mv-table-card">
+
+    <!-- Info de paginação dentro do card -->
+    <div class="mv-pag-info">
+      <span>
+        Exibindo <strong>{{ page_obj.start_index }}</strong> a
+        <strong>{{ page_obj.end_index }}</strong> de
+        <strong>{{ paginator.count }}</strong> movimentações
+        &nbsp;·&nbsp; {{ itens_por_pagina }} por página
+      </span>
+      <span>Página <strong>{{ page_obj.number }}</strong> de <strong>{{ paginator.num_pages }}</strong></span>
+    </div>
+
     <div style="overflow-x:auto;">
       <table class="mv-table">
         <thead>
           <tr>
             <th class="col-id">#</th>
-            <th>
-              <!-- calendário -->
-              <span style="display:inline-flex;align-items:center;gap:.3rem;">
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="#64748b" stroke-width="1.5"/><path d="M5 1v3M11 1v3M2 7h12" stroke="#64748b" stroke-width="1.5" stroke-linecap="round"/></svg>
-                Data
-              </span>
-            </th>
-            <th>
-              <span style="display:inline-flex;align-items:center;gap:.3rem;">
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#64748b" stroke-width="1.5"/><path d="M5 8h6M5 5h6M5 11h4" stroke="#64748b" stroke-width="1.5" stroke-linecap="round"/></svg>
-                Produto
-              </span>
-            </th>
+            <th>Data</th>
+            <th>Produto</th>
             <th>Tipo</th>
-            <th>
-              <span style="display:inline-flex;align-items:center;gap:.3rem;">
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#64748b" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="#64748b" stroke-width="1.5" stroke-linecap="round"/></svg>
-                Qtd.
-              </span>
-            </th>
-            <!-- Cabeçalho -->
-            <th class="col-usuario">
-            <span style="display:inline-flex;align-items:center;gap:.3rem;">
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
-                <circle cx="8" cy="5" r="3" stroke="#64748b" stroke-width="1.5"/>
-                <path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="#64748b" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
-                Responsável
-            </span>
-            </th>
+            <th>Qtd.</th>
+            <th class="col-usuario">Responsável</th>
             <th></th>
           </tr>
         </thead>
-
         <tbody>
           {% for m in movimentacoes %}
           <tr>
 
-            <!-- ID -->
-            <td class="col-id">
-              <span class="cell-id">{{ m.id }}</span>
-            </td>
+            <td class="col-id"><span class="cell-id">{{ m.id }}</span></td>
 
-            <!-- Data — era m.criado_em, correto é m.data_movimentacao -->
-            <td class="cell-data">
-            <div class="data-dia">{{ m.data_movimentacao|date:"d/m/Y" }}</div>
-            <div class="data-hora">{{ m.data_movimentacao|date:"H:i" }}</div>
-            </td>
-
-            <!-- Produto -->
             <td>
-              <div class="cell-produto">
-                <div class="produto-icone">
-                  <!-- ícone genérico de produto -->
-                  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="#64748b" stroke-width="1.4"/><path d="M5 4V3a3 3 0 0 1 6 0v1" stroke="#64748b" stroke-width="1.4" stroke-linecap="round"/></svg>
+              <div class="data-dia">{{ m.data_movimentacao|date:"d/m/Y" }}</div>
+              <div class="data-hora">{{ m.data_movimentacao|date:"H:i" }}</div>
+            </td>
+
+            <td>
+              <div class="prod-wrap">
+                <div class="prod-icon">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <rect x="2" y="4" width="12" height="9" rx="1.5" stroke="#64748b" stroke-width="1.4"/>
+                    <path d="M5 4V3a3 3 0 0 1 6 0v1" stroke="#64748b" stroke-width="1.4" stroke-linecap="round"/>
+                  </svg>
                 </div>
-                <span class="produto-nome">{{ m.produto.nome }}</span>
+                <span style="font-weight:600;">{{ m.produto.nome }}</span>
               </div>
             </td>
 
-            <!-- Tipo -->
             <td>
-              {% if is_entrada %}
-                <span class="tipo-badge entrada">
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 13V3M3 8l5-5 5 5" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              {% if m.is_entrada %}
+                <span class="badge badge-green">
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none">
+                    <path d="M8 13V3M3 8l5-5 5 5" stroke="#3B6D11" stroke-width="2.2" stroke-linecap="round"/>
+                  </svg>
                   {{ m.get_tipo_display }}
                 </span>
               {% else %}
-                <span class="tipo-badge saida">
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8l5 5 5-5" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="badge badge-red">
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none">
+                    <path d="M8 3v10M3 8l5 5 5-5" stroke="#A32D2D" stroke-width="2.2" stroke-linecap="round"/>
+                  </svg>
                   {{ m.get_tipo_display }}
                 </span>
               {% endif %}
             </td>
 
-            <!-- Quantidade -->
             <td>
-              {% if is_entrada %}
-                <span class="qty-badge entrada">
-                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 13V3M3 8l5-5 5 5" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  +{{ m.quantidade }}
-                </span>
+              {% if m.is_entrada %}
+                <span class="qty qty-green">+{{ m.quantidade }}</span>
               {% else %}
-                <span class="qty-badge saida">
-                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8l5 5 5-5" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  −{{ m.quantidade }}
-                </span>
+                <span class="qty qty-red">−{{ m.quantidade }}</span>
               {% endif %}
             </td>
 
-            <!-- Responsável -->
-            <!-- Célula Responsável -->
             <td class="col-usuario">
-            <div class="cell-usuario">
-                {% with nome=m.usuario.get_full_name|default:m.usuario.username %}
-                <div class="usuario-avatar {% if m.tipo == 'ENTRADA_ESCOLA' %}avatar-entrada{% else %}avatar-saida{% endif %}">
-                {{ nome|slice:":2"|upper }}
+              {% with nome=m.usuario_responsavel.get_full_name|default:m.usuario_responsavel.username %}
+              <div class="resp-wrap">
+                <div class="avatar {% if m.is_entrada %}avatar-green{% else %}avatar-red{% endif %}">
+                  {{ nome|slice:":2"|upper }}
                 </div>
                 <div>
-                <span class="usuario-nome">{{ nome }}</span>
-                <div class="usuario-papel">
-                    {% if m.tipo == 'ENTRADA_ESCOLA' %}
-                    Enviou ao estoque
-                    {% else %}
-                    Retirou do estoque
-                    {% endif %}
+                  <div class="resp-nome">{{ nome }}</div>
+                  <div class="resp-papel">
+                    {% if m.is_entrada %}Enviou ao estoque{% else %}Retirou do estoque{% endif %}
+                  </div>
                 </div>
-                </div>
-                {% endwith %}
-            </div>
+              </div>
+              {% endwith %}
             </td>
 
-            <!-- Ação -->
             <td style="text-align:right;">
               <a href="{% url 'modulo_merendeiras:movimentacao_estoque_detail' m.id %}" class="btn-ver">
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="#1d4ed8" stroke-width="1.6"/><path d="M1.5 8C3 4.5 5.5 2.5 8 2.5S13 4.5 14.5 8C13 11.5 10.5 13.5 8 13.5S3 11.5 1.5 8Z" stroke="#1d4ed8" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="8" r="3" stroke="#185FA5" stroke-width="1.6"/>
+                  <path d="M1.5 8C3 4.5 5.5 2.5 8 2.5S13 4.5 14.5 8C13 11.5 10.5 13.5 8 13.5S3 11.5 1.5 8Z"
+                        stroke="#185FA5" stroke-width="1.6" stroke-linejoin="round"/>
+                </svg>
                 Detalhes
               </a>
             </td>
 
           </tr>
-
           {% empty %}
           <tr>
             <td colspan="7">
               <div class="mv-empty">
-                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
                   <rect x="8" y="14" width="32" height="26" rx="4" stroke="#94a3b8" stroke-width="2.5"/>
                   <path d="M16 14v-3a8 8 0 0 1 16 0v3" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
                   <path d="M18 26h12M18 32h8" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
                 </svg>
-                <p>Nenhuma movimentação registrada ainda.</p>
+                <p>Nenhuma movimentação encontrada.</p>
               </div>
             </td>
           </tr>
@@ -369,6 +326,40 @@
       </table>
     </div>
   </div>
+
+  <!-- Paginação -->
+  {% if is_paginated %}
+  <nav aria-label="Paginação">
+    <div class="mv-pagination">
+
+      {% if page_obj.has_previous %}
+        <a class="page-link" href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">« Primeira</a>
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">‹</a>
+      {% else %}
+        <span class="page-link disabled">« Primeira</span>
+        <span class="page-link disabled">‹</span>
+      {% endif %}
+
+      {% for num in paginator.page_range %}
+        {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+          <a class="page-link {% if page_obj.number == num %}active{% endif %}"
+             href="?page={{ num }}{% if querystring %}&{{ querystring }}{% endif %}">
+            {{ num }}
+          </a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">›</a>
+        <a class="page-link" href="?page={{ paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}">Última »</a>
+      {% else %}
+        <span class="page-link disabled">›</span>
+        <span class="page-link disabled">Última »</span>
+      {% endif %}
+
+    </div>
+  </nav>
+  {% endif %}
 
 </div>
 {% endblock %}

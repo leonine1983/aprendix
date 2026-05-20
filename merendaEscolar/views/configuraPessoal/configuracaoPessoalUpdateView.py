@@ -10,9 +10,12 @@ from core.views.baseNutricionista import BaseNutricionistaView
 
 class ConfiguracaoPessoalUpdateView(BaseNutricionistaView, UpdateView):
     model = ConfiguraPessoal
-    fields =  '__all__'
+
+    # Excluímos o campo "usuario" do formulário, pois ele será
+    # preenchido automaticamente com request.user.
+    exclude = ["usuario"]
+
     template_name = "merendaEscolar/configuraSistem/configuraPessoal.html"
-    # success_url = reverse_lazy("merendaEscolar:configuracao_pessoal")
 
     def get_success_url(self):
         next_url = self.request.POST.get("next")
@@ -22,16 +25,29 @@ class ConfiguracaoPessoalUpdateView(BaseNutricionistaView, UpdateView):
 
     def get_object(self, queryset=None):
         """
-        🔒 Garante que sempre exista UMA configuração global
+        Retorna a configuração do usuário logado.
+
+        Se ainda não existir, cria automaticamente com os valores
+        padrão definidos no model ConfiguraPessoal.
         """
-        obj, _ = ConfiguraPessoal.objects.get_or_create(pk=1)
+        obj, created = ConfiguraPessoal.objects.get_or_create(
+            usuario=self.request.user
+        )
         return obj
 
     def form_valid(self, form):
+        """
+        Garante que o usuário logado seja salvo no campo usuario.
+        Isso é importante principalmente no primeiro acesso,
+        quando o registro é criado automaticamente.
+        """
+        form.instance.usuario = self.request.user
+
         messages.success(
             self.request,
             "Configuração atualizada com sucesso."
         )
+
         return super().form_valid(form)
 
     def form_invalid(self, form):

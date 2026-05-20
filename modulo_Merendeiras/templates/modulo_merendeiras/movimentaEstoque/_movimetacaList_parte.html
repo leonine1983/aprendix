@@ -1,0 +1,106 @@
+<style>
+.mv-filter-card {
+  background: #fff;
+  border: 1px solid var(--mv-borda);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--mv-shadow);
+}
+.mv-filter-card .form-label {
+  display: block;
+  font-size: .68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .04em;
+  color: var(--mv-muted); margin-bottom: .3rem;
+}
+.mv-filter-card .form-control,
+.mv-filter-card .form-select {
+  width: 100%; min-height: 40px;
+  border: 1px solid var(--mv-borda);
+  border-radius: 9px; background: #fff;
+  color: var(--mv-texto); font-size: .83rem;
+  padding: .45rem .7rem; transition: border .12s;
+}
+.mv-filter-card .form-control:focus,
+.mv-filter-card .form-select:focus {
+  outline: none; border-color: #185FA5;
+  box-shadow: 0 0 0 3px rgba(24,95,165,.12);
+}
+.mv-filter-card .btn {
+  min-height: 40px; border-radius: 9px;
+  font-size: .8rem; font-weight: 600;
+  padding: .45rem 1rem; transition: all .12s;
+}
+.mv-filter-card .btn-primary {
+  background: #185FA5; border: 1px solid #185FA5; color: #fff;
+}
+.mv-filter-card .btn-primary:hover { filter: brightness(.92); }
+.mv-filter-card .btn-outline-secondary {
+  background: #fff; border: 1px solid var(--mv-borda); color: var(--mv-muted);
+}
+.mv-filter-card .btn-outline-secondary:hover { background: var(--mv-bg-sec); }
+
+@media (max-width: 768px) {
+  .mv-filter-card .btn { width: 100%; }
+}
+</style>
+
+<div class="mv-filter-card">
+  <form method="get" class="row g-3 align-items-end">
+
+    <div class="col-md-3">
+      <label class="form-label">Pesquisar</label>
+      <input type="text" name="q" class="form-control"
+             placeholder="Produto, observação ou usuário…" value="{{ q }}">
+    </div>
+
+    <div class="col-md-2">
+      <label class="form-label">Tipo</label>
+      <select name="tipo" class="form-select">
+        <option value="">Todos</option>
+        <option value="entrada" {% if tipo_filtro == "entrada" %}selected{% endif %}>Entradas</option>
+        <option value="saida"   {% if tipo_filtro == "saida"   %}selected{% endif %}>Saídas</option>
+      </select>
+    </div>
+
+    <div class="col-md-2">
+      <label class="form-label">Data inicial</label>
+      <input type="date" name="data_inicio" class="form-control" value="{{ data_inicio }}">
+    </div>
+
+    <div class="col-md-2">
+      <label class="form-label">Data final</label>
+      <input type="date" name="data_fim" class="form-control" value="{{ data_fim }}">
+    </div>
+
+    <div class="col-md-1">
+      <label class="form-label">Exibir</label>
+      <!--
+        O select abaixo faz POST para salvar pagina_movimentacaoEstoque
+        em ConfiguraPessoal. O valor atual vem de itens_por_pagina
+        (injetado pela view via configuracao_pessoal.pagina_movimentacaoEstoque).
+      -->
+      <form method="post" action="{% url 'modulo_merendeiras:configuracao_pessoal' %}"
+            id="form-pagina">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <select name="pagina_movimentacaoEstoque"
+        class="form-select"
+        onchange="document.getElementById('form-pagina').submit()">
+  <option value="5"   {% if itens_por_pagina == 5   %}selected{% endif %}>5</option>
+  <option value="10"  {% if itens_por_pagina == 10  %}selected{% endif %}>10</option>
+  <option value="20"  {% if itens_por_pagina == 20  %}selected{% endif %}>20</option>
+  <option value="50"  {% if itens_por_pagina == 50  %}selected{% endif %}>50</option>
+  <option value="100" {% if itens_por_pagina == 100 %}selected{% endif %}>100</option>
+</select>
+      </form>
+    </div>
+
+    <div class="col-md-2 d-grid gap-2">
+      <button type="submit" class="btn btn-primary">Filtrar</button>
+      <a href="{% url 'modulo_merendeiras:movimentacao_estoque_list' %}"
+         class="btn btn-outline-secondary">Limpar</a>
+    </div>
+
+  </form>
+</div>

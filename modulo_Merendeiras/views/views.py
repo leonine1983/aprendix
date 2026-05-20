@@ -154,14 +154,21 @@ class ExecutarReceitaView(BaseMerendeiraView, View):
 
 
 
+from django.views.generic import UpdateView
+from django.urls import reverse_lazy
+from django.contrib import messages
 
+from core.models import ConfiguraPessoal
+from core.views.baseMerendeira import BaseMerendeiraView
 
 
 class ConfiguracaoPessoalUpdateView(BaseMerendeiraView, UpdateView):
     model = ConfiguraPessoal
-    fields =  '__all__'
+
+    # O campo usuario será preenchido automaticamente
+    exclude = ["usuario"]
+
     template_name = "merendaEscolar/configuraSistem/configuraPessoal.html"
-    # success_url = reverse_lazy("merendaEscolar:configuracao_pessoal")
 
     def get_success_url(self):
         next_url = self.request.POST.get("next")
@@ -171,16 +178,28 @@ class ConfiguracaoPessoalUpdateView(BaseMerendeiraView, UpdateView):
 
     def get_object(self, queryset=None):
         """
-        🔒 Garante que sempre exista UMA configuração global
+        Retorna a configuração do usuário logado.
+
+        Se ainda não existir, cria automaticamente um registro
+        com os valores padrão definidos no model ConfiguraPessoal.
         """
-        obj, _ = ConfiguraPessoal.objects.get_or_create(pk=1)
+        obj, created = ConfiguraPessoal.objects.get_or_create(
+            usuario=self.request.user
+        )
         return obj
 
     def form_valid(self, form):
+        """
+        Garante que a configuração seja sempre vinculada
+        ao usuário atualmente autenticado.
+        """
+        form.instance.usuario = self.request.user
+
         messages.success(
             self.request,
             "Configuração atualizada com sucesso."
         )
+
         return super().form_valid(form)
 
     def form_invalid(self, form):

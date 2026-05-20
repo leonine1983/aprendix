@@ -585,13 +585,22 @@ class Transferencia(models.Model):
             estoque_escola.save()
 
             # Gera movimentação auditável
+            # Gera movimentação auditável
             MovimentacaoEstoque.objects.create(
                 produto=item.produto,
                 escola=self.escola_destino,
                 quantidade=quantidade_final,
                 tipo="ENTRADA_ESCOLA",
-                usuario=usuario,
-                observacao=f"Recebimento da Transferência {self.numero}"
+
+                # Responsável institucional pela entrada:
+                # o usuário que enviou a transferência (nutricionista)
+                usuario=self.enviado_por or self.criado_por,
+
+                # Mantém rastreabilidade de quem confirmou o recebimento
+                observacao=(
+                    f"Recebimento da Transferência {self.numero} "
+                    f"(confirmado por {usuario.username})"
+                )
             )
 
         from django.utils import timezone
