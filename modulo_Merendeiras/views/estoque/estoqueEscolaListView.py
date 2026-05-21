@@ -5,7 +5,7 @@ from datetime import timedelta
 from django.contrib import messages
 
 from merendaEscolar.models import EstoqueEscola
-from ..baseMerendeiraView import BaseMerendeiraView
+from core.views.baseMerendeira import BaseMerendeiraView
 
 
 class EstoqueEscolaListView(BaseMerendeiraView, ListView):

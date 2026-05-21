@@ -2,6 +2,7 @@
 
 from django.urls import path
 from . import views
+from .views.notificaMerendeira import *
 
 app_name = "modulo_merendeiras"
 
@@ -88,6 +89,36 @@ urlpatterns = [
         "cardapio/execucao/cardápioDia/<int:execucao_id>/<str:turno>/ficha/",
         views.FichaDiariaCreateView.as_view(),
         name="ficha_diaria",
+    ),
+
+
+    # Notificaçao
+    path(
+        "notificacoes/sistema/<int:pk>/marcar-lida/",
+        MarcarNotificacaoSistemaLidaView.as_view(),
+        name="notif_sistema_marcar_lida",
+    ),
+    path(
+        "notificacoes/produto/<int:pk>/marcar-lida/",
+        MarcarNotificacaoProdutoLidaView.as_view(),
+        name="notif_produto_marcar_lida",
+    ),
+    # Deletar
+    path(
+        "notificacoes/sistema/<int:pk>/deletar/",
+        DeletarNotificacaoSistemaView.as_view(),
+        name="notif_sistema_deletar",
+    ),
+    path(
+        "notificacoes/produto/<int:pk>/deletar/",
+        DeletarNotificacaoProdutoView.as_view(),
+        name="notif_produto_deletar",
+    ),
+    # Marcar todas como lidas
+    path(
+        "notificacoes/marcar-todas-lidas/",
+        MarcarTodasLidasView.as_view(),
+        name="notif_marcar_todas_lidas",
     ),
 
 ]

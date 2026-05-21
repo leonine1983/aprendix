@@ -35,7 +35,7 @@ from django.utils.timezone import now
 
 from merendaEscolar.models import Transferencia
 from core.groups.merenda import MERENDEIRA_GROUPS
-from .baseMerendeiraView import BaseMerendeiraView
+from core.views.baseMerendeira import BaseMerendeiraView
 
 
 class TransferenciasEscolaListView(BaseMerendeiraView, ListView):

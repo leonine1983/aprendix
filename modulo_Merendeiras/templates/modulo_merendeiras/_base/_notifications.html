@@ -1,0 +1,773 @@
+{% load static %}
+
+
+<div class="notif-widget" id="notifWidget">
+
+    {# ── Botão de sino ── #}
+    <button class="notif-toggle"
+            id="notifToggle"
+            aria-label="Notificações"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="notifPanel"
+            type="button">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 3C9.24 3 7 5.24 7 8V13L5 15V16H19V15L17 13V8C17 5.24 14.76 3 12 3ZM12 21C13.1 21 14 20.1 14 19H10C10 20.1 10.9 21 12 21Z"
+                  stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+        {% if total_nao_lidas > 0 %}
+            <span class="notif-badge" aria-label="{{ total_nao_lidas }} notificações não lidas">
+                {{ total_nao_lidas }}
+            </span>
+        {% endif %}
+    </button>
+
+    {# ── Painel ── #}
+    <div class="notif-panel" id="notifPanel" role="dialog" aria-label="Notificações" aria-modal="true" hidden>
+
+        {# Cabeçalho #}
+        <div class="notif-panel__head">
+            <h2 class="notif-panel__title">Notificações</h2>
+            {% if total_nao_lidas > 0 %}
+                <button class="notif-panel__mark-all"
+                        type="button"
+                        data-action="marcar-todas"
+                        title="Marcar todas como lidas">
+                    ✓ Marcar todas como lidas
+                </button>
+            {% endif %}
+        </div>
+
+        {# Abas #}
+        <div class="notif-tabs" role="tablist">
+            <button class="notif-tab notif-tab--active"
+                    role="tab"
+                    aria-selected="true"
+                    aria-controls="tab-nao-lidas"
+                    id="btn-tab-nao-lidas"
+                    type="button">
+                Não lidas
+                {% if total_nao_lidas > 0 %}
+                    <span class="notif-tab__count">{{ total_nao_lidas }}</span>
+                {% endif %}
+            </button>
+            <button class="notif-tab"
+                    role="tab"
+                    aria-selected="false"
+                    aria-controls="tab-lidas"
+                    id="btn-tab-lidas"
+                    type="button">
+                Lidas
+            </button>
+        </div>
+
+        <div class="notif-tabpanel notif-tabpanel--active"
+             id="tab-nao-lidas"
+             role="tabpanel"
+             aria-labelledby="btn-tab-nao-lidas">
+
+            <ul class="notif-list" id="lista-nao-lidas">
+
+                {% for notif in notificacoes_nao_lidas %}
+                    {% include "modulo_merendeiras/_base/_notif_item.html" with notif=notif lida=False %}
+                {% empty %}
+                    <li class="notif-list__empty">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 3C9.24 3 7 5.24 7 8V13L5 15V16H19V15L17 13V8C17 5.24 14.76 3 12 3ZM12 21C13.1 21 14 20.1 14 19H10C10 20.1 10.9 21 12 21Z"
+                                  stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" opacity=".4"/>
+                        </svg>
+                        <p>Nenhuma notificação nova.</p>
+                    </li>
+                {% endfor %}
+
+            </ul>
+        </div>
+
+        <div class="notif-tabpanel"
+             id="tab-lidas"
+             role="tabpanel"
+             aria-labelledby="btn-tab-lidas"
+             hidden>
+
+            <ul class="notif-list" id="lista-lidas">
+
+                {% for notif in notificacoes_lidas %}
+                    {% include "modulo_merendeiras/_base/_notif_item.html" with notif=notif lida=True %}
+                {% empty %}
+                    <li class="notif-list__empty">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".4"/>
+                        </svg>
+                        <p>Nenhuma notificação lida ainda.</p>
+                    </li>
+                {% endfor %}
+
+            </ul>
+        </div>
+
+    </div>{# /notif-panel #}
+</div>{# /notif-widget #}
+
+
+<style>
+/* ── Reset de base ── */
+.notif-widget { position: relative; display: inline-block; }
+
+/* ── Botão sino ── */
+.notif-toggle {
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: .45rem;
+    color: var(--color-header-icon, #374151);
+    border-radius: .5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s;
+}
+.notif-toggle:hover { background: var(--color-hover, rgba(0,0,0,.06)); }
+
+/* badge */
+.notif-badge {
+    position: absolute;
+    top: 2px; right: 2px;
+    min-width: 16px; height: 16px;
+    padding: 0 4px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+    box-shadow: 0 0 0 2px var(--color-surface, #fff);
+}
+
+/* ── Painel ── */
+.notif-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 360px;
+    max-height: 520px;
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.12);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+    animation: notifFadeIn .18s ease;
+}
+@keyframes notifFadeIn {
+    from { opacity: 0; transform: translateY(-6px) scale(.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Cabeçalho do painel */
+.notif-panel__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .9rem 1rem .6rem;
+    border-bottom: 1px solid var(--color-border, #f0f0f0);
+    flex-shrink: 0;
+}
+.notif-panel__title {
+    font-size: .95rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--color-text, #111827);
+}
+.notif-panel__mark-all {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: .75rem;
+    color: var(--color-primary, #166534);
+    font-weight: 500;
+    padding: .2rem .4rem;
+    border-radius: 4px;
+    transition: background .15s;
+}
+.notif-panel__mark-all:hover { background: rgba(22,101,52,.08); }
+
+/* ── Abas ── */
+.notif-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--color-border, #e5e7eb);
+    flex-shrink: 0;
+    background: var(--color-surface-alt, #fafafa);
+}
+.notif-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: .6rem .5rem;
+    font-size: .82rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--color-muted, #6b7280);
+    transition: color .15s, border-color .15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .35rem;
+}
+.notif-tab--active {
+    color: var(--color-primary, #166534);
+    border-bottom-color: var(--color-primary, #166534);
+    background: var(--color-surface, #fff);
+}
+.notif-tab__count {
+    background: var(--color-primary, #166534);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 999px;
+    min-width: 18px; height: 18px;
+    padding: 0 5px;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Painel de aba ── */
+.notif-tabpanel {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border, #ddd) transparent;
+}
+.notif-tabpanel[hidden] { display: none; }
+
+/* ── Lista ── */
+.notif-list {
+    list-style: none;
+    margin: 0;
+    padding: .4rem 0;
+}
+
+/* Item vazio */
+.notif-list__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .5rem;
+    padding: 2.5rem 1rem;
+    color: var(--color-muted, #9ca3af);
+    font-size: .82rem;
+    text-align: center;
+}
+
+/* ── Item de notificação ── */
+.notif-item {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    gap: .5rem;
+    align-items: start;
+    padding: .7rem 1rem;
+    border-bottom: 1px solid var(--color-border-light, #f3f4f6);
+    transition: background .12s;
+    position: relative;
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-item:hover { background: var(--color-hover, rgba(0,0,0,.025)); }
+.notif-item--unread { background: var(--color-unread-bg, rgba(22,101,52,.04)); }
+
+/* ícone */
+.notif-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.notif-icon--warning { background: #fef3c7; color: #d97706; }
+.notif-icon--danger  { background: #fee2e2; color: #dc2626; }
+.notif-icon--green   { background: #dcfce7; color: #16a34a; }
+.notif-icon--info    { background: #dbeafe; color: #2563eb; }
+.notif-icon--system  { background: #f3e8ff; color: #7c3aed; }
+
+/* corpo */
+.notif-panel--hidden {
+    display: none !important;
+}
+.notif-body { min-width: 0; }
+.notif-title {
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--color-text, #111827);
+    margin: 0 0 .15rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.notif-text {
+    font-size: .78rem;
+    color: var(--color-text-secondary, #374151);
+    margin: 0 0 .2rem;
+    line-height: 1.45;
+    /* 3 linhas máx */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.notif-time {
+    font-size: .7rem;
+    color: var(--color-muted, #9ca3af);
+    display: block;
+}
+
+/* dot não lida */
+.notif-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--color-primary, #166534);
+    flex-shrink: 0;
+    margin-top: 6px;
+    opacity: .85;
+}
+
+/* ── Ações do item ── */
+.notif-actions {
+    display: flex;
+    gap: .3rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+.notif-btn {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: .25rem .4rem;
+    font-size: .7rem;
+    font-weight: 500;
+    transition: background .15s, border-color .15s, color .15s;
+    display: flex;
+    align-items: center;
+    gap: .2rem;
+    white-space: nowrap;
+}
+.notif-btn--read {
+    color: var(--color-primary, #166534);
+    border-color: var(--color-primary, #166534);
+}
+.notif-btn--read:hover {
+    background: var(--color-primary, #166534);
+    color: #fff;
+}
+.notif-btn--delete {
+    color: #dc2626;
+    border-color: #dc2626;
+}
+.notif-btn--delete:hover {
+    background: #dc2626;
+    color: #fff;
+}
+
+/* ── Animação de remoção ── */
+.notif-item--removing {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity .25s ease, transform .25s ease;
+    pointer-events: none;
+}
+
+/* ── Responsivo mobile ── */
+@media (max-width: 400px) {
+    .notif-panel {
+        width: calc(100vw - 16px);
+        right: -60px;
+    }
+}
+</style>
+
+<script>
+(function () {
+
+    // ─────────────────────────────────────────────────────────────
+    // URLs Django
+    // ─────────────────────────────────────────────────────────────
+    const URLS = {
+        sistemaMarcarLida : (pk) => `{% url 'modulo_merendeiras:notif_sistema_marcar_lida' pk=0 %}`.replace('/0/', `/${pk}/`),
+        produtoMarcarLida : (pk) => `{% url 'modulo_merendeiras:notif_produto_marcar_lida' pk=0 %}`.replace('/0/', `/${pk}/`),
+        sistemaDeletar    : (pk) => `{% url 'modulo_merendeiras:notif_sistema_deletar' pk=0 %}`.replace('/0/', `/${pk}/`),
+        produtoDeletar    : (pk) => `{% url 'modulo_merendeiras:notif_produto_deletar' pk=0 %}`.replace('/0/', `/${pk}/`),
+        marcarTodasLidas  : `{% url 'modulo_merendeiras:notif_marcar_todas_lidas' %}`,
+    };
+
+    const CSRF =
+        document.cookie.match(/csrftoken=([^;]+)/)?.[1] ?? '';
+
+    // ─────────────────────────────────────────────────────────────
+    // ELEMENTOS
+    // ─────────────────────────────────────────────────────────────
+    const toggle = document.getElementById('notifToggle');
+    const panel  = document.getElementById('notifPanel');
+
+    if (!toggle || !panel) return;
+
+    // ─────────────────────────────────────────────────────────────
+    // HELPER POST
+    // ─────────────────────────────────────────────────────────────
+    async function postJSON(url) {
+
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': CSRF,
+                'Content-Type': 'application/json'
+            },
+        });
+
+        return res.json();
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // ABRIR / FECHAR PAINEL
+    // ─────────────────────────────────────────────────────────────
+    function abrirPanel() {
+        panel.hidden = false;
+        toggle.setAttribute('aria-expanded', 'true');
+    }
+
+    function fecharPanel() {
+        panel.hidden = true;
+        toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    function alternarPanel() {
+
+        const aberto = !panel.hidden;
+
+        if (aberto) {
+            fecharPanel();
+        } else {
+            abrirPanel();
+        }
+    }
+
+    toggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        alternarPanel();
+    });
+
+    // impede fechar ao clicar dentro
+    panel.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    // fecha clicando fora
+    document.addEventListener('click', (e) => {
+
+        const clicouNoToggle =
+            toggle.contains(e.target);
+
+        const clicouNoPainel =
+            panel.contains(e.target);
+
+        if (!clicouNoToggle && !clicouNoPainel) {
+            fecharPanel();
+        }
+    });
+
+    // fecha no ESC
+    document.addEventListener('keydown', (e) => {
+
+        if (e.key === 'Escape') {
+            fecharPanel();
+        }
+    });
+
+    // ─────────────────────────────────────────────────────────────
+    // ABAS
+    // ─────────────────────────────────────────────────────────────
+    document.querySelectorAll('.notif-tab').forEach(btn => {
+
+        btn.addEventListener('click', () => {
+
+            document.querySelectorAll('.notif-tab')
+                .forEach(b => {
+
+                    b.classList.remove('notif-tab--active');
+                    b.setAttribute('aria-selected', 'false');
+                });
+
+            document.querySelectorAll('.notif-tabpanel')
+                .forEach(p => {
+
+                    p.hidden = true;
+                    p.classList.remove('notif-tabpanel--active');
+                });
+
+            btn.classList.add('notif-tab--active');
+            btn.setAttribute('aria-selected', 'true');
+
+            const painel =
+                document.getElementById(
+                    btn.getAttribute('aria-controls')
+                );
+
+            if (painel) {
+                painel.hidden = false;
+                painel.classList.add('notif-tabpanel--active');
+            }
+        });
+    });
+
+    // ─────────────────────────────────────────────────────────────
+    // BADGE
+    // ─────────────────────────────────────────────────────────────
+    function atualizarBadge(delta) {
+
+        const badge =
+            toggle.querySelector('.notif-badge');
+
+        if (!badge) return;
+
+        const atual =
+            parseInt(badge.textContent, 10) || 0;
+
+        const novo =
+            Math.max(0, atual + delta);
+
+        badge.textContent = novo;
+
+        badge.style.display =
+            novo === 0 ? 'none' : '';
+
+        // remove botão marcar todas
+        if (novo === 0) {
+
+            document
+                .querySelector('[data-action="marcar-todas"]')
+                ?.remove();
+        }
+
+        // contador da aba
+        const tabCount =
+            document.querySelector(
+                '#btn-tab-nao-lidas .notif-tab__count'
+            );
+
+        if (tabCount) {
+
+            tabCount.textContent = novo;
+
+            tabCount.style.display =
+                novo === 0 ? 'none' : '';
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // REMOVER ITEM
+    // ─────────────────────────────────────────────────────────────
+    function removerItem(li) {
+
+        li.classList.add('notif-item--removing');
+
+        li.addEventListener(
+            'transitionend',
+            () => li.remove(),
+            { once: true }
+        );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // MOVER PARA LIDAS
+    // ─────────────────────────────────────────────────────────────
+    function moverParaLidas(li) {
+
+        const listaLidas =
+            document.getElementById('lista-lidas');
+
+        if (!listaLidas) return;
+
+        li.querySelector('.notif-dot')?.remove();
+
+        li.querySelector('.notif-btn--read')
+            ?.remove();
+
+        li.classList.remove('notif-item--unread');
+
+        listaLidas
+            .querySelector('.notif-list__empty')
+            ?.remove();
+
+        const clone = li.cloneNode(true);
+
+        bindItemActions(clone);
+
+        listaLidas.prepend(clone);
+
+        removerItem(li);
+
+        const listaNaoLidas =
+            document.getElementById('lista-nao-lidas');
+
+        if (
+            listaNaoLidas &&
+            !listaNaoLidas.querySelector(
+                '.notif-item:not(.notif-item--removing)'
+            )
+        ) {
+
+            const vazio =
+                document.createElement('li');
+
+            vazio.className = 'notif-list__empty';
+
+            vazio.innerHTML = `
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 3C9.24 3 7 5.24 7 8V13L5 15V16H19V15L17 13V8C17 5.24 14.76 3 12 3ZM12 21C13.1 21 14 20.1 14 19H10C10 20.1 10.9 21 12 21Z"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linejoin="round"
+                          opacity=".4"/>
+                </svg>
+                <p>Nenhuma notificação nova.</p>
+            `;
+
+            listaNaoLidas.appendChild(vazio);
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // BIND AÇÕES ITEM
+    // ─────────────────────────────────────────────────────────────
+    function bindItemActions(li) {
+
+        // marcar lida
+        li.querySelector('.notif-btn--read')
+            ?.addEventListener('click', async (e) => {
+
+                e.stopPropagation();
+
+                const btn  = e.currentTarget;
+
+                const pk   = btn.dataset.pk;
+
+                const tipo = btn.dataset.tipo;
+
+                btn.disabled = true;
+
+                btn.textContent = '…';
+
+                const url =
+                    tipo === 'sistema'
+                        ? URLS.sistemaMarcarLida(pk)
+                        : URLS.produtoMarcarLida(pk);
+
+                const data =
+                    await postJSON(url);
+
+                if (data.ok) {
+
+                    atualizarBadge(-1);
+
+                    moverParaLidas(li);
+
+                } else {
+
+                    btn.disabled = false;
+
+                    btn.textContent = '✓ Lida';
+
+                    alert(
+                        data.erro ??
+                        'Erro ao marcar como lida.'
+                    );
+                }
+            });
+
+        // deletar
+        li.querySelector('.notif-btn--delete')
+            ?.addEventListener('click', async (e) => {
+
+                e.stopPropagation();
+
+                if (
+                    !confirm(
+                        'Excluir esta notificação?'
+                    )
+                ) return;
+
+                const btn =
+                    e.currentTarget;
+
+                const pk =
+                    btn.dataset.pk;
+
+                const tipo =
+                    btn.dataset.tipo;
+
+                btn.disabled = true;
+
+                const url =
+                    tipo === 'sistema'
+                        ? URLS.sistemaDeletar(pk)
+                        : URLS.produtoDeletar(pk);
+
+                const data =
+                    await postJSON(url);
+
+                if (data.ok) {
+
+                    removerItem(li);
+
+                } else {
+
+                    btn.disabled = false;
+
+                    alert(
+                        data.erro ??
+                        'Erro ao excluir notificação.'
+                    );
+                }
+            });
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // BIND INICIAL
+    // ─────────────────────────────────────────────────────────────
+    document
+        .querySelectorAll('.notif-item[data-pk]')
+        .forEach(bindItemActions);
+
+    // ─────────────────────────────────────────────────────────────
+    // MARCAR TODAS
+    // ─────────────────────────────────────────────────────────────
+    document
+        .querySelector('[data-action="marcar-todas"]')
+        ?.addEventListener('click', async (e) => {
+
+            e.stopPropagation();
+
+            const data =
+                await postJSON(
+                    URLS.marcarTodasLidas
+                );
+
+            if (data.ok) {
+
+                document
+                    .querySelectorAll(
+                        '#lista-nao-lidas .notif-item[data-pk]'
+                    )
+                    .forEach(li => {
+                        moverParaLidas(li);
+                    });
+
+                atualizarBadge(-999);
+            }
+        });
+
+})();
+</script>

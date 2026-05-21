@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.db.models import F
 
 from ....models import DescarteEstoqueEscola
-from ...baseMerendeiraView import BaseMerendeiraView
+from core.views.baseMerendeira import BaseMerendeiraView
 
 
 class ListaDescartesView(BaseMerendeiraView, View):

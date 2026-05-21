@@ -1,0 +1,163 @@
+{% load static %}
+
+
+{# Determinar tipo de modelo e data #}
+{% if notif.criada_em %}
+    {# ═══ AtualizacaoNotificacaoSistema ═══ #}
+    {% with modelo_tipo="sistema" data_notif=notif.criada_em %}
+
+        <li class="notif-item {% if not lida %}notif-item--unread{% endif %}"
+            data-pk="{{ notif.pk }}">
+
+            {# Ícone conforme tipo da notificação de sistema #}
+            <div class="notif-icon
+                {% if notif.tipo == 'urgente' %}notif-icon--danger
+                {% elif notif.tipo == 'aviso' %}notif-icon--warning
+                {% elif notif.tipo == 'atualizado' %}notif-icon--system
+                {% else %}notif-icon--info{% endif %}"
+                aria-hidden="true">
+
+                {% if notif.tipo == 'urgente' %}
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M12 8V12M12 16H12.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                {% elif notif.tipo == 'aviso' %}
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 9V13M12 17H12.01M10.29 3.86L1.82 18C1.55 18.47 1.55 19.05 1.82 19.52C2.1 20 2.61 20.3 3.16 20.3H20.84C21.39 20.3 21.9 20 22.18 19.52C22.45 19.05 22.45 18.47 22.18 18L13.71 3.86C13.43 3.38 12.93 3.08 12.38 3.08C11.83 3.08 11.32 3.38 11.05 3.86H10.29Z"
+                              stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                {% elif notif.tipo == 'atualizado' %}
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <path d="M4 4v5h5M20 20v-5h-5M4.07 15a8 8 0 1 0 .29-4.88" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                {% else %}
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M12 12V16M12 8H12.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                {% endif %}
+            </div>
+
+            {# Corpo #}
+            <div class="notif-body">
+                <p class="notif-title">{{ notif.titulo }}</p>
+                {# mensagem é RichTextField — strip de HTML para exibição resumida #}
+                <p class="notif-text">{{ notif.mensagem|striptags|truncatechars:120 }}</p>
+                <time class="notif-time" datetime="{{ data_notif|date:'c' }}">
+                    {{ data_notif|timesince }} atrás
+                </time>
+            </div>
+
+            {# Ações #}
+            <div class="notif-actions">
+                {% if not lida %}
+                    <button class="notif-btn notif-btn--read"
+                            type="button"
+                            data-pk="{{ notif.pk }}"
+                            data-tipo="{{ modelo_tipo }}"
+                            title="Marcar como lida">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Lida
+                    </button>
+                {% else %}
+                    <button class="notif-btn notif-btn--delete"
+                            type="button"
+                            data-pk="{{ notif.pk }}"
+                            data-tipo="{{ modelo_tipo }}"
+                            title="Excluir notificação">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Excluir
+                    </button>
+                {% endif %}
+            </div>
+
+            {% if not lida %}<div class="notif-dot" aria-hidden="true"></div>{% endif %}
+        </li>
+
+    {% endwith %}
+
+{% else %}
+    {# ═══ NotificacaoProduto ═══ #}
+    {% with modelo_tipo="produto" data_notif=notif.criado_em %}
+
+        <li class="notif-item {% if not lida %}notif-item--unread{% endif %}"
+            data-pk="{{ notif.pk }}">
+
+            {# Ícone conforme tipo #}
+            <div class="notif-icon
+                {% if notif.tipo == 'PRODUTO_VENCENDO' %}notif-icon--danger
+                {% elif notif.tipo == 'ESTOQUE_BAIXO' %}notif-icon--warning
+                {% elif notif.tipo == 'TRANSFERENCIA_ENVIADA' or notif.tipo == 'TRANSFERENCIA_RECEBIDA' %}notif-icon--green
+                {% elif notif.tipo == 'DIVERGENCIA_ABERTA' %}notif-icon--warning
+                {% else %}notif-icon--info{% endif %}"
+                aria-hidden="true">
+
+                {% if notif.tipo == 'ESTOQUE_BAIXO' %}
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 9V13M12 17H12.01M10.29 3.86L1.82 18C1.55 18.47 1.55 19.05 1.82 19.52C2.1 20 2.61 20.3 3.16 20.3H20.84C21.39 20.3 21.9 20 22.18 19.52C22.45 19.05 22.45 18.47 22.18 18L13.71 3.86C13.43 3.38 12.93 3.08 12.38 3.08C11.83 3.08 11.32 3.38 11.05 3.86H10.29Z"
+                              stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                {% elif notif.tipo == 'PRODUTO_VENCENDO' %}
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M12 8V12M12 16H12.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                {% elif notif.tipo == 'TRANSFERENCIA_ENVIADA' or notif.tipo == 'TRANSFERENCIA_RECEBIDA' %}
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                {% else %}
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M12 12V16M12 8H12.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                {% endif %}
+            </div>
+
+            {# Corpo #}
+            <div class="notif-body">
+                <p class="notif-title">{{ notif.titulo }}</p>
+                <p class="notif-text">{{ notif.mensagem|truncatechars:120 }}</p>
+                <time class="notif-time" datetime="{{ data_notif|date:'c' }}">
+                    {{ data_notif|timesince }} atrás
+                </time>
+            </div>
+
+            {# Ações #}
+            <div class="notif-actions">
+                {% if not lida %}
+                    <button class="notif-btn notif-btn--read"
+                            type="button"
+                            data-pk="{{ notif.pk }}"
+                            data-tipo="{{ modelo_tipo }}"
+                            title="Marcar como lida">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Lida
+                    </button>
+                {% else %}
+                    <button class="notif-btn notif-btn--delete"
+                            type="button"
+                            data-pk="{{ notif.pk }}"
+                            data-tipo="{{ modelo_tipo }}"
+                            title="Excluir notificação">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Excluir
+                    </button>
+                {% endif %}
+            </div>
+
+            {% if not lida %}<div class="notif-dot" aria-hidden="true"></div>{% endif %}
+        </li>
+
+    {% endwith %}
+{% endif %}

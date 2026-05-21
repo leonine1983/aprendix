@@ -1,0 +1,293 @@
+
+{% load static %}
+    <!-- HEADER -->
+    <header class="header" role="banner">
+{% if messages %}
+
+<style>
+.messages-wrapper{
+    position:fixed;
+    top:20px;
+    right:20px;
+    z-index:99999;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    width:380px;
+    max-width:95vw;
+}
+
+.custom-message{
+    position:relative;
+    overflow:hidden;
+    border-radius:14px;
+    padding:16px 18px;
+    color:black;
+    font-weight:500;
+    box-shadow:0 10px 25px rgba(0,0,0,.12);
+    animation:slideIn .35s ease;
+    transition:
+        opacity .4s ease,
+        transform .4s ease;
+}
+
+.custom-message.success{
+    background:linear-gradient(135deg,#16a34a,#15803d);
+    color:#000!important;
+}
+
+.custom-message.error{
+    background:linear-gradient(135deg,#dc2626,#b91c1c);
+    color:#000;;
+}
+
+.custom-message.warning{
+    background:linear-gradient(135deg,#f59e0b,#d97706);
+    color:#000;;
+}
+
+.custom-message.info{
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    color:#000;;
+}
+
+.message-close{
+    position:absolute;
+    top:10px;
+    right:12px;
+    border:none;
+    background:none;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+    opacity:.8;
+}
+
+.message-close:hover{
+    opacity:1;
+}
+
+.message-progress{
+    position:absolute;
+    bottom:0;
+    left:0;
+    height:4px;
+    background:rgba(255,255,255,.45);
+    width:100%;
+    transform-origin:left;
+}
+
+.custom-message.paused .message-progress{
+    animation-play-state:paused;
+}
+
+.fade-out{
+    opacity:0;
+    transform:translateX(40px);
+}
+
+@keyframes slideIn{
+    from{
+        opacity:0;
+        transform:translateX(30px);
+    }
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+}
+
+@keyframes progressBar{
+    from{
+        width:100%;
+    }
+    to{
+        width:0%;
+    }
+}
+</style>
+
+<div class="messages-wrapper">
+    {% for message in messages %}
+        <div class="custom-message {{ message.tags }}"
+             data-tag="{{ message.tags }}">
+            <button class="message-close">
+                ✕
+            </button>
+            <div style="padding-right:20px;">
+                {{ message|safe }}
+            </div>
+            <div class="message-progress"></div>
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+document.querySelectorAll('.custom-message').forEach(message => {
+
+    const progress = message.querySelector('.message-progress');
+    const closeBtn = message.querySelector('.message-close');
+
+    const tempos = {
+        success: 10000,
+        error: 15000,
+        warning: 22000,
+        info: 20000
+    };
+
+    const tag = message.dataset.tag || 'info';
+
+    const duration = tempos[tag] || 10000;
+
+    progress.style.animation =
+        `progressBar ${duration}ms linear forwards`;
+
+    let timeout = setTimeout(() => {
+        fecharMensagem();
+    }, duration);
+
+    function fecharMensagem(){
+        message.classList.add('fade-out');
+
+        setTimeout(() => {
+            message.remove();
+        }, 400);
+    }
+
+    closeBtn.addEventListener('click', () => {
+        clearTimeout(timeout);
+        fecharMensagem();
+    });
+
+    message.addEventListener('mouseenter', () => {
+        clearTimeout(timeout);
+
+        progress.style.animationPlayState = 'paused';
+    });
+
+    message.addEventListener('mouseleave', () => {
+
+        const remaining =
+            progress.offsetWidth /
+            message.offsetWidth *
+            duration;
+
+        progress.style.animationPlayState = 'running';
+
+        timeout = setTimeout(() => {
+            fecharMensagem();
+        }, remaining);
+
+    });
+
+});
+</script>
+
+{% endif %}
+      <div class="header__start">
+        <button class="hdr-toggle" id="menuToggle" aria-label="Abrir ou fechar menu" aria-controls="sidebar" aria-expanded="false">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M2.5 5H17.5M2.5 10H17.5M2.5 15H11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <div class="app-stamp">
+          <img src="{% static 'prefeitura.png' %}" alt="Prefeitura" class="app-stamp__logo">
+          <div class="app-stamp__text">
+            <span class="app-stamp__org">Secretaria Municipal da Educação</span>
+            <span class="app-stamp__app">MerendaFácil<span class="plus">+</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header__end">
+
+        <!-- Notifications -->
+        {% include "modulo_merendeiras/_base/_notifications.html" %}
+
+        <!-- Messages -->
+        <div class="widget" id="msgWidget">
+          <button class="hdr-btn" id="msgToggle" aria-label="Mensagens" aria-haspopup="true" aria-expanded="false" aria-controls="msgPanel">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M21 15C21 15.55 20.55 16 20 16H7L3 20V4C3 3.45 3.45 3 4 3H20C20.55 3 21 3.45 21 4V15Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+            <span class="hdr-badge hdr-badge--green" aria-hidden="true">2</span>
+          </button>
+          <div class="panel" id="msgPanel" role="dialog" aria-label="Mensagens" aria-modal="true">
+            <div class="panel__head">
+              <h2 class="panel__title">Mensagens</h2>
+              <button class="panel__action">Marcar lidas</button>
+            </div>
+            <ul class="panel__list">
+              <li class="notif-item notif-item--unread" style="background:#f3fbf5">
+                <div class="notif-icon" style="background:linear-gradient(135deg,var(--color-primary),var(--color-primary-mid));color:#fff;border-radius:50%;font-size:11px;font-weight:800">NU</div>
+                <div class="notif-body">
+                  <p class="notif-text"><strong>Nutricionista</strong> — Cardápio de setembro atualizado.</p>
+                  <time class="notif-time">há 5 min</time>
+                </div>
+                <div class="notif-dot" aria-hidden="true"></div>
+              </li>
+              <li class="notif-item notif-item--unread" style="background:#f3fbf5">
+                <div class="notif-icon" style="background:linear-gradient(135deg,#0277bd,#29b6f6);color:#fff;border-radius:50%;font-size:11px;font-weight:800">SE</div>
+                <div class="notif-body">
+                  <p class="notif-text"><strong>Secretaria</strong> — Confirmar recebimento da cesta básica.</p>
+                  <time class="notif-time">há 30 min</time>
+                </div>
+                <div class="notif-dot" aria-hidden="true"></div>
+              </li>
+            </ul>
+            <div class="panel__footer">
+              <a href="#" class="panel__footer-link">Abrir todas as mensagens →</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="hdr-divider" aria-hidden="true"></div>
+
+        <!-- User -->
+        <div class="widget" id="userWidget">
+          <button class="hdr-user" id="userToggle" aria-label="Menu do usuário" aria-haspopup="true" aria-expanded="false" aria-controls="userPanel">
+            <div class="hdr-user__av" aria-hidden="true">{{ usuario_nome|slice:":1" }}</div>
+            <span class="hdr-user__name">{{ usuario_nome }}</span>
+            <svg class="hdr-user__chevron" width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+              <path d="M3 5L6.5 8.5L10 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="panel user-panel" id="userPanel" role="dialog" aria-label="Opções do usuário" aria-modal="true">
+            <div class="user-panel__profile">
+              <div class="user-panel__av" aria-hidden="true">{{ usuario_nome|slice:":2"|upper }}</div>
+              <div>
+                <div class="user-panel__name">{{ usuario_nome }}</div>
+                <div class="user-panel__email">merendeira@gov.ba.br</div>
+                <span class="user-panel__badge">Merendeira</span>
+              </div>
+            </div>
+            <div class="panel__divider"></div>
+            <nav aria-label="Opções pessoais">
+              <a href="#" class="user-panel__item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20C4 16.69 7.58 14 12 14C16.42 14 20 16.69 20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                Meu Perfil
+              </a>
+              <a href="#" class="user-panel__item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 8V12M12 16H12.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                Central de Ajuda
+              </a>
+            </nav>
+            <div class="panel__divider"></div>
+            <div class="user-panel__session">
+              <div class="session-dot"></div>
+              <span class="session-text">Sessão ativa</span>
+            </div>
+            <div class="panel__divider"></div>
+            <form method="post" action="{% url 'admin_acessos:logout' %}">
+              {% csrf_token %}
+              <button type="submit" class="user-panel__item user-panel__item--logout" style="width:100%;text-align:left;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17L21 12L16 7M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Sair do sistema
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </header>

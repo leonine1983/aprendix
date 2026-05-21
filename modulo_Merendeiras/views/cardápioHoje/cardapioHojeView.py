@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView
 from django.utils import timezone
 from core.groups.merenda import MerendeirasRequiredMixin
-from ..baseMerendeiraView import BaseMerendeiraView
+from core.views.baseMerendeira import BaseMerendeiraView
 
 from merendaEscolar.models import (
     CardapioEscola,
@@ -9,7 +9,7 @@ from merendaEscolar.models import (
 )
 
 
-class CardapioHojeView(MerendeirasRequiredMixin, BaseMerendeiraView, TemplateView):
+class CardapioHojeView(BaseMerendeiraView, TemplateView):
     """
     Exibe o cardápio do dia atual para a merendeira logada.
     """
