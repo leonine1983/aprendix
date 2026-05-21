@@ -444,10 +444,80 @@
     margin-top: 18px;
   }
 
-  @media print {
-    .form-footer, .modo-banner, .alerta-cancelada, .alerta-aviso { display: none; }
-    .ficha-wrap { box-shadow: none; border: 1px solid #999; }
+@media print {
+  /* Oculta elementos de interface */
+  .form-footer,
+  .modo-banner,
+  .alerta-cancelada,
+  .alerta-aviso,
+  nav, header, aside, footer,
+  .navbar, .sidebar, .breadcrumb,
+  [class*="nav-"], [class*="sidebar-"] {
+    display: none !important;
   }
+
+  /* Garante que todos os ancestrais do .imprimir sejam visíveis */
+  html, body,
+  body > *,
+  body > * > *,
+  body > * > * > *,
+  body > * > * > * > * {
+    display: block !important;
+    visibility: visible !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Oculta tudo que NÃO é o .imprimir nem seu conteúdo */
+  body *:not(.imprimir):not(.imprimir *) {
+    visibility: hidden !important;
+  }
+
+  /* Exibe o .imprimir e tudo dentro dele */
+  .imprimir,
+  .imprimir * {
+    visibility: visible !important;
+  }
+
+  .imprimir {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: 1px solid #999 !important;
+  }
+
+  /* Garante cores no print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+  /* ── BOTÃO IMPRIMIR ── */
+.btn-imprimir {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--azul-fnde);
+  color: var(--branco);
+  border: none;
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  letter-spacing: .3px;
+  transition: background .15s;
+  margin-right: 12px;
+}
+.btn-imprimir:hover { background: var(--azul-fnde-light); }
+
+
 </style>
 
 <div style="padding: 16px 8px;">
@@ -472,7 +542,7 @@
   <form method="post">
     {% csrf_token %}
 
-    <div class="ficha-wrap">
+    <div class="ficha-wrap imprimir" >
 
       {# ══ CABEÇALHO ══ #}
       <div class="ficha-header">
@@ -833,14 +903,28 @@
 
     {# BOTÃO SALVAR fora do card #}
     <div class="form-footer">
-      <button type="submit"
-              class="btn-salvar"
-              {% if execucao_receita.status == "CANCELADA" %}disabled title="Execução cancelada"{% endif %}>
-        💾 {% if modo_edicao %}Atualizar Ficha{% else %}Salvar Ficha{% endif %}
-      </button>
+      <div class="form-footer">
+  {# Botão Imprimir #}
+  <button type="button" class="btn-imprimir" onclick="imprimirFicha()">
+    🖨️ Imprimir Ficha
+  </button>
+
+  <button type="submit"
+          class="btn-salvar"
+          {% if execucao_receita.status == "CANCELADA" %}disabled title="Execução cancelada"{% endif %}>
+    💾 {% if modo_edicao %}Atualizar Ficha{% else %}Salvar Ficha{% endif %}
+  </button>
+</div>
+      
     </div>
 
   </form>
 </div>
+
+<script>
+  function imprimirFicha() {
+    window.print();
+  }
+</script>
 
 {% endblock %}

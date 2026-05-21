@@ -164,9 +164,13 @@
                             </td>
 
                             <!-- QUANTIDADE -->
-                            <td class="text-end fw-semibold">
-                                {{ e.quantidade }}
-                            </td>
+                            <!-- QUANTIDADE -->
+<td class="text-end fw-semibold " style='color:blue'>
+    {{ e.quantidade }}
+    <small class="text-muted fw-normal">
+        {{ e.produto.unidade_medida.sigla }}
+    </small>
+</td>
 
                             <!-- STATUS -->
                             <td>

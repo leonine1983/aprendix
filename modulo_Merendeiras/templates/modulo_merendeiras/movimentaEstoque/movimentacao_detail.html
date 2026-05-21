@@ -1,56 +1,122 @@
 {% extends "modulo_merendeiras/base_merendeira.html" %}
 
 {% block content %}
-<div class="container py-4">
+<div class="main">
 
-    <div class="card shadow-sm border-0">
+    <!-- 🔷 HEADER -->
+    <div class="page-hdr">
+        <div>
+            <div class="page-hdr__eyebrow">Estoque Escolar</div>
+            <h1 class="page-hdr__title">
+                📊 Detalhe da Movimentação
+            </h1>
+            <p class="page-hdr__desc">
+                Registro completo desta movimentação de estoque
+            </p>
+        </div>
+    </div>
 
-        <div class="card-body">
+    <!-- 🔷 CARD PRINCIPAL -->
+    <div class="card">
 
-            <h4 class="fw-bold text-primary mb-3">
-                🔍 Detalhe da Movimentação
-            </h4>
+        <div class="card__head">
+            <div>
+                <div class="card__title">📋 Informações da Movimentação</div>
+                <div class="card__subtitle">
+                    {{ movimentacao.data_movimentacao|date:"d/m/Y \à\s H:i" }}
+                </div>
+            </div>
 
-            <hr>
+            <!-- Badge de tipo -->
+            <div>
+                {% with tipo=movimentacao.tipo %}
+                    {% if "ENTRADA" in tipo %}
+                        <span class="pill pill--ok">⬇ {{ movimentacao.get_tipo_display }}</span>
+                    {% elif "SAIDA" in tipo %}
+                        <span class="pill pill--warn">⬆ {{ movimentacao.get_tipo_display }}</span>
+                    {% else %}
+                        <span class="pill pill--info">⚙ {{ movimentacao.get_tipo_display }}</span>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
 
-            <div class="row g-3">
+        <div class="card__body">
 
-                <div class="col-md-6">
-                    <strong>Produto:</strong><br>
-                    {{ movimentacao.produto.nome }}
+            <!-- GRADE DE DETALHES -->
+            <div class="detail-grid">
+
+                <div class="detail-item">
+                    <span class="detail-item__label">Produto</span>
+                    <span class="detail-item__value fw-semibold">
+                        {{ movimentacao.produto.nome }}
+                    </span>
+                    <span class="detail-item__meta">
+                        ID: {{ movimentacao.produto.id }}
+                    </span>
                 </div>
 
-                <div class="col-md-6">
-                    <strong>Tipo:</strong><br>
-                    {{ movimentacao.get_tipo_display }}
+                <div class="detail-item">
+                    <span class="detail-item__label">Quantidade</span>
+                    <span class="detail-item__value fw-semibold">
+                        {{ movimentacao.quantidade }}
+                        <small class="text-muted fw-normal">
+                            {{ movimentacao.produto.unidade_medida.sigla }}
+                        </small>
+                    </span>
                 </div>
 
-                <div class="col-md-6">
-                    <strong>Quantidade:</strong><br>
-                    {{ movimentacao.quantidade }}
+                <div class="detail-item">
+                    <span class="detail-item__label">Responsável</span>
+                    <span class="detail-item__value">
+                        {{ movimentacao.usuario.get_full_name|default:movimentacao.usuario.username }}
+                    </span>
+                    <span class="detail-item__meta">
+                        @{{ movimentacao.usuario.username }}
+                    </span>
                 </div>
 
-                <div class="col-md-6">
-                    <strong>Usuário:</strong><br>
-                    {{ movimentacao.usuario.get_full_name|default:movimentacao.usuario.username }}
+                <div class="detail-item">
+                    <span class="detail-item__label">Data e Hora</span>
+                    <span class="detail-item__value">
+                        {{ movimentacao.data_movimentacao|date:"d/m/Y" }}
+                    </span>
+                    <span class="detail-item__meta">
+                        {{ movimentacao.data_movimentacao|date:"H:i" }}
+                    </span>
                 </div>
 
-                <div class="col-md-6">
-                    <strong>Data:</strong><br>
-                    {{ movimentacao.criado_em|date:"d/m/Y H:i" }}
+                {% if movimentacao.escola %}
+                <div class="detail-item">
+                    <span class="detail-item__label">Escola</span>
+                    <span class="detail-item__value">
+                        {{ movimentacao.escola }}
+                    </span>
                 </div>
-
-                <div class="col-md-12">
-                    <strong>Observação:</strong><br>
-                    {{ movimentacao.observacao|safe }}
-                </div>
+                {% endif %}
 
             </div>
 
+            <!-- OBSERVAÇÃO -->
+            {% if movimentacao.observacao %}
+            <div class="mt-4">
+                <div class="detail-item__label mb-2">Observação</div>
+                <div class="context-card">
+                    <div class="context-card__body">
+                        {{ movimentacao.observacao|safe }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
         </div>
 
-        <div class="card-footer text-end">
-            <button onclick="window.print()" class="btn btn-outline-secondary">
+        <!-- RODAPÉ COM AÇÕES -->
+        <div class="card__foot">
+            <a href="javascript:history.back()" class="btn btn--outline btn--md">
+                ← Voltar
+            </a>
+            <button onclick="window.print()" class="btn btn--primary btn--md">
                 🖨️ Imprimir
             </button>
         </div>
@@ -58,4 +124,86 @@
     </div>
 
 </div>
+
+<!-- ESTILOS ESPECÍFICOS DA PÁGINA -->
+<style>
+    /* ── Grade de detalhes ───────────────────────── */
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: .2rem;
+        padding: 1rem;
+        background: var(--surface-alt, #f8f9fa);
+        border-radius: .5rem;
+        border-left: 3px solid var(--primary, #2e7d32);
+    }
+
+    .detail-item__label {
+        font-size: .7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: var(--text-muted, #6c757d);
+    }
+
+    .detail-item__value {
+        font-size: 1rem;
+        color: var(--text-primary, #212529);
+        line-height: 1.3;
+    }
+
+    .detail-item__meta {
+        font-size: .75rem;
+        color: var(--text-muted, #6c757d);
+    }
+
+    /* ── Rodapé do card ──────────────────────────── */
+    .card__foot {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: .75rem;
+        padding: 1rem 1.25rem;
+        border-top: 1px solid var(--border, #dee2e6);
+        flex-wrap: wrap;
+    }
+
+    /* ── Responsividade mobile ───────────────────── */
+    @media (max-width: 480px) {
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .card__foot {
+            flex-direction: column-reverse;
+        }
+
+        .card__foot .btn {
+            width: 100%;
+            text-align: center;
+        }
+    }
+
+    /* ── Impressão ───────────────────────────────── */
+    @media print {
+        .page-hdr,
+        .card__foot { display: none; }
+
+        .card {
+            box-shadow: none;
+            border: 1px solid #ccc;
+        }
+
+        .detail-item {
+            border-left-color: #000;
+            background: #fff;
+        }
+    }
+</style>
 {% endblock %}
