@@ -736,7 +736,7 @@
 
               <td>
                 <div class="ea-actions">
-                  <a href="{% url 'modulo_merendeiras:execucao_ficha_diaria' execucao.pk %}"
+                  <a href="{% url 'modulo_merendeiras:execucao_ficha_diaria' pk=execucao.pk turno=execucao.turno %}"
                      class="ea-action-btn" data-tip="Preencher Ficha Diária">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                   </a>
@@ -817,10 +817,7 @@
             <div class="ea-card__obs">{{ execucao.observacoes|safe }}</div>
           {% endif %}
           <div class="ea-card__actions">
-            <a href="{% url 'modulo_merendeiras:execucao_ficha_diaria' execucao.pk %}" class="ea-card__action-btn ea-card__action-btn--primary">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-              Ficha Diária
-            </a>
+            
             <a href="#" class="ea-card__action-btn">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               Detalhes

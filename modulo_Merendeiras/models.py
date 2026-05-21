@@ -36,6 +36,20 @@ class ExecucaoReceitaCozinha(models.Model):
         ("CANCELADA", "Cancelada"),
     )
 
+    
+    TURNO_CHOICES = (
+    ("MANHA", "Manhã"),
+    ("TARDE", "Tarde"),
+    ("NOITE", "Noite"),
+    ("INTEGRAL", "Integral"),
+    )
+
+    turno = models.CharField(
+        max_length=20,
+        choices=TURNO_CHOICES,
+        default="MANHA",
+    )
+
     escola = models.ForeignKey(Escola, on_delete=models.PROTECT, related_name='execucoes_receita')
     receita = models.ForeignKey(Receita, on_delete=models.PROTECT, related_name='execucoes')
     status = models.CharField(max_length=20, choices=STATUS, default="ABERTA")
@@ -380,6 +394,77 @@ class FichaDiariaItem(models.Model):
         verbose_name = "Item da Ficha Diária"
         verbose_name_plural = "Itens da Ficha Diária"
 
+
+class FichaExecucaoReceitaCozinha(models.Model):
+    """
+    Ficha vinculada diretamente a uma ExecucaoReceitaCozinha.
+    Substitui FichaExecucaoReceita para o fluxo de cozinha.
+    """
+
+    ACEITABILIDADE_CHOICES = (
+        ("OTIMA",    "Ótima"),
+        ("BOA",      "Boa"),
+        ("REGULAR",  "Regular"),
+        ("BAIXA",    "Baixa"),
+    )
+
+    SOBRAS_CHOICES = (
+        ("NAO",      "Não houve"),
+        ("PEQUENA",  "Pequena quantidade"),
+        ("GRANDE",   "Grande quantidade"),
+    )
+
+    # ── RELAÇÃO PRINCIPAL ────────────────────────────────────────────
+    execucao_receita = models.OneToOneField(
+        ExecucaoReceitaCozinha,
+        on_delete=models.CASCADE,
+        related_name="ficha",
+    )
+
+    # ── QUEM PREENCHEU ───────────────────────────────────────────────
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        related_name="fichas_receita_cozinha",
+    )
+
+    # ── PRODUÇÃO REAL ────────────────────────────────────────────────
+    porcoes_produzidas = models.PositiveIntegerField(null=True, blank=True)
+
+    # ── AVALIAÇÃO ────────────────────────────────────────────────────
+    aceitabilidade = models.CharField(
+        max_length=10, choices=ACEITABILIDADE_CHOICES, blank=True, null=True
+    )
+    houve_sobras = models.CharField(
+        max_length=10, choices=SOBRAS_CHOICES, blank=True, null=True
+    )
+    motivo_sobras = models.CharField(max_length=200, blank=True, null=True)
+
+    # ── OCORRÊNCIAS ──────────────────────────────────────────────────
+    falta_alimento       = models.BooleanField(default=False)
+    problema_equipamento = models.BooleanField(default=False)
+    falta_gas            = models.BooleanField(default=False)
+    outra_ocorrencia     = models.CharField(max_length=200, blank=True, null=True)
+
+    # ── OBSERVAÇÕES ──────────────────────────────────────────────────
+    observacoes = RichTextField(blank=True, null=True)
+
+    # ── ASSINATURA ───────────────────────────────────────────────────
+    assinado_por_direcao = models.BooleanField(default=False)
+
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criado_em"]
+        verbose_name = "Ficha de Execução de Receita"
+        verbose_name_plural = "Fichas de Execução de Receita"
+
+    def __str__(self):
+        return (
+            f"Ficha — {self.execucao_receita.receita.nome} | "
+            f"{self.execucao_receita.escola} | "
+            f"{self.execucao_receita.iniciado_em:%d/%m/%Y}"
+        )
 
 # =========================================================
 # SERVIÇOS DE DOMÍNIO APERFEIÇOADOS

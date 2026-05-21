@@ -29,13 +29,21 @@ from core.views.baseMerendeira import BaseMerendeiraView
 from merendaEscolar.models import CardapioDia, CardapioItem, CardapioSemana, CardapioEscola
 
 
-# ============================================================
-# Formulário (reaproveita os mesmos campos da FichaDiariaForm)
-# ============================================================
+
+from modulo_Merendeiras.models import (
+    ExecucaoReceitaCozinha,
+    ExecucaoCardapioDia,
+    ExecucaoCardapioItem,
+    FichaExecucaoReceitaCozinha,   # ← novo model
+    MovimentacaoCozinha,
+)
+
+
+# ── Formulário ───────────────────────────────────────────────────────────────
 
 class FichaDiariaExecucaoForm(forms.ModelForm):
     class Meta:
-        model = FichaExecucaoReceita
+        model = FichaExecucaoReceitaCozinha          # ← novo model
         fields = [
             "porcoes_produzidas",
             "aceitabilidade",
@@ -48,9 +56,9 @@ class FichaDiariaExecucaoForm(forms.ModelForm):
             "observacoes",
         ]
         widgets = {
-            "aceitabilidade": forms.Select(attrs={"class": "form-select"}),
-            "houve_sobras":   forms.Select(attrs={"class": "form-select"}),
-            "motivo_sobras": forms.TextInput(attrs={
+            "aceitabilidade":   forms.Select(attrs={"class": "form-select"}),
+            "houve_sobras":     forms.Select(attrs={"class": "form-select"}),
+            "motivo_sobras":    forms.TextInput(attrs={
                 "class": "form-control",
                 "placeholder": "Motivo das sobras (se houver)",
             }),
@@ -62,36 +70,30 @@ class FichaDiariaExecucaoForm(forms.ModelForm):
         }
 
 
+
 # ============================================================
 # View principal
 # ============================================================
 
 class ExecucaoReceitaCozinhaFichaDiariaView(BaseMerendeiraView, CreateView):
-    """
-    Cria ou edita a Ficha Diária a partir de uma ExecucaoReceitaCozinha.
 
-    URL sugerida:
-        path(
-            "execucao/<int:pk>/ficha-diaria/",
-            ExecucaoReceitaCozinhaFichaDiariaView.as_view(),
-            name="execucao_ficha_diaria",
-        )
-    """
-
-    model        = FichaExecucaoReceita
-    form_class   = FichaDiariaExecucaoForm
+    model         = FichaExecucaoReceitaCozinha      # ← novo model
+    form_class    = FichaDiariaExecucaoForm
     template_name = "modulo_merendeiras/cozinha/ficha_diaria_execucaoCozinha.html"
 
     # ------------------------------------------------------------------
     # dispatch — carrega a ExecucaoReceitaCozinha e contextos derivados
     # ------------------------------------------------------------------
     def dispatch(self, request, *args, **kwargs):
+        self.turno_url: str = self.kwargs.get("turno", "").upper()
+
         self.execucao_receita: ExecucaoReceitaCozinha = get_object_or_404(
-            ExecucaoReceitaCozinha.objects.select_related("escola", "receita", "iniciado_por"),
+            ExecucaoReceitaCozinha.objects.select_related(
+                "escola", "receita", "iniciado_por"
+            ),
             pk=self.kwargs["pk"],
         )
 
-        # Tenta localizar ExecucaoCardapioDia compatível (mesma escola + data)
         self.execucao_dia: ExecucaoCardapioDia | None = (
             ExecucaoCardapioDia.objects
             .filter(
@@ -101,17 +103,14 @@ class ExecucaoReceitaCozinhaFichaDiariaView(BaseMerendeiraView, CreateView):
             .first()
         )
 
-        # Tenta localizar CardapioDia compatível com a data real da execução
-        self.cardapio_dia: CardapioDia | None = self._resolver_cardapio_dia()
+        self.cardapio_dia = self._resolver_cardapio_dia()
 
-        # Verifica se já existe uma ficha para este ExecucaoCardapioDia
-        self.ficha_existente: FichaExecucaoReceita | None = None
-        if self.execucao_dia:
-            self.ficha_existente = (
-                FichaExecucaoReceita.objects
-                .filter(execucao_cardapio_dia=self.execucao_dia)
-                .first()
-            )
+        # ── Ficha existente agora buscada pela execução da receita ────
+        self.ficha_existente: FichaExecucaoReceitaCozinha | None = (
+            FichaExecucaoReceitaCozinha.objects
+            .filter(execucao_receita=self.execucao_receita)
+            .first()
+        )
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -255,10 +254,21 @@ class ExecucaoReceitaCozinhaFichaDiariaView(BaseMerendeiraView, CreateView):
         # ── Dados da execução para exibição no cabeçalho ─────────────
         ctx["escola"]           = exec_receita.escola
         ctx["data_execucao"]    = exec_receita.iniciado_em.date()
-        ctx["turno_display"]    = (
-            self.execucao_dia.get_turno_display()
-            if self.execucao_dia else "—"
+
+
+        # Turno: prioriza o da URL; fallback para o da execução; depois ExecucaoCardapioDia
+        turno_resolvido = (
+            self.turno_url
+            or self.execucao_receita.turno
+            or (self.execucao_dia.turno if self.execucao_dia else None)
         )
+
+        ctx["turno_display"] = dict(ExecucaoReceitaCozinha.TURNO_CHOICES).get(
+            turno_resolvido, turno_resolvido or "—"
+        )
+        ctx["turno_valor"] = turno_resolvido  # valor bruto, útil para lógicas futuras
+
+
         ctx["quantidade_alunos"] = (
             exec_receita.quantidade_alunos
             or (self.execucao_dia.quantidade_alunos if self.execucao_dia else None)
@@ -289,25 +299,18 @@ class ExecucaoReceitaCozinhaFichaDiariaView(BaseMerendeiraView, CreateView):
     # ------------------------------------------------------------------
 
     def form_valid(self, form):
-        # Garante que existe ExecucaoCardapioDia para vincular a ficha.
-        # Se não existir, cria um registro mínimo para preservar a relação.
-        if not self.execucao_dia:
-            messages.error(
-                self.request,
-                "Não foi possível localizar uma Execução de Cardápio do Dia "
-                "para vincular esta ficha. Certifique-se de que a execução "
-                "foi criada corretamente.",
-            )
-            return self.form_invalid(form)
-
         try:
             with transaction.atomic():
                 ficha = form.save(commit=False)
-                ficha.execucao_cardapio_dia = self.execucao_dia
+                ficha.execucao_receita = self.execucao_receita  # ← vínculo direto
                 ficha.usuario = self.request.user
                 ficha.save()
 
-                msg = "Ficha atualizada com sucesso." if self.ficha_existente else "Ficha registrada com sucesso."
+                msg = (
+                    "Ficha atualizada com sucesso."
+                    if self.ficha_existente
+                    else "Ficha registrada com sucesso."
+                )
                 messages.success(self.request, msg)
 
         except Exception as exc:

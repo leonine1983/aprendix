@@ -78,14 +78,14 @@ urlpatterns = [
     ),
 
     path(
-        "execucao/<int:pk>/ficha-diaria/",
-        views.ExecucaoReceitaCozinhaFichaDiariaView.as_view(),
-        name="execucao_ficha_diaria",
-    ),
+    "execucao/<int:pk>/ficha-diaria/<str:turno>/",
+    views.ExecucaoReceitaCozinhaFichaDiariaView.as_view(),
+    name="execucao_ficha_diaria",
+),
 
     # Ficha via execuçaõ
     path(
-        "cardapio/execucao/merendaManual/<int:execucao_id>/<str:turno>/ficha/",
+        "cardapio/execucao/cardápioDia/<int:execucao_id>/<str:turno>/ficha/",
         views.FichaDiariaCreateView.as_view(),
         name="ficha_diaria",
     ),
