@@ -42,8 +42,12 @@
           <span>Em operação</span>
         </div>
       </div>
+      
       {% block content %}
       {% endblock content %}
+      <!-- Mensagens -->
+       {% include "modulo_merendeiras/_base/_mensagem_fab.html" %}
+      
     </main>
     <!-- FOOTER -->
      {% include "modulo_merendeiras/_base/_footer.html" %}    
@@ -220,6 +224,8 @@
 
     })();
   </script>
+  
+
 
 </body>
 </html>

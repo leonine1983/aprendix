@@ -9,24 +9,141 @@ from rh.models import Escola
 User = get_user_model()
 
 
+from django.db import models
+from django.contrib.auth import get_user_model
+from ckeditor.fields import RichTextField
+from django.utils import timezone
+from datetime import timedelta
+
+User = get_user_model()
+
+
 class MessageUser(models.Model):
-    remetente = models.ForeignKey(User, null=True, on_delete=models.CASCADE, editable=False, verbose_name="Remetente da mensagem", related_name="sent_messages")
-    destinatario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Destinatário da mensagem", related_name="received_messages")
-    assunto = models.CharField(max_length=100, verbose_name='Assunto da mensagem')
-    mensagem = RichTextField(null=True, blank=True)
-    aberta = models.BooleanField(default=False)
-    foi_consultado = models.BooleanField(default=False)
-    data_envio = models.DateTimeField(auto_now_add=True)
-    exclude_msg = models.CharField(max_length=5, blank=True, null=True)  # Corrigido para permitir valores em branco
+
+    remetente = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        editable=False,
+        related_name="sent_messages",
+        verbose_name="Remetente"
+    )
+
+    destinatario = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="received_messages",
+        verbose_name="Destinatário"
+    )
+
+    assunto = models.CharField(
+        max_length=100,
+        verbose_name="Assunto"
+    )
+
+    mensagem = RichTextField(
+        null=True,
+        blank=True
+    )
+
+    aberta = models.BooleanField(
+        default=False,
+        verbose_name="Mensagem lida"
+    )
+
+    foi_consultado = models.BooleanField(
+        default=False
+    )
+
+    data_envio = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    data_leitura = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    exclude_msg = models.CharField(
+        max_length=5,
+        blank=True,
+        null=True
+    )
 
     class Meta:
         ordering = ["-data_envio"]
         verbose_name = "Mensagem"
         verbose_name_plural = "Mensagens"
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.assunto
 
+    # =====================================================
+    # MARCAR COMO LIDA
+    # =====================================================
+
+    def marcar_como_lida(self):
+
+        if not self.aberta:
+            self.aberta = True
+            self.data_leitura = timezone.now()
+            self.save(update_fields=["aberta", "data_leitura"])
+
+    # =====================================================
+    # LIMPEZA AUTOMÁTICA
+    # =====================================================
+
+    @classmethod
+    def limpar_mensagens_antigas(cls):
+
+        agora = timezone.now()
+
+        # -----------------------------------------
+        # 1. EXCLUI mensagens NÃO LIDAS antigas
+        #    (30 dias)
+        # -----------------------------------------
+
+        cls.objects.filter(
+            aberta=False,
+            data_envio__lt=agora - timedelta(days=30)
+        ).delete()
+
+        # -----------------------------------------
+        # 2. EXCLUI mensagens LIDAS antigas
+        #    (15 dias após leitura)
+        # -----------------------------------------
+
+        cls.objects.filter(
+            aberta=True,
+            data_leitura__lt=agora - timedelta(days=15)
+        ).delete()
+
+        # -----------------------------------------
+        # 3. MANTÉM SOMENTE 20 mensagens lidas
+        #    por usuário
+        # -----------------------------------------
+
+        usuarios = User.objects.all()
+
+        for user in usuarios:
+
+            mensagens = (
+                cls.objects
+                .filter(
+                    destinatario=user,
+                    aberta=True
+                )
+                .order_by("-data_leitura")
+            )
+
+            if mensagens.count() > 20:
+
+                ids_manter = mensagens[:20].values_list("id", flat=True)
+
+                mensagens.exclude(id__in=ids_manter).delete()
+
+                
 
 class AtualizacaoNotificacaoSistema(models.Model):
     TIPO_CHOICES = [

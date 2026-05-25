@@ -36,3 +36,7 @@ from .cozinha.execucaoListView import *
 from .cozinha.executaAvulsa.execucaoAvulsa import *
 from .cozinha.executaAvulsa.listExecutaAvulsa import *
 from .cozinha.executaAvulsa.ficha_diaria_execucao_view import *
+
+# Messages
+from .messagesUser.enviar_mensagem_ajax import *
+from .messagesUser.listaMensagensView import *

@@ -10,6 +10,7 @@ from core.models.perfil import PerfilUsuario
 from core.models import ConfiguraPessoal
 
 from admin_acessos.models import AtualizacaoNotificacaoSistema, NotificacaoProduto
+from admin_acessos.models import MessageUser
 
 
 class BaseMerendeiraView(LoginRequiredMixin, GroupRequiredMixin):
@@ -175,6 +176,19 @@ class BaseMerendeiraView(LoginRequiredMixin, GroupRequiredMixin):
     # ─────────────────────────────────────────────
 
     def get_context_data(self, **kwargs):
+        from datetime import timedelta
+        MessageUser.limpar_mensagens_antigas()
+
+        agora = timezone.now()
+
+        AtualizacaoNotificacaoSistema.objects.filter(
+            criada_em__lt=agora - timedelta(days=30)
+        ).delete()
+
+        NotificacaoProduto.objects.filter(
+            criado_em__lt=agora - timedelta(days=30)
+        ).delete()
+
         ctx = super().get_context_data(**kwargs)
         user = self.request.user
 
@@ -196,6 +210,20 @@ class BaseMerendeiraView(LoginRequiredMixin, GroupRequiredMixin):
             "notificacoes_nao_lidas": self.notificacoes_nao_lidas,
             "notificacoes_lidas": self.notificacoes_lidas,
             "total_nao_lidas": len(self.notificacoes_nao_lidas),
+
+            "mensagens_notificacao": (
+                MessageUser.objects
+                .filter(destinatario=user)
+                .select_related("remetente", "destinatario")
+                .order_by("-data_envio")[:10]
+            ),
+
+            "total_nao_lidas_msg": (
+                MessageUser.objects.filter(
+                    destinatario=user,
+                    aberta=False
+                ).count()
+            ),
         })
         return ctx
     

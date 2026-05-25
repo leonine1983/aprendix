@@ -1,0 +1,1077 @@
+{% load static %}
+
+
+{# ── FAB BUTTON ── #}
+<button
+  class="msg-fab"
+  id="msgFab"
+  aria-label="Nova mensagem"
+  title="Nova mensagem"
+>
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <span class="msg-fab__badge" id="msgFabBadge" aria-label="mensagens não lidas">
+    {{ total_msg_nao_lidas|default:"0" }}
+  </span>
+</button>
+
+{# ── OVERLAY + COMPOSER ── #}
+<div class="msg-overlay" id="msgOverlay" role="dialog" aria-modal="true" aria-label="Compositor de mensagem" hidden>
+
+  <div class="msg-composer" id="msgComposer">
+
+    {# Header #}
+    <div class="msg-composer__header">
+      <div class="msg-composer__header-info">
+        <div class="msg-composer__avatar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <p class="msg-composer__title">Nova mensagem</p>
+          <p class="msg-composer__sub" id="msgComposerSub">Selecione o destinatário</p>
+        </div>
+      </div>
+      <button class="msg-composer__close" id="msgClose" aria-label="Fechar compositor">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    {# Body #}
+    <div class="msg-composer__body">
+
+      {# Destinatário #}
+      <div class="msg-field">
+        <label class="msg-label" for="msgDest">Para</label>
+        <select class="msg-select" id="msgDest" name="destinatario_id">
+          <option value="">— Selecionar destinatário —</option>
+          {# Opções carregadas via JS ou renderizadas pelo Django via context #}
+          {% if destinatarios_msg %}
+            {% regroup destinatarios_msg by grupo as grupos_list %}
+            {% for grupo in grupos_list %}
+              <optgroup label="{{ grupo.grouper }}">
+                {% for u in grupo.list %}
+                  <option value="{{ u.id }}">{{ u.nome }}</option>
+                {% endfor %}
+              </optgroup>
+            {% endfor %}
+          {% else %}
+            {# Fallback: carregado dinamicamente pelo JS #}
+          {% endif %}
+        </select>
+      </div>
+
+      {# Assunto #}
+      <div class="msg-field">
+        <label class="msg-label" for="msgAssunto">Assunto</label>
+        <input
+          class="msg-input"
+          id="msgAssunto"
+          name="assunto"
+          type="text"
+          placeholder="Ex.: Falta de ingrediente / Cardápio"
+          maxlength="100"
+          autocomplete="off"
+        >
+      </div>
+
+      {# Editor #}
+      <div class="msg-field">
+        <label class="msg-label">Mensagem</label>
+
+        {# Toolbar #}
+        <div class="msg-toolbar" role="toolbar" aria-label="Formatação de texto">
+          <button class="msg-tb-btn" data-cmd="bold"              title="Negrito (Ctrl+B)"      aria-label="Negrito">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M6 4h8a4 4 0 0 1 0 8H6zm0 8h9a4 4 0 0 1 0 8H6z" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="msg-tb-btn" data-cmd="italic"            title="Itálico (Ctrl+I)"     aria-label="Itálico">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><line x1="19" y1="4" x2="10" y2="4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="14" y1="20" x2="5" y2="20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="15" y1="4" x2="9" y2="20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          </button>
+          <button class="msg-tb-btn" data-cmd="underline"         title="Sublinhado (Ctrl+U)"  aria-label="Sublinhado">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M6 3v7a6 6 0 0 0 12 0V3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="4" y1="21" x2="20" y2="21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          </button>
+          <button class="msg-tb-btn" data-cmd="strikeThrough"     title="Tachado"              aria-label="Tachado">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M16 4H9a3 3 0 0 0 0 6h6a3 3 0 0 1 0 6H6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          </button>
+          <span class="msg-tb-sep" aria-hidden="true"></span>
+          <button class="msg-tb-btn" data-cmd="insertUnorderedList" title="Lista"              aria-label="Lista">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><line x1="9" y1="6"  x2="20" y2="6"  stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="9" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="9" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="4" cy="6"  r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/></svg>
+          </button>
+          <button class="msg-tb-btn" data-cmd="insertOrderedList" title="Lista numerada"       aria-label="Lista numerada">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><line x1="10" y1="6"  x2="21" y2="6"  stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><text x="2" y="8"  font-size="7" fill="currentColor" font-family="sans-serif">1</text><text x="2" y="14" font-size="7" fill="currentColor" font-family="sans-serif">2</text><text x="2" y="20" font-size="7" fill="currentColor" font-family="sans-serif">3</text></svg>
+          </button>
+          <span class="msg-tb-sep" aria-hidden="true"></span>
+          <button class="msg-tb-btn msg-tb-btn--emoji" id="msgEmojiToggle" title="Emojis" aria-label="Inserir emoji" aria-expanded="false">
+            😊
+          </button>
+          <button class="msg-tb-btn" id="msgClearBtn" title="Limpar mensagem" aria-label="Limpar mensagem" style="margin-left:auto">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6l-1 14H6L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M9 6V4h6v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+
+        {# Área editável #}
+        <div
+          class="msg-editor"
+          id="msgEditor"
+          contenteditable="true"
+          role="textbox"
+          aria-multiline="true"
+          aria-label="Corpo da mensagem"
+          aria-required="true"
+          spellcheck="true"
+        ></div>
+
+        {# Emoji picker #}
+        <div class="msg-emoji-picker" id="msgEmojiPicker" aria-label="Seletor de emojis" hidden>
+          <div class="msg-emoji-cats" role="tablist">
+            <button class="msg-emoji-cat msg-emoji-cat--active" data-cat="smileys"  role="tab" aria-selected="true">😊 Rostos</button>
+            <button class="msg-emoji-cat" data-cat="comida"   role="tab" aria-selected="false">🍎 Comida</button>
+            <button class="msg-emoji-cat" data-cat="objetos"  role="tab" aria-selected="false">📋 Objetos</button>
+            <button class="msg-emoji-cat" data-cat="sinais"   role="tab" aria-selected="false">✅ Sinais</button>
+          </div>
+          <div class="msg-emoji-grid" id="msgEmojiGrid" role="listbox" aria-label="Emojis disponíveis"></div>
+        </div>
+      </div>
+
+    </div>{# /body #}
+
+    {# Footer #}
+    <div class="msg-composer__footer">
+      <span class="msg-char-count" id="msgCharCount" aria-live="polite">0 / 2000</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="msg-btn-cancel" id="msgCancelBtn" type="button">Cancelar</button>
+        <button class="msg-btn-send"   id="msgSendBtn"   type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <line x1="22" y1="2" x2="11" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/>
+          </svg>
+          Enviar
+        </button>
+      </div>
+    </div>
+
+  </div>{# /composer #}
+</div>{# /overlay #}
+
+{# ── TOAST ── #}
+<div class="msg-toast" id="msgToast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+
+<style>
+/* ─────────────────────────────────────────
+   FAB
+───────────────────────────────────────── */
+.msg-fab {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 1040;
+
+  width: 56px;
+  height: 56px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #25D366;
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  box-shadow: 0 4px 20px rgba(0,0,0,.20);
+
+  transition:
+    transform .15s ease,
+    background .15s ease;
+}
+
+.msg-fab:hover {
+  background: #1ebe5a;
+  transform: scale(1.06);
+}
+
+.msg-fab:active {
+  transform: scale(.96);
+}
+
+.msg-fab__badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+
+  border-radius: 999px;
+
+  background: #E24B4A;
+  color: #fff;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid #fff;
+
+  line-height: 1;
+}
+
+.msg-fab__badge[data-count="0"] {
+  display: none;
+}
+
+/* ─────────────────────────────────────────
+   OVERLAY
+───────────────────────────────────────── */
+.msg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+
+  background: rgba(0,0,0,.35);
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+
+  padding: 24px;
+
+  box-sizing: border-box;
+
+  opacity: 0;
+  pointer-events: none;
+
+  transition: opacity .25s ease;
+}
+
+/* garante iniciar fechado */
+.msg-overlay[hidden] {
+  display: none !important;
+}
+
+.msg-overlay.msg-overlay--open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ─────────────────────────────────────────
+   COMPOSER
+───────────────────────────────────────── */
+.msg-composer {
+  width: 100%;
+  max-width: 460px;
+
+  max-height: calc(100vh - 120px);
+
+  background: #fff;
+
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,.10);
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 10px 35px rgba(0,0,0,.18);
+
+  opacity: 0;
+  transform: translateY(40px);
+
+  transition:
+    transform .25s ease,
+    opacity .25s ease;
+}
+
+/* estado aberto */
+.msg-overlay--open .msg-composer {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─────────────────────────────────────────
+   HEADER
+───────────────────────────────────────── */
+.msg-composer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 16px;
+
+  border-bottom: 1px solid #f0f0f0;
+
+  background: #f8f9fa;
+
+  flex-shrink: 0;
+}
+
+.msg-composer__header-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.msg-composer__avatar {
+  width: 36px;
+  height: 36px;
+
+  border-radius: 50%;
+
+  background: #dcf8c6;
+  color: #075e54;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+.msg-composer__title {
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  color: #111;
+}
+
+.msg-composer__sub {
+  margin: 0;
+
+  font-size: 12px;
+
+  color: #666;
+}
+
+.msg-composer__close {
+  background: none;
+  border: none;
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  color: #666;
+
+  transition:
+    background .15s ease,
+    color .15s ease;
+}
+
+.msg-composer__close:hover {
+  background: #eee;
+  color: #111;
+}
+
+/* ─────────────────────────────────────────
+   BODY
+───────────────────────────────────────── */
+.msg-composer__body {
+  flex: 1;
+
+  overflow-y: auto;
+
+  padding: 14px 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ─────────────────────────────────────────
+   FIELDS
+───────────────────────────────────────── */
+.msg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.msg-label {
+  font-size: 12px;
+  font-weight: 600;
+
+  color: #555;
+}
+
+.msg-select,
+.msg-input {
+  width: 100%;
+
+  padding: 10px 12px;
+
+  border: 1px solid #ddd;
+  border-radius: 8px;
+
+  background: #fff;
+  color: #111;
+
+  font-size: 13px;
+  font-family: inherit;
+
+  transition:
+    border-color .15s ease,
+    box-shadow .15s ease;
+}
+
+.msg-select:focus,
+.msg-input:focus {
+  outline: none;
+
+  border-color: #25D366;
+
+  box-shadow:
+    0 0 0 3px rgba(37,211,102,.12);
+}
+
+/* ─────────────────────────────────────────
+   TOOLBAR
+───────────────────────────────────────── */
+.msg-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  flex-wrap: wrap;
+
+  padding: 6px 8px;
+
+  background: #f0f2f5;
+
+  border: 1px solid #ddd;
+  border-bottom: none;
+
+  border-radius: 8px 8px 0 0;
+}
+
+.msg-tb-btn {
+  width: 30px;
+  height: 28px;
+
+  border: none;
+  border-radius: 6px;
+
+  background: none;
+  color: #555;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition:
+    background .1s ease,
+    color .1s ease;
+}
+
+.msg-tb-btn:hover,
+.msg-tb-btn.msg-tb-btn--active {
+  background: #fff;
+  color: #111;
+}
+
+.msg-tb-btn--emoji {
+  width: auto;
+  padding: 0 5px;
+
+  font-size: 17px;
+}
+
+.msg-tb-sep {
+  width: 1px;
+  height: 18px;
+
+  margin: 0 4px;
+
+  background: #ccc;
+}
+
+/* ─────────────────────────────────────────
+   EDITOR
+───────────────────────────────────────── */
+.msg-editor {
+  min-height: 110px;
+  max-height: 180px;
+
+  overflow-y: auto;
+
+  padding: 10px 12px;
+
+  border: 1px solid #ddd;
+  border-top: none;
+
+  border-radius: 0 0 8px 8px;
+
+  background: #fff;
+  color: #111;
+
+  font-size: 13.5px;
+  line-height: 1.65;
+  font-family: inherit;
+
+  word-break: break-word;
+
+  outline: none;
+
+  transition:
+    border-color .15s ease,
+    box-shadow .15s ease;
+}
+
+.msg-editor:focus {
+  border-color: #25D366;
+
+  box-shadow:
+    0 0 0 3px rgba(37,211,102,.10);
+}
+
+.msg-editor:empty::before {
+  content: attr(data-placeholder);
+
+  color: #aaa;
+
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────
+   EMOJIS
+───────────────────────────────────────── */
+.msg-emoji-picker {
+  margin-top: 4px;
+
+  padding: 10px;
+
+  background: #fff;
+
+  border: 1px solid #ddd;
+  border-radius: 10px;
+
+  max-height: 190px;
+
+  overflow-y: auto;
+}
+
+.msg-emoji-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  margin-bottom: 8px;
+}
+
+.msg-emoji-cat {
+  padding: 4px 10px;
+
+  border: 1px solid #ddd;
+  border-radius: 999px;
+
+  background: none;
+  color: #555;
+
+  font-size: 12px;
+  font-family: inherit;
+
+  cursor: pointer;
+
+  transition:
+    background .1s ease,
+    color .1s ease;
+}
+
+.msg-emoji-cat:hover,
+.msg-emoji-cat--active {
+  background: #f0f2f5;
+  color: #111;
+  border-color: #bbb;
+}
+
+.msg-emoji-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.msg-emoji-btn {
+  width: 32px;
+  height: 32px;
+
+  border: none;
+  border-radius: 6px;
+
+  background: none;
+
+  font-size: 19px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: background .1s ease;
+}
+
+.msg-emoji-btn:hover {
+  background: #f0f2f5;
+}
+
+/* ─────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────── */
+.msg-composer__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 10px 16px;
+
+  background: #f8f9fa;
+
+  border-top: 1px solid #f0f0f0;
+
+  flex-shrink: 0;
+}
+
+.msg-char-count {
+  font-size: 11px;
+  color: #888;
+}
+
+.msg-char-count--warn {
+  color: #E24B4A;
+}
+
+.msg-btn-cancel {
+  padding: 8px 14px;
+
+  border: 1px solid #ddd;
+  border-radius: 999px;
+
+  background: none;
+  color: #555;
+
+  font-size: 13px;
+  font-family: inherit;
+
+  cursor: pointer;
+
+  transition: background .1s ease;
+}
+
+.msg-btn-cancel:hover {
+  background: #eee;
+}
+
+.msg-btn-send {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 8px 20px;
+
+  border: none;
+  border-radius: 999px;
+
+  background: #25D366;
+  color: #fff;
+
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+
+  cursor: pointer;
+
+  transition:
+    background .15s ease,
+    transform .1s ease;
+}
+
+.msg-btn-send:hover {
+  background: #1ebe5a;
+}
+
+.msg-btn-send:active {
+  transform: scale(.97);
+}
+
+.msg-btn-send:disabled {
+  background: #a8e6c1;
+  cursor: not-allowed;
+}
+
+/* ─────────────────────────────────────────
+   TOAST
+───────────────────────────────────────── */
+.msg-toast {
+  position: fixed;
+
+  right: 28px;
+  bottom: 96px;
+
+  z-index: 1060;
+
+  max-width: 320px;
+
+  padding: 10px 18px;
+
+  border-radius: 10px;
+
+  background: #1a1a1a;
+  color: #fff;
+
+  font-size: 13px;
+
+  opacity: 0;
+  transform: translateY(8px);
+
+  pointer-events: none;
+
+  transition:
+    opacity .25s ease,
+    transform .25s ease;
+}
+
+.msg-toast--show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─────────────────────────────────────────
+   MOBILE
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  .msg-fab {
+    bottom: 80px;
+    right: 18px;
+  }
+
+  .msg-overlay {
+    padding-right: 12px;
+    padding-bottom: 140px;
+  }
+
+  .msg-toast {
+    right: 18px;
+    bottom: 150px;
+  }
+
+  .msg-composer {
+    max-width: 100%;
+  }
+}
+</style>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── CSRF ── */
+  function getCsrf() {
+    const m = document.cookie.match(/csrftoken=([^;]+)/);
+    return m ? m[1] : '';
+  }
+
+  /* ── EMOJIS ── */
+  const EMOJI_CATS = {
+    smileys: ['😊','😀','😂','🤣','😍','🥰','😘','😎','🤔','😅','😭','😤',
+              '🥳','🤩','😴','🤗','😇','🙏','👍','👎','👏','🙌','💪','🤝',
+              '❤️','💚','💛','🎉','🌟','⭐'],
+    comida:  ['🍎','🍊','🍋','🍇','🍓','🥦','🥕','🧅','🧄','🍅','🥚','🧀',
+              '🍗','🥩','🍳','🍲','🥘','🍱','🥗','🫙','🧃','🥛','🍞','🌽',
+              '🥑','🫑','🫒','🍄','🫛','🥜'],
+    objetos: ['📋','📝','✏️','📌','📎','🗂️','📁','📊','📈','🔔','🔕','📣',
+              '📢','💡','🔍','🔑','📅','🗓️','⏰','🖨️','💻','📱','🧾','🏫',
+              '🏥','🚌','⚠️','ℹ️','📬','📩'],
+    sinais:  ['✅','❌','⭕','🔴','🟡','🟢','🔵','⚡','💯','🔥','❗','❓',
+              '➡️','⬆️','⬇️','↩️','🔄','✔️','☑️','➕','➖','🔐','🔓',
+              '🚫','⛔','🆕','🆗','🔛','📌','🏷️'],
+  };
+
+  /* ── ELEMENTS ── */
+  const fab          = document.getElementById('msgFab');
+  const fabBadge     = document.getElementById('msgFabBadge');
+  const overlay      = document.getElementById('msgOverlay');
+  const composer     = document.getElementById('msgComposer');
+  const compSub      = document.getElementById('msgComposerSub');
+  const closeBtn     = document.getElementById('msgClose');
+  const cancelBtn    = document.getElementById('msgCancelBtn');
+  const sendBtn      = document.getElementById('msgSendBtn');
+  const destSelect   = document.getElementById('msgDest');
+  const assuntoInput = document.getElementById('msgAssunto');
+  const editor       = document.getElementById('msgEditor');
+  const charCount    = document.getElementById('msgCharCount');
+  const emojiToggle  = document.getElementById('msgEmojiToggle');
+  const emojiPicker  = document.getElementById('msgEmojiPicker');
+  const emojiGrid    = document.getElementById('msgEmojiGrid');
+  const clearBtn     = document.getElementById('msgClearBtn');
+  const toast        = document.getElementById('msgToast');
+
+  let savedRange = null;
+  let toastTimer = null;
+
+  /* ── BADGE ── */
+  function updateBadge(n) {
+    fabBadge.textContent = n;
+    fabBadge.dataset.count = n;
+    fabBadge.setAttribute('aria-label', n + ' mensagens não lidas');
+  }
+  // Esconde badge zero ao inicializar
+  const initCount = parseInt(fabBadge.textContent) || 0;
+  updateBadge(initCount);
+
+  /* ── OVERLAY ── */
+  function openComposer() {
+    overlay.hidden = false;
+    requestAnimationFrame(() => overlay.classList.add('msg-overlay--open'));
+    destSelect.focus();
+  }
+  function closeComposer() {
+    overlay.classList.remove('msg-overlay--open');
+    overlay.addEventListener('transitionend', () => { overlay.hidden = true; }, { once: true });
+    emojiPicker.hidden = true;
+    emojiToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  fab.addEventListener('click', openComposer);
+  closeBtn.addEventListener('click', closeComposer);
+  cancelBtn.addEventListener('click', closeComposer);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeComposer(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) closeComposer(); });
+
+  /* ── DESTINATÁRIO ── */
+
+  // Se não houver opções renderizadas pelo Django, carrega via AJAX
+  if (destSelect.options.length <= 1) {
+    fetch('{% url "modulo_merendeiras:destinatarios_ajax" %}', {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+      const grupos = {};
+      (data.destinatarios || []).forEach(u => {
+        if (!grupos[u.grupo]) grupos[u.grupo] = [];
+        grupos[u.grupo].push(u);
+      });
+      Object.keys(grupos).forEach(g => {
+        const og = document.createElement('optgroup');
+        og.label = g;
+        grupos[g].forEach(u => {
+          const opt = document.createElement('option');
+          opt.value = u.id;
+          opt.textContent = u.nome;
+          og.appendChild(opt);
+        });
+        destSelect.appendChild(og);
+      });
+    })
+    .catch(() => {}); // Silencia erros de rede
+  }
+
+  destSelect.addEventListener('change', () => {
+    const sel = destSelect.options[destSelect.selectedIndex];
+    compSub.textContent = sel.value ? sel.text : 'Selecione o destinatário';
+  });
+
+  /* ── FORMATAÇÃO ── */
+  document.querySelectorAll('.msg-tb-btn[data-cmd]').forEach(btn => {
+    btn.addEventListener('mousedown', (e) => {
+      e.preventDefault(); // evita perder foco do editor
+      document.execCommand(btn.dataset.cmd, false, null);
+      syncToolbarState();
+      editor.focus();
+    });
+  });
+
+  editor.addEventListener('keyup',   syncToolbarState);
+  editor.addEventListener('mouseup', syncToolbarState);
+  editor.addEventListener('keyup',   updateCharCount);
+  editor.addEventListener('input',   updateCharCount);
+
+  function syncToolbarState() {
+    document.querySelectorAll('.msg-tb-btn[data-cmd]').forEach(btn => {
+      const active = document.queryCommandState(btn.dataset.cmd);
+      btn.classList.toggle('msg-tb-btn--active', active);
+    });
+  }
+
+  function updateCharCount() {
+    const len = editor.innerText.replace(/\n$/, '').length;
+    charCount.textContent = len + ' / 2000';
+    charCount.classList.toggle('msg-char-count--warn', len > 1800);
+  }
+
+  /* ── LIMPAR ── */
+  clearBtn.addEventListener('click', () => {
+    editor.innerHTML = '';
+    updateCharCount();
+    editor.focus();
+  });
+
+  /* ── PLACEHOLDER ── */
+  editor.setAttribute('data-placeholder', 'Digite sua mensagem aqui...');
+
+  /* ── EMOJIS ── */
+  function renderEmojis(cat) {
+    emojiGrid.innerHTML = '';
+    EMOJI_CATS[cat].forEach(em => {
+      const btn = document.createElement('button');
+      btn.className = 'msg-emoji-btn';
+      btn.type = 'button';
+      btn.textContent = em;
+      btn.setAttribute('aria-label', em);
+      btn.setAttribute('role', 'option');
+      btn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        insertEmoji(em);
+      });
+      emojiGrid.appendChild(btn);
+    });
+  }
+  renderEmojis('smileys');
+
+  function saveRange() {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) savedRange = sel.getRangeAt(0).cloneRange();
+  }
+  editor.addEventListener('blur',   saveRange);
+  editor.addEventListener('keyup',  saveRange);
+  editor.addEventListener('mouseup', saveRange);
+
+  function insertEmoji(em) {
+    editor.focus();
+    const sel = window.getSelection();
+    if (savedRange) {
+      sel.removeAllRanges();
+      sel.addRange(savedRange);
+    }
+    document.execCommand('insertText', false, em);
+    updateCharCount();
+    savedRange = null;
+  }
+
+  emojiToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = emojiPicker.hidden;
+    emojiPicker.hidden = !open;
+    emojiToggle.setAttribute('aria-expanded', String(open));
+  });
+
+  document.querySelectorAll('.msg-emoji-cat').forEach(catBtn => {
+    catBtn.addEventListener('click', () => {
+      document.querySelectorAll('.msg-emoji-cat').forEach(b => {
+        b.classList.remove('msg-emoji-cat--active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      catBtn.classList.add('msg-emoji-cat--active');
+      catBtn.setAttribute('aria-selected', 'true');
+      renderEmojis(catBtn.dataset.cat);
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!emojiPicker.contains(e.target) && e.target !== emojiToggle) {
+      emojiPicker.hidden = true;
+      emojiToggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  /* ── TOAST ── */
+  function showToast(msg, duration = 3500) {
+    clearTimeout(toastTimer);
+    toast.textContent = msg;
+    toast.classList.add('msg-toast--show');
+    toastTimer = setTimeout(() => toast.classList.remove('msg-toast--show'), duration);
+  }
+
+  /* ── ENVIO ── */
+  sendBtn.addEventListener('click', enviarMensagem);
+  editor.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      enviarMensagem();
+    }
+  });
+
+  function enviarMensagem() {
+    const destId   = destSelect.value.trim();
+    const assunto  = assuntoInput.value.trim();
+    const mensagem = editor.innerHTML.trim();
+    const texto    = editor.innerText.trim();
+
+    if (!destId)   { showToast('⚠️ Selecione um destinatário'); destSelect.focus(); return; }
+    if (!assunto)  { showToast('⚠️ Informe o assunto da mensagem'); assuntoInput.focus(); return; }
+    if (!texto)    { showToast('⚠️ Digite o corpo da mensagem'); editor.focus(); return; }
+    if (texto.length > 2000) { showToast('⚠️ Mensagem muito longa (máx. 2000 caracteres)'); return; }
+
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Enviando…';
+
+    const data = new FormData();
+    data.append('destinatario_id', destId);
+    data.append('assunto', assunto);
+    data.append('mensagem', mensagem);
+    data.append('csrfmiddlewaretoken', getCsrf());
+
+    fetch('{% url "modulo_merendeiras:enviar_mensagem" %}', {
+      method: 'POST',
+      body: data,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    })
+    .then(r => r.json())
+    .then(json => {
+      if (json.ok) {
+        const nome = destSelect.options[destSelect.selectedIndex].text;
+        showToast('✅ Mensagem enviada para ' + nome);
+        resetForm();
+        closeComposer();
+      } else {
+        showToast('❌ ' + (json.erro || 'Erro ao enviar mensagem'));
+      }
+    })
+    .catch(() => showToast('❌ Falha na conexão. Tente novamente.'))
+    .finally(() => {
+      sendBtn.disabled = false;
+      sendBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polygon points="22 2 15 22 11 13 2 9 22 2" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/></svg> Enviar';
+    });
+  }
+
+  function resetForm() {
+    destSelect.value = '';
+    assuntoInput.value = '';
+    editor.innerHTML = '';
+    compSub.textContent = 'Selecione o destinatário';
+    charCount.textContent = '0 / 2000';
+    charCount.classList.remove('msg-char-count--warn');
+    emojiPicker.hidden = true;
+  }
+
+})();
+</script>

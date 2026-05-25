@@ -50,7 +50,7 @@ def iniciar_registros():
                 "Secretario",
                 "Coordenador",
                 "Aluno",
-            ]
+            ]            
 
             # ===============================
             # Criação / Garantia dos grupos

@@ -1,3 +1,4 @@
+
 <!--_header.html-->
 {% load static %}
     <!-- HEADER -->
@@ -205,46 +206,23 @@ document.querySelectorAll('.custom-message').forEach(message => {
         <!-- Notifications -->
         {% include "modulo_merendeiras/_base/_notifications.html" %}
 
-        <!-- Messages -->
-        <div class="widget" id="msgWidget">
-          <button class="hdr-btn" id="msgToggle" aria-label="Mensagens" aria-haspopup="true" aria-expanded="false" aria-controls="msgPanel">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M21 15C21 15.55 20.55 16 20 16H7L3 20V4C3 3.45 3.45 3 4 3H20C20.55 3 21 3.45 21 4V15Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-            </svg>
-            <span class="hdr-badge hdr-badge--green" aria-hidden="true">2</span>
-          </button>
-          <div class="panel" id="msgPanel" role="dialog" aria-label="Mensagens" aria-modal="true">
-            <div class="panel__head">
-              <h2 class="panel__title">Mensagens</h2>
-              <button class="panel__action">Marcar lidas</button>
-            </div>
-            <ul class="panel__list">
-              <li class="notif-item notif-item--unread" style="background:#f3fbf5">
-                <div class="notif-icon" style="background:linear-gradient(135deg,var(--color-primary),var(--color-primary-mid));color:#fff;border-radius:50%;font-size:11px;font-weight:800">NU</div>
-                <div class="notif-body">
-                  <p class="notif-text"><strong>Nutricionista</strong> — Cardápio de setembro atualizado.</p>
-                  <time class="notif-time">há 5 min</time>
-                </div>
-                <div class="notif-dot" aria-hidden="true"></div>
-              </li>
-              <li class="notif-item notif-item--unread" style="background:#f3fbf5">
-                <div class="notif-icon" style="background:linear-gradient(135deg,#0277bd,#29b6f6);color:#fff;border-radius:50%;font-size:11px;font-weight:800">SE</div>
-                <div class="notif-body">
-                  <p class="notif-text"><strong>Secretaria</strong> — Confirmar recebimento da cesta básica.</p>
-                  <time class="notif-time">há 30 min</time>
-                </div>
-                <div class="notif-dot" aria-hidden="true"></div>
-              </li>
-            </ul>
-            <div class="panel__footer">
-              <a href="#" class="panel__footer-link">Abrir todas as mensagens →</a>
-            </div>
-          </div>
-        </div>
+
+
+
+
+
+
+
+
+        {% include "modulo_merendeiras/_base/_messageUser.html" %}
+        
+        
 
         <div class="hdr-divider" aria-hidden="true"></div>
 
         <!-- User -->
+
+        
         <div class="widget" id="userWidget">
           <button class="hdr-user" id="userToggle" aria-label="Menu do usuário" aria-haspopup="true" aria-expanded="false" aria-controls="userPanel">
             <div class="hdr-user__av" aria-hidden="true">{{ usuario_nome|slice:":1" }}</div>

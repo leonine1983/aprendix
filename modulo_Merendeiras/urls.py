@@ -121,4 +121,33 @@ urlpatterns = [
         name="notif_marcar_todas_lidas",
     ),
 
+    # ── Mensagens ────────────────────────────────────────────  
+    path("mensagens/enviar/", views.enviar_mensagem_ajax, name="enviar_mensagem"),
+    path("mensagens/destinatarios/", views.destinatarios_ajax, name="destinatarios_ajax"),
+
+
+
+    path(
+    "mensagens/",
+    views.ListaMensagensView.as_view(),
+    name="mensagens"
+),
+
+path(
+    "mensagens/marcar-lidas/",
+    views.MarcarMensagensLidasView.as_view(),
+    name="marcar_mensagens_lidas"
+),
+
+path(
+    "mensagens/<int:pk>/marcar/",
+    views.MarcarMensagemView.as_view(),
+    name="marcar_mensagem"
+),
+
+path(
+    "mensagens/<int:pk>/excluir/",
+    views.ExcluirMensagemView.as_view(),
+    name="excluir_mensagem"
+),
 ]
