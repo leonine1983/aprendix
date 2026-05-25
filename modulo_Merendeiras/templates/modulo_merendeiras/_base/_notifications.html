@@ -1,3 +1,4 @@
+<!--_notifications.html-->
 {% load static %}
 
 
@@ -165,6 +166,9 @@
 @keyframes notifFadeIn {
     from { opacity: 0; transform: translateY(-6px) scale(.98); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.notif-panel[hidden] {
+    display: none !important;
 }
 
 /* Cabeçalho do painel */
@@ -387,12 +391,9 @@
 }
 </style>
 
-<script>
+<script>// Substitua todo o bloco <script> no _notifications.html por este:
 (function () {
 
-    // ─────────────────────────────────────────────────────────────
-    // URLs Django
-    // ─────────────────────────────────────────────────────────────
     const URLS = {
         sistemaMarcarLida : (pk) => `{% url 'modulo_merendeiras:notif_sistema_marcar_lida' pk=0 %}`.replace('/0/', `/${pk}/`),
         produtoMarcarLida : (pk) => `{% url 'modulo_merendeiras:notif_produto_marcar_lida' pk=0 %}`.replace('/0/', `/${pk}/`),
@@ -401,36 +402,25 @@
         marcarTodasLidas  : `{% url 'modulo_merendeiras:notif_marcar_todas_lidas' %}`,
     };
 
-    const CSRF =
-        document.cookie.match(/csrftoken=([^;]+)/)?.[1] ?? '';
+    const CSRF = document.cookie.match(/csrftoken=([^;]+)/)?.[1] ?? '';
 
-    // ─────────────────────────────────────────────────────────────
-    // ELEMENTOS
-    // ─────────────────────────────────────────────────────────────
     const toggle = document.getElementById('notifToggle');
     const panel  = document.getElementById('notifPanel');
 
     if (!toggle || !panel) return;
 
-    // ─────────────────────────────────────────────────────────────
-    // HELPER POST
-    // ─────────────────────────────────────────────────────────────
-    async function postJSON(url) {
+    // ─── Garante fechado no load ───
+    panel.hidden = true;
+    toggle.setAttribute('aria-expanded', 'false');
 
+    async function postJSON(url) {
         const res = await fetch(url, {
             method: 'POST',
-            headers: {
-                'X-CSRFToken': CSRF,
-                'Content-Type': 'application/json'
-            },
+            headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' },
         });
-
         return res.json();
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // ABRIR / FECHAR PAINEL
-    // ─────────────────────────────────────────────────────────────
     function abrirPanel() {
         panel.hidden = false;
         toggle.setAttribute('aria-expanded', 'true');
@@ -441,80 +431,51 @@
         toggle.setAttribute('aria-expanded', 'false');
     }
 
-    function alternarPanel() {
-
-        const aberto = !panel.hidden;
-
-        if (aberto) {
-            fecharPanel();
-        } else {
-            abrirPanel();
-        }
-    }
-
+    // ─── Toggle: usa flag para não conflitar com document click ───
     toggle.addEventListener('click', (e) => {
         e.preventDefault();
-        e.stopPropagation();
-
-        alternarPanel();
+        // NÃO usa stopPropagation — deixa borbulhar para o document
+        // mas usa um flag para saber que este clique veio do toggle
+        toggle._justClicked = true;
+        if (panel.hidden) {
+            abrirPanel();
+        } else {
+            fecharPanel();
+        }
     });
 
-    // impede fechar ao clicar dentro
-    panel.addEventListener('click', (e) => {
-        e.stopPropagation();
-    });
-
-    // fecha clicando fora
+    // ─── Fecha ao clicar FORA (sem stopPropagation no painel) ───
     document.addEventListener('click', (e) => {
-
-        const clicouNoToggle =
-            toggle.contains(e.target);
-
-        const clicouNoPainel =
-            panel.contains(e.target);
-
-        if (!clicouNoToggle && !clicouNoPainel) {
-            fecharPanel();
+        // Se o clique veio do toggle, consome o flag e ignora
+        if (toggle._justClicked) {
+            toggle._justClicked = false;
+            return;
         }
+        // Se o clique foi dentro do painel, não fecha
+        if (panel.contains(e.target)) return;
+        // Fora de tudo — fecha
+        fecharPanel();
     });
 
-    // fecha no ESC
+    // ─── Fecha no ESC ───
     document.addEventListener('keydown', (e) => {
-
-        if (e.key === 'Escape') {
-            fecharPanel();
-        }
+        if (e.key === 'Escape') fecharPanel();
     });
 
-    // ─────────────────────────────────────────────────────────────
-    // ABAS
-    // ─────────────────────────────────────────────────────────────
+    // ─── Abas ───
     document.querySelectorAll('.notif-tab').forEach(btn => {
-
         btn.addEventListener('click', () => {
-
-            document.querySelectorAll('.notif-tab')
-                .forEach(b => {
-
-                    b.classList.remove('notif-tab--active');
-                    b.setAttribute('aria-selected', 'false');
-                });
-
-            document.querySelectorAll('.notif-tabpanel')
-                .forEach(p => {
-
-                    p.hidden = true;
-                    p.classList.remove('notif-tabpanel--active');
-                });
-
+            document.querySelectorAll('.notif-tab').forEach(b => {
+                b.classList.remove('notif-tab--active');
+                b.setAttribute('aria-selected', 'false');
+            });
+            document.querySelectorAll('.notif-tabpanel').forEach(p => {
+                p.hidden = true;
+                p.classList.remove('notif-tabpanel--active');
+            });
             btn.classList.add('notif-tab--active');
             btn.setAttribute('aria-selected', 'true');
-
-            const painel =
-                document.getElementById(
-                    btn.getAttribute('aria-controls')
-                );
-
+            const painel = document.getElementById(btn.getAttribute('aria-controls'));
             if (painel) {
                 painel.hidden = false;
                 painel.classList.add('notif-tabpanel--active');
@@ -522,252 +483,89 @@
         });
     });
 
-    // ─────────────────────────────────────────────────────────────
-    // BADGE
-    // ─────────────────────────────────────────────────────────────
+    // ─── Badge ───
     function atualizarBadge(delta) {
-
-        const badge =
-            toggle.querySelector('.notif-badge');
-
+        const badge = toggle.querySelector('.notif-badge');
         if (!badge) return;
-
-        const atual =
-            parseInt(badge.textContent, 10) || 0;
-
-        const novo =
-            Math.max(0, atual + delta);
-
+        const novo = Math.max(0, (parseInt(badge.textContent, 10) || 0) + delta);
         badge.textContent = novo;
-
-        badge.style.display =
-            novo === 0 ? 'none' : '';
-
-        // remove botão marcar todas
-        if (novo === 0) {
-
-            document
-                .querySelector('[data-action="marcar-todas"]')
-                ?.remove();
-        }
-
-        // contador da aba
-        const tabCount =
-            document.querySelector(
-                '#btn-tab-nao-lidas .notif-tab__count'
-            );
-
+        badge.style.display = novo === 0 ? 'none' : '';
+        if (novo === 0) document.querySelector('[data-action="marcar-todas"]')?.remove();
+        const tabCount = document.querySelector('#btn-tab-nao-lidas .notif-tab__count');
         if (tabCount) {
-
             tabCount.textContent = novo;
-
-            tabCount.style.display =
-                novo === 0 ? 'none' : '';
+            tabCount.style.display = novo === 0 ? 'none' : '';
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // REMOVER ITEM
-    // ─────────────────────────────────────────────────────────────
     function removerItem(li) {
-
         li.classList.add('notif-item--removing');
-
-        li.addEventListener(
-            'transitionend',
-            () => li.remove(),
-            { once: true }
-        );
+        li.addEventListener('transitionend', () => li.remove(), { once: true });
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // MOVER PARA LIDAS
-    // ─────────────────────────────────────────────────────────────
     function moverParaLidas(li) {
-
-        const listaLidas =
-            document.getElementById('lista-lidas');
-
+        const listaLidas = document.getElementById('lista-lidas');
         if (!listaLidas) return;
-
         li.querySelector('.notif-dot')?.remove();
-
-        li.querySelector('.notif-btn--read')
-            ?.remove();
-
+        li.querySelector('.notif-btn--read')?.remove();
         li.classList.remove('notif-item--unread');
-
-        listaLidas
-            .querySelector('.notif-list__empty')
-            ?.remove();
-
+        listaLidas.querySelector('.notif-list__empty')?.remove();
         const clone = li.cloneNode(true);
-
         bindItemActions(clone);
-
         listaLidas.prepend(clone);
-
         removerItem(li);
-
-        const listaNaoLidas =
-            document.getElementById('lista-nao-lidas');
-
-        if (
-            listaNaoLidas &&
-            !listaNaoLidas.querySelector(
-                '.notif-item:not(.notif-item--removing)'
-            )
-        ) {
-
-            const vazio =
-                document.createElement('li');
-
+        const listaNaoLidas = document.getElementById('lista-nao-lidas');
+        if (listaNaoLidas && !listaNaoLidas.querySelector('.notif-item:not(.notif-item--removing)')) {
+            const vazio = document.createElement('li');
             vazio.className = 'notif-list__empty';
-
             vazio.innerHTML = `
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 3C9.24 3 7 5.24 7 8V13L5 15V16H19V15L17 13V8C17 5.24 14.76 3 12 3ZM12 21C13.1 21 14 20.1 14 19H10C10 20.1 10.9 21 12 21Z"
-                          stroke="currentColor"
-                          stroke-width="1.5"
-                          stroke-linejoin="round"
-                          opacity=".4"/>
+                          stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" opacity=".4"/>
                 </svg>
-                <p>Nenhuma notificação nova.</p>
-            `;
-
+                <p>Nenhuma notificação nova.</p>`;
             listaNaoLidas.appendChild(vazio);
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // BIND AÇÕES ITEM
-    // ─────────────────────────────────────────────────────────────
     function bindItemActions(li) {
+        li.querySelector('.notif-btn--read')?.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const btn = e.currentTarget;
+            const pk = btn.dataset.pk;
+            const tipo = btn.dataset.tipo;
+            btn.disabled = true;
+            btn.textContent = '…';
+            const url = tipo === 'sistema' ? URLS.sistemaMarcarLida(pk) : URLS.produtoMarcarLida(pk);
+            const data = await postJSON(url);
+            if (data.ok) { atualizarBadge(-1); moverParaLidas(li); }
+            else { btn.disabled = false; btn.textContent = '✓ Lida'; alert(data.erro ?? 'Erro ao marcar como lida.'); }
+        });
 
-        // marcar lida
-        li.querySelector('.notif-btn--read')
-            ?.addEventListener('click', async (e) => {
-
-                e.stopPropagation();
-
-                const btn  = e.currentTarget;
-
-                const pk   = btn.dataset.pk;
-
-                const tipo = btn.dataset.tipo;
-
-                btn.disabled = true;
-
-                btn.textContent = '…';
-
-                const url =
-                    tipo === 'sistema'
-                        ? URLS.sistemaMarcarLida(pk)
-                        : URLS.produtoMarcarLida(pk);
-
-                const data =
-                    await postJSON(url);
-
-                if (data.ok) {
-
-                    atualizarBadge(-1);
-
-                    moverParaLidas(li);
-
-                } else {
-
-                    btn.disabled = false;
-
-                    btn.textContent = '✓ Lida';
-
-                    alert(
-                        data.erro ??
-                        'Erro ao marcar como lida.'
-                    );
-                }
-            });
-
-        // deletar
-        li.querySelector('.notif-btn--delete')
-            ?.addEventListener('click', async (e) => {
-
-                e.stopPropagation();
-
-                if (
-                    !confirm(
-                        'Excluir esta notificação?'
-                    )
-                ) return;
-
-                const btn =
-                    e.currentTarget;
-
-                const pk =
-                    btn.dataset.pk;
-
-                const tipo =
-                    btn.dataset.tipo;
-
-                btn.disabled = true;
-
-                const url =
-                    tipo === 'sistema'
-                        ? URLS.sistemaDeletar(pk)
-                        : URLS.produtoDeletar(pk);
-
-                const data =
-                    await postJSON(url);
-
-                if (data.ok) {
-
-                    removerItem(li);
-
-                } else {
-
-                    btn.disabled = false;
-
-                    alert(
-                        data.erro ??
-                        'Erro ao excluir notificação.'
-                    );
-                }
-            });
+        li.querySelector('.notif-btn--delete')?.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            if (!confirm('Excluir esta notificação?')) return;
+            const btn = e.currentTarget;
+            const pk = btn.dataset.pk;
+            const tipo = btn.dataset.tipo;
+            btn.disabled = true;
+            const url = tipo === 'sistema' ? URLS.sistemaDeletar(pk) : URLS.produtoDeletar(pk);
+            const data = await postJSON(url);
+            if (data.ok) { removerItem(li); }
+            else { btn.disabled = false; alert(data.erro ?? 'Erro ao excluir notificação.'); }
+        });
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // BIND INICIAL
-    // ─────────────────────────────────────────────────────────────
-    document
-        .querySelectorAll('.notif-item[data-pk]')
-        .forEach(bindItemActions);
+    document.querySelectorAll('.notif-item[data-pk]').forEach(bindItemActions);
 
-    // ─────────────────────────────────────────────────────────────
-    // MARCAR TODAS
-    // ─────────────────────────────────────────────────────────────
-    document
-        .querySelector('[data-action="marcar-todas"]')
-        ?.addEventListener('click', async (e) => {
-
-            e.stopPropagation();
-
-            const data =
-                await postJSON(
-                    URLS.marcarTodasLidas
-                );
-
-            if (data.ok) {
-
-                document
-                    .querySelectorAll(
-                        '#lista-nao-lidas .notif-item[data-pk]'
-                    )
-                    .forEach(li => {
-                        moverParaLidas(li);
-                    });
-
-                atualizarBadge(-999);
-            }
-        });
+    document.querySelector('[data-action="marcar-todas"]')?.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const data = await postJSON(URLS.marcarTodasLidas);
+        if (data.ok) {
+            document.querySelectorAll('#lista-nao-lidas .notif-item[data-pk]').forEach(li => moverParaLidas(li));
+            atualizarBadge(-999);
+        }
+    });
 
 })();
 </script>

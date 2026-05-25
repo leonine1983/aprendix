@@ -113,9 +113,8 @@
         });
       }
 
-      /* Widget dropdowns */
+      /* Widget dropdowns — apenas msg e user; notif é gerenciado pelo próprio _notifications.html */
       const widgets = [
-        { w: $('#notifWidget'), t: $('#notifToggle') },
         { w: $('#msgWidget'),   t: $('#msgToggle') },
         { w: $('#userWidget'),  t: $('#userToggle') },
       ];
@@ -127,6 +126,14 @@
             if (t) t.setAttribute('aria-expanded', 'false');
           }
         });
+
+        /* Fecha o painel de notificações também, se estiver aberto */
+        const notifPanel = $('#notifPanel');
+        const notifToggle = $('#notifToggle');
+        if (notifPanel && !notifPanel.hidden) {
+          notifPanel.hidden = true;
+          if (notifToggle) notifToggle.setAttribute('aria-expanded', 'false');
+        }
       }
 
       widgets.forEach(({ w, t }) => {
@@ -139,7 +146,12 @@
         });
       });
 
-      document.addEventListener('click', (e) => { if (!e.target.closest('.widget')) closeAll(null); });
+      document.addEventListener('click', (e) => {
+        /* Não interfere em cliques dentro do widget de notificações */
+        if (e.target.closest('#notifWidget')) return;
+        closeAll(null);
+      });
+
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') { closeAll(null); closeMobile(); }
       });
