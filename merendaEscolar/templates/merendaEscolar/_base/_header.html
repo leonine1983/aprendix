@@ -1,0 +1,48 @@
+{% load static %}
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <i class="fas fa-bars menu-toggle" id="menuToggle"></i>
+
+            <img src="{% static 'prefeitura.png' %}" 
+                alt="Brasão da Prefeitura"
+                class="header-brasao">
+
+            <div class="header-title-group">
+                <h1>Controle de Estoque</h1>
+                <small class="header-subtitle">Merenda Escolar</small>
+            </div>
+        </div>
+
+
+
+        <div class="topbar-icons">
+
+    {# ── NOTIFICAÇÕES ── #}
+    {% include "merendaEscolar/partes_de_estoque_Base/notifica.html" %}
+    {# ── MENSAGENS ── #}
+    {% include "merendaEscolar/_base/_messages.html" %}
+    
+
+    {# ── USUÁRIO ── #}
+    <div class="icon-wrapper" id="userToggle">
+        <i class="fas fa-user-circle"></i>
+        <div class="custom-dropdown">
+            <h4>Minha Conta</h4>
+            <ul>
+                <li><a href="{% url 'core:meu-perfil' %}">Meu Perfil</a></li>
+                <li><a href="{% url 'core:alterar-senha' %}">Alterar Senha</a></li>
+                <li><a href="{% url 'core:configuracoes' %}">Configurações</a></li>
+                <li style="color:#dc2626;font-weight:600;">
+                    <form method="post" action="{% url 'admin_acessos:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;">
+                            Sair
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>

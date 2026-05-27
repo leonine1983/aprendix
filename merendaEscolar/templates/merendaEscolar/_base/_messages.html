@@ -1,0 +1,455 @@
+{% load i18n %}
+
+{% url 'merendaEscolar:mensagens_listar' as url_listar %}
+{% url 'merendaEscolar:mensagem_lida' pk=0 as url_lida_base %}
+{% url 'merendaEscolar:mensagem_excluir' pk=0 as url_excluir_base %}
+
+<!-- CSS igual ao anterior, sem mudanças -->
+<style>
+/* ... todo o CSS permanece idêntico ... */
+</style>
+
+<div class="icon-wrapper" id="msgToggle">
+  <button class="icon-btn" id="msgToggleBtn" aria-label="Mensagens" aria-expanded="false">
+    <i class="fas fa-envelope" aria-hidden="true"></i>
+    <span class="badge" id="msgBadge" style="display:none"></span>
+  </button>
+
+  <div class="custom-dropdown" id="msgDropdown" hidden>
+    <div class="dropdown-header">
+      <h4>Mensagens</h4>
+      <div class="msg-tabs" role="tablist">
+        <button role="tab" aria-selected="true" id="tab-nao-lidas"
+                aria-controls="panel-nao-lidas" class="tab-btn active"
+                onclick="msgSwitchTab('nao_lidas')">
+          Não lidas <span id="msg-count-nao-lidas"></span>
+        </button>
+        <button role="tab" aria-selected="false" id="tab-lidas"
+                aria-controls="panel-lidas" class="tab-btn"
+                onclick="msgSwitchTab('lidas')">
+          Lidas <span id="msg-count-lidas"></span>
+        </button>
+      </div>
+    </div>
+    <div id="panel-nao-lidas" role="tabpanel" aria-labelledby="tab-nao-lidas" class="msg-panel active"></div>
+    <div id="panel-lidas"     role="tabpanel" aria-labelledby="tab-lidas"     class="msg-panel" hidden></div>
+  </div>
+</div>
+
+<script>
+(function () {
+
+  const URLS = {
+    listar:  "{{ url_listar }}",
+    lida:    "{{ url_lida_base }}".replace("/0/", "/{id}/"),
+    excluir: "{{ url_excluir_base }}".replace("/0/", "/{id}/"),
+  };
+  const CSRF = "{{ csrf_token }}";
+
+  let state        = { nao_lidas: [], lidas: [] };
+  let jaCarregou   = false;   // ← evita duplo fetch no clique
+
+  // ─── helpers ───────────────────────────────────────────
+
+  function initials(name) {
+    if (!name || !name.trim()) return "?";
+    return name.trim().split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase();
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  // ─── render ────────────────────────────────────────────
+
+  function renderPanel(type) {
+    const lista = state[type];
+    const el    = document.getElementById("panel-" + type);
+
+    if (!el) return;   // ← guard: elemento ainda não existe
+
+    if (!lista || !lista.length) {
+      el.innerHTML = '<p class="msg-empty"><i class="fas fa-inbox"></i> Nenhuma mensagem</p>';
+      return;
+    }
+
+    el.innerHTML = lista.map(m => `
+      <div class="msg-item" data-id="${m.id}">
+        ${type === "nao_lidas"
+          ? '<span class="msg-dot" aria-hidden="true"></span>'
+          : '<span class="msg-dot invisible" aria-hidden="true"></span>'}
+        <div class="msg-avatar">${initials(m.remetente)}</div>
+        <div class="msg-body">
+          <p class="msg-subject ${type === 'lidas' ? 'msg-read' : ''}">${escHtml(m.assunto)}</p>
+          <p class="msg-meta">${escHtml(m.remetente)} · ${escHtml(m.data_envio)}</p>
+        </div>
+        <div class="msg-actions">
+          ${type === "nao_lidas" ? `
+            <button class="msg-btn" title="Marcar como lida" onclick="msgMarcarLida(${m.id})">
+              <i class="fas fa-check"></i>
+            </button>` : ""}
+          <button class="msg-btn msg-btn-danger" title="Excluir"
+                  onclick="msgExcluir(${m.id}, '${type}')">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function updateBadge() {
+    const n     = state.nao_lidas.length;
+    const badge = document.getElementById("msgBadge");
+    if (!badge) return;
+    badge.textContent  = n;
+    badge.style.display = n ? "" : "none";
+
+    const elNao = document.getElementById("msg-count-nao-lidas");
+    const elLid = document.getElementById("msg-count-lidas");
+    if (elNao) elNao.textContent = n ? `(${n})` : "";
+    if (elLid) elLid.textContent = state.lidas.length ? `(${state.lidas.length})` : "";
+  }
+
+  // ─── fetch ─────────────────────────────────────────────
+
+  async function fetchMensagens() {
+    try {
+      const r    = await fetch(URLS.listar, { headers: { "X-Requested-With": "XMLHttpRequest" } });
+      const data = await r.json();
+
+      if (!data.ok) { console.warn("API retornou ok=false", data); return; }
+
+      state.nao_lidas = data.nao_lidas || [];
+      state.lidas     = data.lidas     || [];
+
+      renderPanel("nao_lidas");
+      renderPanel("lidas");
+      updateBadge();
+      jaCarregou = true;
+
+    } catch (e) {
+      console.error("Erro ao carregar mensagens:", e);
+    }
+  }
+
+  // ─── ações ─────────────────────────────────────────────
+
+  window.msgMarcarLida = async function (id) {
+    try {
+      await fetch(URLS.lida.replace("{id}", id), {
+        method:  "POST",
+        headers: { "X-CSRFToken": CSRF, "X-Requested-With": "XMLHttpRequest" },
+      });
+      const idx = state.nao_lidas.findIndex(m => m.id === id);
+      if (idx > -1) state.lidas.unshift(state.nao_lidas.splice(idx, 1)[0]);
+      renderPanel("nao_lidas");
+      renderPanel("lidas");
+      updateBadge();
+    } catch (e) { console.error("Erro ao marcar lida:", e); }
+  };
+
+  window.msgExcluir = async function (id, type) {
+    try {
+      await fetch(URLS.excluir.replace("{id}", id), {
+        method:  "POST",
+        headers: { "X-CSRFToken": CSRF, "X-Requested-With": "XMLHttpRequest" },
+      });
+      state[type] = state[type].filter(m => m.id !== id);
+      renderPanel(type);
+      updateBadge();
+    } catch (e) { console.error("Erro ao excluir:", e); }
+  };
+
+  window.msgSwitchTab = function (type) {
+    ["nao_lidas", "lidas"].forEach(t => {
+      const tab   = document.getElementById("tab-"   + t.replace("_", "-"));
+      const panel = document.getElementById("panel-" + t);
+      if (!tab || !panel) return;
+      tab.classList.toggle("active", t === type);
+      tab.setAttribute("aria-selected", t === type);
+      panel.classList.toggle("active", t === type);
+      t === type ? panel.removeAttribute("hidden") : panel.setAttribute("hidden", "");
+    });
+  };
+
+  // ─── toggle dropdown ───────────────────────────────────
+
+  const toggleBtn = document.getElementById("msgToggleBtn");
+  const dropdown  = document.getElementById("msgDropdown");
+
+  toggleBtn.addEventListener("click", () => {
+    const isOpen = !dropdown.hidden;
+    dropdown.hidden = isOpen;
+    toggleBtn.setAttribute("aria-expanded", String(!isOpen));
+    if (!isOpen && !jaCarregou) fetchMensagens();   // ← só busca se ainda não carregou
+  });
+
+  document.addEventListener("click", e => {
+    if (!document.getElementById("msgToggle").contains(e.target)) {
+      dropdown.hidden = true;
+      toggleBtn.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  // ─── carga inicial (badge + pré-cache) ─────────────────
+  // Roda após o DOM estar pronto, independente de quando o
+  // <script> foi inserido na página.
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", fetchMensagens);
+  } else {
+    fetchMensagens();   // DOM já está pronto (include tardio)
+  }
+
+})();
+</script>
+<style>
+/* ───────────────────────────────────────────
+   MSG TOGGLE — icon wrapper + badge
+─────────────────────────────────────────── */
+#msgToggle {
+  position: relative;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  color: inherit;
+  font-size: 18px;
+}
+
+#msgBadge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(40%, -40%);
+  background: #E24B4A;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 500;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* ───────────────────────────────────────────
+   DROPDOWN CONTAINER
+─────────────────────────────────────────── */
+.custom-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 360px;
+  background: #fff;
+  border: 0.5px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+  z-index: 1050;
+  overflow: hidden;
+}
+
+/* ───────────────────────────────────────────
+   HEADER + TABS
+─────────────────────────────────────────── */
+.dropdown-header {
+  padding: 14px 16px 0;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
+}
+
+.dropdown-header h4 {
+  font-size: 15px;
+  font-weight: 500;
+  color: #111;
+  margin: 0 0 10px;
+}
+
+.msg-tabs {
+  display: flex;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 8px 0;
+  font-size: 13px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  color: #888;
+  font-family: inherit;
+  transition: color .15s, border-color .15s;
+}
+
+.tab-btn.active {
+  color: #111;
+  border-bottom-color: #111;
+  font-weight: 500;
+}
+
+.tab-btn span {
+  font-size: 11px;
+  color: #aaa;
+  margin-left: 2px;
+}
+
+/* ───────────────────────────────────────────
+   PANELS
+─────────────────────────────────────────── */
+.msg-panel {
+  max-height: 320px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,.15) transparent;
+}
+
+.msg-panel::-webkit-scrollbar { width: 4px; }
+.msg-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: 4px; }
+
+/* ───────────────────────────────────────────
+   ITEM DE MENSAGEM
+─────────────────────────────────────────── */
+.msg-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 0.5px solid rgba(0,0,0,.06);
+  transition: background .15s;
+  cursor: default;
+}
+
+.msg-item:last-child {
+  border-bottom: none;
+}
+
+.msg-item:hover {
+  background: #f7f7f5;
+}
+
+/* dot de não lida */
+.msg-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #378ADD;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.msg-dot.invisible {
+  visibility: hidden;
+}
+
+/* avatar */
+.msg-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #E6F1FB;
+  color: #185FA5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* body */
+.msg-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.msg-subject {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.msg-subject.msg-read {
+  font-weight: 400;
+  color: #888;
+}
+
+.msg-meta {
+  font-size: 11px;
+  color: #aaa;
+  margin: 2px 0 0;
+}
+
+/* ───────────────────────────────────────────
+   BOTÕES DE AÇÃO (aparecem no hover)
+─────────────────────────────────────────── */
+.msg-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity .15s;
+  flex-shrink: 0;
+}
+
+.msg-item:hover .msg-actions {
+  opacity: 1;
+}
+
+.msg-btn {
+  background: none;
+  border: 0.5px solid rgba(0,0,0,.12);
+  border-radius: 6px;
+  padding: 4px 7px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  transition: background .15s, color .15s;
+  line-height: 1;
+}
+
+.msg-btn:hover {
+  background: #f0f0ee;
+  color: #111;
+}
+
+.msg-btn.msg-btn-danger:hover {
+  background: #FCEBEB;
+  color: #A32D2D;
+  border-color: #F09595;
+}
+
+/* ───────────────────────────────────────────
+   ESTADO VAZIO
+─────────────────────────────────────────── */
+.msg-empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: #aaa;
+  font-size: 13px;
+  margin: 0;
+}
+
+.msg-empty i {
+  display: block;
+  font-size: 24px;
+  margin-bottom: 8px;
+  opacity: .5;
+}
+</style>

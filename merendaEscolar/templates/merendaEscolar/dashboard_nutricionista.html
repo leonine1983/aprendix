@@ -1,297 +1,488 @@
 {% extends "merendaEscolar/estoque_base.html" %}
 
 {% block content %}
+
 <style>
-    section.content{
-        padding-top: 0!important;}
-    .card{padding: 10px;}
-    .card-body svg{
-        height: 30px!important;
-        padding-bottom: 5px;
-        fill: #fff;
-        }
-    .card-body h2{
-        margin: 0px;
-        margin-top: 10px;
-        padding: 5px!important;
-    }
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg:        #F4F6F8;
+    --surface:   #FFFFFF;
+    --border:    #E2E8F0;
+    --text-1:    #1A202C;
+    --text-2:    #4A5568;
+    --text-3:    #A0AEC0;
+
+    --green:     #2D9E6B;
+    --green-bg:  #EBF8F2;
+    --blue:      #2B6CB0;
+    --blue-bg:   #EBF4FF;
+    --amber:     #B7791F;
+    --amber-bg:  #FFFBEB;
+    --red:       #C53030;
+    --red-bg:    #FFF5F5;
+    --purple:    #553C9A;
+    --purple-bg: #FAF5FF;
+
+    --radius:    12px;
+    --shadow:    0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body, .content-wrapper, section.content {
+    background: var(--bg) !important;
+    font-family: 'DM Sans', sans-serif !important;
+    padding-top: 0 !important;
+  }
+
+  /* ── LAYOUT ─────────────────────────────────── */
+  .dash {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 24px 48px;
+  }
+
+  /* ── HEADER ─────────────────────────────────── */
+  .dash-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .dash-header-icon {
+    width: 44px; height: 44px;
+    background: var(--green);
+    border-radius: 10px;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+  }
+  .dash-header-icon svg { width: 22px; height: 22px; fill: #fff; }
+  .dash-header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-1);
+    line-height: 1.3;
+  }
+  .dash-header p {
+    font-size: 13px;
+    color: var(--text-3);
+    margin-top: 2px;
+  }
+
+  /* ── SECTION LABEL ───────────────────────────── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 10px;
+  }
+
+  /* ── KPI GRID ────────────────────────────────── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: box-shadow .15s;
+  }
+  .kpi:hover { box-shadow: var(--shadow-md); }
+
+  .kpi-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .kpi-icon {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+  }
+  .kpi-icon svg { width: 17px; height: 17px; }
+
+  .kpi-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 7px;
+    border-radius: 20px;
+    letter-spacing: .04em;
+  }
+
+  .kpi-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--text-1);
+    line-height: 1;
+  }
+  .kpi-value span {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-3);
+    margin-left: 4px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .kpi-label {
+    font-size: 12px;
+    color: var(--text-2);
+    font-weight: 500;
+  }
+
+  /* Color variants */
+  .kpi--green .kpi-icon { background: var(--green-bg); }
+  .kpi--green .kpi-icon svg { fill: var(--green); }
+  .kpi--green .kpi-badge { background: var(--green-bg); color: var(--green); }
+
+  .kpi--blue .kpi-icon { background: var(--blue-bg); }
+  .kpi--blue .kpi-icon svg { fill: var(--blue); }
+  .kpi--blue .kpi-badge { background: var(--blue-bg); color: var(--blue); }
+
+  .kpi--purple .kpi-icon { background: var(--purple-bg); }
+  .kpi--purple .kpi-icon svg { fill: var(--purple); }
+  .kpi--purple .kpi-badge { background: var(--purple-bg); color: var(--purple); }
+
+  .kpi--amber .kpi-icon { background: var(--amber-bg); }
+  .kpi--amber .kpi-icon svg { fill: var(--amber); }
+  .kpi--amber .kpi-badge { background: var(--amber-bg); color: var(--amber); }
+  .kpi--amber { border-color: #F6E05E; }
+
+  .kpi--red .kpi-icon { background: var(--red-bg); }
+  .kpi--red .kpi-icon svg { fill: var(--red); }
+  .kpi--red .kpi-badge { background: var(--red-bg); color: var(--red); }
+  .kpi--red { border-color: #FC8181; }
+
+  /* ── CHARTS GRID ─────────────────────────────── */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  @media (max-width: 768px) { .charts-grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card-head {
+    padding: 16px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-head-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    flex-shrink: 0;
+  }
+  .card-head h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-1);
+  }
+  .card-body {
+    padding: 20px;
+  }
+  .chart-wrap {
+    position: relative;
+    height: 240px;
+  }
+
+  /* ── TABLES ──────────────────────────────────── */
+  .tables-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 768px) { .tables-grid { grid-template-columns: 1fr; } }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .data-table thead th {
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .1s;
+  }
+  .data-table tbody tr:last-child { border-bottom: none; }
+  .data-table tbody tr:hover { background: var(--bg); }
+  .data-table tbody td {
+    padding: 10px 12px;
+    color: var(--text-2);
+  }
+  .data-table tbody td:first-child { color: var(--text-1); font-weight: 500; }
+  .data-table .qty {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text-2);
+  }
+  .rank-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px; height: 20px;
+    border-radius: 4px;
+    background: var(--bg);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    margin-right: 6px;
+    font-family: 'DM Mono', monospace;
+  }
 </style>
 
-<div class="container-fluid mt-4">
 
-    <!-- CABEÇALHO -->
+<div class="dash">
 
-    <div class="d-flex align-items-center mb-4">  
-        
-     
-        <h2 class="mb-0">Painel de Gestão Nutricional da Rede Escolar</h2>
+  <!-- HEADER -->
+  <div class="dash-header">
+    <div class="dash-header-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 110-16 8 8 0 010 16zm-1-5h2v2h-2v-2zm0-8h2v6h-2V7z"/></svg>
+    </div>
+    <div>
+      <h1>Gestão Nutricional da Rede Escolar</h1>
+      <p>Visão consolidada de estoque, consumo e movimentações</p>
+    </div>
+  </div>
+
+
+  <!-- KPIs -->
+  <p class="section-label">Indicadores Gerais</p>
+  <div class="kpi-grid">
+
+    <div class="kpi kpi--green">
+      <div class="kpi-top">
+        <div class="kpi-icon">
+          <svg viewBox="0 0 100 100"><path d="M69.61,84.17a1.5,1.5,0,0,1-.45-2.93l5.55-1.74a1.5,1.5,0,1,1,.9,2.86L70.06,84.1A1.41,1.41,0,0,1,69.61,84.17Z"/><path d="M50,90.25a1.46,1.46,0,0,1-1.5-1.46V40a1.49,1.49,0,0,1,1.05-1.43L87.43,26.76a1.52,1.52,0,0,1,1.34.22,1.51,1.51,0,0,1,.61,1.21V56.76a1.5,1.5,0,0,1-3,0V30.23L51.54,41.13V88.71A1.53,1.53,0,0,1,50,90.25Z"/><path d="M50,90.29a1.5,1.5,0,0,1-.45-2.93l19.57-6.12a1.5,1.5,0,1,1,.89,2.86L50.49,90.22A1.41,1.41,0,0,1,50,90.29Z"/><path d="M56,81.29a1.5,1.5,0,0,1-.45-2.93L69.38,74a1.5,1.5,0,1,1,.9,2.86L56.49,81.22A1.41,1.41,0,0,1,56,81.29Z"/><path d="M56,74.29a1.5,1.5,0,0,1-.45-2.93l10.53-3.29A1.5,1.5,0,1,1,67,70.93L56.49,74.22A1.41,1.41,0,0,1,56,74.29Z"/><path d="M50,90.21a1.31,1.31,0,0,1-.44-.07L11.7,78.3a1.49,1.49,0,0,1-1.06-1.43V28.11a1.5,1.5,0,0,1,1.5-1.5,1.43,1.43,0,0,1,.46.07l10.27,3.2a1.52,1.52,0,0,1,1.05,1.44V51.94a1.55,1.55,0,0,1,.15,1.3,1.52,1.52,0,0,1-1.92.92l-.23-.08a1.51,1.51,0,0,1-1-1.42V32.42l-7.28-2.28V75.77l34.9,10.9V41.05L40.37,38.5V58a1.5,1.5,0,0,1-3,0V36.46A1.5,1.5,0,0,1,39.31,35l11.18,3.5a1.48,1.48,0,0,1,1,1.43V88.71a1.48,1.48,0,0,1-.61,1.21A1.5,1.5,0,0,1,50,90.21Z"/><path d="M12.16,29.6a1.5,1.5,0,0,1-.58-2.88l38-15.82a1.5,1.5,0,0,1,1.16,2.77l-38,15.82A1.44,1.44,0,0,1,12.16,29.6Z"/><path d="M87.89,29.69a1.51,1.51,0,0,1-.58-.12l-26.14-11a1.5,1.5,0,1,1,1.17-2.76l26.14,11a1.5,1.5,0,0,1-.59,2.88Z"/></svg>
+        </div>
+        <span class="kpi-badge">Catálogo</span>
+      </div>
+      <div>
+        <div class="kpi-value">{{ total_produtos }}<span>itens</span></div>
+        <div class="kpi-label">Total de Produtos</div>
+      </div>
     </div>
 
-
-    <!-- INDICADORES -->
-
-    <div class="row mb-4">
-
-        <div class="col-md-2">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">                    
-                    <h6 class="badge">
-                        <svg fill="#000000"  viewBox="0 0 100 100" data-name="Layer 1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M69.61,84.17a1.5,1.5,0,0,1-.45-2.93l5.55-1.74a1.5,1.5,0,1,1,.9,2.86L70.06,84.1A1.41,1.41,0,0,1,69.61,84.17Z"></path><path d="M50,90.25a1.46,1.46,0,0,1-1.5-1.46V40a1.49,1.49,0,0,1,1.05-1.43L87.43,26.76a1.52,1.52,0,0,1,1.34.22,1.51,1.51,0,0,1,.61,1.21V56.76a1.5,1.5,0,0,1-3,0V30.23L51.54,41.13V88.71A1.53,1.53,0,0,1,50,90.25Z"></path><path d="M50,90.29a1.5,1.5,0,0,1-.45-2.93l19.57-6.12a1.5,1.5,0,1,1,.89,2.86L50.49,90.22A1.41,1.41,0,0,1,50,90.29Z"></path><path d="M56,81.29a1.5,1.5,0,0,1-.45-2.93L69.38,74a1.5,1.5,0,1,1,.9,2.86L56.49,81.22A1.41,1.41,0,0,1,56,81.29Z"></path><path d="M56,74.29a1.5,1.5,0,0,1-.45-2.93l10.53-3.29A1.5,1.5,0,1,1,67,70.93L56.49,74.22A1.41,1.41,0,0,1,56,74.29Z"></path><path d="M50,90.21a1.31,1.31,0,0,1-.44-.07L11.7,78.3a1.49,1.49,0,0,1-1.06-1.43V28.11a1.5,1.5,0,0,1,1.5-1.5,1.43,1.43,0,0,1,.46.07l10.27,3.2a1.52,1.52,0,0,1,1.05,1.44V51.94a1.55,1.55,0,0,1,.15,1.3,1.52,1.52,0,0,1-1.92.92l-.23-.08a1.51,1.51,0,0,1-1-1.42V32.42l-7.28-2.28V75.77l34.9,10.9V41.05L40.37,38.5V58a1.5,1.5,0,0,1-3,0V36.46A1.5,1.5,0,0,1,39.31,35l11.18,3.5a1.48,1.48,0,0,1,1,1.43V88.71a1.48,1.48,0,0,1-.61,1.21A1.5,1.5,0,0,1,50,90.21Z"></path><path d="M38.87,59.53a1.5,1.5,0,0,1-1.5-1.5V36.66a1.44,1.44,0,0,1,.05-.68,1.49,1.49,0,0,1,1.88-1,1.54,1.54,0,0,1,1.07,1.44V58A1.5,1.5,0,0,1,38.87,59.53Z"></path><path d="M22.65,54.24a1.74,1.74,0,0,1-.5-.08l-.23-.08a1.51,1.51,0,0,1-1-1.42V31.32a1.5,1.5,0,0,1,3,0V51.94a1.55,1.55,0,0,1,.15,1.3A1.52,1.52,0,0,1,22.65,54.24Z"></path><path d="M50,41.49A1.48,1.48,0,0,1,48.53,40V40a1.5,1.5,0,0,1,3,0A1.52,1.52,0,0,1,50,41.49Z"></path><path d="M12.16,29.6a1.5,1.5,0,0,1-.58-2.88l38-15.82a1.5,1.5,0,0,1,1.16,2.77l-38,15.82A1.44,1.44,0,0,1,12.16,29.6Z"></path><path d="M23.62,32.85A1.5,1.5,0,0,1,23,30l17.17-7.14a1.5,1.5,0,0,1,1.15,2.77L24.19,32.73A1.46,1.46,0,0,1,23.62,32.85Z"></path><path d="M38.83,37.94A1.48,1.48,0,0,1,37.45,37a1.5,1.5,0,0,1,.8-2l15.12-6.29a1.5,1.5,0,0,1,1.16,2.77L39.41,37.83A1.49,1.49,0,0,1,38.83,37.94Z"></path><path d="M61.75,18.66a1.51,1.51,0,0,1-.58-.12L49.62,13.66a1.5,1.5,0,1,1,1.16-2.76l11.56,4.88a1.5,1.5,0,0,1,.8,2A1.52,1.52,0,0,1,61.75,18.66Z"></path><path d="M87.89,29.69a1.51,1.51,0,0,1-.58-.12l-26.14-11a1.5,1.5,0,1,1,1.17-2.76l26.14,11a1.5,1.5,0,0,1-.59,2.88Z"></path><path d="M38.87,59.53a1.51,1.51,0,0,1-1.27-.7l-8-12.55a1.5,1.5,0,0,1,2.53-1.61l8,12.55a1.51,1.51,0,0,1-1.26,2.31Z"></path><path d="M22.65,54.24a1.47,1.47,0,0,1-1.12-.51,1.49,1.49,0,0,1,.13-2.11l8.21-7.27a1.5,1.5,0,0,1,2,2.25l-8.21,7.26A1.45,1.45,0,0,1,22.65,54.24Z"></path><path d="M54,31.65a1.5,1.5,0,0,1-.62-.13L40.2,25.59a1.5,1.5,0,0,1,1.23-2.73l13.14,5.92A1.5,1.5,0,0,1,54,31.65Z"></path><path d="M81.88,84.2A15.16,15.16,0,1,1,97,69,15.18,15.18,0,0,1,81.88,84.2Zm0-27.32A12.16,12.16,0,1,0,94,69,12.17,12.17,0,0,0,81.88,56.88Z"></path><path d="M80.29,75.42A1.53,1.53,0,0,1,79.22,75l-5.28-5.3a1.5,1.5,0,0,1,2.12-2.12l5.29,5.3a1.51,1.51,0,0,1,0,2.12A1.53,1.53,0,0,1,80.29,75.42Z"></path><path d="M80.29,75.42a1.51,1.51,0,0,1-1.06-2.57l8.91-8.91a1.5,1.5,0,0,1,2.12,2.12L81.35,75A1.53,1.53,0,0,1,80.29,75.42Z"></path></g></svg>
-                        Total de Produtos
-                    </h6>
-                    <h2>{{ total_produtos }} </h2>
-                </div>
-            </div>
+    <div class="kpi kpi--blue">
+      <div class="kpi-top">
+        <div class="kpi-icon">
+          <svg viewBox="0 0 512 512"><path d="M499.933,163.855L260.501,1.383c-2.716-1.845-6.284-1.844-9.002,0L12.067,163.855c-2.199,1.492-3.516,3.976-3.516,6.634v333.495c0,4.427,3.589,8.017,8.017,8.017h478.864c4.428,0,8.017-3.589,8.017-8.017V170.489C503.449,167.831,502.133,165.347,499.933,163.855zM24.585,174.737L256,17.705l231.415,157.032V495.967H24.585V174.737z"/></svg>
         </div>
-
-        <div class="col-md-2">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">                    
-                    <h6 class="badge">
-                        <svg fill="#000000"  version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M499.933,163.855L260.501,1.383c-2.716-1.845-6.284-1.844-9.002,0L12.067,163.855c-2.199,1.492-3.516,3.976-3.516,6.634 v333.495c0,4.427,3.589,8.017,8.017,8.017h478.864c4.428,0,8.017-3.589,8.017-8.017V170.489 C503.449,167.831,502.133,165.347,499.933,163.855z M196.676,495.967h-86.58v-86.58h18.171v43.29c0,4.427,3.589,8.017,8.017,8.017 h34.205c4.427,0,8.017-3.589,8.017-8.017v-43.29h18.171V495.967z M92.994,205.228v-18.171h326.013v18.171H92.994z M144.301,444.66 v-35.273h18.171v35.273H144.301z M196.676,393.353h-26.188h-34.205h-26.188v-86.58h18.171v43.29c0,4.427,3.589,8.017,8.017,8.017 h34.205c4.427,0,8.017-3.589,8.017-8.017v-43.29h18.171V393.353z M144.301,342.046v-35.273h18.171v35.273H144.301z M299.29,495.967h-86.58v-86.58h18.171v43.29c0,4.427,3.589,8.017,8.017,8.017h34.205c4.428,0,8.017-3.589,8.017-8.017v-43.29 h18.171V495.967z M246.914,444.66v-35.273h18.171v35.273H246.914z M487.416,495.967h-69.478V324.409 c0-4.427-3.588-8.017-8.017-8.017c-4.428,0-8.017,3.589-8.017,8.017v171.557h-86.58V401.37c0-4.427-3.588-8.017-8.017-8.017 H212.71v-94.597c0-4.427-3.589-8.017-8.017-8.017h-94.597v-69.478h291.808v68.944c0,4.427,3.588,8.017,8.017,8.017 c4.428,0,8.017-3.589,8.017-8.017v-68.944h9.086c4.428,0,8.017-3.589,8.017-8.017V179.04c0-4.427-3.588-8.017-8.017-8.017H84.977 c-4.427,0-8.017,3.589-8.017,8.017v34.205c0,4.427,3.589,8.017,8.017,8.017h9.086v274.706H24.585V174.737L256,17.705 l231.415,157.032V495.967z"></path> </g> </g> <g> <g> <path d="M290.205,68.409h-68.409c-4.427,0-8.017,3.589-8.017,8.017s3.589,8.017,8.017,8.017h68.409 c4.428,0,8.017-3.589,8.017-8.017S294.633,68.409,290.205,68.409z"></path> </g> </g> <g> <g> <path d="M290.205,102.614h-68.409c-4.427,0-8.017,3.589-8.017,8.017s3.589,8.017,8.017,8.017h68.409 c4.428,0,8.017-3.589,8.017-8.017S294.633,102.614,290.205,102.614z"></path> </g> </g> <g> <g> <path d="M290.205,136.818h-68.409c-4.427,0-8.017,3.589-8.017,8.017s3.589,8.017,8.017,8.017h68.409 c4.428,0,8.017-3.589,8.017-8.017S294.633,136.818,290.205,136.818z"></path> </g> </g> <g> <g> <path d="M170.489,367.7h-34.205c-4.427,0-8.017,3.589-8.017,8.017c0,4.427,3.589,8.017,8.017,8.017h34.205 c4.427,0,8.017-3.589,8.017-8.017C178.505,371.289,174.916,367.7,170.489,367.7z"></path> </g> </g> <g> <g> <path d="M170.489,470.313h-34.205c-4.427,0-8.017,3.589-8.017,8.017c0,4.427,3.589,8.017,8.017,8.017h34.205 c4.427,0,8.017-3.589,8.017-8.017C178.505,473.903,174.916,470.313,170.489,470.313z"></path> </g> </g> <g> <g> <path d="M273.102,470.313h-34.205c-4.427,0-8.017,3.589-8.017,8.017c0,4.427,3.589,8.017,8.017,8.017h34.205 c4.428,0,8.017-3.589,8.017-8.017C281.119,473.903,277.531,470.313,273.102,470.313z"></path> </g> </g> </g></svg>
-                        Estoque Central
-                    </h6>
-                    <h2>{{ estoque_total_central|default:0 }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-2">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">                    
-                    <h6 class="badge">
-                        <svg fill="#000000"  version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M503.83,174.298H392.17c-4.513,0-8.17,3.657-8.17,8.17s3.657,8.17,8.17,8.17H495.66v49.021H392.17 c-4.513,0-8.17,3.657-8.17,8.17c0,4.513,3.657,8.17,8.17,8.17H495.66v174.298H392.17c-4.513,0-8.17,3.657-8.17,8.17 s3.657,8.17,8.17,8.17H495.66v49.021h-128V157.484c0.899,0.318,1.817,0.476,2.722,0.476c3.291,0,6.395-2.004,7.636-5.264 c1.607-4.217-0.51-8.937-4.727-10.544l-109.121-41.57V27.234h49.021v27.234h-24.511c-4.513,0-8.17,3.657-8.17,8.17 s3.657,8.17,8.17,8.17h32.681c4.513,0,8.17-3.657,8.17-8.17V19.064c0-4.513-3.657-8.17-8.17-8.17H264.17V8.17 c0-4.513-3.657-8.17-8.17-8.17c-4.513,0-8.17,3.657-8.17,8.17v92.412l-109.121,41.57c-4.217,1.607-6.332,6.327-4.727,10.544 c1.583,4.156,6.189,6.264,10.359,4.787V495.66h-128v-49.021H119.83c4.513,0,8.17-3.657,8.17-8.17s-3.657-8.17-8.17-8.17H16.34V256 H119.83c4.513,0,8.17-3.657,8.17-8.17c0-4.513-3.657-8.17-8.17-8.17H16.34v-49.021H119.83c4.513,0,8.17-3.657,8.17-8.17 s-3.657-8.17-8.17-8.17H8.17c-4.513,0-8.17,3.657-8.17,8.17V503.83c0,4.513,3.657,8.17,8.17,8.17h495.66 c4.513,0,8.17-3.657,8.17-8.17V182.468C512,177.955,508.343,174.298,503.83,174.298z M351.319,495.66H160.681v-16.34h190.638 V495.66z M318.638,446.638v16.34H193.362v-16.34H318.638z M193.362,430.298v-81.702h54.468v81.702H193.362z M264.17,430.298 v-81.702h54.468v81.702H264.17z M351.319,462.979h-16.34V340.426c0-4.513-3.657-8.17-8.17-8.17H185.192 c-4.513,0-8.17,3.657-8.17,8.17v122.553h-16.34V151.268L256,114.955l95.319,36.313V462.979z"></path> </g> </g> <g> <g> <path d="M55.83,356.766c-4.513,0-8.17,3.657-8.17,8.17v32.681c0,4.513,3.657,8.17,8.17,8.17c4.513,0,8.17-3.657,8.17-8.17v-32.681 C64,360.423,60.343,356.766,55.83,356.766z"></path> </g> </g> <g> <g> <path d="M104.851,356.766c-4.513,0-8.17,3.657-8.17,8.17v32.681c0,4.513,3.657,8.17,8.17,8.17s8.17-3.657,8.17-8.17v-32.681 C113.021,360.423,109.364,356.766,104.851,356.766z"></path> </g> </g> <g> <g> <path d="M55.83,280.511c-4.513,0-8.17,3.657-8.17,8.17v32.681c0,4.513,3.657,8.17,8.17,8.17c4.513,0,8.17-3.657,8.17-8.17v-32.681 C64,284.168,60.343,280.511,55.83,280.511z"></path> </g> </g> <g> <g> <path d="M104.851,280.511c-4.513,0-8.17,3.657-8.17,8.17v32.681c0,4.513,3.657,8.17,8.17,8.17s8.17-3.657,8.17-8.17v-32.681 C113.021,284.168,109.364,280.511,104.851,280.511z"></path> </g> </g> <g> <g> <path d="M456.17,356.766c-4.513,0-8.17,3.657-8.17,8.17v32.681c0,4.513,3.657,8.17,8.17,8.17s8.17-3.657,8.17-8.17v-32.681 C464.34,360.423,460.683,356.766,456.17,356.766z"></path> </g> </g> <g> <g> <path d="M407.149,356.766c-4.513,0-8.17,3.657-8.17,8.17v32.681c0,4.513,3.657,8.17,8.17,8.17s8.17-3.657,8.17-8.17v-32.681 C415.319,360.423,411.662,356.766,407.149,356.766z"></path> </g> </g> <g> <g> <path d="M456.17,280.511c-4.513,0-8.17,3.657-8.17,8.17v32.681c0,4.513,3.657,8.17,8.17,8.17s8.17-3.657,8.17-8.17v-32.681 C464.34,284.168,460.683,280.511,456.17,280.511z"></path> </g> </g> <g> <g> <path d="M407.149,280.511c-4.513,0-8.17,3.657-8.17,8.17v32.681c0,4.513,3.657,8.17,8.17,8.17s8.17-3.657,8.17-8.17v-32.681 C415.319,284.168,411.662,280.511,407.149,280.511z"></path> </g> </g> <g> <g> <path d="M256,174.298c-22.526,0-40.851,18.325-40.851,40.851S233.474,256,256,256s40.851-18.325,40.851-40.851 S278.526,174.298,256,174.298z M256,239.66c-13.515,0-24.511-10.996-24.511-24.511c0-13.515,10.996-24.511,24.511-24.511 c13.515,0,24.511,10.996,24.511,24.511C280.511,228.664,269.515,239.66,256,239.66z"></path> </g> </g> </g></svg>
-                        Estoque nas Escolas
-                    </h6>
-                    <h2>{{ estoque_total_escolas|default:0 }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-2">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">                    
-                    <h6 class="badge">
-                        <svg fill="#000000" version="1.2" baseProfile="tiny" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 188" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <g> <path d="M63,133c-13,0-23.5,10.5-23.5,23.5s10.5,23.5,23.5,23.5c13,0,23.5-10.5,23.5-23.5S76,133,63,133z M63,165.4 c-4.9,0-9-4.1-9-9c0-4.9,4.1-9,9-9c4.9,0,9,4.1,9,9C72,161.4,68,165.4,63,165.4z M210.8,132c-13,0-23.5,10.5-23.5,23.5 s10.5,23.5,23.5,23.5c13,0,23.5-10.5,23.5-23.5S223.8,132,210.8,132z M210.8,164.4c-4.9,0-9-4.1-9-9c0-4.9,4.1-9,9-9 c4.9,0,9,4.1,9,9C219.8,160.4,215.8,164.4,210.8,164.4z M-0.5,143.1c0,4.6,3.7,8.2,8.2,8.2h22.6c0.9,0,1.7-0.7,1.9-1.5 c2.6-14.7,15.4-24.9,30.8-24.9s28.3,10.2,30.8,24.9c0.2,0.9,0.9,1.5,1.9,1.5H99h30.9V115H-0.5V143.1z M253.6,134.5h-5v-22 c0-7.5-6.1-13.6-13.7-13.6h-24.3c-0.5,0-1-0.3-1.4-0.6l-38-37c-1.7-1.7-4.1-2.7-6.6-2.8h-27.5v92.8h40.9c0.9,0,1.7-0.7,1.9-1.5 c2.6-14.7,15.4-25.9,30.8-25.9s28.3,11.2,30.8,25.9c0.2,0.9,0.9,1.5,1.9,1.5h3.2c4.9,0,8.7-3.9,8.7-8.7v-6.3 C255.5,135.4,254.6,134.5,253.6,134.5z M191.1,99h-41.4c-1,0-1.9-0.9-1.9-1.9V70.7c0-1,0.9-1.9,1.9-1.9h13.9c0.5,0,1,0.3,1.5,0.6 l27.5,26.3C193.5,97,192.7,99,191.1,99z"></path> </g> </g> </g> <path d="M57.8,101.5H17.1V60.8h15.7v13h9.3v-13h15.7V101.5z M110.9,101.5H70.3V60.8H86v13h9.3v-13h15.7V101.5z M84.7,48.3H44V7.6 h15.7v13H69v-13h15.7V48.3z"></path> </g></svg>
-                        Movimentações no Mês
-                    </h6>
-                    <h2>{{ movimentacoes_mes }}</h2>
-                </div>
-            </div>
-        </div>
-
-
-
-    <!-- LOGÍSTICA -->
-
-
-        <div class="col-md-2">
-            <div class="card border-warning shadow-sm" title="Aguardando Confirmação de Recebimento pela Escola">
-                <div class="card-body text-center">                    
-                    <h6 class="badge"> 
-                        <svg  viewBox="0 0 24 24" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><defs><style>.cls-1{fill:none;stroke:#020202;stroke-miterlimit:10;stroke-width:1.91px;}</style></defs><circle class="cls-1" cx="5.78" cy="16.33" r="2.39"></circle><path class="cls-1" d="M1.48,23.5V23a4.29,4.29,0,0,1,4.3-4.3h0a4.29,4.29,0,0,1,4.3,4.3v.48"></path><polyline class="cls-1" points="15.71 16.69 18.69 13.7 21.68 16.69"></polyline><path class="cls-1" d="M18.69,13.93V16.8A5.74,5.74,0,0,1,13,22.54h0"></path><polyline class="cls-1" points="7.33 8.31 4.34 11.3 1.36 8.31"></polyline><path class="cls-1" d="M4.35,11.07V8.2a5.73,5.73,0,0,1,5.73-5.74h0"></path><rect class="cls-1" x="12.95" y="1.5" width="9.57" height="8.61"></rect><line class="cls-1" x1="17.74" y1="4.37" x2="17.74" y2="1.5"></line></g></svg>
-                        Recebimento Pendente
-                    </h6>
-                    <h2>{{ transferencias_pendentes }}</h2>
-                </div>
-            </div>
-        </div>
-
-        
-
-        <div class="col-md-2">
-            <div class="card border-danger shadow-sm">
-                <div class="card-body text-center">                    
-                    <h6 class="badge">
-                        <svg  viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M8 5.00005C7.01165 5.00082 6.49359 5.01338 6.09202 5.21799C5.71569 5.40973 5.40973 5.71569 5.21799 6.09202C5 6.51984 5 7.07989 5 8.2V17.8C5 18.9201 5 19.4802 5.21799 19.908C5.40973 20.2843 5.71569 20.5903 6.09202 20.782C6.51984 21 7.07989 21 8.2 21H15.8C16.9201 21 17.4802 21 17.908 20.782C18.2843 20.5903 18.5903 20.2843 18.782 19.908C19 19.4802 19 18.9201 19 17.8V8.2C19 7.07989 19 6.51984 18.782 6.09202C18.5903 5.71569 18.2843 5.40973 17.908 5.21799C17.5064 5.01338 16.9884 5.00082 16 5.00005M8 5.00005V7H16V5.00005M8 5.00005V4.70711C8 4.25435 8.17986 3.82014 8.5 3.5C8.82014 3.17986 9.25435 3 9.70711 3H14.2929C14.7456 3 15.1799 3.17986 15.5 3.5C15.8201 3.82014 16 4.25435 16 4.70711V5.00005M12 11V17M12 11L14 13M12 11L10 13" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
-                        Divergências Registradas
-                    </h6>
-                    <h2>{{ divergencias_abertas }}</h2>
-                </div>
-            </div>
-        </div>
-
+        <span class="kpi-badge">Central</span>
+      </div>
+      <div>
+        <div class="kpi-value">{{ estoque_total_central|default:0 }}<span>itens</span></div>
+        <div class="kpi-label">Estoque Central</div>
+      </div>
     </div>
 
-
-    <!-- GRÁFICOS -->
-
-    <div class="row">
-
-        <!-- Pizza -->
-
-        <div class="col-md-6 mb-4">
-
-            <div class="card shadow-sm">
-
-                <div class="card-header">
-                    Distribuição de Estoque por Categoria
-                </div>
-
-                <div class="card-body">
-                    <canvas id="graficoCategoria"></canvas>
-                </div>
-
-            </div>
-
+    <div class="kpi kpi--purple">
+      <div class="kpi-top">
+        <div class="kpi-icon">
+          <svg viewBox="0 0 512 512"><path d="M256,174.298c-22.526,0-40.851,18.325-40.851,40.851S233.474,256,256,256s40.851-18.325,40.851-40.851S278.526,174.298,256,174.298zM256,239.66c-13.515,0-24.511-10.996-24.511-24.511c0-13.515,10.996-24.511,24.511-24.511c13.515,0,24.511,10.996,24.511,24.511C280.511,228.664,269.515,239.66,256,239.66z"/><path d="M351.319,462.979h-16.34V340.426c0-4.513-3.657-8.17-8.17-8.17H185.192c-4.513,0-8.17,3.657-8.17,8.17v122.553h-16.34V151.268L256,114.955l95.319,36.313V462.979z"/></svg>
         </div>
-
-
-        <!-- Barras consumo -->
-
-        <div class="col-md-6 mb-4">
-
-            <div class="card shadow-sm">
-
-                <div class="card-header">
-                    Ranking de Consumo de Produtos
-                </div>
-
-                <div class="card-body">
-                    <canvas id="graficoConsumo"></canvas>
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- Estoque por escola -->
-
-        <div class="col-md-6 mb-4">
-
-            <div class="card shadow-sm">
-
-                <div class="card-header">
-                    Estoque por Escola
-                </div>
-
-                <div class="card-body">
-                    <canvas id="graficoEscolas"></canvas>
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- Histórico -->
-
-        <div class="col-md-6 mb-4">
-
-            <div class="card shadow-sm">
-
-                <div class="card-header">
-                    Histórico de Movimentação
-                </div>
-
-                <div class="card-body">
-                    <canvas id="graficoHistorico"></canvas>
-                </div>
-
-            </div>
-
-        </div>
-
+        <span class="kpi-badge">Escolas</span>
+      </div>
+      <div>
+        <div class="kpi-value">{{ estoque_total_escolas }}<span>itens</span></div>
+        <div class="kpi-label">Estoque nas Escolas</div>
+      </div>
     </div>
 
-
-    <!-- TABELAS -->
-
-    <div class="row">
-
-        <div class="col-md-6">
-
-            <div class="card shadow-sm">
-
-                <div class="card-header">
-                    Produtos Mais Consumidos
-                </div>
-
-                <div class="card-body">
-
-                    <table class="table table-sm">
-
-                        <thead>
-
-                            <tr>
-                                <th>Produto</th>
-                                <th>Consumo</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            {% for p in consumo_produtos %}
-
-                            <tr>
-                                <td>{{ p.produto__nome }}</td>
-                                <td>{{ p.total }}</td>
-                            </tr>
-
-                            {% endfor %}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
+    <div class="kpi kpi--blue">
+      <div class="kpi-top">
+        <div class="kpi-icon">
+          <svg viewBox="0 0 256 188"><path d="M57.8,101.5H17.1V60.8h15.7v13h9.3v-13h15.7V101.5zM110.9,101.5H70.3V60.8H86v13h9.3v-13h15.7V101.5zM84.7,48.3H44V7.6h15.7v13H69v-13h15.7V48.3z"/><path d="M63,133c-13,0-23.5,10.5-23.5,23.5s10.5,23.5,23.5,23.5c13,0,23.5-10.5,23.5-23.5S76,133,63,133zM210.8,132c-13,0-23.5,10.5-23.5,23.5s10.5,23.5,23.5,23.5c13,0,23.5-10.5,23.5-23.5S223.8,132,210.8,132z"/></svg>
         </div>
-
-
-        <div class="col-md-6">
-
-            <div class="card shadow-sm">
-
-                <div class="card-header">
-                    Ranking de Estoque por Escola
-                </div>
-
-                <div class="card-body">
-
-                    <table class="table table-sm">
-
-                        <thead>
-
-                            <tr>
-                                <th>Escola</th>
-                                <th>Quantidade</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            {% for e in estoque_escolas %}
-
-                            <tr>
-                                <td>{{ e.escola__nome_escola }}</td>
-                                <td>{{ e.total }}</td>
-                            </tr>
-
-                            {% endfor %}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-        </div>
-
+        <span class="kpi-badge">Mês</span>
+      </div>
+      <div>
+        <div class="kpi-value">{{ movimentacoes_mes }}<span>mov.</span></div>
+        <div class="kpi-label">Movimentações no Mês</div>
+      </div>
     </div>
+
+    <div class="kpi kpi--amber">
+      <div class="kpi-top">
+        <div class="kpi-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="fill:none;stroke:var(--amber)">
+            <circle cx="5.78" cy="16.33" r="2.39"/>
+            <path d="M1.48,23.5V23a4.29,4.29,0,0,1,4.3-4.3h0a4.29,4.29,0,0,1,4.3,4.3v.48"/>
+            <polyline points="15.71 16.69 18.69 13.7 21.68 16.69"/>
+            <path d="M18.69,13.93V16.8A5.74,5.74,0,0,1,13,22.54h0"/>
+          </svg>
+        </div>
+        <span class="kpi-badge">Atenção</span>
+      </div>
+      <div>
+        <div class="kpi-value">{{ transferencias_pendentes }}<span>itens</span></div>
+        <div class="kpi-label">Recebimento Pendente</div>
+      </div>
+    </div>
+
+    <div class="kpi kpi--red">
+      <div class="kpi-top">
+        <div class="kpi-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="fill:none;stroke:var(--red)">
+            <path d="M8 5H16V7H8zM12 11V17M12 11L14 13M12 11L10 13"/>
+            <rect x="5" y="5" width="14" height="16" rx="1"/>
+          </svg>
+        </div>
+        <span class="kpi-badge">Alerta</span>
+      </div>
+      <div>
+        <div class="kpi-value">{{ divergencias_abertas }}<span>itens</span></div>
+        <div class="kpi-label">Divergências Registradas</div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- CHARTS -->
+  <p class="section-label">Análise Visual</p>
+  <div class="charts-grid">
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-dot" style="background:var(--green)"></div>
+        <h3>Distribuição por Categoria</h3>
+      </div>
+      <div class="card-body">
+        <div class="chart-wrap"><canvas id="graficoCategoria"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-dot" style="background:var(--blue)"></div>
+        <h3>Ranking de Consumo de Produtos</h3>
+      </div>
+      <div class="card-body">
+        <div class="chart-wrap"><canvas id="graficoConsumo"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-dot" style="background:var(--purple)"></div>
+        <h3>Estoque por Escola</h3>
+      </div>
+      <div class="card-body">
+        <div class="chart-wrap"><canvas id="graficoEscolas"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-dot" style="background:var(--amber)"></div>
+        <h3>Histórico de Movimentações</h3>
+      </div>
+      <div class="card-body">
+        <div class="chart-wrap"><canvas id="graficoHistorico"></canvas></div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- TABLES -->
+  <p class="section-label">Detalhamento</p>
+  <div class="tables-grid">
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-dot" style="background:var(--blue)"></div>
+        <h3>Produtos Mais Consumidos</h3>
+      </div>
+      <div class="card-body" style="padding:0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Consumo</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in consumo_produtos %}
+            <tr>
+              <td>
+                <span class="rank-num">{{ forloop.counter }}</span>
+                {{ p.produto__nome }}
+              </td>
+              <td class="qty">{{ p.total }} {{ p.produto__unidade_medida__sigla }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-dot" style="background:var(--purple)"></div>
+        <h3>Estoque por Escola</h3>
+      </div>
+      <div class="card-body" style="padding:0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Escola</th>
+              <th>Quantidade</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for e in estoque_escolas %}
+            <tr>
+              <td>
+                <span class="rank-num">{{ forloop.counter }}</span>
+                {{ e.escola__nome_escola }}
+              </td>
+              <td class="qty">{{ e.total }} itens</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
 
 </div>
 
 
-<!-- SERIALIZAÇÃO SEGURA DJANGO -->
-
+<!-- SERIALIZAÇÃO DJANGO -->
 {{ estoque_categoria|json_script:"estoqueCategoriaData" }}
 {{ consumo_produtos|json_script:"consumoProdutosData" }}
 {{ estoque_escolas|json_script:"estoqueEscolasData" }}
@@ -299,83 +490,117 @@
 
 
 <!-- CHART.JS -->
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
+  const categorias = JSON.parse(document.getElementById("estoqueCategoriaData").textContent);
+  const consumo    = JSON.parse(document.getElementById("consumoProdutosData").textContent);
+  const escolas    = JSON.parse(document.getElementById("estoqueEscolasData").textContent);
+  const historico  = JSON.parse(document.getElementById("historicoData").textContent);
 
-const categorias = JSON.parse(document.getElementById("estoqueCategoriaData").textContent);
-const consumo = JSON.parse(document.getElementById("consumoProdutosData").textContent);
-const escolas = JSON.parse(document.getElementById("estoqueEscolasData").textContent);
-const historico = JSON.parse(document.getElementById("historicoData").textContent);
+  const PALETTE = ['#2D9E6B','#2B6CB0','#553C9A','#B7791F','#C53030','#285E61','#744210','#44337A'];
 
+  const baseFont = { family: "'DM Sans', sans-serif", size: 12 };
 
-/* Pizza */
+  Chart.defaults.font = baseFont;
+  Chart.defaults.color = '#718096';
+  Chart.defaults.plugins.legend.labels.boxWidth = 10;
+  Chart.defaults.plugins.legend.labels.padding = 16;
 
-new Chart(document.getElementById('graficoCategoria'), {
-
-    type: 'pie',
-
+  /* Pizza */
+  new Chart(document.getElementById('graficoCategoria'), {
+    type: 'doughnut',
     data: {
-        labels: categorias.map(c => c.nome),
-        datasets: [{
-            data: categorias.map(c => c.total)
-        }]
+      labels: categorias.map(c => c.nome),
+      datasets: [{
+        data: categorias.map(c => c.total),
+        backgroundColor: PALETTE,
+        borderWidth: 2,
+        borderColor: '#fff',
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: { position: 'bottom' }
+      }
     }
+  });
 
-});
-
-
-/* Consumo */
-
-new Chart(document.getElementById('graficoConsumo'), {
-
+  /* Consumo */
+  new Chart(document.getElementById('graficoConsumo'), {
     type: 'bar',
-
     data: {
-        labels: consumo.map(c => c.produto__nome),
-        datasets: [{
-            label: 'Consumo',
-            data: consumo.map(c => c.total)
-        }]
+      labels: consumo.map(c => c.produto__nome),
+      datasets: [{
+        label: 'Consumo',
+        data: consumo.map(c => c.total),
+        backgroundColor: '#2B6CB0',
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#EDF2F7' }, border: { display: false } },
+        y: { grid: { display: false }, border: { display: false } }
+      }
     }
+  });
 
-});
-
-
-/* Escolas */
-
-new Chart(document.getElementById('graficoEscolas'), {
-
+  /* Escolas */
+  new Chart(document.getElementById('graficoEscolas'), {
     type: 'bar',
-
     data: {
-        labels: escolas.map(e => e.escola__nome_escola),
-        datasets: [{
-            label: 'Estoque',
-            data: escolas.map(e => e.total)
-        }]
+      labels: escolas.map(e => e.escola__nome_escola),
+      datasets: [{
+        label: 'Estoque',
+        data: escolas.map(e => e.total),
+        backgroundColor: '#553C9A',
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, border: { display: false } },
+        y: { grid: { color: '#EDF2F7' }, border: { display: false } }
+      }
     }
+  });
 
-});
-
-
-/* Histórico */
-
-new Chart(document.getElementById('graficoHistorico'), {
-
+  /* Histórico */
+  new Chart(document.getElementById('graficoHistorico'), {
     type: 'line',
-
     data: {
-        labels: historico.map(h => h.mes),
-        datasets: [{
-            label: 'Movimentações',
-            data: historico.map(h => h.total)
-        }]
+      labels: historico.map(h => h.mes),
+      datasets: [{
+        label: 'Movimentações',
+        data: historico.map(h => h.total),
+        borderColor: '#B7791F',
+        backgroundColor: 'rgba(183,121,31,.08)',
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointBackgroundColor: '#B7791F',
+        tension: 0.35,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, border: { display: false } },
+        y: { grid: { color: '#EDF2F7' }, border: { display: false } }
+      }
     }
-
-});
-
+  });
 </script>
 
 {% endblock %}

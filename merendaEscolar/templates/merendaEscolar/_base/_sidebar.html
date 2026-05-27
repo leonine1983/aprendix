@@ -1,0 +1,172 @@
+{% load static %}
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-title">Prefeitura Municipal de Vera Cruz</div>
+        <div class="brand-module">Sistema de Merenda Escolar</div>
+        <div class="brand-sector">Gestão de Estoque</div>
+    </div>
+
+    
+    <nav class="menu">
+        <a href="{% url 'merendaEscolar:merenda_inicio' %}">            
+            <i class="fas fa-chart-pie"></i>
+            Dashboard Nutricional
+        </a>
+
+        <a href="{% url 'merendaEscolar:estoque-central' %}">
+            <i class="fas fa-warehouse"></i>
+            Todos os Itens no Estoque (Cantina)
+        </a>
+
+        <a href="{% url 'merendaEscolar:transferencia-list' %}">
+            <i class="fas fa-truck"></i>
+            Transferências
+        </a>
+
+        
+        <div class="submenu-wrapper">
+
+    <a href="#" class="submenu-toggle">
+        <i class="fas fa-utensils"></i>
+        Cardápios
+        <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
+    </a>
+
+    <div class="submenu">
+        <a href="{% url 'merendaEscolar:receita_lista' %}">
+            <svg  height="30px" viewBox="0 0 48 48" id="a" xmlns="http://www.w3.org/2000/svg" fill="#d6d6d6" stroke="#d6d6d6"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <defs> <style>.b{fill:none;stroke:#e6e6e6;stroke-linecap:round;stroke-linejoin:round;}</style> </defs> <g> <path class="b" d="M24,24.4682H5.5c0,9.2155,11.597,17.1393,11.597,17.1393h6.903"></path> <path class="b" d="M10.8843,26.5736c0,6.7924,7.6278,11.8041,7.6278,11.8041"></path> <path class="b" d="M24,24.4682h18.5c0,9.2155-11.597,17.1393-11.597,17.1393h-6.903"></path> <path class="b" d="M14.0942,24.4682c-1.3461-5.0392,7.6541-8.5034,15.7305-9.5733l.7892-1.4542,3.184,3.87-1.7473,.2847c-.8542,2.8087-5.1347,6.8728-5.1347,6.8728"></path> <path class="b" d="M15.5093,24.4682c.2883-2.5946,3.2968-5.5138,14.7724-9.0189"></path> <path class="b" d="M30.5784,15.8092c-4.3403,2.1744-9.4,4.6725-12.9464,8.659"></path> <path class="b" d="M31.4253,16.8367c-4.5094,6.1259-7.4253,7.6315-7.4253,7.6315"></path> <path class="b" d="M21.5047,24.4682c2.7196-1.5897,9.4897-8.1542,9.4897-8.1542"></path> <path class="b" d="M33.0768,16.4532l8.1513-6.6057c.5628-.4561,.6493-1.282,.1932-1.8447h0c-.4561-.5628-1.282-.6493-1.8447-.1932l-8.1513,6.6057"></path> </g> <line class="b" x1="29.8248" y1="14.8949" x2="32.0506" y2="17.5954"></line> </g></svg>
+            Receitas Institucionais
+        </a>
+        <a href="{% url 'merendaEscolar:cardapio_list' %}">
+            <i class="fas fa-list"></i>
+            Listar Cardápios
+        </a>
+
+        <a href="{% url 'merendaEscolar:cardapio_escola_list' %}">
+            <i class="fas fa-link"></i>
+            Cardápio x Escola
+        </a>
+    </div>
+
+</div>
+
+
+
+        <div class="submenu-wrapper">
+            <a href="#" class="submenu-toggle">
+                <i class="fas fa-school"></i>
+                Escolas
+                <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
+            </a>
+            <!--
+                
+            <a href="{% url 'arquitetura_system:grafo_3d' %}">
+                🧠 Arquitetura do Sistema
+            </a>-->
+
+
+
+            <div class="submenu">
+
+                <!-- Fluxo operacional -->
+                <a href="{% url 'merendaEscolar:lista_escolas' %}">
+                    <i class="fas fa-clipboard-check"></i>
+                    Confirma Transferência
+                </a>
+
+                <!-- Fluxo analítico -->
+                <a href="{% url 'merendaEscolar:lista_escolas_dashboard' %}">
+                    <i class="fas fa-chart-line"></i>
+                    Dashboards de Estoque
+                </a>
+
+                <!-- PREVISÃO DE IMPLEMENTAÇÃO -->
+                <a href="#"
+                class="disabled"
+                aria-disabled="true"
+                title="Funcionalidade prevista para futura implementação">
+                    <i class="fas fa-comments"></i>
+                    Feedback da Merenda
+                </a>
+
+            </div>
+        </div>
+        <a href='{% url "core:usuarios_lista" %}'>
+           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" height='20' stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title></title> <g id="Complete"> <g id="user-add"> <g> <path d="M17,21V19a4,4,0,0,0-4-4H5a4,4,0,0,0-4,4v2" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path> <circle cx="9" cy="7" fill="none" r="4" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></circle> <line fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="17" x2="23" y1="11" y2="11"></line> <line fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="20" x2="20" y1="8" y2="14"></line> </g> </g> </g> </g></svg>
+           Controle de Usuários            
+        </a>        
+        <a><i class="fas fa-bell"></i> Alertas</a>
+        
+        <div class="submenu-wrapper">
+
+        <a href="#" class="submenu-toggle">
+            <i class="fas fa-file-alt"></i>
+            Relatórios
+            <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
+        </a>
+
+        <div class="submenu">
+
+            <a href="{% url 'merendaEscolar:relatorio-descartes' %}">
+                <i class="fas fa-trash-alt"></i>
+                Relatório de Descartes
+            </a>
+
+            <a href="{% url 'merendaEscolar:relatorio_estoque_central' %}">
+                <i class="fas fa-boxes"></i>
+                Relatório de Estoque
+            </a>
+
+            <a href="#">
+                <i class="fas fa-exchange-alt"></i>
+                Movimentações de Estoque
+            </a>
+
+            <a href="#">
+                <i class="fas fa-truck-loading"></i>
+                Transferências
+            </a>
+
+        </div>
+
+    </div>
+
+
+        
+        <div class="submenu-wrapper">
+            <a href="#" class="submenu-toggle">
+                <i class="fas fa-cog"></i>
+                Configuração 
+                <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
+            </a>
+            <div class="submenu">
+                
+                <a href="{% url 'merendaEscolar:configuracao_pessoal' %}">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                    Configuração do sistema
+                </a>
+                <a href="{% url 'merendaEscolar:unidade_medida_list' %}">
+                    <i class="fas fa-balance-scale"></i>
+                    Unidades de Medida
+                </a>
+                <a href="{% url 'merendaEscolar:categoria_produto_list' %}">
+                    <i class="fas fa-tags"></i>
+                    Categorias de Produtos
+                </a>
+                <a href="{% url 'merendaEscolar:produto_list' %}">
+                    <i class="fas fa-box"></i>
+                    Produtos
+                </a>
+                <a href="{% url 'merendaEscolar:tipo_refeicao_list' %}">
+                    <i class="fas fa-utensils"></i>
+                    Tipos de Refeição
+                </a>
+            </div>
+        </div> 
+    </nav>
+    <div class="sidebar-footer">
+        <img src="{% static 'prefeitura.png' %}" 
+            alt="Brasão da Prefeitura"
+            class="brasao-prefeitura">
+    </div>
+</aside>

@@ -5,6 +5,37 @@ from . views import *
 
 app_name = 'merendaEscolar'
 urlpatterns = [ 
+    # envio de mensagens
+    path(
+        'mensagens/enviar/',
+        EnviarMensagemView.as_view(),
+        name='mensagem-enviar'
+    ),
+
+    # autocomplete usuários
+    path(
+        'mensagens/buscar-usuarios/',
+        BuscarUsuariosView.as_view(),
+        name='mensagem-buscar-usuarios'
+    ),
+
+    path(
+    "mensagens/",
+    ListarMensagensView.as_view(),
+    name="mensagens_listar"
+        ),
+
+        path(
+            "mensagens/<int:pk>/lida/",
+            MarcarMensagemLidaView.as_view(),
+            name="mensagem_lida"
+        ),
+
+        path(
+            "mensagens/<int:pk>/excluir/",
+            ExcluirMensagemView.as_view(),
+            name="mensagem_excluir"
+        ),
 
     path(
         "configuracoes/",

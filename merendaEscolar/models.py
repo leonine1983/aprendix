@@ -342,13 +342,6 @@ class EstoqueEscola(models.Model):
 # ==============================
 
 class MovimentacaoEstoque(models.Model):
-    """
-    Registra entradas e saídas de produtos, seja do estoque central ou das escolas.
-    Tipos:
-        - ENTRADA_CENTRAL / SAIDA_CENTRAL
-        - ENTRADA_ESCOLA / SAIDA_ESCOLA
-        - AJUSTE (manual)
-    """
     TIPO_CHOICES = (
         ("ENTRADA_CENTRAL", "Entrada Central"),
         ("SAIDA_CENTRAL", "Saída Central"),

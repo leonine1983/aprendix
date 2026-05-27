@@ -1,0 +1,1034 @@
+
+
+{# ── ESTILOS ── #}
+<style>
+
+/* ═══════════════════════════════
+   BOTÃO FLUTUANTE
+═══════════════════════════════ */
+
+.fab-msg {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;          /* canto inferior ESQUERDO */
+    z-index: 9998;
+}
+
+.fab-msg-btn {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0ea5a4, #0c8f8d);
+    border: none;
+    color: #fff;
+    font-size: 1.35rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 24px rgba(14,165,164,.45);
+    transition: transform .25s ease, box-shadow .25s ease;
+    position: relative;
+}
+
+.fab-msg-btn:hover {
+    transform: scale(1.12) rotate(-8deg);
+    box-shadow: 0 10px 32px rgba(14,165,164,.6);
+}
+
+.fab-msg-btn .fab-pulse {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid rgba(14,165,164,.4);
+    animation: fabPulse 2s infinite;
+}
+
+@keyframes fabPulse {
+    0%   { transform: scale(1);   opacity: .6; }
+    70%  { transform: scale(1.3); opacity: 0;  }
+    100% { transform: scale(1.3); opacity: 0;  }
+}
+
+.fab-tooltip {
+    position: absolute;
+    right: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #0f172a;
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: 6px 12px;
+    border-radius: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+}
+
+.fab-tooltip::before {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: #0f172a;
+}
+
+.fab-msg-btn:hover .fab-tooltip { opacity: 1; }
+
+
+/* ═══════════════════════════════
+   OVERLAY
+═══════════════════════════════ */
+
+.msg-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, .55);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+}
+
+.msg-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+
+/* ═══════════════════════════════
+   MODAL
+═══════════════════════════════ */
+
+.msg-modal {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 640px;
+    margin: 20px;
+    box-shadow: 0 30px 80px rgba(15,23,42,.18);
+    transform: translateY(30px) scale(.97);
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+.msg-overlay.active .msg-modal {
+    transform: translateY(0) scale(1);
+}
+
+
+/* ── Cabeçalho ── */
+
+.msg-modal-header {
+    padding: 22px 26px 16px;
+    border-bottom: 1px solid #e5eaf0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(to right, #f8fafc, #fff);
+}
+
+.msg-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.msg-modal-title .title-icon {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, #0ea5a4, #0c8f8d);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: .95rem;
+    flex-shrink: 0;
+}
+
+.msg-modal-title .title-sub {
+    font-size: .75rem;
+    font-weight: 400;
+    color: #6b7280;
+    margin-top: 1px;
+}
+
+.msg-modal-close {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid #e5eaf0;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    font-size: .9rem;
+    transition: all .2s;
+    flex-shrink: 0;
+}
+
+.msg-modal-close:hover {
+    background: #fef2f2;
+    border-color: #dc2626;
+    color: #dc2626;
+}
+
+
+/* ── Corpo ── */
+
+.msg-modal-body {
+    padding: 20px 26px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.msg-form-row {
+    margin-bottom: 16px;
+}
+
+.msg-form-label {
+    display: block;
+    font-size: .78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #64748b;
+    margin-bottom: 7px;
+}
+
+/* Select estilizado */
+.msg-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #e5eaf0;
+    border-radius: 10px;
+    font-size: .9rem;
+    color: #0f172a;
+    background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230ea5a4' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 14px center;
+    appearance: none;
+    transition: border-color .2s;
+    cursor: pointer;
+}
+
+.msg-select:focus {
+    outline: none;
+    border-color: #0ea5a4;
+    box-shadow: 0 0 0 3px rgba(14,165,164,.12);
+    background-color: #fff;
+}
+
+/* Destinatário individual (oculto por padrão) */
+#wrap-destinatario-individual {
+    display: none;
+    margin-top: 10px;
+}
+
+.msg-search-wrapper {
+    position: relative;
+}
+
+.msg-search-wrapper i {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: .85rem;
+}
+
+.msg-input {
+    width: 100%;
+    padding: 10px 14px 10px 36px;
+    border: 1.5px solid #e5eaf0;
+    border-radius: 10px;
+    font-size: .9rem;
+    color: #0f172a;
+    background: #f8fafc;
+    transition: border-color .2s;
+}
+
+.msg-input:focus {
+    outline: none;
+    border-color: #0ea5a4;
+    box-shadow: 0 0 0 3px rgba(14,165,164,.12);
+    background: #fff;
+}
+
+/* Assunto */
+.msg-input-assunto {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #e5eaf0;
+    border-radius: 10px;
+    font-size: .9rem;
+    color: #0f172a;
+    background: #f8fafc;
+    transition: border-color .2s;
+}
+
+.msg-input-assunto:focus {
+    outline: none;
+    border-color: #0ea5a4;
+    box-shadow: 0 0 0 3px rgba(14,165,164,.12);
+    background: #fff;
+}
+
+
+/* ── Editor Rico ── */
+
+.msg-editor-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 10px;
+    border: 1.5px solid #e5eaf0;
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    background: #f8fafc;
+    flex-wrap: wrap;
+}
+
+.toolbar-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .8rem;
+    color: #475569;
+    transition: all .15s;
+}
+
+.toolbar-btn:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+.toolbar-btn.active {
+    background: #d1f3f2;
+    border-color: #0ea5a4;
+    color: #0ea5a4;
+}
+
+.toolbar-sep {
+    width: 1px;
+    height: 20px;
+    background: #e2e8f0;
+    margin: 0 4px;
+}
+
+.toolbar-select {
+    padding: 3px 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: .78rem;
+    color: #475569;
+    background: #fff;
+    cursor: pointer;
+}
+
+/* Painel de emojis */
+.emoji-picker-panel {
+    display: none;
+    background: #fff;
+    border: 1.5px solid #e5eaf0;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 8px 30px rgba(15,23,42,.12);
+    margin-top: 4px;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-height: 160px;
+    overflow-y: auto;
+}
+
+.emoji-picker-panel.show { display: flex; }
+
+.emoji-btn {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    border: 1px solid transparent;
+    background: none;
+    transition: all .15s;
+}
+
+.emoji-btn:hover {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    transform: scale(1.15);
+}
+
+.msg-editor-area {
+    min-height: 160px;
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 12px 14px;
+    border: 1.5px solid #e5eaf0;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    font-size: .92rem;
+    line-height: 1.6;
+    color: #0f172a;
+    background: #fff;
+    outline: none;
+    transition: border-color .2s;
+}
+
+.msg-editor-area:focus {
+    border-color: #0ea5a4;
+    box-shadow: 0 0 0 3px rgba(14,165,164,.12);
+}
+
+.msg-editor-area:empty::before {
+    content: attr(data-placeholder);
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+/* Contador de caracteres */
+.msg-char-counter {
+    text-align: right;
+    font-size: .72rem;
+    color: #94a3b8;
+    margin-top: 5px;
+}
+
+.msg-char-counter.warn { color: #d97706; }
+.msg-char-counter.over { color: #dc2626; font-weight: 700; }
+
+
+/* ── Rodapé ── */
+
+.msg-modal-footer {
+    padding: 16px 26px;
+    border-top: 1px solid #e5eaf0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.msg-footer-info {
+    font-size: .78rem;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.msg-footer-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.msg-btn-cancel {
+    padding: 9px 20px;
+    border: 1.5px solid #e5eaf0;
+    border-radius: 10px;
+    background: #fff;
+    font-size: .875rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all .2s;
+}
+
+.msg-btn-cancel:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+.msg-btn-send {
+    padding: 9px 22px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #0ea5a4, #0c8f8d);
+    font-size: .875rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all .2s;
+    box-shadow: 0 4px 14px rgba(14,165,164,.35);
+}
+
+.msg-btn-send:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(14,165,164,.45);
+}
+
+.msg-btn-send:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.msg-btn-send .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+    display: none;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Toast de sucesso / erro */
+.msg-toast {
+    position: fixed;
+    bottom: 100px;
+    right: 28px;
+    background: #0f172a;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: .85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(15,23,42,.25);
+    z-index: 10001;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all .3s ease;
+    pointer-events: none;
+}
+
+.msg-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.msg-toast.success { background: #065f46; }
+.msg-toast.error   { background: #7f1d1d; }
+
+/* Responsivo */
+@media (max-width: 640px) {
+    .msg-modal { margin: 10px; border-radius: 18px; }
+    .msg-modal-body { padding: 16px 18px; }
+    .msg-modal-header { padding: 16px 18px 12px; }
+    .msg-modal-footer { padding: 12px 18px; }
+    .msg-editor-toolbar { gap: 1px; }
+}
+
+</style>
+
+
+
+<div class="fab-msg">
+    <button class="fab-msg-btn" id="fabMsgBtn" title="Enviar mensagem">
+        <span class="fab-pulse"></span>
+        <i class="fas fa-paper-plane"></i>
+        <span class="fab-tooltip">✉️ Nova mensagem</span>
+    </button>
+</div>
+
+
+<div class="msg-overlay" id="msgOverlay">
+    <div class="msg-modal" id="msgModal" role="dialog" aria-labelledby="msgModalTitle" aria-modal="true">
+
+        {# ── Cabeçalho ── #}
+        <div class="msg-modal-header">
+            <div class="msg-modal-title">
+                <div class="title-icon"><i class="fas fa-envelope"></i></div>
+                <div>
+                    <div id="msgModalTitle">Nova Mensagem</div>
+                    <div class="title-sub">Merenda Escolar · Sistema de Comunicação Interna</div>
+                </div>
+            </div>
+            <button class="msg-modal-close" id="msgModalClose" title="Fechar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        {# ── Corpo ── #}
+        <div class="msg-modal-body">
+
+            {# Para quem enviar #}
+            <div class="msg-form-row">
+                <label class="msg-form-label" for="msgTipo">
+                    <i class="fas fa-users"></i> &nbsp;Destinatários
+                </label>
+                <select class="msg-select" id="msgTipo" name="tipo_destinatario">
+                    <option value="">— Selecione os destinatários —</option>
+                    <optgroup label="📢 Grupos">
+                        <option value="grupo_nutricionista">🥗 Grupo: Nutricionistas</option>
+                        <option value="grupo_merendeira">👩‍🍳 Grupo: Merendeiras</option>
+                        <option value="todos">🌐 Todos os usuários</option>
+                    </optgroup>
+                    <optgroup label="👤 Usuário individual">
+                        <option value="individual">🔍 Buscar usuário específico…</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            {# Busca de usuário individual #}
+            <div id="wrap-destinatario-individual">
+                <div class="msg-search-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input
+                        type="text"
+                        class="msg-input"
+                        id="msgBuscaUser"
+                        placeholder="Nome ou usuário…"
+                        autocomplete="off"
+                    >
+                </div>
+                <div id="msgUserResults" style="
+                    margin-top:6px;
+                    border:1.5px solid #e5eaf0;
+                    border-radius:10px;
+                    background:#fff;
+                    overflow:hidden;
+                    display:none;
+                "></div>
+                <input type="hidden" id="msgDestinatarioId" name="destinatario_id">
+                <div id="msgUserSelected" style="
+                    display:none;
+                    margin-top:8px;
+                    padding:8px 12px;
+                    background:#d1f3f2;
+                    border-radius:8px;
+                    font-size:.85rem;
+                    color:#0f172a;
+                    font-weight:600;
+                "></div>
+            </div>
+
+            {# Assunto #}
+            <div class="msg-form-row">
+                <label class="msg-form-label" for="msgAssunto">
+                    <i class="fas fa-tag"></i> &nbsp;Assunto
+                </label>
+                <input
+                    type="text"
+                    class="msg-input-assunto"
+                    id="msgAssunto"
+                    name="assunto"
+                    placeholder="Ex: Cardápio da semana, Aviso importante…"
+                    maxlength="100"
+                >
+            </div>
+
+            {# Mensagem — editor rico #}
+            <div class="msg-form-row">
+                <label class="msg-form-label">
+                    <i class="fas fa-align-left"></i> &nbsp;Mensagem
+                </label>
+
+                {# Toolbar #}
+                <div class="msg-editor-toolbar" id="msgToolbar">
+
+                    {# Formatação básica #}
+                    <button type="button" class="toolbar-btn" data-cmd="bold"          title="Negrito"><i class="fas fa-bold"></i></button>
+                    <button type="button" class="toolbar-btn" data-cmd="italic"        title="Itálico"><i class="fas fa-italic"></i></button>
+                    <button type="button" class="toolbar-btn" data-cmd="underline"     title="Sublinhado"><i class="fas fa-underline"></i></button>
+                    <button type="button" class="toolbar-btn" data-cmd="strikeThrough" title="Tachado"><i class="fas fa-strikethrough"></i></button>
+
+                    <span class="toolbar-sep"></span>
+
+                    {# Alinhamento #}
+                    <button type="button" class="toolbar-btn" data-cmd="justifyLeft"   title="Esquerda"><i class="fas fa-align-left"></i></button>
+                    <button type="button" class="toolbar-btn" data-cmd="justifyCenter" title="Centro"><i class="fas fa-align-center"></i></button>
+                    <button type="button" class="toolbar-btn" data-cmd="justifyRight"  title="Direita"><i class="fas fa-align-right"></i></button>
+
+                    <span class="toolbar-sep"></span>
+
+                    {# Listas #}
+                    <button type="button" class="toolbar-btn" data-cmd="insertUnorderedList" title="Lista"><i class="fas fa-list-ul"></i></button>
+                    <button type="button" class="toolbar-btn" data-cmd="insertOrderedList"   title="Lista numerada"><i class="fas fa-list-ol"></i></button>
+
+                    <span class="toolbar-sep"></span>
+
+                    {# Cores #}
+                    <select class="toolbar-select" id="msgColorPick" title="Cor do texto">
+                        <option value=""  >🎨 Cor</option>
+                        <option value="#0ea5a4" style="color:#0ea5a4">● Verde-água</option>
+                        <option value="#16a34a" style="color:#16a34a">● Verde</option>
+                        <option value="#dc2626" style="color:#dc2626">● Vermelho</option>
+                        <option value="#d97706" style="color:#d97706">● Laranja</option>
+                        <option value="#1d4ed8" style="color:#1d4ed8">● Azul</option>
+                        <option value="#7c3aed" style="color:#7c3aed">● Roxo</option>
+                        <option value="#0f172a" style="color:#0f172a">● Preto</option>
+                    </select>
+
+                    {# Tamanho #}
+                    <select class="toolbar-select" id="msgFontSize" title="Tamanho">
+                        <option value="">Tamanho</option>
+                        <option value="1">Pequeno</option>
+                        <option value="3" selected>Normal</option>
+                        <option value="5">Grande</option>
+                        <option value="7">Enorme</option>
+                    </select>
+
+                    <span class="toolbar-sep"></span>
+
+                    {# Emojis #}
+                    <button type="button" class="toolbar-btn" id="btnEmoji" title="Emojis">😊</button>
+
+                    {# Limpar #}
+                    <button type="button" class="toolbar-btn" id="btnClearEditor" title="Limpar">
+                        <i class="fas fa-eraser"></i>
+                    </button>
+
+                </div>
+
+                {# Painel de emojis #}
+                <div class="emoji-picker-panel" id="emojiPanel">
+                    {% with emojis="😊 😄 😂 🤣 😍 🥰 😘 🤩 🎉 🎊 👏 🙌 💪 👍 ✅ ❤️ 💙 💚 💛 🧡 ❗ ❓ ⚠️ 🔔 📢 📣 📋 📅 📌 📎 🗂️ 🍽️ 🥗 🥦 🍎 🥕 🧃 🍞 🥛 🏫 👩‍🍳 👩‍⚕️ 📊 📈 🔍 ✏️ 📝 🖊️ 💬 🤝 🌟 ⭐ 🚨 ⛔ 🆘 ℹ️ 💡 🔑 🗓️ 🕐 ⏰ 🌿 🌱 🌻 🍀" %}
+                        {% for emoji in emojis.split %}
+                            <button type="button" class="emoji-btn" data-emoji="{{ emoji }}">{{ emoji }}</button>
+                        {% endfor %}
+                    {% endwith %}
+                </div>
+
+                {# Área de digitação #}
+                <div
+                    class="msg-editor-area"
+                    id="msgEditorArea"
+                    contenteditable="true"
+                    data-placeholder="✍️ Digite sua mensagem aqui…"
+                    spellcheck="true"
+                ></div>
+
+                <div class="msg-char-counter" id="msgCharCounter">0 / 5000 caracteres</div>
+
+            </div>
+
+        </div>{# /body #}
+
+
+        {# ── Rodapé ── #}
+        <div class="msg-modal-footer">
+            <div class="msg-footer-info">
+                <i class="fas fa-lock" style="color:#0ea5a4"></i>
+                Comunicação interna segura
+            </div>
+            <div class="msg-footer-actions">
+                <button type="button" class="msg-btn-cancel" id="msgBtnCancel">Cancelar</button>
+                <button type="button" class="msg-btn-send"   id="msgBtnSend">
+                    <span class="spinner" id="msgSpinner"></span>
+                    <i class="fas fa-paper-plane" id="msgSendIcon"></i>
+                    Enviar Mensagem
+                </button>
+            </div>
+        </div>
+
+    </div>{# /modal #}
+</div>{# /overlay #}
+
+{# Toast #}
+<div class="msg-toast" id="msgToast">
+    <i class="fas fa-check-circle"></i>
+    <span id="msgToastText">Mensagem enviada com sucesso!</span>
+</div>
+
+
+<script>
+(function () {
+    'use strict';
+
+    /* ── Elementos ── */
+    const fab        = document.getElementById('fabMsgBtn');
+    const overlay    = document.getElementById('msgOverlay');
+    const modal      = document.getElementById('msgModal');
+    const btnClose   = document.getElementById('msgModalClose');
+    const btnCancel  = document.getElementById('msgBtnCancel');
+    const btnSend    = document.getElementById('msgBtnSend');
+    const spinner    = document.getElementById('msgSpinner');
+    const sendIcon   = document.getElementById('msgSendIcon');
+    const toast      = document.getElementById('msgToast');
+    const toastText  = document.getElementById('msgToastText');
+
+    const selTipo    = document.getElementById('msgTipo');
+    const wrapIndiv  = document.getElementById('wrap-destinatario-individual');
+    const inputUser  = document.getElementById('msgBuscaUser');
+    const userRes    = document.getElementById('msgUserResults');
+    const userSel    = document.getElementById('msgUserSelected');
+    const hiddenId   = document.getElementById('msgDestinatarioId');
+    const assunto    = document.getElementById('msgAssunto');
+    const editor     = document.getElementById('msgEditorArea');
+    const counter    = document.getElementById('msgCharCounter');
+    const emojiPanel = document.getElementById('emojiPanel');
+    const btnEmoji   = document.getElementById('btnEmoji');
+    const btnClear   = document.getElementById('btnClearEditor');
+
+    const CSRF = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+    /* ── Abrir / Fechar ── */
+    function openModal() {
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        assunto.focus();
+    }
+
+    function closeModal() {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    fab.addEventListener('click', openModal);
+    btnClose.addEventListener('click', closeModal);
+    btnCancel.addEventListener('click', closeModal);
+
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
+
+    /* ── Tipo de destinatário ── */
+    selTipo.addEventListener('change', () => {
+        const v = selTipo.value;
+        wrapIndiv.style.display = v === 'individual' ? 'block' : 'none';
+        if (v !== 'individual') {
+            hiddenId.value = '';
+            userSel.style.display = 'none';
+            inputUser.value = '';
+        }
+    });
+
+    /* ── Busca de usuário (AJAX) ── */
+    let searchTimeout;
+
+    inputUser.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        const q = inputUser.value.trim();
+        if (q.length < 2) { userRes.style.display = 'none'; return; }
+
+        searchTimeout = setTimeout(() => {
+            // Substitua pela sua URL de busca de usuários
+            fetch(`{% url 'merendaEscolar:mensagem-buscar-usuarios' %}?q=${encodeURIComponent(q)}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (!data.length) {
+                    userRes.innerHTML = '<div style="padding:12px 14px;font-size:.85rem;color:#94a3b8">Nenhum usuário encontrado</div>';
+                } else {
+                    userRes.innerHTML = data.map(u => `
+                        <div class="msg-user-option" data-id="${u.id}" data-nome="${u.nome}" style="
+                            padding:10px 14px;
+                            font-size:.88rem;
+                            cursor:pointer;
+                            display:flex;
+                            align-items:center;
+                            gap:10px;
+                            border-bottom:1px solid #f1f5f9;
+                            transition:background .15s;
+                        " onmouseover="this.style.background='#f0fafb'" onmouseout="this.style.background=''">
+                            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#0ea5a4,#0c8f8d);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:700;flex-shrink:0">
+                                ${u.nome.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <div style="font-weight:600;color:#0f172a">${u.nome}</div>
+                                <div style="font-size:.75rem;color:#94a3b8">${u.username || ''} · ${u.grupo || ''}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                userRes.style.display = 'block';
+            })
+            .catch(() => {
+                userRes.innerHTML = '<div style="padding:12px 14px;font-size:.85rem;color:#dc2626">Erro ao buscar usuários</div>';
+                userRes.style.display = 'block';
+            });
+        }, 350);
+    });
+
+    userRes.addEventListener('click', (e) => {
+        const opt = e.target.closest('.msg-user-option');
+        if (!opt) return;
+        hiddenId.value = opt.dataset.id;
+        userSel.textContent = `✅ Selecionado: ${opt.dataset.nome}`;
+        userSel.style.display = 'block';
+        userRes.style.display = 'none';
+        inputUser.value = opt.dataset.nome;
+    });
+
+
+    /* ── Toolbar do editor ── */
+    document.querySelectorAll('.toolbar-btn[data-cmd]').forEach(btn => {
+        btn.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // não perde o foco do editor
+            const cmd = btn.dataset.cmd;
+            document.execCommand(cmd, false, null);
+            btn.classList.toggle('active', document.queryCommandState(cmd));
+            editor.focus();
+        });
+    });
+
+    /* Cor */
+    document.getElementById('msgColorPick').addEventListener('change', function () {
+        if (this.value) {
+            document.execCommand('foreColor', false, this.value);
+            editor.focus();
+        }
+        this.value = '';
+    });
+
+    /* Tamanho */
+    document.getElementById('msgFontSize').addEventListener('change', function () {
+        if (this.value) {
+            document.execCommand('fontSize', false, this.value);
+            editor.focus();
+        }
+    });
+
+    /* Emojis */
+    btnEmoji.addEventListener('click', (e) => {
+        e.stopPropagation();
+        emojiPanel.classList.toggle('show');
+    });
+
+    emojiPanel.addEventListener('click', (e) => {
+        const btn = e.target.closest('.emoji-btn');
+        if (!btn) return;
+        editor.focus();
+        document.execCommand('insertText', false, btn.dataset.emoji);
+        emojiPanel.classList.remove('show');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!emojiPanel.contains(e.target) && e.target !== btnEmoji) {
+            emojiPanel.classList.remove('show');
+        }
+    });
+
+    /* Limpar */
+    btnClear.addEventListener('click', () => {
+        if (confirm('Limpar toda a mensagem?')) {
+            editor.innerHTML = '';
+            updateCounter();
+        }
+    });
+
+    /* Contador */
+    function updateCounter() {
+        const len = editor.innerText.trim().length;
+        const max = 5000;
+        counter.textContent = `${len} / ${max} caracteres`;
+        counter.classList.remove('warn', 'over');
+        if (len > max)       counter.classList.add('over');
+        else if (len > 4500) counter.classList.add('warn');
+    }
+
+    editor.addEventListener('input', updateCounter);
+
+
+    /* ── Toast ── */
+    function showToast(msg, tipo = 'success') {
+        toastText.textContent = msg;
+        toast.className = `msg-toast ${tipo}`;
+        toast.querySelector('i').className = tipo === 'success'
+            ? 'fas fa-check-circle'
+            : 'fas fa-exclamation-circle';
+
+        requestAnimationFrame(() => toast.classList.add('show'));
+        setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+
+    /* ── Enviar ── */
+    btnSend.addEventListener('click', async () => {
+
+        /* Validação */
+        const tipo = selTipo.value;
+        if (!tipo) { showToast('Selecione os destinatários.', 'error'); return; }
+        if (tipo === 'individual' && !hiddenId.value) { showToast('Selecione um usuário específico.', 'error'); return; }
+        if (!assunto.value.trim()) { showToast('Preencha o assunto.', 'error'); assunto.focus(); return; }
+        const html = editor.innerHTML.trim();
+        if (!editor.innerText.trim()) { showToast('Escreva a mensagem.', 'error'); editor.focus(); return; }
+
+        /* Loading */
+        btnSend.disabled = true;
+        spinner.style.display = 'block';
+        sendIcon.style.display = 'none';
+
+        try {
+            const body = new FormData();
+            body.append('tipo_destinatario', tipo);
+            body.append('assunto', assunto.value.trim());
+            body.append('mensagem', html);
+            if (tipo === 'individual') body.append('destinatario_id', hiddenId.value);
+            body.append('csrfmiddlewaretoken', CSRF);
+
+            /*
+             * ⚠️  AJUSTE A URL ABAIXO para a sua view de envio de mensagens
+             *     Ex: /merenda/mensagens/enviar/
+             *         {% url 'merendaEscolar:mensagem-enviar' %}
+             */
+            const res = await fetch("{% url 'merendaEscolar:mensagem-enviar' %}", {
+                method: 'POST',
+                body,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.ok) {
+                showToast(`✅ Mensagem enviada para ${data.total || ''} destinatário(s)!`, 'success');
+                closeModal();
+                /* Limpa campos */
+                selTipo.value = '';
+                wrapIndiv.style.display = 'none';
+                hiddenId.value = '';
+                inputUser.value = '';
+                userSel.style.display = 'none';
+                assunto.value = '';
+                editor.innerHTML = '';
+                updateCounter();
+            } else {
+                showToast(data.erro || 'Erro ao enviar mensagem.', 'error');
+            }
+
+        } catch (err) {
+            console.error(err);
+            showToast('Falha na conexão. Tente novamente.', 'error');
+        } finally {
+            btnSend.disabled = false;
+            spinner.style.display = 'none';
+            sendIcon.style.display = '';
+        }
+    });
+
+})();
+</script>

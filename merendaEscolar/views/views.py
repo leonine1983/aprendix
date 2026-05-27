@@ -1,21 +1,47 @@
-from django.shortcuts import render, redirect
-from django.db.models import Sum, Count
-from django.utils import timezone
 from datetime import timedelta
-from rh.models import Escola
+from decimal import Decimal, ROUND_HALF_UP
 
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
-
-from ..models import EstoqueCentral, UnidadeMedida, CategoriaProduto, Produto
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Q
-from core.permissions import GroupRequiredMixin
-from core.groups.nutricionista import NUTRICIONISTA_GROUPS
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ValidationError
+from django.db.models import (
+    Avg,
+    Count,
+    Exists,
+    OuterRef,
+    Q,
+    Sum,
+)
+from django.db.models.functions import Round, TruncMonth
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
+from django.utils import timezone
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    ListView,
+    TemplateView,
+    UpdateView,
+)
 
+from core.groups.nutricionista import NutricionistaRequiredMixin
+from core.models import ConfiguraPessoal
+from core.views.baseNutricionista import BaseNutricionistaView
+
+from merendaEscolar.models import (
+    CategoriaProduto,
+    DivergenciaEntrega,
+    Escola,
+    EstoqueCentral,
+    EstoqueEscola,
+    MovimentacaoEstoque,
+    Produto,
+    ReceitaIngrediente,
+    Transferencia,
+    TransferenciaItem,
+    UnidadeMedida,
+)
 
 
 class SuccessMessageMixin:
@@ -37,27 +63,7 @@ class ErrorMessageMixin:
 
 
 
-class UnidadeMedidaListView(
-    LoginRequiredMixin,
-    ListView
-):
-    """
-    Lista paginada das unidades de medida cadastradas no sistema.
-
-    Esta view possui também uma responsabilidade adicional:
-    informar ao template se cada unidade de medida possui vínculo
-    com outros registros do sistema (ex: produtos cadastrados).
-
-    Essa informação é utilizada para fins de segurança na interface,
-    permitindo exibir o botão "Excluir" apenas quando a unidade ainda
-    não estiver sendo utilizada por nenhuma outra tabela.
-
-    IMPORTANTE:
-    Mesmo com essa verificação no template, a validação definitiva
-    deve ocorrer também na view de exclusão para garantir integridade
-    de dados no backend.
-    """
-
+class UnidadeMedidaListView(BaseNutricionistaView, ListView):
     model = UnidadeMedida
     template_name = "merendaEscolar/unidade_medida/list.html"
     context_object_name = "unidades"
@@ -93,9 +99,7 @@ class UnidadeMedidaListView(
 
 
 
-class UnidadeMedidaCreateView(
-    LoginRequiredMixin,
-    SuccessMessageMixin,
+class UnidadeMedidaCreateView(BaseNutricionistaView, SuccessMessageMixin,
     ErrorMessageMixin,
     CreateView
 
@@ -108,8 +112,7 @@ class UnidadeMedidaCreateView(
     error_message = "Erro ao cadastrar a unidade de medida."
 
 
-class UnidadeMedidaUpdateView(
-    LoginRequiredMixin,
+class UnidadeMedidaUpdateView(BaseNutricionistaView,
     SuccessMessageMixin,
     ErrorMessageMixin,
     UpdateView
@@ -124,24 +127,7 @@ class UnidadeMedidaUpdateView(
 
 
 
-class UnidadeMedidaDeleteView(LoginRequiredMixin, DeleteView):
-    """
-    Exclusão institucional de Unidade de Medida.
-
-    Regras de negócio aplicadas:
-
-    1) Uma unidade de medida NÃO pode ser excluída caso exista
-       qualquer Produto vinculado a ela.
-
-    2) A validação ocorre obrigatoriamente no backend para garantir
-       integridade referencial do banco de dados.
-
-    3) O template apenas solicita confirmação da ação do usuário.
-
-    4) Todas as respostas da view enviam mensagens ao usuário,
-       seguindo a diretriz institucional de feedback explícito
-       utilizando o Django Messages Framework.
-    """
+class UnidadeMedidaDeleteView(BaseNutricionistaView, DeleteView):
 
     model = UnidadeMedida
     template_name = "merendaEscolar/unidade_medida/confirm_delete.html"
@@ -188,14 +174,7 @@ class UnidadeMedidaDeleteView(LoginRequiredMixin, DeleteView):
             return redirect(self.success_url)
 
 
-# Categoria de Produto
-from django.db.models import Count
-
-
-class CategoriaProdutoListView(
-    LoginRequiredMixin,
-    ListView
-):
+class CategoriaProdutoListView(BaseNutricionistaView, ListView):
     """
     Listagem institucional de categorias de produto.
 
@@ -233,10 +212,7 @@ class CategoriaProdutoListView(
         return queryset
 
 
-
-
-class CategoriaProdutoCreateView(
-    LoginRequiredMixin,
+class CategoriaProdutoCreateView(BaseNutricionistaView,
     SuccessMessageMixin,
     ErrorMessageMixin,
     CreateView
@@ -249,8 +225,7 @@ class CategoriaProdutoCreateView(
     error_message = "Erro ao cadastrar a categoria."
 
 
-class CategoriaProdutoUpdateView(
-    LoginRequiredMixin,
+class CategoriaProdutoUpdateView(BaseNutricionistaView,
     SuccessMessageMixin,
     ErrorMessageMixin,
     UpdateView
@@ -264,7 +239,7 @@ class CategoriaProdutoUpdateView(
 
 
 
-class CategoriaProdutoDeleteView(LoginRequiredMixin, DeleteView):
+class CategoriaProdutoDeleteView(BaseNutricionistaView, DeleteView):
     """
     Exclusão de Categoria de Produto.
 
@@ -304,19 +279,9 @@ class CategoriaProdutoDeleteView(LoginRequiredMixin, DeleteView):
         )
 
         return redirect(self.success_url)
-
-
+    
 # Produtos
-from django.db.models import Q
-from django.db.models import Exists, OuterRef
-from ..models import EstoqueEscola, MovimentacaoEstoque, ReceitaIngrediente, TransferenciaItem
-# Produtos
-from django.db.models import Q
-from django.db.models import Exists, OuterRef
-from ..models import EstoqueEscola, MovimentacaoEstoque, ReceitaIngrediente, TransferenciaItem
-
-class ProdutoListView(
-    LoginRequiredMixin,
+class ProdutoListView(BaseNutricionistaView,
     ListView
 ):
     model = Produto
@@ -324,10 +289,8 @@ class ProdutoListView(
     context_object_name = "produtos"
     paginate_by = 10
 
-    
 
     def get_queryset(self):
-
         queryset = (
             Produto.objects
             .select_related("categoria", "unidade_medida")
@@ -371,9 +334,7 @@ class ProdutoListView(
         return context
 
 
-
-class ProdutoCreateView(
-    LoginRequiredMixin,
+class ProdutoCreateView(BaseNutricionistaView,
     SuccessMessageMixin,
     ErrorMessageMixin,
     CreateView
@@ -398,8 +359,7 @@ class ProdutoCreateView(
         return context
 
 
-class ProdutoUpdateView(
-    LoginRequiredMixin,
+class ProdutoUpdateView(BaseNutricionistaView,
     SuccessMessageMixin,
     ErrorMessageMixin,
     UpdateView
@@ -412,7 +372,7 @@ class ProdutoUpdateView(
         "unidade_medida",
         "ativo"
     ]
-    template_name = "produto/form.html"
+    template_name = "merendaEscolar/produto/form.html"
     success_url = reverse_lazy("merendaEscolar:produto_list")
     success_message = "Produto atualizado com sucesso."
     error_message = "Erro ao atualizar o produto."
@@ -420,17 +380,10 @@ class ProdutoUpdateView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = "Produto"
-        return context
-    
+        return context    
 
-from django.urls import reverse_lazy
-from django.views.generic import DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
-from django.core.exceptions import ValidationError
 
-class ProdutoDeleteView(
-    LoginRequiredMixin,
+class ProdutoDeleteView(BaseNutricionistaView,
     DeleteView
 ):
     model = Produto
@@ -467,31 +420,15 @@ class ProdutoDeleteView(
             return True
 
         return False
-
-
-
-
-
+    
+    
 # daqui pra baixo sao os exemplos de dashboards
 
-
-
-from django.views.generic import TemplateView
-from django.contrib import messages
-from django.db.models import Sum, Count, Avg
-from django.db.models.functions import TruncMonth
-from django.utils import timezone
-from core.views.baseNutricionista import BaseNutricionistaView
-
-from merendaEscolar.models import (
-    Produto,
-    EstoqueCentral,
-    EstoqueEscola,
-    MovimentacaoEstoque,
-    Transferencia,
-    DivergenciaEntrega,
-    CategoriaProduto
-)
+def quantize2(valor):
+    """Arredonda para 2 casas decimais."""
+    if valor is None:
+        return Decimal("0.00")
+    return Decimal(str(valor)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 class DashboardNutricionalView(BaseNutricionistaView, TemplateView):
 
@@ -524,18 +461,15 @@ class DashboardNutricionalView(BaseNutricionistaView, TemplateView):
                 total=Sum("quantidade")
             )["total"] or 0
         )
-
-        context["estoque_total_escolas"] = (
-            EstoqueEscola.objects.aggregate(
-                total=Sum("quantidade")
-            )["total"] or 0
-        )
+        
+        context["estoque_total_escolas"] = EstoqueEscola.objects.filter(quantidade__gt=0).aggregate(total=Round(Sum("quantidade")))["total"]
 
         context["movimentacoes_mes"] = (
             MovimentacaoEstoque.objects
             .filter(data_movimentacao__gte=mes_inicio)
             .count()
         )
+
 
         # =========================
         # ESTOQUE POR CATEGORIA
@@ -544,7 +478,7 @@ class DashboardNutricionalView(BaseNutricionistaView, TemplateView):
         estoque_categoria = (
             CategoriaProduto.objects
             .annotate(
-                total=Sum("produtos__estoque_central__quantidade")
+                total=Round(Sum("produtos__estoque_central__quantidade"))
             )
             .values("nome", "total")
         )
@@ -558,7 +492,7 @@ class DashboardNutricionalView(BaseNutricionistaView, TemplateView):
         estoque_escolas = (
             EstoqueEscola.objects
             .values("escola__nome_escola")
-            .annotate(total=Sum("quantidade"))
+            .annotate(total=Round(Sum("quantidade")))
             .order_by("-total")[:10]
         )
 
@@ -571,10 +505,10 @@ class DashboardNutricionalView(BaseNutricionistaView, TemplateView):
         consumo_produtos = (
             MovimentacaoEstoque.objects
             .filter(tipo="SAIDA_ESCOLA")
-            .values("produto__nome")
-            .annotate(total=Sum("quantidade"))
+            .values("produto__nome", "produto__unidade_medida__sigla")
+            .annotate(total=Round(Sum("quantidade")))
             .order_by("-total")[:10]
-        )
+        )       
 
         context["consumo_produtos"] = list(consumo_produtos)
 
@@ -614,26 +548,7 @@ class DashboardNutricionalView(BaseNutricionistaView, TemplateView):
         )
 
         return context  
-
-
-from django.views.generic import ListView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
-from django.utils import timezone
-from django.db.models import Sum
-from datetime import timedelta
-
-from merendaEscolar.models import (
-    EstoqueCentral,
-    Transferencia,
-    DivergenciaEntrega,
-    Escola
-)
-# Pronteção de acesso
-from core.groups.nutricionista import NutricionistaRequiredMixin
-from core.views.baseNutricionista import BaseNutricionistaView
-from core.models import ConfiguraPessoal
-
+    
 
 class EstoqueCentralListView(BaseNutricionistaView, ListView):
     """
@@ -742,11 +657,7 @@ class EstoqueCentralListView(BaseNutricionistaView, ListView):
 
         context["pagina_transferencia"] = self.configuracao.pagina_estoqueCentral
         # 🔷 Fonte única de verdade (governança)
-        context["page_size_options"] = [5,10, 20, 30, 50]
-        
-
-
-
+        context["page_size_options"] = [5,10, 20, 30, 50]   
 
         # =========================
         # INDICADORES LOGÍSTICOS

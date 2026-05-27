@@ -65,10 +65,8 @@ class MessageUser(models.Model):
         blank=True
     )
 
-    exclude_msg = models.CharField(
-        max_length=5,
-        blank=True,
-        null=True
+    exclude_msg = models.BooleanField(
+    default=False
     )
 
     class Meta:
