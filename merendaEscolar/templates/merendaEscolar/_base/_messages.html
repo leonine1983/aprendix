@@ -4,11 +4,6 @@
 {% url 'merendaEscolar:mensagem_lida' pk=0 as url_lida_base %}
 {% url 'merendaEscolar:mensagem_excluir' pk=0 as url_excluir_base %}
 
-<!-- CSS igual ao anterior, sem mudanças -->
-<style>
-/* ... todo o CSS permanece idêntico ... */
-</style>
-
 <div class="icon-wrapper" id="msgToggle">
   <button class="icon-btn" id="msgToggleBtn" aria-label="Mensagens" aria-expanded="false">
     <i class="fas fa-envelope" aria-hidden="true"></i>
@@ -39,6 +34,7 @@
 <script>
 (function () {
 
+  /* ── URLs resolvidas pelo Django ── */
   const URLS = {
     listar:  "{{ url_listar }}",
     lida:    "{{ url_lida_base }}".replace("/0/", "/{id}/"),
@@ -46,10 +42,13 @@
   };
   const CSRF = "{{ csrf_token }}";
 
-  let state        = { nao_lidas: [], lidas: [] };
-  let jaCarregou   = false;   // ← evita duplo fetch no clique
+  /* ── estado em memória ── */
+  let state      = { nao_lidas: [], lidas: [] };
+  let carregando = false;   // evita fetch simultâneo
 
-  // ─── helpers ───────────────────────────────────────────
+  /* ════════════════════════════════
+     HELPERS
+  ════════════════════════════════ */
 
   function initials(name) {
     if (!name || !name.trim()) return "?";
@@ -64,15 +63,19 @@
       .replace(/"/g, "&quot;");
   }
 
-  // ─── render ────────────────────────────────────────────
+  /* ════════════════════════════════
+     RENDER
+  ════════════════════════════════ */
 
   function renderPanel(type) {
-    const lista = state[type];
-    const el    = document.getElementById("panel-" + type);
+    /* IDs usados no HTML: "panel-nao-lidas" e "panel-lidas" */
+    const panelId = "panel-" + type.replace("_", "-");
+    const el      = document.getElementById(panelId);
+    if (!el) return;
 
-    if (!el) return;   // ← guard: elemento ainda não existe
+    const lista = state[type] || [];
 
-    if (!lista || !lista.length) {
+    if (!lista.length) {
       el.innerHTML = '<p class="msg-empty"><i class="fas fa-inbox"></i> Nenhuma mensagem</p>';
       return;
     }
@@ -84,7 +87,7 @@
           : '<span class="msg-dot invisible" aria-hidden="true"></span>'}
         <div class="msg-avatar">${initials(m.remetente)}</div>
         <div class="msg-body">
-          <p class="msg-subject ${type === 'lidas' ? 'msg-read' : ''}">${escHtml(m.assunto)}</p>
+          <p class="msg-subject ${type === "lidas" ? "msg-read" : ""}">${escHtml(m.assunto)}</p>
           <p class="msg-meta">${escHtml(m.remetente)} · ${escHtml(m.data_envio)}</p>
         </div>
         <div class="msg-actions">
@@ -102,110 +105,147 @@
   }
 
   function updateBadge() {
-    const n     = state.nao_lidas.length;
+    const n     = (state.nao_lidas || []).length;
     const badge = document.getElementById("msgBadge");
-    if (!badge) return;
-    badge.textContent  = n;
-    badge.style.display = n ? "" : "none";
-
+    if (badge) {
+      badge.textContent   = n;
+      badge.style.display = n ? "" : "none";
+    }
     const elNao = document.getElementById("msg-count-nao-lidas");
     const elLid = document.getElementById("msg-count-lidas");
     if (elNao) elNao.textContent = n ? `(${n})` : "";
-    if (elLid) elLid.textContent = state.lidas.length ? `(${state.lidas.length})` : "";
+    if (elLid) elLid.textContent = (state.lidas || []).length ? `(${state.lidas.length})` : "";
   }
 
-  // ─── fetch ─────────────────────────────────────────────
+  function renderTudo() {
+    renderPanel("nao_lidas");
+    renderPanel("lidas");
+    updateBadge();
+  }
+
+  /* ════════════════════════════════
+     FETCH
+  ════════════════════════════════ */
 
   async function fetchMensagens() {
+    if (carregando) return;
+    carregando = true;
     try {
       const r    = await fetch(URLS.listar, { headers: { "X-Requested-With": "XMLHttpRequest" } });
       const data = await r.json();
-
-      if (!data.ok) { console.warn("API retornou ok=false", data); return; }
-
+      if (!data.ok) { console.warn("API ok=false", data); return; }
       state.nao_lidas = data.nao_lidas || [];
       state.lidas     = data.lidas     || [];
-
-      renderPanel("nao_lidas");
-      renderPanel("lidas");
-      updateBadge();
-      jaCarregou = true;
-
+      renderTudo();
     } catch (e) {
       console.error("Erro ao carregar mensagens:", e);
+    } finally {
+      carregando = false;
     }
   }
 
-  // ─── ações ─────────────────────────────────────────────
+  /* ════════════════════════════════
+     AÇÕES
+  ════════════════════════════════ */
 
   window.msgMarcarLida = async function (id) {
     try {
       await fetch(URLS.lida.replace("{id}", id), {
-        method:  "POST",
+        method: "POST",
         headers: { "X-CSRFToken": CSRF, "X-Requested-With": "XMLHttpRequest" },
       });
       const idx = state.nao_lidas.findIndex(m => m.id === id);
       if (idx > -1) state.lidas.unshift(state.nao_lidas.splice(idx, 1)[0]);
-      renderPanel("nao_lidas");
-      renderPanel("lidas");
-      updateBadge();
+      renderTudo();
     } catch (e) { console.error("Erro ao marcar lida:", e); }
   };
 
   window.msgExcluir = async function (id, type) {
     try {
       await fetch(URLS.excluir.replace("{id}", id), {
-        method:  "POST",
+        method: "POST",
         headers: { "X-CSRFToken": CSRF, "X-Requested-With": "XMLHttpRequest" },
       });
       state[type] = state[type].filter(m => m.id !== id);
-      renderPanel(type);
-      updateBadge();
+      renderTudo();
     } catch (e) { console.error("Erro ao excluir:", e); }
   };
 
   window.msgSwitchTab = function (type) {
     ["nao_lidas", "lidas"].forEach(t => {
-      const tab   = document.getElementById("tab-"   + t.replace("_", "-"));
-      const panel = document.getElementById("panel-" + t);
+      const tabId   = "tab-"   + t.replace("_", "-");
+      const panelId = "panel-" + t.replace("_", "-");
+      const tab     = document.getElementById(tabId);
+      const panel   = document.getElementById(panelId);
       if (!tab || !panel) return;
-      tab.classList.toggle("active", t === type);
-      tab.setAttribute("aria-selected", t === type);
-      panel.classList.toggle("active", t === type);
-      t === type ? panel.removeAttribute("hidden") : panel.setAttribute("hidden", "");
+      const active = (t === type);
+      tab.classList.toggle("active", active);
+      tab.setAttribute("aria-selected", String(active));
+      panel.classList.toggle("active", active);
+      active ? panel.removeAttribute("hidden") : panel.setAttribute("hidden", "");
     });
   };
 
-  // ─── toggle dropdown ───────────────────────────────────
+  /* ════════════════════════════════
+     TOGGLE DROPDOWN
+     — Sempre re-renderiza ao abrir,
+       busca nova se ainda não carregou
+  ════════════════════════════════ */
 
   const toggleBtn = document.getElementById("msgToggleBtn");
   const dropdown  = document.getElementById("msgDropdown");
 
-  toggleBtn.addEventListener("click", () => {
-    const isOpen = !dropdown.hidden;
-    dropdown.hidden = isOpen;
-    toggleBtn.setAttribute("aria-expanded", String(!isOpen));
-    if (!isOpen && !jaCarregou) fetchMensagens();   // ← só busca se ainda não carregou
+  toggleBtn.addEventListener("click", async () => {
+    const abrindo = dropdown.hidden;   // true = estava fechado, vai abrir
+
+    /* fecha / abre */
+    dropdown.hidden = !abrindo;
+    toggleBtn.setAttribute("aria-expanded", String(abrindo));
+
+    if (abrindo) {
+      /* Busca dados (sempre), depois renderiza */
+      await fetchMensagens();
+      /* Garante renderização mesmo se fetchMensagens() devolveu cache */
+      renderTudo();
+    }
   });
 
+  /* fecha ao clicar fora */
   document.addEventListener("click", e => {
-    if (!document.getElementById("msgToggle").contains(e.target)) {
+    const wrapper = document.getElementById("msgToggle");
+    if (wrapper && !wrapper.contains(e.target)) {
       dropdown.hidden = true;
       toggleBtn.setAttribute("aria-expanded", "false");
     }
   });
 
-  // ─── carga inicial (badge + pré-cache) ─────────────────
-  // Roda após o DOM estar pronto, independente de quando o
-  // <script> foi inserido na página.
+  /* ════════════════════════════════
+     CARGA INICIAL — só o badge
+     (não renderiza painéis; eles
+      ficam hidden até o 1.º clique)
+  ════════════════════════════════ */
+  async function cargaInicial() {
+    try {
+      const r    = await fetch(URLS.listar, { headers: { "X-Requested-With": "XMLHttpRequest" } });
+      const data = await r.json();
+      if (!data.ok) return;
+      state.nao_lidas = data.nao_lidas || [];
+      state.lidas     = data.lidas     || [];
+      updateBadge();   /* só o badge — painéis ainda não existem visivelmente */
+    } catch (e) {
+      console.error("Carga inicial falhou:", e);
+    }
+  }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", fetchMensagens);
+    document.addEventListener("DOMContentLoaded", cargaInicial);
   } else {
-    fetchMensagens();   // DOM já está pronto (include tardio)
+    cargaInicial();
   }
 
 })();
 </script>
+
 <style>
 /* ───────────────────────────────────────────
    MSG TOGGLE — icon wrapper + badge

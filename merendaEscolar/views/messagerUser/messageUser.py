@@ -1,63 +1,42 @@
-"""
-views/mensagens.py
-==================
-View de envio de mensagens via AJAX — compatível com o modal msg_btn_modal.html
-Registre a URL em urls.py:
-
-    path('mensagens/enviar/', views.EnviarMensagemView.as_view(), name='mensagem-enviar'),
-
-Busca de usuários (autocomplete):
-    path('mensagens/buscar-usuarios/', views.BuscarUsuariosView.as_view(), name='mensagem-buscar-usuarios'),
-"""
+# views/mensagens.py
 
 import json
 from django.contrib.auth.models import User, Group
 from django.http import JsonResponse
-from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
-from django.views.decorators.http import require_POST
+from django.db.models import Q
 
-from core.views.baseNutricionista import BaseNutricionistaView   # sua base
-from admin_acessos.models import MessageUser  
-from django.db.models import Q       # seu model
+from admin_acessos.models import MessageUser
 
 
-class EnviarMensagemView(BaseNutricionistaView, View):
+class EnviarMensagemView(LoginRequiredMixin, View):
     """
     POST /merenda/mensagens/enviar/
-    Aceita: tipo_destinatario, assunto, mensagem[, destinatario_id]
-    Retorna: JSON { ok: true, total: N } | { ok: false, erro: '...' }
     """
-
-    http_method_names = ['post']
 
     def post(self, request, *args, **kwargs):
 
         if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'ok': False, 'erro': 'Requisição inválida.'}, status=400)
 
-        tipo       = request.POST.get('tipo_destinatario', '').strip()
-        assunto    = request.POST.get('assunto', '').strip()
-        mensagem   = request.POST.get('mensagem', '').strip()
-        dest_id    = request.POST.get('destinatario_id', '').strip()
+        tipo    = request.POST.get('tipo_destinatario', '').strip()
+        assunto = request.POST.get('assunto', '').strip()
+        mensagem = request.POST.get('mensagem', '').strip()
+        dest_id  = request.POST.get('destinatario_id', '').strip()
 
-        # ── Validações básicas ──────────────────────────────────────────
         if not tipo:
             return JsonResponse({'ok': False, 'erro': 'Destinatário não informado.'})
-
         if not assunto:
             return JsonResponse({'ok': False, 'erro': 'Assunto obrigatório.'})
-
         if not mensagem:
             return JsonResponse({'ok': False, 'erro': 'Mensagem não pode estar vazia.'})
 
-        # ── Montar lista de destinatários ───────────────────────────────
         destinatarios = self._resolver_destinatarios(tipo, dest_id)
 
         if not destinatarios:
             return JsonResponse({'ok': False, 'erro': 'Nenhum destinatário encontrado.'})
 
-        # ── Criar mensagens ─────────────────────────────────────────────
         msgs = [
             MessageUser(
                 remetente=request.user,
@@ -66,38 +45,28 @@ class EnviarMensagemView(BaseNutricionistaView, View):
                 mensagem=mensagem,
             )
             for dest in destinatarios
-            if dest != request.user        # não envia para si mesmo
+            if dest != request.user
         ]
 
-        MessageUser.objects.bulk_create(msgs, ignore_conflicts=True)
+        if not msgs:
+            return JsonResponse({'ok': False, 'erro': 'Nenhuma mensagem a enviar (você seria o único destinatário).'})
 
-        return JsonResponse({'ok': True, 'total': len(msgs)})
+        criados = MessageUser.objects.bulk_create(msgs, ignore_conflicts=True)
 
-    # ── helpers ─────────────────────────────────────────────────────────
+        return JsonResponse({'ok': True, 'total': len(criados)})
 
     def _resolver_destinatarios(self, tipo, dest_id):
-        """
-        Retorna queryset/lista de Users conforme o tipo selecionado.
-        """
         if tipo == 'individual':
             try:
                 return [User.objects.get(pk=dest_id, is_active=True)]
             except (User.DoesNotExist, ValueError):
                 return []
-
         elif tipo == 'grupo_nutricionista':
             return self._usuarios_do_grupo('Nutricionista')
-
         elif tipo == 'grupo_merendeira':
             return self._usuarios_do_grupo('Merendeira')
-
         elif tipo == 'todos':
-            return list(
-                User.objects
-                .filter(is_active=True)
-                .exclude(is_superuser=True)   # opcional: excluir superusers
-            )
-
+            return list(User.objects.filter(is_active=True).exclude(is_superuser=True))
         return []
 
     @staticmethod
@@ -109,20 +78,12 @@ class EnviarMensagemView(BaseNutricionistaView, View):
             return []
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# BUSCA DE USUÁRIOS (AUTOCOMPLETE)
-# ═══════════════════════════════════════════════════════════════════════════════
-
-class BuscarUsuariosView(BaseNutricionistaView, View):
+class BuscarUsuariosView(LoginRequiredMixin, View):
     """
-    GET /admin/acessos/buscar-usuarios/?q=<termo>
-    Retorna lista JSON: [{ id, nome, username, grupo }]
+    GET /merenda/mensagens/buscar-usuarios/?q=<termo>
     """
-
-    http_method_names = ['get']
 
     def get(self, request, *args, **kwargs):
-
         q = request.GET.get('q', '').strip()
 
         if len(q) < 2:
