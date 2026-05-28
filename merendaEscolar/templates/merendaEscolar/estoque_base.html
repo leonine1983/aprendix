@@ -1306,7 +1306,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         wrapper.addEventListener("click", (e) => {
             // Cliques nos botões de ação não devem abrir/fechar o dropdown
-            if (e.target.closest('.btn-notif-lida, .btn-notif-del, .notif-tab, #btnMarcarTodas, #btnExcluirLidas')) return;
+            if (
+    e.target.closest(
+        '.btn-notif-lida, .btn-notif-del, .notif-tab, .tab-btn, #btnMarcarTodas, #btnExcluirLidas'
+    )
+) return;
 
             e.stopPropagation();
             const menu = dropdownId

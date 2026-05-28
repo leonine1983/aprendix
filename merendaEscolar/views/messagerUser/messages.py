@@ -17,28 +17,13 @@ class ListarMensagensView(BaseNutricionistaView, View):
     http_method_names = ["get"]
 
     def get(self, request, *args, **kwargs):
-
-        print("\n========== DEBUG MENSAGENS ==========")
-        print("USUÁRIO:", request.user)
-        print("ID:", request.user.id)
-
         todas = (
             MessageUser.objects
             .filter(destinatario=request.user)
             .select_related("remetente", "destinatario")
             .order_by("-data_envio")
         )
-
-        print("TOTAL NO BANCO:", todas.count())
-
-        for m in todas[:10]:
-            print({
-                "id": m.id,
-                "assunto": m.assunto,
-                "aberta": m.aberta,
-                "exclude_msg": m.exclude_msg,
-                "destinatario": m.destinatario_id,
-            })
+        
 
         # -----------------------------------------
         # NÃO LIDAS
@@ -60,19 +45,13 @@ class ListarMensagensView(BaseNutricionistaView, View):
             .exclude(exclude_msg=True)
         )[:20]
 
-        print("NÃO LIDAS:", nao_lidas.count())
-        print("LIDAS:", lidas.count())
-
         # -----------------------------------------
         # SERIALIZAÇÃO
         # -----------------------------------------
 
         def serializar(qs):
-
             dados = []
-
             for m in qs:
-
                 dados.append({
                     "id": m.pk,
                     "assunto": m.assunto or "",
@@ -103,9 +82,6 @@ class ListarMensagensView(BaseNutricionistaView, View):
             "total_nao_lidas": nao_lidas.count(),
             "total_lidas": lidas.count(),
         }
-
-        print("RETORNO:", response)
-        print("====================================\n")
 
         return JsonResponse(response)
 
@@ -156,8 +132,6 @@ class ExcluirMensagemView(BaseNutricionistaView, View):
         msg.exclude_msg = True
 
         msg.save(update_fields=["exclude_msg"])
-
-        print(f"MENSAGEM {msg.pk} MARCADA COMO EXCLUÍDA")
 
         return JsonResponse({
             "ok": True,

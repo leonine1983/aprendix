@@ -4,253 +4,772 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Currículo de {{ perfil.user.get_full_name|default:perfil.user.username }}{% if perfil.cargo %} — {{ perfil.cargo }}{% endif %}">
+<title>{{ perfil.user.get_full_name|default:perfil.user.username }} — Currículo</title>
 
-<title>
-Currículo - {{ perfil.user.get_full_name|default:perfil.user.username }}
-</title>
+<!-- Open Graph (WhatsApp, LinkedIn, Facebook) -->
+<meta property="og:title" content="{{ perfil.user.get_full_name|default:perfil.user.username }}{% if perfil.cargo %} — {{ perfil.cargo }}{% endif %}">
+<meta property="og:description" content="{% if perfil.biografia %}{{ perfil.biografia|truncatechars:160 }}{% else %}Currículo profissional{% endif %}">
+<meta property="og:type" content="profile">
+{% if perfil.foto %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ perfil.foto.url }}">{% endif %}
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --ink:        #111827;
+  --ink-2:      #374151;
+  --ink-3:      #6B7280;
+  --ink-4:      #9CA3AF;
+  --accent:     #1D4ED8;
+  --accent-lt:  #EFF6FF;
+  --accent-bd:  #BFDBFE;
+  --success:    #065F46;
+  --success-lt: #ECFDF5;
+  --bg:         #F9FAFB;
+  --surface:    #FFFFFF;
+  --border:     #E5E7EB;
+  --border-2:   #D1D5DB;
+  --r:          10px;
+  --serif:      'Source Serif 4', Georgia, serif;
+  --sans:       'IBM Plex Sans', system-ui, sans-serif;
+  --shadow:     0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:  0 4px 12px rgba(0,0,0,.10);
+}
+
+html{scroll-behavior:smooth}
 
 body{
-    background:#f5f7fa;
+  background:var(--bg);
+  font-family:var(--sans);
+  color:var(--ink);
+  line-height:1.6;
+  font-size:15px;
+  -webkit-font-smoothing:antialiased;
 }
 
-.curriculo-container{
-    max-width:1000px;
-    margin:auto;
+/* ── PAGE ── */
+.page{
+  max-width:860px;
+  margin:0 auto;
+  padding:32px 16px 80px;
 }
 
-.foto-perfil{
-    width:160px;
-    height:160px;
-    object-fit:cover;
+/* ── STICKY TOOLBAR ── */
+.toolbar{
+  position:sticky;
+  top:0;
+  z-index:200;
+  background:rgba(249,250,251,.9);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);
+  padding:8px 16px;
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-bottom:0;
 }
 
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 14px;
+  border-radius:6px;
+  font-family:var(--sans);
+  font-size:13px;
+  font-weight:500;
+  border:1px solid var(--border-2);
+  cursor:pointer;
+  background:var(--surface);
+  color:var(--ink-2);
+  text-decoration:none;
+  transition:background .15s, border-color .15s, color .15s;
+  white-space:nowrap;
+}
+.btn:hover{background:var(--bg);border-color:var(--ink-3)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:#1e40af;border-color:#1e40af;color:#fff}
+.btn i{font-size:14px}
+
+/* Share dropdown */
+.share-wrap{position:relative}
+.share-menu{
+  display:none;
+  position:absolute;
+  top:calc(100% + 6px);
+  right:0;
+  background:var(--surface);
+  border:1px solid var(--border-2);
+  border-radius:var(--r);
+  box-shadow:var(--shadow-md);
+  min-width:210px;
+  padding:6px;
+  z-index:300;
+}
+.share-menu.open{display:block}
+.share-menu a{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:9px 12px;
+  border-radius:6px;
+  font-size:13px;
+  color:var(--ink-2);
+  text-decoration:none;
+  cursor:pointer;
+  transition:background .12s;
+}
+.share-menu a:hover{background:var(--bg)}
+.share-menu a i{font-size:16px;width:20px;text-align:center}
+.share-menu .sep{height:1px;background:var(--border);margin:4px 0}
+.share-menu .copy-url{color:var(--accent)}
+.share-menu .whatsapp{color:#25D366}
+.share-menu .linkedin{color:#0A66C2}
+.share-menu .email-share{color:var(--ink-3)}
+#copied-toast{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%) translateY(10px);
+  background:var(--ink);
+  color:#fff;
+  font-size:13px;
+  padding:8px 18px;
+  border-radius:50px;
+  opacity:0;
+  transition:opacity .2s, transform .2s;
+  pointer-events:none;
+  z-index:999;
+}
+#copied-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── HEADER CARD ── */
+.header-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  box-shadow:var(--shadow);
+  padding:28px 32px;
+  margin-bottom:16px;
+  display:grid;
+  grid-template-columns:110px 1fr;
+  gap:24px;
+  align-items:start;
+}
+
+.avatar{
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid var(--border);
+  display:block;
+}
+
+.hname{
+  font-family:var(--serif);
+  font-size:1.75rem;
+  font-weight:600;
+  color:var(--ink);
+  line-height:1.2;
+  margin-bottom:4px;
+}
+
+.hcargo{
+  font-size:14px;
+  color:var(--accent);
+  font-weight:500;
+  margin-bottom:12px;
+}
+
+.meta-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 14px;
+  margin-bottom:14px;
+}
+.meta-item{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:13px;
+  color:var(--ink-3);
+}
+.meta-item i{font-size:13px;color:var(--ink-4)}
+
+/* Disponibilidade badge */
+.badge-disponivel{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  background:var(--success-lt);
+  color:var(--success);
+  border:1px solid #A7F3D0;
+  font-size:12px;
+  font-weight:500;
+  padding:3px 10px;
+  border-radius:50px;
+}
+.badge-disponivel::before{
+  content:'';
+  width:7px;height:7px;
+  border-radius:50%;
+  background:#10B981;
+}
+
+/* ── DOIS PAINÉIS ── */
+.two-col{
+  display:grid;
+  grid-template-columns:260px 1fr;
+  gap:16px;
+  align-items:start;
+}
+
+/* ── PAINEL LATERAL ── */
+.sidebar .card{margin-bottom:16px}
+
+/* ── CARD GENÉRICO ── */
 .card{
-    border:none;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  box-shadow:var(--shadow);
+  overflow:hidden;
 }
 
-.section-title{
-    font-weight:600;
+.card-body{padding:20px 22px}
+
+.section-head{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:16px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+}
+.section-head h2{
+  font-family:var(--serif);
+  font-size:1rem;
+  font-weight:600;
+  color:var(--ink);
+}
+.section-head .ico{
+  width:28px;height:28px;
+  background:var(--accent-lt);
+  color:var(--accent);
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;
+  flex-shrink:0;
 }
 
-/* BOTÃO DE IMPRESSÃO */
+/* ── CONTATO LATERAL ── */
+.contact-list{list-style:none}
+.contact-list li{
+  display:flex;align-items:flex-start;gap:9px;
+  font-size:13px;color:var(--ink-2);
+  padding:5px 0;
+  border-bottom:1px solid var(--border);
+}
+.contact-list li:last-child{border-bottom:none}
+.contact-list i{font-size:14px;color:var(--accent);margin-top:1px;flex-shrink:0}
+.contact-list .cl-label{font-size:11px;color:var(--ink-4);display:block;line-height:1}
+.contact-list .cl-val{font-size:13px;color:var(--ink-2);line-height:1.4}
 
-.print-btn{
-    position:fixed;
-    top:20px;
-    right:20px;
-    z-index:1000;
+/* ── COMPETÊNCIAS / IDIOMAS ── */
+.skill-tags{display:flex;flex-wrap:wrap;gap:6px}
+.skill-tag{
+  background:var(--accent-lt);
+  color:var(--accent);
+  border:1px solid var(--accent-bd);
+  font-size:12px;
+  font-weight:500;
+  padding:3px 10px;
+  border-radius:50px;
 }
 
-/* ESTILO PARA IMPRESSÃO */
+/* Formação simples lateral */
+.edu-simple li{
+  list-style:none;
+  padding:7px 0;
+  border-bottom:1px solid var(--border);
+  font-size:13px;
+}
+.edu-simple li:last-child{border-bottom:none}
+.edu-simple .edu-lbl{font-size:11px;color:var(--ink-4);text-transform:uppercase;letter-spacing:.04em;font-weight:500}
+.edu-simple .edu-val{color:var(--ink-2);margin-top:1px}
 
-@media print {
+/* ── TIMELINE ── */
+.timeline{list-style:none}
+.tl-item{
+  display:grid;
+  grid-template-columns:16px 1fr;
+  gap:0 12px;
+  padding-bottom:20px;
+  position:relative;
+}
+.tl-item:not(:last-child) .tl-line{
+  position:absolute;
+  left:7px;top:16px;bottom:0;
+  width:1px;background:var(--border-2);
+}
+.tl-dot{
+  width:14px;height:14px;
+  border-radius:50%;
+  background:var(--accent);
+  border:2px solid var(--surface);
+  box-shadow:0 0 0 2px var(--accent-bd);
+  margin-top:3px;
+  flex-shrink:0;
+  position:relative;z-index:1;
+}
+.tl-period{
+  font-size:11px;color:var(--ink-4);
+  font-weight:500;margin-bottom:3px;
+}
+.tl-title{font-size:14px;font-weight:600;color:var(--ink);line-height:1.35}
+.tl-sub{font-size:13px;color:var(--accent);margin-top:1px;margin-bottom:4px}
+.tl-desc{font-size:13px;color:var(--ink-3);margin-top:4px;line-height:1.55}
 
-    body{
-        background:white;
-    }
+/* ── GRID CARDS (cursos, publicações, livros) ── */
+.item-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:10px;
+}
+.item-tile{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:12px 14px;
+}
+.item-tile .it-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.item-tile .it-sub{font-size:12px;color:var(--ink-3)}
+.item-tile .it-badge{
+  display:inline-block;
+  margin-top:6px;
+  font-size:11px;font-weight:500;
+  background:var(--accent-lt);
+  color:var(--accent);
+  border-radius:4px;
+  padding:1px 7px;
+}
+.item-tile a{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:12px;color:var(--accent);text-decoration:none;margin-top:6px;
+}
+.item-tile a:hover{text-decoration:underline}
 
-    .print-btn{
-        display:none;
-    }
+/* ── SOBRE ── */
+.bio{font-size:14px;color:var(--ink-2);line-height:1.75}
 
-    .card{
-        box-shadow:none !important;
-        border:1px solid #ddd;
-    }
-
-    .container{
-        max-width:100%;
-        padding:0;
-    }
-
-    .curriculo-container{
-        margin:0;
-    }
-
+/* ── RODAPÉ ── */
+.footer{
+  text-align:center;font-size:12px;color:var(--ink-4);
+  padding-top:16px;margin-top:4px;
+  border-top:1px solid var(--border);
 }
 
+/* ── RESPONSIVE ── */
+@media(max-width:680px){
+  .two-col{grid-template-columns:1fr}
+  .header-card{grid-template-columns:1fr;text-align:center;padding:20px}
+  .avatar{margin:0 auto 12px}
+  .meta-row{justify-content:center}
+  .card-body{padding:16px}
+}
+
+/* ── PRINT ── */
+@media print{
+  body{background:#fff;font-size:12px}
+  .toolbar,#copied-toast{display:none!important}
+  .page{padding:0;max-width:100%}
+  .two-col{grid-template-columns:220px 1fr}
+  .card,.header-card{
+    box-shadow:none!important;
+    border-color:#ddd;
+    page-break-inside:avoid;
+    margin-bottom:10px;
+  }
+  .header-card{padding:16px}
+  .card-body{padding:14px 16px}
+  .item-grid{grid-template-columns:repeat(2,1fr)}
+  @page{margin:1.5cm}
+}
 </style>
-
 </head>
-
 <body>
 
-<!-- BOTÃO DE IMPRESSÃO -->
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <button class="btn" onclick="window.print()">
+    <i class="bi bi-printer"></i> Imprimir / PDF
+  </button>
 
-<div class="print-btn">
-    <button class="btn btn-primary" onclick="window.print()">
-        <i class="bi bi-printer"></i>
-        Imprimir currículo
+  <div class="share-wrap" id="shareWrap">
+    <button class="btn btn-primary" onclick="toggleShare()">
+      <i class="bi bi-share"></i> Compartilhar
+      <i class="bi bi-chevron-down" style="font-size:11px;opacity:.8"></i>
     </button>
+    <div class="share-menu" id="shareMenu">
+      <a class="copy-url" onclick="copyURL()">
+        <i class="bi bi-link-45deg"></i>
+        Copiar link
+      </a>
+      <div class="sep"></div>
+      <a class="whatsapp" id="whatsappLink" target="_blank" rel="noopener">
+        <i class="bi bi-whatsapp"></i>
+        Enviar pelo WhatsApp
+      </a>
+      <a class="linkedin" id="linkedinLink" target="_blank" rel="noopener">
+        <i class="bi bi-linkedin"></i>
+        Compartilhar no LinkedIn
+      </a>
+      <a class="email-share" id="emailLink">
+        <i class="bi bi-envelope"></i>
+        Enviar por e-mail
+      </a>
+    </div>
+  </div>
 </div>
 
+<div id="copied-toast">Link copiado!</div>
 
-<div class="container py-5 curriculo-container">
+<main class="page">
 
-    <!-- CABEÇALHO -->
-    <div class="card shadow-sm mb-4">
+  <!-- ── CABEÇALHO ── -->
+  <div class="header-card">
+    <div>
+      {% if perfil.foto %}
+        <img src="{{ perfil.foto.url }}" class="avatar" alt="Foto de {{ perfil.user.get_full_name }}">
+      {% else %}
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar" alt="Avatar padrão">
+      {% endif %}
+    </div>
+
+    <div>
+      <h1 class="hname">{{ perfil.user.get_full_name|default:perfil.user.username }}</h1>
+
+      {% if perfil.cargo %}
+        <div class="hcargo">{{ perfil.cargo }}</div>
+      {% endif %}
+
+      <div class="meta-row">
+        {% if perfil.cidade %}
+        <span class="meta-item">
+          <i class="bi bi-geo-alt"></i>
+          {{ perfil.cidade }}{% if perfil.estado %}, {{ perfil.estado }}{% endif %}
+        </span>
+        {% endif %}
+        {% if perfil.escola %}
+        <span class="meta-item">
+          <i class="bi bi-buildings"></i>
+          {{ perfil.escola.nome }}
+        </span>
+        {% endif %}
+      </div>
+
+      <span class="badge-disponivel">Aberto a oportunidades</span>
+    </div>
+  </div>
+
+
+  <!-- ── LAYOUT DOIS PAINÉIS ── -->
+  <div class="two-col">
+
+    <!-- ════ SIDEBAR ════ -->
+    <aside class="sidebar">
+
+      <!-- Contato -->
+      <div class="card">
         <div class="card-body">
+          <div class="section-head">
+            <span class="ico"><i class="bi bi-person-vcard"></i></span>
+            <h2>Contato</h2>
+          </div>
+          <ul class="contact-list">
+            {% if perfil.user.email %}
+            <li>
+              <i class="bi bi-envelope-fill"></i>
+              <div>
+                <span class="cl-label">E-mail</span>
+                <span class="cl-val">{{ perfil.user.email }}</span>
+              </div>
+            </li>
+            {% endif %}
+            {% if perfil.telefone %}
+            <li>
+              <i class="bi bi-telephone-fill"></i>
+              <div>
+                <span class="cl-label">Telefone</span>
+                <span class="cl-val">{{ perfil.telefone }}</span>
+              </div>
+            </li>
+            {% endif %}
+            {% if perfil.cidade %}
+            <li>
+              <i class="bi bi-geo-alt-fill"></i>
+              <div>
+                <span class="cl-label">Localização</span>
+                <span class="cl-val">{{ perfil.cidade }}{% if perfil.estado %}, {{ perfil.estado }}{% endif %}</span>
+              </div>
+            </li>
+            {% endif %}
+            {% if perfil.cep %}
+            <li>
+              <i class="bi bi-mailbox"></i>
+              <div>
+                <span class="cl-label">CEP</span>
+                <span class="cl-val">{{ perfil.cep }}</span>
+              </div>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
 
-            <div class="row align-items-center">
+      <!-- Formação simples (campos do model) -->
+      {% if perfil.graduacao or perfil.especializacao %}
+      <div class="card">
+        <div class="card-body">
+          <div class="section-head">
+            <span class="ico"><i class="bi bi-mortarboard-fill"></i></span>
+            <h2>Formação</h2>
+          </div>
+          <ul class="edu-simple">
+            {% if perfil.graduacao %}
+            <li>
+              <div class="edu-lbl">Graduação</div>
+              <div class="edu-val">{{ perfil.graduacao }}</div>
+            </li>
+            {% endif %}
+            {% if perfil.especializacao %}
+            <li>
+              <div class="edu-lbl">Especialização</div>
+              <div class="edu-val">{{ perfil.especializacao }}</div>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
 
-                <div class="col-md-3 text-center mb-3 mb-md-0">
+      <!-- Cursos (resumo lateral) -->
+      {% if perfil.cursos.exists %}
+      <div class="card">
+        <div class="card-body">
+          <div class="section-head">
+            <span class="ico"><i class="bi bi-journal-check"></i></span>
+            <h2>Certificações</h2>
+          </div>
+          <ul class="edu-simple">
+            {% for curso in perfil.cursos.all %}
+            <li>
+              <div class="edu-val">{{ curso.nome }}</div>
+              <div class="edu-lbl" style="margin-top:2px">{{ curso.instituicao }} · {{ curso.ano }}</div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
 
-                    {% if perfil.foto %}
-                        <img
-                        src="{{ perfil.foto.url }}"
-                        class="rounded-circle shadow foto-perfil"
-                        alt="Foto de {{ perfil.user.get_full_name }}">
-                    {% else %}
-                        <img
-                        src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-                        class="rounded-circle shadow foto-perfil"
-                        alt="Foto padrão">
-                    {% endif %}
+    </aside>
 
+
+    <!-- ════ CONTEÚDO PRINCIPAL ════ -->
+    <div class="main-col">
+
+      <!-- Sobre -->
+      {% if perfil.biografia %}
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-body">
+          <div class="section-head">
+            <span class="ico"><i class="bi bi-file-person"></i></span>
+            <h2>Sobre</h2>
+          </div>
+          <p class="bio">{{ perfil.biografia|linebreaks }}</p>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Experiência -->
+      {% if perfil.experiencias.exists %}
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-body">
+          <div class="section-head">
+            <span class="ico"><i class="bi bi-briefcase-fill"></i></span>
+            <h2>Experiência Profissional</h2>
+          </div>
+          <ul class="timeline">
+            {% for exp in perfil.experiencias.all %}
+            <li class="tl-item">
+              <div class="tl-line"></div>
+              <div class="tl-dot"></div>
+              <div>
+                <div class="tl-period">
+                  {{ exp.inicio|date:"m/Y" }} —
+                  {% if exp.fim %}{{ exp.fim|date:"m/Y" }}{% else %}<strong style="color:var(--success)">atual</strong>{% endif %}
                 </div>
+                <div class="tl-title">{{ exp.cargo }}</div>
+                <div class="tl-sub">{{ exp.instituicao }}</div>
+                {% if exp.descricao %}<p class="tl-desc">{{ exp.descricao }}</p>{% endif %}
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
 
-                <div class="col-md-9">
-
-                    <h1 class="mb-1">
-                        <i class="bi bi-person-badge-fill"></i>
-                        {{ perfil.user.get_full_name|default:perfil.user.username }}
-                    </h1>
-
-                    {% if perfil.cargo %}
-                    <p class="text-muted fs-5 mb-2">
-                        {{ perfil.cargo }}
-                    </p>
-                    {% endif %}
-
-                    <div class="small text-secondary">
-
-                        {% if perfil.cidade %}
-                        <div>
-                            <i class="bi bi-geo-alt"></i>
-                            {{ perfil.cidade }} - {{ perfil.estado }}
-                        </div>
-                        {% endif %}
-
-                        {% if perfil.telefone %}
-                        <div>
-                            <i class="bi bi-telephone"></i>
-                            {{ perfil.telefone }}
-                        </div>
-                        {% endif %}
-
-                        {% if perfil.user.email %}
-                        <div>
-                            <i class="bi bi-envelope"></i>
-                            {{ perfil.user.email }}
-                        </div>
-                        {% endif %}
-
-                    </div>
-
+      <!-- Formação detalhada (model Formacao) -->
+      {% if perfil.formacoes.exists %}
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-body">
+          <div class="section-head">
+            <span class="ico"><i class="bi bi-mortarboard-fill"></i></span>
+            <h2>Formação Acadêmica</h2>
+          </div>
+          <ul class="timeline">
+            {% for form in perfil.formacoes.all %}
+            <li class="tl-item">
+              <div class="tl-line"></div>
+              <div class="tl-dot"></div>
+              <div>
+                <div class="tl-period">
+                  {{ form.inicio|date:"m/Y" }} —
+                  {% if form.fim %}{{ form.fim|date:"m/Y" }}{% else %}<strong style="color:var(--success)">em curso</strong>{% endif %}
                 </div>
+                <div class="tl-title">{{ form.titulo }}</div>
+                <div class="tl-sub">{{ form.instituicao }}</div>
+                {% if form.descricao %}<p class="tl-desc">{{ form.descricao }}</p>{% endif %}
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
 
+      <!-- Publicações -->
+      {% if perfil.publicacoes.exists %}
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-body">
+          <div class="section-head">
+            <span class="ico"><i class="bi bi-file-earmark-text-fill"></i></span>
+            <h2>Publicações</h2>
+          </div>
+          <div class="item-grid">
+            {% for pub in perfil.publicacoes.all %}
+            <div class="item-tile">
+              <div class="it-title">{{ pub.titulo }}</div>
+              {% if pub.revista %}<div class="it-sub">{{ pub.revista }}</div>{% endif %}
+              <span class="it-badge">{{ pub.ano }}</span>
+              {% if pub.link %}
+                <br>
+                <a href="{{ pub.link }}" target="_blank" rel="noopener">
+                  <i class="bi bi-box-arrow-up-right"></i> Ver publicação
+                </a>
+              {% endif %}
             </div>
-
+            {% endfor %}
+          </div>
         </div>
-    </div>
+      </div>
+      {% endif %}
 
-
-    <!-- BIOGRAFIA -->
-    {% if perfil.biografia %}
-    <div class="card shadow-sm mb-4">
-
+      <!-- Livros -->
+      {% if perfil.livros.exists %}
+      <div class="card" style="margin-bottom:16px">
         <div class="card-body">
-
-            <h4 class="section-title mb-3">
-                <i class="bi bi-file-person"></i>
-                Sobre o Profissional
-            </h4>
-
-            <p class="text-muted">
-                {{ perfil.biografia|linebreaks }}
-            </p>
-
+          <div class="section-head">
+            <span class="ico"><i class="bi bi-book-half"></i></span>
+            <h2>Livros</h2>
+          </div>
+          <div class="item-grid">
+            {% for livro in perfil.livros.all %}
+            <div class="item-tile">
+              <div class="it-title">{{ livro.titulo }}</div>
+              {% if livro.editora %}<div class="it-sub">{{ livro.editora }}</div>{% endif %}
+              <span class="it-badge">{{ livro.ano }}</span>
+              {% if livro.isbn %}<div class="it-sub" style="margin-top:4px">ISBN {{ livro.isbn }}</div>{% endif %}
+            </div>
+            {% endfor %}
+          </div>
         </div>
+      </div>
+      {% endif %}
 
-    </div>
-    {% endif %}
+    </div><!-- /main-col -->
+  </div><!-- /two-col -->
 
+  <!-- RODAPÉ -->
+  <div class="footer">
+    Currículo público · atualizado em {{ perfil.atualizado_em|date:"d/m/Y \à\s H:i" }}
+  </div>
 
-    <!-- FORMAÇÃO -->
-    <div class="card shadow-sm mb-4">
+</main>
 
-        <div class="card-body">
+<script>
+(function(){
+  var pageURL = window.location.href;
+  var nome    = document.querySelector('.hname') ? document.querySelector('.hname').textContent.trim() : 'Currículo';
+  var texto   = 'Veja o currículo de ' + nome + ': ' + pageURL;
 
-            <h4 class="section-title mb-3">
-                <i class="bi bi-mortarboard-fill"></i>
-                Formação Acadêmica
-            </h4>
+  document.getElementById('whatsappLink').href =
+    'https://wa.me/?text=' + encodeURIComponent(texto);
 
-            <ul class="list-group list-group-flush">
+  document.getElementById('linkedinLink').href =
+    'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(pageURL);
 
-                {% if perfil.graduacao %}
-                <li class="list-group-item">
-                    <strong>Graduação</strong><br>
-                    {{ perfil.graduacao }}
-                </li>
-                {% endif %}
+  document.getElementById('emailLink').onclick = function(){
+    window.location.href = 'mailto:?subject=' + encodeURIComponent('Currículo de ' + nome) +
+      '&body=' + encodeURIComponent(texto);
+  };
 
-                {% if perfil.especializacao %}
-                <li class="list-group-item">
-                    <strong>Especialização</strong><br>
-                    {{ perfil.especializacao }}
-                </li>
-                {% endif %}
+  document.addEventListener('click', function(e){
+    var wrap = document.getElementById('shareWrap');
+    if(!wrap.contains(e.target)) closeShare();
+  });
+})();
 
-            </ul>
+function toggleShare(){
+  var m = document.getElementById('shareMenu');
+  m.classList.toggle('open');
+}
 
-        </div>
+function closeShare(){
+  document.getElementById('shareMenu').classList.remove('open');
+}
 
-    </div>
+function copyURL(){
+  var url = window.location.href;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(showToast);
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = url; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast();
+  }
+  closeShare();
+}
 
-
-    <!-- ENDEREÇO -->
-    {% if perfil.endereco %}
-    <div class="card shadow-sm mb-4">
-
-        <div class="card-body">
-
-            <h4 class="section-title mb-3">
-                <i class="bi bi-building"></i>
-                Localização
-            </h4>
-
-            <p class="text-muted mb-0">
-                {{ perfil.endereco }}<br>
-                {{ perfil.cidade }} - {{ perfil.estado }}<br>
-
-                {% if perfil.cep %}
-                CEP: {{ perfil.cep }}
-                {% endif %}
-            </p>
-
-        </div>
-
-    </div>
-    {% endif %}
-
-
-    <!-- RODAPÉ -->
-    <div class="text-center text-muted small mt-4">
-
-        <hr>
-
-        Currículo público gerado automaticamente •
-        {{ perfil.atualizado_em|date:"d/m/Y H:i" }}
-
-    </div>
-
-</div>
+function showToast(){
+  var t = document.getElementById('copied-toast');
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+</script>
 
 </body>
 </html>

@@ -15,13 +15,13 @@
       <h4>Mensagens</h4>
       <div class="msg-tabs" role="tablist">
         <button role="tab" aria-selected="true" id="tab-nao-lidas"
-                aria-controls="panel-nao-lidas" class="tab-btn active"
-                onclick="msgSwitchTab('nao_lidas')">
+        aria-controls="panel-nao-lidas" class="tab-btn active"
+        onclick="event.stopPropagation(); msgSwitchTab('nao_lidas')">
           Não lidas <span id="msg-count-nao-lidas"></span>
         </button>
         <button role="tab" aria-selected="false" id="tab-lidas"
-                aria-controls="panel-lidas" class="tab-btn"
-                onclick="msgSwitchTab('lidas')">
+        aria-controls="panel-lidas" class="tab-btn"
+        onclick="event.stopPropagation(); msgSwitchTab('lidas')">
           Lidas <span id="msg-count-lidas"></span>
         </button>
       </div>
