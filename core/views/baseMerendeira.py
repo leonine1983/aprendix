@@ -2,7 +2,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.functional import cached_property
 from django.contrib import messages
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
-from django.utils import timezone  # 👈 Importado para segurança das datas
+from django.utils import timezone
+from django.conf import settings
 
 from core.permissions import GroupRequiredMixin
 from core.groups.merenda import MERENDEIRA_GROUPS
@@ -10,7 +11,7 @@ from core.models.perfil import PerfilUsuario
 from core.models import ConfiguraPessoal
 
 from admin_acessos.models import AtualizacaoNotificacaoSistema, NotificacaoProduto
-from admin_acessos.models import MessageUser
+from admin_acessos.models import MessageUser, PushSubscription  # 👈 novo import
 
 
 class BaseMerendeiraView(LoginRequiredMixin, GroupRequiredMixin):
@@ -22,7 +23,6 @@ class BaseMerendeiraView(LoginRequiredMixin, GroupRequiredMixin):
 
     @cached_property
     def _usuario_eh_merendeira(self):
-        # Otimizado para usar a lista carregada em vez de bater no banco de novo
         return any(grupo in MERENDEIRA_GROUPS for grupo in self.grupos_usuario)
 
     # ─────────────────────────────────────────────
@@ -87,8 +87,6 @@ class BaseMerendeiraView(LoginRequiredMixin, GroupRequiredMixin):
         if not self._usuario_eh_merendeira:
             return NotificacaoProduto.objects.none()
 
-        # 💡 ATENÇÃO: Se as notificações de produto não aparecerem, mude 
-        # 'usuario=self.request.user' para 'escola=self.escola_usuario'
         return NotificacaoProduto.objects.filter(
             usuario=self.request.user, lida=False
         ).select_related("escola").order_by("-criado_em")[:20]
@@ -103,11 +101,10 @@ class BaseMerendeiraView(LoginRequiredMixin, GroupRequiredMixin):
         ).select_related("escola").order_by("-criado_em")[:10]
 
     # ─────────────────────────────────────────────
-    # 🧠 AGREGAÇÃO (CORRIGIDA)
+    # 🧠 AGREGAÇÃO
     # ─────────────────────────────────────────────
 
     def _get_data_notificacao(self, obj):
-        # Retorna a data existente ou uma data base bem antiga se for nula (evita erro com o sorted)
         data = getattr(obj, "criada_em", None) or getattr(obj, "criado_em", None)
         return data if data else timezone.make_aware(timezone.datetime.min)
 
@@ -126,6 +123,27 @@ class BaseMerendeiraView(LoginRequiredMixin, GroupRequiredMixin):
 
         lista = list(self.notificacoes_sistema_lidas) + list(self.notificacoes_produto_lidas)
         return sorted(lista, key=lambda x: self._get_data_notificacao(x), reverse=True)[:20]
+
+    # ─────────────────────────────────────────────
+    # 📲 WEB PUSH NOTIFICATIONS
+    # ─────────────────────────────────────────────
+
+    @cached_property
+    def push_subscription(self):
+        """Retorna a subscription push mais recente do usuário, se existir."""
+        if not self._usuario_eh_merendeira:
+            return None
+        return (
+            PushSubscription.objects
+            .filter(user=self.request.user)
+            .order_by("-criada_em")
+            .first()
+        )
+
+    @cached_property
+    def push_ativado(self):
+        """True se o usuário já autorizou notificações push neste dispositivo."""
+        return self.push_subscription is not None
 
     # ─────────────────────────────────────────────
     # 🚨 SISTEMA DE MENSAGENS
@@ -170,7 +188,7 @@ class BaseMerendeiraView(LoginRequiredMixin, GroupRequiredMixin):
                 )
                 request.session[chave] = True
         return response
-    
+
     # ─────────────────────────────────────────────
     # 🌐 CONTEXTO GLOBAL UNIFICADO
     # ─────────────────────────────────────────────
@@ -193,6 +211,7 @@ class BaseMerendeiraView(LoginRequiredMixin, GroupRequiredMixin):
         user = self.request.user
 
         ctx.update({
+            # — dados base —
             "usuario": user,
             "usuario_nome": self.usuario_nome,
             "escola": self.escola_usuario,
@@ -203,6 +222,8 @@ class BaseMerendeiraView(LoginRequiredMixin, GroupRequiredMixin):
             "config": self.configuracao,
             "itens_por_pagina": self.configuracao.pagina_CardapiosEscolares,
             "usuario_eh_merendeira": self._usuario_eh_merendeira,
+
+            # — notificações internas —
             "notificacoes_sistema_nao_lidas": self.notificacoes_sistema_nao_lidas,
             "notificacoes_sistema_lidas": self.notificacoes_sistema_lidas,
             "notificacoes_produto_nao_lidas": self.notificacoes_produto_nao_lidas,
@@ -211,20 +232,22 @@ class BaseMerendeiraView(LoginRequiredMixin, GroupRequiredMixin):
             "notificacoes_lidas": self.notificacoes_lidas,
             "total_nao_lidas": len(self.notificacoes_nao_lidas),
 
+            # — mensagens diretas —
             "mensagens_notificacao": (
                 MessageUser.objects
                 .filter(destinatario=user)
                 .select_related("remetente", "destinatario")
                 .order_by("-data_envio")[:10]
             ),
-
             "total_nao_lidas_msg": (
                 MessageUser.objects.filter(
                     destinatario=user,
                     aberta=False
                 ).count()
             ),
+
+            # — web push —
+            "push_ativado": self.push_ativado,
+            "vapid_public_key": getattr(settings, "VAPID_PUBLIC_KEY", ""),
         })
         return ctx
-    
-    

@@ -1,0 +1,312 @@
+{% if usuario_eh_merendeira %}
+
+<script>
+
+    // =========================================================
+    // 🔑 VAPID PUBLIC KEY
+    // =========================================================
+
+    const VAPID_PUBLIC_KEY = "{{ vapid_public_key }}";
+
+
+    // =========================================================
+    // 🔄 BASE64 → UINT8
+    // =========================================================
+
+    function urlBase64ToUint8Array(base64String) {
+
+        const padding =
+            '='.repeat((4 - base64String.length % 4) % 4);
+
+        const base64 =
+            (base64String + padding)
+            .replace(/-/g, '+')
+            .replace(/_/g, '/');
+
+        const rawData = window.atob(base64);
+
+        return new Uint8Array(
+            [...rawData].map(char => char.charCodeAt(0))
+        );
+    }
+
+
+    // =========================================================
+    // 🍪 GET COOKIE
+    // =========================================================
+
+    function getCookie(name) {
+
+        let cookieValue = null;
+
+        if (document.cookie && document.cookie !== '') {
+
+            const cookies = document.cookie.split(';');
+
+            for (let cookie of cookies) {
+
+                cookie = cookie.trim();
+
+                if (cookie.startsWith(name + '=')) {
+
+                    cookieValue = decodeURIComponent(
+                        cookie.substring(name.length + 1)
+                    );
+
+                    break;
+                }
+            }
+        }
+
+        return cookieValue;
+    }
+
+
+    // =========================================================
+    // 🔔 ATIVAR PUSH
+    // =========================================================
+
+    async function ativarPush() {
+
+        // -----------------------------------------------------
+        // SUPORTE
+        // -----------------------------------------------------
+
+        if (!('serviceWorker' in navigator)) {
+
+            console.warn(
+                '❌ Service Worker não suportado.'
+            );
+
+            return;
+        }
+
+        if (!('PushManager' in window)) {
+
+            console.warn(
+                '❌ Push API não suportada.'
+            );
+
+            return;
+        }
+
+        try {
+
+            // -------------------------------------------------
+            // REGISTRA SERVICE WORKER
+            // -------------------------------------------------
+
+            const registration =
+                await navigator.serviceWorker.register('/sw.js');
+
+            console.log(
+                '✅ Service Worker registrado.'
+            );
+
+
+            // -------------------------------------------------
+            // PERMISSÃO
+            // -------------------------------------------------
+
+            const permission =
+                await Notification.requestPermission();
+
+            if (permission !== 'granted') {
+
+                console.warn(
+                    '❌ Permissão negada.'
+                );
+
+                return;
+            }
+
+
+            // -------------------------------------------------
+            // VERIFICA SUBSCRIPTION
+            // -------------------------------------------------
+
+            let subscription =
+                await registration.pushManager.getSubscription();
+
+
+            // -------------------------------------------------
+            // CRIA NOVA
+            // -------------------------------------------------
+
+            if (!subscription) {
+
+                subscription =
+                    await registration.pushManager.subscribe({
+
+                        userVisibleOnly: true,
+
+                        applicationServerKey:
+                            urlBase64ToUint8Array(
+                                VAPID_PUBLIC_KEY
+                            ),
+                    });
+
+                console.log(
+                    '✅ Nova subscription criada.'
+                );
+
+            } else {
+
+                console.log(
+                    'ℹ️ Subscription já existente.'
+                );
+            }
+
+
+            // -------------------------------------------------
+            // ENVIA AO DJANGO
+            // -------------------------------------------------
+
+            const response = await fetch(
+                "{% url 'admin_acessos:push_subscribe' %}",
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/json',
+
+                        'X-CSRFToken':
+                            getCookie('csrftoken'),
+                    },
+
+                    body: JSON.stringify(
+                        subscription.toJSON()
+                    ),
+                }
+            );
+
+
+            // -------------------------------------------------
+            // ERRO HTTP
+            // -------------------------------------------------
+
+            if (!response.ok) {
+
+                throw new Error(
+                    `HTTP ${response.status}`
+                );
+            }
+
+
+            // -------------------------------------------------
+            // RESPOSTA
+            // -------------------------------------------------
+
+            const data = await response.json();
+
+            console.log(
+                '✅ Push ativado:',
+                data.status
+            );
+
+        } catch (error) {
+
+            console.error(
+                '❌ Erro Push:',
+                error
+            );
+        }
+    }
+
+
+    // =========================================================
+    // 🚫 DESATIVAR PUSH
+    // =========================================================
+
+    async function desativarPush() {
+
+        try {
+
+            const registration =
+                await navigator.serviceWorker.ready;
+
+            const subscription =
+                await registration.pushManager.getSubscription();
+
+            if (!subscription) {
+
+                console.warn(
+                    'ℹ️ Nenhuma subscription encontrada.'
+                );
+
+                return;
+            }
+
+
+            // -------------------------------------------------
+            // REMOVE DO DJANGO
+            // -------------------------------------------------
+
+            const response = await fetch(
+                "{% url 'admin_acessos:push_unsubscribe' %}",
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/json',
+
+                        'X-CSRFToken':
+                            getCookie('csrftoken'),
+                    },
+
+                    body: JSON.stringify({
+                        endpoint: subscription.endpoint
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+
+                throw new Error(
+                    `HTTP ${response.status}`
+                );
+            }
+
+
+            // -------------------------------------------------
+            // REMOVE DO NAVEGADOR
+            // -------------------------------------------------
+
+            await subscription.unsubscribe();
+
+            console.log(
+                '✅ Push desativado.'
+            );
+
+        } catch (error) {
+
+            console.error(
+                '❌ Erro ao remover push:',
+                error
+            );
+        }
+    }
+
+
+    // =========================================================
+    // 🚀 INIT
+    // =========================================================
+
+    {% if not push_ativado %}
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            ativarPush
+        );
+
+    {% else %}
+
+        console.log(
+            'ℹ️ Push já ativado.'
+        );
+
+    {% endif %}
+
+</script>
+
+{% endif %}

@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.utils.safestring import mark_safe
 from django.urls import reverse
 
-from ..baseMerendeiraView import BaseMerendeiraView
+from core.views.baseMerendeira import BaseMerendeiraView
 from merendaEscolar.models import (
     Cardapio, CardapioSemana, CardapioDia, CardapioItem,
     Receita, EstoqueEscola,

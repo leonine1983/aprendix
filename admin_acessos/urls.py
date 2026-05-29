@@ -6,7 +6,13 @@ from .views import (
     PaletaCoresCreateView,
     PaletaCoresUpdateView,
     PaletaCoresDeleteView,
-    CreateUsers, marcar_notificacao_como_lida, EnviarNotificacaoView, startSme, loginMerendaEscolar
+    CreateUsers, 
+    marcar_notificacao_como_lida, 
+    EnviarNotificacaoView, 
+    startSme, 
+    loginMerendaEscolar, 
+    push_subscribe,
+    push_unsubscribe
 )
 
 app_name = 'admin_acessos'
@@ -37,8 +43,20 @@ urlpatterns = [
 
     # Notificação
      path('notificacao/lida/', marcar_notificacao_como_lida, name='notificacao_lida'),
-     path("notificacao/", EnviarNotificacaoView.as_view(), name="notificacao")
+     path("notificacao/", EnviarNotificacaoView.as_view(), name="notificacao"),
+     
+     # Web Push
+    path(
+    'push/subscribe/',
+    push_subscribe,
+    name='push_subscribe'
+    ),
 
+    path(
+        'push/unsubscribe/',
+        push_unsubscribe,
+        name='push_unsubscribe'
+    ),
 ]
 
 

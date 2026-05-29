@@ -29,8 +29,8 @@ from django.views.decorators.http import require_POST
 from ckeditor.widgets import CKEditorWidget
 
 # Local apps
-from .models import MessageUser, PaletaCores, AtualizacaoNotificacaoSistema
-from .forms import NotificacaoForm
+from admin_acessos.models import MessageUser, PaletaCores, AtualizacaoNotificacaoSistema
+from admin_acessos.forms import NotificacaoForm
 from rh.models import Prefeitura
 
 # Login

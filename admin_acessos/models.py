@@ -224,5 +224,24 @@ class NomeclaturaJanelas(models.Model):
 
     def __str__(self):
         return self.nome_disciplina
+    
+
+from django.db import models
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class PushSubscription(models.Model):
+    user       = models.ForeignKey(User, on_delete=models.CASCADE, related_name="push_subscriptions")
+    endpoint   = models.TextField(unique=True)
+    p256dh     = models.TextField()
+    auth       = models.TextField()
+    criada_em  = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Assinatura Push"
+
+    def __str__(self):
+        return f"Push de {self.user} – {self.endpoint[:60]}"
 
 

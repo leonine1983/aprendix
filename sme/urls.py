@@ -4,6 +4,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls import handler400, handler404, handler500, handler403
 from django.shortcuts import render
+from django.http import FileResponse
+import os
+from django.conf import settings
 
 
 def error_400(request, exception):
@@ -24,7 +27,32 @@ handler403 = error_403
 handler404 = error_404
 handler500 = error_500
 
+from django.http import FileResponse, Http404
+import os
+
+
+def serve_sw(request):
+
+    sw_path = os.path.join(
+        settings.BASE_DIR,
+        'base_static',
+        'sw.js'
+    )
+
+    if not os.path.exists(sw_path):
+        raise Http404()
+
+    response = FileResponse(
+        open(sw_path, 'rb'),
+        content_type='application/javascript'
+    )
+
+    response["Service-Worker-Allowed"] = "/"
+
+    return response
+
 urlpatterns = [    
+    path('sw.js', serve_sw, name='sw'),
     path('', include('admin_acessos.urls')),
     path('admin/', admin.site.urls),   
     path('core/', include('core.urls')), 

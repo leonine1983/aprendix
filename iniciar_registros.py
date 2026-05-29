@@ -3,8 +3,7 @@
 import os
 import django
 
-# Configura o Django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sme.settings")  # Substitua pelo nome do seu projeto
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sme.settings")
 django.setup()
 
 from admin_acessos.models import MessageUser, NomeclaturaJanelas
@@ -13,9 +12,101 @@ from gestao_escolar.models import *
 from django.contrib.auth.models import User, Group
 from datetime import datetime
 
+
+# ══════════════════════════════════════════════════════════════════
+# 🔐 GERAÇÃO DAS CHAVES VAPID
+# ══════════════════════════════════════════════════════════════════
+
+def gerar_chaves_vapid():
+    """
+    Gera as chaves VAPID necessárias para Web Push Notifications.
+
+    - Salva a chave privada em vapid_private.pem (nunca versionar este arquivo).
+    - Salva a chave pública em base64url em vapid_public.txt.
+    - Injeta VAPID_PUBLIC_KEY e VAPID_PRIVATE_KEY no settings em tempo de execução.
+    - Exibe instruções para colar as variáveis no settings.py / .env.
+    """
+
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    PRIVATE_PEM = os.path.join(BASE_DIR, "vapid_private.pem")
+    PUBLIC_TXT  = os.path.join(BASE_DIR, "vapid_public.txt")
+
+    print("\n──── 🔐 VAPID ────")
+
+    # ── já existem? ──────────────────────────────────────────────
+    if os.path.exists(PRIVATE_PEM) and os.path.exists(PUBLIC_TXT):
+        print("Chaves VAPID já existem — pulando geração.")
+
+        with open(PUBLIC_TXT) as f:
+            pub_key = f.read().strip()
+
+        _aplicar_vapid_no_settings(PRIVATE_PEM, pub_key)
+        return
+
+    # ── gera novas chaves ─────────────────────────────────────────
+    try:
+        from py_vapid import Vapid
+        from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+        import base64
+    except ImportError:
+        print(
+            "⚠️  pywebpush / py_vapid não instalado.\n"
+            "   Execute:  pip install pywebpush\n"
+            "   e rode este script novamente."
+        )
+        return
+
+    vapid = Vapid()
+    vapid.generate_keys()
+    vapid.save_key(PRIVATE_PEM)
+
+    # Chave pública em base64url sem padding (formato exigido pelo navegador)
+    pub_bytes = vapid.public_key.public_bytes(Encoding.X962, PublicFormat.UncompressedPoint)
+    pub_key   = base64.urlsafe_b64encode(pub_bytes).decode().rstrip("=")
+
+    with open(PUBLIC_TXT, "w") as f:
+        f.write(pub_key)
+
+    print(f"✅ Chave privada salva em : {PRIVATE_PEM}")
+    print(f"✅ Chave pública salva em : {PUBLIC_TXT}")
+    print(f"\n   VAPID_PUBLIC_KEY  = \"{pub_key}\"")
+    print(f"   VAPID_PRIVATE_KEY = \"{PRIVATE_PEM}\"  (caminho do .pem)")
+    print(
+        "\n   ⚠️  Adicione as linhas acima ao seu settings.py (ou .env).\n"
+        "   ⚠️  NUNCA versione vapid_private.pem — adicione-o ao .gitignore.\n"
+    )
+
+    _aplicar_vapid_no_settings(PRIVATE_PEM, pub_key)
+
+
+def _aplicar_vapid_no_settings(private_pem_path: str, public_key: str):
+    """Injeta as variáveis VAPID no settings em tempo de execução (sem reiniciar)."""
+    from django.conf import settings
+
+    if not getattr(settings, "VAPID_PUBLIC_KEY", ""):
+        settings.VAPID_PUBLIC_KEY = public_key
+
+    if not getattr(settings, "VAPID_PRIVATE_KEY", ""):
+        settings.VAPID_PRIVATE_KEY = private_pem_path
+
+    if not getattr(settings, "VAPID_CLAIMS", None):
+        settings.VAPID_CLAIMS = {"sub": "mailto:admin@prefeitura.gov.br"}
+
+    print("VAPID carregado no settings com sucesso.")
+
+
+# ══════════════════════════════════════════════════════════════════
+# 📦 REGISTROS PADRÃO
+# ══════════════════════════════════════════════════════════════════
+
 def iniciar_registros():
     try:
-        print("------ Inicializando os registros do Moldulo Admin Acessos ------")
+        # ── VAPID (deve ser o primeiro passo) ─────────────────────
+        gerar_chaves_vapid()
+
+        # ── ADMIN ACESSOS ─────────────────────────────────────────
+        print("\n──── Inicializando Admin Acessos ────")
+
         if not MessageUser.objects.exists():
             for user in User.objects.all():
                 MessageUser.objects.get_or_create(
@@ -32,163 +123,99 @@ def iniciar_registros():
             )
             print("Nomeclatura criada com sucesso.")
 
-
         from django.contrib.auth.models import Group, Permission
         from django.contrib.contenttypes.models import ContentType
         from django.db import transaction
         from django.apps import apps
 
-
         @transaction.atomic
         def configurar_grupos_institucionais():
             group_names = [
-                "Nutricionista",
-                "Merendeira",
-                "Admin",
-                "Professor",
-                "Diretor",
-                "Secretario",
-                "Coordenador",
-                "Aluno",
-            ]            
+                "Nutricionista", "Merendeira", "Admin", "Professor",
+                "Diretor", "Secretario", "Coordenador", "Aluno",
+            ]
 
-            # ===============================
-            # Criação / Garantia dos grupos
-            # ===============================
             grupos = {}
             for group_name in group_names:
                 grupo, created = Group.objects.get_or_create(name=group_name)
                 grupos[group_name] = grupo
-                if created:
-                    print(f"Grupo criado: {group_name}")
-                else:
-                    print(f"Grupo já existente: {group_name}")
+                status = "criado" if created else "já existente"
+                print(f"Grupo {status}: {group_name}")
 
-            # ======================================================
-            # merendaEscolar → Admin e Nutricionista (mantém regra)
-            # ======================================================
-            permissoes_merenda = Permission.objects.filter(
-                content_type__app_label="merendaEscolar"
-            )
-
+            permissoes_merenda = Permission.objects.filter(content_type__app_label="merendaEscolar")
             grupos["Admin"].permissions.add(*permissoes_merenda)
-            print(f"Permissões atribuídas ao grupo Admin (merendaEscolar): {permissoes_merenda.count()}")
-
             grupos["Nutricionista"].permissions.add(*permissoes_merenda)
-            print(f"Permissões atribuídas ao grupo Nutricionista (merendaEscolar): {permissoes_merenda.count()}")
+            print(f"Permissões merendaEscolar → Admin e Nutricionista: {permissoes_merenda.count()}")
 
-            # ======================================================
-            # modulo_Merendeiras → Merendeira
-            # ======================================================
             app_config = apps.get_app_config("modulo_Merendeiras")
             permissoes_merendeira = []
-
             for model in app_config.get_models():
-                content_type = ContentType.objects.get_for_model(model)
-                permissoes_merendeira.extend(
-                    Permission.objects.filter(content_type=content_type)
-                )
-
+                ct = ContentType.objects.get_for_model(model)
+                permissoes_merendeira.extend(Permission.objects.filter(content_type=ct))
             grupos["Merendeira"].permissions.add(*permissoes_merendeira)
-            print(f"Permissões atribuídas ao grupo Merendeira (modulo_Merendeiras): {len(permissoes_merendeira)}")
+            print(f"Permissões modulo_Merendeiras → Merendeira: {len(permissoes_merendeira)}")
 
-            # ======================================================
-            # modulo_professor → Professor
-            # ======================================================
-            permissoes_professor = Permission.objects.filter(
-                content_type__app_label="modulo_professor"
-            )
-            grupos["Professor"].permissions.add(*permissoes_professor)
-            print(f"Permissões atribuídas ao grupo Professor (modulo_professor): {permissoes_professor.count()}")
+            for app_label, grupo_nome in [
+                ("modulo_professor",    "Professor"),
+                ("modulo_aluno",        "Aluno"),
+                ("gestao_escolar",      "Diretor"),
+                ("gestao_escolar",      "Secretario"),
+                ("modulo_coordenacao",  "Coordenador"),
+            ]:
+                perms = Permission.objects.filter(content_type__app_label=app_label)
+                grupos[grupo_nome].permissions.add(*perms)
+                print(f"Permissões {app_label} → {grupo_nome}: {perms.count()}")
 
-            # ======================================================
-            # modulo_aluno → Aluno
-            # ======================================================
-            permissoes_aluno = Permission.objects.filter(
-                content_type__app_label="modulo_aluno"
-            )
-            grupos["Aluno"].permissions.add(*permissoes_aluno)
-            print(f"Permissões atribuídas ao grupo Aluno (modulo_aluno): {permissoes_aluno.count()}")
-
-            # ======================================================
-            # gestao_escolar → Diretor e Secretário
-            # ======================================================
-            permissoes_gestao = Permission.objects.filter(
-                content_type__app_label="gestao_escolar"
-            )
-
-            grupos["Diretor"].permissions.add(*permissoes_gestao)
-            print(f"Permissões atribuídas ao grupo Diretor (gestao_escolar): {permissoes_gestao.count()}")
-
-            grupos["Secretario"].permissions.add(*permissoes_gestao)
-            print(f"Permissões atribuídas ao grupo Secretario (gestao_escolar): {permissoes_gestao.count()}")
-
-            # ======================================================
-            # modulo_coordenacao → Coordenador
-            # ======================================================
-            permissoes_coordenador = Permission.objects.filter(
-                content_type__app_label="modulo_coordenacao"
-            )
-
-            grupos["Coordenador"].permissions.add(*permissoes_coordenador)
-            print(f"Permissões atribuídas ao grupo Coordenador (modulo_coordenacao): {permissoes_coordenador.count()}")
-
-            print("Configuração institucional de grupos concluída com sucesso.")
-
+            print("Grupos configurados com sucesso.")
 
         configurar_grupos_institucionais()
 
-        print("------ Inicializando os registros do Moldulo RH ------")
-        if not Config_plataforma.objects.exists():
-            Config_plataforma.objects.create(
-                nome_sistema='Meu Sistema',
-                versao='1.0.0'
-                # Adicione outros campos obrigatórios conforme o seu modelo
-            )
-            print("Configuração de prataforma criados com sucesso.")
+        # ── RH ────────────────────────────────────────────────────
+        print("\n──── Inicializando RH ────")
 
-        # Cria os registros UF se não existirem
+        if not Config_plataforma.objects.exists():
+            Config_plataforma.objects.create(nome_sistema='Meu Sistema', versao='1.0.0')
+            print("Config plataforma criada.")
+
         if not Uf_Unidade_Federativa.objects.exists():
             uf_estados = [
-                ('AC', 'Acre'), ('AL', 'Alagoas'), ('AM', 'Amazonas'), ('AP', 'Amapá'),
-                ('BA', 'Bahia'), ('CE', 'Ceará'), ('DF', 'Distrito Federal'), ('ES', 'Espírito Santo'),
-                ('GO', 'Goiás'), ('MA', 'Maranhão'), ('MG', 'Minas Gerais'), ('MS', 'Mato Grosso do Sul'),
-                ('MT', 'Mato Grosso'), ('PA', 'Pará'), ('PB', 'Paraíba'), ('PE', 'Pernambuco'),
-                ('PI', 'Piauí'), ('PR', 'Paraná'), ('RJ', 'Rio de Janeiro'), ('RN', 'Rio Grande do Norte'),
-                ('RO', 'Roraima'), ('RR', 'Rondônia'), ('RS', 'Rio Grande do Sul'), ('SC', 'Santa Catarina'),
-                ('SE', 'Sergipe'), ('SP', 'São Paulo'), ('TO', 'Tocantins')
+                ('AC','Acre'),('AL','Alagoas'),('AM','Amazonas'),('AP','Amapá'),
+                ('BA','Bahia'),('CE','Ceará'),('DF','Distrito Federal'),('ES','Espírito Santo'),
+                ('GO','Goiás'),('MA','Maranhão'),('MG','Minas Gerais'),('MS','Mato Grosso do Sul'),
+                ('MT','Mato Grosso'),('PA','Pará'),('PB','Paraíba'),('PE','Pernambuco'),
+                ('PI','Piauí'),('PR','Paraná'),('RJ','Rio de Janeiro'),('RN','Rio Grande do Norte'),
+                ('RO','Roraima'),('RR','Rondônia'),('RS','Rio Grande do Sul'),('SC','Santa Catarina'),
+                ('SE','Sergipe'),('SP','São Paulo'),('TO','Tocantins'),
             ]
             Uf_Unidade_Federativa.objects.bulk_create(
                 [Uf_Unidade_Federativa(sigla=s, estado=e) for s, e in uf_estados]
             )
-            print("Estados criados com sucesso.")
+            print("Estados criados.")
 
-        # Cria registros Cidade e Bairro se não existirem
         if not Cidade.objects.exists():
             try:
-                uf_unidade_federativa = Uf_Unidade_Federativa.objects.get(sigla='BA')
-                Cidade.objects.create(nome_estado=uf_unidade_federativa, nome_cidade='Vera Cruz')   
-                print("Cidade criada com sucesso.")
-
+                uf = Uf_Unidade_Federativa.objects.get(sigla='BA')
+                Cidade.objects.create(nome_estado=uf, nome_cidade='Vera Cruz')
+                print("Cidade criada.")
             except Uf_Unidade_Federativa.DoesNotExist:
-                print("UF Unidade Federativa de sigla BA não encontrada.")
+                print("UF BA não encontrada.")
 
         if not Bairro.objects.exists():
             try:
                 cidade = Cidade.objects.get(nome_cidade='Vera Cruz')
-                bairros = [
-                    "Aratuba", "Baiacu", "Barra do Gil", "Barra do Pote", "Berlinque",
-                    "Cacha Pregos", "Campinas", "Cine", "Conceição", "Coroa", 
-                    "Gamboa", "Ilhota", "Juerana", "Mar Grande", "Matarandiba", 
-                    "Ponta Grossa", "Porrãozinho"
-                ]
-                for nome_bairro in sorted(bairros):  # Garantindo ordem alfabética
-                    Bairro.objects.create(nome_cidade=cidade, nome_bairro=nome_bairro)
-                    print("Bairros criados com sucesso.")
-
+                bairros = sorted([
+                    "Aratuba","Baiacu","Barra do Gil","Barra do Pote","Berlinque",
+                    "Cacha Pregos","Campinas","Cine","Conceição","Coroa",
+                    "Gamboa","Ilhota","Juerana","Mar Grande","Matarandiba",
+                    "Ponta Grossa","Porrãozinho",
+                ])
+                Bairro.objects.bulk_create(
+                    [Bairro(nome_cidade=cidade, nome_bairro=b) for b in bairros]
+                )
+                print("Bairros criados.")
             except Cidade.DoesNotExist:
-                print("Cidade com ID 1 não encontrada.")                
-        
+                print("Cidade Vera Cruz não encontrada.")
+
         if not Prefeitura.objects.exists():
             try:
                 cidade = Cidade.objects.get(nome_cidade='Vera Cruz')
@@ -196,354 +223,264 @@ def iniciar_registros():
                 Prefeitura.objects.create(
                     nome='Prefeitura Municipal de Vera Cruz',
                     instituto='Secretaria Municipal da Educação',
-                    cidade=cidade,
-                    estado=estado,
+                    cidade=cidade, estado=estado,
                     endereco='Av. Te encontro lá',
-                    pessoa_publica='Igor Pinho',
-                    brasao = ''
+                    pessoa_publica='Igor Pinho', brasao='',
                 )
-                print("Prefeitura registrada com sucesso.")     
-            except Cidade.DoesNotExist:
-                print("Cidade com PK 1 não encontrada.")
-            except Uf_Unidade_Federativa.DoesNotExist:
-                print("UF Unidade Federativa com PK 1 não encontrada.")
+                print("Prefeitura criada.")
+            except (Cidade.DoesNotExist, Uf_Unidade_Federativa.DoesNotExist):
+                print("Cidade ou UF não encontrada para criar Prefeitura.")
 
         if not Ano.objects.exists():
             try:
                 prefeitura = Prefeitura.objects.get(nome='Prefeitura Municipal de Vera Cruz')
-                data_in = datetime.strptime('12/03/2025', '%d/%m/%Y').date()
-                data_end = datetime.strptime('19/12/2025', '%d/%m/%Y').date()
                 Ano.objects.create(
-                    prefeitura = prefeitura,
-                    ano='2025',
-                    data_inicio=data_in,
-                    data_fim = data_end)
-                print('Ano Letivo criado com sucesso!!!')
+                    prefeitura=prefeitura, ano='2025',
+                    data_inicio=datetime.strptime('12/03/2025', '%d/%m/%Y').date(),
+                    data_fim=datetime.strptime('19/12/2025', '%d/%m/%Y').date(),
+                )
+                print('Ano Letivo criado.')
             except Prefeitura.DoesNotExist:
-                print("A prefeitura selecionada não existe")
+                print("Prefeitura não encontrada.")
 
-        
         if not Profissao.objects.exists():
             nome_descreve = [
                 ('Diretor Escolar', 'Profissional encarregado da administração e gestão de uma escola.'),
-                ('Vice-Diretor Escolar', 'Profissional que auxilia o diretor escolar na administração e gestão da escola, assumindo suas funções na sua ausência e colaborando nas decisões administrativas e pedagógicas.'),
-                ('Coordenador Escolar', 'Profissional que supervisiona as operações e as atividades educacionais de uma escola.'),
-                ('Secretária escolar', 'Profissional responsável por tarefas administrativas e organizacionais dentro de uma instituição de ensino.'),
-                ('Professor', 'Profissional dedicado à educação e ao ensino, desempenhando um papel fundamental na transmissão de conhecimentos, habilidades e valores para os alunos.'), 
-                ('Reserva Técnica', 'Profissional responsável por apoiar a infraestrutura e a logística do ambiente escolar, garantindo que todos os recursos necessários estejam disponíveis para o funcionamento adequado das atividades educacionais.'),
-                ('Auxiliar de Classe', 'Colaborador que assiste o professor no dia a dia da sala de aula, ajudando na gestão de alunos e na preparação de materiais, contribuindo para um ambiente de aprendizado mais eficaz e acolhedor.'),
-                ('Merendeira', 'Funcionária responsável pela preparação e distribuição das refeições escolares.'),
-                ('Técnica em alimentação escolar', 'Profissional especializada em planejar, preparar e supervisionar refeições nutritivas e balanceadas.'),
-                ('Porteiro escolar', 'Profissional encarregado de monitorar e controlar o acesso à escola.'),            
-                ('Auxiliar Administrativo Escolar', 'Profissional que oferece suporte em atividades administrativas dentro de uma instituição educacional.')
-                
+                ('Vice-Diretor Escolar', 'Profissional que auxilia o diretor escolar.'),
+                ('Coordenador Escolar', 'Profissional que supervisiona as operações educacionais.'),
+                ('Secretária escolar', 'Profissional responsável por tarefas administrativas.'),
+                ('Professor', 'Profissional dedicado à educação e ao ensino.'),
+                ('Reserva Técnica', 'Profissional responsável por apoiar a infraestrutura.'),
+                ('Auxiliar de Classe', 'Colaborador que assiste o professor no dia a dia.'),
+                ('Merendeira', 'Funcionária responsável pela preparação e distribuição das refeições.'),
+                ('Técnica em alimentação escolar', 'Profissional especializada em planejar refeições nutritivas.'),
+                ('Porteiro escolar', 'Profissional encarregado de monitorar o acesso à escola.'),
+                ('Auxiliar Administrativo Escolar', 'Profissional de suporte administrativo.'),
             ]
-
             Profissao.objects.bulk_create(
-                [Profissao(nome_profissao=nome, descricao=descricao) for nome, descricao in nome_descreve]
+                [Profissao(nome_profissao=n, descricao=d) for n, d in nome_descreve]
             )
-            print('Profissão criado com sucesso!!!')
+            print('Profissões criadas.')
 
-        # Cria registros de Sexo se não existirem
         if not Sexo.objects.exists():
-            Sexo.objects.bulk_create(
-                [Sexo(nome=sexo) for sexo in [
-                    'Masculino (cisgênero)',
-                    'Feminino (cisgênero)',
-                    'Homem trans',
-                    'Mulher trans',
-                    'Travesti',
-                    'Não-binário',
-                    'Agênero',
-                    'Gênero-fluido',
-                    'Bigênero',
-                    'Demiboy',
-                    'Demigirl',
-                    'Intersexo',
-                    'Outro',
-                    'Prefere não informar'
-                ]]
-
-            )
-            print('Gênero Sexual criado com sucesso!!!')
-
-        
+            Sexo.objects.bulk_create([Sexo(nome=s) for s in [
+                'Masculino (cisgênero)','Feminino (cisgênero)','Homem trans','Mulher trans',
+                'Travesti','Não-binário','Agênero','Gênero-fluido','Bigênero',
+                'Demiboy','Demigirl','Intersexo','Outro','Prefere não informar',
+            ]])
+            print('Gêneros criados.')
 
         if not Escola.objects.exists():
-            prefeitura = Prefeitura.objects.all().first()
-            
-            if prefeitura is None:
-                print("Nenhuma prefeitura encontrada.")
-            else:
-                # Definindo as escolas a serem criadas
-                escolas = [
-                    (prefeitura, "Escola Municipal Geralda Maria", True),
-                    (prefeitura, "Colégio Municipal de Vera Cruz", True),
-                    (prefeitura, "Centro de Atendimento Educacional Especializado Dr Nicandro Moreira de Macedo", False),
-                    (prefeitura, "Centro Municipal de Educação Infantil de Cacha Pregos", False),
-                    (prefeitura, "Colégio Municipal Telma Régis de Andrade", True),
-                    (prefeitura, "Colégio Municipal Geralda Maria da Conceição", True),
-                    (prefeitura, "Colégio Municipal Jarbas Passarinho", False),
-                    (prefeitura, "Colégio Municipal Luiz Eduardo Magalhães", True),
-                    (prefeitura, "Colégio Municipal Professora Daulia Angélica de Souza Santos", True),
-                    (prefeitura, "Creche de Jiribatuba", False),
-                    (prefeitura, "Creche Escola Municipal Educandário Tio Aurélio", False),
-                    (prefeitura, "Creche Escola Municipal Elza Galvão", False),
-                    (prefeitura, "Creche Escola Municipal Professora Nice Maria Vinagre de Oliveira", False),
-                    (prefeitura, "Creche Escola Municipal Simone Trigano", False),
-                    (prefeitura, "Creche Escola Municipal Vovó Nida", False),
-                    (prefeitura, "Creche Escola Municipal Vovô Nizio", False),
-                    (prefeitura, "Escola Clementino Lima", False),
-                    (prefeitura, "Escola Comunitária Aquilino dos Santos", False),
-                    (prefeitura, "Escola Dr José Eugênio Mendes Figueiredo", False),
-                    (prefeitura, "Escola Ivandite Pires Miranda Costa", False),
-                    (prefeitura, "Escola Major Everaldo Calazans de Almeida", False),
-                    (prefeitura, "Escola Manoel Januário de Lima", False),
-                    (prefeitura, "Escola Municipal Presidente Emílio Garrastazu Médici", False),
-                    (prefeitura, "Escola Municipal Almiro Antunes de Brito", False),
-                    (prefeitura, "Escola Municipal Antônio Hermenegildo de Sena Pereira", False),
-                    (prefeitura, "Escola Municipal Argérico Rocha Borges", False),
-                    (prefeitura, "Escola Municipal Aureliano de Azevedo Monteiro", False),
-                    (prefeitura, "Escola Municipal Braz Felisberto de Santana", False),
-                    (prefeitura, "Escola Municipal de Ponta Grossa", False),
-                    (prefeitura, "Escola Municipal Gaudêncio Acelino Marques", False),
-                    (prefeitura, "Escola Municipal Gezilda Alves de Souza", False),
-                    (prefeitura, "Escola Municipal Guilherme Franco Guimarães", False),
-                    (prefeitura, "Escola Municipal Hilton Rodrigues", False),
-                    (prefeitura, "Escola Municipal João José de Macedo", True),
-                    (prefeitura, "Escola Municipal Joaquim Barreto de Araújo", False),
-                    (prefeitura, "Escola Municipal Juvenal Galvão", False),
-                    (prefeitura, "Escola Municipal Margarida Moreira", False),
-                    (prefeitura, "Escola Municipal Nova Divineia", False),
-                    (prefeitura, "Escola Municipal Olga Seabra", False),
-                    (prefeitura, "Escola Municipal Padre Ignácio Alves Pereira", False),
-                    (prefeitura, "Escola Municipal Professor Jorge Calmon", False),
-                    (prefeitura, "Escola Municipal Raimundo Afonso Borges", False),
-                    (prefeitura, "Escola Municipal Turma da Mônica", False),
-                    (prefeitura, "Escola Narciso Francisco de Pinho", False),
-                    (prefeitura, "Escola Sede Social do Riachinho", False),
-                    (prefeitura, "Escola Voluntárias Sociais da Bahia", False),
-                    (prefeitura, "Ginásio Municipal Estelita Eusébia Santiago dos Santos", True)
+            prefeitura = Prefeitura.objects.first()
+            if prefeitura:
+                escolas_data = [
+                    ("Escola Municipal Geralda Maria", True),
+                    ("Colégio Municipal de Vera Cruz", True),
+                    ("Centro de Atendimento Educacional Especializado Dr Nicandro Moreira de Macedo", False),
+                    ("Centro Municipal de Educação Infantil de Cacha Pregos", False),
+                    ("Colégio Municipal Telma Régis de Andrade", True),
+                    ("Colégio Municipal Geralda Maria da Conceição", True),
+                    ("Colégio Municipal Jarbas Passarinho", False),
+                    ("Colégio Municipal Luiz Eduardo Magalhães", True),
+                    ("Colégio Municipal Professora Daulia Angélica de Souza Santos", True),
+                    ("Creche de Jiribatuba", False),
+                    ("Creche Escola Municipal Educandário Tio Aurélio", False),
+                    ("Creche Escola Municipal Elza Galvão", False),
+                    ("Creche Escola Municipal Professora Nice Maria Vinagre de Oliveira", False),
+                    ("Creche Escola Municipal Simone Trigano", False),
+                    ("Creche Escola Municipal Vovó Nida", False),
+                    ("Creche Escola Municipal Vovô Nizio", False),
+                    ("Escola Clementino Lima", False),
+                    ("Escola Comunitária Aquilino dos Santos", False),
+                    ("Escola Dr José Eugênio Mendes Figueiredo", False),
+                    ("Escola Ivandite Pires Miranda Costa", False),
+                    ("Escola Major Everaldo Calazans de Almeida", False),
+                    ("Escola Manoel Januário de Lima", False),
+                    ("Escola Municipal Presidente Emílio Garrastazu Médici", False),
+                    ("Escola Municipal Almiro Antunes de Brito", False),
+                    ("Escola Municipal Antônio Hermenegildo de Sena Pereira", False),
+                    ("Escola Municipal Argérico Rocha Borges", False),
+                    ("Escola Municipal Aureliano de Azevedo Monteiro", False),
+                    ("Escola Municipal Braz Felisberto de Santana", False),
+                    ("Escola Municipal de Ponta Grossa", False),
+                    ("Escola Municipal Gaudêncio Acelino Marques", False),
+                    ("Escola Municipal Gezilda Alves de Souza", False),
+                    ("Escola Municipal Guilherme Franco Guimarães", False),
+                    ("Escola Municipal Hilton Rodrigues", False),
+                    ("Escola Municipal João José de Macedo", True),
+                    ("Escola Municipal Joaquim Barreto de Araújo", False),
+                    ("Escola Municipal Juvenal Galvão", False),
+                    ("Escola Municipal Margarida Moreira", False),
+                    ("Escola Municipal Nova Divineia", False),
+                    ("Escola Municipal Olga Seabra", False),
+                    ("Escola Municipal Padre Ignácio Alves Pereira", False),
+                    ("Escola Municipal Professor Jorge Calmon", False),
+                    ("Escola Municipal Raimundo Afonso Borges", False),
+                    ("Escola Municipal Turma da Mônica", False),
+                    ("Escola Narciso Francisco de Pinho", False),
+                    ("Escola Sede Social do Riachinho", False),
+                    ("Escola Voluntárias Sociais da Bahia", False),
+                    ("Ginásio Municipal Estelita Eusébia Santiago dos Santos", True),
                 ]
-
-                
-                # Criar as escolas
                 escolas_criadas = Escola.objects.bulk_create(
-                    [Escola(prefeitura=p, nome_escola=n, fund2 = t ) for p, n, t in escolas]
+                    [Escola(prefeitura=prefeitura, nome_escola=n, fund2=t) for n, t in escolas_data]
                 )
-                print(f"Escolas criadas: {[escola.nome_escola for escola in escolas_criadas]}")
-
-                # Criar um único registro de Escola_admin para cada Escola, garantindo um relacionamento um-para-um
                 for escola in escolas_criadas:
-                    if not Escola_admin.objects.filter(nome=escola).exists():
-                        # Criar o registro de Escola_admin para a escola
-                        Escola_admin.objects.create(nome=escola)
-                        print(f"Escola_admin criado para: {escola.nome_escola}")
-                    else:
-                        print(f"Já existe um Escola_admin para: {escola.nome_escola}")
-        
+                    Escola_admin.objects.get_or_create(nome=escola)
+                print(f"{len(escolas_criadas)} escolas criadas.")
 
-        print("------ Inicializando os registros do Moldulo Gestão Escolar ------")
+        # ── GESTÃO ESCOLAR ────────────────────────────────────────
+        print("\n──── Inicializando Gestão Escolar ────")
 
         if not Cargo.objects.exists():
             cargos = [
-                'Diretor', 'Vice-Diretor', 'Coordenador', 'Professor', 'Auxiliar-Administrativo-I',
-                'Auxiliar-Administrativo-II', 'Tecnico-em-Multimeitos-Didáticos', 'Tecnico-em-Merenda-Escolar',
-                'Auxiliar-de-Classe', 'Servente-de-limpeza', 'Monitor-de-Informática', 'Merendeira',
-                'Porteiro', 'Estagiário'
+                'Diretor','Vice-Diretor','Coordenador','Professor',
+                'Auxiliar-Administrativo-I','Auxiliar-Administrativo-II',
+                'Tecnico-em-Multimeitos-Didáticos','Tecnico-em-Merenda-Escolar',
+                'Auxiliar-de-Classe','Servente-de-limpeza','Monitor-de-Informática',
+                'Merendeira','Porteiro','Estagiário',
             ]
             Cargo.objects.bulk_create([Cargo(nome=n) for n in cargos])
-            print('Cargos criados com sucesso!!!')
+            print('Cargos criados.')
 
-        # Cria os registros Etnia se não existirem
         if not Etnia.objects.exists():
-            etnias = ['Branca', 'Negra', 'Parda', 'Amarela', 'Indigena', 'Não declarado']
-            Etnia.objects.bulk_create([Etnia(nome=etnia) for etnia in etnias])
-            print('Etnias criados com sucesso!!!')
+            Etnia.objects.bulk_create(
+                [Etnia(nome=e) for e in ['Branca','Negra','Parda','Amarela','Indigena','Não declarado']]
+            )
+            print('Etnias criadas.')
 
-        # Cria os registros Nacionalidade se não existirem
         if not Nacionalidade.objects.exists():
-            nacionalidades = ['Brasileira', 'Brasileiro nascido no exterior', 'Mexicano']
-            Nacionalidade.objects.bulk_create([Nacionalidade(nome=nacionalidade) for nacionalidade in nacionalidades])
-            print('Nacionalides criados com sucesso!!!')
+            Nacionalidade.objects.bulk_create(
+                [Nacionalidade(nome=n) for n in ['Brasileira','Brasileiro nascido no exterior','Mexicano']]
+            )
+            print('Nacionalidades criadas.')
 
-        # Cria os registros Pais_origem se não existirem
         if not Pais_origem.objects.exists():
-            paises = ['Brasil', 'Japão', 'México']
-            Pais_origem.objects.bulk_create([Pais_origem(nome=pais) for pais in paises])
-            print('País de origem criado com sucesso!!!')
-                
-        if not  GrauEscolar.objects.exists():
-            graus = [
-                'Etapa Creche',
-                'Ensino Fundamental I (Séries Iniciais)',
-                'Ensino Fundamental II (Séries Finais)'
-            ]
+            Pais_origem.objects.bulk_create(
+                [Pais_origem(nome=p) for p in ['Brasil','Japão','México']]
+            )
+            print('Países de origem criados.')
 
-            for g in graus:
+        if not GrauEscolar.objects.exists():
+            for g in ['Etapa Creche','Ensino Fundamental I (Séries Iniciais)','Ensino Fundamental II (Séries Finais)']:
                 GrauEscolar.objects.get_or_create(nome=g)
-
-            print('GrauEscolar criado/verificado com sucesso!')
+            print('GrauEscolar criado.')
 
         if not Compatibilidade_EducaCenso.objects.exists():
-            nivel = [
-                'Berçário I (0 a 1 ano)',
-                'Berçário II (1 a 2 anos)',
-                'Maternal I (2 a 3 anos)',
-                'Maternal II (3 a 4 anos)',
-                'Pré I (ou Jardim I, 4 a 5 anos)',
-                'Pré II (ou Jardim II, 5 a 6 anos)',
-                '1º ano (6 a 7 anos)',
-                '2º ano (7 a 8 anos)',
-                '3º ano (8 a 9 anos)',
-                '4º ano (9 a 10 anos)',
-                '5º ano (10 a 11 anos)',
-                '6º ano (11 a 12 anos)',
-                '7º ano (12 a 13 anos)',
-                '8º ano (13 a 14 anos)',
-                '9º ano (14 a 15 anos)',
+            niveis = [
+                'Berçário I (0 a 1 ano)','Berçário II (1 a 2 anos)',
+                'Maternal I (2 a 3 anos)','Maternal II (3 a 4 anos)',
+                'Pré I (ou Jardim I, 4 a 5 anos)','Pré II (ou Jardim II, 5 a 6 anos)',
+                '1º ano (6 a 7 anos)','2º ano (7 a 8 anos)','3º ano (8 a 9 anos)',
+                '4º ano (9 a 10 anos)','5º ano (10 a 11 anos)','6º ano (11 a 12 anos)',
+                '7º ano (12 a 13 anos)','8º ano (13 a 14 anos)','9º ano (14 a 15 anos)',
                 'Ciclo I (inicial, para jovens e adultos que ainda não completaram o Ensino Fundamental)',
-                'Ciclo II (avançado, para conclusão do Ensino Fundamental)'
+                'Ciclo II (avançado, para conclusão do Ensino Fundamental)',
             ]
-            for nome in nivel:
+            for nome in niveis:
                 Compatibilidade_EducaCenso.objects.create(nome=nome)
-            print('Compatibilidade criado com sucesso!!!')
-
+            print('Compatibilidade_EducaCenso criada.')
 
         if not TiposRemanejamentos.objects.exists():
-            tipos = [  
-                ['Desistente/Evasão Escolar', 'Constatado que o aluno não frequenta mais as aulas há bastante tempo'],
-                ['Transferido', 'O aluno foi transferido para outra escola'],
-                ['Mudança de Turma', 'O aluno mudou para outra turma da mesma escola']
-            ]
-            for n, m in tipos:
-                TiposRemanejamentos.objects.create(
-                    nome = n,
-                    description = m
-                )
-            print('Tipos Remanejamento criado com sucesso!!!')
+            for n, m in [
+                ('Desistente/Evasão Escolar', 'Constatado que o aluno não frequenta mais as aulas'),
+                ('Transferido', 'O aluno foi transferido para outra escola'),
+                ('Mudança de Turma', 'O aluno mudou para outra turma da mesma escola'),
+            ]:
+                TiposRemanejamentos.objects.create(nome=n, description=m)
+            print('TiposRemanejamentos criados.')
 
-        # Cria os registros Deficiencia_aluno se não existirem
         if not Deficiencia_aluno.objects.exists():
-            deficiencias = ['Física', 'Mental', 'Auditiva', 'Visual', 'Nenhuma']
-            Deficiencia_aluno.objects.bulk_create([Deficiencia_aluno(nome=deficiencia) for deficiencia in deficiencias])
-            print('Deficiencia aluno criado com sucesso!!!')
+            Deficiencia_aluno.objects.bulk_create(
+                [Deficiencia_aluno(nome=d) for d in ['Física','Mental','Auditiva','Visual','Nenhuma']]
+            )
+            print('Deficiencias criadas.')
 
-        # Cria os registros Disciplina se não existirem
         if not Disciplina.objects.exists():
             disciplinas = [
-                ('Língua Portuguesa', 1), ('Língua Inglesa', 2), ('Matemática', 3), ('Ciências', 4),
-                ('Geografia', 5), ('História', 6), ('Educação Ambiental', 7), ('Educação Artística', 8),
-                ('Educação Física', 9)
+                ('Língua Portuguesa',1),('Língua Inglesa',2),('Matemática',3),
+                ('Ciências',4),('Geografia',5),('História',6),
+                ('Educação Ambiental',7),('Educação Artística',8),('Educação Física',9),
             ]
-            Disciplina.objects.bulk_create([Disciplina(nome=nome, ordem_historico=ordem) for nome, ordem in disciplinas])
-            print('Disciplina criado com sucesso!!!')
-        
+            Disciplina.objects.bulk_create(
+                [Disciplina(nome=n, ordem_historico=o) for n, o in disciplinas]
+            )
+            print('Disciplinas criadas.')
 
-        # Cria os registros GrauEscolar se não existirem
-        if not Serie_Escolar.objects.exists():        
+        if not Serie_Escolar.objects.exists():
             try:
                 et = GrauEscolar.objects.get(nome='Etapa Creche')
                 f1 = GrauEscolar.objects.get(nome='Ensino Fundamental I (Séries Iniciais)')
-                f2 = GrauEscolar.objects.get(nome='Ensino Fundamental II (Séries Finais)')                    
-                compatibilidades = list(Compatibilidade_EducaCenso.objects.all())
-
-                if len(compatibilidades) < 17:
-                    print("Não há compatibilidade suficiente registrada em Compatibilidade_EducaCenso.")
-                    return
-
-                series = [
-                    ('G1', et, compatibilidades[0]),
-                    ('G2', et, compatibilidades[1]),
-                    ('G3', et, compatibilidades[2]),
-                    ('G4', et, compatibilidades[3]),
-                    ('G5', et, compatibilidades[4]),
-                    ('G6', et, compatibilidades[5]),
-                    ('1 ano', f1, compatibilidades[6]),
-                    ('2 ano', f1, compatibilidades[7]),
-                    ('3 ano', f1, compatibilidades[8]),
-                    ('4 ano', f1, compatibilidades[9]),
-                    ('5 ano', f1, compatibilidades[10]),
-                    ('6 ano', f2, compatibilidades[11]),
-                    ('7 ano', f2, compatibilidades[12]),
-                    ('8 ano', f2, compatibilidades[13]),
-                    ('9 ano', f2, compatibilidades[14]),
-                    ('Ciclo I', f1, compatibilidades[15]),
-                    ('Ciclo II', f2, compatibilidades[16])
-                ]
-
-                for nome, nivel, compatibilidade in series:
-                    Serie_Escolar.objects.create(
-                        nome=nome,
-                        nivel_escolar=nivel,
-                        compatibilidade_EducaCenso=compatibilidade
-                    )
-                print('Serie Escolar criado com sucesso!!!')
-
+                f2 = GrauEscolar.objects.get(nome='Ensino Fundamental II (Séries Finais)')
+                compat = list(Compatibilidade_EducaCenso.objects.all())
+                if len(compat) >= 17:
+                    series = [
+                        ('G1',et,compat[0]),('G2',et,compat[1]),('G3',et,compat[2]),
+                        ('G4',et,compat[3]),('G5',et,compat[4]),('G6',et,compat[5]),
+                        ('1 ano',f1,compat[6]),('2 ano',f1,compat[7]),('3 ano',f1,compat[8]),
+                        ('4 ano',f1,compat[9]),('5 ano',f1,compat[10]),('6 ano',f2,compat[11]),
+                        ('7 ano',f2,compat[12]),('8 ano',f2,compat[13]),('9 ano',f2,compat[14]),
+                        ('Ciclo I',f1,compat[15]),('Ciclo II',f2,compat[16]),
+                    ]
+                    for nome, nivel, compatibilidade in series:
+                        Serie_Escolar.objects.create(
+                            nome=nome,
+                            nivel_escolar=nivel,
+                            compatibilidade_EducaCenso=compatibilidade,
+                        )
+                    print('Serie Escolar criada.')
             except GrauEscolar.DoesNotExist:
-                # Handle the case where GrauEscolar entries are not found
-                print("Alguns dos registros de GrauEscolar não foram encontrados.")
-            
+                print("GrauEscolar não encontrado.")
 
-
-        # Cria os registros TamanhoRoupa se não existirem
         if not TamanhoRoupa.objects.exists():
             tamanhos = [
-                {'nome': 'PP', 'descricao': 'Tamanho extra pequeno', 'largura': 40, 'altura': 60, 'comprimento': 30, 'peso': 0.2},
-                {'nome': 'P', 'descricao': 'Tamanho pequeno', 'largura': 45, 'altura': 65, 'comprimento': 35, 'peso': 0.3},
-                {'nome': 'M', 'descricao': 'Tamanho médio', 'largura': 50, 'altura': 70, 'comprimento': 40, 'peso': 0.4},
-                {'nome': 'G', 'descricao': 'Tamanho grande', 'largura': 55, 'altura': 75, 'comprimento': 45, 'peso': 0.5},
-                {'nome': 'GG', 'descricao': 'Tamanho extra grande', 'largura': 60, 'altura': 80, 'comprimento': 50, 'peso': 0.6}
+                {'nome':'PP','descricao':'Extra pequeno','largura':40,'altura':60,'comprimento':30,'peso':0.2},
+                {'nome':'P', 'descricao':'Pequeno',      'largura':45,'altura':65,'comprimento':35,'peso':0.3},
+                {'nome':'M', 'descricao':'Médio',        'largura':50,'altura':70,'comprimento':40,'peso':0.4},
+                {'nome':'G', 'descricao':'Grande',       'largura':55,'altura':75,'comprimento':45,'peso':0.5},
+                {'nome':'GG','descricao':'Extra grande', 'largura':60,'altura':80,'comprimento':50,'peso':0.6},
             ]
-            TamanhoRoupa.objects.bulk_create([TamanhoRoupa(**tamanho) for tamanho in tamanhos])
-            print('Tamanho Roupa com sucesso!!!')
+            TamanhoRoupa.objects.bulk_create([TamanhoRoupa(**t) for t in tamanhos])
+            print('TamanhoRoupa criado.')
 
-        # Cria o registro Cursos se não existir
         if not Cursos.objects.exists():
             Cursos.objects.create(nome="Licenciatura em Pedagogia", nivel=2)
-            print('Cursos criado com sucesso!!!')
+            print('Curso criado.')
 
-        # Cria o registro Faculdades_ou_Escolas se não existir
         if not Faculdades_ou_Escolas.objects.exists():
             Faculdades_ou_Escolas.objects.create(nome="UNEB - Universidade Estadual da Bahia")
-            print('Faculdes ou Escola criado com sucesso!!!')
+            print('Faculdade criada.')
 
-        # Cria os registros Trimestre se não existirem
         if not Trimestre.objects.exists():
-            ano_letivo = AnoLetivo.objects.get(id=1)
-            trimestres = [
-                ('I Trimestre', ano_letivo, False),
-                ('II Trimestre', ano_letivo, False),
-                ('III Trimestre', ano_letivo, False),
-                ('Final', ano_letivo, True)
-            ]
-            Trimestre.objects.bulk_create([Trimestre(numero_nome=num, ano_letivo=ano, final=final) for num, ano, final in trimestres])
-            print('Trimestre criado com sucesso!!!')
+            try:
+                ano_letivo = AnoLetivo.objects.get(id=1)
+                Trimestre.objects.bulk_create([
+                    Trimestre(numero_nome=n, ano_letivo=ano_letivo, final=f)
+                    for n, f in [
+                        ('I Trimestre',False),('II Trimestre',False),
+                        ('III Trimestre',False),('Final',True),
+                    ]
+                ])
+                print('Trimestres criados.')
+            except AnoLetivo.DoesNotExist:
+                print("AnoLetivo id=1 não encontrado.")
 
-        # Cria os registros DiaSemana se não existirem
         if not DiaSemana.objects.exists():
-            dias_da_semana = [
-                (1, 'Segunda-feira'), (2, 'Terça-feira'), (3, 'Quarta-feira'), (4, 'Quinta-feira'),
-                (5, 'Sexta-feira'), (6, 'Sábado'), (7, 'Domingo')
-            ]
-            DiaSemana.objects.bulk_create([DiaSemana(numero_dia=num, nome_dia=nome) for num, nome in dias_da_semana])   
-            print('Dia da Semana criado com sucesso!!!')  
-        print(f"Todos registros criados com sucesso")
+            DiaSemana.objects.bulk_create([
+                DiaSemana(numero_dia=n, nome_dia=d)
+                for n, d in [
+                    (1,'Segunda-feira'),(2,'Terça-feira'),(3,'Quarta-feira'),
+                    (4,'Quinta-feira'),(5,'Sexta-feira'),(6,'Sábado'),(7,'Domingo'),
+                ]
+            ])
+            print('Dias da semana criados.')
 
-
-
-
-
-
-
-
-
-
-
-
+        print("\n✅ Todos os registros criados com sucesso.")
 
     except Exception as e:
-        print(f"Erro ao adicionar registros: {e}")
+        print(f"\n❌ Erro ao adicionar registros: {e}")
+        raise
+
 
 if __name__ == '__main__':
     iniciar_registros()

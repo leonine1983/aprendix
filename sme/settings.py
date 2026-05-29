@@ -116,11 +116,6 @@ else:
             'PORT': config('DB_PORT', default='5432'),
         }
     }
-# END DATABASE ----------------------------------------------------
-
-# END DATABASE ----------------------------------------------------
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -195,9 +190,6 @@ CKEDITOR_CONFIGS = {
     },
 }
 
-
-
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -215,8 +207,6 @@ mimetypes.types_map[".js"] = "text/javascript"
 X_FRAME_OPTIONS = 'DENY'
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-
-
 
 """
 # Email settings
@@ -249,7 +239,6 @@ MESSAGE_TAGS = {
 }
 
 
-
 # ===============================
 # CONFIGURAÇÕES DE SESSÃO E COOKIES
 # ===============================
@@ -278,5 +267,18 @@ LOGIN_URL = 'admin_acessos:login_create'
 SESSION_COOKIE_AGE = 3600  # 1 hora
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
+
+
+# Substitua o bloco VAPID fixo atual por isto:
+
+_vapid_pem = BASE_DIR / "vapid_private.pem"
+_vapid_pub = BASE_DIR / "vapid_public.txt"
+
+VAPID_PRIVATE_KEY = config("VAPID_PRIVATE_KEY", default=str(_vapid_pem) if _vapid_pem.exists() else "")
+VAPID_PUBLIC_KEY  = config("VAPID_PUBLIC_KEY",  default=_vapid_pub.read_text().strip() if _vapid_pub.exists() else "")
+VAPID_CLAIMS      = {"sub": f"mailto:{config('VAPID_CLAIMS_EMAIL', default='admin@prefeitura.gov.br')}"}
+
+PUSH_ICON_DEFAULT  = config("PUSH_ICON_DEFAULT",  default="/static/img/icon-192.png")
+PUSH_BADGE_DEFAULT = config("PUSH_BADGE_DEFAULT", default="/static/img/badge-72.png")
 
 
