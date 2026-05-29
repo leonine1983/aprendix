@@ -1,40 +1,47 @@
-from django.views.generic import TemplateView
-from django.utils import timezone
-from django.db import transaction
-from django.shortcuts import redirect
-from django.contrib import messages
-
-from ..baseMerendeiraView import BaseMerendeiraView
-from merendaEscolar.models import Cardapio, CardapioSemana, CardapioDia, CardapioItem, Receita
-
-from modulo_Merendeiras.models import (
-    ExecucaoCardapioDia,
-    verificar_disponibilidade_ingredientes,
-)
+import calendar
+from datetime import date
 
 from django.views.generic import TemplateView
 from django.utils import timezone
 from django.db import transaction
 from django.shortcuts import redirect
 from django.contrib import messages
+from django.utils.safestring import mark_safe
+from django.urls import reverse
 
 from ..baseMerendeiraView import BaseMerendeiraView
 from merendaEscolar.models import (
-    Cardapio, CardapioSemana, CardapioDia, CardapioItem, Receita, EstoqueEscola
+    Cardapio, CardapioSemana, CardapioDia, CardapioItem,
+    Receita, EstoqueEscola,
 )
-
 from modulo_Merendeiras.models import (
     ExecucaoCardapioDia,
     verificar_disponibilidade_ingredientes,
 )
 
 
-from django.db import transaction
-from django.utils import timezone
-from merendaEscolar.models import Receita
-from modulo_Merendeiras.models import ExecucaoCardapioDia
+# ──────────────────────────────────────────────────────────────────────────────
+# Helpers de calendário (idênticos ao CardapioHojeView)
+# ──────────────────────────────────────────────────────────────────────────────
+
+def _semana_do_mes(data: date) -> int:
+    """
+    Retorna o número da semana do mês (1-based) seguindo o calendário
+    visual Dom–Sáb, reiniciando a cada mês.
+    """
+    primeiro = data.replace(day=1)
+    col_primeiro = (primeiro.weekday() + 1) % 7   # dom=0, seg=1 … sáb=6
+    return (col_primeiro + data.day - 1) // 7 + 1
 
 
+def _total_semanas_do_mes(ano: int, mes: int) -> int:
+    ultimo_dia = date(ano, mes, calendar.monthrange(ano, mes)[1])
+    return _semana_do_mes(ultimo_dia)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Função auxiliar de execução (inalterada, apenas movida para cá)
+# ──────────────────────────────────────────────────────────────────────────────
 
 @transaction.atomic
 def executar_receita_individual(
@@ -46,7 +53,7 @@ def executar_receita_individual(
     turno,
     cardapio_dia=None,
     quantidade_alunos=None,
-    criar_execucao_receita=True,   # ← novo parâmetro
+    criar_execucao_receita=True,
 ):
     from modulo_Merendeiras.models import (
         ExecucaoReceitaCozinha,
@@ -61,7 +68,6 @@ def executar_receita_individual(
     if not disponivel:
         raise Exception("Estoque insuficiente para esta quantidade.")
 
-    # --- execução do dia (mestre) ---
     execucao_dia, created = ExecucaoCardapioDia.objects.get_or_create(
         escola=escola,
         data=data,
@@ -82,7 +88,6 @@ def executar_receita_individual(
         execucao_dia.quantidade_alunos = quantidade_alunos
         execucao_dia.save(update_fields=['quantidade_alunos'])
 
-    # --- execução da receita (opcional) ---
     exec_receita = None
     if criar_execucao_receita:
         exec_receita = ExecucaoReceitaCozinha.objects.create(
@@ -92,7 +97,6 @@ def executar_receita_individual(
             iniciado_por=usuario,
         )
 
-    # --- baixa estoque (FEFO) ---
     for ing in receita.ingredientes.all():
         quantidade_necessaria = ing.quantidade * porcoes
 
@@ -120,7 +124,7 @@ def executar_receita_individual(
                 quantidade=consumir,
                 tipo='RETIRADA_RECEITA',
                 usuario=usuario,
-                execucao_receita=exec_receita,   # será None se criar_execucao_receita=False
+                execucao_receita=exec_receita,
                 observacao=(
                     f"Lote: {estoque.lote} "
                     f"(Validade: {estoque.data_validade})"
@@ -130,7 +134,6 @@ def executar_receita_individual(
         if restante > 0:
             raise Exception(f"Erro ao debitar estoque de {ing.produto.nome}")
 
-    # --- finaliza execução da receita (apenas se foi criada) ---
     if exec_receita:
         exec_receita.status = 'FINALIZADA'
         exec_receita.finalizado_em = timezone.now()
@@ -140,7 +143,6 @@ def executar_receita_individual(
             update_fields=['status', 'finalizado_em', 'finalizado_por', 'rendimento_real']
         )
 
-    # --- descobre tipo de refeição ---
     tipo_refeicao = None
     if execucao_dia.cardapio_dia:
         ci = CardapioItem.objects.filter(
@@ -156,7 +158,6 @@ def executar_receita_individual(
     if not tipo_refeicao:
         raise Exception("Nenhum TipoRefeicao cadastrado no sistema.")
 
-    # --- item executado do cardápio ---
     exec_item, item_created = ExecucaoCardapioItem.objects.get_or_create(
         execucao_cardapio=execucao_dia,
         receita=receita,
@@ -183,7 +184,6 @@ def executar_receita_individual(
         if alterou:
             exec_item.save()
 
-    # --- status final do dia ---
     total_itens = execucao_dia.itens_executados.count()
     total_executados = execucao_dia.itens_executados.filter(status='EXECUTADO').count()
 
@@ -200,38 +200,61 @@ def executar_receita_individual(
         'cardapio_dia_id': execucao_dia.cardapio_dia.id if execucao_dia.cardapio_dia else None,
     }
 
+
+# ──────────────────────────────────────────────────────────────────────────────
+# View principal
+# ──────────────────────────────────────────────────────────────────────────────
+
 class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
     template_name = "modulo_merendeiras/cadapioHoje/preparar_execucao.html"
 
     TURNOS_DISPONIVEIS = [
-        ("MANHA", "Manhã"),
-        ("TARDE", "Tarde"),
-        ("NOITE", "Noite"),
+        ("MANHA",    "Manhã"),
+        ("TARDE",    "Tarde"),
+        ("NOITE",    "Noite"),
         ("INTEGRAL", "Integral"),
     ]
 
-    # ─────────────────────────────────────────────
-    def get_cardapio_do_dia(self, escola, hoje):
-        dia_semana = hoje.isoweekday()
-        if dia_semana > 5:
+    # ── Calendário ────────────────────────────────────────────────────────────
+
+    def get_cardapio_do_dia(self, escola, hoje: date):
+        """
+        Retorna o CardapioDia correspondente a hoje, usando a mesma lógica
+        de semanas do calendário visual (Dom–Sáb) aplicada em CardapioHojeView.
+        Retorna None em qualquer situação sem cardápio.
+        """
+        dia_semana_iso = hoje.isoweekday()
+        if dia_semana_iso > 5:
             return None
 
-        cardapio = Cardapio.objects.filter(
-            cardapioescola__escola=escola,
-            ativo=True,
-            data_inicio__lte=hoje,
-            data_fim__gte=hoje
-        ).first()
+        if not escola:
+            return None
+
+        cardapio = (
+            Cardapio.objects
+            .filter(
+                cardapioescola__escola=escola,
+                ativo=True,
+                data_inicio__lte=hoje,
+                data_fim__gte=hoje,
+            )
+            .first()
+        )
 
         if not cardapio:
             return None
 
-        dias_desde_inicio = (hoje - cardapio.data_inicio).days
-        numero_semana = (dias_desde_inicio // 7) + 1
+        # Semana pelo calendário visual do mês
+        numero_semana  = _semana_do_mes(hoje)
+        total_semanas  = _total_semanas_do_mes(hoje.year, hoje.month)
+
+        # Semana inexistente neste mês → ignora silenciosamente
+        if numero_semana > total_semanas:
+            return None
 
         semana = CardapioSemana.objects.filter(
             cardapio=cardapio,
-            numero=numero_semana
+            numero=numero_semana,
         ).first()
 
         if not semana:
@@ -239,10 +262,11 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
 
         return CardapioDia.objects.filter(
             semana=semana,
-            dia_semana=dia_semana
+            dia_semana=dia_semana_iso,
         ).first()
 
-    # ─────────────────────────────────────────────
+    # ── Helpers ───────────────────────────────────────────────────────────────
+
     def _calcular_maximo_porcoes(self, detalhes, rendimento_base=100):
         if not detalhes or not detalhes.get('ingredientes'):
             return rendimento_base
@@ -252,7 +276,6 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
         for ing in detalhes['ingredientes']:
             necessario = ing.get('necessario', 0)
             disponivel = ing.get('disponivel', 0)
-
             if necessario > 0:
                 ratio = disponivel / necessario
                 if ratio < min_ratio:
@@ -263,10 +286,11 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
 
         return min(int(min_ratio * rendimento_base), 1000)
 
-    # ─────────────────────────────────────────────
+    # ── GET ───────────────────────────────────────────────────────────────────
+
     def get(self, request, *args, **kwargs):
         escola = self.get_escola_usuario()
-        hoje = timezone.now().date()
+        hoje   = timezone.localdate()
 
         if not escola:
             messages.error(request, "Escola não encontrada.")
@@ -278,17 +302,20 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
 
         return super().get(request, *args, **kwargs)
 
-    # ─────────────────────────────────────────────
+    # ── Contexto ──────────────────────────────────────────────────────────────
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
-        escola = self.get_escola_usuario()
-        hoje = timezone.now().date()
+        escola       = self.get_escola_usuario()
+        hoje         = timezone.localdate()
         cardapio_dia = self.get_cardapio_do_dia(escola, hoje)
 
-        itens = CardapioItem.objects.filter(
-            dia=cardapio_dia
-        ).select_related('receita', 'tipo_refeicao')
+        itens = (
+            CardapioItem.objects
+            .filter(dia=cardapio_dia)
+            .select_related('receita', 'tipo_refeicao')
+        )
 
         itens_preparados = []
 
@@ -302,39 +329,43 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
             maximo = self._calcular_maximo_porcoes(info, rendimento)
 
             itens_preparados.append({
-                'item': item,
-                'estoque_ok': disponivel,
+                'item':             item,
+                'estoque_ok':       disponivel,
                 'porcoes_sugeridas': rendimento,
-                'porcoes_maximas': maximo,
-                'faltantes': info.get('faltantes', []),
-                'ingredientes': info['ingredientes'],
+                'porcoes_maximas':  maximo,
+                'faltantes':        info.get('faltantes', []),
+                'ingredientes':     info['ingredientes'],
             })
 
         ctx.update({
-            'cardapio': cardapio_dia,
-            'itens': itens_preparados,
-            'hoje': hoje,
-            'total_itens': len(itens_preparados),
-            'itens_com_estoque': sum(1 for i in itens_preparados if i['estoque_ok']),
+            'cardapio':           cardapio_dia,
+            'itens':              itens_preparados,
+            'hoje':               hoje,
+            'total_itens':        len(itens_preparados),
+            'itens_com_estoque':  sum(1 for i in itens_preparados if i['estoque_ok']),
             'turnos_disponiveis': [
                 {'valor': v, 'label': l} for v, l in self.TURNOS_DISPONIVEIS
             ],
-            'porcoes_presets': [100, 200, 300, 500],
+            'porcoes_presets':    [100, 200, 300, 500],
+            # informação de semana útil para debug/template
+            'numero_semana':      _semana_do_mes(hoje),
+            'total_semanas':      _total_semanas_do_mes(hoje.year, hoje.month),
         })
 
         return ctx
 
-    # ─────────────────────────────────────────────
+    # ── POST ──────────────────────────────────────────────────────────────────
+
     def post(self, request, *args, **kwargs):
         escola = self.get_escola_usuario()
-        hoje = timezone.now().date()
+        hoje   = timezone.localdate()
 
         if not escola:
             messages.error(request, "Escola não encontrada.")
             return redirect('modulo_merendeiras:cardapio_hoje')
 
         receita_id = request.POST.get('receita_id')
-        turno = request.POST.get('turno')
+        turno      = request.POST.get('turno')
 
         if not receita_id:
             messages.error(request, "Receita não informada.")
@@ -344,8 +375,7 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
             messages.error(request, "Selecione o turno.")
             return redirect('modulo_merendeiras:preparar_execucao')
 
-        turnos_validos = {t[0] for t in self.TURNOS_DISPONIVEIS}
-        if turno not in turnos_validos:
+        if turno not in {t[0] for t in self.TURNOS_DISPONIVEIS}:
             messages.error(request, "Turno inválido.")
             return redirect('modulo_merendeiras:preparar_execucao')
 
@@ -358,7 +388,6 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
             messages.error(request, "Informe ao menos 1 porção.")
             return redirect('modulo_merendeiras:preparar_execucao')
 
-        # ✅ BUSCA O CARDÁPIO ANTES DE EXECUTAR
         cardapio_dia = self.get_cardapio_do_dia(escola, hoje)
         if not cardapio_dia:
             messages.error(request, "Não há cardápio vinculado para hoje.")
@@ -374,100 +403,48 @@ class PrepararExecucaoView(BaseMerendeiraView, TemplateView):
                     porcoes=porcoes,
                     turno=turno,
                     cardapio_dia=cardapio_dia,
-                    criar_execucao_receita=False,   # ← sem ExecucaoReceitaCozinha
+                    criar_execucao_receita=False,
                 )
-                messages.success(
-                    request,
-                    f"Receita executada com sucesso ({porcoes} porções - {turno})."
-                )
-                from django.utils.safestring import mark_safe
-                from django.urls import reverse
-                url_execucoes = reverse('modulo_merendeiras:lista_execucoes')
-                messages.info(
-                    request,
-                    mark_safe(f""" <div style="
-    margin-top:12px;
-    padding:16px;
-    border:1px solid #dbeafe;
-    border-radius:14px;
-    background:#f8fbff;
-    color:#1e293b;
-    line-height:1.6;
-">
 
-    <div style="
-        font-size:15px;
-        font-weight:600;
-        margin-bottom:12px;
-        color:#0f172a;
-    ">
-        📋 Ficha Diária – Controle da Alimentação Escolar
+            messages.success(
+                request,
+                f"Receita executada com sucesso ({porcoes} porções — {turno})."
+            )
+
+            url_execucoes = reverse('modulo_merendeiras:lista_execucoes')
+            messages.info(request, mark_safe(f"""
+<div style="margin-top:12px;padding:16px;border:1px solid #dbeafe;
+            border-radius:14px;background:#f8fbff;color:#1e293b;line-height:1.6">
+  <div style="font-size:15px;font-weight:600;margin-bottom:12px;color:#0f172a">
+    📋 Ficha Diária – Controle da Alimentação Escolar
+  </div>
+  <div style="margin-bottom:14px;">
+    Após servir a alimentação aos alunos, acesse a área de execuções para
+    preencher a ficha diária referente ao cardápio executado, informando os
+    dados da refeição servida conforme a data e o turno.
+  </div>
+  <a href="{url_execucoes}" style="text-decoration:none;display:inline-block">
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;
+                border:1px solid #cbd5e1;border-radius:10px;background:#ffffff;
+                width:max-content;font-weight:600;color:#334155;cursor:pointer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M3 2h2l2.5 9H18l2-7H7"
+              stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="9"  cy="20" r="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <circle cx="17" cy="20" r="1.5" stroke="currentColor" stroke-width="1.8"/>
+      </svg>
+      Execuções
     </div>
-
-    <div style="margin-bottom:14px;">
-        Após servir a alimentação aos alunos, acesse a área de execuções
-        para preencher a ficha diária referente ao cardápio executado,
-        informando os dados da refeição servida conforme a data e o turno.
-    </div>
-
-    <a href="{url_execucoes}"
-       style="
-            text-decoration:none;
-            display:inline-block;
-       ">
-
-        <div style="
-            display:flex;
-            align-items:center;
-            gap:8px;
-            padding:10px 14px;
-            border:1px solid #cbd5e1;
-            border-radius:10px;
-            background:#ffffff;
-            width:max-content;
-            font-weight:600;
-            color:#334155;
-            transition:all .2s ease;
-            cursor:pointer;
-        ">
-
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M3 2h2l2.5 9H18l2-7H7"
-                      stroke="currentColor"
-                      stroke-width="1.8"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"/>
-                <circle cx="9" cy="20" r="1.5"
-                        stroke="currentColor"
-                        stroke-width="1.8"/>
-                <circle cx="17" cy="20" r="1.5"
-                        stroke="currentColor"
-                        stroke-width="1.8"/>
-            </svg>
-
-            <span class="sb-item__label">
-                Execuções
-            </span>
-        </div>
-    </a>
-
-    <div style="
-        margin-top:14px;
-        font-size:14px;
-        color:#475569;
-    ">
-        Em seguida, localize a execução desejada pela
-        <strong>data</strong> e pelo
-        <strong>turno</strong>,
-        e preencha a ficha correspondente.
-    </div>
-
+  </a>
+  <div style="margin-top:14px;font-size:14px;color:#475569">
+    Em seguida, localize a execução pela <strong>data</strong> e pelo
+    <strong>turno</strong>, e preencha a ficha correspondente.
+  </div>
 </div>
-                    """)
-                )
+            """))
 
         except Exception as e:
             messages.error(request, f"Erro: {str(e)}")
-
 
         return redirect('modulo_merendeiras:preparar_execucao')
