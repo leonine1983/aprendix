@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'docsGestao_Escolar',  
     'modulo_aluno',
     'modulo_professor',
+    'modulo_atividadesPedagogicas',
     # 🔹 Base institucional
     'core.apps.CoreConfig',
 

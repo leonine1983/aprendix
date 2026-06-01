@@ -58,7 +58,7 @@ urlpatterns = [
     path('core/', include('core.urls')), 
     path('rh/', include('rh.urls')),
     path('sga/Sist.Gest.Aprendizagem/', include('gestao_escolar.urls')),
-    #path('nutricao/', include('controle_estoque.urls')),
+    path('sga/atividadesPedagogicas/', include('modulo_atividadesPedagogicas.urls')),
     path('administrativo/', include('docsGestao_Escolar.urls')),
     path('acesso_aluno/', include('modulo_aluno.urls')),
     path('acesso_professor/', include('modulo_professor.urls')),

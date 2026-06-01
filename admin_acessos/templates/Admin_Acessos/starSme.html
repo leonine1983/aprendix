@@ -5,520 +5,706 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Portal Digital da Educação | SME</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
-:root{
-    --bg: linear-gradient(135deg,#eef2f7,#dfe7ef);
-    --glass: rgba(255,255,255,.55);
-    --border: rgba(255,255,255,.35);
-    --text: #1f2933;
-    --muted:#5f6c7b;
-    --primary:#2563eb;
-    --shadow:0 30px 60px rgba(0,0,0,.15);
+:root {
+  --bg: linear-gradient(135deg,#eef2f7,#dfe7ef);
+  --glass: rgba(255,255,255,.58);
+  --glass-card: rgba(255,255,255,.82);
+  --border: rgba(255,255,255,.45);
+  --text: #1a2332;
+  --muted: #5a6a7a;
+  --primary: #1d4ed8;
+  --primary-light: #3b82f6;
+  --accent: #0ea5e9;
+  --green: #059669;
+  --shadow: 0 32px 64px rgba(0,0,0,.13);
+  --shadow-card: 0 8px 32px rgba(30,64,175,.10);
+  --radius: 28px;
 }
 
-*{
-    box-sizing:border-box;
-    font-family:"Segoe UI",system-ui,sans-serif;
-    margin:0;
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+body {
+  background: var(--bg);
+  min-height: 100vh;
+  padding: clamp(12px, 3vw, 28px);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  overflow-y: auto;
 }
 
-body{
-    background:var(--bg);
-    min-height:100vh;
-    padding:20px;
-    color:var(--text);
-    overflow-y:auto; /* 🔹 garante rolagem */
-}
-/* TEXTURA DE FUNDO */
-.bg-texture{
-    position:fixed;
-    inset:0;
-    width:100%;
-    height:100%;
-    z-index:-1;
-    pointer-events:none;
+/* ── SVG BACKGROUND (keep original) ─────────────────── */
+.bg-texture {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .5;
 }
 
-
-/* APP CONTAINER */
-.app{
-    width:100%;
-    max-width:1100px;
-    margin:0 auto;
-    background:var(--glass);
-    backdrop-filter:blur(20px);
-    border-radius:32px;
-    border:1px solid var(--border);
-    box-shadow:var(--shadow);
-    padding:40px 36px 36px;
+/* ── APP SHELL ───────────────────────────────────────── */
+.app {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  background: var(--glass);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 36px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: clamp(28px, 5vw, 52px) clamp(20px, 5vw, 48px) 44px;
 }
 
-/* HEADER */
-header{
-    text-align:center;
-    margin-bottom:36px;
+/* ── HEADER ──────────────────────────────────────────── */
+header {
+  text-align: center;
+  margin-bottom: 40px;
 }
 
-header img{
-    max-width:300px;
-    width:100%;
-    margin-bottom:16px;
-    transition:.3s;
+.header-logo-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,.75);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 14px 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(30,64,175,.08);
 }
 
-header h1{
-    font-size:1.8rem;
-    margin-bottom:10px;
+header img {
+  max-width: 160px;
+  width: 100%;
 }
 
-header p{
-    max-width:760px;
-    margin:0 auto;
-    color:var(--muted);
-    line-height:1.6;
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(29,78,216,.10);
+  border: 1px solid rgba(29,78,216,.18);
+  color: var(--primary);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin-bottom: 14px;
 }
 
-/* NAV */
-.nav{
-    display:flex;
-    justify-content:center;
-    gap:12px;
-    margin:36px 0 28px;
-    flex-wrap:wrap;
+header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.55rem, 4vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 14px;
+  color: var(--text);
 }
 
-.nav button{
-    background:rgba(255,255,255,.7);
-    border:1px solid var(--border);
-    padding:10px 22px;
-    border-radius:14px;
-    cursor:pointer;
-    font-size:.95rem;
-    transition:.25s;
+header p {
+  max-width: 680px;
+  margin: 0 auto;
+  color: var(--muted);
+  line-height: 1.65;
+  font-size: clamp(.88rem, 2vw, .97rem);
+}
+
+/* ── DIVIDER ─────────────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(30,64,175,.15), transparent);
+  margin: 32px 0;
+}
+
+/* ── NAV ─────────────────────────────────────────────── */
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+}
+
+.nav button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,.72);
+  border: 1px solid var(--border);
+  padding: 10px 24px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .93rem;
+  font-weight: 500;
+  color: var(--muted);
+  transition: all .22s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
 }
 
 .nav button.active,
-.nav button:hover{
-    background:var(--primary);
-    color:#fff;
+.nav button:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 6px 20px rgba(29,78,216,.28);
+  transform: translateY(-1px);
 }
 
-/* PAGES */
-.pages{
-    position:relative;
-    min-height:360px;
-    perspective:1200px;
+/* ── PAGES ───────────────────────────────────────────── */
+.pages { position: relative; min-height: 400px; }
+
+.page {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity .38s ease, transform .38s ease;
 }
 
-/* PAGE */
-.page{
-    position:absolute;
-    inset:0;
-    opacity:0;
-    transform:rotateY(90deg);
-    transition:.6s cubic-bezier(.4,.2,.2,1);
+.page.active {
+  opacity: 1;
+  transform: translateY(0);
+  position: relative;
+  pointer-events: auto;
 }
 
-.page.active{
-    opacity:1;
-    transform:rotateY(0);
-    position:relative;
+/* ── SECTION HEADING ─────────────────────────────────── */
+.section-heading {
+  margin-bottom: 28px;
 }
 
-/* GRID */
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:32px;
-    padding-bottom:20px;
+.section-heading h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  color: var(--text);
+  font-weight: 600;
 }
 
-/* CARD */
-.card{
-    background:rgba(255,255,255,.75);
-    border-radius:26px;
-    padding:42px 30px;
-    text-align:center;
-    box-shadow:0 25px 55px rgba(0,0,0,.12);
-    text-decoration:none;
-    color:inherit;
-    transition:.35s;
-    position:relative;
+.section-heading p {
+  font-size: .875rem;
+  color: var(--muted);
+  margin-top: 4px;
 }
 
-.card:hover{
-    transform:translateY(-10px) scale(1.02);
+/* ── GRID ────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  padding-bottom: 8px;
 }
 
-.icon{
-    font-size:4rem;
-    margin-bottom:16px;
+/* ── CARD ────────────────────────────────────────────── */
+.card {
+  background: var(--glass-card);
+  border-radius: 22px;
+  padding: 32px 26px 28px;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid rgba(255,255,255,.6);
+  box-shadow: var(--shadow-card);
+  transition: all .3s cubic-bezier(.34,1.56,.64,1);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  overflow: hidden;
 }
 
-/* TOOLTIP */
-.card::after{
-    content:attr(data-tip);
-    position:absolute;
-    bottom:120%;
-    left:50%;
-    transform:translateX(-50%);
-    background:#111827;
-    color:#fff;
-    padding:12px 16px;
-    border-radius:14px;
-    font-size:.85rem;
-    line-height:1.4;
-    width:260px;
-    opacity:0;
-    pointer-events:none;
-    transition:.3s;
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(29,78,216,.05), transparent 60%);
+  opacity: 0;
+  transition: opacity .3s;
 }
 
-.card:hover::after{
-    opacity:1;
+.card:hover {
+  transform: translateY(-7px) scale(1.015);
+  box-shadow: 0 20px 48px rgba(29,78,216,.16);
+  border-color: rgba(29,78,216,.18);
 }
 
-/* CONTACT */
-.contact{
-    max-width:520px;
-    margin:0 auto;
-    text-align:center;
+.card:hover::before { opacity: 1; }
+
+/* Icon wrap */
+.card-icon {
+  width: 62px;
+  height: 62px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(0,0,0,.10);
 }
 
-.contact p{
-    margin-bottom:20px;
-    color:var(--muted);
+.card-icon svg { width: 30px; height: 30px; }
+
+/* Color themes */
+.card:nth-child(1) .card-icon { background: linear-gradient(135deg,#eff6ff,#dbeafe); }
+.card:nth-child(1) .card-icon svg { color: #2563eb; }
+
+.card:nth-child(2) .card-icon { background: linear-gradient(135deg,#ecfdf5,#d1fae5); }
+.card:nth-child(2) .card-icon svg { color: #059669; }
+
+.card:nth-child(3) .card-icon { background: linear-gradient(135deg,#fef9c3,#fde68a); }
+.card:nth-child(3) .card-icon svg { color: #d97706; }
+
+.card:nth-child(4) .card-icon { background: linear-gradient(135deg,#fdf4ff,#f3e8ff); }
+.card:nth-child(4) .card-icon svg { color: #9333ea; }
+
+.card-label {
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
 }
 
-.contact input,
-.contact textarea{
-    width:100%;
-    padding:14px;
-    border-radius:14px;
-    border:1px solid #d1d5db;
-    margin-bottom:14px;
-    font-size:.95rem;
+.card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text);
 }
 
-.contact button{
-    padding:14px 28px;
-    border:none;
-    border-radius:16px;
-    background:var(--primary);
-    color:#fff;
-    font-size:1rem;
-    cursor:pointer;
+.card-desc {
+  font-size: .875rem;
+  color: var(--muted);
+  line-height: 1.6;
+  flex-grow: 1;
 }
 
-/* 📱 MOBILE AJUSTES CRÍTICOS */
-@media(max-width:600px){
-
-    header img{
-        max-width:200px; /* 🔹 logo menor no mobile */
-    }
-
-    header h1{
-        font-size:1.4rem;
-    }
-
-    .app{
-        padding:28px 20px 32px;
-        border-radius:26px;
-    }
-
-    .icon{
-        font-size:3.4rem;
-    }
-
-    
-
-    .pages{
-        perspective:none;      /* remove efeito 3D no mobile */
-        min-height:auto;
-    }
-
-    .page{
-        position:relative;     /* evita empurrar conteúdo para baixo */
-        transform:none !important;
-        opacity:1 !important;
-        display:none;          /* controla via JS */
-    }
-
-    .page.active{
-        display:block;
-    }
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0,0,0,.06);
 }
 
+.card-link-text {
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--primary);
 }
-/* Overlay total da tela */
+
+.card-arrow {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: rgba(29,78,216,.09);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s, transform .2s;
+}
+
+.card:hover .card-arrow {
+  background: var(--primary);
+  transform: translateX(2px);
+}
+
+.card:hover .card-arrow svg { color: #fff; }
+
+.card-arrow svg {
+  width: 15px;
+  height: 15px;
+  color: var(--primary);
+  transition: color .2s;
+}
+
+/* ── CONTACT PAGE ────────────────────────────────────── */
+.contact-wrap {
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.contact-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.contact-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.contact-header p {
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.6;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 6px;
+  letter-spacing: .03em;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,.1);
+  background: rgba(255,255,255,.8);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .92rem;
+  color: var(--text);
+  transition: border .2s, box-shadow .2s;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+}
+
+.form-group textarea { resize: vertical; min-height: 110px; }
+
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: .02em;
+  margin-top: 6px;
+  transition: opacity .2s, transform .2s, box-shadow .2s;
+  box-shadow: 0 6px 22px rgba(29,78,216,.30);
+}
+
+.btn-submit:hover {
+  opacity: .92;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(29,78,216,.36);
+}
+
+/* ── FOOTER ──────────────────────────────────────────── */
+.app-footer {
+  margin-top: 40px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(0,0,0,.07);
+  text-align: center;
+  font-size: .78rem;
+  color: var(--muted);
+  opacity: .8;
+}
+
+/* ── OVERLAY MESSAGE ─────────────────────────────────── */
 .message-overlay {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-
-    /* Background sofisticado */
-    background: linear-gradient(
-        135deg,
-        rgba(25, 118, 210, 0.85),
-        rgba(46, 125, 50, 0.85)
-    );
-
-    backdrop-filter: blur(6px);
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  background: linear-gradient(135deg,rgba(25,118,210,.85),rgba(46,125,50,.85));
+  backdrop-filter: blur(6px);
 }
 
-/* Card central */
 .message-card {
-    background: rgba(255, 255, 255, 0.92);
-    padding: 50px 60px;
-    border-radius: 20px;
-    text-align: center;
-    width: 90%;
-    max-width: 450px;
-
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
-    animation: scaleIn 0.35s ease;
+  background: rgba(255,255,255,.93);
+  padding: 50px 60px;
+  border-radius: 20px;
+  text-align: center;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 25px 60px rgba(0,0,0,.25);
+  animation: scaleIn .35s ease;
 }
 
-/* Ícone */
-.message-icon {
-    width: 90px;
-    margin-bottom: 25px;
-}
-
-/* Título */
-.message-title {
-    margin-bottom: 10px;
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: #2e7d32;
-}
-
-/* Texto */
-.message-text {
-    font-size: 1.05rem;
-    margin-bottom: 25px;
-    color: #333;
-}
-
-/* Botão */
+.message-icon { width: 90px; margin-bottom: 25px; }
+.message-title { margin-bottom: 10px; font-size: 1.4rem; font-weight: 600; color: #2e7d32; }
+.message-text { font-size: 1.05rem; margin-bottom: 25px; color: #333; }
 .message-button {
-    background-color: #2e7d32;
-    color: #fff;
-    border: none;
-    padding: 10px 30px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background 0.2s ease;
+  background-color: #2e7d32; color: #fff; border: none;
+  padding: 10px 30px; border-radius: 8px; cursor: pointer;
+  font-weight: 500; transition: background .2s;
 }
+.message-button:hover { background-color: #1b5e20; }
 
-.message-button:hover {
-    background-color: #1b5e20;
-}
-
-/* Animação */
 @keyframes scaleIn {
-    from {
-        opacity: 0;
-        transform: scale(0.85);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+  from { opacity: 0; transform: scale(.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────── */
+@media (max-width: 600px) {
+  .app { border-radius: 26px; }
+  header img { max-width: 130px; }
+  header h1 { font-size: 1.4rem; }
+  .grid { grid-template-columns: 1fr; gap: 14px; }
+  .card { padding: 24px 20px 20px; }
+  .page {
+    position: relative;
+    transform: none !important;
+    opacity: 1 !important;
+    display: none;
+    pointer-events: auto;
+  }
+  .page.active { display: block; }
+  .pages { min-height: auto; }
 }
 </style>
 </head>
 
 <body>
 
-    <!-- TEXTURA INSTITUCIONAL -->
-<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" 
-     style="position: absolute; top: 0; left: 0; z-index: -1; pointer-events: none; opacity: 0.6;">
-  
+<!-- TEXTURA INSTITUCIONAL (mantida original) -->
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"
+     style="position:fixed;top:0;left:0;z-index:-1;pointer-events:none;opacity:.5;">
   <defs>
     <pattern id="eduTechOutline" x="0" y="0" width="500" height="500" patternUnits="userSpaceOnUse">
-      
       <g fill="none" stroke="#334155" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        
-        <g transform="translate(40, 50) rotate(-15)">
-          <path d="M2,10 Q12,5 22,10 V40 Q12,35 2,40 V10 Z M22,10 Q32,5 42,10 V40 Q32,35 22,40 V10" />
-          <line x1="22" y1="10" x2="22" y2="40" />
-          <path d="M6,15 H18 M26,15 H38 M6,22 H18 M26,22 H38" stroke-width="1" opacity="0.6"/>
+        <g transform="translate(40,50) rotate(-15)">
+          <path d="M2,10 Q12,5 22,10 V40 Q12,35 2,40 V10 Z M22,10 Q32,5 42,10 V40 Q32,35 22,40 V10"/>
+          <line x1="22" y1="10" x2="22" y2="40"/>
+          <path d="M6,15 H18 M26,15 H38 M6,22 H18 M26,22 H38" stroke-width="1" opacity=".6"/>
         </g>
-        
-        <g transform="translate(150, 40) rotate(45)">
-          <path d="M5,0 L15,0 L15,40 L10,50 L5,40 Z" />
-          <line x1="5" y1="5" x2="15" y2="5" />
-          <line x1="10" y1="0" x2="10" y2="40" opacity="0.5"/>
+        <g transform="translate(150,40) rotate(45)">
+          <path d="M5,0 L15,0 L15,40 L10,50 L5,40 Z"/>
+          <line x1="5" y1="5" x2="15" y2="5"/>
+          <line x1="10" y1="0" x2="10" y2="40" opacity=".5"/>
         </g>
-
-        <g transform="translate(350, 60) rotate(5)">
-          <rect x="0" y="0" width="40" height="28" rx="2" />
+        <g transform="translate(350,60) rotate(5)">
+          <rect x="0" y="0" width="40" height="28" rx="2"/>
           <line x1="-4" y1="32" x2="44" y2="32" stroke-width="2"/>
-          <line x1="18" y1="28" x2="22" y2="28" />
+          <line x1="18" y1="28" x2="22" y2="28"/>
         </g>
-
-        <g transform="translate(440, 40) rotate(-10)">
-          <polyline points="10,0 0,10 10,20" />
-          <polyline points="20,0 30,10 20,20" />
-          <line x1="12" y1="22" x2="18" y2="-2" />
+        <g transform="translate(440,40) rotate(-10)">
+          <polyline points="10,0 0,10 10,20"/>
+          <polyline points="20,0 30,10 20,20"/>
+          <line x1="12" y1="22" x2="18" y2="-2"/>
         </g>
-
-        <g transform="translate(100, 400) rotate(20)">
-          <rect x="0" y="0" width="24" height="24" rx="2" />
+        <g transform="translate(100,400) rotate(20)">
+          <rect x="0" y="0" width="24" height="24" rx="2"/>
           <path d="M-4,6 H0 M-4,12 H0 M-4,18 H0 M24,6 H28 M24,12 H28 M24,18 H28 M6,-4 V0 M12,-4 V0 M18,-4 V0 M6,24 V28 M12,24 V28 M18,24 V28" stroke-width="1"/>
-          <rect x="6" y="6" width="12" height="12" stroke-width="1" opacity="0.6"/>
+          <rect x="6" y="6" width="12" height="12" stroke-width="1" opacity=".6"/>
         </g>
-
-        <g transform="translate(280, 200)">
-          <ellipse cx="20" cy="20" rx="20" ry="6" transform="rotate(0 20 20)" />
-          <ellipse cx="20" cy="20" rx="20" ry="6" transform="rotate(60 20 20)" />
-          <ellipse cx="20" cy="20" rx="20" ry="6" transform="rotate(120 20 20)" />
-          <circle cx="20" cy="20" r="3" />
+        <g transform="translate(280,200)">
+          <ellipse cx="20" cy="20" rx="20" ry="6" transform="rotate(0 20 20)"/>
+          <ellipse cx="20" cy="20" rx="20" ry="6" transform="rotate(60 20 20)"/>
+          <ellipse cx="20" cy="20" rx="20" ry="6" transform="rotate(120 20 20)"/>
+          <circle cx="20" cy="20" r="3"/>
         </g>
-
-        <g transform="translate(50, 200) rotate(15)">
-          <path d="M25,15 L28,10 L34,12 L35,18 L40,20 L40,26 L35,28 L34,34 L28,36 L25,31 L19,31 L16,36 L10,34 L9,28 L4,26 L4,20 L9,18 L10,12 L16,10 L19,15 Z" stroke-linejoin="round"/>
-          <circle cx="22" cy="23" r="5" />
+        <g transform="translate(50,200) rotate(15)">
+          <path d="M25,15 L28,10 L34,12 L35,18 L40,20 L40,26 L35,28 L34,34 L28,36 L25,31 L19,31 L16,36 L10,34 L9,28 L4,26 L4,20 L9,18 L10,12 L16,10 L19,15 Z"/>
+          <circle cx="22" cy="23" r="5"/>
         </g>
-
-        <g transform="translate(420, 250) rotate(-5)">
-          <rect x="0" y="10" width="30" height="20" rx="4" />
-          <line x1="8" y1="10" x2="8" y2="0" />
-          <circle cx="8" cy="-2" r="2" />
-          <line x1="22" y1="10" x2="22" y2="0" />
-          <circle cx="22" cy="-2" r="2" />
+        <g transform="translate(420,250) rotate(-5)">
+          <rect x="0" y="10" width="30" height="20" rx="4"/>
+          <line x1="8" y1="10" x2="8" y2="0"/>
+          <circle cx="8" cy="-2" r="2"/>
+          <line x1="22" y1="10" x2="22" y2="0"/>
+          <circle cx="22" cy="-2" r="2"/>
           <circle cx="9" cy="18" r="2" fill="none"/>
           <circle cx="21" cy="18" r="2" fill="none"/>
-          <path d="M10,24 Q15,28 20,24" fill="none" />
+          <path d="M10,24 Q15,28 20,24" fill="none"/>
         </g>
-
-        <g transform="translate(200, 350) rotate(-10)">
-          <path d="M15,5 Q20,0 25,5 Q32,8 30,18 Q28,28 15,30 Q2,28 0,18 Q-2,8 5,5 Q10,0 15,5 Z" />
+        <g transform="translate(200,350) rotate(-10)">
+          <path d="M15,5 Q20,0 25,5 Q32,8 30,18 Q28,28 15,30 Q2,28 0,18 Q-2,8 5,5 Q10,0 15,5 Z"/>
           <path d="M15,5 Q15,0 20,-5" fill="none"/>
         </g>
-
-        <g transform="translate(380, 420)">
-          <path d="M10,20 Q5,10 15,5 Q25,0 35,10 Q45,5 50,20 Q55,35 40,40 Q30,45 20,40 Q5,40 10,20 Z" />
-          <path d="M20,10 Q25,20 30,10 M15,25 Q25,30 35,25" opacity="0.5"/>
+        <g transform="translate(380,420)">
+          <path d="M10,20 Q5,10 15,5 Q25,0 35,10 Q45,5 50,20 Q55,35 40,40 Q30,45 20,40 Q5,40 10,20 Z"/>
+          <path d="M20,10 Q25,20 30,10 M15,25 Q25,30 35,25" opacity=".5"/>
         </g>
-
         <circle cx="200" cy="100" r="1.5" fill="#334155" stroke="none"/>
         <circle cx="300" cy="400" r="1.5" fill="#334155" stroke="none"/>
         <path d="M100,100 L108,108 M108,100 L100,108" stroke-width="1" transform="translate(20,20)"/>
         <rect x="400" y="150" width="6" height="6" stroke-width="1"/>
-
       </g>
-
-      <use href="#eduTechOutline" x="250" y="250" transform="rotate(180 250 250)" opacity="0.7"/>
-
+      <use href="#eduTechOutline" x="250" y="250" transform="rotate(180 250 250)" opacity=".7"/>
     </pattern>
   </defs>
-
-  <rect width="100%" height="100%" fill="url(#eduTechOutline)" />
+  <rect width="100%" height="100%" fill="url(#eduTechOutline)"/>
 </svg>
-
 
 <div class="app">
 
-<header>
-     
-    <img src="{% static 'prefeitura.png' %}" alt="Prefeitura Municipal" style='width:150px'>
+  <!-- HEADER -->
+  <header>
+    <div class="header-logo-wrap">
+      <img src="{% static 'prefeitura.png' %}" alt="Prefeitura Municipal">
+    </div>
+    <div class="header-badge">
+      <!-- dot -->
+      <svg width="7" height="7" viewBox="0 0 7 7" fill="none"><circle cx="3.5" cy="3.5" r="3.5" fill="#1d4ed8"/></svg>
+      Plataforma Oficial · SME
+    </div>
     <h1>Portal Digital da Educação</h1>
-   
     <p>
-        Plataforma oficial da <strong>Secretaria Municipal da Educação</strong>,
-        desenvolvida para centralizar sistemas educacionais e administrativos,
-        oferecendo uma experiência moderna, acessível e eficiente para toda a comunidade escolar.
+      Plataforma oficial da <strong>Secretaria Municipal da Educação</strong> — centralizando
+      sistemas educacionais e administrativos com experiência moderna, acessível e eficiente
+      para toda a comunidade escolar.
     </p>
-</header>
+  </header>
 
+  <div class="divider"></div>
 
-<nav class="nav">
-    <button class="active" onclick="openTab('servicos', this)">Serviços</button>
-    <button onclick="openTab('contato', this)">Contato</button>
-</nav>
+  <!-- NAV -->
+  <nav class="nav">
+    <button class="active" onclick="openTab('servicos',this)">
+      <!-- grid icon -->
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Serviços
+    </button>
+    <button onclick="openTab('contato',this)">
+      <!-- mail icon -->
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+      Contato
+    </button>
+  </nav>
 
-<section class="pages">
+  <!-- PAGES -->
+  <section class="pages">
 
+    <!-- SERVIÇOS -->
     <div class="page active" id="servicos">
-        <div class="grid">
+      <div class="section-heading">
+        <h2>Sistemas Disponíveis</h2>
+        <p>Acesse os módulos da Secretaria Municipal da Educação</p>
+      </div>
+      <div class="grid">
 
-            <!--<a class="card" href="{% url 'Gestao_Escolar:GE_inicio' %}"
-         
-               data-tip="Plataforma para acompanhamento pedagógico, lançamento de notas, matrículas online e gestão escolar integrada.">
-                <div class="icon">🎓</div>
-                <h3>Aprendix</h3>
-                <p>Gestão pedagógica e acadêmica</p>
-            </a>-->
+        <!-- Merenda -->
+        <a class="card" href="{% url 'admin_acessos:loginMerendaEscolar' %}">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 11l19-9-9 19-2-8-8-2z"/>
+            </svg>
+          </div>
+          <div class="card-label">Nutrição</div>
+          <h3>Merenda Escolar</h3>
+          <p class="card-desc">Controle de cardápios nutricionais, distribuição de refeições e acompanhamento da logística alimentar nas unidades escolares.</p>
+          <div class="card-footer">
+            <span class="card-link-text">Acessar sistema</span>
+            <div class="card-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+        </a>
 
-            <a class="card" href="{% url "admin_acessos:loginMerendaEscolar" %}"
-               data-tip="Sistema para controle da merenda escolar, cardápios nutricionais e distribuição de alimentos.">
-                <div class="icon">🍽️</div>
-                <h3>Merenda Escolar</h3>
-                <p>Nutrição e logística alimentar</p>
-            </a>
+        <!-- Atividade Pedagógica -->
+        <a class="card" href="{% url 'atividadePedagogica:inicio' %}">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </div>
+          <div class="card-label">Pedagógico</div>
+          <h3>Atividade Pedagógica</h3>
+          <p class="card-desc">Registro e acompanhamento de atividades pedagógicas, planos de aula, avaliações e relatórios de desempenho escolar.</p>
+          <div class="card-footer">
+            <span class="card-link-text">Acessar sistema</span>
+            <div class="card-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+        </a>
 
-            <a class="card" href="#"
-               data-tip="Gestão de materiais, patrimônio, estoque e distribuição interna da Secretaria.">
-                <div class="icon">🏢</div>
-                <h3>Depósito SME</h3>
-                <p>Controle de estoque e patrimônio</p>
-            </a>
+        <!-- Depósito -->
+        <a class="card" href="#">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
+            </svg>
+          </div>
+          <div class="card-label">Almoxarifado</div>
+          <h3>Depósito SME</h3>
+          <p class="card-desc">Gestão de materiais, controle de estoque, patrimônio e distribuição de insumos internos da Secretaria Municipal.</p>
+          <div class="card-footer">
+            <span class="card-link-text">Acessar sistema</span>
+            <div class="card-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+        </a>
 
-        </div>
+      </div>
     </div>
 
+    <!-- CONTATO -->
     <div class="page" id="contato">
-        <div class="contact">
-            <p>
-                Precisa de suporte ou tem alguma dúvida?
-                Entre em contato com a Secretaria Municipal da Educação.
-            </p>
-
-            <input type="text" placeholder="Nome">
-            <input type="email" placeholder="E-mail">
-            <textarea rows="4" placeholder="Mensagem"></textarea>
-            <button>Enviar</button>
+      <div class="contact-wrap">
+        <div class="contact-header">
+          <h2>Fale Conosco</h2>
+          <p>Precisa de suporte ou tem alguma dúvida? Entre em contato com a Secretaria Municipal da Educação.</p>
         </div>
+        <div class="form-group">
+          <label>Nome completo</label>
+          <input type="text" placeholder="Seu nome">
+        </div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" placeholder="seu@email.com.br">
+        </div>
+        <div class="form-group">
+          <label>Mensagem</label>
+          <textarea placeholder="Descreva sua dúvida ou solicitação..."></textarea>
+        </div>
+        <button class="btn-submit">Enviar mensagem</button>
+      </div>
     </div>
 
-</section>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    © 2025 Secretaria Municipal da Educação &nbsp;·&nbsp; Todos os direitos reservados
+  </footer>
 
 </div>
 
 <script>
-function openTab(id, btn){
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-
-    document.getElementById(id).classList.add('active');
-    btn.classList.add('active');
+function openTab(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
 }
+
+function closeMessage() {
+  const overlay = document.querySelector('.message-overlay');
+  if (overlay) overlay.remove();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.querySelector('.message-overlay');
+  if (overlay) setTimeout(() => overlay.remove(), 5000);
+});
 </script>
 
 </body>
 </html>
-
-<script>
-// Fecha a mensagem ao clicar no botão
-function closeMessage() {
-    const overlay = document.querySelector('.message-overlay');
-    if (overlay) {
-        overlay.remove();
-    }
-}
-
-// Remove automaticamente a mensagem após 5 segundos (5000 ms)
-window.addEventListener('DOMContentLoaded', () => {
-    const overlay = document.querySelector('.message-overlay');
-    if (overlay) {
-        setTimeout(() => overlay.remove(), 5000);
-    }
-});
-</script>

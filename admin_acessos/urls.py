@@ -20,9 +20,10 @@ app_name = 'admin_acessos'
 urlpatterns = [
     path('', startSme, name='starsme' ),
     path('merendaEscolar', loginMerendaEscolar, name='loginMerendaEscolar' ),
+    path('loginAprendix', CreateLoginView.as_view(), name='login_create' ),
 
     path('logout', LogoutView_logout.as_view(), name='logout' ),
-    path('loginAprendix', CreateLoginView.as_view(), name='login_create' ),
+    
     
     path('accounts/profile/', PainelAcessoView.as_view(), name='painel_acesso' ),    
     path('accounts/mensagem/', MensagemCreateView.as_view(), name='mensagem' ),      
