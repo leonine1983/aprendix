@@ -417,7 +417,8 @@ body {
   <header class="top-header">
     <div class="top-header-inner">
       <a class="header-brand" href="#">
-        <div class="header-brand-icon"><i class="fas fa-graduation-cap"></i></div>
+        {% load static %}
+        <img width='60px' src="{% static 'prefeitura.png' %}" alt="Prefeitura Municipal">
         <div>
           <div class="brand-text-title">Portal Educacional</div>
           <div class="brand-text-sub">Secretaria Municipal da Educação</div>
