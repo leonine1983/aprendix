@@ -1,0 +1,536 @@
+{% extends "atividadesPedagogicas/base_jogos.html" %}
+{% load static %}
+
+{% block title %}
+Cadastrar Jogo Pedagógico
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #4361ee;
+        --primary-light: #eef1fd;
+        --success: #2ec4b6;
+        --success-light: #e6f9f7;
+        --warning: #ff9f1c;
+        --warning-light: #fff4e5;
+        --danger: #e71d36;
+        --danger-light: #fde8ec;
+        --info: #4cc9f0;
+        --info-light: #e5f7fd;
+        --purple: #7209b7;
+        --purple-light: #f3e8fb;
+        --dark: #1e293b;
+        --gray-100: #f8fafc;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --border-radius: 16px;
+        --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
+        --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.08), 0 3px 8px rgba(0, 0, 0, 0.04);
+        --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* RESET E TIPOGRAFIA */
+    body {
+        font-family: var(--font-sans);
+        background: linear-gradient(135deg, #f0f4ff 0%, #e8edf8 50%, #f5f3ff 100%);
+        min-height: 100vh;
+        color: var(--gray-800);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .container-fluid {
+        max-width: 1200px;
+    }
+
+    /* CABEÇALHO DA PÁGINA */
+    .page-header {
+        position: relative;
+        padding: 0 0 8px 0;
+    }
+    .page-header h1 {
+        font-weight: 700;
+        font-size: 2rem;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, var(--dark) 0%, var(--gray-600) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .page-header p {
+        font-size: 0.95rem;
+        color: var(--gray-500);
+    }
+
+    /* CARDS */
+    .form-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-md);
+        transition: box-shadow var(--transition), transform var(--transition);
+        overflow: hidden;
+    }
+    .form-card:hover {
+        box-shadow: var(--shadow-lg);
+    }
+
+    .card-header {
+        background: transparent;
+        border-bottom: 1px solid var(--gray-200);
+        padding: 1.25rem 1.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .card-header .icon-badge {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .card-header h5 {
+        font-weight: 650;
+        color: var(--gray-800);
+        margin: 0;
+        font-size: 1.05rem;
+        letter-spacing: -0.01em;
+    }
+    .card-body {
+        padding: 1.5rem 1.75rem 1.75rem;
+    }
+
+    /* ÍCONES DOS CARDS */
+    .icon-badge.basic { background: var(--primary-light); color: var(--primary); }
+    .icon-badge.classification { background: var(--info-light); color: #0891b2; }
+    .icon-badge.pedagogical { background: var(--success-light); color: #0d9488; }
+    .icon-badge.media { background: var(--warning-light); color: #d97706; }
+    .icon-badge.tags { background: var(--purple-light); color: var(--purple); }
+
+    /* FORMULÁRIO */
+    .form-label {
+        font-weight: 600;
+        font-size: 0.75rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--gray-500);
+        margin-bottom: 0.4rem;
+        display: inline-block;
+    }
+
+    /* INPUTS, SELECTS, TEXTAREAS */
+    input[type="text"],
+    input[type="url"],
+    input[type="number"],
+    input[type="file"],
+    select,
+    textarea {
+        display: block;
+        width: 100%;
+        padding: 0.7rem 1rem;
+        font-size: 0.95rem;
+        font-family: var(--font-sans);
+        color: var(--gray-800);
+        background: #fff;
+        border: 1.5px solid var(--gray-200);
+        border-radius: 12px;
+        transition: all var(--transition);
+        box-shadow: var(--shadow-sm);
+        outline: none;
+        resize: vertical;
+    }
+    input[type="text"]:focus,
+    input[type="url"]:focus,
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+        background: #fff;
+    }
+    input[type="text"]:hover,
+    textarea:hover,
+    select:hover {
+        border-color: var(--gray-300);
+    }
+    input[type="file"] {
+        padding: 0.5rem;
+        cursor: pointer;
+    }
+    input[type="file"]::file-selector-button {
+        background: var(--gray-100);
+        border: 1px solid var(--gray-200);
+        border-radius: 8px;
+        padding: 0.4rem 1rem;
+        margin-right: 1rem;
+        font-weight: 500;
+        color: var(--gray-700);
+        cursor: pointer;
+        transition: background var(--transition);
+    }
+    input[type="file"]::file-selector-button:hover {
+        background: var(--gray-200);
+    }
+    select {
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        padding-right: 2.5rem;
+    }
+    textarea {
+        min-height: 120px;
+    }
+
+    /* FORM-TEXT */
+    .form-text {
+        font-size: 0.8rem;
+        color: var(--gray-400);
+        margin-top: 0.35rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    /* CHECKBOX PERSONALIZADO */
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin: 0;
+    }
+    .form-check input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--gray-300);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all var(--transition);
+        position: relative;
+        background: #fff;
+        flex-shrink: 0;
+    }
+    .form-check input[type="checkbox"]:checked {
+        background: var(--primary);
+        border-color: var(--primary);
+    }
+    .form-check input[type="checkbox"]:checked::after {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 1px;
+        width: 6px;
+        height: 11px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+    .form-check input[type="checkbox"]:focus {
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+    }
+    .form-check-label {
+        font-weight: 600;
+        color: var(--gray-700);
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    /* PUBLISH BOX */
+    .publish-box {
+        background: var(--gray-100);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    /* BOTÕES */
+    .btn {
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 0.65rem 1.75rem;
+        border-radius: 12px;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all var(--transition);
+        cursor: pointer;
+        letter-spacing: 0.02em;
+    }
+    .btn-primary {
+        background: var(--primary);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.35);
+    }
+    .btn-primary:hover {
+        background: #3651d4;
+        box-shadow: 0 6px 18px rgba(67, 97, 238, 0.45);
+        transform: translateY(-1px);
+    }
+    .btn-outline-secondary {
+        background: #fff;
+        color: var(--gray-600);
+        border: 1.5px solid var(--gray-200);
+    }
+    .btn-outline-secondary:hover {
+        background: var(--gray-100);
+        border-color: var(--gray-300);
+        color: var(--gray-800);
+    }
+
+    /* ROW GAP */
+    .g-3 {
+        --bs-gutter-y: 1rem;
+    }
+
+    /* ANIMAÇÕES */
+    @keyframes fadeSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .form-card {
+        animation: fadeSlideIn 0.45s ease forwards;
+    }
+    .form-card:nth-child(1) { animation-delay: 0s; }
+    .form-card:nth-child(2) { animation-delay: 0.05s; }
+    .form-card:nth-child(3) { animation-delay: 0.1s; }
+    .form-card:nth-child(4) { animation-delay: 0.15s; }
+    .form-card:nth-child(5) { animation-delay: 0.2s; }
+
+    /* RESPONSIVO */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.25rem;
+        }
+        .card-header {
+            padding: 1rem 1.25rem;
+        }
+        .page-header h1 {
+            font-size: 1.6rem;
+        }
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<div class="container-fluid py-4 px-3 px-md-4">
+    
+    <div class="row justify-content-center">
+        <div class="col-xl-10">
+
+            <!-- Cabeçalho -->
+            <div class="page-header d-flex align-items-center gap-3 mb-4 flex-wrap">
+                <span class="fs-1" aria-hidden="true">🎮</span>
+                <div>
+                    <h1 class="mb-1">Cadastro de Jogo Pedagógico</h1>
+                    <p class="mb-0">Preencha os campos abaixo para adicionar um novo jogo ao catálogo</p>
+                </div>
+            </div>
+
+            <form method="post"
+                  enctype="multipart/form-data"
+                  class="needs-validation"
+                  novalidate>
+                {% csrf_token %}
+
+                <!-- Card: Informações Básicas -->
+                <div class="form-card mb-4">
+                    <div class="card-header">
+                        <div class="icon-badge basic">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h5>Informações Básicas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label for="{{ form.titulo.id_for_label }}" class="form-label">Título do Jogo</label>
+                                {{ form.titulo }}
+                                <div class="form-text">💡 Escolha um nome atraente e descritivo.</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.tempo_estimado.id_for_label }}" class="form-label">Tempo Estimado</label>
+                                {{ form.tempo_estimado }}
+                            </div>
+                            <div class="col-12">
+                                <label for="{{ form.resumo.id_for_label }}" class="form-label">Resumo</label>
+                                {{ form.resumo }}
+                                <div class="form-text">📝 Breve descrição que aparecerá nos cards de listagem (máx. 200 caracteres).</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Classificação -->
+                <div class="form-card mb-4">
+                    <div class="card-header">
+                        <div class="icon-badge classification">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                            </svg>
+                        </div>
+                        <h5>Classificação</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.modalidade.id_for_label }}" class="form-label">Modalidade</label>
+                                {{ form.modalidade }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.dificuldade.id_for_label }}" class="form-label">Nível de Dificuldade</label>
+                                {{ form.dificuldade }}
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Disciplinas Relacionadas</label>
+                                {{ form.disciplinas }}
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Séries / Anos</label>
+                                {{ form.series }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Alinhamento Pedagógico -->
+                <div class="form-card mb-4">
+                    <div class="card-header">
+                        <div class="icon-badge pedagogical">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <h5>Alinhamento Pedagógico</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Habilidades BNCC</label>
+                                {{ form.habilidades_bncc }}
+                                <div class="form-text">📚 Selecione uma ou mais habilidades da BNCC contempladas.</div>
+                            </div>
+                            <div class="col-md-12">
+                                <label for="{{ form.objetivo_pedagogico.id_for_label }}" class="form-label">Objetivo Pedagógico</label>
+                                {{ form.objetivo_pedagogico }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Conteúdo e Mídia -->
+                <div class="form-card mb-4">
+                    <div class="card-header">
+                        <div class="icon-badge media">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h5>Conteúdo e Mídia</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label for="{{ form.descricao.id_for_label }}" class="form-label">Descrição Completa</label>
+                                {{ form.descricao }}
+                                <div class="form-text">📖 Instruções, regras e contextualização do jogo.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.imagem_capa.id_for_label }}" class="form-label">Imagem de Capa</label>
+                                {{ form.imagem_capa }}
+                                <div class="form-text">🖼️ Resolução ideal: 800×500px. Formatos: JPG, PNG.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.link_externo.id_for_label }}" class="form-label">Link Externo</label>
+                                {{ form.link_externo }}
+                                <div class="form-text">🔗 URL para acesso direto ao jogo (se aplicável).</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Tags e Visibilidade -->
+                <div class="form-card mb-4">
+                    <div class="card-header">
+                        <div class="icon-badge tags">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </div>
+                        <h5>Tags e Visibilidade</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Categorias</label>
+                                {{ form.categorias }}
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Tags</label>
+                                {{ form.tags }}
+                                <div class="form-text">🏷️ Palavras-chave que facilitam a busca (ex: tabuleiro, digital, cooperação).</div>
+                            </div>
+                            <div class="col-md-12 mt-2">
+                                <div class="publish-box">
+                                    {{ form.publicado }}
+                                    <label class="form-check-label" for="{{ form.publicado.id_for_label }}">
+                                        Publicar imediatamente ao salvar
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="d-flex justify-content-end align-items-center gap-3 mb-5 flex-wrap">
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg>
+                        Salvar Jogo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

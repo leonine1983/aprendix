@@ -1,0 +1,82 @@
+<!-- ══════════════════════════════════
+       [4] RODAPÉ PEDAGÓGICO
+       ══════════════════════════════════ -->
+  <footer class="rcs-footer" role="contentinfo">
+    <div class="rcs-footer__inner rcs-glass">
+      <!-- Objetivos -->
+      <div>
+        <h2 class="rcs-footer__section-title">Objetivos do Catálogo</h2>
+        <ul class="rcs-footer__obj-list" aria-label="Objetivos pedagógicos do catálogo">
+          <li class="rcs-footer__obj-item">
+            <div class="rcs-footer__obj-icon" aria-hidden="true">🎯</div>
+            <span>Articular os recursos à BNCC e ao currículo municipal</span>
+          </li>
+          <li class="rcs-footer__obj-item">
+            <div class="rcs-footer__obj-icon" aria-hidden="true">🤝</div>
+            <span>Apoiar o professor com orientações didáticas práticas</span>
+          </li>
+          <li class="rcs-footer__obj-item">
+            <div class="rcs-footer__obj-icon" aria-hidden="true">📊</div>
+            <span>Facilitar a avaliação formativa por habilidade BNCC</span>
+          </li>
+          <li class="rcs-footer__obj-item">
+            <div class="rcs-footer__obj-icon" aria-hidden="true">♿</div>
+            <span>Incluir adaptações para estudantes com necessidades especiais</span>
+          </li>
+          <li class="rcs-footer__obj-item">
+            <div class="rcs-footer__obj-icon" aria-hidden="true">🔄</div>
+            <span>Promover a interdisciplinaridade com Computação</span>
+          </li>
+          <li class="rcs-footer__obj-item">
+            <div class="rcs-footer__obj-icon" aria-hidden="true">🌱</div>
+            <span>Estimular a autonomia digital dos estudantes</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Formulário de sugestão -->
+      <div>
+        <h2 class="rcs-footer__section-title">Contribua com o Catálogo</h2>
+        <form class="rcs-suggestion-form" onsubmit="rcsApp.submitSuggestion(event)" aria-label="Formulário para envio de sugestão pedagógica" novalidate>
+          <div class="rcs-form-row">
+            <div class="rcs-form-field">
+              <label for="rcs-f-nome">Nome do professor</label>
+              <input type="text" id="rcs-f-nome" name="nome" placeholder="Seu nome" autocomplete="name" required>
+            </div>
+            <div class="rcs-form-field">
+              <label for="rcs-f-escola">Escola</label>
+              <input type="text" id="rcs-f-escola" name="escola" placeholder="Nome da escola" required>
+            </div>
+          </div>
+          <div class="rcs-form-row">
+            <div class="rcs-form-field">
+              <label for="rcs-f-comp">Componente</label>
+              <select id="rcs-f-comp" name="componente">
+                <option value="">Selecione...</option>
+                <option>Computação</option>
+                <option>Matemática</option>
+                <option>Ciências</option>
+                <option>Interdisciplinar</option>
+              </select>
+            </div>
+            <div class="rcs-form-field">
+              <label for="rcs-f-serie">Ano/Série</label>
+              <input type="text" id="rcs-f-serie" name="serie" placeholder="Ex: 4º ano">
+            </div>
+          </div>
+          <div class="rcs-form-field">
+            <label for="rcs-f-titulo">Título da atividade</label>
+            <input type="text" id="rcs-f-titulo" name="titulo" placeholder="Nome da sua atividade" required>
+          </div>
+          <div class="rcs-form-field">
+            <label for="rcs-f-objetivo">Objetivo pedagógico</label>
+            <textarea id="rcs-f-objetivo" name="objetivo" placeholder="Descreva brevemente o objetivo da atividade..."></textarea>
+          </div>
+          <button type="submit" class="rcs-btn rcs-btn--primary" aria-label="Enviar sugestão de atividade pedagógica">
+            ✉ Enviar Sugestão
+          </button>
+        </form>
+      </div>
+    </div>
+      {% include "global/partials/footers/index.html" %}
+  </footer>

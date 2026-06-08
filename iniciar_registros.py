@@ -11,6 +11,7 @@ from rh.models import *
 from gestao_escolar.models import *
 from django.contrib.auth.models import User, Group
 from datetime import datetime
+from modulo_atividadesPedagogicas.models import *
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -98,6 +99,295 @@ def _aplicar_vapid_no_settings(private_pem_path: str, public_key: str):
 # ══════════════════════════════════════════════════════════════════
 # 📦 REGISTROS PADRÃO
 # ══════════════════════════════════════════════════════════════════
+
+def criar_habilidades_bncc_computacao():
+
+    habilidades = [
+
+        (
+            "CD1.01",
+            "Reconhecer tecnologias digitais presentes no cotidiano e identificar suas diferentes finalidades."
+        ),
+
+        (
+            "CD1.02",
+            "Utilizar dispositivos digitais de forma segura, ética e responsável."
+        ),
+
+        (
+            "CD2.01",
+            "Identificar os principais componentes físicos (hardware) e lógicos (software) dos sistemas computacionais."
+        ),
+
+        (
+            "CD2.02",
+            "Compreender a interação entre hardware e software no funcionamento dos dispositivos digitais."
+        ),
+
+        (
+            "CD2.03",
+            "Reconhecer diferentes tipos de dispositivos computacionais e suas aplicações."
+        ),
+
+        (
+            "PC1.01",
+            "Resolver problemas simples utilizando decomposição."
+        ),
+
+        (
+            "PC1.02",
+            "Identificar padrões em situações do cotidiano."
+        ),
+
+        (
+            "PC1.03",
+            "Representar soluções utilizando sequências de passos."
+        ),
+
+        (
+            "PC2.01",
+            "Desenvolver algoritmos simples utilizando linguagem natural."
+        ),
+
+        (
+            "PC2.02",
+            "Construir sequências lógicas para resolução de problemas."
+        ),
+
+        (
+            "PC2.03",
+            "Identificar erros em sequências de instruções."
+        ),
+
+        (
+            "PC3.01",
+            "Aplicar conceitos de abstração na resolução de problemas."
+        ),
+
+        (
+            "PC3.02",
+            "Utilizar estruturas de repetição em atividades de programação."
+        ),
+
+        (
+            "PC3.03",
+            "Utilizar estruturas condicionais para tomada de decisão."
+        ),
+
+        (
+            "PC4.01",
+            "Desenvolver projetos computacionais utilizando linguagens de programação em blocos."
+        ),
+
+        (
+            "PC4.02",
+            "Testar e depurar programas."
+        ),
+
+        (
+            "PC4.03",
+            "Documentar soluções computacionais desenvolvidas."
+        ),
+
+        (
+            "MD1.01",
+            "Criar conteúdos digitais utilizando ferramentas adequadas."
+        ),
+
+        (
+            "MD1.02",
+            "Compartilhar conteúdos digitais respeitando princípios éticos."
+        ),
+
+        (
+            "MD1.03",
+            "Analisar criticamente informações encontradas em ambientes digitais."
+        ),
+
+        (
+            "MD2.01",
+            "Produzir projetos digitais colaborativos."
+        ),
+
+        (
+            "MD2.02",
+            "Utilizar recursos multimídia na comunicação digital."
+        ),
+
+        (
+            "MD2.03",
+            "Aplicar princípios básicos de design digital."
+        ),
+
+        (
+            "RC1.01",
+            "Identificar componentes básicos de sistemas robóticos."
+        ),
+
+        (
+            "RC1.02",
+            "Compreender a utilização de sensores e atuadores."
+        ),
+
+        (
+            "RC1.03",
+            "Montar protótipos simples utilizando kits educacionais."
+        ),
+
+        (
+            "RC2.01",
+            "Programar dispositivos robóticos para execução de tarefas."
+        ),
+
+        (
+            "RC2.02",
+            "Integrar sensores e programação em projetos de robótica."
+        ),
+
+        (
+            "RC2.03",
+            "Testar e aperfeiçoar soluções robóticas."
+        ),
+    ]
+
+    for codigo, descricao in habilidades:
+
+        HabilidadeBNCC.objects.get_or_create(
+            codigo=codigo,
+            defaults={
+                "descricao": descricao
+            }
+        )
+
+    print(
+        f"{len(habilidades)} habilidades BNCC Computação criadas."
+    )
+
+
+def criar_tags_jogos():
+
+    tags = [
+
+        # Computação
+        "Algoritmo",
+        "Computação",
+        "Computador",
+        "Hardware",
+        "Software",
+        "Internet",
+        "Rede de Computadores",
+        "Banco de Dados",
+
+        # Programação
+        "Programação",
+        "Lógica",
+        "Pensamento Computacional",
+        "Depuração",
+        "Scratch",
+        "Blockly",
+
+        # IA
+        "Inteligência Artificial",
+        "ChatGPT",
+
+        # Robótica
+        "Robótica",
+        "Arduino",
+        "Maker",
+        "Sensores",
+
+        # Cultura Digital
+        "Cultura Digital",
+        "Segurança Digital",
+        "Cyberbullying",
+        "Cidadania Digital",
+
+        # Matemática
+        "Matemática",
+        "Raciocínio Lógico",
+        "Geometria",
+        "Operações",
+
+        # Linguagens
+        "Leitura",
+        "Escrita",
+        "Alfabetização",
+        "Interpretação de Texto",
+
+        # Ciências
+        "Ciências",
+        "Meio Ambiente",
+        "Sustentabilidade",
+
+        # Humanas
+        "História",
+        "Geografia",
+
+        # Metodologias
+        "Gamificação",
+        "Aprendizagem Ativa",
+        "Aprendizagem Colaborativa",
+
+        # Formatos
+        "Quiz",
+        "Desafio",
+        "Missão",
+        "Caça ao Tesouro",
+        "Simulação",
+
+        # Inclusão
+        "Educação Inclusiva",
+        "Acessibilidade",
+
+        # Competências
+        "Criatividade",
+        "Resolução de Problemas",
+        "Trabalho em Equipe",
+        "Comunicação",
+    ]
+
+    for nome in tags:
+
+        Tag.objects.get_or_create(
+            nome=nome
+        )
+
+    print(
+        f"{len(tags)} tags pedagógicas criadas."
+    )
+
+
+def criar_categorias_jogos():
+
+    categorias = [
+
+        "Quiz",
+        "Jogo de Cartas",
+        "Jogo de Tabuleiro",
+        "Desafio",
+        "Caça ao Tesouro",
+        "Programação",
+        "Robótica",
+        "Pensamento Computacional",
+        "Realidade Virtual",
+        "Simulação",
+        "Gamificação",
+        "Atividade Desplugada",
+        "Atividade Plugada",
+        "Projeto Maker",
+        "Scratch",
+        "Arduino",
+    ]
+
+    for nome in categorias:
+
+        CategoriaJogo.objects.get_or_create(
+            nome=nome
+        )
+
+    print(
+        f"{len(categorias)} categorias criadas."
+    )
 
 def iniciar_registros():
     try:
@@ -400,7 +690,7 @@ def iniciar_registros():
             disciplinas = [
                 ('Língua Portuguesa',1),('Língua Inglesa',2),('Matemática',3),
                 ('Ciências',4),('Geografia',5),('História',6),
-                ('Educação Ambiental',7),('Educação Artística',8),('Educação Física',9),
+                ('Educação Ambiental',7),('Educação Artística',8),('Educação Física',9),('Computação e Robótica', 10)
             ]
             Disciplina.objects.bulk_create(
                 [Disciplina(nome=n, ordem_historico=o) for n, o in disciplinas]
@@ -474,6 +764,20 @@ def iniciar_registros():
                 ]
             ])
             print('Dias da semana criados.')
+
+        # ─────────────────────────────────────
+        # JOGOS PEDAGÓGICOS
+        # ─────────────────────────────────────
+
+        if not Tag.objects.exists():
+            criar_tags_jogos()
+
+        if not CategoriaJogo.objects.exists():
+            criar_categorias_jogos()
+
+        if not HabilidadeBNCC.objects.exists():
+            criar_habilidades_bncc_computacao()
+
 
         print("\n✅ Todos os registros criados com sucesso.")
 
