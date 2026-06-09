@@ -7,17 +7,32 @@ from datetime import datetime
 PYTHON_CMD = sys.executable
 
 APPS = [
-    "rh",
-    "admin_acessos",
-    "controle_estoque",
-    "gestao_escolar",
-    "modulo_professor",
-    "modulo_aluno",
-    "docsGestao_Escolar",
-    "core",
+    # meus apps
+    'rh',   
+    'admin_acessos',     
+    'gestao_escolar',  
+    #'controle_estoque', 
+    'docsGestao_Escolar',  
+    'modulo_aluno',
+    'modulo_professor',
+    'modulo_atividadesPedagogicas',
+    # 🔹 Base institucional
+    'core.apps.CoreConfig',
+
+    # 🔹 Domínio Merenda
     "merendaEscolar",
+
+    # 🔹 Módulos dependentes
     "modulo_Merendeiras",
     "modulo_coordenacao",
+
+    
+    'ckeditor',
+    'ckeditor_uploader',    
+    'widget_tweaks',
+    'django.contrib.humanize',
+    "django_extensions",
+    "arquitetura"
 ]
 
 LOG_FILE = "migracoes.log"
