@@ -1,0 +1,127 @@
+{% extends "atividadesPedagogicas/base_jogos.html" %}
+  {% block content  %}  
+  <section class="rcs-section" aria-label="Selecionar nível de ensino">
+       
+    <div class="rcs-level-selector">
+      <div class="rcs-level-selector__label" role="note">Selecione o nível de ensino</div>
+      <div class="rcs-level-selector__grid" role="tablist" aria-label="Níveis de ensino">
+
+        <!-- Educação Infantil -->
+        <div class="rcs-level-card rcs-level-card--infantil"
+             role="tab"
+             tabindex="0"
+             aria-selected="false"
+             aria-controls="rcs-panel-infantil"
+             data-level="infantil"
+             onclick="rcsApp.selectLevel('infantil')"
+             onkeydown="if(event.key==='Enter'||event.key===' ')rcsApp.selectLevel('infantil')">
+          <div class="rcs-level-card__active-dot" aria-hidden="true"></div>
+          <div class="rcs-level-card__icon" aria-hidden="true">🌱</div>
+          <div class="rcs-level-card__info">
+            <div class="rcs-level-card__name">Educação Infantil</div>
+            <div class="rcs-level-card__range">0 a 5 anos · Creche e Pré-Escola</div>
+            <span class="rcs-level-card__count">🎒 18 recursos</span>
+          </div>
+        </div>
+
+        <!-- Anos Iniciais -->
+        <div class="rcs-level-card rcs-level-card--iniciais rcs-level-card--active"
+             role="tab"
+             tabindex="0"
+             aria-selected="true"
+             aria-controls="rcs-panel-iniciais"
+             data-level="iniciais"
+             onclick="rcsApp.selectLevel('iniciais')"
+             onkeydown="if(event.key==='Enter'||event.key===' ')rcsApp.selectLevel('iniciais')">
+          <div class="rcs-level-card__active-dot" aria-hidden="true"></div>
+          <div class="rcs-level-card__icon" aria-hidden="true">📘</div>
+          <div class="rcs-level-card__info">
+            <div class="rcs-level-card__name">Anos Iniciais</div>
+            <div class="rcs-level-card__range">1º ao 5º ano · Ensino Fundamental</div>
+            <span class="rcs-level-card__count">📖 24 recursos</span>
+          </div>
+        </div>
+
+        <!-- Anos Finais -->
+        <div class="rcs-level-card rcs-level-card--finais"
+             role="tab"
+             tabindex="0"
+             aria-selected="false"
+             aria-controls="rcs-panel-finais"
+             data-level="finais"
+             onclick="rcsApp.selectLevel('finais')"
+             onkeydown="if(event.key==='Enter'||event.key===' ')rcsApp.selectLevel('finais')">
+          <div class="rcs-level-card__active-dot" aria-hidden="true"></div>
+          <div class="rcs-level-card__icon" aria-hidden="true">📗</div>
+          <div class="rcs-level-card__info">
+            <div class="rcs-level-card__name">Anos Finais</div>
+            <div class="rcs-level-card__range">6º ao 9º ano · Ensino Fundamental</div>
+            <span class="rcs-level-card__count">💻 31 recursos</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       [3] CONTEÚDO DO NÍVEL ATIVO
+       ══════════════════════════════════ -->
+  <section class="rcs-section" aria-label="Recursos pedagógicos">
+    <div class="rcs-content-panel rcs-glass" id="rcs-content-panel">
+
+      <!-- 3.1 Componentes Curriculares -->
+      <nav aria-label="Componentes curriculares">
+        <div class="rcs-component-nav" role="tablist" id="rcs-component-nav" aria-label="Filtrar por componente">
+          <!-- pills geradas via JS -->
+        </div>
+      </nav>
+
+      <!-- 3.2 Filtros + Busca -->
+      <div class="rcs-filter-bar" role="search">
+        <div class="rcs-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="search" id="rcs-search-input" placeholder="Buscar recurso..." aria-label="Buscar recurso">
+        </div>
+        <select class="rcs-filter-select" id="rcs-filter-tipo" aria-label="Filtrar por tipo">
+          <option value="">Tipo ▾</option>
+          <option value="plugado">Plugado</option>
+          <option value="desplugado">Desplugado</option>
+        </select>
+        <select class="rcs-filter-select" id="rcs-filter-dif" aria-label="Filtrar por dificuldade">
+          <option value="">Dificuldade ▾</option>
+          <option value="basico">Básico</option>
+          <option value="intermediario">Intermediário</option>
+          <option value="avancado">Avançado</option>
+        </select>
+      </div>
+      <div class="rcs-filter-tags" role="group" aria-label="Filtros rápidos" id="rcs-filter-tags">
+        <span class="rcs-filter-tag" tabindex="0" onclick="rcsApp.toggleTag(this)">Pensamento Computacional</span>
+        <span class="rcs-filter-tag" tabindex="0" onclick="rcsApp.toggleTag(this)">Cultura Digital</span>
+        <span class="rcs-filter-tag" tabindex="0" onclick="rcsApp.toggleTag(this)">Scratch</span>
+        <span class="rcs-filter-tag" tabindex="0" onclick="rcsApp.toggleTag(this)">Inteligência Artificial</span>
+        <span class="rcs-filter-tag" tabindex="0" onclick="rcsApp.toggleTag(this)">Desplugado</span>
+        <span class="rcs-filter-tag" tabindex="0" onclick="rcsApp.toggleTag(this)">Robótica</span>
+      </div>
+
+      <!-- 3.4 Destaques -->
+      <div class="rcs-featured" id="rcs-featured">
+        <div class="rcs-featured__title" aria-label="Recursos mais utilizados pelos professores">
+          ⭐ Mais Utilizados pelos Professores
+        </div>
+        <div class="rcs-featured__grid" id="rcs-featured-grid"></div>
+      </div>
+
+      <!-- 3.3 Todos os recursos -->
+      <div class="rcs-section-label" aria-label="Todos os recursos do nível selecionado">
+        Todos os recursos
+      </div>
+      <div class="rcs-resource-grid" id="rcs-resource-grid" role="list"></div>
+      <div class="rcs-empty" id="rcs-empty" style="display:none" aria-live="polite">
+        <div class="rcs-empty__icon">🔍</div>
+        <div class="rcs-empty__text">Nenhum recurso encontrado com esses filtros.</div>
+      </div>
+
+    </div>
+  </section>
+  {% endblock content  %}

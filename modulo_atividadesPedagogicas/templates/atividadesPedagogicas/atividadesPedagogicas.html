@@ -1,127 +1,47 @@
-{% extends "atividadesPedagogicas/base_jogos.html" %}
-  {% block content  %}  
-  <section class="rcs-section" aria-label="Selecionar nível de ensino">
-       
-    <div class="rcs-level-selector">
-      <div class="rcs-level-selector__label" role="note">Selecione o nível de ensino</div>
-      <div class="rcs-level-selector__grid" role="tablist" aria-label="Níveis de ensino">
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Horizonte da Aprendizagem — Fase 4: Missões e Atividades</title>
+{% include "atividadesPedagogicas/includes/ilha/_css_ilha.html" %}
+</head>
+<body>
+<div id="loading">
+  <h1>Horizonte da Aprendizagem</h1>
+  <p>Preparando sua jornada...</p>
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+</div>
 
-        <!-- Educação Infantil -->
-        <div class="rcs-level-card rcs-level-card--infantil"
-             role="tab"
-             tabindex="0"
-             aria-selected="false"
-             aria-controls="rcs-panel-infantil"
-             data-level="infantil"
-             onclick="rcsApp.selectLevel('infantil')"
-             onkeydown="if(event.key==='Enter'||event.key===' ')rcsApp.selectLevel('infantil')">
-          <div class="rcs-level-card__active-dot" aria-hidden="true"></div>
-          <div class="rcs-level-card__icon" aria-hidden="true">🌱</div>
-          <div class="rcs-level-card__info">
-            <div class="rcs-level-card__name">Educação Infantil</div>
-            <div class="rcs-level-card__range">0 a 5 anos · Creche e Pré-Escola</div>
-            <span class="rcs-level-card__count">🎒 18 recursos</span>
-          </div>
-        </div>
+<div id="trail-panel"><div id="trail-panel-inner"><div id="trail-icon-wrap"><span id="trail-icon-emoji">🌲</span></div><h2 id="trail-panel-name">Floresta dos Algoritmos</h2><p id="trail-panel-tema">Pensamento Computacional</p><p id="trail-panel-desc">Descrição da trilha.</p><div class="trail-concepts"><h4>Nesta região você aprenderá:</h4><ul id="trail-concept-list"></ul></div><div id="trail-status">🚧 Conteúdo em desenvolvimento</div><div class="trail-btns"><button class="btn-travel" id="trail-travel-btn">✈ Viajar</button><button class="btn-trail-close" onclick="closeTrailPanel()">✕ Fechar</button></div></div></div>
+<div id="discovery-notif"><div class="disc-stars">✨ ⭐ ✨</div><div class="disc-sub">Nova Região Descoberta!</div><div id="disc-name">Floresta dos Algoritmos</div></div>
+<div id="phase3-hud"><span class="hud-level" id="hud-level">Nível 1</span><span class="hud-sep">|</span><div class="hud-xp-wrap"><span class="hud-xp-label">XP <span id="hud-xp-text">0/100</span></span><div class="hud-xp-bar"><div class="hud-xp-fill" id="hud-xp-fill"></div></div></div><span class="hud-sep">|</span><span class="hud-crystals">💎 <span id="hud-crystals">0</span></span></div>
+<div id="notif-container"></div>
+<div id="levelup-overlay"><div id="levelup-inner"><div class="lu-stars">⭐✨⭐</div><div class="lu-title" id="lu-title">Nível 2 alcançado!</div><div class="lu-sub">Continue explorando o horizonte do conhecimento</div></div></div>
+<div id="profile-panel"><div id="profile-inner"><h2>👤 Perfil do Explorador</h2><div class="profile-stat"><span class="profile-stat-label">Nome</span><span class="profile-stat-val" id="prof-nome">Explorador</span></div><div class="profile-stat"><span class="profile-stat-label">Nível</span><span class="profile-stat-val" id="prof-nivel">1</span></div><div class="profile-stat"><span class="profile-stat-label">XP Total</span><span class="profile-stat-val" id="prof-xp">0</span></div><div class="profile-stat"><span class="profile-stat-label">💎 Cristais</span><span class="profile-stat-val" id="prof-cristais">0</span></div><div class="profile-stat"><span class="profile-stat-label">Regiões Descobertas</span><span class="profile-stat-val" id="prof-regioes">0</span></div><div class="profile-stat"><span class="profile-stat-label">Tempo de Exploração</span><span class="profile-stat-val" id="prof-tempo">0 min</span></div><div class="profile-medals"><h4>🏅 Medalhas</h4><div class="medal-grid" id="prof-medals"></div></div><button class="btn-panel-close2" onclick="closeProfilePanel()">✕ Fechar</button></div></div>
+<div id="diary-panel"><div id="diary-inner"><h2>📖 Diário do Explorador</h2><div class="diary-section"><h4>📍 Trilhas Visitadas</h4><div id="diary-trilhas"></div></div><div class="diary-section"><h4>🌐 Portais Descobertos</h4><div id="diary-portais"></div></div><div class="diary-section"><h4>📊 Estatísticas</h4><div id="diary-stats"></div></div><button class="btn-panel-close2" onclick="closeDiaryPanel()">✕ Fechar</button></div></div>
+<div id="waterfall-panel"><div id="waterfall-inner"><h2>💧 Cachoeira do Conhecimento</h2><div class="progress-tree"><div class="ptree-item"><div class="ptree-icon">⭐</div><div class="ptree-label">Nível</div><div class="ptree-val" id="wf-nivel">1</div></div><div class="ptree-item"><div class="ptree-icon">💎</div><div class="ptree-label">Cristais</div><div class="ptree-val" id="wf-cristais">0</div></div><div class="ptree-item"><div class="ptree-icon">🗺️</div><div class="ptree-label">Regiões</div><div class="ptree-val" id="wf-regioes">0</div></div><div class="ptree-item"><div class="ptree-icon">🏅</div><div class="ptree-label">Medalhas</div><div class="ptree-val" id="wf-medals">0</div></div></div><div class="wfall-xp-wrap"><div class="wfall-xp-label">XP: <span id="wf-xp-text">0/100</span></div><div class="wfall-xp-bar"><div class="wfall-xp-fill" id="wf-xp-fill"></div></div></div><button class="btn-panel-close2" onclick="closeWaterfallPanel()">✕ Fechar</button></div></div>
 
-        <!-- Anos Iniciais -->
-        <div class="rcs-level-card rcs-level-card--iniciais rcs-level-card--active"
-             role="tab"
-             tabindex="0"
-             aria-selected="true"
-             aria-controls="rcs-panel-iniciais"
-             data-level="iniciais"
-             onclick="rcsApp.selectLevel('iniciais')"
-             onkeydown="if(event.key==='Enter'||event.key===' ')rcsApp.selectLevel('iniciais')">
-          <div class="rcs-level-card__active-dot" aria-hidden="true"></div>
-          <div class="rcs-level-card__icon" aria-hidden="true">📘</div>
-          <div class="rcs-level-card__info">
-            <div class="rcs-level-card__name">Anos Iniciais</div>
-            <div class="rcs-level-card__range">1º ao 5º ano · Ensino Fundamental</div>
-            <span class="rcs-level-card__count">📖 24 recursos</span>
-          </div>
-        </div>
+<!-- FASE 4: Missões e NPC Elements -->
+<div id="missions-panel"><button id="missions-btn">📜 Missões Ativas</button><div id="missions-list"></div></div>
+<div id="npc-dialog" class="npc-dialog"><p id="dialog-text">Olá, explorador! Preciso de sua ajuda.</p><button id="dialog-next">Prosseguir</button><button id="dialog-close">Fechar</button></div>
+<div id="activity-overlay" class="activity-overlay"><div class="activity-card"><h3 id="activity-title">Desafio da Trilha</h3><div id="activity-question" class="question"></div><div id="activity-options" class="options"></div><div id="activity-feedback"></div><button id="activity-close-btn" class="activity-close-btn">Fechar</button></div></div>
 
-        <!-- Anos Finais -->
-        <div class="rcs-level-card rcs-level-card--finais"
-             role="tab"
-             tabindex="0"
-             aria-selected="false"
-             aria-controls="rcs-panel-finais"
-             data-level="finais"
-             onclick="rcsApp.selectLevel('finais')"
-             onkeydown="if(event.key==='Enter'||event.key===' ')rcsApp.selectLevel('finais')">
-          <div class="rcs-level-card__active-dot" aria-hidden="true"></div>
-          <div class="rcs-level-card__icon" aria-hidden="true">📗</div>
-          <div class="rcs-level-card__info">
-            <div class="rcs-level-card__name">Anos Finais</div>
-            <div class="rcs-level-card__range">6º ao 9º ano · Ensino Fundamental</div>
-            <span class="rcs-level-card__count">💻 31 recursos</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════
-       [3] CONTEÚDO DO NÍVEL ATIVO
-       ══════════════════════════════════ -->
-  <section class="rcs-section" aria-label="Recursos pedagógicos">
-    <div class="rcs-content-panel rcs-glass" id="rcs-content-panel">
-
-      <!-- 3.1 Componentes Curriculares -->
-      <nav aria-label="Componentes curriculares">
-        <div class="rcs-component-nav" role="tablist" id="rcs-component-nav" aria-label="Filtrar por componente">
-          <!-- pills geradas via JS -->
-        </div>
-      </nav>
-
-      <!-- 3.2 Filtros + Busca -->
-      <div class="rcs-filter-bar" role="search">
-        <div class="rcs-search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="search" id="rcs-search-input" placeholder="Buscar recurso..." aria-label="Buscar recurso">
-        </div>
-        <select class="rcs-filter-select" id="rcs-filter-tipo" aria-label="Filtrar por tipo">
-          <option value="">Tipo ▾</option>
-          <option value="plugado">Plugado</option>
-          <option value="desplugado">Desplugado</option>
-        </select>
-        <select class="rcs-filter-select" id="rcs-filter-dif" aria-label="Filtrar por dificuldade">
-          <option value="">Dificuldade ▾</option>
-          <option value="basico">Básico</option>
-          <option value="intermediario">Intermediário</option>
-          <option value="avancado">Avançado</option>
-        </select>
-      </div>
-      <div class="rcs-filter-tags" role="group" aria-label="Filtros rápidos" id="rcs-filter-tags">
-        <span class="rcs-filter-tag" tabindex="0" onclick="rcsApp.toggleTag(this)">Pensamento Computacional</span>
-        <span class="rcs-filter-tag" tabindex="0" onclick="rcsApp.toggleTag(this)">Cultura Digital</span>
-        <span class="rcs-filter-tag" tabindex="0" onclick="rcsApp.toggleTag(this)">Scratch</span>
-        <span class="rcs-filter-tag" tabindex="0" onclick="rcsApp.toggleTag(this)">Inteligência Artificial</span>
-        <span class="rcs-filter-tag" tabindex="0" onclick="rcsApp.toggleTag(this)">Desplugado</span>
-        <span class="rcs-filter-tag" tabindex="0" onclick="rcsApp.toggleTag(this)">Robótica</span>
-      </div>
-
-      <!-- 3.4 Destaques -->
-      <div class="rcs-featured" id="rcs-featured">
-        <div class="rcs-featured__title" aria-label="Recursos mais utilizados pelos professores">
-          ⭐ Mais Utilizados pelos Professores
-        </div>
-        <div class="rcs-featured__grid" id="rcs-featured-grid"></div>
-      </div>
-
-      <!-- 3.3 Todos os recursos -->
-      <div class="rcs-section-label" aria-label="Todos os recursos do nível selecionado">
-        Todos os recursos
-      </div>
-      <div class="rcs-resource-grid" id="rcs-resource-grid" role="list"></div>
-      <div class="rcs-empty" id="rcs-empty" style="display:none" aria-live="polite">
-        <div class="rcs-empty__icon">🔍</div>
-        <div class="rcs-empty__text">Nenhum recurso encontrado com esses filtros.</div>
-      </div>
-
-    </div>
-  </section>
-  {% endblock content  %}
+<canvas id="canvas"></canvas>
+<div id="hud">
+  <div id="fps">60 FPS</div>
+  <div id="world-title"><h1>Horizonte da Aprendizagem</h1><p>Uma jornada pelos territórios do conhecimento</p></div>
+  <div id="info-panel"><div id="info-panel-inner"><span class="poi-icon" id="panel-icon">🌟</span><h2 id="panel-title">Ponto de Interesse</h2><p id="panel-desc">Descrição do local.</p><button class="panel-close-btn" onclick="closeInfoPanel()">✕ Fechar</button></div></div>
+  <div id="interact-hint">Pressione E · Toque para interagir</div>
+  <div id="map-panel"><h3>🗺️ Mapa do Mundo</h3><ul><li>⭐ Praça Central do Conhecimento</li></ul></div>
+  <div id="top-buttons"><button class="hud-btn" id="btn-fullscreen" title="Tela cheia">⛶</button><button class="hud-btn" id="btn-reset" title="Resetar câmera">⟳</button><button class="hud-btn" id="btn-settings" title="Configurações">⚙</button><button class="hud-btn" id="btn-map" title="Mapa">🗺️</button><button class="hud-btn" id="btn-profile" title="Perfil" onclick="openProfilePanel()">👤</button><button class="hud-btn" id="btn-diary" title="Diário" onclick="openDiaryPanel()">📖</button></div>
+  <div id="controls-hint">WASD / Arrastar para girar · Scroll/Pinch para zoom · ⟳ visão geral</div>
+  <div id="settings-panel"><span class="close-btn" id="close-settings">✕</span><h3>CONFIGURAÇÕES</h3><div class="setting-row"><label>Sensibilidade</label><input type="range" id="s-sensitivity" min="0.2" max="2" step="0.1" value="1"></div><div class="setting-row"><label>Velocidade</label><input type="range" id="s-speed" min="0.5" max="3" step="0.1" value="1"></div><div class="setting-row"><label>FOV</label><input type="range" id="s-fov" min="50" max="100" step="1" value="70"></div><div class="setting-row"><label>Qualidade</label><select id="s-quality"><option value="low">Baixa</option><option value="med" selected>Média</option><option value="high">Alta</option></select></div></div>
+  <div id="joystick-zone" style="display:none"><div id="joystick-outer"><div id="joystick-inner"></div></div></div>
+  <div id="jump-btn" style="display:none">↑</div>
+  <div id="camera-btn" style="display:none">👁</div>
+  <div id="zoom-controls"><button id="btn-zoom-in" class="hud-btn" style="font-size:20px;font-weight:300">+</button><button id="btn-zoom-out" class="hud-btn" style="font-size:20px;font-weight:300">−</button></div>
+</div>
+{% include "atividadesPedagogicas/includes/ilha/_javascript_ilha.html" %}
+</body>
+</html>

@@ -1,0 +1,2293 @@
+<!--_javascript_ilha.html-->
+{% load static %}
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+const canvas = document.getElementById('canvas');
+const loading = document.getElementById('loading');
+const progressFill = document.getElementById('progress-fill');
+const fpsEl = document.getElementById('fps');
+const hint = document.getElementById('controls-hint');
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+function setProgress(p){ progressFill.style.width = p+'%'; }
+
+// ── Renderer ──────────────────────────────────────────────────
+const renderer = new THREE.WebGLRenderer({canvas, antialias:!isMobile, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile?1.5:2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+renderer.outputEncoding = THREE.sRGBEncoding;
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0xc8e8ff, 0.0008);
+
+// ── Camera ───────────────────────────────────────────────────
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 2000);
+let cfg = { sensitivity:1, speed:1, fov:70 };
+
+
+// ══════════════════════════════════════════════════════════════
+// ASSET MANAGER (Fase 6 - Preservação Total)
+// ══════════════════════════════════════════════════════════════
+const AssetManager = {
+    cache: new Map(),
+    
+    loadTexture(url, fallbackColor = 0xff00ff) {
+        if (this.cache.has(url)) {
+            return Promise.resolve(this.cache.get(url));
+        }
+        
+        return new Promise((resolve) => {
+            const loader = new THREE.TextureLoader();
+            loader.load(
+                url,
+                (texture) => {
+                    texture.encoding = THREE.sRGBEncoding;
+                    this.cache.set(url, texture);
+                    console.log(`[AssetManager] ✅ Carregado: ${url}`);
+                    resolve(texture);
+                },
+                undefined,
+                (error) => {
+                    console.warn(`[AssetManager] ⚠️ Falha ao carregar ${url}. Usando fallback.`);
+                    const fallbackMat = new THREE.MeshStandardMaterial({
+                        color: fallbackColor,
+                        roughness: 0.7,
+                        metalness: 0.2
+                    });
+                    resolve({ isFallback: true, material: fallbackMat });
+                }
+            );
+        });
+    },
+    
+    async loadMultiple(assetList) {
+        const results = {};
+        for (const [key, url] of Object.entries(assetList)) {
+            results[key] = await this.loadTexture(url);
+        }
+        return results;
+    }
+};
+
+
+// ── Sky ──────────────────────────────────────────────────────
+function makeSky(){
+  const geo = new THREE.SphereGeometry(1200,32,16);
+  const mat = new THREE.ShaderMaterial({
+    side: THREE.BackSide,
+    uniforms:{ uTime:{value:0} },
+    vertexShader:`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+    fragmentShader:`uniform float uTime; varying vec3 vPos; void main(){ float y = normalize(vPos).y; vec3 zenith = vec3(0.18,0.45,0.88); vec3 horizon = vec3(0.62,0.84,1.0); vec3 ground  = vec3(0.72,0.88,0.95); vec3 col = mix(horizon, zenith, clamp(y,0.,1.)); col = mix(ground, col, clamp(y*2.+0.5,0.,1.)); gl_FragColor = vec4(col,1.0); }`
+  });
+  return new THREE.Mesh(geo,mat);
+}
+function makeCloudTexture(){
+  const size=256; const c=document.createElement('canvas'); c.width=c.height=size;
+  const ctx=c.getContext('2d');
+  ctx.clearRect(0,0,size,size);
+  function puff(x,y,r,a){ const g=ctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,`rgba(255,255,255,${a})`); g.addColorStop(1,'rgba(255,255,255,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); }
+  puff(128,128,90,.9); puff(90,120,65,.8); puff(165,115,60,.75); puff(110,155,50,.7); puff(148,152,55,.7); puff(75,140,45,.6); puff(185,140,40,.55);
+  const tex=new THREE.CanvasTexture(c); tex.encoding=THREE.sRGBEncoding; return tex;
+}
+const cloudTex = makeCloudTexture();
+const clouds=[];
+function spawnCloud(x,y,z,scale){
+  const mat=new THREE.MeshBasicMaterial({map:cloudTex,transparent:true,opacity:.85,depthWrite:false,side:THREE.DoubleSide});
+  const geo=new THREE.PlaneGeometry(scale,scale*.55);
+  const m=new THREE.Mesh(geo,mat); m.position.set(x,y,z); m.rotation.x=-0.1; scene.add(m); clouds.push(m); return m;
+}
+function buildClouds(){
+  const layers=[
+    {y:-60,count:20,spread:500,scale:[90,180]},
+    {y:-30,count:14,spread:400,scale:[60,130]},
+    {y: 40,count:10,spread:350,scale:[80,160]},
+    {y:120,count:8, spread:500,scale:[100,220]},
+  ];
+  layers.forEach(({y,count,spread,scale})=>{
+    for(let i=0;i<count;i++){
+      const s=scale[0]+Math.random()*(scale[1]-scale[0]);
+      spawnCloud((Math.random()-.5)*spread*2, y+(Math.random()-.5)*30, (Math.random()-.5)*spread*2, s);
+    }
+  });
+}
+setProgress(15);
+
+// ── Island terrain ────────────────────────────────────────────
+function buildIsland(){
+  const group=new THREE.Group();
+  const terrainGeo=new THREE.CylinderGeometry(80,55,28,64,8,false);
+  const pos=terrainGeo.attributes.position;
+  for(let i=0;i<pos.count;i++){
+    const x=pos.getX(i),y=pos.getY(i),z=pos.getZ(i);
+    const r=Math.sqrt(x*x+z*z);
+    const n1=Math.sin(x*.08)*Math.cos(z*.08)*8;
+    const n2=Math.sin(x*.18+1.5)*Math.sin(z*.15)*4;
+    const n3=Math.sin(x*.35+z*.3)*2;
+    const bump=(n1+n2+n3);
+    if(y>0) pos.setY(i,y+bump*(1-r/90));
+    if(y<0){ const s=0.7+Math.sin(i*.7)*.3; pos.setX(i,x*s); pos.setZ(i,z*s); pos.setY(i,y+Math.sin(i*.5)*3); }
+  }
+  pos.needsUpdate=true; terrainGeo.computeVertexNormals();
+  const terrainMat=new THREE.MeshStandardMaterial({color:0x6ab04c,roughness:.9,metalness:.0});
+  const terrain=new THREE.Mesh(terrainGeo,terrainMat); terrain.receiveShadow=true; terrain.castShadow=true;
+  group.add(terrain);
+  const rockGeo=new THREE.CylinderGeometry(50,30,35,48,5,false);
+  const rockPos=rockGeo.attributes.position;
+  for(let i=0;i<rockPos.count;i++){ rockPos.setX(i,rockPos.getX(i)+(Math.random()-.5)*6); rockPos.setZ(i,rockPos.getZ(i)+(Math.random()-.5)*6); }
+  rockPos.needsUpdate=true; rockGeo.computeVertexNormals();
+  const rockMat=new THREE.MeshStandardMaterial({color:0x8B7355,roughness:1,metalness:0});
+  const rock=new THREE.Mesh(rockGeo,rockMat); rock.position.y=-20; rock.receiveShadow=true; group.add(rock);
+  const rootMat=new THREE.MeshStandardMaterial({color:0x5c4827,roughness:1});
+  for(let i=0;i<22;i++){
+    const a=Math.random()*Math.PI*2; const r=25+Math.random()*25;
+    const h=8+Math.random()*30; const w=1.2+Math.random()*2;
+    const rg=new THREE.CylinderGeometry(w*.3,w,h,6); const rm=new THREE.Mesh(rg,rootMat);
+    rm.position.set(Math.cos(a)*r,-(28+h*.5)+Math.random()*5,Math.sin(a)*r);
+    rm.rotation.x=(Math.random()-.5)*.4; rm.rotation.z=(Math.random()-.5)*.4;
+    rm.castShadow=true; group.add(rm);
+  }
+  const hangMat=new THREE.MeshStandardMaterial({color:0x9c8860,roughness:.85});
+  for(let i=0;i<12;i++){
+    const a=Math.random()*Math.PI*2; const r=30+Math.random()*30;
+    const s=3+Math.random()*8;
+    const hg=new THREE.DodecahedronGeometry(s,0); const hm=new THREE.Mesh(hg,hangMat);
+    hm.position.set(Math.cos(a)*r,-35-Math.random()*15,Math.sin(a)*r);
+    hm.rotation.set(Math.random(),Math.random(),Math.random()); hm.castShadow=true; group.add(hm);
+  }
+  return group;
+}
+setProgress(30);
+
+// ── Waterfall ─────────────────────────────────────────────────
+function buildWaterfall(){
+  const group=new THREE.Group();
+  const mat=new THREE.MeshBasicMaterial({color:0x88ddff,transparent:true,opacity:.7});
+  for(let i=0;i<3;i++){
+    const a=(i/3)*Math.PI*2+Math.PI*.25;
+    const geo=new THREE.PlaneGeometry(4,40);
+    const m=new THREE.Mesh(geo,mat.clone()); m.position.set(Math.cos(a)*68,-14,Math.sin(a)*68);
+    m.rotation.y=a; m.rotation.x=-0.08; group.add(m);
+    const sg=new THREE.SphereGeometry(5,8,8); sg.scale(1,.3,1);
+    const sm=new THREE.Mesh(sg,new THREE.MeshBasicMaterial({color:0xaaeeff,transparent:true,opacity:.4}));
+    sm.position.set(Math.cos(a)*68,-36,Math.sin(a)*68); group.add(sm);
+  }
+  return group;
+}
+
+// ── Trees ─────────────────────────────────────────────────────
+function makeTree(x,z,scale=1){
+  const g=new THREE.Group();
+  const trunkMat=new THREE.MeshStandardMaterial({color:0x6b4226,roughness:.9});
+  const leafMat=new THREE.MeshStandardMaterial({color:0x2d8a4e,roughness:.8});
+  const trunkG=new THREE.CylinderGeometry(.8*scale,.9*scale,5*scale,8);
+  const trunk=new THREE.Mesh(trunkG,trunkMat); trunk.position.y=2.5*scale; trunk.castShadow=true; g.add(trunk);
+  const layers=3+Math.floor(Math.random()*2);
+  for(let i=0;i<layers;i++){
+    const r=(4-i*.7)*scale; const y=(5+i*2.8)*scale;
+    const cg=new THREE.ConeGeometry(r,3.5*scale,8);
+    const leaf=new THREE.Mesh(cg,leafMat.clone()); leaf.material.color.setHSL(.32+Math.random()*.05,(.6+Math.random()*.2),(.28+Math.random()*.1));
+    leaf.position.y=y; leaf.castShadow=true; leaf.receiveShadow=true; g.add(leaf);
+  }
+  g.position.set(x,0,z); g.rotation.y=Math.random()*Math.PI*2; return g;
+}
+setProgress(45);
+
+// ── Flowers ───────────────────────────────────────────────────
+function makeFlower(x,z){
+  const g=new THREE.Group();
+  const stemMat=new THREE.MeshStandardMaterial({color:0x4a9e3f});
+  const sg=new THREE.CylinderGeometry(.1,.1,1.5,6); const stem=new THREE.Mesh(sg,stemMat); stem.position.y=.75; g.add(stem);
+  const colors=[0xff6b8a,0xffcc44,0xff8c42,0xff4dd8,0x9b59ff,0x44ddff];
+  const petMat=new THREE.MeshStandardMaterial({color:colors[Math.floor(Math.random()*colors.length)],roughness:.6});
+  const peg=new THREE.SphereGeometry(.35,8,8); const pet=new THREE.Mesh(peg,petMat); pet.position.y=1.7; g.add(pet);
+  g.position.set(x,.2,z); return g;
+}
+
+// ── Crystals ──────────────────────────────────────────────────
+function makeCrystal(x,y,z,scale=1){
+  const mat=new THREE.MeshStandardMaterial({color:0x88ccff,metalness:.8,roughness:.1,transparent:true,opacity:.85});
+  const geo=new THREE.ConeGeometry(.8*scale,3*scale+Math.random()*2,6);
+  const m=new THREE.Mesh(geo,mat.clone()); m.material.color.setHSL(.55+Math.random()*.2,.9,.65);
+  m.position.set(x,y,z); m.rotation.y=Math.random()*Math.PI*2; m.rotation.z=(Math.random()-.5)*.3; m.castShadow=true; return m;
+}
+
+// ── Secondary floating islands ─────────────────────────────────
+function makeMiniIsland(x,y,z,r){
+  const g=new THREE.Group();
+  const geo=new THREE.CylinderGeometry(r,r*.7,r*.6,16,3); const pos=geo.attributes.position;
+  for(let i=0;i<pos.count;i++){ if(pos.getY(i)>0){ pos.setY(i,pos.getY(i)+Math.sin(pos.getX(i)*.3)*2); } }
+  pos.needsUpdate=true; geo.computeVertexNormals();
+  g.add(new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0x5a9e38,roughness:.9})));
+  const rg=new THREE.CylinderGeometry(r*.65,r*.4,r*.5,12); const rm=new THREE.Mesh(rg,new THREE.MeshStandardMaterial({color:0x8B7355,roughness:1}));
+  rm.position.y=-(r*.55); g.add(rm);
+  g.position.set(x,y,z); return g;
+}
+function buildParticles(){
+  const count=800; const geo=new THREE.BufferGeometry(); const positions=new Float32Array(count*3); const colors=new Float32Array(count*3);
+  for(let i=0;i<count;i++){
+    const a=Math.random()*Math.PI*2; const r=20+Math.random()*120;
+    positions[i*3]=Math.cos(a)*r; positions[i*3+1]=-20+Math.random()*80; positions[i*3+2]=Math.sin(a)*r;
+    const h=.5+Math.random()*.4; const rv=h, gv=.7, bv=.9;
+    colors[i*3]=rv; colors[i*3+1]=gv; colors[i*3+2]=bv;
+  }
+  geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+  geo.setAttribute('color',new THREE.BufferAttribute(colors,3));
+  const mat=new THREE.PointsMaterial({size:.8,vertexColors:true,transparent:true,opacity:.75,sizeAttenuation:true});
+  return new THREE.Points(geo,mat);
+}
+setProgress(60);
+
+// ── Birds ─────────────────────────────────────────────────────
+function makeBirds(){
+  const g=new THREE.Group();
+  const mat=new THREE.MeshBasicMaterial({color:0x334455,side:THREE.DoubleSide});
+  for(let i=0;i<12;i++){
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.BufferAttribute(new Float32Array([0,0,0,-1.5,.5,0,-1.5,-.5,0]),3));
+    geo.setIndex([0,1,2]); const m=new THREE.Mesh(geo,mat); m.position.set((Math.random()-.5)*200,30+Math.random()*60,(Math.random()-.5)*200);
+    m.userData.phase=Math.random()*Math.PI*2; m.userData.speed=.3+Math.random()*.3; g.add(m);
+  }
+  return g;
+}
+
+// ── Lighting ──────────────────────────────────────────────────
+const ambientLight=new THREE.AmbientLight(0xfff5e8,.6);
+scene.add(ambientLight);
+const sun=new THREE.DirectionalLight(0xfff5dc,1.6);
+sun.position.set(120,180,80); sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048); sun.shadow.camera.near=1; sun.shadow.camera.far=400;
+sun.shadow.camera.left=-120; sun.shadow.camera.right=120; sun.shadow.camera.top=120; sun.shadow.camera.bottom=-120;
+sun.shadow.bias=-0.0005; scene.add(sun);
+const fillLight=new THREE.DirectionalLight(0xaaddff,.4); fillLight.position.set(-80,40,-100); scene.add(fillLight);
+const rimLight=new THREE.DirectionalLight(0xffe8c0,.3); rimLight.position.set(0,-50,100); scene.add(rimLight);
+setProgress(70);
+
+// ── Assemble scene ────────────────────────────────────────────
+const sky=makeSky(); scene.add(sky);
+buildClouds();
+const island=buildIsland(); island.position.y=0; scene.add(island);
+const waterfall=buildWaterfall(); waterfall.position.y=0; scene.add(waterfall);
+
+// Trees
+const treeGroup=new THREE.Group();
+const treePositions=[[10,15],[28,-8],[-25,18],[-15,-30],[35,30],[-40,-15],[5,-45],[40,-35],[-30,40],[20,40],[-50,10],[50,-20],[15,-20],[-10,-15],[32,12]];
+treePositions.forEach(([x,z])=>{ const s=.7+Math.random()*.8; treeGroup.add(makeTree(x,z,s)); });
+scene.add(treeGroup);
+
+// Flowers scattered
+const flowerGroup=new THREE.Group();
+for(let i=0;i<80;i++){
+  const a=Math.random()*Math.PI*2; const r=10+Math.random()*55;
+  if(r>25||Math.random()>.5) flowerGroup.add(makeFlower(Math.cos(a)*r,Math.sin(a)*r));
+}
+scene.add(flowerGroup);
+
+// Crystals
+const crystalGroup=new THREE.Group();
+[[15,1,45],[-30,2,-40],[55,3,10],[-45,2,30],[0,1,-60],[40,4,-50],[-55,3,-10]].forEach(([x,y,z])=>{
+  for(let k=0;k<2+Math.floor(Math.random()*3);k++) crystalGroup.add(makeCrystal(x+(Math.random()-.5)*8,y,z+(Math.random()-.5)*8,.7+Math.random()*.8));
+});
+scene.add(crystalGroup);
+
+// Mini islands
+const miniIslands=[
+  makeMiniIsland(160,20,80,18), makeMiniIsland(-150,40,120,22), makeMiniIsland(200,-15,-100,15),
+  makeMiniIsland(-180,10,-130,20), makeMiniIsland(100,60,-160,12), makeMiniIsland(-120,-30,200,16)
+];
+miniIslands.forEach(m=>scene.add(m));
+miniIslands.forEach(m=>{ const n=2+Math.floor(Math.random()*3); for(let i=0;i<n;i++){ const a=Math.random()*Math.PI*2,r=Math.random()*m.children[0].geometry.parameters.radiusTop*.6; const t=makeTree(m.position.x+Math.cos(a)*r,m.position.z+Math.sin(a)*r,.5+Math.random()*.4); t.position.y=m.position.y+2; scene.add(t); } });
+
+const particles=buildParticles(); scene.add(particles);
+const birds=makeBirds(); scene.add(birds);
+setProgress(85);
+
+// ── Avatar ────────────────────────────────────────────────────
+function makeCapsuleMesh(radiusTop,radiusBot,height,mat){
+  const g=new THREE.Group();
+  const cyl=new THREE.Mesh(new THREE.CylinderGeometry(radiusTop,radiusBot,height,10),mat); g.add(cyl);
+  const sTop=new THREE.Mesh(new THREE.SphereGeometry(radiusTop,10,8),mat); sTop.position.y=height/2; g.add(sTop);
+  const sBot=new THREE.Mesh(new THREE.SphereGeometry(radiusBot,10,8),mat); sBot.position.y=-height/2; g.add(sBot);
+  return g;
+}
+function buildAvatar(){
+  const g=new THREE.Group();
+  const bodyMat=new THREE.MeshStandardMaterial({color:0xe8c08a});
+  const clothMat=new THREE.MeshStandardMaterial({color:0x4a7cc2});
+  const capeMat=new THREE.MeshStandardMaterial({color:0x8B2020});
+  const body=makeCapsuleMesh(.35,.35,.8,bodyMat); body.position.y=1.5; body.castShadow=true; g.add(body);
+  const head=new THREE.Mesh(new THREE.SphereGeometry(.32,12,12),bodyMat); head.position.y=2.65; head.castShadow=true; g.add(head);
+  const tunic=new THREE.Mesh(new THREE.CylinderGeometry(.3,.38,.9,8),clothMat); tunic.position.y=1.5; g.add(tunic);
+  const hat=new THREE.Mesh(new THREE.ConeGeometry(.28,.55,8),capeMat); hat.position.y=3.12; g.add(hat);
+  [-1,1].forEach(side=>{ const arm=makeCapsuleMesh(.1,.1,.5,bodyMat); arm.position.set(side*.48,1.55,0); arm.rotation.z=side*.3; g.add(arm); });
+  [-1,1].forEach(side=>{ const leg=makeCapsuleMesh(.12,.12,.6,clothMat); leg.position.set(side*.2,.65,0); g.add(leg); });
+  g.userData.walkTime=0; g.userData.isMoving=false;
+  return g;
+}
+const avatar=buildAvatar();
+avatar.position.set(0,14.5,0); avatar.castShadow=true; scene.add(avatar);
+setProgress(95);
+
+// ── Camera controller ─────────────────────────────────────────
+const camState={
+  distance:80, minDist:10, maxDist:250,
+  theta:0, phi:0.8, minPhi:.15, maxPhi:1.55,
+  target:new THREE.Vector3(), smoothTarget:new THREE.Vector3(),
+  smoothPos:new THREE.Vector3(),
+  reset(){ this.distance=80; this.theta=0; this.phi=0.8; }
+};
+function updateCamera(){
+  camState.smoothTarget.lerp(avatar.position.clone().add(new THREE.Vector3(0,2,0)),.1);
+  const x=camState.smoothTarget.x+camState.distance*Math.sin(camState.phi)*Math.sin(camState.theta);
+  const y=camState.smoothTarget.y+camState.distance*Math.cos(camState.phi);
+  const z=camState.smoothTarget.z+camState.distance*Math.sin(camState.phi)*Math.cos(camState.theta);
+  camState.smoothPos.lerp(new THREE.Vector3(x,y,z),.08);
+  camera.position.copy(camState.smoothPos);
+  camera.lookAt(camState.smoothTarget);
+}
+
+// ── Movement ──────────────────────────────────────────────────
+const keys={};
+let velX=0,velZ=0,velY=0,isJumping=false,onGround=true;
+let joystickDx=0,joystickDz=0;
+document.addEventListener('keydown',e=>keys[e.code]=true);
+document.addEventListener('keyup',e=>keys[e.code]=false);
+
+let isDragging=false,lastMX=0,lastMY=0;
+canvas.addEventListener('mousedown',e=>{ isDragging=true; lastMX=e.clientX; lastMY=e.clientY; });
+window.addEventListener('mouseup',()=>isDragging=false);
+window.addEventListener('mousemove',e=>{
+  if(!isDragging)return;
+  camState.theta-=(e.clientX-lastMX)*.005*cfg.sensitivity;
+  camState.phi=Math.max(camState.minPhi,Math.min(camState.maxPhi,camState.phi+(e.clientY-lastMY)*.004*cfg.sensitivity));
+  lastMX=e.clientX; lastMY=e.clientY;
+});
+canvas.addEventListener('wheel',e=>{ const delta=e.deltaY*0.001*camState.distance; camState.distance=Math.max(camState.minDist,Math.min(camState.maxDist,camState.distance+delta)); },{passive:true});
+
+let touchStart=null,pinchDist=0;
+canvas.addEventListener('touchstart',e=>{
+  if(e.touches.length===1){ touchStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; }
+  if(e.touches.length===2){ const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY; pinchDist=Math.hypot(dx,dy); }
+},{passive:true});
+canvas.addEventListener('touchmove',e=>{
+  if(e.touches.length===1&&touchStart&&!joystickActive){
+    camState.theta-=(e.touches[0].clientX-touchStart.x)*.006*cfg.sensitivity;
+    camState.phi=Math.max(camState.minPhi,Math.min(camState.maxPhi,camState.phi+(e.touches[0].clientY-touchStart.y)*.005*cfg.sensitivity));
+    touchStart={x:e.touches[0].clientX,y:e.touches[0].clientY};
+  }
+  if(e.touches.length===2){
+    const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;
+    const d=Math.hypot(dx,dy); camState.distance=Math.max(camState.minDist,Math.min(camState.maxDist,camState.distance*(pinchDist/d))); pinchDist=d;
+  }
+},{passive:true});
+canvas.addEventListener('touchend',()=>touchStart=null,{passive:true});
+
+const joystickOuter=document.getElementById('joystick-outer');
+const joystickInner=document.getElementById('joystick-inner');
+let joystickActive=false,jStart={x:0,y:0};
+const jRadius=40;
+function joystickHandler(cx,cy){ const dx=cx-jStart.x,dy=cy-jStart.y; const d=Math.min(jRadius,Math.hypot(dx,dy)); const a=Math.atan2(dy,dx); joystickDx=Math.cos(a)*(d/jRadius); joystickDz=Math.sin(a)*(d/jRadius); joystickInner.style.transform=`translate(calc(-50% + ${Math.cos(a)*d}px), calc(-50% + ${Math.sin(a)*d}px))`; }
+joystickOuter.addEventListener('touchstart',e=>{ joystickActive=true; const r=joystickOuter.getBoundingClientRect(); jStart={x:r.left+r.width/2,y:r.top+r.height/2}; joystickHandler(e.touches[0].clientX,e.touches[0].clientY); e.stopPropagation(); },{passive:true});
+joystickOuter.addEventListener('touchmove',e=>{ joystickHandler(e.touches[0].clientX,e.touches[0].clientY); e.stopPropagation(); },{passive:true});
+joystickOuter.addEventListener('touchend',()=>{ joystickActive=false; joystickDx=0; joystickDz=0; joystickInner.style.transform='translate(-50%,-50%)'; },{passive:true});
+
+document.getElementById('jump-btn').addEventListener('touchstart',e=>{ if(onGround){ velY=8; isJumping=true; onGround=false; } e.preventDefault(); },{passive:false});
+document.getElementById('jump-btn').addEventListener('click',()=>{ if(onGround){ velY=8; isJumping=true; onGround=false; } });
+
+const groundHeight=14.5;
+function updateMovement(dt){
+  const speed=6*cfg.speed;
+  let mx=0,mz=0;
+  if(keys['KeyW']||keys['ArrowUp']) mz-=1;
+  if(keys['KeyS']||keys['ArrowDown']) mz+=1;
+  if(keys['KeyA']||keys['ArrowLeft']) mx-=1;
+  if(keys['KeyD']||keys['ArrowRight']) mx+=1;
+  if(joystickActive){ mx+=joystickDx; mz+=joystickDz; }
+  if(keys['Space']&&onGround){ velY=8; isJumping=true; onGround=false; }
+  const len=Math.hypot(mx,mz); if(len>1){ mx/=len; mz/=len; }
+  const sinT=Math.sin(camState.theta),cosT=Math.cos(camState.theta);
+  const wx=mx*cosT+mz*sinT, wz=-mx*sinT+mz*cosT;
+  velX+=(wx*speed-velX)*.18; velZ+=(wz*speed-velZ)*.18;
+  avatar.position.x+=velX*dt; avatar.position.z+=velZ*dt;
+  velY-=20*dt; avatar.position.y+=velY*dt;
+  if(avatar.position.y<=groundHeight){ avatar.position.y=groundHeight; velY=0; isJumping=false; onGround=true; }
+  const isMoving=Math.hypot(velX,velZ)>.15;
+  if(isMoving&&Math.hypot(mx,mz)>.05){ const targetAngle=Math.atan2(wx,wz); let diff=targetAngle-avatar.rotation.y; while(diff>Math.PI)diff-=Math.PI*2; while(diff<-Math.PI)diff+=Math.PI*2; avatar.rotation.y+=diff*.15; }
+  if(isMoving){
+    const wt=performance.now()*.006; const s=Math.sin(wt*cfg.speed);
+    const legs=avatar.children.filter((c,i)=>i>=5);
+    if(legs.length>=2){ legs[0].rotation.x=s*.6; if(legs[1]) legs[1].rotation.x=-s*.6; }
+    const arms=avatar.children.filter((c,i)=>i>=3&&i<=4);
+    if(arms.length>=2){ arms[0].rotation.x=-s*.4; if(arms[1]) arms[1].rotation.x=s*.4; }
+  }
+  const islandR=9999; const dist=Math.hypot(avatar.position.x,avatar.position.z);
+  if(dist>islandR){ const a=Math.atan2(avatar.position.z,avatar.position.x); avatar.position.x=Math.cos(a)*islandR; avatar.position.z=Math.sin(a)*islandR; velX*=-.3; velZ*=-.3; }
+}
+
+// ── HUD buttons ───────────────────────────────────────────────
+document.getElementById('btn-fullscreen').addEventListener('click',()=>{ if(!document.fullscreenElement){ document.documentElement.requestFullscreen?.(); }else{ document.exitFullscreen?.(); } });
+document.getElementById('btn-reset').addEventListener('click',()=>camState.reset());
+
+let zoomInterval=null;
+function startZoom(dir){
+  zoomInterval=setInterval(()=>{
+    const step=camState.distance*0.02;
+    camState.distance=Math.max(camState.minDist,Math.min(camState.maxDist,camState.distance+dir*step));
+  },16);
+}
+function stopZoom(){ clearInterval(zoomInterval); zoomInterval=null; }
+['mousedown','touchstart'].forEach(ev=>{ document.getElementById('btn-zoom-in').addEventListener(ev,e=>{ startZoom(-1); e.preventDefault(); },{passive:false}); });
+['mousedown','touchstart'].forEach(ev=>{ document.getElementById('btn-zoom-out').addEventListener(ev,e=>{ startZoom(1); e.preventDefault(); },{passive:false}); });
+['mouseup','mouseleave','touchend'].forEach(ev=>{ document.getElementById('btn-zoom-in').addEventListener(ev,stopZoom); document.getElementById('btn-zoom-out').addEventListener(ev,stopZoom); });
+const settingsPanel=document.getElementById('settings-panel');
+document.getElementById('btn-settings').addEventListener('click',()=>settingsPanel.style.display=settingsPanel.style.display==='block'?'none':'block');
+document.getElementById('close-settings').addEventListener('click',()=>settingsPanel.style.display='none');
+document.getElementById('s-sensitivity').addEventListener('input',e=>cfg.sensitivity=+e.target.value);
+document.getElementById('s-speed').addEventListener('input',e=>cfg.speed=+e.target.value);
+document.getElementById('s-fov').addEventListener('input',e=>{ cfg.fov=+e.target.value; camera.fov=cfg.fov; camera.updateProjectionMatrix(); });
+document.getElementById('s-quality').addEventListener('change',e=>{
+  if(e.target.value==='low'){ renderer.setPixelRatio(1); renderer.shadowMap.enabled=false; }
+  else if(e.target.value==='med'){ renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5)); renderer.shadowMap.enabled=true; }
+  else{ renderer.setPixelRatio(Math.min(window.devicePixelRatio,2)); renderer.shadowMap.enabled=true; }
+});
+
+if(isMobile){
+  document.getElementById('joystick-zone').style.display='block';
+  document.getElementById('jump-btn').style.display='flex';
+  document.getElementById('camera-btn').style.display='flex';
+  hint.textContent='Joystick esquerdo para mover · Arraste para câmera';
+}
+setTimeout(()=>{ hint.style.opacity='0'; },5000);
+
+window.addEventListener('resize',()=>{
+  camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
+});
+
+let frames=0,lastFPSTime=performance.now();
+function updateFPS(){
+  frames++; const now=performance.now(); if(now-lastFPSTime>=500){ fpsEl.textContent=Math.round(frames*1000/(now-lastFPSTime))+' FPS'; frames=0; lastFPSTime=now; }
+}
+
+let lastTime=performance.now();
+setProgress(100);
+setTimeout(()=>{ loading.style.opacity='0'; setTimeout(()=>loading.style.display='none',800); },400);
+
+// ══════════════════════════════════════════════════════════════
+// FASE 1: HORIZONTE DA APRENDIZAGEM
+// ══════════════════════════════════════════════════════════════
+
+const trilhas = [
+  {id:"algoritmos",nome:"Floresta dos Algoritmos",desbloqueada:false,progresso:0},
+  {id:"cristais",nome:"Vale dos Cristais",desbloqueada:false,progresso:0},
+  {id:"inventores",nome:"Oficina dos Inventores",desbloqueada:false,progresso:0},
+  {id:"nuvens",nome:"Cidade das Nuvens",desbloqueada:false,progresso:0},
+  {id:"codigos",nome:"Torre dos Códigos",desbloqueada:false,progresso:0},
+  {id:"digital",nome:"Porto Digital",desbloqueada:false,progresso:0},
+  {id:"conexoes",nome:"Ilha das Conexões",desbloqueada:false,progresso:0}
+];
+
+const pontosDeInteresse = [
+  {id:"trilhas",nome:"Portal das Trilhas",descricao:"Explore os caminhos da Computação. Em breve cada trilha levará a novos mundos de conhecimento.",icone:"🌀",posicao:{x:20,y:15,z:20},acao:"msg:Bem-vindo ao Portal das Trilhas! Em breve você poderá explorar os caminhos da Computação."},
+  {id:"cachoeira",nome:"Cachoeira do Conhecimento",descricao:"Seu progresso será registrado aqui. Cada conquista ficará gravada nas águas desta cachoeira.",icone:"💧",posicao:{x:-25,y:15,z:-15},acao:"info"},
+  {id:"mundos",nome:"Portal dos Mundos",descricao:"Novas disciplinas chegarão em breve. Este portal conectará você a universos de aprendizado ainda inexplorados.",icone:"🌐",posicao:{x:0,y:15,z:-40},acao:"msg:Em construção — Novas disciplinas chegarão em breve!"},
+  {id:"missoes",nome:"Centro de Missões",descricao:"Em breve você receberá desafios e conquistas. Prepare-se para sua jornada educacional!",icone:"🏆",posicao:{x:-30,y:15,z:25},acao:"info"}
+];
+
+function createCentralPlaza(){
+  const group = new THREE.Group();
+  const crystalMat = new THREE.MeshBasicMaterial({color:0x00ffcc,transparent:true,opacity:0.75});
+  const crystalGeo = new THREE.OctahedronGeometry(4,0);
+  const centralCrystal = new THREE.Mesh(crystalGeo, crystalMat);
+  centralCrystal.position.set(0,18,0);
+  centralCrystal.userData.isCentralCrystal = true;
+  group.add(centralCrystal);
+  const ringMat = new THREE.MeshBasicMaterial({color:0x5bc8f5,transparent:true,opacity:0.5,wireframe:true});
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(6,0.3,8,32), ringMat);
+  ring.position.set(0,16,0);
+  ring.rotation.x = Math.PI/2;
+  group.add(ring);
+  const pedMat = new THREE.MeshBasicMaterial({color:0x8899bb,transparent:true,opacity:0.8});
+  const ped = new THREE.Mesh(new THREE.CylinderGeometry(1.5,2,3,8), pedMat);
+  ped.position.set(0,15.5,0);
+  group.add(ped);
+  const plaqueMat = new THREE.MeshBasicMaterial({color:0x1a3a6a,transparent:true,opacity:0.9,side:THREE.DoubleSide});
+  const plaque = new THREE.Mesh(new THREE.PlaneGeometry(14,5), plaqueMat);
+  plaque.position.set(0,17,-8);
+  plaque.rotation.y = Math.PI;
+  group.add(plaque);
+  const pathMat = new THREE.MeshBasicMaterial({color:0x7799aa,transparent:true,opacity:0.6});
+  [[0,0,1],[0,0,-1],[1,0,0],[-1,0,0]].forEach(([x,y,z])=>{
+    const path = new THREE.Mesh(new THREE.CylinderGeometry(1,1,0.2,6), pathMat);
+    path.position.set(x*14, 14.5, z*14);
+    group.add(path);
+    for(let i=2;i<=4;i++){
+      const seg = new THREE.Mesh(new THREE.CylinderGeometry(0.8,0.8,0.2,6), pathMat);
+      seg.position.set(x*14*i/4, 14.5, z*14*i/4);
+      group.add(seg);
+    }
+  });
+  scene.add(group);
+  return {group, centralCrystal, ring};
+}
+function createPointsOfInterest(){
+  const markers = [];
+  const markerMat = new THREE.MeshBasicMaterial({color:0xffdd44,transparent:true,opacity:0.9});
+  pontosDeInteresse.forEach(poi => {
+    const markerGroup = new THREE.Group();
+    markerGroup.position.set(poi.posicao.x, poi.posicao.y, poi.posicao.z);
+    const gem = new THREE.Mesh(new THREE.OctahedronGeometry(1.2,0), markerMat.clone());
+    gem.material.color.setHex(0xffee66);
+    markerGroup.add(gem);
+    const beamMat = new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.15});
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,8,6), beamMat);
+    beam.position.y = -4;
+    markerGroup.add(beam);
+    markerGroup.userData = {poi, baseY: poi.posicao.y};
+    scene.add(markerGroup);
+    markers.push(markerGroup);
+  });
+  return markers;
+}
+function createFutureAreas(){
+  const futureAreas = [
+    {nome:"🌲 Floresta dos Algoritmos",x:90,z:60,y:25},
+    {nome:"🔮 Vale dos Cristais",x:-100,z:80,y:35},
+    {nome:"🏗 Oficina dos Inventores",x:130,z:-90,y:20},
+    {nome:"☁ Cidade das Nuvens",x:-140,z:-110,y:45},
+    {nome:"⚡ Torre dos Códigos",x:180,z:30,y:30},
+    {nome:"🌐 Porto Digital",x:-160,z:50,y:20},
+    {nome:"📡 Ilha das Conexões",x:70,z:-170,y:25}
+  ];
+  const mat = new THREE.MeshBasicMaterial({color:0x334466,transparent:true,opacity:0.8,side:THREE.DoubleSide});
+  const borderMat = new THREE.MeshBasicMaterial({color:0x5577aa,transparent:true,opacity:0.6,wireframe:true});
+  futureAreas.forEach(area => {
+    const group = new THREE.Group();
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(16,5), mat.clone());
+    const border = new THREE.Mesh(new THREE.PlaneGeometry(16,5), borderMat);
+    group.add(sign);
+    group.add(border);
+    group.position.set(area.x, area.y, area.z);
+    group.lookAt(0, area.y, 0);
+    group.userData = {baseY: area.y, area};
+    scene.add(group);
+  });
+}
+function createCentralParticles(){
+  const count = 60;
+  const geo = new THREE.BufferGeometry();
+  const positions = new Float32Array(count * 3);
+  const colors = new Float32Array(count * 3);
+  for(let i=0;i<count;i++){
+    const angle = (i/count)*Math.PI*2;
+    const r = 5 + Math.random()*3;
+    positions[i*3] = Math.cos(angle)*r;
+    positions[i*3+1] = 16 + Math.random()*6;
+    positions[i*3+2] = Math.sin(angle)*r;
+    colors[i*3]=0.3+Math.random()*0.3; colors[i*3+1]=0.8+Math.random()*0.2; colors[i*3+2]=1;
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+  geo.setAttribute('color', new THREE.BufferAttribute(colors,3));
+  const pts = new THREE.Points(geo, new THREE.PointsMaterial({size:0.8,vertexColors:true,transparent:true,opacity:0.9,sizeAttenuation:true}));
+  scene.add(pts);
+  return pts;
+}
+function openInfoPanel(poi){
+  document.getElementById('panel-icon').textContent = poi.icone;
+  document.getElementById('panel-title').textContent = poi.nome;
+  document.getElementById('panel-desc').textContent = poi.descricao;
+  document.getElementById('info-panel').classList.add('active');
+}
+function closeInfoPanel(){
+  document.getElementById('info-panel').classList.remove('active');
+}
+document.getElementById('info-panel').addEventListener('click', function(e){
+  if(e.target===this) closeInfoPanel();
+});
+
+const mapPanelElem = document.getElementById('map-panel');
+document.getElementById('btn-map').addEventListener('click', ()=>{
+  mapPanelElem.style.display = mapPanelElem.style.display==='block'?'none':'block';
+});
+
+const plaza = createCentralPlaza();
+const poiMarkers = createPointsOfInterest();
+createFutureAreas();
+const centralParticles = createCentralParticles();
+
+const hintEl = document.getElementById('interact-hint');
+let nearPoi = null;
+const isMobileDevice = /Mobi|Android/i.test(navigator.userAgent);
+if(!isMobileDevice){
+  hintEl.textContent = 'Pressione E para interagir';
+} else {
+  hintEl.textContent = 'Toque para interagir';
+}
+document.addEventListener('keydown', e=>{
+  if(e.code==='KeyE' && nearPoi) openInfoPanel(nearPoi.userData.poi);
+  if(e.code==='Escape') closeInfoPanel();
+});
+hintEl.addEventListener('click', ()=>{ if(nearPoi) openInfoPanel(nearPoi.userData.poi); });
+
+function updateFase1(t){
+  if(plaza.centralCrystal){
+    plaza.centralCrystal.rotation.y += 0.008;
+    plaza.centralCrystal.rotation.x = Math.sin(t*0.7)*0.1;
+    plaza.centralCrystal.position.y = 18 + Math.sin(t*1.2)*0.5;
+    plaza.centralCrystal.material.opacity = 0.6 + Math.sin(t*1.5)*0.2;
+  }
+  if(plaza.ring){
+    plaza.ring.rotation.z += 0.004;
+  }
+  poiMarkers.forEach((m, i)=>{
+    m.position.y = m.userData.baseY + Math.sin(t*1.4 + i*1.2)*0.8;
+    m.children[0].rotation.y += 0.02;
+    m.children[0].material.opacity = 0.7 + Math.sin(t*2 + i)*0.3;
+  });
+  if(centralParticles){
+    const pos = centralParticles.geometry.attributes.position;
+    for(let i=0;i<pos.count;i++){
+      const angle = (i/pos.count)*Math.PI*2 + t*0.3;
+      const r = 5 + Math.sin(t*0.5+i)*1.5;
+      pos.setX(i, Math.cos(angle)*r);
+      pos.setY(i, 16 + Math.random()*0.1 + Math.sin(t+i*0.3)*2);
+      pos.setZ(i, Math.sin(angle)*r);
+    }
+    pos.needsUpdate = true;
+  }
+  scene.children.forEach(obj=>{
+    if(obj.userData && obj.userData.area){
+      obj.position.y = obj.userData.baseY + Math.sin(t*0.8 + obj.userData.area.x)*0.3;
+    }
+  });
+  let closest = null, closestDist = Infinity;
+  poiMarkers.forEach(m=>{
+    const dx = avatar.position.x - m.position.x;
+    const dz = avatar.position.z - m.position.z;
+    const dist = Math.hypot(dx, dz);
+    if(dist < 12 && dist < closestDist){ closest = m; closestDist = dist; }
+  });
+  if(closest !== nearPoi){
+    nearPoi = closest;
+    if(nearPoi){
+      hintEl.style.left = '50%';
+      hintEl.style.top = '65%';
+      hintEl.classList.add('visible');
+    } else {
+      hintEl.classList.remove('visible');
+    }
+  }
+  if(isMobileDevice && closest){
+    hintEl.classList.add('visible');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// FASE 2: TRILHAS DA BNCC COMPUTAÇÃO
+// ══════════════════════════════════════════════════════════════
+
+const TRILHAS_DATA = [
+  {id:"algoritmos",nome:"Floresta dos Algoritmos",emoji:"🌲", tema:"Pensamento Computacional", descricao:"Aprenda a resolver problemas passo a passo através de algoritmos e fluxogramas.", conceitos:["Sequência","Algoritmos","Fluxogramas","Resolução de Problemas"], habilidadesBNCC:["EF05CO01","EF06CO01"], cor:0x22cc44,corHex:"#22cc44", islandPos:new THREE.Vector3(160,20,80), descoberta:false,desbloqueada:true,concluida:false},
+  {id:"cristais",nome:"Vale dos Cristais",emoji:"🔮", tema:"Reconhecimento de Padrões", descricao:"Descubra os padrões ocultos que existem ao nosso redor no mundo digital.", conceitos:["Identificação de Padrões","Repetição","Similaridade","Abstração Visual"], habilidadesBNCC:["EF05CO02","EF06CO02"], cor:0x9933ff,corHex:"#9933ff", islandPos:new THREE.Vector3(-150,40,120), descoberta:false,desbloqueada:true,concluida:false},
+  {id:"inventores",nome:"Oficina dos Inventores",emoji:"🏗", tema:"Decomposição", descricao:"Aprenda a dividir grandes problemas em partes menores e mais fáceis de resolver.", conceitos:["Decomposição","Divisão de Problemas","Modularidade","Organização"], habilidadesBNCC:["EF05CO03","EF06CO03"], cor:0xff6600,corHex:"#ff6600", islandPos:new THREE.Vector3(200,-15,-100), descoberta:false,desbloqueada:true,concluida:false},
+  {id:"nuvens",nome:"Cidade das Nuvens",emoji:"☁", tema:"Abstração", descricao:"Simplifique o complexo. Eleve seu pensamento e veja o essencial.", conceitos:["Abstração","Simplificação","Modelagem","Representações"], habilidadesBNCC:["EF05CO04","EF06CO04"], cor:0xaaddff,corHex:"#aaddff", islandPos:new THREE.Vector3(-180,10,-130), descoberta:false,desbloqueada:true,concluida:false},
+  {id:"codigos",nome:"Torre dos Códigos",emoji:"⚡", tema:"Programação", descricao:"Aprenda a dar instruções ao computador e criar seus próprios programas.", conceitos:["Programação","Variáveis","Condições","Repetição e Funções"], habilidadesBNCC:["EF07CO01","EF07CO02"], cor:0x00eeff,corHex:"#00eeff", islandPos:new THREE.Vector3(100,60,-160), descoberta:false,desbloqueada:true,concluida:false},
+  {id:"digital",nome:"Porto Digital",emoji:"🌐", tema:"Cultura Digital", descricao:"Explore o mundo digital com responsabilidade, ética e criatividade.", conceitos:["Cultura Digital","Cidadania Digital","Ética Online","Criação Digital"], habilidadesBNCC:["EF08CO01","EF08CO02"], cor:0x00ccaa,corHex:"#00ccaa", islandPos:new THREE.Vector3(-120,-30,200), descoberta:false,desbloqueada:true,concluida:false},
+  {id:"conexoes",nome:"Ilha das Conexões",emoji:"📡", tema:"Internet e Redes", descricao:"Conecte-se ao mundo. Entenda como a internet e as redes funcionam.", conceitos:["Internet","Redes de Computadores","Protocolos","Comunicação Digital"], habilidadesBNCC:["EF09CO01","EF09CO02"], cor:0x2255ff,corHex:"#2255ff", islandPos:new THREE.Vector3(50,-15,-230), descoberta:false,desbloqueada:true,concluida:false}
+];
+
+let trilhaAtiva = null;
+let camTravel = null;
+let portais = [];
+let trilhaGroups = [];
+
+const sharedStone = new THREE.MeshStandardMaterial({color:0x778899,roughness:1});
+const sharedWood  = new THREE.MeshStandardMaterial({color:0x6b4226,roughness:.95});
+const sharedGray  = new THREE.MeshStandardMaterial({color:0x556677,roughness:.9,metalness:.3});
+
+function createExtraIsland7(){
+  const pos = TRILHAS_DATA[6].islandPos;
+  const g = new THREE.Group();
+  const geo = new THREE.CylinderGeometry(14,10,7,16,3,false);
+  const p = geo.attributes.position;
+  for(let i=0;i<p.count;i++){
+    if(p.getY(i)>0) p.setY(i,p.getY(i)+Math.sin(p.getX(i)*.3)*1.8);
+  }
+  p.needsUpdate=true; geo.computeVertexNormals();
+  const m = new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0x4a8030,roughness:.9}));
+  m.receiveShadow=true; g.add(m);
+  const bot = new THREE.Mesh(new THREE.CylinderGeometry(10,7,8,12),new THREE.MeshStandardMaterial({color:0x8B7355,roughness:1}));
+  bot.position.y=-7; g.add(bot);
+  g.position.set(pos.x,pos.y,pos.z);
+  scene.add(g);
+  return g;
+}
+function createFlorestAlgoritmos(pos){
+  const g = new THREE.Group();
+  const grnMat = new THREE.MeshStandardMaterial({color:0x33cc55,emissive:0x004400,emissiveIntensity:.25,roughness:.7});
+  for(let i=0;i<4;i++){
+    const a=(i/4)*Math.PI*2; const r=7;
+    const totem = new THREE.Group();
+    totem.add(new THREE.Mesh(new THREE.CylinderGeometry(.45,.55,6,8),sharedWood.clone()));
+    for(let j=0;j<3;j++){
+      const ring=new THREE.Mesh(new THREE.TorusGeometry(.65,.13,6,12),grnMat.clone());
+      ring.position.y=-2+j*2; ring.rotation.x=Math.PI/2; totem.add(ring);
+    }
+    totem.position.set(Math.cos(a)*r,pos.y+3,Math.sin(a)*r);
+    g.add(totem);
+  }
+  const stoneGeo = new THREE.DodecahedronGeometry(.7,0);
+  const stoneMesh = new THREE.InstancedMesh(stoneGeo,sharedStone,10);
+  const dummy = new THREE.Object3D();
+  for(let i=0;i<10;i++){
+    dummy.position.set((Math.random()-.5)*18,pos.y+.4,(Math.random()-.5)*18);
+    dummy.rotation.set(Math.random(),Math.random(),Math.random());
+    dummy.scale.setScalar(.7+Math.random()*.6);
+    dummy.updateMatrix(); stoneMesh.setMatrixAt(i,dummy.matrix);
+  }
+  g.add(stoneMesh);
+  const lf = new THREE.MeshStandardMaterial({color:0x2db830,emissive:0x003300,emissiveIntensity:.15,roughness:.8});
+  const tk = new THREE.MeshStandardMaterial({color:0x5a3010,roughness:.9});
+  for(let i=0;i<5;i++){
+    const a=(i/5)*Math.PI*2+.5; const r=9+Math.random()*3;
+    const tr=new THREE.Group();
+    tr.add(new THREE.Mesh(new THREE.CylinderGeometry(.4,.6,4,8),tk.clone()));
+    for(let j=0;j<3;j++){
+      const cone=new THREE.Mesh(new THREE.ConeGeometry(3-j*.6,2.5,7),lf.clone());
+      cone.position.y=4+j*2; tr.add(cone);
+    }
+    tr.position.set(Math.cos(a)*r,pos.y,Math.sin(a)*r);
+    g.add(tr);
+  }
+  const bGeo=new THREE.BufferGeometry();
+  const bPos=new Float32Array(6*3);
+  for(let i=0;i<6;i++){
+    bPos[i*3]=(Math.random()-.5)*20; bPos[i*3+1]=pos.y+10+Math.random()*5; bPos[i*3+2]=(Math.random()-.5)*20;
+  }
+  bGeo.setAttribute('position',new THREE.BufferAttribute(bPos,3));
+  const bPts=new THREE.Points(bGeo,new THREE.PointsMaterial({color:0x223322,size:.9,sizeAttenuation:true}));
+  g.userData.bPts=bPts; g.userData.bPhases=Array.from({length:6},()=>Math.random()*Math.PI*2);
+  g.add(bPts);
+  g.position.set(pos.x,0,pos.z); scene.add(g); return g;
+}
+function createValeCristais(pos){
+  const g = new THREE.Group();
+  const colors=[0x9933ff,0x6644ff,0xcc44ff,0x4466ff,0xaa55ee];
+  const cGeo=new THREE.ConeGeometry(.7,3.5,6);
+  const cMat=new THREE.MeshStandardMaterial({color:0x9933ff,metalness:.85,roughness:.08,transparent:true,opacity:.85,emissive:0x330066,emissiveIntensity:.3});
+  const crystalMesh=new THREE.InstancedMesh(cGeo,cMat,10);
+  const d2=new THREE.Object3D();
+  const cPhases=[];
+  for(let i=0;i<10;i++){
+    d2.position.set((Math.random()-.5)*18,pos.y+1.5,(Math.random()-.5)*18);
+    d2.rotation.set(0,Math.random()*Math.PI*2,(Math.random()-.5)*.3);
+    d2.scale.setScalar(.6+Math.random()*.9);
+    d2.updateMatrix(); crystalMesh.setMatrixAt(i,d2.matrix);
+    cPhases.push(Math.random()*Math.PI*2);
+  }
+  g.userData.crystalMesh=crystalMesh; g.userData.cPhases=cPhases;
+  g.add(crystalMesh);
+  const hMat=new THREE.MeshStandardMaterial({color:0x5533aa,roughness:.5,emissive:0x110033,emissiveIntensity:.4,transparent:true,opacity:.9});
+  const hGeo=new THREE.CylinderGeometry(1.3,1.3,.25,6);
+  const hexMesh=new THREE.InstancedMesh(hGeo,hMat,6);
+  for(let i=0;i<6;i++){
+    const a=(i/6)*Math.PI*2;
+    d2.position.set(Math.cos(a)*7.5,pos.y+.15,Math.sin(a)*7.5);
+    d2.rotation.set(0,0,0); d2.scale.setScalar(1);
+    d2.updateMatrix(); hexMesh.setMatrixAt(i,d2.matrix);
+  }
+  g.add(hexMesh);
+  const rGeo=new THREE.DodecahedronGeometry(1.2,0);
+  for(let i=0;i<6;i++){
+    const rMat=new THREE.MeshStandardMaterial({color:colors[i%colors.length],roughness:.65,transparent:true,opacity:.9});
+    const rock=new THREE.Mesh(rGeo,rMat);
+    rock.position.set((Math.random()-.5)*14,pos.y+1,(Math.random()-.5)*14);
+    rock.rotation.set(Math.random(),Math.random(),Math.random()); g.add(rock);
+  }
+  g.position.set(pos.x,0,pos.z); scene.add(g); return g;
+}
+function createOficina(pos){
+  const g = new THREE.Group();
+  const metalMat=new THREE.MeshStandardMaterial({color:0xff7700,metalness:.75,roughness:.3,emissive:0x331100,emissiveIntensity:.2});
+  const dkMat=new THREE.MeshStandardMaterial({color:0x884400,metalness:.8,roughness:.4});
+  const bench=new THREE.Mesh(new THREE.BoxGeometry(8,.5,3),new THREE.MeshStandardMaterial({color:0x8B6914,roughness:.9}));
+  bench.position.set(0,pos.y+1.2,0); g.add(bench);
+  [[3.5,0,1],[3.5,0,-1],[-3.5,0,1],[-3.5,0,-1]].forEach(([x,,z])=>{
+    const leg=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,2,6),dkMat.clone());
+    leg.position.set(x,pos.y+.1,z); g.add(leg);
+  });
+  const gGeo=new THREE.TorusGeometry(1,.3,6,14);
+  const gMesh=new THREE.InstancedMesh(gGeo,metalMat,4);
+  const d3=new THREE.Object3D();
+  const gearPositions=[[0,pos.y+5,0],[4,pos.y+4,2.5],[-3.5,pos.y+3.5,-2],[5.5,pos.y+3.2,-3]];
+  const gearSpeeds=[.012,-.018,.015,-.01];
+  gearPositions.forEach(([gx,gy,gz],i)=>{
+    d3.position.set(gx,gy,gz); d3.rotation.set(0,0,0); d3.scale.setScalar(1);
+    d3.updateMatrix(); gMesh.setMatrixAt(i,d3.matrix);
+  });
+  g.userData.gMesh=gMesh; g.userData.gearPos=gearPositions; g.userData.gearSpeeds=gearSpeeds;
+  g.userData.gearAngles=[0,0,0,0];
+  g.add(gMesh);
+  [[-6,0],[6,0]].forEach(([x,z])=>{
+    const col=new THREE.Mesh(new THREE.CylinderGeometry(.45,.55,8,8),dkMat.clone());
+    col.position.set(x,pos.y+4,z); g.add(col);
+  });
+  const beam=new THREE.Mesh(new THREE.BoxGeometry(12,.4,.4),dkMat.clone());
+  beam.position.set(0,pos.y+8.2,0); g.add(beam);
+  const sMat=new THREE.MeshBasicMaterial({color:0xbbbbbb,transparent:true,opacity:.22});
+  const smokes=[];
+  for(let i=0;i<5;i++){
+    const sm=new THREE.Mesh(new THREE.SphereGeometry(1+i*.35,6,6),sMat.clone());
+    sm.position.set(0,pos.y+5+i*1.3,0);
+    sm.userData.phase=i*.45; smokes.push(sm); g.add(sm);
+  }
+  g.userData.smokes=smokes;
+  g.position.set(pos.x,0,pos.z); scene.add(g); return g;
+}
+function createCidadeNuvens(pos){
+  const g = new THREE.Group();
+  const platMat=new THREE.MeshStandardMaterial({color:0xddeeff,roughness:.25,metalness:.12,transparent:true,opacity:.92});
+  const bridgeMat=new THREE.MeshStandardMaterial({color:0xaaccff,roughness:.4,transparent:true,opacity:.72});
+  const platData=[[0,0,0],[8,3,-6],[-7,5,5],[10,-2,8],[-5,2,-8]];
+  const platforms=[];
+  platData.forEach(([x,yo,z])=>{
+    const r=3+Math.random()*2;
+    const plat=new THREE.Mesh(new THREE.CylinderGeometry(r,r,.4,8),platMat.clone());
+    plat.position.set(x,pos.y+3+yo,z);
+    plat.userData.baseY=pos.y+3+yo; plat.userData.fp=Math.random()*Math.PI*2;
+    platforms.push(plat); g.add(plat);
+    if(Math.random()>.35){
+      const bh=1.5+Math.random()*2.5;
+      const bld=new THREE.Mesh(new THREE.BoxGeometry(2,bh,2),platMat.clone());
+      bld.position.set(x,pos.y+3+yo+.2+bh*.5,z); g.add(bld);
+    }
+  });
+  g.userData.platforms=platforms;
+  [[0,0,8,-6],[8,-6,-5,2],[0,0,-5,2]].forEach(([x1,z1,x2,z2])=>{
+    const mx=(x1+x2)/2,mz=(z1+z2)/2,len=Math.hypot(x2-x1,z2-z1);
+    const bridge=new THREE.Mesh(new THREE.BoxGeometry(len,.2,.9),bridgeMat.clone());
+    bridge.position.set(mx,pos.y+3,mz);
+    bridge.rotation.y=Math.atan2(z2-z1,x2-x1); g.add(bridge);
+  });
+  const cMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.72});
+  const cloudObjs=[];
+  for(let i=0;i<4;i++){
+    const cl=new THREE.Group();
+    for(let j=0;j<3;j++){
+      const puff=new THREE.Mesh(new THREE.SphereGeometry(1.5+j*.5,8,6),cMat.clone());
+      puff.position.x=j*2.2; cl.add(puff);
+    }
+    cl.position.set((Math.random()-.5)*22,pos.y+8+Math.random()*4,(Math.random()-.5)*22);
+    cl.userData.sp=.25+Math.random()*.2; cl.userData.ph=Math.random()*Math.PI*2;
+    cloudObjs.push(cl); g.add(cl);
+  }
+  g.userData.cloudObjs=cloudObjs;
+  g.position.set(pos.x,0,pos.z); scene.add(g); return g;
+}
+function createTorreCodigos(pos){
+  const g = new THREE.Group();
+  const towerMat=new THREE.MeshStandardMaterial({color:0x002233,roughness:.4,metalness:.6});
+  const glowMat=new THREE.MeshBasicMaterial({color:0x00ffff,transparent:true,opacity:.75});
+  const tower=new THREE.Mesh(new THREE.CylinderGeometry(2,3.2,14,10),towerMat.clone());
+  tower.position.set(0,pos.y+7,0); g.add(tower);
+  const topCrystal=new THREE.Mesh(new THREE.OctahedronGeometry(2.8,0),glowMat.clone());
+  topCrystal.position.set(0,pos.y+15.5,0);
+  g.userData.topCrystal=topCrystal; g.add(topCrystal);
+  const runeMat=new THREE.MeshBasicMaterial({color:0x00eeff,transparent:true,opacity:.8,side:THREE.DoubleSide});
+  const runeRings=[];
+  for(let i=0;i<4;i++){
+    const r=new THREE.Mesh(new THREE.TorusGeometry(3.2+i*.6,.15,6,22),runeMat.clone());
+    r.position.set(0,pos.y+3+i*3,0); r.rotation.x=Math.PI/2;
+    r.rotation.y=i*Math.PI/4; r.userData.ph=i*.5;
+    r.userData.rs=(i%2===0?1:-1)*.018;
+    runeRings.push(r); g.add(r);
+  }
+  g.userData.runeRings=runeRings;
+  const eGeo=new THREE.BufferGeometry();
+  const ePos=new Float32Array(40*3);
+  for(let i=0;i<40;i++){
+    const a=(i/40)*Math.PI*2;
+    ePos[i*3]=Math.cos(a)*4.5; ePos[i*3+1]=pos.y+3+(i/40)*12; ePos[i*3+2]=Math.sin(a)*4.5;
+  }
+  eGeo.setAttribute('position',new THREE.BufferAttribute(ePos,3));
+  const ePts=new THREE.Points(eGeo,new THREE.PointsMaterial({color:0x00ffff,size:.7,transparent:true,opacity:.85,sizeAttenuation:true}));
+  g.userData.ePts=ePts; g.add(ePts);
+  g.position.set(pos.x,0,pos.z); scene.add(g); return g;
+}
+function createPortoDigital(pos){
+  const g = new THREE.Group();
+  const portMat=new THREE.MeshStandardMaterial({color:0x004433,roughness:.5,metalness:.5});
+  const holoMat=new THREE.MeshBasicMaterial({color:0x00ffaa,transparent:true,opacity:.45,side:THREE.DoubleSide});
+  const dock=new THREE.Mesh(new THREE.BoxGeometry(14,.5,5),new THREE.MeshStandardMaterial({color:0x2a3322,roughness:.9}));
+  dock.position.set(0,pos.y+.3,0); g.add(dock);
+  const pilGeo=new THREE.CylinderGeometry(.25,.25,5,8);
+  const pilMesh=new THREE.InstancedMesh(pilGeo,portMat,4);
+  const lightGeo=new THREE.SphereGeometry(.4,8,8);
+  const lightMat=new THREE.MeshBasicMaterial({color:0x00ffcc,transparent:true,opacity:.92});
+  const lightMesh=new THREE.InstancedMesh(lightGeo,lightMat,4);
+  const d4=new THREE.Object3D();
+  [[-6,0,2],[6,0,2],[-6,0,-2],[6,0,-2]].forEach(([x,,z],i)=>{
+    d4.position.set(x,pos.y+2.5,z); d4.rotation.set(0,0,0); d4.scale.setScalar(1);
+    d4.updateMatrix(); pilMesh.setMatrixAt(i,d4.matrix);
+    d4.position.set(x,pos.y+5.3,z); d4.updateMatrix(); lightMesh.setMatrixAt(i,d4.matrix);
+  });
+  g.add(pilMesh); g.add(lightMesh);
+  const holos=[];
+  for(let i=0;i<4;i++){
+    const a=(i/4)*Math.PI*2;
+    const holo=new THREE.Mesh(new THREE.PlaneGeometry(2,3),holoMat.clone());
+    holo.position.set(Math.cos(a)*6.5,pos.y+3,Math.sin(a)*6.5);
+    holo.rotation.y=a; holo.userData.ph=i*Math.PI/2;
+    holos.push(holo); g.add(holo);
+    const hr=new THREE.Mesh(new THREE.TorusGeometry(1.2,.07,6,16),new THREE.MeshBasicMaterial({color:0x00ffaa,transparent:true,opacity:.8}));
+    hr.position.copy(holo.position); hr.rotation.x=Math.PI/2; g.add(hr);
+  }
+  g.userData.holos=holos;
+  for(let i=0;i<3;i++){
+    const h=4+i*2;
+    const ft=new THREE.Mesh(new THREE.CylinderGeometry(.22,.32,h,6),portMat.clone());
+    ft.position.set(-4+i*4,pos.y+h/2,-4); g.add(ft);
+    const top=new THREE.Mesh(new THREE.ConeGeometry(.35,1,6),new THREE.MeshBasicMaterial({color:0x00ffaa,transparent:true,opacity:.88}));
+    top.position.set(-4+i*4,pos.y+h+.5,-4); g.add(top);
+  }
+  g.position.set(pos.x,0,pos.z); scene.add(g); return g;
+}
+function createIlhaConexoes(pos){
+  const g = new THREE.Group();
+  const antMat=new THREE.MeshStandardMaterial({color:0x223355,roughness:.4,metalness:.65});
+  const sigMat=new THREE.MeshBasicMaterial({color:0x4488ff,transparent:true,opacity:.55,side:THREE.DoubleSide});
+  const antGeo=new THREE.CylinderGeometry(.22,.42,10,8);
+  const antMesh=new THREE.InstancedMesh(antGeo,antMat,4);
+  const d5=new THREE.Object3D();
+  const antPositions=[[0,0],[5,-4],[-5,3],[3,5]];
+  antPositions.forEach(([ax,az],i)=>{
+    d5.position.set(ax,pos.y+5,az); d5.rotation.set(0,0,0); d5.scale.setScalar(1);
+    d5.updateMatrix(); antMesh.setMatrixAt(i,d5.matrix);
+  });
+  g.add(antMesh);
+  antPositions.forEach(([ax,az],i)=>{
+    [-1,1].forEach(side=>{
+      const arm=new THREE.Mesh(new THREE.CylinderGeometry(.1,.1,4,6),antMat.clone());
+      arm.rotation.z=Math.PI/2; arm.position.set(ax+side*2,pos.y+8,az); g.add(arm);
+    });
+  });
+  const satMat=new THREE.MeshStandardMaterial({color:0x8899cc,metalness:.85,roughness:.2});
+  const sat=new THREE.Mesh(new THREE.CylinderGeometry(2.8,2.8,.2,16),satMat);
+  sat.position.set(2,pos.y+13,-2); sat.rotation.x=Math.PI/3; g.add(sat);
+  const ssup=new THREE.Mesh(new THREE.CylinderGeometry(.14,.14,3,6),antMat.clone());
+  ssup.position.set(2,pos.y+11.5,-2); g.add(ssup);
+  const sigRings=[];
+  for(let i=0;i<5;i++){
+    const r=new THREE.Mesh(new THREE.TorusGeometry(2+i*2.2,.12,6,26),sigMat.clone());
+    r.position.set(0,pos.y+12,0); r.rotation.x=Math.PI/2;
+    r.userData.si=i; sigRings.push(r); g.add(r);
+  }
+  g.userData.sigRings=sigRings;
+  const mainTower=new THREE.Mesh(new THREE.CylinderGeometry(.55,1.1,10,8),antMat.clone());
+  mainTower.position.set(0,pos.y+5,0); g.add(mainTower);
+  g.position.set(pos.x,0,pos.z); scene.add(g); return g;
+}
+function createTrailPortals(){
+  const list=[];
+  const dummy=new THREE.Object3D();
+  TRILHAS_DATA.forEach(trilha=>{
+    const pos=trilha.islandPos;
+    const pg=new THREE.Group();
+    const pilMat=new THREE.MeshStandardMaterial({color:trilha.cor,emissive:trilha.cor,emissiveIntensity:.35,roughness:.3,metalness:.6});
+    const pilGeo=new THREE.CylinderGeometry(.42,.52,7,8);
+    const pilMesh=new THREE.InstancedMesh(pilGeo,pilMat,2);
+    [-2.8,2.8].forEach((side,i)=>{
+      dummy.position.set(side,3.5,0); dummy.rotation.set(0,0,0); dummy.scale.setScalar(1);
+      dummy.updateMatrix(); pilMesh.setMatrixAt(i,dummy.matrix);
+    });
+    pg.add(pilMesh);
+    const archMat=new THREE.MeshStandardMaterial({color:trilha.cor,emissive:trilha.cor,emissiveIntensity:.55,transparent:true,opacity:.92,roughness:.15,metalness:.8});
+    const arch=new THREE.Mesh(new THREE.TorusGeometry(2.8,.38,8,22,Math.PI),archMat);
+    arch.position.set(0,7,0); arch.rotation.z=Math.PI; pg.add(arch);
+    const innerMat=new THREE.MeshBasicMaterial({color:trilha.cor,transparent:true,opacity:.22,side:THREE.DoubleSide});
+    const inner=new THREE.Mesh(new THREE.PlaneGeometry(5,6.2),innerMat);
+    inner.position.set(0,3.4,0); pg.add(inner);
+    const pGeo=new THREE.BufferGeometry();
+    const pPos=new Float32Array(32*3);
+    for(let i=0;i<32;i++){
+      const a=(i/32)*Math.PI*2;
+      pPos[i*3]=Math.cos(a)*2.7; pPos[i*3+1]=3.5+Math.sin(a)*2.7; pPos[i*3+2]=(Math.random()-.5)*.4;
+    }
+    pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
+    const pPts=new THREE.Points(pGeo,new THREE.PointsMaterial({color:trilha.cor,size:.55,transparent:true,opacity:.95,sizeAttenuation:true}));
+    pg.add(pPts);
+    const plateMat=new THREE.MeshBasicMaterial({color:trilha.cor,transparent:true,opacity:.55,side:THREE.DoubleSide,wireframe:false});
+    const plate=new THREE.Mesh(new THREE.PlaneGeometry(6,1.2),plateMat.clone());
+    plate.position.set(0,8.2,0); pg.add(plate);
+    const angle=Math.atan2(pos.x,pos.z);
+    pg.position.set(pos.x,pos.y+1,pos.z);
+    pg.rotation.y=angle;
+    pg.userData={trilha,arch,inner,pPts,ph:Math.random()*Math.PI*2,isPortal:true};
+    scene.add(pg); list.push(pg);
+  });
+  return list;
+}
+
+const discoveredSet=new Set();
+const discQueue=[];
+let discShowing=false;
+function triggerDiscovery(trilha){
+  if(discoveredSet.has(trilha.id)) return;
+  discoveredSet.add(trilha.id);
+  discQueue.push(trilha);
+  if(!discShowing) showNextDisc();
+}
+function showNextDisc(){
+  if(!discQueue.length){discShowing=false;return;}
+  discShowing=true;
+  const t=discQueue.shift();
+  const el=document.getElementById('discovery-notif');
+  document.getElementById('disc-name').textContent=t.emoji+' '+t.nome;
+  el.classList.add('visible');
+  setTimeout(()=>{el.classList.remove('visible');setTimeout(showNextDisc,500);},3600);
+}
+function lerpAngle(a,b,t){
+  let d=b-a;
+  while(d>Math.PI)d-=Math.PI*2;
+  while(d<-Math.PI)d+=Math.PI*2;
+  return a+d*t;
+}
+function easeInOut(t){return t<.5?2*t*t:-1+(4-2*t)*t;}
+function travelToTrail(trilhaId){
+  const tr=trilhaId?TRILHAS_DATA.find(x=>x.id===trilhaId):trilhaAtiva;
+  if(!tr)return;
+  triggerDiscovery(tr);
+  closeTrailPanel();
+  mapPanelElem.style.display='none';
+  const pos=tr.islandPos;
+  const targetTheta=Math.atan2(pos.x,pos.z)+Math.PI;
+  camTravel={
+    sTheta:camState.theta,sPhi:camState.phi,sDist:camState.distance,
+    tTheta:targetTheta,tPhi:.7,tDist:85,
+    dur:2.5,el:0,
+    sTarget:camState.smoothTarget.clone(),
+    tTarget:pos.clone().add(new THREE.Vector3(0,6,0))
+  };
+  setTimeout(() => { startTrailActivity(tr.id); }, 2800);
+}
+function travelToMain(){
+  mapPanelElem.style.display='none';
+  camTravel={
+    sTheta:camState.theta,sPhi:camState.phi,sDist:camState.distance,
+    tTheta:0,tPhi:.8,tDist:80,
+    dur:2,el:0,
+    sTarget:camState.smoothTarget.clone(),
+    tTarget:new THREE.Vector3(0,14,0)
+  };
+  const actOverlay = document.getElementById('activity-overlay');
+  if(actOverlay.classList.contains('active')) actOverlay.classList.remove('active');
+}
+function updateCamTravel(dt){
+  if(!camTravel)return;
+  camTravel.el+=dt;
+  const frac=Math.min(camTravel.el/camTravel.dur,1);
+  const e=easeInOut(frac);
+  camState.theta=lerpAngle(camTravel.sTheta,camTravel.tTheta,e);
+  camState.phi=camTravel.sPhi+(camTravel.tPhi-camTravel.sPhi)*e;
+  camState.distance=camTravel.sDist+(camTravel.tDist-camTravel.sDist)*e;
+  camState.smoothTarget.lerpVectors(camTravel.sTarget,camTravel.tTarget,e);
+  if(frac>=1)camTravel=null;
+}
+function openTrailPanel(trilha){
+  if(!trilha)return;
+  trilhaAtiva=trilha;
+  document.getElementById('trail-icon-emoji').textContent=trilha.emoji;
+  document.getElementById('trail-icon-wrap').style.background=trilha.corHex+'28';
+  document.getElementById('trail-panel-name').textContent=trilha.nome;
+  document.getElementById('trail-panel-tema').textContent='🎯 '+trilha.tema;
+  document.getElementById('trail-panel-desc').textContent=trilha.descricao;
+  document.getElementById('trail-concept-list').innerHTML=trilha.conceitos.map(c=>`<li>${c}</li>`).join('');
+  const pi=document.getElementById('trail-panel-inner');
+  pi.style.borderColor=trilha.corHex+'66';
+  document.getElementById('trail-panel').classList.add('active');
+}
+function closeTrailPanel(){
+  document.getElementById('trail-panel').classList.remove('active');
+  trilhaAtiva=null;
+}
+document.getElementById('trail-panel').addEventListener('click',function(e){if(e.target===this)closeTrailPanel();});
+document.getElementById('trail-travel-btn').addEventListener('click',()=>travelToTrail());
+function updateMapSystem(){
+  const mp=document.getElementById('map-panel');
+  mp.innerHTML=`<h3>🗺️ Mapa do Mundo</h3><ul><li><span class="map-dot" style="background:#5bc8f5"></span><span class="map-trail-name">⭐ Praça Central</span><button class="map-travel-btn" onclick="travelToMain()">Ir</button></li>${TRILHAS_DATA.map(t=>`<li><span class="map-dot" style="background:${t.corHex}"></span><span class="map-trail-name">${t.emoji} ${t.nome}</span><button class="map-travel-btn" onclick="openTrailPanel(TRILHAS_DATA.find(x=>x.id==='${t.id}'))">Info</button><button class="map-travel-btn" onclick="travelToTrail('${t.id}')">Ir</button></li>`).join('')}</ul>`;
+}
+const rc2=new THREE.Raycaster();
+const m2v=new THREE.Vector2();
+function handleCanvasClick(event){
+  if(document.getElementById('trail-panel').classList.contains('active'))return;
+  const cx=event.touches?event.changedTouches[0].clientX:event.clientX;
+  const cy=event.touches?event.changedTouches[0].clientY:event.clientY;
+  m2v.set((cx/window.innerWidth)*2-1,-(cy/window.innerHeight)*2+1);
+  rc2.setFromCamera(m2v,camera);
+  const meshes=[];
+  portais.forEach(p=>p.traverse(c=>{if(c.isMesh)meshes.push(c);}));
+  const hits=rc2.intersectObjects(meshes,false);
+  if(hits.length){
+    let hitPortal=null;
+    portais.forEach(p=>{p.traverse(c=>{if(c===hits[0].object)hitPortal=p;});});
+    if(hitPortal){openTrailPanel(hitPortal.userData.trilha);}
+  }
+}
+canvas.addEventListener('click',handleCanvasClick);
+function updatePhase2(t, pList, tGroups, dt){
+  if(pList) pList.forEach(p=>{
+    const{arch,inner,pPts,ph}=p.userData;
+    if(arch) arch.material.emissiveIntensity=.4+Math.sin(t*2+ph)*.28;
+    if(inner) inner.material.opacity=.12+Math.sin(t*1.6+ph)*.12;
+    if(pPts){
+      const pp=pPts.geometry.attributes.position;
+      for(let j=0;j<pp.count;j++){
+        const a=(j/pp.count)*Math.PI*2+t*.85+ph;
+        const r=2.65+Math.sin(t*2.5+j*.4)*.2;
+        pp.setX(j,Math.cos(a)*r); pp.setY(j,3.5+Math.sin(a)*r); pp.setZ(j,Math.sin(t+j)*.15);
+      }
+      pp.needsUpdate=true;
+    }
+  });
+  if(tGroups) tGroups.forEach((g,idx)=>{
+    if(!g)return;
+    if(idx===0&&g.userData.bPts){
+      const bp=g.userData.bPts.geometry.attributes.position;
+      g.userData.bPhases.forEach((ph,i)=>{
+        bp.setX(i,bp.getX(i)+Math.cos(t*.9+ph)*.07);
+        bp.setY(i,bp.getY(i)+Math.sin(t*2.8+ph)*.035);
+        bp.setZ(i,bp.getZ(i)+Math.sin(t*.7+ph)*.07);
+      });
+      bp.needsUpdate=true;
+    }
+    if(idx===2){
+      if(g.userData.gMesh){
+        g.userData.gearAngles=g.userData.gearAngles||[0,0,0,0];
+        const d=new THREE.Object3D();
+        g.userData.gearAngles=g.userData.gearAngles.map((a,i)=>a+g.userData.gearSpeeds[i]);
+        g.userData.gearAngles.forEach((a,i)=>{
+          const[gx,gy,gz]=g.userData.gearPos[i];
+          d.position.set(gx,gy,gz); d.rotation.set(0,0,a); d.scale.setScalar(1);
+          d.updateMatrix(); g.userData.gMesh.setMatrixAt(i,d.matrix);
+        });
+        g.userData.gMesh.instanceMatrix.needsUpdate=true;
+      }
+      if(g.userData.smokes) g.userData.smokes.forEach((sm,j)=>{
+        sm.position.y+=.012; sm.userData.phase+=dt;
+        sm.material.opacity=Math.max(0,.28-sm.userData.phase*.09);
+        sm.scale.setScalar(1+sm.userData.phase*.18);
+        if(sm.userData.phase>3){sm.position.set(0,TRILHAS_DATA[2].islandPos.y+5+j*1.3,0);sm.userData.phase=0;sm.scale.setScalar(1);}
+      });
+    }
+    if(idx===3){
+      if(g.userData.platforms) g.userData.platforms.forEach(p=>{
+        p.position.y=p.userData.baseY+Math.sin(t*.85+p.userData.fp)*.55;
+      });
+      if(g.userData.cloudObjs) g.userData.cloudObjs.forEach(cl=>{
+        cl.position.x+=Math.sin(t*cl.userData.sp+cl.userData.ph)*.028;
+        cl.position.y+=Math.sin(t*.5+cl.userData.ph)*.016;
+      });
+    }
+    if(idx===4){
+      if(g.userData.runeRings) g.userData.runeRings.forEach(r=>{
+        r.rotation.z+=r.userData.rs; r.material.opacity=.55+Math.sin(t*2+r.userData.ph)*.32;
+      });
+      if(g.userData.topCrystal){
+        g.userData.topCrystal.rotation.y+=.016;
+        g.userData.topCrystal.material.opacity=.45+Math.sin(t*2.2)*.32;
+      }
+      if(g.userData.ePts){
+        const ep=g.userData.ePts.geometry.attributes.position;
+        for(let i=0;i<ep.count;i++){
+          const a=(i/ep.count)*Math.PI*2+t*.65;
+          ep.setX(i,Math.cos(a)*4.5); ep.setZ(i,Math.sin(a)*4.5);
+        }
+        ep.needsUpdate=true;
+      }
+    }
+    if(idx===5&&g.userData.holos) g.userData.holos.forEach(h=>{
+      h.material.opacity=.22+Math.sin(t*1.6+h.userData.ph)*.28;
+      h.scale.y=.88+Math.sin(t*2.2+h.userData.ph)*.12;
+    });
+    if(idx===6&&g.userData.sigRings) g.userData.sigRings.forEach(r=>{
+      const v=Math.sin(t*1.6-r.userData.si*.35);
+      r.material.opacity=Math.max(0,v*.5);
+      r.scale.setScalar(.8+v*.22);
+    });
+  });
+  updateCamTravel(dt);
+}
+createExtraIsland7();
+trilhaGroups=[
+  createFlorestAlgoritmos(TRILHAS_DATA[0].islandPos),
+  createValeCristais(TRILHAS_DATA[1].islandPos),
+  createOficina(TRILHAS_DATA[2].islandPos),
+  createCidadeNuvens(TRILHAS_DATA[3].islandPos),
+  createTorreCodigos(TRILHAS_DATA[4].islandPos),
+  createPortoDigital(TRILHAS_DATA[5].islandPos),
+  createIlhaConexoes(TRILHAS_DATA[6].islandPos)
+];
+portais = createTrailPortals();
+updateMapSystem();
+console.log('[FASE 2] Trilhas BNCC inicializadas:', TRILHAS_DATA.length, 'trilhas | ', portais.length, 'portais');
+
+// ══════════════════════════════════════════════════════════════
+// FASE 3: Gamificação
+// ══════════════════════════════════════════════════════════════
+function createNotificationSystem(){
+  const container = document.getElementById('notif-container');
+  function show(msg, type='', duration=2800){
+    const el = document.createElement('div');
+    el.className = 'float-notif ' + type;
+    el.textContent = msg;
+    container.appendChild(el);
+    requestAnimationFrame(()=>{ requestAnimationFrame(()=>{ el.classList.add('show'); }); });
+    setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(), 400); }, duration);
+  }
+  return { show };
+}
+const notifSys = createNotificationSystem();
+function createSaveSystem(){
+  const KEY = 'horizonte_aprendizagem_save_v1';
+  function save(player, descobertas, estatisticas){
+    try{ localStorage.setItem(KEY, JSON.stringify({ player, descobertas: [...descobertas], estatisticas })); } catch(e){}
+  }
+  function load(){
+    try{ const raw = localStorage.getItem(KEY); if(!raw) return null; return JSON.parse(raw); } catch(e){ return null; }
+  }
+  function clear(){ localStorage.removeItem(KEY); }
+  return { save, load, clear };
+}
+const saveSys = createSaveSystem();
+function createStatisticsSystem(){
+  const stats = { tempoExploracao:0, trilhasVisitadas:0, regioesDescobertas:0, interacoesRealizadas:0, cristaisColetados:0, levelUps:0 };
+  return stats;
+}
+const estatisticas = createStatisticsSystem();
+function createAchievementsSystem(){
+  const medalhas = [
+    {id:"primeira_descoberta", nome:"Primeira Descoberta", emoji:"🏅", desc:"Visitou sua primeira região", conquistada:false},
+    {id:"explorador_nuvens",   nome:"Explorador das Nuvens", emoji:"☁️", desc:"Descobriu a Cidade das Nuvens", conquistada:false},
+    {id:"visitante_digital",   nome:"Visitante Digital", emoji:"🌐", desc:"Descobriu o Porto Digital", conquistada:false},
+    {id:"curioso_computacional", nome:"Curioso Computacional", emoji:"💻", desc:"Interagiu com 3 portais", conquistada:false},
+    {id:"nivel2",              nome:"Aprendiz", emoji:"⭐", desc:"Atingiu o Nível 2", conquistada:false},
+    {id:"nivel5",              nome:"Explorador Experiente", emoji:"🌟", desc:"Atingiu o Nível 5", conquistada:false},
+    {id:"colecao_cristais",    nome:"Caçador de Cristais", emoji:"💎", desc:"Coletou 50 Cristais do Conhecimento", conquistada:false}
+  ];
+  function check(player, descobertas){
+    const gained = [];
+    if(!medalhas[0].conquistada && descobertas.size >= 1){ medalhas[0].conquistada=true; gained.push(medalhas[0]); }
+    if(!medalhas[1].conquistada && descobertas.has('nuvens')){ medalhas[1].conquistada=true; gained.push(medalhas[1]); }
+    if(!medalhas[2].conquistada && descobertas.has('digital')){ medalhas[2].conquistada=true; gained.push(medalhas[2]); }
+    if(!medalhas[3].conquistada && estatisticas.interacoesRealizadas >= 3){ medalhas[3].conquistada=true; gained.push(medalhas[3]); }
+    if(!medalhas[4].conquistada && player.nivel >= 2){ medalhas[4].conquistada=true; gained.push(medalhas[4]); }
+    if(!medalhas[5].conquistada && player.nivel >= 5){ medalhas[5].conquistada=true; gained.push(medalhas[5]); }
+    if(!medalhas[6].conquistada && player.cristais >= 50){ medalhas[6].conquistada=true; gained.push(medalhas[6]); }
+    return gained;
+  }
+  return { medalhas, check };
+}
+const achieveSys = createAchievementsSystem();
+function createXPSystem(player){
+  function xpNecessario(nivel){ return nivel * 100; }
+  function gainXP(amount){
+    player.xp += amount;
+    notifSys.show('+' + amount + ' XP', 'xp');
+    let leveledUp = false;
+    while(player.xp >= xpNecessario(player.nivel)){
+      player.xp -= xpNecessario(player.nivel);
+      player.nivel++;
+      leveledUp = true;
+      estatisticas.levelUps++;
+      showLevelUp(player.nivel);
+      notifSys.show('⭐ Nível ' + player.nivel + ' alcançado!', 'levelup', 3500);
+    }
+    updateHUD();
+    const gained = achieveSys.check(player, discoveredSet);
+    gained.forEach(m => { player.medalhas.push(m.id); notifSys.show(m.emoji + ' Medalha: ' + m.nome, 'medal', 4000); });
+    updateCentralCrystalScale();
+    saveProgress();
+  }
+  function xpPercent(){ return (player.xp / xpNecessario(player.nivel)) * 100; }
+  return { gainXP, xpNecessario, xpPercent };
+}
+function createCrystalSystem(player){
+  function gainCristais(amount){
+    player.cristais += amount;
+    estatisticas.cristaisColetados += amount;
+    notifSys.show('💎 +' + amount + ' Cristais do Conhecimento', 'cristal');
+    updateHUD();
+    const gained = achieveSys.check(player, discoveredSet);
+    gained.forEach(m => { if(!player.medalhas.includes(m.id)){ player.medalhas.push(m.id); notifSys.show(m.emoji + ' Medalha: ' + m.nome, 'medal', 4000); } });
+    saveProgress();
+  }
+  return { gainCristais };
+}
+let player = { nome: "Explorador", nivel: 1, xp: 0, cristais: 0, medalhas: [], regioesDescobertas: [], trilhasVisitadas: [] };
+const xpSys = createXPSystem(player);
+const crystalSys = createCrystalSystem(player);
+const descobertas = { trilhas: [], locais: [], portais: [] };
+(function loadSavedProgress(){
+  const saved = saveSys.load();
+  if(!saved) return;
+  try{
+    Object.assign(player, saved.player);
+    if(saved.descobertas) saved.descobertas.forEach(id => discoveredSet.add(id));
+    if(saved.estatisticas) Object.assign(estatisticas, saved.estatisticas);
+    if(player.medalhas){
+      player.medalhas.forEach(mid => { const m = achieveSys.medalhas.find(x=>x.id===mid); if(m) m.conquistada = true; });
+    }
+    [...discoveredSet].forEach(id => {
+      const t = TRILHAS_DATA.find(x=>x.id===id);
+      if(t){ t.descoberta=true; if(!descobertas.portais.includes(id)) descobertas.portais.push(id); }
+    });
+    updateHUD();
+    updateCentralCrystalScale();
+    console.log('[FASE 3] Save restaurado — Nível', player.nivel, '| XP', player.xp, '| Cristais', player.cristais);
+  } catch(e){ console.warn('[FASE 3] Erro ao carregar save:', e); }
+})();
+function updateHUD(){
+  const xpMax = player.nivel * 100;
+  const pct = Math.min(100, (player.xp / xpMax) * 100);
+  document.getElementById('hud-level').textContent = 'Nível ' + player.nivel;
+  document.getElementById('hud-xp-text').textContent = player.xp + '/' + xpMax;
+  document.getElementById('hud-xp-fill').style.width = pct + '%';
+  document.getElementById('hud-crystals').textContent = player.cristais;
+}
+updateHUD();
+function showLevelUp(nivel){
+  const overlay = document.getElementById('levelup-overlay');
+  document.getElementById('lu-title').textContent = '⭐ Nível ' + nivel + ' alcançado!';
+  overlay.classList.add('show');
+  setTimeout(()=>overlay.classList.remove('show'), 3000);
+}
+function updateCentralCrystalScale(){
+  if(plaza && plaza.centralCrystal){
+    const s = 1 + player.nivel * 0.05;
+    plaza.centralCrystal.scale.set(s, s, s);
+    plaza.centralCrystal.material.opacity = Math.min(0.95, 0.7 + player.nivel * 0.03);
+    if(centralParticles){
+      centralParticles.material.size = 0.8 + player.nivel * 0.1;
+    }
+  }
+}
+function saveProgress(){
+  saveSys.save(player, discoveredSet, estatisticas);
+}
+function openProfilePanel(){
+  document.getElementById('prof-nome').textContent = player.nome;
+  document.getElementById('prof-nivel').textContent = player.nivel;
+  document.getElementById('prof-xp').textContent = player.xp + ' / ' + (player.nivel * 100) + ' XP';
+  document.getElementById('prof-cristais').textContent = player.cristais;
+  document.getElementById('prof-regioes').textContent = discoveredSet.size;
+  document.getElementById('prof-tempo').textContent = Math.floor(estatisticas.tempoExploracao / 60) + ' min';
+  const grid = document.getElementById('prof-medals');
+  grid.innerHTML = achieveSys.medalhas.map(m => `<div class="medal-badge ${m.conquistada?'':'locked'}">${m.emoji} ${m.nome}</div>`).join('');
+  document.getElementById('profile-panel').classList.add('active');
+}
+function closeProfilePanel(){
+  document.getElementById('profile-panel').classList.remove('active');
+}
+document.getElementById('profile-panel').addEventListener('click', function(e){ if(e.target===this) closeProfilePanel(); });
+function openDiaryPanel(){
+  const trilhasEl = document.getElementById('diary-trilhas');
+  if(descobertas.portais.length === 0){
+    trilhasEl.innerHTML = '<div class="diary-empty">Nenhuma trilha visitada ainda...</div>';
+  } else {
+    trilhasEl.innerHTML = descobertas.portais.map(id => {
+      const t = TRILHAS_DATA.find(x=>x.id===id);
+      return t ? `<div class="diary-entry">${t.emoji} ${t.nome} <small style="opacity:.5">— ${t.tema}</small><div><small>BNCC: ${t.habilidadesBNCC.join(', ')}</small></div></div>` : '';
+    }).join('');
+  }
+  const portaisEl = document.getElementById('diary-portais');
+  portaisEl.innerHTML = descobertas.portais.length > 0 ? `<div class="diary-entry">💎 ${descobertas.portais.length} portais descobertos</div>` : '<div class="diary-empty">Nenhum portal descoberto ainda...</div>';
+  document.getElementById('diary-stats').innerHTML = `<div class="diary-entry">⏱️ Tempo de Exploração: ${Math.floor(estatisticas.tempoExploracao/60)} min ${Math.floor(estatisticas.tempoExploracao%60)} seg</div><div class="diary-entry">🗺️ Regiões Descobertas: ${discoveredSet.size}</div><div class="diary-entry">🤝 Interações Realizadas: ${estatisticas.interacoesRealizadas}</div><div class="diary-entry">💎 Cristais Totais Coletados: ${estatisticas.cristaisColetados}</div><div class="diary-entry">⭐ Nível Atual: ${player.nivel}</div><div class="diary-entry">🏅 Medalhas: ${player.medalhas.length}/${achieveSys.medalhas.length}</div>`;
+  document.getElementById('diary-panel').classList.add('active');
+}
+function closeDiaryPanel(){
+  document.getElementById('diary-panel').classList.remove('active');
+}
+document.getElementById('diary-panel').addEventListener('click', function(e){ if(e.target===this) closeDiaryPanel(); });
+function openWaterfallPanel(){
+  document.getElementById('wf-nivel').textContent = player.nivel;
+  document.getElementById('wf-cristais').textContent = player.cristais;
+  document.getElementById('wf-regioes').textContent = discoveredSet.size;
+  document.getElementById('wf-medals').textContent = player.medalhas.length;
+  const xpMax = player.nivel * 100;
+  const pct = Math.min(100, (player.xp / xpMax) * 100);
+  document.getElementById('wf-xp-text').textContent = player.xp + '/' + xpMax + ' XP';
+  document.getElementById('wf-xp-fill').style.width = pct + '%';
+  document.getElementById('waterfall-panel').classList.add('active');
+  rewardWaterfallVisit();
+}
+function closeWaterfallPanel(){
+  document.getElementById('waterfall-panel').classList.remove('active');
+}
+document.getElementById('waterfall-panel').addEventListener('click', function(e){ if(e.target===this) closeWaterfallPanel(); });
+const rewardedOnce = new Set();
+function rewardDiscovery(trilhaId){
+  if(rewardedOnce.has('disc_'+trilhaId)) return;
+  rewardedOnce.add('disc_'+trilhaId);
+  crystalSys.gainCristais(5);
+  xpSys.gainXP(20);
+  estatisticas.regioesDescobertas++;
+  estatisticas.interacoesRealizadas++;
+  if(!descobertas.portais.includes(trilhaId)) descobertas.portais.push(trilhaId);
+  updateMapEvolutivo();
+}
+function rewardPortalInteraction(trilhaId){
+  if(rewardedOnce.has('portal_'+trilhaId)) return;
+  rewardedOnce.add('portal_'+trilhaId);
+  crystalSys.gainCristais(3);
+  xpSys.gainXP(10);
+  estatisticas.interacoesRealizadas++;
+}
+function rewardPanelRead(panelId){
+  if(rewardedOnce.has('panel_'+panelId)) return;
+  rewardedOnce.add('panel_'+panelId);
+  crystalSys.gainCristais(2);
+  xpSys.gainXP(5);
+  estatisticas.interacoesRealizadas++;
+}
+let waterfallVisited = false;
+function rewardWaterfallVisit(){
+  if(waterfallVisited) return;
+  waterfallVisited = true;
+  crystalSys.gainCristais(2);
+  xpSys.gainXP(5);
+}
+const _origTriggerDiscovery = triggerDiscovery;
+window.triggerDiscovery = function(trilha){
+  _origTriggerDiscovery(trilha);
+  rewardDiscovery(trilha.id);
+  const gained = achieveSys.check(player, discoveredSet);
+  gained.forEach(m => {
+    if(!player.medalhas.includes(m.id)){
+      player.medalhas.push(m.id);
+      notifSys.show(m.emoji + ' Medalha: ' + m.nome, 'medal', 4000);
+    }
+  });
+};
+const _origOpenTrailPanel = openTrailPanel;
+window.openTrailPanel = function(trilha){
+  _origOpenTrailPanel(trilha);
+  if(trilha) rewardPortalInteraction(trilha.id);
+};
+const _origOpenInfoPanel = openInfoPanel;
+window.openInfoPanel = function(poi){
+  _origOpenInfoPanel(poi);
+  rewardPanelRead(poi.id);
+  if(poi.id === 'cachoeira'){ setTimeout(()=>{ openWaterfallPanel(); }, 300); }
+};
+function updateMapEvolutivo(){
+  const mp = document.getElementById('map-panel');
+  mp.innerHTML = `<h3>🗺️ Mapa do Mundo</h3><ul><li><span class="map-dot" style="background:#5bc8f5"></span><span class="map-trail-name">⭐ Praça Central</span><button class="map-travel-btn" onclick="travelToMain()">Ir</button></li>${TRILHAS_DATA.map(t=>`<li><span class="map-dot" style="background:${t.corHex}"></span><span class="map-trail-name">${t.emoji} ${t.nome} ${discoveredSet.has(t.id)?'✔':'🔒'}</span><button class="map-travel-btn" onclick="openTrailPanel(TRILHAS_DATA.find(x=>x.id==='${t.id}'))">Info</button><button class="map-travel-btn" onclick="travelToTrail('${t.id}')">Ir</button></li>`).join('')}</ul>`;
+}
+function updateKnowledgeWaterfall(t){
+  const waterfallMarker = poiMarkers.find(m => m.userData.poi && m.userData.poi.id === 'cachoeira');
+  if(waterfallMarker){
+    const intensity = 0.7 + Math.min(player.cristais * 0.005, 0.25);
+    waterfallMarker.children[0].material.opacity = intensity + Math.sin(t*2)*0.15;
+    const baseScale = 1 + player.nivel * 0.03;
+    waterfallMarker.scale.setScalar(baseScale + Math.sin(t*1.5)*0.05);
+  }
+}
+let lastStatTime = performance.now();
+function updateStatisticsTimer(){
+  const now = performance.now();
+  estatisticas.tempoExploracao += (now - lastStatTime) / 1000;
+  lastStatTime = now;
+  if(Math.floor(estatisticas.tempoExploracao) % 30 === 0 && Math.floor(estatisticas.tempoExploracao) > 0){
+    saveProgress();
+  }
+}
+updateCentralCrystalScale();
+updateMapEvolutivo();
+console.log('[FASE 3] Sistema de Gamificação inicializado — Jogador:', player.nome, 'Nível:', player.nivel);
+
+// ══════════════════════════════════════════════════════════════
+// FASE 4: MISSÕES, NPCs E ATIVIDADES
+// ══════════════════════════════════════════════════════════════
+let npcGroup = null;
+let npcDialog = document.getElementById('npc-dialog');
+let currentDialogIndex = 0;
+
+
+// ══════════════════════════════════════════════════════════════
+// NPC: MAGO DA COMPUTAÇÃO (Fase 6 - Substituição Visual Segura)
+// ══════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════
+// NPC: MAGO DA COMPUTAÇÃO (Com Patrulha e Interação Automática)
+// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// NPC: MAGO DA COMPUTAÇÃO (Com Anel de Interação Visual)
+// ══════════════════════════════════════════════════════════════
+async function createNPC() {
+    const group = new THREE.Group();
+    
+    // 1. Carregar textura (com fallback)
+    const npcTexture = await AssetManager.loadTexture('{% static "ilha/mago.png" %}', 0x4466ff);
+    
+    if (npcTexture.isFallback) {
+        // FALLBACK: Geometria procedural
+        const bodyMat = npcTexture.material; 
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.7, 1.2, 8), bodyMat);
+        body.castShadow = true; body.receiveShadow = true;
+        group.add(body);
+        
+        const headMat = new THREE.MeshStandardMaterial({ color: 0xffccaa });
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.45, 16, 16), headMat);
+        head.position.y = 1.2; head.castShadow = true;
+        group.add(head);
+        
+        const hatMat = new THREE.MeshStandardMaterial({ color: 0x6644ff });
+        const hat = new THREE.Mesh(new THREE.ConeGeometry(0.6, 0.8, 8), hatMat);
+        hat.position.y = 1.7;
+        group.add(hat);
+        
+        const eyeMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+        const leftEye = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), eyeMat);
+        leftEye.position.set(-0.15, 1.3, 0.45);
+        const rightEye = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), eyeMat);
+        rightEye.position.set(0.15, 1.3, 0.45);
+        group.add(leftEye); group.add(rightEye);
+        
+        const staffMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+        const staff = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2.5, 6), staffMat);
+        staff.position.set(0.6, 1.2, 0.2);
+        staff.rotation.z = -0.2;
+        group.add(staff);
+    } else {
+        // SUCESSO: Sprite com textura
+        const spriteMat = new THREE.SpriteMaterial({ map: npcTexture, transparent: true });
+        const sprite = new THREE.Sprite(spriteMat);
+        sprite.scale.set(2.2, 2.8, 1);
+        sprite.position.y = 1.4;
+        group.add(sprite);
+        
+        const collider = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.7, 0.7, 2.2, 8),
+            new THREE.MeshBasicMaterial({ visible: false })
+        );
+        collider.position.y = 1.1;
+        group.add(collider);
+    }
+    
+    // Posição inicial
+    group.position.set(5, 14.8, 12);
+    
+    // ══════════════════════════════════════════════════════════
+    // INDICADOR VISUAL DA ZONA DE INTERAÇÃO (VisualLayer)
+    // ══════════════════════════════════════════════════════════
+    const radius = 6.5;
+    const interactionRingGeo = new THREE.RingGeometry(radius - 0.15, radius + 0.15, 64);
+    const interactionRingMat = new THREE.MeshBasicMaterial({ 
+        color: 0x5bc8f5, 
+        transparent: true, 
+        opacity: 0.2, 
+        side: THREE.DoubleSide,
+        depthWrite: false // Evita conflitos de renderização com o chão
+    });
+    const interactionRing = new THREE.Mesh(interactionRingGeo, interactionRingMat);
+    interactionRing.rotation.x = -Math.PI / 2; // Deitar no plano XZ (chão)
+    interactionRing.position.y = -0.3; // Ajuste fino para ficar no nível do chão (14.8 - 0.3 = 14.5)
+    group.add(interactionRing);
+    
+    // DADOS DE ESTADO (GameLogic / InteractionLayer)
+    group.userData = {
+        isNPC: true,
+        npcName: "Mago da Computação",
+        interactionRadius: radius,
+        isPatrolling: true,
+        patrolDirection: 1,
+        patrolSpeed: 1.2,
+        patrolAxis: 'x',
+        hasInteracted: false,
+        interactionCooldown: 0,
+        interactionRing: interactionRing // Referência para animação no loop
+    };
+    
+    scene.add(group);
+    return group;
+}
+
+// ══════════════════════════════════════════════════════════════
+// LÓGICA DE PATRULHA E INTERAÇÃO AUTOMÁTICA DO NPC
+// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// LÓGICA DE PATRULHA E INTERAÇÃO AUTOMÁTICA DO NPC
+// ══════════════════════════════════════════════════════════════
+function updateNPC(dt) {
+    if (!npcGroup) return;
+
+    const dist = avatar.position.distanceTo(npcGroup.position);
+    const interactionRadius = npcGroup.userData.interactionRadius;
+    const exitRadius = interactionRadius * 1.5; 
+    
+    const isClose = dist < interactionRadius;
+    const isFar = dist > exitRadius; 
+    
+    const isDialogOpen = document.getElementById('npc-dialog').style.display === 'flex' || 
+                         document.getElementById('dialogo-avancado').style.display === 'flex' ||
+                         document.getElementById('activity-overlay').classList.contains('active');
+
+    if (npcGroup.userData.interactionCooldown === undefined) {
+        npcGroup.userData.interactionCooldown = 0;
+    }
+
+    if (npcGroup.userData.interactionCooldown > 0) {
+        npcGroup.userData.interactionCooldown -= dt;
+    }
+
+    // 1. Lógica de Interação Automática
+    if (isClose && !isDialogOpen && !npcGroup.userData.hasInteracted && npcGroup.userData.interactionCooldown <= 0) {
+        npcGroup.userData.hasInteracted = true;
+        npcGroup.userData.interactionCooldown = 2;
+        startNPCDialog();
+    } 
+    // 2. FECHAMENTO AUTOMÁTICO ao se afastar
+    else if (isFar && isDialogOpen) {
+        document.getElementById('npc-dialog').style.display = 'none';
+        document.getElementById('dialogo-avancado').style.display = 'none';
+        document.getElementById('activity-overlay').classList.remove('active');
+        npcGroup.userData.hasInteracted = false;
+    }
+    // 3. Reset do estado
+    else if (isFar && !isDialogOpen) {
+        npcGroup.userData.hasInteracted = false;
+    }
+
+    // 4. Lógica de Patrulha
+    if (!isClose && !isDialogOpen && npcGroup.userData.isPatrolling) {
+        const moveAmount = npcGroup.userData.patrolSpeed * dt * npcGroup.userData.patrolDirection;
+        
+        if (npcGroup.userData.patrolAxis === 'x') {
+            npcGroup.position.x += moveAmount;
+            npcGroup.rotation.y = npcGroup.userData.patrolDirection > 0 ? Math.PI / 2 : -Math.PI / 2;
+            
+            if (npcGroup.position.x > 8) {
+                npcGroup.userData.patrolDirection = -1;
+            } else if (npcGroup.position.x < 2) {
+                npcGroup.userData.patrolDirection = 1;
+            }
+        }
+    } 
+    // 5. Quando parado, olha para o jogador
+    else if (isClose || isDialogOpen) {
+        npcGroup.lookAt(avatar.position.x, npcGroup.position.y, avatar.position.z);
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // 6. FEEDBACK VISUAL DO ANEL (VisualLayer)
+    // ══════════════════════════════════════════════════════════
+    if (npcGroup.userData.interactionRing) {
+        const t = performance.now() * 0.001;
+        const baseOpacity = 0.9 + Math.sin(t * 2) * 0.1; // Pulsação suave constante
+        
+        if (isClose) {
+            // Jogador dentro da zona: Anel fica mais opaco e dourado
+            npcGroup.userData.interactionRing.material.opacity = 0.45;
+            npcGroup.userData.interactionRing.material.color.setHex(0xffdd44); 
+        } else {
+            // Jogador fora: Anel azul suave pulsando
+            npcGroup.userData.interactionRing.material.opacity = baseOpacity;
+            npcGroup.userData.interactionRing.material.color.setHex(0x5bc8f5); 
+        }
+    }
+}
+
+
+let missoes = [
+    { id: "missao1", titulo: "Primeiro Passo", descricao: "Descubra sua primeira região através de um portal.", objetivo: "descobrir_trilha", objetivoValor: 1, progresso: 0, concluida: false, recompensaXP: 30, recompensaCristais: 10, recompensaMedalha: null },
+    { id: "missao2", titulo: "Explorador das Nuvens", descricao: "Visite a Cidade das Nuvens.", objetivo: "visitar_trilha", objetivoValor: "nuvens", progresso: 0, concluida: false, recompensaXP: 50, recompensaCristais: 15, recompensaMedalha: "explorador_nuvens" },
+    { id: "missao3", titulo: "Curioso Digital", descricao: "Interaja com 3 portais diferentes.", objetivo: "interagir_portais", objetivoValor: 3, progresso: 0, concluida: false, recompensaXP: 40, recompensaCristais: 12, recompensaMedalha: "curioso_computacional" }
+];
+const trailActivities = {
+    "algoritmos": { title: "🌲 Desafio da Floresta dos Algoritmos", question: "Para fazer um bolo, qual a ordem correta das ações?", options: ["Misturar ingredientes, Assar, Ligar o forno", "Ligar o forno, Misturar ingredientes, Assar", "Assar, Ligar o forno, Misturar ingredientes"], correct: 1 },
+    "nuvens": { title: "☁️ Desafio da Cidade das Nuvens", question: "Quando representamos um carro como um retângulo, estamos usando qual habilidade computacional?", options: ["Abstração", "Decomposição", "Algoritmo"], correct: 0 },
+    "codigos": { title: "⚡ Desafio da Torre dos Códigos", question: "Em programação, uma 'variável' é usada para:", options: ["Armazenar um valor", "Repetir um trecho de código", "Fazer uma pergunta"], correct: 0 }
+};
+let currentActivityTrailId = null;
+function startTrailActivity(trailId) {
+    const activity = trailActivities[trailId];
+    if (!activity) return;
+    currentActivityTrailId = trailId;
+    const overlay = document.getElementById('activity-overlay');
+    document.getElementById('activity-title').textContent = activity.title;
+    document.getElementById('activity-question').textContent = activity.question;
+    const optionsDiv = document.getElementById('activity-options');
+    optionsDiv.innerHTML = '';
+    activity.options.forEach((opt, index) => {
+        const optDiv = document.createElement('div');
+        optDiv.className = 'activity-option';
+        optDiv.textContent = opt;
+        optDiv.onclick = () => checkActivityAnswer(index, activity.correct, trailId);
+        optionsDiv.appendChild(optDiv);
+    });
+    document.getElementById('activity-feedback').innerHTML = '';
+    overlay.classList.add('active');
+}
+function checkActivityAnswer(selectedIndex, correctIndex, trailId) {
+    const fb = document.getElementById('activity-feedback');
+    const options = document.querySelectorAll('.activity-option');
+    options.forEach(opt => { opt.classList.add('disabled'); opt.style.pointerEvents = 'none'; });
+    if (selectedIndex === correctIndex) {
+        fb.innerHTML = '<span style="color:#88ff88;">✅ Resposta correta! Você ganhou 15 XP e 5 Cristais!</span>';
+        xpSys.gainXP(15);
+        crystalSys.gainCristais(5);
+        const trail = TRILHAS_DATA.find(t => t.id === trailId);
+        if (trail) trail.concluida = true;
+        checkMissionProgress('concluir_atividade', trailId);
+    } else {
+        fb.innerHTML = '<span style="color:#ff8888;">❌ Resposta incorreta. Tente novamente mais tarde para aprender!</span>';
+    }
+    setTimeout(() => {
+        const overlay = document.getElementById('activity-overlay');
+        overlay.classList.remove('active');
+        currentActivityTrailId = null;
+    }, 2500);
+}
+function updateMissionUI() {
+    const missionsList = document.getElementById('missions-list');
+    missionsList.innerHTML = '';
+    missoes.forEach(mission => {
+        if (!mission.concluida) {
+            const missionDiv = document.createElement('div');
+            missionDiv.className = 'mission-item';
+            missionDiv.innerHTML = `<div class="mission-title">${mission.titulo}</div><div class="mission-desc">${mission.descricao}</div><div class="mission-progress">Progresso: ${mission.progresso}/${mission.objetivoValor}</div><div class="mission-reward">Recompensa: ${mission.recompensaXP} XP, ${mission.recompensaCristais} 💎</div>${mission.progresso >= mission.objetivoValor ? '<button class="mission-complete-btn" data-id="'+mission.id+'">Receber Recompensa</button>' : ''}`;
+            missionsList.appendChild(missionDiv);
+        }
+    });
+    document.querySelectorAll('.mission-complete-btn').forEach(btn => {
+        btn.onclick = (e) => {
+            const id = btn.getAttribute('data-id');
+            const mission = missoes.find(m => m.id === id);
+            if (mission && !mission.concluida && mission.progresso >= mission.objetivoValor) {
+                mission.concluida = true;
+                xpSys.gainXP(mission.recompensaXP);
+                crystalSys.gainCristais(mission.recompensaCristais);
+                if (mission.recompensaMedalha) {
+                    const medal = achieveSys.medalhas.find(m => m.id === mission.recompensaMedalha);
+                    if(medal && !medal.conquistada){
+                        medal.conquistada = true;
+                        player.medalhas.push(medal.id);
+                        notifSys.show(medal.emoji + ' Medalha: ' + medal.nome, 'medal', 4000);
+                    }
+                }
+                updateMissionUI();
+                saveProgress();
+            }
+        };
+    });
+}
+function checkMissionProgress(type, value) {
+    let updated = false;
+    missoes.forEach(mission => {
+        if (mission.concluida) return;
+        switch(mission.objetivo) {
+            case 'descobrir_trilha':
+                if (type === 'descobrir') { mission.progresso = discoveredSet.size; if (mission.progresso >= mission.objetivoValor) mission.progresso = mission.objetivoValor; updated = true; }
+                break;
+            case 'visitar_trilha':
+                if (type === 'visitar' && value === mission.objetivoValor) { mission.progresso = 1; updated = true; }
+                break;
+            case 'interagir_portais':
+                if (type === 'interagir') { mission.progresso = estatisticas.interacoesRealizadas; if (mission.progresso >= mission.objetivoValor) mission.progresso = mission.objetivoValor; updated = true; }
+                break;
+            case 'concluir_atividade':
+                if (type === 'atividade' && value === mission.objetivoValor) { mission.progresso = 1; updated = true; }
+                break;
+        }
+        if (updated && mission.progresso >= mission.objetivoValor) mission.progresso = mission.objetivoValor;
+    });
+    if (updated) { updateMissionUI(); saveProgress(); }
+}
+function startNPCDialog() {
+    currentDialogIndex = 0;
+    const dialogs = ["Olá, jovem explorador! O Conselho do Conhecimento precisa de ajuda.", "Várias trilhas de aprendizado precisam ser ativadas. Viaje pelos portais e complete os desafios!", "Fale comigo novamente para ver suas missões ativas. Boa sorte!"];
+    const dialogText = document.getElementById('dialog-text');
+    dialogText.textContent = dialogs[currentDialogIndex];
+    npcDialog.style.display = 'flex';
+    const nextBtn = document.getElementById('dialog-next');
+    const closeBtn = document.getElementById('dialog-close');
+    nextBtn.onclick = () => {
+        currentDialogIndex++;
+        if (currentDialogIndex < dialogs.length) { dialogText.textContent = dialogs[currentDialogIndex]; }
+        else { npcDialog.style.display = 'none'; const missionsList = document.getElementById('missions-list'); missionsList.style.display = missionsList.style.display === 'flex' ? 'none' : 'flex'; }
+    };
+    closeBtn.onclick = () => { npcDialog.style.display = 'none'; };
+}
+function checkNPCInteraction() {
+    const npcPos = npcGroup.position;
+    const dist = avatar.position.distanceTo(npcPos);
+    if (dist < 5) {
+        hintEl.style.left = '50%'; hintEl.style.top = '65%'; hintEl.classList.add('visible');
+        if (window.lastNearNPC === false) hintEl.textContent = isMobile ? 'Toque no NPC' : 'Pressione E para falar';
+        window.lastNearNPC = true;
+    } else {
+        if (window.lastNearNPC === true) hintEl.classList.remove('visible');
+        window.lastNearNPC = false;
+    }
+}
+document.addEventListener('keydown', (e) => { if (e.code === 'KeyE' && window.lastNearNPC) startNPCDialog(); });
+hintEl.addEventListener('click', () => { if (window.lastNearNPC) startNPCDialog(); });
+const originalTravelToTrail = travelToTrail;
+window.travelToTrail = function(trilhaId) {
+    originalTravelToTrail(trilhaId);
+    checkMissionProgress('visitar', trilhaId);
+};
+const originalTriggerDiscoveryFinal = triggerDiscovery;
+window.triggerDiscovery = function(trilha) {
+    originalTriggerDiscoveryFinal(trilha);
+    checkMissionProgress('descobrir', null);
+    checkMissionProgress('visitar', trilha.id);
+};
+const originalOpenTrailPanelFinal = openTrailPanel;
+window.openTrailPanel = function(trilha) {
+    originalOpenTrailPanelFinal(trilha);
+    if(trilha) checkMissionProgress('interagir', null);
+};
+// Inicialização assíncrona do NPC com AssetManager
+createNPC().then((npc) => {
+    npcGroup = npc;
+    console.log('[FASE 4] NPC inicializado com AssetManager');
+});
+updateMissionUI();
+document.getElementById('missions-btn').addEventListener('click', () => {
+    const missionsList = document.getElementById('missions-list');
+    missionsList.style.display = missionsList.style.display === 'flex' ? 'none' : 'flex';
+    updateMissionUI();
+});
+try {
+    const savedMissions = localStorage.getItem('horizonte_missoes');
+    if (savedMissions) { const saved = JSON.parse(savedMissions); missoes = saved; updateMissionUI(); }
+} catch(e) {}
+function saveMissions() { localStorage.setItem('horizonte_missoes', JSON.stringify(missoes)); }
+const originalSaveProgress = saveProgress;
+window.saveProgress = function() { originalSaveProgress(); saveMissions(); };
+console.log('[FASE 4] Sistema de Missões, NPCs e Atividades inicializado');
+
+// ── ANIMAÇÃO PRINCIPAL ─────────────────────────────────────────
+function animate(){
+  requestAnimationFrame(animate);
+  const now=performance.now(); 
+  const dt=Math.min(.05,(now-lastTime)/1000); 
+  lastTime=now;
+  const t=now*.001;
+  
+  sky.material.uniforms.uTime.value=t;
+  clouds.forEach((c,i)=>{ 
+    c.position.x+=(.05+i*.002)*Math.sin(i*.7)*.3*dt*60*.016; 
+    c.rotation.y=Math.sin(t*.05+i)*.05; 
+    if(c.position.x>600) c.position.x=-600; 
+    if(c.position.x<-600) c.position.x=600; 
+  });
+  waterfall.children.forEach((w,i)=>{ w.material.opacity=.5+Math.sin(t*3+i)*.15; });
+  const ppos=particles.geometry.attributes.position;
+  for(let i=0;i<ppos.count;i++){ 
+    ppos.setY(i,ppos.getY(i)+Math.sin(t+i*.3)*.02); 
+    ppos.setX(i,ppos.getX(i)+Math.cos(t*.5+i*.4)*.01); 
+  }
+  ppos.needsUpdate=true;
+  birds.children.forEach((b,i)=>{
+    const sp=b.userData.speed; const ph=b.userData.phase;
+    b.position.x+=Math.cos(t*sp+ph)*(.3+sp*.2);
+    b.position.z+=Math.sin(t*sp*.7+ph)*(.2+sp*.1);
+    b.position.y+=Math.sin(t*3+ph)*.4*dt*60*.016;
+    b.rotation.y=Math.atan2(Math.cos(t*sp+ph),Math.sin(t*sp*.7+ph));
+  });
+  miniIslands.forEach((m,i)=>{ m.position.y+=Math.sin(t*.4+i*1.1)*.012; });
+  crystalGroup.children.forEach((c,i)=>{ c.material.opacity=.7+Math.sin(t*1.5+i*.8)*.2; c.rotation.y+=.005; });
+  sun.position.set(Math.cos(t*.05)*150, 150+Math.sin(t*.05)*30, Math.sin(t*.05)*80);
+  
+  updateMovement(dt);
+  updateCamera();
+  updateFase1(t);
+  updatePhase2(t,portais,trilhaGroups,dt);
+  
+  // ✅ CHAMADA CORRETA DO NPC (patrulha + interação automática)
+  updateNPC(dt); 
+  
+  updateFPS();
+  updateKnowledgeWaterfall(t);
+  updateStatisticsTimer();
+  
+  // ❌ REMOVIDO: checkNPCInteraction() - não é mais necessário
+  
+  renderer.render(scene,camera);
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// FASE 5: Gamificação Avançada, Biblioteca e Relatórios
+// ══════════════════════════════════════════════════════════════
+
+// ==========================================
+// MÓDULO: Estado Global e Progressão (Fase 5)
+// ==========================================
+const worldProgress = {
+    percentualGeral: 0,
+    trilhasConcluidas: 0,
+    habilidadesDesenvolvidas: new Set(),
+    tempoTotalExploracao: 0
+};
+
+const learningProfile = {
+    acertos: 0,
+    erros: 0,
+    atividadesConcluidas: 0,
+    dificuldadeAtual: "facil",
+    trilhasAtivas: ["algoritmos"]
+};
+
+const conhecimentos = [];
+const fragmentosColetados = new Set();
+
+const npcMapping = {
+    "algoritmos": "Professor Byte",
+    "cristais": "Cristalina",
+    "inventores": "Engenheiro Neo",
+    "nuvens": "Nuvem",
+    "codigos": "Mestre Loop",
+    "digital": "Capitã Digital",
+    "conexoes": "Guardião Link"
+};
+
+const dialogosNPC = {
+    "Mago da Computação": {
+        saudacao: "Saudações, jovem aprendiz! Sou o Mago da Computação. Dominar o código é como dominar a magia: requer lógica e prática.",
+        missao: "Sua jornada começa na Floresta dos Algoritmos. Consegue organizar os passos lógicos para lançar seu primeiro feitiço de código?",
+        dica: "Lembre-se: um algoritmo é como uma receita de poção. A ordem dos ingredientes muda tudo!",
+        sucesso: "Brilhante! Sua mente está afiada como uma varinha de condutor.",
+        dica_emergencial: "Parece que o feitiço falhou. Que tal revisar os conceitos de 'Sequência' na sua Biblioteca?"
+    },
+    // ... mantenha os outros NPCs (Cristalina, Engenheiro Neo, etc.) aqui embaixo
+    "Cristalina": {
+        saudacao: "Saudações! Eu sou Cristalina. O Vale dos Cristais brilha quando encontramos padrões ocultos.",
+        missao: "Observe as formações de cristais. Consegue classificar os que se repetem?",
+        dica: "Procure por repetições. O que aconteceu na última vez que você viu esta cor?",
+        sucesso: "Magnífico! Seu olho para padrões é digno de um cientista de dados.",
+        dica_emergencial: "Dica de amiga: compare o primeiro cristal com o quarto. O que muda?"
+    },
+    "Engenheiro Neo": { saudacao: "Olá! Sou o Engenheiro Neo. Vamos decompor grandes problemas em partes menores!", missao: "Precisamos separar as engrenagens certas para a máquina funcionar.", dica: "Divida o problema em pedaços menores.", sucesso: "Excelente decomposição!", dica_emergencial: "Tente resolver uma parte de cada vez." },
+    "Nuvem": { saudacao: "Sou a Nuvem. A abstração é a arte de ignorar o irrelevante.", missao: "Vamos simplificar esta cidade complexa?", dica: "Foque apenas no essencial.", sucesso: "Você viu a essência!", dica_emergencial: "O que realmente importa neste problema?" },
+    "Mestre Loop": { saudacao: "Saudações, programador! Sou o Mestre Loop.", missao: "Hora de escrever alguns comandos e variáveis.", dica: "Repita ações sempre que possível.", sucesso: "Seu código está perfeito!", dica_emergencial: "Verifique se sua variável está mudando de valor." },
+    "Capitã Digital": { saudacao: "Aqui é a Capitã Digital. Navegue com segurança e ética!", missao: "Precisamos identificar as práticas seguras na rede.", dica: "Pense antes de clicar.", sucesso: "Você é um cidadão digital exemplar!", dica_emergencial: "Nunca compartilhe suas senhas." },
+    "Guardião Link": { saudacao: "Sou o Guardião Link. As redes conectam o mundo.", missao: "Vamos entender como os pacotes de dados viajam?", dica: "Pense nos protocolos como regras de trânsito.", sucesso: "Conexão estabelecida com sucesso!", dica_emergencial: "Lembre-se da topologia da rede." }
+};
+
+// Portais e Eventos Futuros (Preparado para expansões)
+const portaisMundos = [
+    { nome: "Matemática", icone: "📐", status: "future" },
+    { nome: "Ciências", icone: "🔬", status: "future" },
+    { nome: "História", icone: "📜", status: "future" },
+    { nome: "Geografia", icone: "🌍", status: "future" },
+    { nome: "Linguagens", icone: "📖", status: "future" }
+];
+
+const sistemaEventos = {
+    desafioSemanal: null,
+    eventoEspecial: null,
+    registrarEvento: function(tipo, dados) {
+        console.log(`[Evento] ${tipo} registrado:`, dados);
+    }
+};
+
+// ==========================================
+// MÓDULO: Injeção de UI (100% Incremental via JS)
+// ==========================================
+function injectPhase5UI() {
+    // 1. Injeta CSS da Fase 5 sem alterar o arquivo _css_ilha.html
+    const style = document.createElement('style');
+    style.textContent = `
+        #btn-biblioteca { position: absolute; top: 10px; right: 220px; background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.2); color: #fff; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(8px); font-size: 16px; pointer-events: all; z-index: 15; }
+        #biblioteca-panel, #relatorio-panel { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 55; pointer-events: none; opacity: 0; transition: opacity .3s; }
+        #biblioteca-panel.active, #relatorio-panel.active { opacity: 1; pointer-events: all; }
+        .bib-inner, .rel-inner { background: rgba(4,10,28,.95); border: 1px solid rgba(160,120,255,.3); border-radius: 20px; padding: 28px 32px; max-width: 500px; width: 92%; max-height: 80vh; overflow-y: auto; backdrop-filter: blur(22px); box-shadow: 0 10px 50px rgba(0,0,0,.6); color: #fff; }
+        .bib-inner h2, .rel-inner h2 { color: #c8a8ff; text-align: center; margin-bottom: 20px; }
+        .bib-item { background: rgba(91,200,245,.1); border-radius: 12px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #5bc8f5; }
+        .bib-item h4 { margin: 0 0 5px; color: #a8e8ff; }
+        .bib-item p { margin: 0; font-size: 13px; color: #ccc; }
+        .btn-fase5 { background: rgba(91,200,245,.2); border: 1px solid #5bc8f5; color: #a8e8ff; padding: 8px 16px; border-radius: 20px; cursor: pointer; margin: 5px; }
+        .btn-fase5:hover { background: rgba(91,200,245,.4); }
+        #certificado-modal { position: fixed; inset: 0; background: rgba(0,0,0,.8); display: none; align-items: center; justify-content: center; z-index: 200; }
+        .certificado-container { background: linear-gradient(135deg, #0a1a2a, #1a2a4a); border: 3px solid #ffdd88; border-radius: 24px; padding: 40px; max-width: 450px; text-align: center; color: #fff; box-shadow: 0 0 40px rgba(255,220,100,.3); }
+        .certificado-container h2 { color: #ffdd88; margin-bottom: 10px; }
+        .certificado-container h3 { color: #a8e8ff; margin: 15px 0; }
+        .certificado-container p { margin: 8px 0; font-size: 14px; }
+        .data-emissao { font-size: 12px; opacity: .7; margin-top: 20px !important; }
+        #dialogo-avancado { position: fixed; bottom: 140px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.9); color: white; padding: 16px 24px; border-radius: 24px; border: 1px solid #ffdd88; backdrop-filter: blur(12px); text-align: center; z-index: 60; pointer-events: all; display: none; flex-direction: column; gap: 12px; max-width: 80%; }
+        #dialogo-avancado .opcoes { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        #dialogo-avancado .opcoes button { background: rgba(91,200,245,.2); border: 1px solid #5bc8f5; padding: 6px 14px; border-radius: 16px; cursor: pointer; color: #fff; font-size: 13px; }
+        #dialogo-avancado .opcoes button:hover { background: rgba(91,200,245,.4); }
+    `;
+    document.head.appendChild(style);
+
+    // 2. Botão da Biblioteca no HUD (Aproveita o container existente)
+    const btnBib = document.createElement('div');
+    btnBib.id = 'btn-biblioteca';
+    btnBib.className = 'hud-btn';
+    btnBib.innerHTML = '📚';
+    btnBib.title = 'Biblioteca do Conhecimento';
+    document.getElementById('top-buttons').appendChild(btnBib);
+
+    // 3. Criação dos Painéis em Memória (Sem alterar o HTML base)
+    const bibPanel = document.createElement('div');
+    bibPanel.id = 'biblioteca-panel';
+    bibPanel.innerHTML = `
+        <div class="bib-inner">
+            <h2>📚 Biblioteca do Conhecimento</h2>
+            <div id="bib-conteudos"></div>
+            <div id="bib-fragmentos" style="margin-top:20px; text-align:center; color:#88ddff;"></div>
+            <div style="text-align:center; margin-top:20px;">
+                <button class="btn-fase5" id="btn-ver-relatorio">📊 Ver Relatório Pedagógico</button>
+                <button class="btn-fase5" id="btn-fechar-bib">Fechar</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(bibPanel);
+
+    const relPanel = document.createElement('div');
+    relPanel.id = 'relatorio-panel';
+    relPanel.innerHTML = `
+        <div class="rel-inner">
+            <h2>📊 Relatório Pedagógico</h2>
+            <div id="rel-conteudo"></div>
+            <div style="text-align:center; margin-top:20px;">
+                <button class="btn-fase5" id="btn-voltar-bib">Voltar à Biblioteca</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(relPanel);
+
+    const certModal = document.createElement('div');
+    certModal.id = 'certificado-modal';
+    document.body.appendChild(certModal);
+
+    const advDialog = document.createElement('div');
+    advDialog.id = 'dialogo-avancado';
+    advDialog.innerHTML = `
+        <p id="adv-dialog-text"></p>
+        <div class="opcoes" id="adv-dialog-opcoes"></div>
+    `;
+    document.body.appendChild(advDialog);
+
+    // 4. Event Listeners
+    btnBib.addEventListener('click', abrirBiblioteca);
+    bibPanel.addEventListener('click', function(e){ if(e.target===this) fecharBiblioteca(); });
+    relPanel.addEventListener('click', function(e){ if(e.target===this) fecharRelatorio(); });
+    document.getElementById('btn-ver-relatorio').addEventListener('click', gerarRelatorioEducacionalUI);
+    document.getElementById('btn-fechar-bib').addEventListener('click', fecharBiblioteca);
+    document.getElementById('btn-voltar-bib').addEventListener('click', function() {
+        document.getElementById('relatorio-panel').classList.remove('active');
+        abrirBiblioteca();
+    });
+}
+
+// ==========================================
+// MÓDULO: Funções da Biblioteca e Relatórios
+// ==========================================
+function abrirBiblioteca() {
+    atualizarEnciclopedia();
+    document.getElementById('biblioteca-panel').classList.add('active');
+}
+function fecharBiblioteca() {
+    document.getElementById('biblioteca-panel').classList.remove('active');
+}
+function fecharRelatorio() {
+    document.getElementById('relatorio-panel').classList.remove('active');
+}
+
+function desbloquearConhecimento(atividadeId) {
+    const trilha = TRILHAS_DATA.find(t => t.id === atividadeId);
+    if (!trilha) return;
+    
+    if (!conhecimentos.find(k => k.id === atividadeId)) {
+        conhecimentos.push({
+            id: atividadeId,
+            titulo: `Conceito: ${trilha.tema}`,
+            descricao: `Você dominou os fundamentos de ${trilha.tema} na ${trilha.nome}.`,
+            desbloqueado: true,
+            trilha: trilha.nome,
+            dataDesbloqueio: new Date().toISOString()
+        });
+        notifSys.show(`📚 Novo Conhecimento: ${trilha.tema}`, 'xp', 3000);
+        atualizarEnciclopedia();
+    }
+}
+
+function atualizarEnciclopedia() {
+    const conteudosEl = document.getElementById('bib-conteudos');
+    if (conhecimentos.length === 0) {
+        conteudosEl.innerHTML = '<p style="text-align:center; color:#888;">Nenhum conceito desbloqueado ainda. Complete atividades para aprender!</p>';
+    } else {
+        conteudosEl.innerHTML = conhecimentos.map(k => `
+            <div class="bib-item">
+                <h4>${k.titulo}</h4>
+                <p>${k.descricao}</p>
+                <small style="color:#888;">Trilha: ${k.trilha}</small>
+            </div>
+        `).join('');
+    }
+    document.getElementById('bib-fragmentos').textContent = `💎 Fragmentos Coletados: ${fragmentosColetados.size}`;
+}
+
+function gerarRelatorioEducacionalUI() {
+    fecharBiblioteca();
+    const competencias = {
+        "Pensamento Computacional": learningProfile.acertos > 3 ? "Em Desenvolvimento" : "Iniciante",
+        "Cultura Digital": fragmentosColetados.size > 2 ? "Em Desenvolvimento" : "Iniciante",
+        "Mundo Digital": worldProgress.trilhasConcluidas > 1 ? "Em Desenvolvimento" : "Iniciante"
+    };
+
+    let compHTML = Object.entries(competencias).map(([k, v]) => `<div class="bib-item"><h4>${k}</h4><p>${v}</p></div>`).join('');
+    
+    document.getElementById('rel-conteudo').innerHTML = `
+        <div class="bib-item">
+            <h4>Estatísticas de Aprendizagem</h4>
+            <p>⏱️ Tempo de Exploração: ${Math.floor(estatisticas.tempoExploracao/60)} min</p>
+            <p>✅ Atividades Concluídas: ${learningProfile.atividadesConcluidas}</p>
+            <p>🎯 Taxa de Acerto: ${Math.round((learningProfile.acertos / (learningProfile.acertos + learningProfile.erros || 1)) * 100)}%</p>
+            <p>🌟 Dificuldade Atual: ${learningProfile.dificuldadeAtual}</p>
+        </div>
+        <h4 style="color:#c8a8ff; margin:15px 0 10px; text-align:center;">Competências BNCC</h4>
+        ${compHTML}
+        <div style="text-align:center; margin-top:20px;">
+            <button class="btn-fase5" id="btn-emitir-cert">🏆 Ver Certificado (Exemplo)</button>
+        </div>
+    `;
+    document.getElementById('relatorio-panel').classList.add('active');
+    
+    document.getElementById('btn-emitir-cert').addEventListener('click', () => emitirCertificado('algoritmos'));
+}
+
+function emitirCertificado(trilhaId) {
+    const trilha = TRILHAS_DATA.find(t => t.id === trilhaId);
+    if(!trilha) return;
+    const certModal = document.getElementById('certificado-modal');
+    certModal.innerHTML = `
+        <div class="certificado-container">
+            <h2>🏆 Certificado de Conclusão</h2>
+            <p>Certificamos que o Explorador <strong>${player.nome}</strong> concluiu com êxito a jornada:</p>
+            <h3>${trilha.emoji} ${trilha.nome}</h3>
+            <p><strong>Competência:</strong> ${trilha.tema}</p>
+            <p class="data-emissao">Emitido em: ${new Date().toLocaleDateString()}</p>
+            <button class="btn-fase5" id="btn-fechar-cert" style="margin-top:20px;">Guardar na Enciclopédia</button>
+        </div>
+    `;
+    certModal.style.display = 'flex';
+    document.getElementById('btn-fechar-cert').addEventListener('click', () => {
+        certModal.style.display = 'none';
+    });
+}
+
+function coletarFragmento(idFragmento) {
+    if (!fragmentosColetados.has(idFragmento)) {
+        fragmentosColetados.add(idFragmento);
+        notifSys.show("💎 Fragmento do Conhecimento Encontrado!", 'cristal');
+        xpSys.gainXP(15);
+        saveProgress();
+    }
+}
+
+// ==========================================
+// MÓDULO: Diálogo Avançado e Adaptativo
+// ==========================================
+function iniciarDialogoAvancado(npcNome, tipoInteracao) {
+    const npcData = dialogosNPC[npcNome] || dialogosNPC["Professor Byte"];
+    let texto = npcData[tipoInteracao] || npcData.saudacao;
+    
+    document.getElementById('adv-dialog-text').textContent = texto;
+    const opcoesDiv = document.getElementById('adv-dialog-opcoes');
+    opcoesDiv.innerHTML = '';
+
+    let opcoes = [];
+    if (tipoInteracao === 'saudacao' || tipoInteracao === 'missao') {
+        opcoes.push({ texto: "Aceitar Desafio", acao: () => { fecharDialogoAvancado(); } });
+        opcoes.push({ texto: "Preciso de uma dica", acao: () => iniciarDialogoAvancado(npcNome, "dica") });
+    } else if (tipoInteracao === 'dica' || tipoInteracao === 'dica_emergencial') {
+        opcoes.push({ texto: "Entendi, vamos tentar!", acao: fecharDialogoAvancado });
+        opcoes.push({ texto: "Abrir Biblioteca", acao: () => { fecharDialogoAvancado(); abrirBiblioteca(); } });
+    } else {
+        opcoes.push({ texto: "Fechar", acao: fecharDialogoAvancado });
+    }
+
+    opcoes.forEach(op => {
+        const btn = document.createElement('button');
+        btn.textContent = op.texto;
+        btn.onclick = op.acao;
+        opcoesDiv.appendChild(btn);
+    });
+
+    document.getElementById('dialogo-avancado').style.display = 'flex';
+}
+
+function fecharDialogoAvancado() {
+    document.getElementById('dialogo-avancado').style.display = 'none';
+}
+
+// ==========================================
+// MÓDULO: Hooks Incrementais (Integração Fase 4 -> Fase 5)
+// ==========================================
+// Hook no sistema de resposta de atividades para adaptar dificuldade
+const _originalCheckActivityAnswer = checkActivityAnswer;
+checkActivityAnswer = function(selectedIndex, correctIndex, trailId) {
+    _originalCheckActivityAnswer(selectedIndex, correctIndex, trailId);
+    
+    const isCorreta = (selectedIndex === correctIndex);
+    if (isCorreta) {
+        learningProfile.acertos++;
+        desbloquearConhecimento(trailId);
+        
+        const trilha = TRILHAS_DATA.find(t => t.id === trailId);
+        if (trilha && trilha.concluida && !worldProgress.habilidadesDesenvolvidas.has(trailId)) {
+            worldProgress.trilhasConcluidas++;
+            worldProgress.habilidadesDesenvolvidas.add(trailId);
+        }
+        
+        if (learningProfile.acertos % 3 === 0 && learningProfile.dificuldadeAtual === "facil") {
+            learningProfile.dificuldadeAtual = "medio";
+            notifSys.show("🌟 Desafio avançado desbloqueado!", 'levelup', 3000);
+        } else if (learningProfile.acertos % 5 === 0 && learningProfile.dificuldadeAtual === "medio") {
+            learningProfile.dificuldadeAtual = "avancado";
+            notifSys.show("🏆 Modo Mestre ativado!", 'levelup', 3000);
+        }
+    } else {
+        learningProfile.erros++;
+        if (learningProfile.erros >= 2 && learningProfile.dificuldadeAtual !== "facil") {
+            learningProfile.dificuldadeAtual = "facil";
+            notifSys.show("💡 Modo de dicas extras ativado!", 'xp', 3000);
+        }
+    }
+    learningProfile.atividadesConcluidas++;
+    saveProgress();
+};
+
+// Hook no NPC para usar o diálogo avançado do Mago
+// Hook no NPC para usar o diálogo avançado do Mago
+const _originalStartNPCDialog = startNPCDialog;
+startNPCDialog = function() {
+    // ✅ Chama diretamente o diálogo avançado (sem verificar distância)
+    // A verificação de proximidade já é feita pelo updateNPC()
+    iniciarDialogoAvancado("Mago da Computação", "saudacao");
+};
+
+// Inicialização da Fase 5
+injectPhase5UI();
+console.log('[FASE 5] Gamificação Avançada, Biblioteca e Relatórios inicializados');
+
+
+animate();
+})();
+
+// ══════════════════════════════════════════════════════════════
+// FASE 5: Gamificação
+// ══════════════════════════════════════════════════════════════
+
+</script>
