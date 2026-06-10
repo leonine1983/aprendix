@@ -34,7 +34,11 @@
   <div id="info-panel"><div id="info-panel-inner"><span class="poi-icon" id="panel-icon">🌟</span><h2 id="panel-title">Ponto de Interesse</h2><p id="panel-desc">Descrição do local.</p><button class="panel-close-btn" onclick="closeInfoPanel()">✕ Fechar</button></div></div>
   <div id="interact-hint">Pressione E · Toque para interagir</div>
   <div id="map-panel"><h3>🗺️ Mapa do Mundo</h3><ul><li>⭐ Praça Central do Conhecimento</li></ul></div>
-  <div id="top-buttons"><button class="hud-btn" id="btn-fullscreen" title="Tela cheia">⛶</button><button class="hud-btn" id="btn-reset" title="Resetar câmera">⟳</button><button class="hud-btn" id="btn-settings" title="Configurações">⚙</button><button class="hud-btn" id="btn-map" title="Mapa">🗺️</button><button class="hud-btn" id="btn-profile" title="Perfil" onclick="openProfilePanel()">👤</button><button class="hud-btn" id="btn-diary" title="Diário" onclick="openDiaryPanel()">📖</button></div>
+  
+  <div id="top-buttons">
+    <button class="hud-btn" id="btn-overview" title="Visão Geral" onclick="resetCameraView()">🏠</button>
+    <button class="hud-btn" id="btn-fullscreen" title="Tela cheia">⛶</button><button class="hud-btn" id="btn-reset" title="Resetar câmera">⟳</button><button class="hud-btn" id="btn-settings" title="Configurações">⚙</button><button class="hud-btn" id="btn-map" title="Mapa">🗺️</button><button class="hud-btn" id="btn-profile" title="Perfil" onclick="openProfilePanel()">👤</button><button class="hud-btn" id="btn-diary" title="Diário" onclick="openDiaryPanel()">📖</button></div>
+  
   <div id="controls-hint">WASD / Arrastar para girar · Scroll/Pinch para zoom · ⟳ visão geral</div>
   <div id="settings-panel"><span class="close-btn" id="close-settings">✕</span><h3>CONFIGURAÇÕES</h3><div class="setting-row"><label>Sensibilidade</label><input type="range" id="s-sensitivity" min="0.2" max="2" step="0.1" value="1"></div><div class="setting-row"><label>Velocidade</label><input type="range" id="s-speed" min="0.5" max="3" step="0.1" value="1"></div><div class="setting-row"><label>FOV</label><input type="range" id="s-fov" min="50" max="100" step="1" value="70"></div><div class="setting-row"><label>Qualidade</label><select id="s-quality"><option value="low">Baixa</option><option value="med" selected>Média</option><option value="high">Alta</option></select></div></div>
   <div id="joystick-zone" style="display:none"><div id="joystick-outer"><div id="joystick-inner"></div></div></div>

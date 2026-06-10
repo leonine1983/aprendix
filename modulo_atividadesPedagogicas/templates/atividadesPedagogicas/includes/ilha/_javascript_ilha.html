@@ -76,6 +76,137 @@ const AssetManager = {
 };
 
 
+// ══════════════════════════════════════════════════════════════
+// SPRITE ANIMATOR NATURAL (Fase 6 - Animação Fluida)
+// ══════════════════════════════════════════════════════════════
+class SpriteAnimator {
+    constructor(texture, framesX, framesY) {
+        this.texture = texture;
+        this.framesX = framesX;
+        this.framesY = framesY;
+        this.totalFrames = framesX * framesY;
+        
+        // Criar material base
+        this.material = new THREE.SpriteMaterial({
+            map: texture,
+            transparent: true,
+            depthWrite: false
+        });
+        
+        // Criar sprite
+        this.sprite = new THREE.Sprite(this.material);
+        
+        // Calcular proporção de cada frame
+        this.frameWidth = 1 / framesX;
+        this.frameHeight = 1 / framesY;
+        
+        // Estado atual
+        this.currentFrame = 0;
+        this.currentAnimation = 'idle';
+        this.animationSpeed = 1;
+        this.elapsed = 0;
+        this.isPlaying = true;
+        
+        // Definição das animações (sequências de frames)
+        this.animations = {
+            // Idle: Loop suave entre frames 0, 1, 2, 3 (linha 1)
+            idle: {
+                frames: [0, 1, 2, 3, 2, 1], // Ida e volta para movimento natural
+                speed: 0.2, // Segundos por frame
+                loop: true
+            },
+            // Talking: Frames da linha 2 (4-7) - gestos de conversa
+            talking: {
+                frames: [4, 5, 6, 7, 6, 5],
+                speed: 0.15,
+                loop: true
+            },
+            // Casting: Frames da linha 3 (8-11) - lançando magia
+            casting: {
+                frames: [8, 9, 10, 11, 10, 9],
+                speed: 0.12,
+                loop: false
+            }
+        };
+        
+        // Iniciar com idle
+        this.play('idle');
+    }
+    
+    play(animationName, resetFrame = true) {
+        if (!this.animations[animationName]) {
+            console.warn(`Animação '${animationName}' não existe!`);
+            return;
+        }
+        
+        this.currentAnimation = animationName;
+        if (resetFrame) {
+            this.currentFrame = 0;
+            this.elapsed = 0;
+        }
+        this.isPlaying = true;
+        this.updateUVs(this.animations[animationName].frames[0]);
+    }
+    
+    stop() {
+        this.isPlaying = false;
+    }
+    
+    update(dt) {
+        if (!this.isPlaying) return;
+        
+        const anim = this.animations[this.currentAnimation];
+        if (!anim) return;
+        
+        this.elapsed += dt * this.animationSpeed;
+        
+        if (this.elapsed >= anim.speed) {
+            this.elapsed = 0;
+            this.currentFrame++;
+            
+            // Loop ou parar no último frame
+            if (this.currentFrame >= anim.frames.length) {
+                if (anim.loop) {
+                    this.currentFrame = 0;
+                } else {
+                    this.currentFrame = anim.frames.length - 1;
+                    this.isPlaying = false;
+                }
+            }
+            
+            // Atualizar UV para o frame atual
+            const frameIndex = anim.frames[this.currentFrame];
+            this.updateUVs(frameIndex);
+        }
+    }
+    
+    updateUVs(frameIndex) {
+        const col = frameIndex % this.framesX;
+        const row = Math.floor(frameIndex / this.framesX);
+        
+        // Resetar transformações UV
+        this.texture.offset.set(0, 0);
+        this.texture.repeat.set(1, 1);
+        
+        // Configurar para mostrar apenas o frame atual
+        this.texture.offset.set(
+            col * this.frameWidth,
+            1 - (row + 1) * this.frameHeight
+        );
+        this.texture.repeat.set(this.frameWidth, this.frameHeight);
+    }
+    
+    setScale(x, y) {
+        this.sprite.scale.set(x, y, 1);
+    }
+    
+    // Método para interpolação suave entre frames
+    setBlendMode(blend) {
+        this.material.blending = blend;
+    }
+}
+
+
 // ── Sky ──────────────────────────────────────────────────────
 function makeSky(){
   const geo = new THREE.SphereGeometry(1200,32,16);
@@ -87,6 +218,9 @@ function makeSky(){
   });
   return new THREE.Mesh(geo,mat);
 }
+
+// ======= Nuvens =========================
+// ── Nuvens Otimizadas (InstancedMesh + Animação por Textura) ──
 function makeCloudTexture(){
   const size=256; const c=document.createElement('canvas'); c.width=c.height=size;
   const ctx=c.getContext('2d');
@@ -96,29 +230,44 @@ function makeCloudTexture(){
   const tex=new THREE.CanvasTexture(c); tex.encoding=THREE.sRGBEncoding; return tex;
 }
 const cloudTex = makeCloudTexture();
-const clouds=[];
-function spawnCloud(x,y,z,scale){
-  const mat=new THREE.MeshBasicMaterial({map:cloudTex,transparent:true,opacity:.85,depthWrite:false,side:THREE.DoubleSide});
-  const geo=new THREE.PlaneGeometry(scale,scale*.55);
-  const m=new THREE.Mesh(geo,mat); m.position.set(x,y,z); m.rotation.x=-0.1; scene.add(m); clouds.push(m); return m;
-}
-function buildClouds(){
-  const layers=[
-    {y:-60,count:20,spread:500,scale:[90,180]},
-    {y:-30,count:14,spread:400,scale:[60,130]},
-    {y: 40,count:10,spread:350,scale:[80,160]},
-    {y:120,count:8, spread:500,scale:[100,220]},
+
+function buildInstancedClouds(){
+  const cloudCount = 60;
+  const geo = new THREE.PlaneGeometry(1, 0.55);
+  const mat = new THREE.MeshBasicMaterial({ 
+    map: cloudTex, transparent: true, opacity: 0.85, depthWrite: false, side: THREE.DoubleSide 
+  });
+  const cloudMesh = new THREE.InstancedMesh(geo, mat, cloudCount);
+  const dummy = new THREE.Object3D();
+  
+  const layers = [
+    { y: -60, count: 20, spread: 500, scale: [90, 180] },
+    { y: -30, count: 15, spread: 400, scale: [60, 130] },
+    { y: 40, count: 10, spread: 350, scale: [80, 160] },
+    { y: 120, count: 15, spread: 500, scale: [100, 220] }
   ];
-  layers.forEach(({y,count,spread,scale})=>{
-    for(let i=0;i<count;i++){
-      const s=scale[0]+Math.random()*(scale[1]-scale[0]);
-      spawnCloud((Math.random()-.5)*spread*2, y+(Math.random()-.5)*30, (Math.random()-.5)*spread*2, s);
+  
+  let idx = 0;
+  layers.forEach(({ y, count, spread, scale }) => {
+    for (let i = 0; i < count && idx < cloudCount; i++, idx++) {
+      const s = scale[0] + Math.random() * (scale[1] - scale[0]);
+      dummy.position.set((Math.random() - 0.5) * spread * 2, y + (Math.random() - 0.5) * 30, (Math.random() - 0.5) * spread * 2);
+      dummy.rotation.set(-0.1, Math.random() * Math.PI, 0);
+      dummy.scale.set(s, s, 1);
+      dummy.updateMatrix();
+      cloudMesh.setMatrixAt(idx, dummy.matrix);
     }
   });
+  scene.add(cloudMesh);
+  return cloudMesh;
 }
+const instancedClouds = buildInstancedClouds();
 setProgress(15);
 
-// ── Island terrain ────────────────────────────────────────────
+
+
+//==============ilhas =================================
+// ── Island terrain (Com Raízes e Pedras Instanciadas) ───────
 function buildIsland(){
   const group=new THREE.Group();
   const terrainGeo=new THREE.CylinderGeometry(80,55,28,64,8,false);
@@ -137,32 +286,51 @@ function buildIsland(){
   const terrainMat=new THREE.MeshStandardMaterial({color:0x6ab04c,roughness:.9,metalness:.0});
   const terrain=new THREE.Mesh(terrainGeo,terrainMat); terrain.receiveShadow=true; terrain.castShadow=true;
   group.add(terrain);
+  
   const rockGeo=new THREE.CylinderGeometry(50,30,35,48,5,false);
   const rockPos=rockGeo.attributes.position;
   for(let i=0;i<rockPos.count;i++){ rockPos.setX(i,rockPos.getX(i)+(Math.random()-.5)*6); rockPos.setZ(i,rockPos.getZ(i)+(Math.random()-.5)*6); }
   rockPos.needsUpdate=true; rockGeo.computeVertexNormals();
   const rockMat=new THREE.MeshStandardMaterial({color:0x8B7355,roughness:1,metalness:0});
   const rock=new THREE.Mesh(rockGeo,rockMat); rock.position.y=-20; rock.receiveShadow=true; group.add(rock);
-  const rootMat=new THREE.MeshStandardMaterial({color:0x5c4827,roughness:1});
-  for(let i=0;i<22;i++){
+
+  // Raízes Otimizadas (InstancedMesh)
+  const rootCount = 35;
+  const rootGeo = new THREE.CylinderGeometry(0.4, 0.8, 15, 6);
+  const rootMat = new THREE.MeshStandardMaterial({color:0x5c4827,roughness:1});
+  const rootMesh = new THREE.InstancedMesh(rootGeo, rootMat, rootCount);
+  const dummy = new THREE.Object3D();
+  for(let i=0; i<rootCount; i++){
     const a=Math.random()*Math.PI*2; const r=25+Math.random()*25;
     const h=8+Math.random()*30; const w=1.2+Math.random()*2;
-    const rg=new THREE.CylinderGeometry(w*.3,w,h,6); const rm=new THREE.Mesh(rg,rootMat);
-    rm.position.set(Math.cos(a)*r,-(28+h*.5)+Math.random()*5,Math.sin(a)*r);
-    rm.rotation.x=(Math.random()-.5)*.4; rm.rotation.z=(Math.random()-.5)*.4;
-    rm.castShadow=true; group.add(rm);
+    dummy.position.set(Math.cos(a)*r, -(28+h*.5)+Math.random()*5, Math.sin(a)*r);
+    dummy.rotation.set((Math.random()-.5)*.4, Math.random()*Math.PI*2, (Math.random()-.5)*.4);
+    dummy.scale.set(w*.3, h/15, w*.3);
+    dummy.updateMatrix();
+    rootMesh.setMatrixAt(i, dummy.matrix);
   }
-  const hangMat=new THREE.MeshStandardMaterial({color:0x9c8860,roughness:.85});
-  for(let i=0;i<12;i++){
+  rootMesh.castShadow = true; rootMesh.receiveShadow = true;
+  group.add(rootMesh);
+
+  // Pedras/Detalhes Suspensos (InstancedMesh)
+  const hangCount = 25;
+  const hangGeo = new THREE.DodecahedronGeometry(1, 0);
+  const hangMat = new THREE.MeshStandardMaterial({color:0x9c8860,roughness:.85});
+  const hangMesh = new THREE.InstancedMesh(hangGeo, hangMat, hangCount);
+  for(let i=0; i<hangCount; i++){
     const a=Math.random()*Math.PI*2; const r=30+Math.random()*30;
     const s=3+Math.random()*8;
-    const hg=new THREE.DodecahedronGeometry(s,0); const hm=new THREE.Mesh(hg,hangMat);
-    hm.position.set(Math.cos(a)*r,-35-Math.random()*15,Math.sin(a)*r);
-    hm.rotation.set(Math.random(),Math.random(),Math.random()); hm.castShadow=true; group.add(hm);
+    dummy.position.set(Math.cos(a)*r, -35-Math.random()*15, Math.sin(a)*r);
+    dummy.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+    dummy.scale.set(s, s, s);
+    dummy.updateMatrix();
+    hangMesh.setMatrixAt(i, dummy.matrix);
   }
+  hangMesh.castShadow = true;
+  group.add(hangMesh);
+
   return group;
 }
-setProgress(30);
 
 // ── Waterfall ─────────────────────────────────────────────────
 function buildWaterfall(){
@@ -180,34 +348,340 @@ function buildWaterfall(){
   return group;
 }
 
-// ── Trees ─────────────────────────────────────────────────────
-function makeTree(x,z,scale=1){
-  const g=new THREE.Group();
-  const trunkMat=new THREE.MeshStandardMaterial({color:0x6b4226,roughness:.9});
-  const leafMat=new THREE.MeshStandardMaterial({color:0x2d8a4e,roughness:.8});
-  const trunkG=new THREE.CylinderGeometry(.8*scale,.9*scale,5*scale,8);
-  const trunk=new THREE.Mesh(trunkG,trunkMat); trunk.position.y=2.5*scale; trunk.castShadow=true; g.add(trunk);
-  const layers=3+Math.floor(Math.random()*2);
-  for(let i=0;i<layers;i++){
-    const r=(4-i*.7)*scale; const y=(5+i*2.8)*scale;
-    const cg=new THREE.ConeGeometry(r,3.5*scale,8);
-    const leaf=new THREE.Mesh(cg,leafMat.clone()); leaf.material.color.setHSL(.32+Math.random()*.05,(.6+Math.random()*.2),(.28+Math.random()*.1));
-    leaf.position.y=y; leaf.castShadow=true; leaf.receiveShadow=true; g.add(leaf);
-  }
-  g.position.set(x,0,z); g.rotation.y=Math.random()*Math.PI*2; return g;
+
+// ================ ARVORES E FLORES E CAMINHOS ========================
+// ══════════════════════════════════════════════════════════════
+// FUNÇÃO DE ALTURA DO TERRENO (Replica EXATAMENTE a matemática da ilha)
+// ══════════════════════════════════════════════════════════════
+function getTerrainHeight(x, z) {
+    const r = Math.sqrt(x * x + z * z);
+    if (r > 80) return -100; // Fora da ilha principal
+    
+    // Mesmas fórmulas de ruído usadas em buildIsland()
+    const n1 = Math.sin(x * 0.08) * Math.cos(z * 0.08) * 8;
+    const n2 = Math.sin(x * 0.18 + 1.5) * Math.sin(z * 0.15) * 4;
+    const n3 = Math.sin(x * 0.35 + z * 0.3) * 2;
+    const bump = n1 + n2 + n3;
+    
+    // A altura base do topo do cilindro é 14. O bump é atenuado nas bordas.
+    return 14 + bump * (1 - r / 90);
 }
+
+// ================ ARVORES, FLORES E CAMINHOS ========================
+// ── Vegetação e Caminhos Otimizados (InstancedMesh com Altura Correta) ─────────
+// ══════════════════════════════════════════════════════════════
+// SISTEMA DE COLISÃO COM ÁRVORES
+// ══════════════════════════════════════════════════════════════
+const treeColliders = [];
+// ══════════════════════════════════════════════════════════════
+// FUNÇÃO DE ALTURA DO TERRENO (Replica EXATAMENTE a matemática da ilha)
+// ══════════════════════════════════════════════════════════════
+function getTerrainHeight(x, z) {
+    const r = Math.sqrt(x * x + z * z);
+    if (r > 80) return -100; // Fora da ilha principal
+    
+    // Mesmas fórmulas de ruído usadas em buildIsland()
+    const n1 = Math.sin(x * 0.08) * Math.cos(z * 0.08) * 8;
+    const n2 = Math.sin(x * 0.18 + 1.5) * Math.sin(z * 0.15) * 4;
+    const n3 = Math.sin(x * 0.35 + z * 0.3) * 2;
+    const bump = n1 + n2 + n3;
+    
+    // A altura base do topo do cilindro é 14. O bump é atenuado nas bordas.
+    return 14 + bump * (1 - r / 90);
+}
+
+
+// ================ ARVORES, FLORES E CAMINHOS ========================
+// ── Vegetação e Caminhos Otimizados (InstancedMesh com Altura Correta) ─────────
+
+// ══════════════════════════════════════════════════════════════
+// SISTEMA DE COLISÃO E MOVIMENTO RESTRITO (Fase 6)
+// ══════════════════════════════════════════════════════════════
+
+// Verifica se está sobre uma ponte
+function isOnBridge(position, bridgeWidth = 4) {
+    for (const bridge of bridges) {
+        const dx = bridge.endX - bridge.startX;
+        const dz = bridge.endZ - bridge.startZ;
+        const lengthSquared = dx * dx + dz * dz;
+        
+        let t = ((position.x - bridge.startX) * dx + 
+                 (position.z - bridge.startZ) * dz) / lengthSquared;
+        
+        if (t >= -0.1 && t <= 1.1) {
+            const closestX = bridge.startX + t * dx;
+            const closestZ = bridge.startZ + t * dz;
+            
+            const perpDist = Math.sqrt(
+                Math.pow(position.x - closestX, 2) + 
+                Math.pow(position.z - closestZ, 2)
+            );
+            
+            if (perpDist <= bridgeWidth / 2 + 0.5) {
+                return {
+                    onBridge: true,
+                    bridge: bridge,
+                    progress: t,
+                    height: bridge.startY + (bridge.endY - bridge.startY) * t
+                };
+            }
+        }
+    }
+    return { onBridge: false };
+}
+
+// Verifica se está sobre uma ilha
+function isOnIsland(position, islandData) {
+    const dx = position.x - islandData.x;
+    const dz = position.z - islandData.z;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+    return dist <= islandData.radius - 2;
+}
+
+// Obtém altura válida (ilha ou ponte)
+function getValidHeight(position) {
+    const bridgeCheck = isOnBridge(position);
+    if (bridgeCheck.onBridge) {
+        return bridgeCheck.height;
+    }
+    
+    for (const island of islandsData) {
+        if (isOnIsland(position, island)) {
+            return island.height;
+        }
+    }
+    
+    return null;
+}
+
+// Valida movimento antes de aplicar
+function validateMovement(newPosition) {
+    const validHeight = getValidHeight({ 
+        x: newPosition.x, 
+        z: newPosition.z 
+    });
+    
+    if (validHeight === null) {
+        return { valid: false, reason: 'fora_das_areas' };
+    }
+    
+    const currentValidHeight = getValidHeight({ 
+        x: avatar.position.x, 
+        z: avatar.position.z 
+    });
+    
+    if (currentValidHeight !== null) {
+        const heightDiff = Math.abs(validHeight - currentValidHeight);
+        if (heightDiff > 3 && !isJumping) {
+            return { valid: false, reason: 'desnivel_excessivo' };
+        }
+    }
+    
+    return { valid: true, height: validHeight };
+}
+
+// Cria ponte corrigida (conecta bordas das ilhas)
+function createCorrectedWoodenBridge(startIsland, endIsland) {
+    const startRadius = startIsland.radius || 75;
+    const endRadius = endIsland.radius || 18;
+    
+    const dx = endIsland.x - startIsland.x;
+    const dz = endIsland.z - startIsland.z;
+    const distance = Math.sqrt(dx * dx + dz * dz);
+    const angle = Math.atan2(dz, dx);
+    
+    const startX = startIsland.x + Math.cos(angle) * (startRadius - 3);
+    const startZ = startIsland.z + Math.sin(angle) * (startRadius - 3);
+    const startY = startIsland.height;
+    
+    const endX = endIsland.x - Math.cos(angle) * (endRadius - 3);
+    const endZ = endIsland.z - Math.sin(angle) * (endRadius - 3);
+    const endY = endIsland.height;
+    
+    const bridgeGroup = new THREE.Group();
+    
+    const woodMat = new THREE.MeshStandardMaterial({
+        color: 0x8B6914,
+        roughness: 0.9,
+        metalness: 0.1
+    });
+    
+    const plankWidth = 3.5;
+    const segmentLength = 2;
+    const segmentCount = Math.ceil(distance / segmentLength);
+    
+    for (let i = 0; i < segmentCount; i++) {
+        const progress = i / (segmentCount - 1);
+        const x = startX + dx * progress;
+        const z = startZ + dz * progress;
+        const y = startY + (endY - startY) * progress;
+        
+        const plank = new THREE.Mesh(
+            new THREE.BoxGeometry(segmentLength + 0.1, 0.15, plankWidth),
+            woodMat
+        );
+        
+        plank.position.set(x, y, z);
+        plank.rotation.y = angle;
+        plank.castShadow = true;
+        plank.receiveShadow = true;
+        bridgeGroup.add(plank);
+    }
+    
+    scene.add(bridgeGroup);
+    
+    bridges.push({
+        group: bridgeGroup,
+        startX: startX,
+        startZ: startZ,
+        endX: endX,
+        endZ: endZ,
+        startY: startY,
+        endY: endY,
+        angle: angle,
+        length: distance,
+        width: plankWidth,
+        startIsland: startIsland,
+        endIsland: endIsland
+    });
+    
+    return bridgeGroup;
+}
+
+// Inicializa todas as pontes
+function initializeAllBridges() {
+    const centralIsland = islandsData[0];
+    
+    for (let i = 1; i < islandsData.length; i++) {
+        const targetIsland = islandsData[i];
+        createCorrectedWoodenBridge(centralIsland, targetIsland);
+    }
+    
+    console.log(`[FASE 6] ${bridges.length} pontes criadas`);
+}
+
+
+
+function buildOptimizedEnvironment() {
+    const group = new THREE.Group();
+    const dummy = new THREE.Object3D();
+    const color = new THREE.Color();
+
+    // 1. ÁRVORES
+    const treePositions = [
+        [10,15],[28,-8],[-25,18],[-15,-30],[35,30],[-40,-15],[5,-45],[40,-35],
+        [-30,40],[20,40],[-50,10],[50,-20],[15,-20],[-10,-15],[32,12],
+        [60,10],[-60,-10],[70,-40],[-70,50],[0,60],[0,-60],[45,45],[-45,-45]
+    ];
+    const treeCount = treePositions.length;
+    
+    const trunkGeo = new THREE.CylinderGeometry(0.4, 0.5, 3, 6);
+    const trunkMat = new THREE.MeshStandardMaterial({ color: 0x6b4226, roughness: 0.9 });
+    const trunkMesh = new THREE.InstancedMesh(trunkGeo, trunkMat, treeCount);
+    
+    const leavesGeo = new THREE.ConeGeometry(2.5, 6, 7);
+    const leavesMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 });
+    const leavesMesh = new THREE.InstancedMesh(leavesGeo, leavesMat, treeCount);
+    
+    treePositions.forEach(([x, z], i) => {
+        const scale = 0.8 + Math.random() * 0.6;
+        const rot = Math.random() * Math.PI * 2;
+        
+        // ✅ CORREÇÃO: Calcula a altura real do terreno neste ponto (X, Z)
+        const terrainY = getTerrainHeight(x, z);
+        
+        // Tronco: base apoiada exatamente no terreno
+        dummy.position.set(x, terrainY + (1.5 * scale), z);
+        dummy.rotation.set(0, rot, 0);
+        dummy.scale.set(scale, scale, scale);
+        dummy.updateMatrix();
+        trunkMesh.setMatrixAt(i, dummy.matrix);
+        
+        // Folhas: acima do tronco
+        dummy.position.set(x, terrainY + (4.5 * scale), z);
+        dummy.updateMatrix();
+        leavesMesh.setMatrixAt(i, dummy.matrix);
+        
+        color.setHSL(0.28 + Math.random() * 0.08, 0.6 + Math.random() * 0.3, 0.3 + Math.random() * 0.2);
+        leavesMesh.setColorAt(i, color);
+    });
+    trunkMesh.castShadow = true; trunkMesh.receiveShadow = true;
+    leavesMesh.castShadow = true; leavesMesh.receiveShadow = true;
+    group.add(trunkMesh);
+    group.add(leavesMesh);
+
+    // 2. FLORES
+    const flowerCount = 150;
+    const flowerGeo = new THREE.SphereGeometry(0.25, 6, 6);
+    const flowerMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6 });
+    const flowerMesh = new THREE.InstancedMesh(flowerGeo, flowerMat, flowerCount);
+    const flowerColors = [0xff6b8a, 0xffcc44, 0xff8c42, 0xff4dd8, 0x9b59ff, 0x44ddff];
+    
+    for (let i = 0; i < flowerCount; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const r = 12 + Math.random() * 50;
+        const fx = Math.cos(a) * r;
+        const fz = Math.sin(a) * r;
+        
+        // ✅ CORREÇÃO: Calcula a altura real do terreno
+        const terrainY = getTerrainHeight(fx, fz);
+        
+        dummy.position.set(fx, terrainY + 0.4, fz);
+        const fs = 0.8 + Math.random() * 0.6;
+        dummy.scale.set(fs, fs, fs);
+        dummy.updateMatrix();
+        flowerMesh.setMatrixAt(i, dummy.matrix);
+        color.setHex(flowerColors[Math.floor(Math.random() * flowerColors.length)]);
+        flowerMesh.setColorAt(i, color);
+    }
+    flowerMesh.receiveShadow = true;
+    group.add(flowerMesh);
+
+    // 3. CAMINHOS (Conectando o centro às trilhas)
+    const pathCount = 60;
+    const pathGeo = new THREE.PlaneGeometry(3.5, 3.5);
+    const pathMat = new THREE.MeshStandardMaterial({ color: 0x8B7355, roughness: 1, metalness: 0 });
+    const pathMesh = new THREE.InstancedMesh(pathGeo, pathMat, pathCount);
+    
+    const trailTargets = [
+        { x: 160, z: 80 }, { x: -150, z: 120 }, { x: 200, z: -100 }, { x: -180, z: -130 }
+    ];
+    
+    let pIdx = 0;
+    trailTargets.forEach(target => {
+        for (let i = 1; i <= 15 && pIdx < pathCount; i++, pIdx++) {
+            const progress = i / 15;
+            const px = target.x * progress * 0.25; 
+            const pz = target.z * progress * 0.25;
+            
+            // ✅ CORREÇÃO: Calcula a altura real do terreno + pequeno offset
+            const terrainY = getTerrainHeight(px, pz);
+            
+            dummy.position.set(px, terrainY + 0.05, pz);
+            dummy.rotation.x = -Math.PI / 2;
+            dummy.rotation.z = Math.atan2(target.z, target.x) + (Math.random() - 0.5) * 0.8;
+            dummy.scale.set(1 + Math.random() * 0.4, 1 + Math.random() * 0.4, 1);
+            dummy.updateMatrix();
+            pathMesh.setMatrixAt(pIdx, dummy.matrix);
+        }
+    });
+    pathMesh.receiveShadow = true;
+    group.add(pathMesh);
+
+    scene.add(group);
+    return { trunkMesh, leavesMesh, flowerMesh, pathMesh };
+}
+
+
+
+
+
+const optimizedEnv = buildOptimizedEnvironment();
 setProgress(45);
 
-// ── Flowers ───────────────────────────────────────────────────
-function makeFlower(x,z){
-  const g=new THREE.Group();
-  const stemMat=new THREE.MeshStandardMaterial({color:0x4a9e3f});
-  const sg=new THREE.CylinderGeometry(.1,.1,1.5,6); const stem=new THREE.Mesh(sg,stemMat); stem.position.y=.75; g.add(stem);
-  const colors=[0xff6b8a,0xffcc44,0xff8c42,0xff4dd8,0x9b59ff,0x44ddff];
-  const petMat=new THREE.MeshStandardMaterial({color:colors[Math.floor(Math.random()*colors.length)],roughness:.6});
-  const peg=new THREE.SphereGeometry(.35,8,8); const pet=new THREE.Mesh(peg,petMat); pet.position.y=1.7; g.add(pet);
-  g.position.set(x,.2,z); return g;
-}
+
+
+
 
 // ── Crystals ──────────────────────────────────────────────────
 function makeCrystal(x,y,z,scale=1){
@@ -269,24 +743,15 @@ const rimLight=new THREE.DirectionalLight(0xffe8c0,.3); rimLight.position.set(0,
 setProgress(70);
 
 // ── Assemble scene ────────────────────────────────────────────
+// ── Assemble scene ────────────────────────────────────────────
 const sky=makeSky(); scene.add(sky);
-buildClouds();
+// buildClouds(); // ✅ REMOVIDO: Nuvens já foram criadas por buildInstancedClouds()
+
 const island=buildIsland(); island.position.y=0; scene.add(island);
 const waterfall=buildWaterfall(); waterfall.position.y=0; scene.add(waterfall);
 
-// Trees
-const treeGroup=new THREE.Group();
-const treePositions=[[10,15],[28,-8],[-25,18],[-15,-30],[35,30],[-40,-15],[5,-45],[40,-35],[-30,40],[20,40],[-50,10],[50,-20],[15,-20],[-10,-15],[32,12]];
-treePositions.forEach(([x,z])=>{ const s=.7+Math.random()*.8; treeGroup.add(makeTree(x,z,s)); });
-scene.add(treeGroup);
-
-// Flowers scattered
-const flowerGroup=new THREE.Group();
-for(let i=0;i<80;i++){
-  const a=Math.random()*Math.PI*2; const r=10+Math.random()*55;
-  if(r>25||Math.random()>.5) flowerGroup.add(makeFlower(Math.cos(a)*r,Math.sin(a)*r));
-}
-scene.add(flowerGroup);
+// ✅ REMOVIDO: treeGroup e flowerGroup antigos. 
+// Eles já foram criados de forma otimizada por buildOptimizedEnvironment()
 
 // Crystals
 const crystalGroup=new THREE.Group();
@@ -301,11 +766,13 @@ const miniIslands=[
   makeMiniIsland(-180,10,-130,20), makeMiniIsland(100,60,-160,12), makeMiniIsland(-120,-30,200,16)
 ];
 miniIslands.forEach(m=>scene.add(m));
-miniIslands.forEach(m=>{ const n=2+Math.floor(Math.random()*3); for(let i=0;i<n;i++){ const a=Math.random()*Math.PI*2,r=Math.random()*m.children[0].geometry.parameters.radiusTop*.6; const t=makeTree(m.position.x+Math.cos(a)*r,m.position.z+Math.sin(a)*r,.5+Math.random()*.4); t.position.y=m.position.y+2; scene.add(t); } });
+// ✅ REMOVIDO: Loop que adicionava makeTree() nas mini ilhas (makeTree não existe mais)
 
 const particles=buildParticles(); scene.add(particles);
 const birds=makeBirds(); scene.add(birds);
 setProgress(85);
+
+
 
 // ── Avatar ────────────────────────────────────────────────────
 function makeCapsuleMesh(radiusTop,radiusBot,height,mat){
@@ -367,7 +834,24 @@ window.addEventListener('mousemove',e=>{
   camState.phi=Math.max(camState.minPhi,Math.min(camState.maxPhi,camState.phi+(e.clientY-lastMY)*.004*cfg.sensitivity));
   lastMX=e.clientX; lastMY=e.clientY;
 });
-canvas.addEventListener('wheel',e=>{ const delta=e.deltaY*0.001*camState.distance; camState.distance=Math.max(camState.minDist,Math.min(camState.maxDist,camState.distance+delta)); },{passive:true});
+
+//=============== ZOOM ============================================
+canvas.addEventListener('wheel', e => {
+  // Sensibilidade muito maior: usa fator fixo + proporcional
+  const scrollSensitivity = 0.05; // Era 0.001 (muito lento)
+  const delta = e.deltaY * scrollSensitivity;
+  
+  // Aplica com suavização
+  camState.distance = Math.max(
+    camState.minDist, 
+    Math.min(camState.maxDist, camState.distance + delta)
+  );
+  
+  // Previne scroll da página (opcional, mas recomendado)
+  e.preventDefault();
+}, { passive: false }); // ← passive: false permite preventDefault
+
+
 
 let touchStart=null,pinchDist=0;
 canvas.addEventListener('touchstart',e=>{
@@ -400,50 +884,239 @@ document.getElementById('jump-btn').addEventListener('touchstart',e=>{ if(onGrou
 document.getElementById('jump-btn').addEventListener('click',()=>{ if(onGround){ velY=8; isJumping=true; onGround=false; } });
 
 const groundHeight=14.5;
-function updateMovement(dt){
-  const speed=6*cfg.speed;
-  let mx=0,mz=0;
-  if(keys['KeyW']||keys['ArrowUp']) mz-=1;
-  if(keys['KeyS']||keys['ArrowDown']) mz+=1;
-  if(keys['KeyA']||keys['ArrowLeft']) mx-=1;
-  if(keys['KeyD']||keys['ArrowRight']) mx+=1;
-  if(joystickActive){ mx+=joystickDx; mz+=joystickDz; }
-  if(keys['Space']&&onGround){ velY=8; isJumping=true; onGround=false; }
-  const len=Math.hypot(mx,mz); if(len>1){ mx/=len; mz/=len; }
-  const sinT=Math.sin(camState.theta),cosT=Math.cos(camState.theta);
-  const wx=mx*cosT+mz*sinT, wz=-mx*sinT+mz*cosT;
-  velX+=(wx*speed-velX)*.18; velZ+=(wz*speed-velZ)*.18;
-  avatar.position.x+=velX*dt; avatar.position.z+=velZ*dt;
-  velY-=20*dt; avatar.position.y+=velY*dt;
-  if(avatar.position.y<=groundHeight){ avatar.position.y=groundHeight; velY=0; isJumping=false; onGround=true; }
-  const isMoving=Math.hypot(velX,velZ)>.15;
-  if(isMoving&&Math.hypot(mx,mz)>.05){ const targetAngle=Math.atan2(wx,wz); let diff=targetAngle-avatar.rotation.y; while(diff>Math.PI)diff-=Math.PI*2; while(diff<-Math.PI)diff+=Math.PI*2; avatar.rotation.y+=diff*.15; }
-  if(isMoving){
-    const wt=performance.now()*.006; const s=Math.sin(wt*cfg.speed);
-    const legs=avatar.children.filter((c,i)=>i>=5);
-    if(legs.length>=2){ legs[0].rotation.x=s*.6; if(legs[1]) legs[1].rotation.x=-s*.6; }
-    const arms=avatar.children.filter((c,i)=>i>=3&&i<=4);
-    if(arms.length>=2){ arms[0].rotation.x=-s*.4; if(arms[1]) arms[1].rotation.x=s*.4; }
-  }
-  const islandR=9999; const dist=Math.hypot(avatar.position.x,avatar.position.z);
-  if(dist>islandR){ const a=Math.atan2(avatar.position.z,avatar.position.x); avatar.position.x=Math.cos(a)*islandR; avatar.position.z=Math.sin(a)*islandR; velX*=-.3; velZ*=-.3; }
+
+
+// ══════════════════════════════════════════════════════════════
+// SISTEMA DE DETECÇÃO DE ILHAS E GRAVIDADE (Fase 6)
+// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// SISTEMA DE DETECÇÃO DE ILHAS E GRAVIDADE (Fase 6)
+// ══════════════════════════════════════════════════════════════
+
+// Dados das ilhas (posição, raio, altura do topo)
+const islandsData = [
+    // Ilha principal (centro)
+    { x: 0, z: 0, radius: 75, height: 14.5, name: "Ilha Central" },
+    
+    // Mini ilhas flutuantes
+    { x: 160, z: 80, radius: 18, height: 20, name: "Floresta dos Algoritmos" },
+    { x: -150, z: 120, radius: 22, height: 40, name: "Vale dos Cristais" },
+    { x: 200, z: -100, radius: 15, height: -15, name: "Oficina dos Inventores" },
+    { x: -180, z: -130, radius: 20, height: 10, name: "Cidade das Nuvens" },
+    { x: 100, z: -160, radius: 12, height: 60, name: "Torre dos Códigos" },
+    { x: -120, z: 200, radius: 16, height: -30, name: "Porto Digital" },
+    { x: 50, z: -230, radius: 14, height: -15, name: "Ilha das Conexões" }
+];
+
+// Função para detectar qual ilha o avatar está
+// Função para detectar qual ilha o avatar está
+function getCurrentIsland(px, pz) {
+    // Primeiro verificar se está em uma ponte
+    const bridge = getCurrentBridge(px, pz, 14.5);
+    if (bridge) {
+        // Retornar a ilha de destino da ponte
+        return islandsData.find(island => 
+            island.x === bridge.bridge.endX && 
+            island.z === bridge.bridge.endZ
+        ) || islandsData[0];
+    }
+    
+    for (const island of islandsData) {
+        const dx = px - island.x;
+        const dz = pz - island.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        // Margem de tolerância de 5 unidades para bordas
+        if (dist <= island.radius + 5) {
+            return island;
+        }
+    }
+    return null; // Não está em nenhuma ilha
 }
+
+// Função para verificar se há ponte entre duas ilhas
+// Função para verificar se há ponte entre duas ilhas
+function hasBridge(island1, island2) {
+    // Verificar se existe uma ponte registrada entre as ilhas
+    return bridges.some(bridge => {
+        const bridgeStartIsland = getCurrentIsland(bridge.startX, bridge.startZ);
+        const bridgeEndIsland = getCurrentIsland(bridge.endX, bridge.endZ);
+        
+        return (
+            (bridgeStartIsland === island1 && bridgeEndIsland === island2) ||
+            (bridgeStartIsland === island2 && bridgeEndIsland === island1)
+        );
+    });
+}
+
+// ✅ REMOVIDO: const groundHeight = 14.5; (Já foi declarado anteriormente no código)
+let currentIsland = islandsData[0]; // Começa na ilha central
+let isFalling = false;
+
+// Função para verificar se o avatar está em uma ponte
+function getCurrentBridge(px, pz, py) {
+    for (const bridge of bridges) {
+        // Calcular distância do ponto à linha da ponte
+        const dx = bridge.endX - bridge.startX;
+        const dz = bridge.endZ - bridge.startZ;
+        const length = Math.sqrt(dx * dx + dz * dz);
+        
+        // Projeção do ponto na linha da ponte
+        const t = ((px - bridge.startX) * dx + (pz - bridge.startZ) * dz) / (length * length);
+        
+        if (t >= 0 && t <= 1) {
+            // Ponto mais próximo na linha
+            const closestX = bridge.startX + t * dx;
+            const closestZ = bridge.startZ + t * dz;
+            
+            // Distância perpendicular
+            const perpDist = Math.sqrt(
+                Math.pow(px - closestX, 2) + 
+                Math.pow(pz - closestZ, 2)
+            );
+            
+            // Verificar se está dentro da largura da ponte
+            if (perpDist <= bridge.width / 2) {
+                // Calcular altura da ponte neste ponto
+                const bridgeY = bridge.startY + (bridge.endY - bridge.startY) * t;
+                
+                // Verificar se está próximo da altura da ponte
+                if (Math.abs(py - bridgeY) < 3) {
+                    return {
+                        bridge: bridge,
+                        progress: t,
+                        height: bridgeY
+                    };
+                }
+            }
+        }
+    }
+    return null;
+}
+
+
+
+function updateMovement(dt) {
+    const speed = 6 * cfg.speed;
+    let mx = 0, mz = 0;
+    
+    if (keys['KeyW'] || keys['ArrowUp']) mz -= 1;
+    if (keys['KeyS'] || keys['ArrowDown']) mz += 1;
+    if (keys['KeyA'] || keys['ArrowLeft']) mx -= 1;
+    if (keys['KeyD'] || keys['ArrowRight']) mx += 1;
+    if (joystickActive) { mx += joystickDx; mz += joystickDz; }
+    
+    const len = Math.hypot(mx, mz);
+    if (len > 1) { mx /= len; mz /= len; }
+    
+    const sinT = Math.sin(camState.theta), cosT = Math.cos(camState.theta);
+    const wx = mx * cosT + mz * sinT;
+    const wz = -mx * sinT + mz * cosT;
+    
+    velX += (wx * speed - velX) * .18;
+    velZ += (wz * speed - velZ) * .18;
+    
+    const proposedX = avatar.position.x + velX * dt;
+    const proposedZ = avatar.position.z + velZ * dt;
+    const proposedPos = { x: proposedX, z: proposedZ };
+    
+    const validation = validateMovement(proposedPos);
+    
+    if (validation.valid) {
+        avatar.position.x = proposedX;
+        avatar.position.z = proposedZ;
+        avatar.position.y = validation.height;
+        onGround = true;
+        isFalling = false;
+    } else {
+        velX *= 0.1;
+        velZ *= 0.1;
+    }
+    
+    if (isFalling) {
+        velY -= 20 * dt;
+        avatar.position.y += velY * dt;
+        
+        const currentPos = { x: avatar.position.x, z: avatar.position.z };
+        const validHeight = getValidHeight(currentPos);
+        
+        if (validHeight !== null && avatar.position.y <= validHeight + 1) {
+            avatar.position.y = validHeight;
+            velY = 0;
+            isFalling = false;
+            onGround = true;
+        }
+    }
+    
+    if (keys['Space'] && onGround && !isFalling) {
+        velY = 8;
+        isJumping = true;
+        onGround = false;
+    }
+    
+    const isMoving = Math.hypot(velX, velZ) > .15;
+    if (isMoving && Math.hypot(mx, mz) > .05) {
+        const targetAngle = Math.atan2(wx, wz);
+        let diff = targetAngle - avatar.rotation.y;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        avatar.rotation.y += diff * .15;
+        
+        const wt = performance.now() * .006;
+        const s = Math.sin(wt * cfg.speed);
+        const legs = avatar.children.filter((c, i) => i >= 5);
+        if (legs.length >= 2) {
+            legs[0].rotation.x = s * .6;
+            if (legs[1]) legs[1].rotation.x = -s * .6;
+        }
+    }
+    
+    if (avatar.position.y < -50) {
+        avatar.position.set(0, 14.5, 0);
+        velX = 0; velY = 0; velZ = 0;
+        isFalling = false;
+        notifSys.show('⚠️ Você caiu! Retornando...', 'xp', 2500);
+    }
+}
+
+
+
+
 
 // ── HUD buttons ───────────────────────────────────────────────
 document.getElementById('btn-fullscreen').addEventListener('click',()=>{ if(!document.fullscreenElement){ document.documentElement.requestFullscreen?.(); }else{ document.exitFullscreen?.(); } });
 document.getElementById('btn-reset').addEventListener('click',()=>camState.reset());
 
-let zoomInterval=null;
-function startZoom(dir){
-  zoomInterval=setInterval(()=>{
-    const step=camState.distance*0.02;
-    camState.distance=Math.max(camState.minDist,Math.min(camState.maxDist,camState.distance+dir*step));
-  },16);
+let zoomInterval = null;
+function startZoom(dir) {
+  if (zoomInterval) clearInterval(zoomInterval); // Evita múltiplos intervals
+  zoomInterval = setInterval(() => {
+    const step = 2; // Valor fixo para zoom suave (era distance * 0.02)
+    camState.distance = Math.max(
+      camState.minDist, 
+      Math.min(camState.maxDist, camState.distance + dir * step)
+    );
+  }, 16);
 }
-function stopZoom(){ clearInterval(zoomInterval); zoomInterval=null; }
-['mousedown','touchstart'].forEach(ev=>{ document.getElementById('btn-zoom-in').addEventListener(ev,e=>{ startZoom(-1); e.preventDefault(); },{passive:false}); });
-['mousedown','touchstart'].forEach(ev=>{ document.getElementById('btn-zoom-out').addEventListener(ev,e=>{ startZoom(1); e.preventDefault(); },{passive:false}); });
-['mouseup','mouseleave','touchend'].forEach(ev=>{ document.getElementById('btn-zoom-in').addEventListener(ev,stopZoom); document.getElementById('btn-zoom-out').addEventListener(ev,stopZoom); });
+function stopZoom() { 
+  clearInterval(zoomInterval); 
+  zoomInterval = null; 
+}
+
+// Garantir que os botões respondam a todos os eventos
+const zoomIn = document.getElementById('btn-zoom-in');
+const zoomOut = document.getElementById('btn-zoom-out');
+
+['mousedown', 'touchstart'].forEach(ev => {
+  zoomIn.addEventListener(ev, e => { startZoom(-1); e.preventDefault(); }, {passive: false});
+  zoomOut.addEventListener(ev, e => { startZoom(1); e.preventDefault(); }, {passive: false});
+});
+
+['mouseup', 'mouseleave', 'touchend', 'touchcancel'].forEach(ev => {
+  zoomIn.addEventListener(ev, stopZoom);
+  zoomOut.addEventListener(ev, stopZoom);
+});
+
+
 const settingsPanel=document.getElementById('settings-panel');
 document.getElementById('btn-settings').addEventListener('click',()=>settingsPanel.style.display=settingsPanel.style.display==='block'?'none':'block');
 document.getElementById('close-settings').addEventListener('click',()=>settingsPanel.style.display='none');
@@ -554,30 +1227,58 @@ function createPointsOfInterest(){
   });
   return markers;
 }
-function createFutureAreas(){
-  const futureAreas = [
-    {nome:"🌲 Floresta dos Algoritmos",x:90,z:60,y:25},
-    {nome:"🔮 Vale dos Cristais",x:-100,z:80,y:35},
-    {nome:"🏗 Oficina dos Inventores",x:130,z:-90,y:20},
-    {nome:"☁ Cidade das Nuvens",x:-140,z:-110,y:45},
-    {nome:"⚡ Torre dos Códigos",x:180,z:30,y:30},
-    {nome:"🌐 Porto Digital",x:-160,z:50,y:20},
-    {nome:"📡 Ilha das Conexões",x:70,z:-170,y:25}
-  ];
-  const mat = new THREE.MeshBasicMaterial({color:0x334466,transparent:true,opacity:0.8,side:THREE.DoubleSide});
-  const borderMat = new THREE.MeshBasicMaterial({color:0x5577aa,transparent:true,opacity:0.6,wireframe:true});
-  futureAreas.forEach(area => {
-    const group = new THREE.Group();
-    const sign = new THREE.Mesh(new THREE.PlaneGeometry(16,5), mat.clone());
-    const border = new THREE.Mesh(new THREE.PlaneGeometry(16,5), borderMat);
-    group.add(sign);
-    group.add(border);
-    group.position.set(area.x, area.y, area.z);
-    group.lookAt(0, area.y, 0);
-    group.userData = {baseY: area.y, area};
-    scene.add(group);
-  });
+
+
+
+async function createFutureAreas(){
+    // Usar as posições REAIS das ilhas do TRILHAS_DATA
+    const futureAreas = TRILHAS_DATA.map(trilha => ({
+        nome: `${trilha.emoji} ${trilha.nome}`,
+        x: trilha.islandPos.x,
+        y: trilha.islandPos.y + 15, // 15 unidades acima do centro da ilha
+        z: trilha.islandPos.z,
+        trilhaId: trilha.id
+    }));
+    
+    const textureLoader = new THREE.TextureLoader();
+    
+    futureAreas.forEach(async (area) => {
+        const group = new THREE.Group();
+        
+        // Carregar textura PNG (com fallback para cor sólida)
+        let mat;
+        try {
+            const texture = textureLoader.load(`/static/ilha/placa_${area.trilhaId}.png`);
+            mat = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 1.0,
+                side: THREE.DoubleSide
+            });
+        } catch(e) {
+            // Fallback: cor sólida se a textura não carregar
+            mat = new THREE.MeshBasicMaterial({
+                color: 0x334466,
+                transparent: true,
+                opacity: 0.8,
+                side: THREE.DoubleSide
+            });
+        }
+        
+        const sign = new THREE.Mesh(new THREE.PlaneGeometry(16, 5), mat);
+        group.add(sign);
+        
+        // Posicionar sobre a ilha real
+        group.position.set(area.x, area.y, area.z);
+        group.lookAt(0, area.y, 0);
+        group.userData = {baseY: area.y, area, trilhaId: area.trilhaId};
+        scene.add(group);
+    });
 }
+
+
+
+
 function createCentralParticles(){
   const count = 60;
   const geo = new THREE.BufferGeometry();
@@ -709,6 +1410,245 @@ let trilhaGroups = [];
 const sharedStone = new THREE.MeshStandardMaterial({color:0x778899,roughness:1});
 const sharedWood  = new THREE.MeshStandardMaterial({color:0x6b4226,roughness:.95});
 const sharedGray  = new THREE.MeshStandardMaterial({color:0x556677,roughness:.9,metalness:.3});
+
+
+
+// ══════════════════════════════════════════════════════════════
+// SISTEMA DE PONTES DE MADEIRA (Fase 6 - Versão Corrigida)
+// ══════════════════════════════════════════════════════════════
+const bridges = [];
+
+function createWoodenBridge(startIsland, endIsland) {
+    const startRadius = startIsland.radius || 75;
+    const endRadius = endIsland.radius || 18;
+    
+    // Calcular ângulo entre as ilhas
+    const dx = endIsland.x - startIsland.x;
+    const dz = endIsland.z - startIsland.z;
+    const distance = Math.sqrt(dx * dx + dz * dz);
+    const angle = Math.atan2(dz, dx);
+    
+    // Ponto de INÍCIO na borda da ilha de origem
+    const startX = startIsland.x + Math.cos(angle) * startRadius;
+    const startZ = startIsland.z + Math.sin(angle) * startRadius;
+    const startY = startIsland.height;
+    
+    // Ponto de FIM na borda da ilha de destino
+    const endX = endIsland.x - Math.cos(angle) * endRadius;
+    const endZ = endIsland.z - Math.sin(angle) * endRadius;
+    const endY = endIsland.height;
+    
+    // Criar grupo da ponte
+    const bridgeGroup = new THREE.Group();
+    
+    // Materiais
+    const woodMat = new THREE.MeshStandardMaterial({ 
+        color: 0x8B6914, 
+        roughness: 0.9,
+        metalness: 0.1
+    });
+    const ropeMat = new THREE.MeshStandardMaterial({ 
+        color: 0xD2B48C, 
+        roughness: 1.0 
+    });
+    const postMat = new THREE.MeshStandardMaterial({ 
+        color: 0x654321, 
+        roughness: 0.95 
+    });
+    
+    // Calcular distância real da ponte (entre as bordas)
+    const bridgeLength = Math.sqrt(
+        Math.pow(endX - startX, 2) + 
+        Math.pow(endZ - startZ, 2)
+    );
+    
+    // Criar tábuas da ponte (segmentos)
+    const plankWidth = 3.5;
+    const plankCount = Math.floor(bridgeLength / 2);
+    const plankGeo = new THREE.BoxGeometry(2.2, 0.15, plankWidth);
+    
+    for (let i = 0; i < plankCount; i++) {
+        const progress = i / plankCount;
+        const x = startX + dx * progress;
+        const z = startZ + dz * progress;
+        const y = startY + (endY - startY) * progress;
+        
+        const plank = new THREE.Mesh(plankGeo, woodMat);
+        plank.position.set(x, y, z);
+        plank.rotation.y = angle;
+        plank.castShadow = true;
+        plank.receiveShadow = true;
+        bridgeGroup.add(plank);
+    }
+    
+    // Criar postes de sustentação (a cada 10 unidades)
+    const postSpacing = 10;
+    const postCount = Math.floor(bridgeLength / postSpacing);
+    const postGeo = new THREE.CylinderGeometry(0.3, 0.3, 3, 6);
+    
+    for (let i = 0; i <= postCount; i++) {
+        const progress = i / postCount;
+        const x = startX + dx * progress;
+        const z = startZ + dz * progress;
+        const y = startY + (endY - startY) * progress;
+        
+        // Poste esquerdo
+        const postLeft = new THREE.Mesh(postGeo, postMat);
+        postLeft.position.set(
+            x - Math.sin(angle) * 2.2,
+            y + 1.5,
+            z + Math.cos(angle) * 2.2
+        );
+        postLeft.castShadow = true;
+        bridgeGroup.add(postLeft);
+        
+        // Poste direito
+        const postRight = new THREE.Mesh(postGeo, postMat);
+        postRight.position.set(
+            x + Math.sin(angle) * 2.2,
+            y + 1.5,
+            z - Math.cos(angle) * 2.2
+        );
+        postRight.castShadow = true;
+        bridgeGroup.add(postRight);
+        
+        // Cordas/corrimão
+        if (i < postCount) {
+            const nextProgress = (i + 1) / postCount;
+            const nextX = startX + dx * nextProgress;
+            const nextZ = startZ + dz * nextProgress;
+            const nextY = startY + (endY - startY) * nextProgress;
+            
+            const ropeLength = Math.sqrt(
+                Math.pow(nextX - x, 2) + 
+                Math.pow(nextZ - z, 2)
+            );
+            const ropeGeo = new THREE.CylinderGeometry(0.08, 0.08, ropeLength, 6);
+            
+            // Corda esquerda
+            const ropeLeft = new THREE.Mesh(ropeGeo, ropeMat);
+            ropeLeft.position.set(
+                (x + nextX) / 2 - Math.sin(angle) * 2.2,
+                (y + nextY) / 2 + 2.5,
+                (z + nextZ) / 2 + Math.cos(angle) * 2.2
+            );
+            ropeLeft.rotation.z = Math.PI / 2;
+            ropeLeft.rotation.y = angle;
+            bridgeGroup.add(ropeLeft);
+            
+            // Corda direita
+            const ropeRight = new THREE.Mesh(ropeGeo, ropeMat);
+            ropeRight.position.set(
+                (x + nextX) / 2 + Math.sin(angle) * 2.2,
+                (y + nextY) / 2 + 2.5,
+                (z + nextZ) / 2 - Math.cos(angle) * 2.2
+            );
+            ropeRight.rotation.z = Math.PI / 2;
+            ropeRight.rotation.y = angle;
+            bridgeGroup.add(ropeRight);
+        }
+    }
+    
+    scene.add(bridgeGroup);
+    
+    // Registrar dados da ponte para colisão e travessia
+    bridges.push({
+        group: bridgeGroup,
+        startX: startX,
+        startZ: startZ,
+        endX: endX,
+        endZ: endZ,
+        startY: startY,
+        endY: endY,
+        angle: angle,
+        length: bridgeLength,
+        width: plankWidth,
+        startIsland: startIsland,
+        endIsland: endIsland
+    });
+    
+    return bridgeGroup;
+}
+
+// Criar pontes conectando a ilha central às ilhas secundárias
+function createAllBridges() {
+    const centralIsland = islandsData[0]; // Ilha Central
+    
+    // Criar ponte para cada ilha secundária
+    for (let i = 1; i < islandsData.length; i++) {
+        const targetIsland = islandsData[i];
+        createWoodenBridge(centralIsland, targetIsland);
+    }
+    
+    console.log(`[FASE 6] ${bridges.length} pontes de madeira criadas conectando as ilhas`);
+}
+
+// Função para verificar se o avatar está em uma ponte
+function getCurrentBridge(px, pz, py) {
+    for (const bridge of bridges) {
+        // Calcular distância do ponto à linha da ponte
+        const dx = bridge.endX - bridge.startX;
+        const dz = bridge.endZ - bridge.startZ;
+        const length = bridge.length;
+        
+        // Projeção do ponto na linha da ponte
+        const t = ((px - bridge.startX) * dx + (pz - bridge.startZ) * dz) / (length * length);
+        
+        if (t >= -0.1 && t <= 1.1) { // Margem de tolerância
+            // Ponto mais próximo na linha
+            const closestX = bridge.startX + t * dx;
+            const closestZ = bridge.startZ + t * dz;
+            
+            // Distância perpendicular
+            const perpDist = Math.sqrt(
+                Math.pow(px - closestX, 2) + 
+                Math.pow(pz - closestZ, 2)
+            );
+            
+            // Verificar se está dentro da largura da ponte
+            if (perpDist <= bridge.width / 2 + 0.5) {
+                // Calcular altura da ponte neste ponto
+                const bridgeY = bridge.startY + (bridge.endY - bridge.startY) * t;
+                
+                // Verificar se está próximo da altura da ponte
+                if (Math.abs(py - bridgeY) < 3) {
+                    return {
+                        bridge: bridge,
+                        progress: t,
+                        height: bridgeY
+                    };
+                }
+            }
+        }
+    }
+    return null;
+}
+
+// Modificar getCurrentIsland para incluir pontes
+function getCurrentIsland(px, pz) {
+    // Primeiro verificar se está em uma ponte
+    const bridge = getCurrentBridge(px, pz, 14.5);
+    if (bridge) {
+        // Retornar a ilha de destino da ponte se estiver indo para lá
+        if (bridge.progress > 0.5) {
+            return bridge.bridge.endIsland;
+        } else {
+            return bridge.bridge.startIsland;
+        }
+    }
+    
+    for (const island of islandsData) {
+        const dx = px - island.x;
+        const dz = pz - island.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        // Margem de tolerância de 5 unidades para bordas
+        if (dist <= island.radius + 5) {
+            return island;
+        }
+    }
+    return null; // Não está em nenhuma ilha
+}
+
 
 function createExtraIsland7(){
   const pos = TRILHAS_DATA[6].islandPos;
@@ -1075,6 +2015,7 @@ function travelToTrail(trilhaId){
   };
   setTimeout(() => { startTrailActivity(tr.id); }, 2800);
 }
+
 function travelToMain(){
   mapPanelElem.style.display='none';
   camTravel={
@@ -1085,8 +2026,61 @@ function travelToMain(){
     tTarget:new THREE.Vector3(0,14,0)
   };
   const actOverlay = document.getElementById('activity-overlay');
-  if(actOverlay.classList.contains('active')) actOverlay.classList.remove('active');
+  if
+  (actOverlay.classList.contains('active')) actOverlay.classList.remove('active');
 }
+
+
+// ══════════════════════════════════════════════════════════════
+// ZOOM AO CLICAR (Fase 6 - Navegação por Clique)
+// ══════════════════════════════════════════════════════════════
+function zoomToPoint(targetPos, newDistance = 35) {
+    // Evita conflito com viagens de trilha já em andamento
+    if (camTravel) return;
+    
+    // Fecha painéis abertos para não atrapalhar
+    if (document.getElementById('trail-panel').classList.contains('active')) closeTrailPanel();
+    if (document.getElementById('info-panel').classList.contains('active')) closeInfoPanel();
+    
+    // Calcula ângulo ideal para olhar o ponto (mantém visão 3/4)
+    const targetTheta = camState.theta; // Mantém rotação atual
+    const targetPhi = 0.7; // Ângulo levemente inclinado
+    
+    camTravel = {
+        sTheta: camState.theta,
+        sPhi: camState.phi,
+        sDist: camState.distance,
+        tTheta: targetTheta,
+        tPhi: targetPhi,
+        tDist: newDistance, // Zoom mais próximo
+        dur: 1.4, // Animação rápida
+        el: 0,
+        sTarget: camState.smoothTarget.clone(),
+        tTarget: targetPos.clone().add(new THREE.Vector3(0, 2, 0)) // Foco 2 unidades acima do chão
+    };
+    
+    // Feedback visual sutil
+    notifSys.show('🔍 Focando no local...', 'xp', 1200);
+}
+
+// Função para retornar à visão geral (duplo clique ou botão)
+function resetCameraView() {
+    if (camTravel) return;
+    camTravel = {
+        sTheta: camState.theta,
+        sPhi: camState.phi,
+        sDist: camState.distance,
+        tTheta: 0,
+        tPhi: 0.8,
+        tDist: 80,
+        dur: 1.2,
+        el: 0,
+        sTarget: camState.smoothTarget.clone(),
+        tTarget: new THREE.Vector3(0, 14, 0)
+    };
+}
+
+
 function updateCamTravel(dt){
   if(!camTravel)return;
   camTravel.el+=dt;
@@ -1121,23 +2115,84 @@ function updateMapSystem(){
   const mp=document.getElementById('map-panel');
   mp.innerHTML=`<h3>🗺️ Mapa do Mundo</h3><ul><li><span class="map-dot" style="background:#5bc8f5"></span><span class="map-trail-name">⭐ Praça Central</span><button class="map-travel-btn" onclick="travelToMain()">Ir</button></li>${TRILHAS_DATA.map(t=>`<li><span class="map-dot" style="background:${t.corHex}"></span><span class="map-trail-name">${t.emoji} ${t.nome}</span><button class="map-travel-btn" onclick="openTrailPanel(TRILHAS_DATA.find(x=>x.id==='${t.id}'))">Info</button><button class="map-travel-btn" onclick="travelToTrail('${t.id}')">Ir</button></li>`).join('')}</ul>`;
 }
-const rc2=new THREE.Raycaster();
-const m2v=new THREE.Vector2();
-function handleCanvasClick(event){
-  if(document.getElementById('trail-panel').classList.contains('active'))return;
-  const cx=event.touches?event.changedTouches[0].clientX:event.clientX;
-  const cy=event.touches?event.changedTouches[0].clientY:event.clientY;
-  m2v.set((cx/window.innerWidth)*2-1,-(cy/window.innerHeight)*2+1);
-  rc2.setFromCamera(m2v,camera);
-  const meshes=[];
-  portais.forEach(p=>p.traverse(c=>{if(c.isMesh)meshes.push(c);}));
-  const hits=rc2.intersectObjects(meshes,false);
-  if(hits.length){
-    let hitPortal=null;
-    portais.forEach(p=>{p.traverse(c=>{if(c===hits[0].object)hitPortal=p;});});
-    if(hitPortal){openTrailPanel(hitPortal.userData.trilha);}
-  }
+
+
+const rc2 = new THREE.Raycaster();
+const m2v = new THREE.Vector2();
+
+function handleCanvasClick(event) {
+    // Não processa clicks se painéis estão abertos
+    if (document.getElementById('trail-panel').classList.contains('active')) return;
+    if (document.getElementById('activity-overlay').classList.contains('active')) return;
+    
+    const cx = event.touches ? event.changedTouches[0].clientX : event.clientX;
+    const cy = event.touches ? event.changedTouches[0].clientY : event.clientY;
+    m2v.set((cx / window.innerWidth) * 2 - 1, -(cy / window.innerHeight) * 2 + 1);
+    rc2.setFromCamera(m2v, camera);
+    
+    // 1. PRIORIDADE: Verificar portais (mantém comportamento original)
+    const portalMeshes = [];
+    portais.forEach(p => p.traverse(c => { if (c.isMesh) portalMeshes.push(c); }));
+    const portalHits = rc2.intersectObjects(portalMeshes, false);
+    
+    if (portalHits.length) {
+        let hitPortal = null;
+        portais.forEach(p => {
+            p.traverse(c => { if (c === portalHits[0].object) hitPortal = p; });
+        });
+        if (hitPortal) {
+            openTrailPanel(hitPortal.userData.trilha);
+            return; // Sai da função - portal tem prioridade
+        }
+    }
+    
+    // 2. NOVO: Se não clicou em portal, faz zoom no ponto clicado
+    // Coleta objetos "clicáveis" do cenário (terreno, ilhas, cristais, árvores)
+    const sceneObjects = [];
+    scene.traverse(obj => {
+        // Filtra: apenas meshes visíveis, não inclui UI/painéis/avatars/NPCs
+        if (obj.isMesh && obj.visible && 
+            !obj.userData.isNPC && 
+            obj.parent !== avatar && 
+            obj !== avatar &&
+            !obj.userData.isCentralCrystal &&
+            obj.material && !obj.material.wireframe) {
+            sceneObjects.push(obj);
+        }
+    });
+    
+    const sceneHits = rc2.intersectObjects(sceneObjects, false);
+    
+    if (sceneHits.length > 0) {
+        const hitPoint = sceneHits[0].point;
+        
+        // Calcula distância ideal de zoom baseada na distância atual
+        const distFromCamera = camera.position.distanceTo(hitPoint);
+        let targetZoom = 35;
+        
+        // Se já está muito perto, mantém distância atual
+        if (distFromCamera < 50) {
+            targetZoom = Math.max(20, distFromCamera * 0.6);
+        }
+        // Se está muito longe, aproxima bastante
+        else if (distFromCamera > 150) {
+            targetZoom = 50;
+        }
+        
+        zoomToPoint(hitPoint, targetZoom);
+    }
 }
+
+canvas.addEventListener('click', handleCanvasClick);
+
+// BÔNUS: Duplo-click retorna à visão geral
+let lastClickTime = 0;
+canvas.addEventListener('dblclick', (e) => {
+    e.preventDefault();
+    resetCameraView();
+});
+
+
 canvas.addEventListener('click',handleCanvasClick);
 function updatePhase2(t, pList, tGroups, dt){
   if(pList) pList.forEach(p=>{
@@ -1223,6 +2278,7 @@ function updatePhase2(t, pList, tGroups, dt){
   updateCamTravel(dt);
 }
 createExtraIsland7();
+createAllBridges();
 trilhaGroups=[
   createFlorestAlgoritmos(TRILHAS_DATA[0].islandPos),
   createValeCristais(TRILHAS_DATA[1].islandPos),
@@ -1518,21 +2574,20 @@ let npcDialog = document.getElementById('npc-dialog');
 let currentDialogIndex = 0;
 
 
-// ══════════════════════════════════════════════════════════════
-// NPC: MAGO DA COMPUTAÇÃO (Fase 6 - Substituição Visual Segura)
-// ══════════════════════════════════════════════════════════════
 
 // ══════════════════════════════════════════════════════════════
-// NPC: MAGO DA COMPUTAÇÃO (Com Patrulha e Interação Automática)
-// ══════════════════════════════════════════════════════════════
-// ══════════════════════════════════════════════════════════════
-// NPC: MAGO DA COMPUTAÇÃO (Com Anel de Interação Visual)
+// NPC: MAGO DA COMPUTAÇÃO (5×5 - 25 frames)
 // ══════════════════════════════════════════════════════════════
 async function createNPC() {
     const group = new THREE.Group();
     
-    // 1. Carregar textura (com fallback)
-    const npcTexture = await AssetManager.loadTexture('{% static "ilha/mago.png" %}', 0x4466ff);
+    // 1. Carregar sprite sheet 5×5
+    const npcTexture = await AssetManager.loadTexture(
+        '{% static "ilha/mago.png" %}', 
+        0x4466ff
+    );
+    
+    let animator = null;
     
     if (npcTexture.isFallback) {
         // FALLBACK: Geometria procedural
@@ -1563,14 +2618,15 @@ async function createNPC() {
         staff.position.set(0.6, 1.2, 0.2);
         staff.rotation.z = -0.2;
         group.add(staff);
-    } else {
-        // SUCESSO: Sprite com textura
-        const spriteMat = new THREE.SpriteMaterial({ map: npcTexture, transparent: true });
-        const sprite = new THREE.Sprite(spriteMat);
-        sprite.scale.set(2.2, 2.8, 1);
-        sprite.position.y = 1.4;
-        group.add(sprite);
         
+    } else {
+        // SUCESSO: Criar animador 5×5
+        animator = new SpriteAnimator(npcTexture, 5, 5, 10);
+        animator.setScale(2.8, 3.5);
+        animator.sprite.position.y = 1.5;
+        group.add(animator.sprite);
+        
+        // Colisor invisível
         const collider = new THREE.Mesh(
             new THREE.CylinderGeometry(0.7, 0.7, 2.2, 8),
             new THREE.MeshBasicMaterial({ visible: false })
@@ -1582,9 +2638,7 @@ async function createNPC() {
     // Posição inicial
     group.position.set(5, 14.8, 12);
     
-    // ══════════════════════════════════════════════════════════
-    // INDICADOR VISUAL DA ZONA DE INTERAÇÃO (VisualLayer)
-    // ══════════════════════════════════════════════════════════
+    // Anel de interação visual
     const radius = 6.5;
     const interactionRingGeo = new THREE.RingGeometry(radius - 0.15, radius + 0.15, 64);
     const interactionRingMat = new THREE.MeshBasicMaterial({ 
@@ -1592,14 +2646,14 @@ async function createNPC() {
         transparent: true, 
         opacity: 0.2, 
         side: THREE.DoubleSide,
-        depthWrite: false // Evita conflitos de renderização com o chão
+        depthWrite: false
     });
     const interactionRing = new THREE.Mesh(interactionRingGeo, interactionRingMat);
-    interactionRing.rotation.x = -Math.PI / 2; // Deitar no plano XZ (chão)
-    interactionRing.position.y = -0.3; // Ajuste fino para ficar no nível do chão (14.8 - 0.3 = 14.5)
+    interactionRing.rotation.x = -Math.PI / 2;
+    interactionRing.position.y = -0.3;
     group.add(interactionRing);
     
-    // DADOS DE ESTADO (GameLogic / InteractionLayer)
+    // DADOS DE ESTADO
     group.userData = {
         isNPC: true,
         npcName: "Mago da Computação",
@@ -1610,18 +2664,19 @@ async function createNPC() {
         patrolAxis: 'x',
         hasInteracted: false,
         interactionCooldown: 0,
-        interactionRing: interactionRing // Referência para animação no loop
+        interactionRing: interactionRing,
+        animator: animator,
+        lastAnimationState: 'idle'
     };
     
     scene.add(group);
     return group;
 }
 
+
+
 // ══════════════════════════════════════════════════════════════
-// LÓGICA DE PATRULHA E INTERAÇÃO AUTOMÁTICA DO NPC
-// ══════════════════════════════════════════════════════════════
-// ══════════════════════════════════════════════════════════════
-// LÓGICA DE PATRULHA E INTERAÇÃO AUTOMÁTICA DO NPC
+// LÓGICA DE PATRULHA E ANIMAÇÃO NATURAL (5×5)
 // ══════════════════════════════════════════════════════════════
 function updateNPC(dt) {
     if (!npcGroup) return;
@@ -1663,8 +2718,16 @@ function updateNPC(dt) {
         npcGroup.userData.hasInteracted = false;
     }
 
-    // 4. Lógica de Patrulha
-    if (!isClose && !isDialogOpen && npcGroup.userData.isPatrolling) {
+    // 4. Determinar estado de animação baseado no contexto
+    let desiredAnimation = 'idle';
+    let isMoving = false;
+    
+    if (isDialogOpen) {
+        desiredAnimation = 'talking'; // Mago está "falando"
+    } else if (isClose) {
+        desiredAnimation = 'pointing'; // Mago aponta para o jogador
+    } else if (!isClose && !isDialogOpen && npcGroup.userData.isPatrolling) {
+        // Patrulhando - usar idle com movimento
         const moveAmount = npcGroup.userData.patrolSpeed * dt * npcGroup.userData.patrolDirection;
         
         if (npcGroup.userData.patrolAxis === 'x') {
@@ -1676,31 +2739,51 @@ function updateNPC(dt) {
             } else if (npcGroup.position.x < 2) {
                 npcGroup.userData.patrolDirection = 1;
             }
+            isMoving = true;
+            desiredAnimation = 'idle'; // Idle mesmo andando (movimento sutil)
         }
-    } 
-    // 5. Quando parado, olha para o jogador
-    else if (isClose || isDialogOpen) {
+    }
+
+    // 5. ANIMAÇÃO NATURAL (VisualLayer)
+    if (npcGroup.userData.animator) {
+        // Transição suave entre animações
+        if (desiredAnimation !== npcGroup.userData.lastAnimationState) {
+            npcGroup.userData.animator.play(desiredAnimation, true);
+            npcGroup.userData.lastAnimationState = desiredAnimation;
+        }
+        
+        // Atualizar animação
+        npcGroup.userData.animator.update(dt);
+        
+        // Ajustar velocidade baseado no movimento
+        if (isMoving) {
+            npcGroup.userData.animator.animationSpeed = 1.2; // Mais rápido andando
+        } else {
+            npcGroup.userData.animator.animationSpeed = 1.0; // Normal parado
+        }
+    }
+
+    // 6. Quando parado, olha para o jogador
+    if (isClose || isDialogOpen) {
         npcGroup.lookAt(avatar.position.x, npcGroup.position.y, avatar.position.z);
     }
 
-    // ══════════════════════════════════════════════════════════
-    // 6. FEEDBACK VISUAL DO ANEL (VisualLayer)
-    // ══════════════════════════════════════════════════════════
+    // 7. FEEDBACK VISUAL DO ANEL
     if (npcGroup.userData.interactionRing) {
         const t = performance.now() * 0.001;
-        const baseOpacity = 0.9 + Math.sin(t * 2) * 0.1; // Pulsação suave constante
+        const baseOpacity = 0.15 + Math.sin(t * 2) * 0.1;
         
         if (isClose) {
-            // Jogador dentro da zona: Anel fica mais opaco e dourado
             npcGroup.userData.interactionRing.material.opacity = 0.45;
             npcGroup.userData.interactionRing.material.color.setHex(0xffdd44); 
         } else {
-            // Jogador fora: Anel azul suave pulsando
             npcGroup.userData.interactionRing.material.opacity = baseOpacity;
             npcGroup.userData.interactionRing.material.color.setHex(0x5bc8f5); 
         }
     }
 }
+
+
 
 
 let missoes = [
@@ -1881,13 +2964,11 @@ function animate(){
   lastTime=now;
   const t=now*.001;
   
-  sky.material.uniforms.uTime.value=t;
-  clouds.forEach((c,i)=>{ 
-    c.position.x+=(.05+i*.002)*Math.sin(i*.7)*.3*dt*60*.016; 
-    c.rotation.y=Math.sin(t*.05+i)*.05; 
-    if(c.position.x>600) c.position.x=-600; 
-    if(c.position.x<-600) c.position.x=600; 
-  });
+  // Animação procedural de nuvens via offset de textura (Custo ZERO de CPU/GPU)
+if(cloudTex) cloudTex.offset.x += 0.0004 * dt * 60;
+
+
+
   waterfall.children.forEach((w,i)=>{ w.material.opacity=.5+Math.sin(t*3+i)*.15; });
   const ppos=particles.geometry.attributes.position;
   for(let i=0;i<ppos.count;i++){ 
@@ -2282,6 +3363,221 @@ startNPCDialog = function() {
 injectPhase5UI();
 console.log('[FASE 5] Gamificação Avançada, Biblioteca e Relatórios inicializados');
 
+
+// ══════════════════════════════════════════════════════════════
+// SISTEMA DE TOOLTIP HOVER (Fase 6 - Identificação Visual)
+// ══════════════════════════════════════════════════════════════
+
+// 1. Criar elemento tooltip via JS (sem alterar HTML)
+const hoverTooltip = document.createElement('div');
+hoverTooltip.id = 'hover-tooltip';
+hoverTooltip.style.cssText = `
+    position: fixed;
+    background: rgba(5, 15, 35, 0.92);
+    border: 1px solid rgba(91, 200, 245, 0.5);
+    border-radius: 12px;
+    padding: 6px 14px;
+    color: #e8f4ff;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    transform: translate(-50%, -120%);
+`;
+document.body.appendChild(hoverTooltip);
+
+// 2. Mapear objetos para seus nomes (usando userData)
+function assignNamesToObjects() {
+    // Ilha Central
+    if (island) {
+        island.traverse(obj => {
+            if (obj.isMesh) obj.userData.locationName = "🏝️ Ilha Central";
+        });
+    }
+    
+    // Mini Ilhas / Trilhas
+    miniIslands.forEach((mini, idx) => {
+        const trail = TRILHAS_DATA[idx];
+        if (trail) {
+            mini.traverse(obj => {
+                if (obj.isMesh) obj.userData.locationName = `${trail.emoji} ${trail.nome}`;
+            });
+        }
+    });
+    
+    // Ilha extra (Ilha das Conexões)
+    const extraIsland = scene.children.find(c => c.userData && c.userData.extraIsland7);
+    if (extraIsland) {
+        extraIsland.traverse(obj => {
+            if (obj.isMesh) obj.userData.locationName = "📡 Ilha das Conexões";
+        });
+    }
+    
+    // Portais
+    portais.forEach(p => {
+        const trilha = p.userData.trilha;
+        if (trilha) {
+            p.traverse(obj => {
+                if (obj.isMesh) obj.userData.locationName = `${trilha.emoji} Portal: ${trilha.nome}`;
+            });
+        }
+    });
+    
+    // Grupos de trilhas (conteúdo das ilhas)
+    trilhaGroups.forEach((g, idx) => {
+        const trail = TRILHAS_DATA[idx];
+        if (trail && g) {
+            g.traverse(obj => {
+                if (obj.isMesh && !obj.userData.locationName) {
+                    obj.userData.locationName = `${trail.emoji} ${trail.nome}`;
+                }
+            });
+        }
+    });
+    
+    // Praça Central
+    if (plaza && plaza.group) {
+        plaza.group.traverse(obj => {
+            if (obj.isMesh) obj.userData.locationName = "⭐ Praça Central do Conhecimento";
+        });
+    }
+    
+    // Pontos de Interesse
+    poiMarkers.forEach(m => {
+        if (m.userData.poi) {
+            m.traverse(obj => {
+                if (obj.isMesh) obj.userData.locationName = `${m.userData.poi.icone} ${m.userData.poi.nome}`;
+            });
+        }
+    });
+    
+    // Cachoeira
+    if (waterfall) {
+        waterfall.traverse(obj => {
+            if (obj.isMesh) obj.userData.locationName = "💧 Cachoeira do Conhecimento";
+        });
+    }
+    
+    // Árvores (InstancedMesh)
+    if (optimizedEnv && optimizedEnv.trunkMesh) {
+        optimizedEnv.trunkMesh.userData.locationName = "🌲 Árvore";
+        optimizedEnv.leavesMesh.userData.locationName = "🌲 Árvore";
+    }
+    
+    // Flores
+    if (optimizedEnv && optimizedEnv.flowerMesh) {
+        optimizedEnv.flowerMesh.userData.locationName = "🌸 Flor";
+    }
+    
+    // Cristais
+    if (crystalGroup) {
+        crystalGroup.traverse(obj => {
+            if (obj.isMesh) obj.userData.locationName = "💎 Cristal Mágico";
+        });
+    }
+    
+    // NPC
+    // Será marcado quando o NPC for criado (já tem userData.isNPC)
+}
+
+// Chamar após todos os objetos serem criados
+setTimeout(assignNamesToObjects, 100);
+
+// 3. Sistema de Hover com Raycaster (otimizado)
+const hoverRaycaster = new THREE.Raycaster();
+const hoverMouse = new THREE.Vector2();
+let lastHoverCheck = 0;
+const HOVER_THROTTLE = 50; // Verificar apenas a cada 50ms (performance)
+let currentHoveredName = null;
+
+canvas.addEventListener('mousemove', (e) => {
+    const now = performance.now();
+    if (now - lastHoverCheck < HOVER_THROTTLE) return;
+    lastHoverCheck = now;
+    
+    // Se painel está aberto, esconder tooltip
+    if (document.getElementById('trail-panel').classList.contains('active') ||
+        document.getElementById('activity-overlay').classList.contains('active')) {
+        hoverTooltip.style.opacity = '0';
+        currentHoveredName = null;
+        return;
+    }
+    
+    hoverMouse.set(
+        (e.clientX / window.innerWidth) * 2 - 1,
+        -(e.clientY / window.innerHeight) * 2 + 1
+    );
+    
+    hoverRaycaster.setFromCamera(hoverMouse, camera);
+    
+    // Coletar meshes com locationName
+    const hoverTargets = [];
+    scene.traverse(obj => {
+        if (obj.isMesh && obj.userData.locationName && obj.visible) {
+            hoverTargets.push(obj);
+        }
+    });
+    
+    // Adicionar NPC se existir
+    if (npcGroup) {
+        npcGroup.traverse(obj => {
+            if (obj.isMesh) {
+                if (!obj.userData.locationName) obj.userData.locationName = "🧙 Mago da Computação";
+                hoverTargets.push(obj);
+            }
+        });
+    }
+    
+    const intersects = hoverRaycaster.intersectObjects(hoverTargets, false);
+    
+    if (intersects.length > 0) {
+        const hit = intersects[0];
+        let locationName = hit.object.userData.locationName;
+        
+        // Para InstancedMesh, identificar instância específica
+        if (hit.object.isInstancedMesh && hit.instanceId !== undefined) {
+            if (hit.object.userData.locationName === "🌲 Árvore") {
+                locationName = `🌲 Árvore #${hit.instanceId + 1}`;
+            } else if (hit.object.userData.locationName === "🌸 Flor") {
+                locationName = `🌸 Flor #${hit.instanceId + 1}`;
+            }
+        }
+        
+        if (locationName && locationName !== currentHoveredName) {
+            currentHoveredName = locationName;
+            hoverTooltip.textContent = locationName;
+            hoverTooltip.style.opacity = '1';
+        }
+        
+        // Posicionar tooltip no mouse
+        hoverTooltip.style.left = e.clientX + 'px';
+        hoverTooltip.style.top = e.clientY + 'px';
+        
+        // Cursor pointer
+        canvas.style.cursor = 'pointer';
+    } else {
+        if (currentHoveredName) {
+            hoverTooltip.style.opacity = '0';
+            currentHoveredName = null;
+            canvas.style.cursor = 'default';
+        }
+    }
+});
+
+// Esconder tooltip ao sair do canvas
+canvas.addEventListener('mouseleave', () => {
+    hoverTooltip.style.opacity = '0';
+    currentHoveredName = null;
+    canvas.style.cursor = 'default';
+});
+
+console.log('[FASE 6] Sistema de Tooltip Hover inicializado');
 
 animate();
 })();
