@@ -1,6 +1,8 @@
 <!--_javascript_ilha.html-->
 {% load static %}
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<!-- ✅ NOVO: Script oficial do botão VR do Three.js -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/webxr/VRButton.js"></script>
 <script>
 (function(){
 'use strict';
@@ -22,6 +24,18 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
 renderer.outputEncoding = THREE.sRGBEncoding;
+
+
+
+// ✅ 1. Habilitar WebXR no renderer
+renderer.xr.enabled = true;
+
+// ✅ 2. Adicionar o botão de VR diretamente (agora que o script já foi carregado no HTML)
+if (typeof VRButton !== 'undefined') {
+    document.body.appendChild(VRButton.createButton(renderer));
+} else {
+    console.warn("⚠️ VRButton não foi carregado. Verifique sua conexão com a internet ou o bloco <script> no topo.");
+}
 
 const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0xc8e8ff, 0.0008);
@@ -971,15 +985,34 @@ const camState={
   smoothPos:new THREE.Vector3(),
   reset(){ this.distance=80; this.theta=0; this.phi=0.8; }
 };
+
+
 function updateCamera(){
-  camState.smoothTarget.lerp(avatar.position.clone().add(new THREE.Vector3(0,2,0)),.1);
-  const x=camState.smoothTarget.x+camState.distance*Math.sin(camState.phi)*Math.sin(camState.theta);
-  const y=camState.smoothTarget.y+camState.distance*Math.cos(camState.phi);
-  const z=camState.smoothTarget.z+camState.distance*Math.sin(camState.phi)*Math.cos(camState.theta);
-  camState.smoothPos.lerp(new THREE.Vector3(x,y,z),.08);
-  camera.position.copy(camState.smoothPos);
-  camera.lookAt(camState.smoothTarget);
+    // ✅ NOVO: Lógica para 1ª Pessoa (Desktop)
+    if (isFirstPerson && !renderer.xr.isPresenting) {
+        camera.position.copy(avatar.position);
+        camera.position.y += 5.0; // Altura dos olhos do avatar (considerando a escala 1.9)
+        
+        const lookTarget = new THREE.Vector3(0, 5.0, -10).applyQuaternion(avatar.quaternion).add(avatar.position);
+        camera.lookAt(lookTarget);
+        return;
+    }
+
+    // --- Lógica Original da 3ª Pessoa ---
+    // No modo VR, o WebXR controla a câmera automaticamente, então ignoramos a lógica abaixo
+    if (!renderer.xr.isPresenting) {
+        camState.smoothTarget.lerp(avatar.position.clone().add(new THREE.Vector3(0,2,0)),.1);
+        const x=camState.smoothTarget.x+camState.distance*Math.sin(camState.phi)*Math.sin(camState.theta);
+        const y=camState.smoothTarget.y+camState.distance*Math.cos(camState.phi);
+        const z=camState.smoothTarget.z+camState.distance*Math.sin(camState.phi)*Math.cos(camState.theta);
+        camState.smoothPos.lerp(new THREE.Vector3(x,y,z),.08);
+        camera.position.copy(camState.smoothPos);
+        camera.lookAt(camState.smoothTarget);
+    }
 }
+
+
+
 
 // ── Movement ──────────────────────────────────────────────────
 // ── Movement ──────────────────────────────────────────────────
@@ -987,6 +1020,7 @@ const keys = {};
 let velX = 0, velZ = 0, velY = 0, isJumping = false, onGround = true;
 let joystickDx = 0, joystickDz = 0;
 let moveTarget = null; // ✅ CORREÇÃO: Declaração da variável que faltava
+let isFirstPerson = false;
 
 document.addEventListener('keydown', e => keys[e.code] = true);
 document.addEventListener('keyup', e => keys[e.code] = false);
@@ -1292,6 +1326,21 @@ function updateMovement(dt) {
 // ── HUD buttons ───────────────────────────────────────────────
 document.getElementById('btn-fullscreen').addEventListener('click',()=>{ if(!document.fullscreenElement){ document.documentElement.requestFullscreen?.(); }else{ document.exitFullscreen?.(); } });
 document.getElementById('btn-reset').addEventListener('click',()=>camState.reset());
+document.getElementById('btn-reset').addEventListener('click',()=>camState.reset());
+
+// ✅ NOVO: Evento do botão de 1ª Pessoa / VR
+const fpvBtn = document.getElementById('btn-fpv');
+if (fpvBtn) {
+    fpvBtn.addEventListener('click', () => {
+        isFirstPerson = !isFirstPerson;
+        fpvBtn.innerHTML = isFirstPerson ? '🧍' : '🥽';
+        if (!isFirstPerson) avatar.rotation.y = 0; // Reseta rotação ao voltar para 3ª pessoa
+    });
+}
+
+
+
+
 
 let zoomInterval = null;
 function startZoom(dir) {
@@ -2999,51 +3048,31 @@ console.log('[FASE 4] Sistema de Missões, NPCs e Atividades inicializado');
 
 // ── ANIMAÇÃO PRINCIPAL ─────────────────────────────────────────
 function animate(){
-  requestAnimationFrame(animate);
-  const now=performance.now(); 
-  const dt=Math.min(.05,(now-lastTime)/1000); 
-  lastTime=now;
-  const t=now*.001;
-  
-  // Animação procedural de nuvens via offset de textura (Custo ZERO de CPU/GPU)
-if(cloudTex) cloudTex.offset.x += 0.0004 * dt * 60;
-
-
-
-  waterfall.children.forEach((w,i)=>{ w.material.opacity=.5+Math.sin(t*3+i)*.15; });
-  const ppos=particles.geometry.attributes.position;
-  for(let i=0;i<ppos.count;i++){ 
-    ppos.setY(i,ppos.getY(i)+Math.sin(t+i*.3)*.02); 
-    ppos.setX(i,ppos.getX(i)+Math.cos(t*.5+i*.4)*.01); 
-  }
-  ppos.needsUpdate=true;
-  birds.children.forEach((b,i)=>{
-    const sp=b.userData.speed; const ph=b.userData.phase;
-    b.position.x+=Math.cos(t*sp+ph)*(.3+sp*.2);
-    b.position.z+=Math.sin(t*sp*.7+ph)*(.2+sp*.1);
-    b.position.y+=Math.sin(t*3+ph)*.4*dt*60*.016;
-    b.rotation.y=Math.atan2(Math.cos(t*sp+ph),Math.sin(t*sp*.7+ph));
-  });
-  miniIslands.forEach((m,i)=>{ m.position.y+=Math.sin(t*.4+i*1.1)*.012; });
-  crystalGroup.children.forEach((c,i)=>{ c.material.opacity=.7+Math.sin(t*1.5+i*.8)*.2; c.rotation.y+=.005; });
-  sun.position.set(Math.cos(t*.05)*150, 150+Math.sin(t*.05)*30, Math.sin(t*.05)*80);
-  
-  updateMovement(dt);
-  updateCamera();
-  updateFase1(t);
-  updatePhase2(t,portais,trilhaGroups,dt);
-  
-  // ✅ CHAMADA CORRETA DO NPC (patrulha + interação automática)
-  updateNPC(dt); 
-  
-  updateFPS();
-  updateKnowledgeWaterfall(t);
-  updateStatisticsTimer();
-  
-  // ❌ REMOVIDO: checkNPCInteraction() - não é mais necessário
-  
-  renderer.render(scene,camera);
+    // ✅ REMOVA o requestAnimationFrame(animate); daqui
+    
+    const now=performance.now();
+    const dt=Math.min(.05,(now-lastTime)/1000);
+    lastTime=now;
+    const t=now*.001;
+    
+    // ... (mantenha TODO o resto do código da função animate exatamente como está) ...
+    
+    if(cloudTex) cloudTex.offset.x += 0.0004 * dt * 60;
+    // ...
+    updateMovement(dt);
+    updateCamera();
+    updateFase1(t);
+    updatePhase2(t,portais,trilhaGroups,dt);
+    updateNPC(dt);
+    updateFPS();
+    updateKnowledgeWaterfall(t);
+    updateStatisticsTimer();
+    
+    renderer.render(scene,camera);
 }
+
+// ✅ NOVO: Iniciar o loop de animação compatível com WebXR
+renderer.setAnimationLoop(animate);
 
 
 // ══════════════════════════════════════════════════════════════
