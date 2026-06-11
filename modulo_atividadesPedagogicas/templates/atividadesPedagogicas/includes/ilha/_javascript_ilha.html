@@ -481,72 +481,234 @@ function validateMovement(newPosition) {
 }
 
 // Cria ponte corrigida (conecta bordas das ilhas)
-function createCorrectedWoodenBridge(startIsland, endIsland) {
-    const startRadius = startIsland.radius || 75;
-    const endRadius = endIsland.radius || 18;
-    
+// ══════════════════════════════════════════════════════════════
+// FUNÇÃO AUXILIAR: Calcula a altura REAL da superfície de uma ilha
+// ══════════════════════════════════════════════════════════════
+function getIslandSurfaceY(islandData) {
+    // Ilha principal usa a função de terreno com ruído
+    if (islandData.radius >= 70) {
+        return getTerrainHeight(islandData.x, islandData.z);
+    }
+    // Mini ilhas: cilindro com altura = radius * 0.6
+    // O topo fica em: centroY + (altura/2) = height + radius*0.3
+    return islandData.height + (islandData.radius * 0.3);
+}
+
+// ══════════════════════════════════════════════════════════════
+// PONTE CORRIGIDA: Vetores, Rotação e Distribuição por Lerp
+// ══════════════════════════════════════════════════════════════
+function createProperBridge(startIsland, endIsland) {
+    const bridgeGroup = new THREE.Group();
+
+    // ── 1. CÁLCULO DOS VETORES DE ORIGEM E DESTINO ─────────────
+    // Direção horizontal entre os centros das ilhas
     const dx = endIsland.x - startIsland.x;
     const dz = endIsland.z - startIsland.z;
-    const distance = Math.sqrt(dx * dx + dz * dz);
-    const angle = Math.atan2(dz, dx);
-    
-    const startX = startIsland.x + Math.cos(angle) * (startRadius - 3);
-    const startZ = startIsland.z + Math.sin(angle) * (startRadius - 3);
-    const startY = startIsland.height;
-    
-    const endX = endIsland.x - Math.cos(angle) * (endRadius - 3);
-    const endZ = endIsland.z - Math.sin(angle) * (endRadius - 3);
-    const endY = endIsland.height;
-    
-    const bridgeGroup = new THREE.Group();
-    
-    const woodMat = new THREE.MeshStandardMaterial({
-        color: 0x8B6914,
-        roughness: 0.9,
-        metalness: 0.1
-    });
-    
-    const plankWidth = 3.5;
-    const segmentLength = 2;
-    const segmentCount = Math.ceil(distance / segmentLength);
-    
-    for (let i = 0; i < segmentCount; i++) {
-        const progress = i / (segmentCount - 1);
-        const x = startX + dx * progress;
-        const z = startZ + dz * progress;
-        const y = startY + (endY - startY) * progress;
-        
+    const horizontalDist = Math.sqrt(dx * dx + dz * dz);
+    const angle = Math.atan2(dz, dx); // Rotação Y (plano XZ)
+
+    // Altura REAL da superfície (topo da grama) de cada ilha
+    const startSurfaceY = getIslandSurfaceY(startIsland);
+    const endSurfaceY   = getIslandSurfaceY(endIsland);
+
+    // Margem de segurança: a ponte começa/termina um pouco antes da borda
+    // para não ficar "flutuando no ar" na extremidade
+    const startMargin = 3;
+    const endMargin   = 3;
+
+    // Ponto de INÍCIO: borda da superfície da Ilha A
+    const startPos = new THREE.Vector3(
+        startIsland.x + Math.cos(angle) * ((startIsland.radius || 75) - startMargin),
+        startSurfaceY,
+        startIsland.z + Math.sin(angle) * ((startIsland.radius || 75) - startMargin)
+    );
+
+    // Ponto de FIM: borda da superfície da Ilha B
+    const endPos = new THREE.Vector3(
+        endIsland.x - Math.cos(angle) * ((endIsland.radius || 18) - endMargin),
+        endSurfaceY,
+        endIsland.z - Math.sin(angle) * ((endIsland.radius || 18) - endMargin)
+    );
+
+    // ── 2. CÁLCULO DA INCLINAÇÃO (SLOPE) ──────────────────────
+    const dy = endPos.y - startPos.y;
+    // Ângulo de inclinação no eixo X local da ponte
+    // atan2(dy, dist_horizontal) dá a rampa correta
+    const slopeAngle = Math.atan2(dy, horizontalDist);
+
+    // ── 3. MATERIAIS ──────────────────────────────────────────
+    const woodMat  = new THREE.MeshStandardMaterial({ color: 0x8B6914, roughness: 0.9, metalness: 0.1 });
+    const ropeMat  = new THREE.MeshStandardMaterial({ color: 0xD2B48C, roughness: 1.0 });
+    const postMat  = new THREE.MeshStandardMaterial({ color: 0x654321, roughness: 0.95 });
+
+    // ── 4. DISTRIBUIÇÃO DAS TÁBUAS VIA VECTOR3.LERP ───────────
+    const plankWidth  = 3.5;
+    const plankLength = 2.2;
+    const plankCount  = Math.ceil(horizontalDist / 2);
+
+    for (let i = 0; i < plankCount; i++) {
+        // Interpolação linear: t vai de 0 (início) a 1 (fim)
+        const t = i / Math.max(1, plankCount - 1);
+        const pos = new THREE.Vector3().lerpVectors(startPos, endPos, t);
+
         const plank = new THREE.Mesh(
-            new THREE.BoxGeometry(segmentLength + 0.1, 0.15, plankWidth),
+            new THREE.BoxGeometry(plankLength, 0.15, plankWidth),
             woodMat
         );
-        
-        plank.position.set(x, y, z);
+
+        // Posição interpolada ao longo da rampa
+        plank.position.copy(pos);
+
+        // Rotação Y: alinha a tábua com a direção da ponte
         plank.rotation.y = angle;
-        plank.castShadow = true;
+
+        // Rotação X: INCLINA a tábua para seguir a rampa
+        // (isso é o que faltava no código original!)
+        plank.rotation.x = -slopeAngle;
+
+        plank.castShadow    = true;
         plank.receiveShadow = true;
         bridgeGroup.add(plank);
     }
-    
+
+    // ── 5. POSTES E CORDAS (também interpolados) ──────────────
+    const postSpacing = 10;
+    const postCount   = Math.floor(horizontalDist / postSpacing);
+    const postGeo     = new THREE.CylinderGeometry(0.3, 0.3, 3, 6);
+
+    for (let i = 0; i <= postCount; i++) {
+        const t = i / Math.max(1, postCount);
+        const pos = new THREE.Vector3().lerpVectors(startPos, endPos, t);
+
+        // Vetor perpendicular à direção da ponte (para posicionar postes nas laterais)
+        const perpX = -Math.sin(angle);
+        const perpZ =  Math.cos(angle);
+        const lateralOffset = 2.2;
+
+        // Poste esquerdo
+        const postLeft = new THREE.Mesh(postGeo, postMat);
+        postLeft.position.set(
+            pos.x + perpX * lateralOffset,
+            pos.y + 1.5,
+            pos.z + perpZ * lateralOffset
+        );
+        postLeft.castShadow = true;
+        bridgeGroup.add(postLeft);
+
+        // Poste direito
+        const postRight = new THREE.Mesh(postGeo, postMat);
+        postRight.position.set(
+            pos.x - perpX * lateralOffset,
+            pos.y + 1.5,
+            pos.z - perpZ * lateralOffset
+        );
+        postRight.castShadow = true;
+        bridgeGroup.add(postRight);
+    }
+
     scene.add(bridgeGroup);
-    
+
+    // ── 6. REGISTRO PARA COLISÃO E TRAVESSIA ──────────────────
     bridges.push({
         group: bridgeGroup,
-        startX: startX,
-        startZ: startZ,
-        endX: endX,
-        endZ: endZ,
-        startY: startY,
-        endY: endY,
+        startX: startPos.x, startZ: startPos.z, startY: startPos.y,
+        endX:   endPos.x,   endZ:   endPos.z,   endY:   endPos.y,
         angle: angle,
-        length: distance,
+        length: horizontalDist,
         width: plankWidth,
         startIsland: startIsland,
         endIsland: endIsland
     });
-    
+
     return bridgeGroup;
 }
+
+// ══════════════════════════════════════════════════════════════
+// VERSÃO ALTERNATIVA: Ponte com CatmullRomCurve3 (curva suave)
+// Use esta se quiser uma ponte arqueada em vez de reta
+// ══════════════════════════════════════════════════════════════
+function createCurvedBridge(startIsland, endIsland, arcHeight = 4) {
+    const startSurfaceY = getIslandSurfaceY(startIsland);
+    const endSurfaceY   = getIslandSurfaceY(endIsland);
+
+    const dx = endIsland.x - startIsland.x;
+    const dz = endIsland.z - startIsland.z;
+    const angle = Math.atan2(dz, dx);
+
+    const startMargin = 3;
+    const endMargin   = 3;
+
+    const startPos = new THREE.Vector3(
+        startIsland.x + Math.cos(angle) * ((startIsland.radius || 75) - startMargin),
+        startSurfaceY,
+        startIsland.z + Math.sin(angle) * ((startIsland.radius || 75) - startMargin)
+    );
+
+    const endPos = new THREE.Vector3(
+        endIsland.x - Math.cos(angle) * ((endIsland.radius || 18) - endMargin),
+        endSurfaceY,
+        endIsland.z - Math.sin(angle) * ((endIsland.radius || 18) - endMargin)
+    );
+
+    // Ponto de controle no meio, elevado para criar o arco
+    const midPoint = new THREE.Vector3().lerpVectors(startPos, endPos, 0.5);
+    midPoint.y += arcHeight; // Eleva o centro da ponte
+
+    // CatmullRomCurve3 cria uma curva suave passando pelos pontos
+    const curve = new THREE.CatmullRomCurve3([
+        startPos,
+        midPoint,
+        endPos
+    ]);
+
+    const bridgeGroup = new THREE.Group();
+    const plankCount  = 40;
+    const woodMat     = new THREE.MeshStandardMaterial({ color: 0x8B6914, roughness: 0.9 });
+
+    for (let i = 0; i < plankCount; i++) {
+        const t = i / (plankCount - 1);
+
+        // Ponto na curva
+        const pos = curve.getPoint(t);
+
+        // Tangente da curva (direção local da ponte neste ponto)
+        const tangent = curve.getTangent(t);
+
+        const plank = new THREE.Mesh(
+            new THREE.BoxGeometry(2.2, 0.15, 3.5),
+            woodMat
+        );
+
+        plank.position.copy(pos);
+
+        // Usa lookAt para alinhar a tábua com a tangente da curva
+        // Criamos um ponto à frente na direção da tangente
+        const lookTarget = pos.clone().add(tangent);
+        plank.lookAt(lookTarget);
+
+        plank.castShadow = true;
+        bridgeGroup.add(plank);
+    }
+
+    scene.add(bridgeGroup);
+    return bridgeGroup;
+}
+
+// ══════════════════════════════════════════════════════════════
+// SUBSTITUIÇÃO: Troque createWoodenBridge e createCorrectedWoodenBridge
+// por createProperBridge na função createAllBridges()
+// ══════════════════════════════════════════════════════════════
+function createAllBridges() {
+    const centralIsland = islandsData[0]; // Ilha Central
+    for (let i = 1; i < islandsData.length; i++) {
+        const targetIsland = islandsData[i];
+        createProperBridge(centralIsland, targetIsland); 
+    }
+    console.log(`[FASE 6] ${bridges.length} pontes criadas conectando as ilhas`);
+}
+
+
+
 
 // Inicializa todas as pontes
 function initializeAllBridges() {
@@ -797,6 +959,7 @@ function buildAvatar(){
   return g;
 }
 const avatar=buildAvatar();
+avatar.scale.set(1.9, 1.9, 1.9); // ✅ Aumenta 190% (1.9x) em largura e altura
 avatar.position.set(0,14.5,0); avatar.castShadow=true; scene.add(avatar);
 setProgress(95);
 
@@ -819,11 +982,14 @@ function updateCamera(){
 }
 
 // ── Movement ──────────────────────────────────────────────────
-const keys={};
-let velX=0,velZ=0,velY=0,isJumping=false,onGround=true;
-let joystickDx=0,joystickDz=0;
-document.addEventListener('keydown',e=>keys[e.code]=true);
-document.addEventListener('keyup',e=>keys[e.code]=false);
+// ── Movement ──────────────────────────────────────────────────
+const keys = {};
+let velX = 0, velZ = 0, velY = 0, isJumping = false, onGround = true;
+let joystickDx = 0, joystickDz = 0;
+let moveTarget = null; // ✅ CORREÇÃO: Declaração da variável que faltava
+
+document.addEventListener('keydown', e => keys[e.code] = true);
+document.addEventListener('keyup', e => keys[e.code] = false);
 
 let isDragging=false,lastMX=0,lastMY=0;
 canvas.addEventListener('mousedown',e=>{ isDragging=true; lastMX=e.clientX; lastMY=e.clientY; });
@@ -994,31 +1160,60 @@ function getCurrentBridge(px, pz, py) {
 }
 
 
-
 function updateMovement(dt) {
     const speed = 6 * cfg.speed;
     let mx = 0, mz = 0;
     
-    if (keys['KeyW'] || keys['ArrowUp']) mz -= 1;
-    if (keys['KeyS'] || keys['ArrowDown']) mz += 1;
-    if (keys['KeyA'] || keys['ArrowLeft']) mx -= 1;
-    if (keys['KeyD'] || keys['ArrowRight']) mx += 1;
-    if (joystickActive) { mx += joystickDx; mz += joystickDz; }
+    // 1. Controles manuais (teclado/joystick) cancelam o movimento por clique
+    if (keys['KeyW'] || keys['ArrowUp']) { mz -= 1; moveTarget = null; }
+    if (keys['KeyS'] || keys['ArrowDown']) { mz += 1; moveTarget = null; }
+    if (keys['KeyA'] || keys['ArrowLeft']) { mx -= 1; moveTarget = null; }
+    if (keys['KeyD'] || keys['ArrowRight']) { mx += 1; moveTarget = null; }
+    if (joystickActive) { mx += joystickDx; mz += joystickDz; moveTarget = null; }
     
     const len = Math.hypot(mx, mz);
     if (len > 1) { mx /= len; mz /= len; }
     
-    const sinT = Math.sin(camState.theta), cosT = Math.cos(camState.theta);
-    const wx = mx * cosT + mz * sinT;
-    const wz = -mx * sinT + mz * cosT;
+    let wx = 0, wz = 0;
     
-    velX += (wx * speed - velX) * .18;
-    velZ += (wz * speed - velZ) * .18;
+    // 2. Lógica de "Clique para Mover" (se não houver input manual)
+    if (moveTarget && len === 0) {
+        const dx = moveTarget.x - avatar.position.x;
+        const dz = moveTarget.z - avatar.position.z;
+        const dist = Math.hypot(dx, dz);
+        
+        if (dist > 0.8) { // Distância mínima para considerar que chegou
+            // Calcula a direção mundial diretamente
+            wx = (dx / dist) * speed;
+            wz = (dz / dist) * speed;
+            
+            // Suaviza a velocidade
+            velX += (wx - velX) * .18;
+            velZ += (wz - velZ) * .18;
+        } else {
+            moveTarget = null; // Chegou ao destino
+            velX *= 0.8;
+            velZ *= 0.8;
+        }
+    } else if (len > 0) {
+        // Movimento manual (com rotação da câmera)
+        const sinT = Math.sin(camState.theta), cosT = Math.cos(camState.theta);
+        wx = mx * cosT + mz * sinT;
+        wz = -mx * sinT + mz * cosT;
+        
+        velX += (wx * speed - velX) * .18;
+        velZ += (wz * speed - velZ) * .18;
+    } else {
+        // Sem input e sem alvo, desacelera
+        velX *= 0.8;
+        velZ *= 0.8;
+        if (Math.abs(velX) < 0.1) velX = 0;
+        if (Math.abs(velZ) < 0.1) velZ = 0;
+    }
     
     const proposedX = avatar.position.x + velX * dt;
     const proposedZ = avatar.position.z + velZ * dt;
     const proposedPos = { x: proposedX, z: proposedZ };
-    
     const validation = validateMovement(proposedPos);
     
     if (validation.valid) {
@@ -1030,15 +1225,18 @@ function updateMovement(dt) {
     } else {
         velX *= 0.1;
         velZ *= 0.1;
+        // Se estiver indo para um alvo e bateu em algo, cancela o alvo se estiver muito perto
+        if (moveTarget) {
+            const distToTarget = Math.hypot(moveTarget.x - avatar.position.x, moveTarget.z - avatar.position.z);
+            if (distToTarget < 2) moveTarget = null;
+        }
     }
     
     if (isFalling) {
         velY -= 20 * dt;
         avatar.position.y += velY * dt;
-        
         const currentPos = { x: avatar.position.x, z: avatar.position.z };
         const validHeight = getValidHeight(currentPos);
-        
         if (validHeight !== null && avatar.position.y <= validHeight + 1) {
             avatar.position.y = validHeight;
             velY = 0;
@@ -1054,8 +1252,9 @@ function updateMovement(dt) {
     }
     
     const isMoving = Math.hypot(velX, velZ) > .15;
-    if (isMoving && Math.hypot(mx, mz) > .05) {
-        const targetAngle = Math.atan2(wx, wz);
+    if (isMoving) {
+        // Usa a direção da velocidade para rotacionar o avatar
+        const targetAngle = Math.atan2(velX, velZ);
         let diff = targetAngle - avatar.rotation.y;
         while (diff > Math.PI) diff -= Math.PI * 2;
         while (diff < -Math.PI) diff += Math.PI * 2;
@@ -1068,12 +1267,20 @@ function updateMovement(dt) {
             legs[0].rotation.x = s * .6;
             if (legs[1]) legs[1].rotation.x = -s * .6;
         }
+    } else {
+        // Parar animação de andar suavemente
+        const legs = avatar.children.filter((c, i) => i >= 5);
+        if (legs.length >= 2) {
+            legs[0].rotation.x *= 0.8;
+            if (legs[1]) legs[1].rotation.x *= 0.8;
+        }
     }
     
     if (avatar.position.y < -50) {
         avatar.position.set(0, 14.5, 0);
         velX = 0; velY = 0; velZ = 0;
         isFalling = false;
+        moveTarget = null;
         notifSys.show('⚠️ Você caiu! Retornando...', 'xp', 2500);
     }
 }
@@ -1231,51 +1438,45 @@ function createPointsOfInterest(){
 
 
 async function createFutureAreas(){
-    // Usar as posições REAIS das ilhas do TRILHAS_DATA
-    const futureAreas = TRILHAS_DATA.map(trilha => ({
-        nome: `${trilha.emoji} ${trilha.nome}`,
-        x: trilha.islandPos.x,
-        y: trilha.islandPos.y + 15, // 15 unidades acima do centro da ilha
-        z: trilha.islandPos.z,
-        trilhaId: trilha.id
-    }));
-    
-    const textureLoader = new THREE.TextureLoader();
-    
-    futureAreas.forEach(async (area) => {
-        const group = new THREE.Group();
-        
-        // Carregar textura PNG (com fallback para cor sólida)
-        let mat;
-        try {
-            const texture = textureLoader.load(`/static/ilha/placa_${area.trilhaId}.png`);
-            mat = new THREE.MeshBasicMaterial({
-                map: texture,
-                transparent: true,
-                opacity: 1.0,
-                side: THREE.DoubleSide
-            });
-        } catch(e) {
-            // Fallback: cor sólida se a textura não carregar
-            mat = new THREE.MeshBasicMaterial({
-                color: 0x334466,
-                transparent: true,
-                opacity: 0.8,
-                side: THREE.DoubleSide
-            });
-        }
-        
-        const sign = new THREE.Mesh(new THREE.PlaneGeometry(16, 5), mat);
-        group.add(sign);
-        
-        // Posicionar sobre a ilha real
-        group.position.set(area.x, area.y, area.z);
-        group.lookAt(0, area.y, 0);
-        group.userData = {baseY: area.y, area, trilhaId: area.trilhaId};
-        scene.add(group);
-    });
+// Usar as posições REAIS das ilhas do TRILHAS_DATA
+const futureAreas = TRILHAS_DATA.map(trilha => ({
+nome: `${trilha.emoji} ${trilha.nome}`,
+x: trilha.islandPos.x,
+y: trilha.islandPos.y + 15, 
+z: trilha.islandPos.z,
+trilhaId: trilha.id
+}));
+const textureLoader = new THREE.TextureLoader();
+futureAreas.forEach(async (area) => {
+const group = new THREE.Group();
+let mat;
+try {
+const texture = textureLoader.load(`/static/ilha/placa_${area.trilhaId}.png`);
+mat = new THREE.MeshBasicMaterial({
+map: texture,
+transparent: true,
+opacity: 1.0,
+side: THREE.DoubleSide
+});
+} catch(e) {
+mat = new THREE.MeshBasicMaterial({
+color: 0x334466,
+transparent: true,
+opacity: 0.8,
+side: THREE.DoubleSide
+});
 }
+// ✅ AQUI ESTÁ A CORREÇÃO: 16 * 1.9 = 30.4 | 5 * 1.9 = 9.5
+const sign = new THREE.Mesh(new THREE.PlaneGeometry(30.4, 9.5), mat); 
+group.add(sign);
 
+// Posicionar sobre a ilha real
+group.position.set(area.x, area.y, area.z);
+group.lookAt(0, area.y, 0);
+group.userData = {baseY: area.y, area, trilhaId: area.trilhaId};
+scene.add(group);
+});
+}
 
 
 
@@ -1318,7 +1519,7 @@ document.getElementById('btn-map').addEventListener('click', ()=>{
 
 const plaza = createCentralPlaza();
 const poiMarkers = createPointsOfInterest();
-createFutureAreas();
+
 const centralParticles = createCentralParticles();
 
 const hintEl = document.getElementById('interact-hint');
@@ -1402,6 +1603,8 @@ const TRILHAS_DATA = [
   {id:"conexoes",nome:"Ilha das Conexões",emoji:"📡", tema:"Internet e Redes", descricao:"Conecte-se ao mundo. Entenda como a internet e as redes funcionam.", conceitos:["Internet","Redes de Computadores","Protocolos","Comunicação Digital"], habilidadesBNCC:["EF09CO01","EF09CO02"], cor:0x2255ff,corHex:"#2255ff", islandPos:new THREE.Vector3(50,-15,-230), descoberta:false,desbloqueada:true,concluida:false}
 ];
 
+createFutureAreas(); 
+
 let trilhaAtiva = null;
 let camTravel = null;
 let portais = [];
@@ -1417,171 +1620,6 @@ const sharedGray  = new THREE.MeshStandardMaterial({color:0x556677,roughness:.9,
 // SISTEMA DE PONTES DE MADEIRA (Fase 6 - Versão Corrigida)
 // ══════════════════════════════════════════════════════════════
 const bridges = [];
-
-function createWoodenBridge(startIsland, endIsland) {
-    const startRadius = startIsland.radius || 75;
-    const endRadius = endIsland.radius || 18;
-    
-    // Calcular ângulo entre as ilhas
-    const dx = endIsland.x - startIsland.x;
-    const dz = endIsland.z - startIsland.z;
-    const distance = Math.sqrt(dx * dx + dz * dz);
-    const angle = Math.atan2(dz, dx);
-    
-    // Ponto de INÍCIO na borda da ilha de origem
-    const startX = startIsland.x + Math.cos(angle) * startRadius;
-    const startZ = startIsland.z + Math.sin(angle) * startRadius;
-    const startY = startIsland.height;
-    
-    // Ponto de FIM na borda da ilha de destino
-    const endX = endIsland.x - Math.cos(angle) * endRadius;
-    const endZ = endIsland.z - Math.sin(angle) * endRadius;
-    const endY = endIsland.height;
-    
-    // Criar grupo da ponte
-    const bridgeGroup = new THREE.Group();
-    
-    // Materiais
-    const woodMat = new THREE.MeshStandardMaterial({ 
-        color: 0x8B6914, 
-        roughness: 0.9,
-        metalness: 0.1
-    });
-    const ropeMat = new THREE.MeshStandardMaterial({ 
-        color: 0xD2B48C, 
-        roughness: 1.0 
-    });
-    const postMat = new THREE.MeshStandardMaterial({ 
-        color: 0x654321, 
-        roughness: 0.95 
-    });
-    
-    // Calcular distância real da ponte (entre as bordas)
-    const bridgeLength = Math.sqrt(
-        Math.pow(endX - startX, 2) + 
-        Math.pow(endZ - startZ, 2)
-    );
-    
-    // Criar tábuas da ponte (segmentos)
-    const plankWidth = 3.5;
-    const plankCount = Math.floor(bridgeLength / 2);
-    const plankGeo = new THREE.BoxGeometry(2.2, 0.15, plankWidth);
-    
-    for (let i = 0; i < plankCount; i++) {
-        const progress = i / plankCount;
-        const x = startX + dx * progress;
-        const z = startZ + dz * progress;
-        const y = startY + (endY - startY) * progress;
-        
-        const plank = new THREE.Mesh(plankGeo, woodMat);
-        plank.position.set(x, y, z);
-        plank.rotation.y = angle;
-        plank.castShadow = true;
-        plank.receiveShadow = true;
-        bridgeGroup.add(plank);
-    }
-    
-    // Criar postes de sustentação (a cada 10 unidades)
-    const postSpacing = 10;
-    const postCount = Math.floor(bridgeLength / postSpacing);
-    const postGeo = new THREE.CylinderGeometry(0.3, 0.3, 3, 6);
-    
-    for (let i = 0; i <= postCount; i++) {
-        const progress = i / postCount;
-        const x = startX + dx * progress;
-        const z = startZ + dz * progress;
-        const y = startY + (endY - startY) * progress;
-        
-        // Poste esquerdo
-        const postLeft = new THREE.Mesh(postGeo, postMat);
-        postLeft.position.set(
-            x - Math.sin(angle) * 2.2,
-            y + 1.5,
-            z + Math.cos(angle) * 2.2
-        );
-        postLeft.castShadow = true;
-        bridgeGroup.add(postLeft);
-        
-        // Poste direito
-        const postRight = new THREE.Mesh(postGeo, postMat);
-        postRight.position.set(
-            x + Math.sin(angle) * 2.2,
-            y + 1.5,
-            z - Math.cos(angle) * 2.2
-        );
-        postRight.castShadow = true;
-        bridgeGroup.add(postRight);
-        
-        // Cordas/corrimão
-        if (i < postCount) {
-            const nextProgress = (i + 1) / postCount;
-            const nextX = startX + dx * nextProgress;
-            const nextZ = startZ + dz * nextProgress;
-            const nextY = startY + (endY - startY) * nextProgress;
-            
-            const ropeLength = Math.sqrt(
-                Math.pow(nextX - x, 2) + 
-                Math.pow(nextZ - z, 2)
-            );
-            const ropeGeo = new THREE.CylinderGeometry(0.08, 0.08, ropeLength, 6);
-            
-            // Corda esquerda
-            const ropeLeft = new THREE.Mesh(ropeGeo, ropeMat);
-            ropeLeft.position.set(
-                (x + nextX) / 2 - Math.sin(angle) * 2.2,
-                (y + nextY) / 2 + 2.5,
-                (z + nextZ) / 2 + Math.cos(angle) * 2.2
-            );
-            ropeLeft.rotation.z = Math.PI / 2;
-            ropeLeft.rotation.y = angle;
-            bridgeGroup.add(ropeLeft);
-            
-            // Corda direita
-            const ropeRight = new THREE.Mesh(ropeGeo, ropeMat);
-            ropeRight.position.set(
-                (x + nextX) / 2 + Math.sin(angle) * 2.2,
-                (y + nextY) / 2 + 2.5,
-                (z + nextZ) / 2 - Math.cos(angle) * 2.2
-            );
-            ropeRight.rotation.z = Math.PI / 2;
-            ropeRight.rotation.y = angle;
-            bridgeGroup.add(ropeRight);
-        }
-    }
-    
-    scene.add(bridgeGroup);
-    
-    // Registrar dados da ponte para colisão e travessia
-    bridges.push({
-        group: bridgeGroup,
-        startX: startX,
-        startZ: startZ,
-        endX: endX,
-        endZ: endZ,
-        startY: startY,
-        endY: endY,
-        angle: angle,
-        length: bridgeLength,
-        width: plankWidth,
-        startIsland: startIsland,
-        endIsland: endIsland
-    });
-    
-    return bridgeGroup;
-}
-
-// Criar pontes conectando a ilha central às ilhas secundárias
-function createAllBridges() {
-    const centralIsland = islandsData[0]; // Ilha Central
-    
-    // Criar ponte para cada ilha secundária
-    for (let i = 1; i < islandsData.length; i++) {
-        const targetIsland = islandsData[i];
-        createWoodenBridge(centralIsland, targetIsland);
-    }
-    
-    console.log(`[FASE 6] ${bridges.length} pontes de madeira criadas conectando as ilhas`);
-}
 
 // Função para verificar se o avatar está em uma ponte
 function getCurrentBridge(px, pz, py) {
@@ -2116,12 +2154,11 @@ function updateMapSystem(){
   mp.innerHTML=`<h3>🗺️ Mapa do Mundo</h3><ul><li><span class="map-dot" style="background:#5bc8f5"></span><span class="map-trail-name">⭐ Praça Central</span><button class="map-travel-btn" onclick="travelToMain()">Ir</button></li>${TRILHAS_DATA.map(t=>`<li><span class="map-dot" style="background:${t.corHex}"></span><span class="map-trail-name">${t.emoji} ${t.nome}</span><button class="map-travel-btn" onclick="openTrailPanel(TRILHAS_DATA.find(x=>x.id==='${t.id}'))">Info</button><button class="map-travel-btn" onclick="travelToTrail('${t.id}')">Ir</button></li>`).join('')}</ul>`;
 }
 
-
 const rc2 = new THREE.Raycaster();
 const m2v = new THREE.Vector2();
 
 function handleCanvasClick(event) {
-    // Não processa clicks se painéis estão abertos
+    // Ignora cliques se há painéis abertos
     if (document.getElementById('trail-panel').classList.contains('active')) return;
     if (document.getElementById('activity-overlay').classList.contains('active')) return;
     
@@ -2130,58 +2167,61 @@ function handleCanvasClick(event) {
     m2v.set((cx / window.innerWidth) * 2 - 1, -(cy / window.innerHeight) * 2 + 1);
     rc2.setFromCamera(m2v, camera);
     
-    // 1. PRIORIDADE: Verificar portais (mantém comportamento original)
+    // 1. PRIORIDADE: Verificar portais
     const portalMeshes = [];
     portais.forEach(p => p.traverse(c => { if (c.isMesh) portalMeshes.push(c); }));
     const portalHits = rc2.intersectObjects(portalMeshes, false);
-    
-    if (portalHits.length) {
+    if (portalHits.length > 0) {
         let hitPortal = null;
         portais.forEach(p => {
             p.traverse(c => { if (c === portalHits[0].object) hitPortal = p; });
         });
         if (hitPortal) {
             openTrailPanel(hitPortal.userData.trilha);
-            return; // Sai da função - portal tem prioridade
+            return; // Sai da função ao abrir portal
         }
     }
     
-    // 2. NOVO: Se não clicou em portal, faz zoom no ponto clicado
-    // Coleta objetos "clicáveis" do cenário (terreno, ilhas, cristais, árvores)
+    // 2. Raycast contra o cenário/terreno
     const sceneObjects = [];
     scene.traverse(obj => {
-        // Filtra: apenas meshes visíveis, não inclui UI/painéis/avatars/NPCs
         if (obj.isMesh && obj.visible && 
             !obj.userData.isNPC && 
             obj.parent !== avatar && 
-            obj !== avatar &&
+            obj !== avatar && 
             !obj.userData.isCentralCrystal &&
-            obj.material && !obj.material.wireframe) {
+            obj.material && 
+            !obj.material.transparent && 
+            !obj.material.wireframe) {
             sceneObjects.push(obj);
         }
     });
     
     const sceneHits = rc2.intersectObjects(sceneObjects, false);
-    
     if (sceneHits.length > 0) {
         const hitPoint = sceneHits[0].point;
         
-        // Calcula distância ideal de zoom baseada na distância atual
+        // ✅ CORREÇÃO CRÍTICA: Define o destino do movimento
+        moveTarget = { x: hitPoint.x, z: hitPoint.z };
+        console.log('[CLICK-TO-MOVE] Destino definido:', moveTarget);
+        
+        // Calcula e aplica o zoom suave
         const distFromCamera = camera.position.distanceTo(hitPoint);
         let targetZoom = 35;
-        
-        // Se já está muito perto, mantém distância atual
         if (distFromCamera < 50) {
             targetZoom = Math.max(20, distFromCamera * 0.6);
-        }
-        // Se está muito longe, aproxima bastante
-        else if (distFromCamera > 150) {
+        } else if (distFromCamera > 150) {
             targetZoom = 50;
         }
-        
         zoomToPoint(hitPoint, targetZoom);
     }
 }
+
+// Garante que o evento esteja vinculado (evita duplicação)
+canvas.removeEventListener('click', handleCanvasClick);
+canvas.addEventListener('click', handleCanvasClick);
+
+
 
 canvas.addEventListener('click', handleCanvasClick);
 
@@ -2637,6 +2677,7 @@ async function createNPC() {
     
     // Posição inicial
     group.position.set(5, 14.8, 12);
+    group.scale.set(1.9, 1.9, 1.9); // ✅ Aumenta 190% (1.9x) em largura e altura;
     
     // Anel de interação visual
     const radius = 6.5;
