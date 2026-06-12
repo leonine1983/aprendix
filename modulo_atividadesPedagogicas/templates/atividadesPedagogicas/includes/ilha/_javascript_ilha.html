@@ -1,5 +1,6 @@
 <!--_javascript_ilha.html-->
 {% load static %}
+
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <!-- ✅ NOVO: Script oficial do botão VR do Three.js -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/webxr/VRButton.js"></script>
@@ -45,16 +46,26 @@ const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHei
 let cfg = { sensitivity:1, speed:1, fov:70 };
 
 
+
+
+
+
+
+
+
+
+
 // ══════════════════════════════════════════════════════════════
 // ASSET MANAGER (Fase 6 - Preservação Total)
 // ══════════════════════════════════════════════════════════════
 const AssetManager = {
-    cache: new Map(),
-    
+cache: new Map(),
     loadTexture(url, fallbackColor = 0xff00ff) {
         if (this.cache.has(url)) {
             return Promise.resolve(this.cache.get(url));
         }
+        
+        console.log(`🔄 Tentando carregar: ${url}`);
         
         return new Promise((resolve) => {
             const loader = new THREE.TextureLoader();
@@ -63,18 +74,44 @@ const AssetManager = {
                 (texture) => {
                     texture.encoding = THREE.sRGBEncoding;
                     this.cache.set(url, texture);
-                    console.log(`[AssetManager] ✅ Carregado: ${url}`);
+                    console.log(`✅ Textura carregada: ${url}`);
+                    console.log(`📐 Dimensões: ${texture.image.width}x${texture.image.height}`);
                     resolve(texture);
                 },
-                undefined,
+                (xhr) => {
+                    // Progresso
+                    if (xhr.total > 0) {
+                        const percent = (xhr.loaded / xhr.total) * 100;
+                        console.log(`📥 Progresso ${url}: ${percent.toFixed(0)}%`);
+                    }
+                },
                 (error) => {
-                    console.warn(`[AssetManager] ⚠️ Falha ao carregar ${url}. Usando fallback.`);
-                    const fallbackMat = new THREE.MeshStandardMaterial({
-                        color: fallbackColor,
-                        roughness: 0.7,
-                        metalness: 0.2
-                    });
-                    resolve({ isFallback: true, material: fallbackMat });
+                    console.error(`❌ ERRO ao carregar ${url}:`, error);
+                    console.error(`🔗 URL completa: ${window.location.origin}${url}`);
+                    
+                    // Criar textura de fallback com texto de erro
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 256;
+                    canvas.height = 256;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Fundo colorido
+                    ctx.fillStyle = '#' + fallbackColor.toString(16).padStart(6, '0');
+                    ctx.fillRect(0, 0, 256, 256);
+                    
+                    // Texto de erro
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 20px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('TEXTURA', 128, 100);
+                    ctx.fillText('NÃO', 128, 130);
+                    ctx.fillText('ENCONTRADA', 128, 160);
+                    
+                    const fallbackTex = new THREE.CanvasTexture(canvas);
+                    resolve({ isFallback: true, material: new THREE.MeshStandardMaterial({
+                        map: fallbackTex,
+                        color: 0xffffff
+                    })});
                 }
             );
         });
@@ -232,6 +269,109 @@ function makeSky(){
   });
   return new THREE.Mesh(geo,mat);
 }
+
+
+
+// ══════════════════════════════════════════════════════════════
+// TEXTURA PROCEDURAL DE CAMINHO DE PEDRA (sem depender de PNG)
+// ══════════════════════════════════════════════════════════════
+function makeStonePathTexture(size = 512){
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  // Base: terra entre as pedras
+  ctx.fillStyle = '#5a4632';
+  ctx.fillRect(0,0,size,size);
+
+  // Ruído da terra
+  for(let i=0;i<2500;i++){
+    const x=Math.random()*size, y=Math.random()*size, r=Math.random()*1.4;
+    ctx.fillStyle=`rgba(${60+Math.random()*30},${45+Math.random()*20},${30+Math.random()*15},0.3)`;
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  }
+
+  function rockPolygon(ctx,w,h){
+    const sides = 5 + Math.floor(Math.random()*3); // 5 a 7 lados
+    ctx.beginPath();
+    for(let i=0;i<sides;i++){
+      const a=(i/sides)*Math.PI*2;
+      const rx=(w/2)*(0.82+Math.random()*0.18);
+      const ry=(h/2)*(0.82+Math.random()*0.18);
+      const px=Math.cos(a)*rx, py=Math.sin(a)*ry;
+      i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+    }
+    ctx.closePath();
+  }
+
+  // Grade de pedras (cobblestone) com jitter
+  const cols=6, rows=6, cw=size/cols, ch=size/rows;
+  for(let row=0; row<rows; row++){
+    for(let col=0; col<cols; col++){
+      const cx = col*cw + cw/2 + (Math.random()-0.5)*cw*0.35;
+      const cy = row*ch + ch/2 + (Math.random()-0.5)*ch*0.35;
+      const w = cw*(0.7+Math.random()*0.25);
+      const h = ch*(0.7+Math.random()*0.25);
+      const rot=(Math.random()-0.5)*0.5;
+      const grey = 105 + Math.random()*60;
+      const tint = Math.random()>0.6 ? [grey-8,grey,grey+6] : [grey,grey-6,grey-12];
+
+      ctx.save();
+      ctx.translate(cx,cy);
+      ctx.rotate(rot);
+
+      // sombra (profundidade)
+      ctx.save(); ctx.translate(2,3);
+      ctx.fillStyle='rgba(15,10,8,0.35)';
+      rockPolygon(ctx,w,h); ctx.fill();
+      ctx.restore();
+
+      // pedra com gradiente (efeito 3D)
+      const grad=ctx.createLinearGradient(-w/2,-h/2,w/2,h/2);
+      grad.addColorStop(0,`rgb(${tint[0]+22},${tint[1]+22},${tint[2]+22})`);
+      grad.addColorStop(0.5,`rgb(${tint[0]},${tint[1]},${tint[2]})`);
+      grad.addColorStop(1,`rgb(${tint[0]-28},${tint[1]-28},${tint[2]-28})`);
+      ctx.fillStyle=grad;
+      rockPolygon(ctx,w,h); ctx.fill();
+      ctx.strokeStyle='rgba(30,25,20,0.5)'; ctx.lineWidth=1.2; ctx.stroke();
+
+      // rachaduras
+      ctx.strokeStyle='rgba(0,0,0,0.15)'; ctx.lineWidth=0.6;
+      for(let c=0;c<2;c++){
+        ctx.beginPath();
+        ctx.moveTo((Math.random()-0.5)*w*0.6,(Math.random()-0.5)*h*0.6);
+        ctx.lineTo((Math.random()-0.5)*w*0.6,(Math.random()-0.5)*h*0.6);
+        ctx.stroke();
+      }
+
+      // brilho superior-esquerdo
+      ctx.strokeStyle='rgba(255,255,255,0.18)'; ctx.lineWidth=1;
+      ctx.beginPath();
+      ctx.moveTo(-w/2+3,-h/2+5);
+      ctx.lineTo(-w/2+5,h/2-3);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+  }
+
+  // Musgo nas frestas
+  for(let i=0;i<22;i++){
+    const x=Math.random()*size, y=Math.random()*size, r=3+Math.random()*8;
+    const g=ctx.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,'rgba(80,120,40,0.35)');
+    g.addColorStop(1,'rgba(80,120,40,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  }
+
+  const tex=new THREE.CanvasTexture(canvas);
+  tex.encoding=THREE.sRGBEncoding;
+  tex.wrapS=THREE.RepeatWrapping;
+  tex.wrapT=THREE.RepeatWrapping;
+  return tex;
+}
+
+
 
 // ======= Nuvens =========================
 // ── Nuvens Otimizadas (InstancedMesh + Animação por Textura) ──
@@ -813,47 +953,79 @@ function buildOptimizedEnvironment() {
     flowerMesh.receiveShadow = true;
     group.add(flowerMesh);
 
-    // 3. CAMINHOS (Conectando o centro às trilhas)
+
+    // 3. CAMINHOS TEXTURIZADOS (procedural — não depende de arquivo externo)
     const pathCount = 60;
     const pathGeo = new THREE.PlaneGeometry(3.5, 3.5);
-    const pathMat = new THREE.MeshStandardMaterial({ color: 0x8B7355, roughness: 1, metalness: 0 });
+
+    const pathTexture = makeStonePathTexture(512);
+
+    const pathMat = new THREE.MeshStandardMaterial({
+        map: pathTexture,
+        roughness: 0.95,
+        metalness: 0.0,
+        color: 0xffffff
+    });
+
     const pathMesh = new THREE.InstancedMesh(pathGeo, pathMat, pathCount);
-    
     const trailTargets = [
-        { x: 160, z: 80 }, { x: -150, z: 120 }, { x: 200, z: -100 }, { x: -180, z: -130 }
+        { x: 160, z: 80 }, { x: -150, z: 120 },
+        { x: 200, z: -100 }, { x: -180, z: -130 }
     ];
-    
+
     let pIdx = 0;
     trailTargets.forEach(target => {
         for (let i = 1; i <= 15 && pIdx < pathCount; i++, pIdx++) {
             const progress = i / 15;
-            const px = target.x * progress * 0.25; 
+            const px = target.x * progress * 0.25;
             const pz = target.z * progress * 0.25;
-            
-            // ✅ CORREÇÃO: Calcula a altura real do terreno + pequeno offset
             const terrainY = getTerrainHeight(px, pz);
-            
-            dummy.position.set(px, terrainY + 0.05, pz);
+            dummy.position.set(px, terrainY + 0.08, pz);
             dummy.rotation.x = -Math.PI / 2;
-            dummy.rotation.z = Math.atan2(target.z, target.x) + (Math.random() - 0.5) * 0.8;
-            dummy.scale.set(1 + Math.random() * 0.4, 1 + Math.random() * 0.4, 1);
+            dummy.rotation.z = Math.atan2(target.z, target.x) + (Math.random() - 0.5) * 0.6;
+            const scaleVar = 0.9 + Math.random() * 0.3;
+            dummy.scale.set(scaleVar, scaleVar * (0.9 + Math.random() * 0.2), 1);
             dummy.updateMatrix();
             pathMesh.setMatrixAt(pIdx, dummy.matrix);
         }
     });
-    pathMesh.receiveShadow = true;
-    group.add(pathMesh);
 
-    scene.add(group);
-    return { trunkMesh, leavesMesh, flowerMesh, pathMesh };
+
+// ✅ BÔNUS: Adicionar pedras pequenas ao longo dos caminhos
+const stoneCount = 40;
+const stoneGeo = new THREE.DodecahedronGeometry(0.25, 0);
+const stoneMat = new THREE.MeshStandardMaterial({
+    color: 0x888888, roughness: 0.9
+});
+const stoneMesh = new THREE.InstancedMesh(stoneGeo, stoneMat, stoneCount);
+for (let i = 0; i < stoneCount; i++) {
+    const target = trailTargets[Math.floor(Math.random() * trailTargets.length)];
+    const progress = Math.random();
+    const px = target.x * progress * 0.25 + (Math.random() - 0.5) * 4;
+    const pz = target.z * progress * 0.25 + (Math.random() - 0.5) * 4;
+    const terrainY = getTerrainHeight(px, pz);
+    dummy.position.set(px, terrainY + 0.15, pz);
+    dummy.rotation.set(Math.random(), Math.random(), Math.random());
+    const s = 0.5 + Math.random() * 0.8;
+    dummy.scale.set(s, s * 0.6, s);
+    dummy.updateMatrix();
+    stoneMesh.setMatrixAt(i, dummy.matrix);
 }
 
+pathMesh.receiveShadow = true;
+stoneMesh.castShadow = true;
+group.add(pathMesh);
+group.add(stoneMesh);
+
+return { trunkMesh, leavesMesh, flowerMesh, pathMesh, stoneMesh };
+}
+   
 
 
 
 
-const optimizedEnv = buildOptimizedEnvironment();
-setProgress(45);
+    const optimizedEnv = buildOptimizedEnvironment();
+    setProgress(45);
 
 
 
@@ -3707,8 +3879,5 @@ window.fecharRelatorio = fecharRelatorio;
 })(); // <-- Esta é a linha final do seu arquivo JS
 
 
-// ══════════════════════════════════════════════════════════════
-// FASE 5: Gamificação
-// ══════════════════════════════════════════════════════════════
 
 </script>
