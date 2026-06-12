@@ -2198,6 +2198,9 @@ function closeTrailPanel(){
 }
 document.getElementById('trail-panel').addEventListener('click',function(e){if(e.target===this)closeTrailPanel();});
 document.getElementById('trail-travel-btn').addEventListener('click',()=>travelToTrail());
+
+
+
 function updateMapSystem(){
   const mp=document.getElementById('map-panel');
   mp.innerHTML=`<h3>🗺️ Mapa do Mundo</h3><ul><li><span class="map-dot" style="background:#5bc8f5"></span><span class="map-trail-name">⭐ Praça Central</span><button class="map-travel-btn" onclick="travelToMain()">Ir</button></li>${TRILHAS_DATA.map(t=>`<li><span class="map-dot" style="background:${t.corHex}"></span><span class="map-trail-name">${t.emoji} ${t.nome}</span><button class="map-travel-btn" onclick="openTrailPanel(TRILHAS_DATA.find(x=>x.id==='${t.id}'))">Info</button><button class="map-travel-btn" onclick="travelToTrail('${t.id}')">Ir</button></li>`).join('')}</ul>`;
@@ -3650,7 +3653,59 @@ canvas.addEventListener('mouseleave', () => {
 console.log('[FASE 6] Sistema de Tooltip Hover inicializado');
 
 animate();
-})();
+// ══════════════════════════════════════════════════════════════
+// EXPOSIÇÃO GLOBAL (Correção para os botões com onclick no HTML)
+// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// CORREÇÃO: Fechamento de Janelas (X e Clique Fora)
+// ══════════════════════════════════════════════════════════════
+
+// 1. Fechar Activity Overlay (Quiz/Desafio)
+const activityOverlay = document.getElementById('activity-overlay');
+const activityCloseBtn = document.getElementById('activity-close-btn');
+if (activityCloseBtn) {
+    activityCloseBtn.addEventListener('click', () => activityOverlay.classList.remove('active'));
+}
+if (activityOverlay) {
+    activityOverlay.addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('active');
+    });
+}
+
+// 2. Fechar Diálogo Avançado ao clicar fora
+const dialogoAvancado = document.getElementById('dialogo-avancado');
+if (dialogoAvancado) {
+    dialogoAvancado.addEventListener('click', function(e) {
+        if (e.target === this) fecharDialogoAvancado();
+    });
+}
+
+// 3. Fechar Painel de Missões ao clicar fora
+document.addEventListener('click', (e) => {
+    const missionsList = document.getElementById('missions-list');
+    const missionsBtn = document.getElementById('missions-btn');
+    if (missionsList && missionsList.style.display === 'flex' && !missionsList.contains(e.target) && e.target !== missionsBtn) {
+        missionsList.style.display = 'none';
+    }
+});
+
+// ══════════════════════════════════════════════════════════════
+// EXPOSIÇÃO GLOBAL (Garante que os botões "X" do HTML funcionem)
+// ══════════════════════════════════════════════════════════════
+window.resetCameraView = resetCameraView;
+window.openProfilePanel = openProfilePanel;
+window.closeProfilePanel = closeProfilePanel;
+window.openDiaryPanel = openDiaryPanel;
+window.closeDiaryPanel = closeDiaryPanel;
+window.openWaterfallPanel = openWaterfallPanel;
+window.closeWaterfallPanel = closeWaterfallPanel;
+window.closeInfoPanel = closeInfoPanel;
+window.closeTrailPanel = closeTrailPanel;
+window.fecharBiblioteca = fecharBiblioteca;
+window.fecharRelatorio = fecharRelatorio;
+
+})(); // <-- Esta é a linha final do seu arquivo JS
+
 
 // ══════════════════════════════════════════════════════════════
 // FASE 5: Gamificação
