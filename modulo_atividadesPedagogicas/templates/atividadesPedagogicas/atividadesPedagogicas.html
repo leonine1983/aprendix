@@ -1,29 +1,33 @@
+
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Horizonte da Aprendizagem — Secretaria Municipal da Educação</title>
+<title>Ambiente Horizonte da Aprendizagem — Fundamental 1 | Prefeitura de Vera Cruz</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
 <!--CSS-->
 {% include "atividadesPedagogicas/includes/ilha/_css_ilha.html" %}
+
+
 
 
 </head>
 <body>
 
 <!-- ══════════════════════════════════════════
-     INTRO SCREEN (CSS-only dismiss via checkbox)
+     INTRO SCREEN
 ══════════════════════════════════════════ -->
 <input type="checkbox" id="intro-toggle">
 <div id="intro-overlay">
   <div class="intro-inner">
 
-    <!-- Institution header with logo slot -->
+    <!-- Cabeçalho institucional com espaço para logotipo da Prefeitura -->
     <div class="intro-header">
-      <div class="intro-logo-slot">
-        <img src='{% static "prefeitura.png" %}' height='30'>
+      <div class="intro-logo-slot" title="Espaço reservado para o logotipo da Prefeitura Municipal de Vera Cruz">
+        <img src='{% static "prefeitura.png" %}' alt="Logotipo da Prefeitura Municipal de Vera Cruz" height='30'>
       </div>
       <div class="intro-institution">
         <span class="city-name">Prefeitura Municipal de Vera Cruz</span>
@@ -31,19 +35,19 @@
       </div>
       <div class="intro-divider-v"></div>
       <div class="intro-brand">
-        <span class="env-label">Ambiente Virtual</span>
+        <span class="env-label">Ambiente Virtual • Fundamental 1</span>
         <span class="env-name">Horizonte da Aprendizagem</span>
       </div>
     </div>
 
-    <!-- Headline -->
+    <!-- Título principal -->
     <div class="intro-title-block">
       <div class="intro-eyebrow">Universo Digital Educacional</div>
       <h1 class="intro-headline">Horizonte da<br>Aprendizagem</h1>
       <p class="intro-subtitle">Onde cada conquista escolar constrói um novo mundo</p>
     </div>
 
-    <!-- Cinematic narrative -->
+    <!-- Narrativa cinematográfica imersiva -->
     <div class="intro-narrative">
       <p>
         <strong>Feche os olhos por um instante e imagine um lugar onde cada ideia tem o poder de criar novos mundos...</strong>
@@ -71,7 +75,7 @@
       </p>
     </div>
 
-    <!-- Feature pills -->
+    <!-- Cards de recursos -->
     <div class="intro-features">
       <div class="feat-card">
         <span class="feat-icon">🏝️</span>
@@ -106,9 +110,11 @@
 <div id="ui-container">
   <div id="top-bar" class="pointer-events-auto">
     <div class="top-left">
-      <!-- Brand -->
+      <!-- Brand com logotipo da Prefeitura -->
       <div class="top-brand">
-        <div class="top-logo-slot"><img src='{% static "prefeitura.png" %}' height='30'></div>
+        <div class="top-logo-slot" title="Prefeitura Municipal de Vera Cruz">
+          <img src='{% static "prefeitura.png" %}' alt="Prefeitura de Vera Cruz" height='30'>
+        </div>
         <div class="top-brand-text">
           <span class="tb-city">Pref. Vera Cruz • Sec. Educação</span>
           <span class="tb-env">Horizonte da Aprendizagem</span>
@@ -121,9 +127,9 @@
       <div class="resource">💎 <span id="crystals">1000</span></div>
     </div>
     <div class="top-right">
-      <button class="icon-btn" onclick="saveWorld()">💾</button>
-      <button class="icon-btn" onclick="loadWorld()">📂</button>
-      <button class="icon-btn" onclick="clearPlaza()">🗑️</button>
+      <button class="icon-btn" onclick="saveWorld()" title="Salvar mundo">💾</button>
+      <button class="icon-btn" onclick="loadWorld()" title="Carregar mundo">📂</button>
+      <button class="icon-btn" onclick="clearPlaza()" title="Limpar praça">🗑️</button>
     </div>
   </div>
 
@@ -135,7 +141,7 @@
 
   <div id="side-menu">
     <div class="menu-header">
-      <h3> Catálogo</h3>
+      <h3>🎨 Catálogo</h3>
       <button class="close-menu" onclick="toggleCatalog()" title="Fechar catálogo">✖</button>
     </div>
     <div class="catalog-title">🌳 Natureza</div>
@@ -154,42 +160,42 @@
     <div class="catalog-item" onclick="selectCatalogItem('fence', 15)">🚧 Cerca <span>💎 15</span></div>
     <div class="catalog-item" onclick="selectCatalogItem('path', 10)">🛤️ Caminho <span>💎 10</span></div>
     <div class="catalog-item" onclick="selectCatalogItem('fountain', 120)">⛲ Fonte <span>💎 120</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('lampPost', 35)"> Poste de Luz <span>💎 35</span></div>
+    <div class="catalog-item" onclick="selectCatalogItem('lampPost', 35)">💡 Poste de Luz <span>💎 35</span></div>
     <div class="catalog-title">🌾 Agricultura</div>
     <div class="catalog-item" onclick="selectCatalogItem('wheat', 8)">🌾 Trigo <span>💎 8</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('carrot', 10)"> Cenoura <span>💎 10</span></div>
+    <div class="catalog-item" onclick="selectCatalogItem('carrot', 10)">🥕 Cenoura <span>💎 10</span></div>
     <div class="catalog-item" onclick="selectCatalogItem('corn', 12)">🌽 Milho <span>💎 12</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('tomato', 10)">🍅 Tomate <span> 10</span></div>
+    <div class="catalog-item" onclick="selectCatalogItem('tomato', 10)">🍅 Tomate <span>💎 10</span></div>
     <div class="catalog-item" onclick="selectCatalogItem('lettuce', 8)">🥬 Alface <span>💎 8</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('garden', 50)"> Horta <span>💎 50</span></div>
+    <div class="catalog-item" onclick="selectCatalogItem('garden', 50)">🌱 Horta <span>💎 50</span></div>
     <div class="catalog-item" onclick="selectCatalogItem('barn', 300)">🏚️ Celeiro <span>💎 300</span></div>
     <div class="catalog-title">🍎 Alimentos</div>
-    <div class="catalog-item" onclick="selectCatalogItem('apple', 15)"> Maçã <span>💎 15</span></div>
+    <div class="catalog-item" onclick="selectCatalogItem('apple', 15)">🍎 Maçã <span>💎 15</span></div>
     <div class="catalog-item" onclick="selectCatalogItem('orange', 15)">🍊 Laranja <span>💎 15</span></div>
     <div class="catalog-item" onclick="selectCatalogItem('bread', 20)">🍞 Pão <span>💎 20</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('cheese', 25)"> Queijo <span>💎 25</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('milk', 20)">🥛 Leite <span> 20</span></div>
+    <div class="catalog-item" onclick="selectCatalogItem('cheese', 25)">🧀 Queijo <span>💎 25</span></div>
+    <div class="catalog-item" onclick="selectCatalogItem('milk', 20)">🥛 Leite <span>💎 20</span></div>
     <div class="catalog-item" onclick="selectCatalogItem('cake', 50)">🎂 Bolo <span>💎 50</span></div>
     <div class="catalog-title">🐾 Animais</div>
     <div class="catalog-item" onclick="selectCatalogItem('cow', 60)">🐄 Vaca <span>💎 60</span></div>
     <div class="catalog-item" onclick="selectCatalogItem('ox', 60)">🐂 Boi <span>💎 60</span></div>
     <div class="catalog-item" onclick="selectCatalogItem('horse', 70)">🐴 Cavalo <span>💎 70</span></div>
     <div class="catalog-item" onclick="selectCatalogItem('chicken', 40)">🐔 Galinha <span>💎 40</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('pig', 50)"> Porco <span>💎 50</span></div>
+    <div class="catalog-item" onclick="selectCatalogItem('pig', 50)">🐷 Porco <span>💎 50</span></div>
     <div class="catalog-title">⭐ NPCs</div>
     <div class="catalog-item" onclick="selectCatalogItem('npc_man', 50)">👨 Homem <span>💎 50</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('npc_woman', 50)">👩 Mulher <span> 50</span></div>
+    <div class="catalog-item" onclick="selectCatalogItem('npc_woman', 50)">👩 Mulher <span>💎 50</span></div>
     <div class="catalog-item" onclick="selectCatalogItem('npc_mtrans', 50)">🏳️‍⚧️ M. Trans <span>💎 50</span></div>
     <div class="catalog-item" onclick="selectCatalogItem('npc_htrans', 50)">🏳️‍️ H. Trans <span>💎 50</span></div>
     <div class="catalog-item" onclick="selectCatalogItem('npc_boy', 50)">👦 Menino <span>💎 50</span></div>
     <div class="catalog-item" onclick="selectCatalogItem('npc_girl', 50)">👧 Menina <span>💎 50</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('npc_dog', 75)"> Cachorro <span>💎 75</span></div>
-    <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 16px 0;">
+    <div class="catalog-item" onclick="selectCatalogItem('npc_dog', 75)">🐕 Cachorro <span>💎 75</span></div>
+    <hr style="border: none; border-top: 1px solid rgba(14, 116, 144, 0.15); margin: 18px 0;">
     <button class="action-btn primary" style="width: 100%;" onclick="showModal('help-modal')">❓ Ajuda</button>
   </div>
 
   <div id="tools-panel" class="pointer-events-auto">
-    <div class="panel-title">🔧 Ferramentas <button style="background:none; border:none; color:white; cursor:pointer;" onclick="deselectObject()">✖</button></div>
+    <div class="panel-title">🔧 Ferramentas <button style="background:none; border:none; color:var(--ink-500); cursor:pointer;" onclick="deselectObject()">✖</button></div>
     <div class="tool-grid">
       <div class="action-btn" onclick="duplicateSelected()">📋 Duplicar</div>
       <div class="action-btn" id="btn-dialogue" onclick="openDialogueModal()" style="display:none;">💬 Falas</div>
@@ -200,7 +206,7 @@
   <div id="camera-controls" class="pointer-events-auto">
     <button class="cam-btn active" id="btn-3rd" onclick="setCameraMode('third')">👁️</button>
     <button class="cam-btn" id="btn-avatar" onclick="setCameraMode('avatar')">🧍</button>
-    <button class="cam-btn" id="btn-1st" onclick="setCameraMode('first')"></button>
+    <button class="cam-btn" id="btn-1st" onclick="setCameraMode('first')">🎯</button>
   </div>
 
   <div id="avatar-hint">
@@ -221,7 +227,7 @@
 <div id="blocker">
   <div id="instructions-fp">
     <h1>🧍 Clique para controlar o Avatar</h1>
-    <p style="margin-top:15px; opacity:0.8;">(WASD = Mover | MOUSE = Olhar | SHIFT = Correr | ESC = Sair)</p>
+    <p style="margin-top:15px; opacity:0.8; color: var(--ink-500);">(WASD = Mover | MOUSE = Olhar | SHIFT = Correr | ESC = Sair)</p>
   </div>
 </div>
 
@@ -286,10 +292,10 @@
 <div id="help-modal" class="modal-overlay pointer-events-auto">
   <div class="modal-content">
     <h2>🌌 Bem-vindo ao Horizonte da Aprendizagem</h2>
-    <p style="line-height:1.7; margin-bottom: 10px; color: rgba(255,255,255,0.75);">🌍 <strong style="color:var(--gold)">Modo Normal:</strong> Explore o mundo e observe os NPCs com IA inteligente!</p>
-    <p style="line-height:1.7; margin-bottom: 10px; color: rgba(255,255,255,0.75);">🧍 <strong style="color:var(--gold)">Modo Avatar:</strong> Controle seu personagem em 3ª pessoa.</p>
-    <p style="line-height:1.7; margin-bottom: 10px; color: rgba(255,255,255,0.75);">️ <strong style="color:var(--gold)">Modo Edição:</strong> Construa com o catálogo.</p>
-    <p style="line-height:1.7; margin-bottom: 18px; color: rgba(255,255,255,0.75);">💎 Cristais custam objetos. Excluir devolve o valor.</p>
+    <p style="line-height:1.7; margin-bottom: 10px; color: var(--ink-700);">🌍 <strong style="color:var(--sky-700)">Modo Normal:</strong> Explore o mundo e observe os NPCs com IA inteligente!</p>
+    <p style="line-height:1.7; margin-bottom: 10px; color: var(--ink-700);">🧍 <strong style="color:var(--sky-700)">Modo Avatar:</strong> Controle seu personagem em 3ª pessoa.</p>
+    <p style="line-height:1.7; margin-bottom: 10px; color: var(--ink-700);">🛠️ <strong style="color:var(--sky-700)">Modo Edição:</strong> Construa com o catálogo.</p>
+    <p style="line-height:1.7; margin-bottom: 18px; color: var(--ink-700);">💎 Cristais custam objetos. Excluir devolve o valor.</p>
     <button class="action-btn primary" style="width:100%;" onclick="closeModal('help-modal')">Começar!</button>
   </div>
 </div>
