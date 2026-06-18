@@ -104,11 +104,11 @@ let currentMode = 'normal';
 let cameraMode = 'third';
 let selectedCatalogItem = null;
 let selectedObject = null;
+let hoveredObject = null;
 let placedObjects = [];
 let npcs = [];
 let animals = [];
-let portals = [];
-let teleportPortals = [];
+let bridges = [];
 let houses = [];
 let solidObjects = [];
 let time = 0;
@@ -141,8 +141,6 @@ let nearNPC = null;
 let isRidingHorse = false;
 let currentHorse = null;
 let horseRidingOffset = new THREE.Vector3(0, 2.5, 0);
-let lastTeleportTime = 0;
-const TELEPORT_COOLDOWN = 3000;
 
 const islandData = [];
 
@@ -207,7 +205,6 @@ const matTrunk = new THREE.MeshPhysicalMaterial({ color: 0x5c4033, roughness: 0.
 const matLeaves = new THREE.MeshPhysicalMaterial({ color: 0x2d5a27, roughness: 0.8, metalness: 0.0, clearcoat: 0.3 });
 const matApple = new THREE.MeshPhysicalMaterial({ color: 0xd32f2f, roughness: 0.2, metalness: 0.1, clearcoat: 1.0 });
 const matWood = new THREE.MeshPhysicalMaterial({ color: 0x8b5a2b, roughness: 0.9, metalness: 0.0 });
-const matPortal = new THREE.MeshPhysicalMaterial({ color: 0xffd700, emissive: 0xffaa00, emissiveIntensity: 2.0, roughness: 0.1, metalness: 0.9, clearcoat: 1.0 });
 const matWater = new THREE.MeshPhysicalMaterial({ color: 0x006994, roughness: 0.1, metalness: 0.8, transmission: 0.6, thickness: 5, transparent: true, opacity: 0.9, clearcoat: 1.0, clearcoatRoughness: 0.1, ior: 1.33, reflectivity: 1.0 });
 const matSnow = new THREE.MeshPhysicalMaterial({ color: 0xf5f5f5, roughness: 0.8, metalness: 0.0, clearcoat: 0.3 });
 const matSkin = new THREE.MeshPhysicalMaterial({ color: 0xffdbac, roughness: 0.7, metalness: 0.0 });
@@ -302,133 +299,144 @@ scene.add(starsMesh);
 dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 
 /* ═══════════════════════════════════════════════════════════════════════════════
-   SISTEMA DE PORTAIS TELEPORTADORES
+   NOVO SISTEMA DE PONTES (SUBSTITUI PORTAIS)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+function createSuspendedBridge(startPos, startY, endPos, endY, destName, themeColor) {
+    const group = new THREE.Group();
+    
+    const midPoint = new THREE.Vector3().addVectors(startPos, endPos).multiplyScalar(0.5);
+    const dist = startPos.distanceTo(endPos);
+    const midY = (startY + endY) / 2 + dist * 0.02; 
+    
+    const curve = new THREE.QuadraticBezierCurve3(
+        new THREE.Vector3(startPos.x, startY, startPos.z),
+        new THREE.Vector3(midPoint.x, midY, midPoint.z),
+        new THREE.Vector3(endPos.x, endY, endPos.z)
+    );
+
+    // Tábuas da ponte com InstancedMesh
+    const plankGeo = new THREE.BoxGeometry(2.4, 0.2, 1.2);
+    const plankMat = new THREE.MeshPhysicalMaterial({ color: 0x5c4033, roughness: 0.9, metalness: 0.1 });
+    const plankCount = Math.floor(dist / 1.5);
+    const instancedPlanks = new THREE.InstancedMesh(plankGeo, plankMat, plankCount);
+    instancedPlanks.castShadow = true;
+    instancedPlanks.receiveShadow = true;
+    
+    const dummy = new THREE.Object3D();
+    for (let i = 0; i < plankCount; i++) {
+        const t = i / (plankCount - 1);
+        const point = curve.getPoint(t);
+        const tangent = curve.getTangent(t);
+        
+        dummy.position.copy(point);
+        dummy.lookAt(point.clone().add(tangent));
+        dummy.rotateX(Math.PI / 2); 
+        
+        dummy.updateMatrix();
+        instancedPlanks.setMatrixAt(i, dummy.matrix);
+    }
+    instancedPlanks.instanceMatrix.needsUpdate = true;
+    group.add(instancedPlanks);
+
+    // Guarda-corpos com Efeito Neon
+    const railMat = new THREE.MeshPhysicalMaterial({
+        color: themeColor, emissive: themeColor, emissiveIntensity: 0.8,
+        roughness: 0.2, metalness: 0.8, transparent: true, opacity: 0.9
+    });
+    
+    const railPointsLeft = [];
+    const railPointsRight = [];
+    for (let i = 0; i <= 32; i++) {
+        const t = i / 32;
+        const p = curve.getPoint(t);
+        const tangent = curve.getTangent(t);
+        const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
+        
+        railPointsLeft.push(p.clone().add(normal.multiplyScalar(1.2)).add(new THREE.Vector3(0, 1, 0)));
+        railPointsRight.push(p.clone().add(normal.multiplyScalar(-1.2)).add(new THREE.Vector3(0, 1, 0)));
+    }
+    
+    const railCurveLeft = new THREE.CatmullRomCurve3(railPointsLeft);
+    const railGeoLeft = new THREE.TubeGeometry(railCurveLeft, 32, 0.1, 8, false);
+    group.add(new THREE.Mesh(railGeoLeft, railMat));
+
+    const railCurveRight = new THREE.CatmullRomCurve3(railPointsRight);
+    const railGeoRight = new THREE.TubeGeometry(railCurveRight, 32, 0.1, 8, false);
+    group.add(new THREE.Mesh(railGeoRight, railMat));
+
+    // Iluminação Noturna
+    const light = new THREE.PointLight(themeColor, 2, 25);
+    light.position.copy(midPoint);
+    light.position.y += 3;
+    group.add(light);
+
+    scene.add(group);
+    placedObjects.push(group);
+
+    // Label de Destino com CSS aprimorado
+    const div = document.createElement('div');
+    div.className = 'bridge-label bridge-label-animated';
+    div.innerHTML = `<span class="bridge-icon">🌉</span><span class="bridge-text">${destName}</span>`;
+    div.style.opacity = '0';
+    div.style.transform = 'scale(0.8) translateY(10px)';
+    div.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+    
+    const colorHex = '#' + themeColor.toString(16).padStart(6, '0');
+    div.style.setProperty('--bridge-color', colorHex);
+    
+    const labelObj = new CSS2DObject(div);
+    labelObj.position.set(startPos.x, startY + 4, startPos.z);
+    scene.add(labelObj);
+
+    bridges.push({
+        start: new THREE.Vector3(startPos.x, startY, startPos.z),
+        end: new THREE.Vector3(endPos.x, endY, endPos.z),
+        curve: curve,
+        destination: destName,
+        group: group,
+        labelDiv: div,
+        color: themeColor,
+        startIslandY: startY,
+        endIslandY: endY,
+        length: dist
+    });
+
+    return group;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SISTEMA DE SELEÇÃO E HIGHLIGHT (FEEDBACK VISUAL)
    ═══════════════════════════════════════════════════════════════════════════════ */
 
-function createTeleportPortal(x, y, z, color, destinationPortal, label) {
-  const group = new THREE.Group();
-
-  const ringGeo = new THREE.TorusGeometry(2.5, 0.25, 16, 64);
-  const ringMat = new THREE.MeshPhysicalMaterial({
-    color: color, emissive: color, emissiveIntensity: 2.5,
-    roughness: 0.1, metalness: 0.9, clearcoat: 1.0
-  });
-  const ring = new THREE.Mesh(ringGeo, ringMat);
-  ring.castShadow = true;
-  group.add(ring);
-
-  const surfaceGeo = new THREE.CircleGeometry(2.3, 64);
-  const surfaceMat = new THREE.MeshPhysicalMaterial({
-    color: color, emissive: color, emissiveIntensity: 1.5,
-    transparent: true, opacity: 0.4, roughness: 0.1, metalness: 0.3, side: THREE.DoubleSide
-  });
-  const surface = new THREE.Mesh(surfaceGeo, surfaceMat);
-  group.add(surface);
-
-  const particleCount = 100;
-  const particleGeo = new THREE.BufferGeometry();
-  const particlePos = new Float32Array(particleCount * 3);
-  const particleSpeeds = new Float32Array(particleCount);
-  const particleAngles = new Float32Array(particleCount);
-  const particleRadii = new Float32Array(particleCount);
-
-  for (let i = 0; i < particleCount; i++) {
-    particleAngles[i] = Math.random() * Math.PI * 2;
-    particleRadii[i] = 2.0 + Math.random() * 1.5;
-    particleSpeeds[i] = 0.5 + Math.random() * 1.5;
-    particlePos[i * 3] = Math.cos(particleAngles[i]) * particleRadii[i];
-    particlePos[i * 3 + 1] = (Math.random() - 0.5) * 1.5;
-    particlePos[i * 3 + 2] = Math.sin(particleAngles[i]) * particleRadii[i];
-  }
-  particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
-  const particleMat = new THREE.PointsMaterial({
-    color: color, size: 0.15, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending
-  });
-  const particles = new THREE.Points(particleGeo, particleMat);
-  group.add(particles);
-
-  const portalLight = new THREE.PointLight(color, 3, 15);
-  portalLight.position.set(0, 0, 0);
-  group.add(portalLight);
-
-  const baseGeo = new THREE.CylinderGeometry(0.8, 1.0, 0.5, 16);
-  const baseMat = new THREE.MeshPhysicalMaterial({ color: 0x555555, roughness: 0.7, metalness: 0.5 });
-  const base = new THREE.Mesh(baseGeo, baseMat);
-  base.position.y = -2.75;
-  base.castShadow = true;
-  group.add(base);
-
-  [-1.2, 1.2].forEach(xOff => {
-    const col = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 5, 8), baseMat);
-    col.position.set(xOff, -0.25, 0);
-    col.castShadow = true;
-    group.add(col);
-    const orb = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), ringMat);
-    orb.position.set(xOff, 2.5, 0);
-    group.add(orb);
-  });
-
-  group.position.set(x, y, z);
-  group.userData.isTeleportPortal = true;
-  group.userData.portalColor = color;
-  group.userData.destination = destinationPortal;
-  group.userData.particleData = { positions: particlePos, speeds: particleSpeeds, angles: particleAngles, radii: particleRadii, count: particleCount };
-
-  scene.add(group);
-  placedObjects.push(group);
-
-  const div = document.createElement('div');
-  div.className = 'portal-label';
-  div.textContent = label;
-  const labelObj = new CSS2DObject(div);
-  labelObj.position.set(0, 3.5, 0);
-  group.add(labelObj);
-
-  return group;
-}
-
-function updateTeleportPortals(delta) {
-  teleportPortals.forEach(portal => {
-    const data = portal.userData.particleData;
-    const positions = data.positions;
-    for (let i = 0; i < data.count; i++) {
-      data.angles[i] += data.speeds[i] * delta * 2;
-      positions[i * 3] = Math.cos(data.angles[i]) * data.radii[i];
-      positions[i * 3 + 1] += Math.sin(time * 3 + i) * 0.01;
-      positions[i * 3 + 2] = Math.sin(data.angles[i]) * data.radii[i];
-    }
-    portal.children.forEach(child => {
-      if (child.isPoints) child.geometry.attributes.position.needsUpdate = true;
+function applyHighlight(obj, color, intensity) {
+    if (!obj) return;
+    obj.traverse(child => {
+        if (child.isMesh && child.material) {
+            if (!child.userData.originalEmissive) {
+                child.userData.originalEmissive = child.material.emissive ? child.material.emissive.clone() : new THREE.Color(0x000000);
+                child.userData.originalEmissiveIntensity = child.material.emissiveIntensity || 0;
+            }
+            if (child.material.emissive) {
+                child.material.emissive.set(color);
+                child.material.emissiveIntensity = intensity;
+            }
+        }
     });
-  });
 }
 
-function checkTeleportCollision(entity) {
-  const now = performance.now();
-  if (now - lastTeleportTime < TELEPORT_COOLDOWN) return;
-
-  teleportPortals.forEach(portal => {
-    const dist = entity.position.distanceTo(portal.position);
-    if (dist < 2.5) {
-      const dest = portal.userData.destination;
-      if (dest && dest.position) {
-        const flash = document.getElementById('teleport-flash');
-        flash.classList.add('active');
-        setTimeout(() => flash.classList.remove('active'), 300);
-
-        entity.position.copy(dest.position);
-        entity.position.y = 1.5;
-
-        const indicator = document.getElementById('mode-indicator');
-        indicator.textContent = `🌀 Teleportado para ${dest.userData.portalName || 'outra ilha'}!`;
-        indicator.style.color = '#' + portal.userData.portalColor.toString(16).padStart(6, '0');
-        indicator.classList.add('show');
-        setTimeout(() => indicator.classList.remove('show'), 2000);
-
-        lastTeleportTime = now;
-      }
-    }
-  });
+function removeHighlight(obj) {
+    if (!obj) return;
+    obj.traverse(child => {
+        if (child.isMesh && child.material && child.userData.originalEmissive !== undefined) {
+            if (child.material.emissive) {
+                child.material.emissive.copy(child.userData.originalEmissive);
+                child.material.emissiveIntensity = child.userData.originalEmissiveIntensity;
+            }
+            delete child.userData.originalEmissive;
+            delete child.userData.originalEmissiveIntensity;
+        }
+    });
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
@@ -495,10 +503,18 @@ function createNPC(type, color, x = 0, z = 0) {
     group.userData.ai = { state: 'idle', timer: 3, direction: new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize(), speed: 1.5, fatigue: 0, fatigueRate: 8, restRate: 20, fatigueThreshold: 70, greetingCooldown: 0, speechTimer: 0, thoughtTimer: 8, targetHouse: null, type: type, scale: scale, parts: { leftArmPivot, rightArmPivot, leftLegPivot, rightLegPivot, head }, jumpTimer: 0 };
   }
   group.position.set(x, 1.5, z); group.userData.isNPC = true; group.userData.npcType = type;
+  
+  // Tarja do NPC (Ocultada por padrão, aparece por proximidade/hover/seleção)
   const div = document.createElement('div'); div.className = 'npc-label';
   const labelNames = { npc_man: '👨 Homem', npc_woman: '👩 Mulher', npc_mtrans: '🏳️‍⚧️ M. Trans', npc_htrans: '🏳️‍⚧️ H. Trans', npc_boy: '👦 Menino', npc_girl: '👧 Menina', npc_dog: '🐕 Cachorro' };
   div.textContent = labelNames[type] || 'NPC';
+  div.style.opacity = '0';
+  div.style.transform = 'scale(0.8)';
+  div.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+  
   const label = new CSS2DObject(div); label.position.set(0, type === 'npc_dog' ? 1.2 : 2.4, 0); group.add(label);
+  group.userData.labelDiv = div;
+  
   scene.add(group); placedObjects.push(group); npcs.push(group); return group;
 }
 
@@ -820,26 +836,50 @@ createMundoDigitalIsland(-60, 21.6, -54);
 createSegurancaIsland(0, 26.4, -78);
 createSolitariaIsland(80, 15, 80);
 
-// Criar portais de teleporte entre ilhas
-const portalMainToAlgo = createTeleportPortal(45, 2.5, -45, 0x9c27b0, null, '🌀 Algoritmos');
-portalMainToAlgo.userData.portalName = 'Algoritmos'; teleportPortals.push(portalMainToAlgo);
-const portalAlgoToMain = createTeleportPortal(0, 2.5, 15, 0x4caf50, portalMainToAlgo, '🌀 Ilha Principal');
-portalAlgoToMain.userData.portalName = 'Ilha Principal'; portalMainToAlgo.userData.destination = portalAlgoToMain; teleportPortals.push(portalAlgoToMain);
+// Criar pontes suspensas entre ilhas (Substitui portais)
+// Substitua as chamadas de createSuspendedBridge por estas com os valores Y corrigidos:
 
-const portalMainToMundo = createTeleportPortal(-45, 2.5, -40, 0x2196f3, null, '🌀 Mundo Digital');
-portalMainToMundo.userData.portalName = 'Mundo Digital'; teleportPortals.push(portalMainToMundo);
-const portalMundoToMain = createTeleportPortal(0, 2.5, 15, 0x4caf50, portalMainToMundo, '🌀 Ilha Principal');
-portalMundoToMain.userData.portalName = 'Ilha Principal'; portalMainToMundo.userData.destination = portalMundoToMain; teleportPortals.push(portalMundoToMain);
+// Ponte para Ilha dos Algoritmos
+createSuspendedBridge(
+    new THREE.Vector3(40, 1.5, -40),  // Posição inicial (X, Y, Z)
+    1.5,                               // Altura inicial
+    new THREE.Vector3(60, 18, -60),   // Posição final
+    18,                                // Altura final (correspondente à altura da ilha)
+    '🌀 Algoritmos', 
+    0x9c27b0
+);
 
-const portalMainToSeg = createTeleportPortal(0, 2.5, -60, 0xf44336, null, '🌀 Segurança');
-portalMainToSeg.userData.portalName = 'Segurança'; teleportPortals.push(portalMainToSeg);
-const portalSegToMain = createTeleportPortal(0, 2.5, 15, 0x4caf50, portalMainToSeg, '🌀 Ilha Principal');
-portalSegToMain.userData.portalName = 'Ilha Principal'; portalMainToSeg.userData.destination = portalSegToMain; teleportPortals.push(portalSegToMain);
+// Ponte para Mundo Digital
+createSuspendedBridge(
+    new THREE.Vector3(-40, 1.5, -36),
+    1.5,
+    new THREE.Vector3(-60, 21.6, -54),
+    21.6,
+    '🖥️ Mundo Digital', 
+    0x2196f3
+);
 
-const portalMainToSol = createTeleportPortal(60, 2.5, 60, 0x00bcd4, null, '🌀 Solitária');
-portalMainToSol.userData.portalName = 'Solitária'; teleportPortals.push(portalMainToSol);
-const portalSolToMain = createTeleportPortal(-15, 2.5, 0, 0x4caf50, portalMainToSol, '🌀 Ilha Principal');
-portalSolToMain.userData.portalName = 'Ilha Principal'; portalMainToSol.userData.destination = portalSolToMain; teleportPortals.push(portalSolToMain);
+// Ponte para Segurança
+createSuspendedBridge(
+    new THREE.Vector3(0, 1.5, -55),
+    1.5,
+    new THREE.Vector3(0, 26.4, -78),
+    26.4,
+    '🛡️ Segurança', 
+    0xf44336
+);
+
+// Ponte para Solitária
+createSuspendedBridge(
+    new THREE.Vector3(40, 1.5, 40),
+    1.5,
+    new THREE.Vector3(80, 15, 80),
+    15,
+    '🏝️ Solitária', 
+    0x00bcd4
+);
+
+
 
 createHouse(-15, -10, 0); createHouse(15, -12, Math.PI / 4); createHouse(-20, 15, -Math.PI / 3); createHouse(20, 18, Math.PI / 2); createHouse(0, -25, Math.PI);
 [[-18, -12], [18, -14.4], [-21.6, 14.4], [21.6, 16.8], [-12, 18], [14.4, -9.6], [-9.6, -18], [12, 12], [25, 5], [-25, -5]].forEach(([x, z]) => createAppleTree(x, z, 1.2 + Math.random() * 0.4));
@@ -992,14 +1032,28 @@ window.updateCrystals = function(amount) { crystals += amount; document.getEleme
 
 window.selectObject = function(obj) {
   if (currentMode !== 'edit') return;
-  deselectObject(); selectedObject = obj;
+  if (selectedObject) removeHighlight(selectedObject);
+  deselectObject(); 
+  selectedObject = obj;
+  applyHighlight(obj, 0xFFD700, 0.6); // Amarelo Dourado
+  
+  if (obj.userData.labelDiv) {
+      obj.userData.labelDiv.style.opacity = '1';
+      obj.userData.labelDiv.style.transform = 'scale(1)';
+  }
+  
   document.getElementById('tools-drawer').classList.add('open');
   const isNPC = npcs.find(n => n === obj);
   document.getElementById('btn-dialogue').style.display = isNPC ? 'block' : 'none';
   if (isNPC) window.currentNPC = isNPC;
 };
 
-window.deselectObject = function() { selectedObject = null; document.getElementById('tools-drawer').classList.remove('open'); window.currentNPC = null; };
+window.deselectObject = function() { 
+  if (selectedObject) removeHighlight(selectedObject);
+  selectedObject = null; 
+  document.getElementById('tools-drawer').classList.remove('open'); 
+  window.currentNPC = null; 
+};
 
 window.duplicateSelected = function() {
   if (!selectedObject || currentMode !== 'edit') return;
@@ -1084,6 +1138,28 @@ window.addEventListener('pointermove', (event) => {
   raycaster.setFromCamera(mouse, camera);
   if (isDraggingMountain && mountainGroup) { const intersectPoint = new THREE.Vector3(); raycaster.ray.intersectPlane(dragPlane, intersectPoint); if (intersectPoint) { const newPos = intersectPoint.add(mountainDragOffset); newPos.y = 0; const maxDist = 30; const dist = Math.sqrt(newPos.x * newPos.x + newPos.z * newPos.z); if (dist < maxDist) { mountainGroup.position.copy(newPos); if (mountainWaterfall) { mountainWaterfall.group.position.x = newPos.x; mountainWaterfall.group.position.z = newPos.z + 48 * 1.2 - 2 * 1.2; mountainWaterfall.x = newPos.x; } const mountainSolid = solidObjects.find(obj => obj.type === 'mountain'); if (mountainSolid) { mountainSolid.position = newPos; } } } }
   if (isDragging && dragObject && currentMode === 'edit') { const intersectPoint = new THREE.Vector3(); raycaster.ray.intersectPlane(dragPlane, intersectPoint); if (intersectPoint) { const newPos = intersectPoint.add(dragOffset); newPos.y = dragObject.position.y; const mountainSolid = solidObjects.find(obj => obj.type === 'mountain'); if (mountainSolid) { const distToMountain = newPos.distanceTo(mountainSolid.position); if (distToMountain > mountainSolid.radius + 2) { dragObject.position.copy(newPos); } } else { dragObject.position.copy(newPos); } } }
+  
+  // Sistema de Hover para Highlight
+  if (currentMode === 'edit' && !isDragging && !isDraggingMountain) {
+      const intersects = raycaster.intersectObjects(placedObjects, true);
+      if (intersects.length > 0) {
+          let obj = intersects[0].object;
+          while(obj.parent && obj.parent.type !== 'Scene') { if (placedObjects.includes(obj.parent)) { obj = obj.parent; break; } obj = obj.parent; }
+          
+          if (obj !== selectedObject && !obj.userData.isBase && !obj.userData.isPlane && !obj.userData.isMountain) {
+              if (hoveredObject && hoveredObject !== obj && hoveredObject !== selectedObject) {
+                  removeHighlight(hoveredObject);
+              }
+              hoveredObject = obj;
+              applyHighlight(obj, 0xFFD700, 0.2); // Highlight leve no hover
+          }
+      } else {
+          if (hoveredObject && hoveredObject !== selectedObject) {
+              removeHighlight(hoveredObject);
+          }
+          hoveredObject = null;
+      }
+  }
 });
 
 window.addEventListener('pointerup', (event) => {
@@ -1100,7 +1176,7 @@ window.addEventListener('pointerup', (event) => {
   const intersects = raycaster.intersectObject(plane);
   if (intersects.length > 0) {
     const point = intersects[0].point.clone();
-    if (currentTime - lastClickTime < 300) { if (clickTimeout) { clearTimeout(clickTimeout); clickTimeout = null; } isAvatarMovingToTarget = true; avatarTargetPosition = point.clone(); avatarTargetPosition.y = 1.5; }
+    if (currentTime - lastClickTime < 300) { if (clickTimeout) { clearTimeout(clickTimeout); clickTimeout = null; } isAvatarMovingToTarget = true; avatarTargetPosition = point.clone(); avatarTargetPosition.y = avatar.position.y; }
     else { if (clickTimeout) clearTimeout(clickTimeout); clickTimeout = setTimeout(() => { const dir = new THREE.Vector3().subVectors(camera.position, orbitControls.target).normalize(); const targetCamPos = new THREE.Vector3().copy(point).add(dir.multiplyScalar(ZOOM_DISTANCE)); targetCamPos.y = point.y + ZOOM_HEIGHT; cameraAnimation = { active: true, startTime: performance.now(), duration: 800, startCamPos: camera.position.clone(), endCamPos: targetCamPos, startTarget: orbitControls.target.clone(), endTarget: point.clone() }; clickTimeout = null; }, 300); }
     lastClickTime = currentTime;
   }
@@ -1153,17 +1229,288 @@ function updateSpeechBubblePosition() { if (!currentSpeechNPC || currentSpeechNP
 function updateNPCAI(npc, deltaTime) {
   const ai = npc.userData.ai; if (!ai) return;
   ai.timer -= deltaTime; ai.greetingCooldown -= deltaTime; ai.speechTimer -= deltaTime; ai.thoughtTimer -= deltaTime;
-  const distanceFromCenter = Math.sqrt(npc.position.x * npc.position.x + npc.position.z * npc.position.z);
-  if (distanceFromCenter > 40 && ai.state !== 'edge_panic' && ai.state !== 'going_to_house' && ai.state !== 'entering_house' && ai.state !== 'resting' && ai.state !== 'leaving_house') { ai.state = 'edge_panic'; ai.timer = 2; const profile = NPC_PROFILES[ai.type]; if (profile && profile.edge) { showSpeechBubble(npc, profile.edge[Math.floor(Math.random() * profile.edge.length)], 'panic'); } }
-  switch (ai.state) {
-    case 'idle': if (ai.parts.leftArmPivot) { ai.parts.leftArmPivot.rotation.x *= 0.9; ai.parts.rightArmPivot.rotation.x *= 0.9; ai.parts.leftLegPivot.rotation.x *= 0.9; ai.parts.rightLegPivot.rotation.x *= 0.9; } if (ai.parts.tailPivot) { ai.parts.tailPivot.rotation.z *= 0.9; } if (ai.fatigue >= ai.fatigueThreshold) { const nearestHouse = findNearestHouse(npc.position); if (nearestHouse) { ai.targetHouse = nearestHouse; ai.state = 'going_to_house'; } else { ai.state = 'resting'; ai.timer = 5; } } else if (ai.timer <= 0) { ai.direction = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize(); ai.state = 'walking'; ai.timer = 3 + Math.random() * 4; } if (ai.type === 'npc_dog' && ai.timer <= 0) { let nearestNPC = null; let minDist = 8; npcs.forEach(other => { if (other !== npc && other.userData.npcType !== 'npc_dog') { const dist = npc.position.distanceTo(other.position); if (dist < minDist) { minDist = dist; nearestNPC = other; } } }); if (nearestNPC) { ai.followTarget = nearestNPC; ai.state = 'following'; } else { ai.state = 'wandering'; ai.timer = 3 + Math.random() * 3; } } break;
-    case 'walking': npc.position.x += ai.direction.x * ai.speed * deltaTime; npc.position.z += ai.direction.z * ai.speed * deltaTime; const lookTarget = npc.position.clone().add(ai.direction); npc.lookAt(lookTarget.x, npc.position.y, lookTarget.z); if (ai.parts.leftArmPivot) { const walkCycle = Math.sin(Date.now() * 0.005 * ai.speed); ai.parts.leftArmPivot.rotation.x = walkCycle * 0.5; ai.parts.rightArmPivot.rotation.x = -walkCycle * 0.5; ai.parts.leftLegPivot.rotation.x = -walkCycle * 0.5; ai.parts.rightLegPivot.rotation.x = walkCycle * 0.5; } else if (ai.parts.legs) { const walkCycle = Math.sin(Date.now() * 0.008 * ai.speed); ai.parts.legs[0].rotation.x = walkCycle * 0.4; ai.parts.legs[1].rotation.x = -walkCycle * 0.4; ai.parts.legs[2].rotation.x = -walkCycle * 0.4; ai.parts.legs[3].rotation.x = walkCycle * 0.4; if (ai.parts.tailPivot) { ai.parts.tailPivot.rotation.z = Math.sin(Date.now() * 0.01) * 0.5; } } ai.fatigue += ai.fatigueRate * deltaTime; if (ai.thoughtTimer <= 0 && Math.random() < 0.3) { const profile = NPC_PROFILES[ai.type]; if (profile && profile.thoughts) { showSpeechBubble(npc, profile.thoughts[Math.floor(Math.random() * profile.thoughts.length)], 'thought'); ai.thoughtTimer = 12 + Math.random() * 8; } } if (ai.greetingCooldown <= 0) { let greeted = false; for (let other of npcs) { if (other !== npc && other.userData.ai.state !== 'resting') { const dist = npc.position.distanceTo(other.position); if (dist < 1.8 && other.userData.ai.greetingCooldown <= 0) { ai.state = 'greeting'; ai.greetingTarget = other; ai.timer = 2; other.userData.ai.state = 'greeting'; other.userData.ai.greetingTarget = npc; other.userData.ai.timer = 2; const profile = NPC_PROFILES[ai.type]; if (profile && profile.greetings) { showSpeechBubble(npc, profile.greetings[Math.floor(Math.random() * profile.greetings.length)], 'greeting'); } const otherProfile = NPC_PROFILES[other.userData.npcType]; if (otherProfile && otherProfile.greetings) { setTimeout(() => { showSpeechBubble(other, otherProfile.greetings[Math.floor(Math.random() * otherProfile.greetings.length)], 'greeting'); }, 1000); } ai.greetingCooldown = 5; other.userData.ai.greetingCooldown = 5; greeted = true; break; } } } if (greeted) break; } if (ai.fatigue >= ai.fatigueThreshold) { const nearestHouse = findNearestHouse(npc.position); if (nearestHouse) { ai.targetHouse = nearestHouse; ai.state = 'going_to_house'; } else { ai.state = 'resting'; ai.timer = 5; } } else if (ai.timer <= 0) { ai.state = 'idle'; ai.timer = 2 + Math.random() * 3; } break;
-    case 'greeting': if (ai.greetingTarget && ai.parts.leftArmPivot) { const targetPos = ai.greetingTarget.position; npc.lookAt(targetPos.x, npc.position.y, targetPos.z); const waveTime = Date.now() * 0.005; ai.parts.rightArmPivot.rotation.x = -2.0 + Math.sin(waveTime) * 0.5; ai.parts.rightArmPivot.rotation.z = Math.sin(waveTime * 2) * 0.3; ai.parts.leftArmPivot.rotation.x *= 0.9; ai.parts.leftLegPivot.rotation.x *= 0.9; ai.parts.rightLegPivot.rotation.x *= 0.9; } if (ai.timer <= 0) { ai.state = 'idle'; ai.timer = 2; if (ai.parts.rightArmPivot) { ai.parts.rightArmPivot.rotation.z = 0; } } break;
-    case 'going_to_house': case 'entering_house': case 'resting': case 'leaving_house': case 'reacting_to_dog': case 'edge_panic': case 'wandering': case 'following': case 'barking': break;
+  
+  // Sistema de travessia de pontes para NPCs
+  let onBridge = false;
+  let bridgeHeight = 1.5;
+  
+  bridges.forEach(bridge => {
+      const bridgeVec = new THREE.Vector3().subVectors(bridge.end, bridge.start);
+      const npcVec = new THREE.Vector3(npc.position.x - bridge.start.x, 0, npc.position.z - bridge.start.z);
+      const t = npcVec.dot(bridgeVec) / bridgeVec.lengthSq();
+      
+      if (t >= -0.05 && t <= 1.05) {
+          const closestPoint = bridge.start.clone().add(bridgeVec.clone().multiplyScalar(Math.max(0, Math.min(1, t))));
+          const dist = new THREE.Vector2(npc.position.x - closestPoint.x, npc.position.z - closestPoint.z).length();
+          
+          if (dist < 2.0) { 
+              onBridge = true;
+              const clampedT = Math.max(0, Math.min(1, t));
+              bridgeHeight = bridge.curve.getPoint(clampedT).y + 1.2;
+          }
+      }
+  });
+  
+  // Ajustar altura do NPC baseado na ponte ou ilha
+  if (onBridge) {
+      npc.position.y = bridgeHeight;
+  } else {
+      // Detectar em qual ilha o NPC está
+      let currentIslandY = 1.5;
+      islandData.forEach(island => {
+          const distToIsland = new THREE.Vector2(
+              npc.position.x - island.position.x,
+              npc.position.z - island.position.z
+          ).length();
+          
+          if (distToIsland < island.radius) {
+              currentIslandY = island.position.y;
+          }
+      });
+      npc.position.y = currentIslandY;
   }
-  const maxRadius = 42; const distFromCenter = Math.sqrt(npc.position.x * npc.position.x + npc.position.z * npc.position.z);
-  if (distFromCenter > maxRadius && ai.state !== 'edge_panic') { const angle = Math.atan2(npc.position.z, npc.position.x); npc.position.x = Math.cos(angle) * maxRadius; npc.position.z = Math.sin(angle) * maxRadius; }
+  
+  // Modificar limite de distância para permitir travessia entre ilhas
+  const distanceFromCenter = Math.sqrt(npc.position.x * npc.position.x + npc.position.z * npc.position.z);
+  const maxAllowedDistance = 120; // Aumentado para permitir travessia
+  
+  if (distanceFromCenter > maxAllowedDistance && ai.state !== 'edge_panic' && ai.state !== 'going_to_house' && ai.state !== 'entering_house' && ai.state !== 'resting' && ai.state !== 'leaving_house') { 
+      ai.state = 'edge_panic'; 
+      ai.timer = 2; 
+      const profile = NPC_PROFILES[ai.type]; 
+      if (profile && profile.edge) { 
+          showSpeechBubble(npc, profile.edge[Math.floor(Math.random() * profile.edge.length)], 'panic'); 
+      } 
+  }
+  
+  switch (ai.state) {
+    case 'idle': 
+        if (ai.parts.leftArmPivot) { 
+            ai.parts.leftArmPivot.rotation.x *= 0.9; 
+            ai.parts.rightArmPivot.rotation.x *= 0.9; 
+            ai.parts.leftLegPivot.rotation.x *= 0.9; 
+            ai.parts.rightLegPivot.rotation.x *= 0.9; 
+        } 
+        if (ai.parts.tailPivot) { 
+            ai.parts.tailPivot.rotation.z *= 0.9; 
+        } 
+        
+        // Chance de decidir atravessar uma ponte
+        if (ai.timer <= 0 && Math.random() < 0.15 && !onBridge) {
+            // Encontrar ponte mais próxima
+            let nearestBridge = null;
+            let minBridgeDist = Infinity;
+            
+            bridges.forEach(bridge => {
+                const distToStart = npc.position.distanceTo(bridge.start);
+                const distToEnd = npc.position.distanceTo(bridge.end);
+                const minDist = Math.min(distToStart, distToEnd);
+                
+                if (minDist < minBridgeDist && minDist < 30) {
+                    minBridgeDist = minDist;
+                    nearestBridge = bridge;
+                }
+            });
+            
+            if (nearestBridge) {
+                ai.state = 'crossing_bridge';
+                ai.targetBridge = nearestBridge;
+                ai.bridgeDirection = npc.position.distanceTo(nearestBridge.start) < npc.position.distanceTo(nearestBridge.end) ? 1 : -1;
+                ai.timer = 10; // Tempo máximo para atravessar
+            }
+        }
+        
+        if (ai.fatigue >= ai.fatigueThreshold) { 
+            const nearestHouse = findNearestHouse(npc.position); 
+            if (nearestHouse) { 
+                ai.targetHouse = nearestHouse; 
+                ai.state = 'going_to_house'; 
+            } else { 
+                ai.state = 'resting'; 
+                ai.timer = 5; 
+            } 
+        } else if (ai.timer <= 0) { 
+            ai.direction = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize(); 
+            ai.state = 'walking'; 
+            ai.timer = 3 + Math.random() * 4; 
+        } 
+        
+        if (ai.type === 'npc_dog' && ai.timer <= 0) { 
+            let nearestNPC = null; 
+            let minDist = 8; 
+            npcs.forEach(other => { 
+                if (other !== npc && other.userData.npcType !== 'npc_dog') { 
+                    const dist = npc.position.distanceTo(other.position); 
+                    if (dist < minDist) { 
+                        minDist = dist; 
+                        nearestNPC = other; 
+                    } 
+                } 
+            }); 
+            if (nearestNPC) { 
+                ai.followTarget = nearestNPC; 
+                ai.state = 'following'; 
+            } else { 
+                ai.state = 'wandering'; 
+                ai.timer = 3 + Math.random() * 3; 
+            } 
+        } 
+        break;
+        
+    case 'crossing_bridge':
+        if (ai.targetBridge) {
+            const bridge = ai.targetBridge;
+            const bridgeVec = new THREE.Vector3().subVectors(bridge.end, bridge.start).normalize();
+            
+            // Mover ao longo da ponte
+            const moveSpeed = ai.speed * 0.8; // Um pouco mais lento na ponte
+            npc.position.x += bridgeVec.x * moveSpeed * deltaTime * ai.bridgeDirection;
+            npc.position.z += bridgeVec.z * moveSpeed * deltaTime * ai.bridgeDirection;
+            
+            // Olhar na direção do movimento
+            const lookTarget = npc.position.clone().add(bridgeVec.clone().multiplyScalar(ai.bridgeDirection));
+            npc.lookAt(lookTarget.x, npc.position.y, lookTarget.z);
+            
+            // Animação de caminhada
+            if (ai.parts.leftArmPivot) {
+                const walkCycle = Math.sin(Date.now() * 0.005 * ai.speed);
+                ai.parts.leftArmPivot.rotation.x = walkCycle * 0.5;
+                ai.parts.rightArmPivot.rotation.x = -walkCycle * 0.5;
+                ai.parts.leftLegPivot.rotation.x = -walkCycle * 0.5;
+                ai.parts.rightLegPivot.rotation.x = walkCycle * 0.5;
+            }
+            
+            // Verificar se terminou de atravessar
+            const progress = ai.bridgeDirection > 0 ? 
+                npc.position.distanceTo(bridge.start) / bridge.length :
+                npc.position.distanceTo(bridge.end) / bridge.length;
+            
+            if (progress > 0.95 || ai.timer <= 0) {
+                ai.state = 'idle';
+                ai.timer = 3 + Math.random() * 3;
+                ai.targetBridge = null;
+            }
+        } else {
+            ai.state = 'idle';
+            ai.timer = 2;
+        }
+        break;
+        
+    case 'walking': 
+        npc.position.x += ai.direction.x * ai.speed * deltaTime; 
+        npc.position.z += ai.direction.z * ai.speed * deltaTime; 
+        const lookTarget = npc.position.clone().add(ai.direction); 
+        npc.lookAt(lookTarget.x, npc.position.y, lookTarget.z); 
+        
+        if (ai.parts.leftArmPivot) { 
+            const walkCycle = Math.sin(Date.now() * 0.005 * ai.speed); 
+            ai.parts.leftArmPivot.rotation.x = walkCycle * 0.5; 
+            ai.parts.rightArmPivot.rotation.x = -walkCycle * 0.5; 
+            ai.parts.leftLegPivot.rotation.x = -walkCycle * 0.5; 
+            ai.parts.rightLegPivot.rotation.x = walkCycle * 0.5; 
+        } else if (ai.parts.legs) { 
+            const walkCycle = Math.sin(Date.now() * 0.008 * ai.speed); 
+            ai.parts.legs[0].rotation.x = walkCycle * 0.4; 
+            ai.parts.legs[1].rotation.x = -walkCycle * 0.4; 
+            ai.parts.legs[2].rotation.x = -walkCycle * 0.4; 
+            ai.parts.legs[3].rotation.x = walkCycle * 0.4; 
+            if (ai.parts.tailPivot) { 
+                ai.parts.tailPivot.rotation.z = Math.sin(Date.now() * 0.01) * 0.5; 
+            } 
+        } 
+        
+        ai.fatigue += ai.fatigueRate * deltaTime; 
+        
+        if (ai.thoughtTimer <= 0 && Math.random() < 0.3) { 
+            const profile = NPC_PROFILES[ai.type]; 
+            if (profile && profile.thoughts) { 
+                showSpeechBubble(npc, profile.thoughts[Math.floor(Math.random() * profile.thoughts.length)], 'thought'); 
+                ai.thoughtTimer = 12 + Math.random() * 8; 
+            } 
+        } 
+        
+        if (ai.greetingCooldown <= 0) { 
+            let greeted = false; 
+            for (let other of npcs) { 
+                if (other !== npc && other.userData.ai.state !== 'resting') { 
+                    const dist = npc.position.distanceTo(other.position); 
+                    if (dist < 1.8 && other.userData.ai.greetingCooldown <= 0) { 
+                        ai.state = 'greeting'; 
+                        ai.greetingTarget = other; 
+                        ai.timer = 2; 
+                        other.userData.ai.state = 'greeting'; 
+                        other.userData.ai.greetingTarget = npc; 
+                        other.userData.ai.timer = 2; 
+                        const profile = NPC_PROFILES[ai.type]; 
+                        if (profile && profile.greetings) { 
+                            showSpeechBubble(npc, profile.greetings[Math.floor(Math.random() * profile.greetings.length)], 'greeting'); 
+                        } 
+                        const otherProfile = NPC_PROFILES[other.userData.npcType]; 
+                        if (otherProfile && otherProfile.greetings) { 
+                            setTimeout(() => { 
+                                showSpeechBubble(other, otherProfile.greetings[Math.floor(Math.random() * otherProfile.greetings.length)], 'greeting'); 
+                            }, 1000); 
+                        } 
+                        ai.greetingCooldown = 5; 
+                        other.userData.ai.greetingCooldown = 5; 
+                        greeted = true; 
+                        break; 
+                    } 
+                } 
+            } 
+            if (greeted) break; 
+        } 
+        
+        if (ai.fatigue >= ai.fatigueThreshold) { 
+            const nearestHouse = findNearestHouse(npc.position); 
+            if (nearestHouse) { 
+                ai.targetHouse = nearestHouse; 
+                ai.state = 'going_to_house'; 
+            } else { 
+                ai.state = 'resting'; 
+                ai.timer = 5; 
+            } 
+        } else if (ai.timer <= 0) { 
+            ai.state = 'idle'; 
+            ai.timer = 2 + Math.random() * 3; 
+        } 
+        break;
+        
+    case 'greeting': 
+        if (ai.greetingTarget && ai.parts.leftArmPivot) { 
+            const targetPos = ai.greetingTarget.position; 
+            npc.lookAt(targetPos.x, npc.position.y, targetPos.z); 
+            const waveTime = Date.now() * 0.005; 
+            ai.parts.rightArmPivot.rotation.x = -2.0 + Math.sin(waveTime) * 0.5; 
+            ai.parts.rightArmPivot.rotation.z = Math.sin(waveTime * 2) * 0.3; 
+            ai.parts.leftArmPivot.rotation.x *= 0.9; 
+            ai.parts.leftLegPivot.rotation.x *= 0.9; 
+            ai.parts.rightLegPivot.rotation.x *= 0.9; 
+        } 
+        if (ai.timer <= 0) { 
+            ai.state = 'idle'; 
+            ai.timer = 2; 
+            if (ai.parts.rightArmPivot) { 
+                ai.parts.rightArmPivot.rotation.z = 0; 
+            } 
+        } 
+        break;
+        
+    case 'going_to_house': case 'entering_house': case 'resting': case 'leaving_house': case 'reacting_to_dog': case 'edge_panic': case 'wandering': case 'following': case 'barking': 
+        break;
+  }
+  
+  // Limite mais flexível para permitir travessia
+  const maxRadius = 120; 
+  const distFromCenter = Math.sqrt(npc.position.x * npc.position.x + npc.position.z * npc.position.z);
+  if (distFromCenter > maxRadius && ai.state !== 'edge_panic' && ai.state !== 'crossing_bridge') { 
+      const angle = Math.atan2(npc.position.z, npc.position.x); 
+      npc.position.x = Math.cos(angle) * maxRadius; 
+      npc.position.z = Math.sin(angle) * maxRadius; 
+  }
 }
+
+
 
 function updateHouses(deltaTime) { houses.forEach(house => { const diff = house.targetDoorAngle - house.currentDoorAngle; if (Math.abs(diff) > 0.01) { house.currentDoorAngle += diff * deltaTime * 3; house.doorPivot.rotation.y = house.currentDoorAngle; } }); }
 
@@ -1199,7 +1546,6 @@ function animate() {
   updateDayNight(delta);
   animateAllWaterfalls();
   updateHouses(delta);
-  updateTeleportPortals(delta);
   npcs.forEach(npc => updateNPCAI(npc, delta));
   animals.forEach(animal => updateAnimalAI(animal, delta));
   updateSpeechBubblePosition();
@@ -1208,7 +1554,24 @@ function animate() {
   npcs.forEach(npc => { if (avatar.position.distanceTo(npc.position) < 3.5) nearNPC = npc; });
   animals.forEach(animal => { if (animal.userData.animalType === 'horse') { const d = avatar.position.distanceTo(animal.position); if (d < 5.0 && d < minHorseDist) { minHorseDist = d; currentHorse = animal; } } });
 
-  if (!isRidingHorse) checkTeleportCollision(avatar);
+  // Lógica de Exibição das Tarjas dos NPCs (Proximidade, Hover, Seleção)
+  npcs.forEach(npc => {
+      const dist = avatar.position.distanceTo(npc.position);
+      const isHovered = (hoveredObject === npc);
+      const isSelected = (selectedObject === npc);
+      
+      if (dist < 8 || isHovered || isSelected) {
+          if (npc.userData.labelDiv) {
+              npc.userData.labelDiv.style.opacity = '1';
+              npc.userData.labelDiv.style.transform = 'scale(1)';
+          }
+      } else {
+          if (npc.userData.labelDiv) {
+              npc.userData.labelDiv.style.opacity = '0';
+              npc.userData.labelDiv.style.transform = 'scale(0.8)';
+          }
+      }
+  });
 
   const prompt = document.getElementById('interaction-prompt');
   if (nearNPC && !isRidingHorse) { prompt.style.display = 'block'; const vector = nearNPC.position.clone(); vector.y += 3.0; vector.project(camera); if (vector.z < 1) { prompt.style.left = `${(vector.x * 0.5 + 0.5) * window.innerWidth}px`; prompt.style.top = `${(-vector.y * 0.5 + 0.5) * window.innerHeight - 40}px`; } } else { prompt.style.display = 'none'; }
@@ -1236,7 +1599,72 @@ function animate() {
     const isMoving = avatarMoveState.forward || avatarMoveState.backward || avatarMoveState.left || avatarMoveState.right; const speed = avatarMoveState.run ? AVATAR_RUN_SPEED : AVATAR_SPEED;
     if (cameraMode === 'avatar' && isMoving) { avatarDirection.set(0, 0, 0); if (avatarMoveState.forward) avatarDirection.z -= 1; if (avatarMoveState.backward) avatarDirection.z += 1; if (avatarMoveState.left) avatarDirection.x -= 1; if (avatarMoveState.right) avatarDirection.x += 1; avatarDirection.normalize(); const cameraDirection = new THREE.Vector3(); camera.getWorldDirection(cameraDirection); cameraDirection.y = 0; cameraDirection.normalize(); const right = new THREE.Vector3(); right.crossVectors(cameraDirection, new THREE.Vector3(0, 1, 0)); const moveDir = new THREE.Vector3(); moveDir.addScaledVector(cameraDirection, -avatarDirection.z); moveDir.addScaledVector(right, avatarDirection.x); moveDir.normalize(); const newPos = avatar.position.clone(); newPos.x += moveDir.x * speed * delta; newPos.z += moveDir.z * speed * delta; const mountainSolid = solidObjects.find(obj => obj.type === 'mountain'); if (mountainSolid) { const distToMountain = newPos.distanceTo(mountainSolid.position); if (distToMountain > mountainSolid.radius + 1) { avatar.position.copy(newPos); } } else { avatar.position.copy(newPos); } const targetYaw = Math.atan2(moveDir.x, moveDir.z); avatar.rotation.y = targetYaw; if (cameraZooming) { cameraZoomTarget = avatar.position.clone(); cameraZoomPosition = new THREE.Vector3(avatar.position.x, avatar.position.y + 6, avatar.position.z + 12); } }
     else if (cameraMode === 'first' && isMoving) { avatarVelocity.x -= avatarVelocity.x * 10.0 * delta; avatarVelocity.z -= avatarVelocity.z * 10.0 * delta; avatarDirection.z = Number(avatarMoveState.forward) - Number(avatarMoveState.backward); avatarDirection.x = Number(avatarMoveState.right) - Number(avatarMoveState.left); avatarDirection.normalize(); if (avatarMoveState.forward || avatarMoveState.backward) avatarVelocity.z -= avatarDirection.z * 120 * delta; if (avatarMoveState.left || avatarMoveState.right) avatarVelocity.x -= avatarDirection.x * 120 * delta; pointerLockControls.moveRight(-avatarVelocity.x * delta); pointerLockControls.moveForward(-avatarVelocity.z * delta); }
-    avatar.position.y = 1.5; animateAvatar(delta, isMoving, avatarMoveState.run);
+    
+    // Sistema de Travessia de Pontes (Interpolação de Y)
+        // Sistema de Travessia de Pontes e Detecção de Ilha
+    let onBridge = false;
+    let currentIslandY = 1.5; // Altura padrão da ilha principal
+    
+    // Detectar em qual ilha o avatar está
+    islandData.forEach(island => {
+        const distToIsland = new THREE.Vector2(
+            avatar.position.x - island.position.x,
+            avatar.position.z - island.position.z
+        ).length();
+        
+        if (distToIsland < island.radius) {
+            currentIslandY = island.position.y;
+        }
+    });
+    
+    // Verificar se está em uma ponte
+    bridges.forEach(bridge => {
+        const bridgeVec = new THREE.Vector3().subVectors(bridge.end, bridge.start);
+        const avatarVec = new THREE.Vector3(avatar.position.x - bridge.start.x, 0, avatar.position.z - bridge.start.z);
+        const t = avatarVec.dot(bridgeVec) / bridgeVec.lengthSq();
+        
+        if (t >= -0.05 && t <= 1.05) {
+            const closestPoint = bridge.start.clone().add(bridgeVec.clone().multiplyScalar(Math.max(0, Math.min(1, t))));
+            const dist = new THREE.Vector2(avatar.position.x - closestPoint.x, avatar.position.z - closestPoint.z).length();
+            
+            if (dist < 2.5) { 
+                onBridge = true;
+                const clampedT = Math.max(0, Math.min(1, t));
+                const curveY = bridge.curve.getPoint(clampedT).y;
+                avatar.position.y = curveY + 1.2; 
+                
+                if (clampedT < 0.15 || clampedT > 0.85) {
+                    bridge.labelDiv.style.opacity = '1';
+                    bridge.labelDiv.style.transform = 'scale(1)';
+                } else {
+                    bridge.labelDiv.style.opacity = '0';
+                    bridge.labelDiv.style.transform = 'scale(0.8)';
+                }
+            }
+        }
+    });
+
+    // CORREÇÃO: Ajustar altura do avatar baseado na ilha atual
+    if (!onBridge) {
+        avatar.position.y = currentIslandY;
+        bridges.forEach(b => {
+            b.labelDiv.style.opacity = '0';
+            b.labelDiv.style.transform = 'scale(0.8)';
+        });
+    }
+
+    animateAvatar(delta, isMoving, avatarMoveState.run);
+    
+    // Efeito de Pulsação para Objeto Selecionado
+    if (selectedObject && currentMode === 'edit') {
+        const pulse = 0.4 + Math.sin(time * 3) * 0.2;
+        selectedObject.traverse(child => {
+            if (child.isMesh && child.material && child.userData.originalEmissive !== undefined) {
+                child.material.emissiveIntensity = pulse;
+            }
+        });
+    }
+
     if (cameraMode === 'avatar' && !cameraZooming) { const cameraOffset = new THREE.Vector3(0, 6, 12); const targetCameraPos = avatar.position.clone().add(cameraOffset); camera.position.lerp(targetCameraPos, 0.1); camera.lookAt(avatar.position.x, avatar.position.y + 2.4, avatar.position.z); }
     if (cameraMode === 'third') orbitControls.update();
   }
@@ -1261,8 +1689,6 @@ animate();
    • updateDayNight() - Ciclo dia/noite
    • updateNPCAI() - Inteligência artificial dos NPCs
    • updateAnimalAI() - Comportamento dos animais
-   • updateTeleportPortals() - Animação dos portais
-   • checkTeleportCollision() - Sistema de teletransporte
    • createNPC() - Criação de personagens
    • createAnimal() - Criação de animais
    • createHouse() - Criação de construções
@@ -1281,6 +1707,8 @@ animate();
    • findNearestHouse() - Pathfinding de NPCs
    • animateAllWaterfalls() - Animação de partículas
    • updateHouses() - Animação de portas
+   • createSuspendedBridge() - Sistema de pontes entre ilhas
+   • applyHighlight() / removeHighlight() - Feedback visual de seleção
    
    EVENTOS GLOBAIS:
    • window.toggleMode - Alternar modos
