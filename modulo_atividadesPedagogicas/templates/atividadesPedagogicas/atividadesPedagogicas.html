@@ -1,307 +1,519 @@
-
-
-{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Ambiente Horizonte da Aprendizagem — Fundamental 1 | Prefeitura de Vera Cruz</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
-<!--CSS-->
-{% include "atividadesPedagogicas/includes/ilha/_css_ilha.html" %}
-
-
-
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Horizonte Digital - Universo de Aprendizagem</title>
+  {% include "atividadesPedagogicas/includes/ilha/_css_ilha.html" %}
 </head>
 <body>
+  <div id="teleport-flash"></div>
 
-<!-- ══════════════════════════════════════════
-     INTRO SCREEN
-══════════════════════════════════════════ -->
-<input type="checkbox" id="intro-toggle">
-<div id="intro-overlay">
-  <div class="intro-inner">
+  <div id="ui-container">
 
-    <!-- Cabeçalho institucional com espaço para logotipo da Prefeitura -->
-    <div class="intro-header">
-      <div class="intro-logo-slot" title="Espaço reservado para o logotipo da Prefeitura Municipal de Vera Cruz">
-        <img src='{% static "prefeitura.png" %}' alt="Logotipo da Prefeitura Municipal de Vera Cruz" height='30'>
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+        TOP INDICATORS - MINIMALISTA
+        ═══════════════════════════════════════════════════════════════════════════ -->
+    <div id="top-indicators">
+      <div class="indicator-pill time-pill">
+        <span id="time-icon">☀️</span>
+        <span id="time-text">Dia</span>
       </div>
-      <div class="intro-institution">
-        <span class="city-name">Prefeitura Municipal de Vera Cruz</span>
-        <span class="sec-name">Secretaria Municipal da Educação</span>
-      </div>
-      <div class="intro-divider-v"></div>
-      <div class="intro-brand">
-        <span class="env-label">Ambiente Virtual • Fundamental 1</span>
-        <span class="env-name">Horizonte da Aprendizagem</span>
+      <div class="indicator-pill crystal-pill">
+        💎 <span id="crystals">1000</span>
       </div>
     </div>
 
-    <!-- Título principal -->
-    <div class="intro-title-block">
-      <div class="intro-eyebrow">Universo Digital Educacional</div>
-      <h1 class="intro-headline">Horizonte da<br>Aprendizagem</h1>
-      <p class="intro-subtitle">Onde cada conquista escolar constrói um novo mundo</p>
-    </div>
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+        MODE BUTTON - FLUTUANTE
+        ═══════════════════════════════════════════════════════════════════════════ -->
+    <button id="mode-button" onclick="toggleMode()">
+      <span id="mode-icon">🌍</span>
+      <span id="mode-text">Explorar</span>
+    </button>
 
-    <!-- Narrativa cinematográfica imersiva -->
-    <div class="intro-narrative">
-      <p>
-        <strong>Feche os olhos por um instante e imagine um lugar onde cada ideia tem o poder de criar novos mundos...</strong>
-      </p>
-      <p>
-        Um espaço onde <em>ilhas flutuantes</em> guardam segredos milenares e portais luminosos se abrem para descobertas que você jamais imaginou serem possíveis. Onde <em>cachoeiras de conhecimento</em> jorram entre pedras de sabedoria, e árvores que crescem a cada lição aprendida tocam as estrelas com seus galhos. Onde pontes de luz unem mundos distantes, e paisagens mágicas se transformam conforme sua mente evolui.
-      </p>
-      <p>
-        <strong>Bem-vindo ao Horizonte da Aprendizagem.</strong>
-      </p>
-      <p>
-        Este não é apenas um jogo. É um <em>universo vivo</em> — criado para mentes como a sua. Aqui, cada passo que você dá na escola se transforma em poder real dentro deste cosmos. Cada exercício resolvido, cada livro lido, cada conquista alcançada vira energia pura para explorar, construir e expandir o seu próprio mundo.
-      </p>
-      <p>
-        Você pode erguer <em>pontes entre mundos</em>, cultivar florestas de ideias, personalizar seus espaços e convidar amigos para construir ao seu lado — porque o conhecimento é muito mais poderoso quando compartilhado. Cada aliança que você forma, cada projeto que você cria junto com seus colegas, adiciona uma nova camada a este universo coletivo e infinito.
-      </p>
-      <p>
-        As ilhas crescem. Os portais se multiplicam. Os <em>portais para novas descobertas</em> surgem a cada habilidade que você domina. E quanto mais você aprende, mais vasto, mais extraordinário e mais seu este horizonte se torna.
-      </p>
-      <p>
-        O futuro da educação não está apenas nas páginas de um livro. Ele está aqui — <strong>vivo, dinâmico, esperando por você</strong>.
-      </p>
-      <p>
-        <em>Sua jornada começa agora. O que você vai construir?</em>
-      </p>
-    </div>
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+        TOGGLE BUTTONS PARA DRAWERS
+        ═══════════════════════════════════════════════════════════════════════════ -->
+    <button class="toggle-btn toggle-left" id="toggle-catalog" onclick="toggleCatalogDrawer()">📦</button>
+    <button class="toggle-btn toggle-right" id="toggle-tools" onclick="toggleToolsDrawer()" style="display:none;">🔧</button>
 
-    <!-- Cards de recursos -->
-    <div class="intro-features">
-      <div class="feat-card">
-        <span class="feat-icon">🏝️</span>
-        <span class="feat-text">Ilhas Flutuantes<br>para explorar</span>
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+        LEFT DRAWER - CATÁLOGO
+        ═══════════════════════════════════════════════════════════════════════════ -->
+    <div class="drawer drawer-left" id="catalog-drawer">
+      <div class="drawer-header">
+        <div class="drawer-title">📦 Catálogo</div>
+        <button class="drawer-close" onclick="toggleCatalogDrawer()">✕</button>
       </div>
-      <div class="feat-card">
-        <span class="feat-icon">💎</span>
-        <span class="feat-text">Recompensas pelas<br>conquistas escolares</span>
-      </div>
-      <div class="feat-card">
-        <span class="feat-icon">🌉</span>
-        <span class="feat-text">Pontes entre<br>mundos do saber</span>
-      </div>
-      <div class="feat-card">
-        <span class="feat-icon">🤝</span>
-        <span class="feat-text">Construção coletiva<br>com amigos</span>
-      </div>
-    </div>
+      <div class="drawer-content">
 
-    <!-- CTA -->
-    <label class="intro-cta-label" for="intro-toggle">
-      Iniciar Minha Jornada
-      <span class="intro-cta-arrow">🚀</span>
-    </label>
-
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════
-     GAME UI
-══════════════════════════════════════════ -->
-<div id="ui-container">
-  <div id="top-bar" class="pointer-events-auto">
-    <div class="top-left">
-      <!-- Brand com logotipo da Prefeitura -->
-      <div class="top-brand">
-        <div class="top-logo-slot" title="Prefeitura Municipal de Vera Cruz">
-          <img src='{% static "prefeitura.png" %}' alt="Prefeitura de Vera Cruz" height='30'>
+        <div class="catalog-section">
+          <div class="catalog-section-title">🌳 Natureza</div>
+          <div class="catalog-grid">
+            <div class="catalog-item" onclick="selectCatalogItem('tree', 10)">
+              <div class="catalog-item-icon">🌳</div>
+              <div class="catalog-item-name">Árvore</div>
+              <div class="catalog-item-cost">💎 10</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('palmTree', 15)">
+              <div class="catalog-item-icon">🌴</div>
+              <div class="catalog-item-name">Palmeira</div>
+              <div class="catalog-item-cost">💎 15</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('decorativeTree', 20)">
+              <div class="catalog-item-icon">🌸</div>
+              <div class="catalog-item-name">Árvore Floral</div>
+              <div class="catalog-item-cost">💎 20</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('rock', 5)">
+              <div class="catalog-item-icon">🪨</div>
+              <div class="catalog-item-name">Pedra</div>
+              <div class="catalog-item-cost">💎 5</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('grass', 3)">
+              <div class="catalog-item-icon">🌿</div>
+              <div class="catalog-item-name">Grama</div>
+              <div class="catalog-item-cost">💎 3</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('flower', 5)">
+              <div class="catalog-item-icon">🌺</div>
+              <div class="catalog-item-name">Flor</div>
+              <div class="catalog-item-cost">💎 5</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('pond', 80)">
+              <div class="catalog-item-icon">🏞️</div>
+              <div class="catalog-item-name">Lago</div>
+              <div class="catalog-item-cost">💎 80</div>
+            </div>
+          </div>
         </div>
-        <div class="top-brand-text">
-          <span class="tb-city">Pref. Vera Cruz • Sec. Educação</span>
-          <span class="tb-env">Horizonte da Aprendizagem</span>
+
+        <div class="catalog-section">
+          <div class="catalog-section-title">🏠 Construções</div>
+          <div class="catalog-grid">
+            <div class="catalog-item" onclick="selectCatalogItem('house', 150)">
+              <div class="catalog-item-icon">🏠</div>
+              <div class="catalog-item-name">Casa</div>
+              <div class="catalog-item-cost">💎 150</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('bench', 30)">
+              <div class="catalog-item-icon">🪑</div>
+              <div class="catalog-item-name">Banco</div>
+              <div class="catalog-item-cost">💎 30</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('parkBench', 40)">
+              <div class="catalog-item-icon">🪑</div>
+              <div class="catalog-item-name">Banco Praça</div>
+              <div class="catalog-item-cost">💎 40</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('bridge', 100)">
+              <div class="catalog-item-icon">🌉</div>
+              <div class="catalog-item-name">Ponte</div>
+              <div class="catalog-item-cost">💎 100</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('fence', 15)">
+              <div class="catalog-item-icon">🚧</div>
+              <div class="catalog-item-name">Cerca</div>
+              <div class="catalog-item-cost">💎 15</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('path', 10)">
+              <div class="catalog-item-icon">🛤️</div>
+              <div class="catalog-item-name">Caminho</div>
+              <div class="catalog-item-cost">💎 10</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('fountain', 120)">
+              <div class="catalog-item-icon">⛲</div>
+              <div class="catalog-item-name">Fonte</div>
+              <div class="catalog-item-cost">💎 120</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('lampPost', 35)">
+              <div class="catalog-item-icon">💡</div>
+              <div class="catalog-item-name">Poste</div>
+              <div class="catalog-item-cost">💎 35</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="catalog-section">
+          <div class="catalog-section-title">🌾 Agricultura</div>
+          <div class="catalog-grid">
+            <div class="catalog-item" onclick="selectCatalogItem('wheat', 8)">
+              <div class="catalog-item-icon">🌾</div>
+              <div class="catalog-item-name">Trigo</div>
+              <div class="catalog-item-cost">💎 8</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('carrot', 10)">
+              <div class="catalog-item-icon">🥕</div>
+              <div class="catalog-item-name">Cenoura</div>
+              <div class="catalog-item-cost">💎 10</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('corn', 12)">
+              <div class="catalog-item-icon">🌽</div>
+              <div class="catalog-item-name">Milho</div>
+              <div class="catalog-item-cost">💎 12</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('tomato', 10)">
+              <div class="catalog-item-icon">🍅</div>
+              <div class="catalog-item-name">Tomate</div>
+              <div class="catalog-item-cost">💎 10</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('lettuce', 8)">
+              <div class="catalog-item-icon">🥬</div>
+              <div class="catalog-item-name">Alface</div>
+              <div class="catalog-item-cost">💎 8</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('garden', 50)">
+              <div class="catalog-item-icon">🌱</div>
+              <div class="catalog-item-name">Horta</div>
+              <div class="catalog-item-cost">💎 50</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('barn', 300)">
+              <div class="catalog-item-icon">🏚️</div>
+              <div class="catalog-item-name">Celeiro</div>
+              <div class="catalog-item-cost">💎 300</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="catalog-section">
+          <div class="catalog-section-title">🍎 Alimentos</div>
+          <div class="catalog-grid">
+            <div class="catalog-item" onclick="selectCatalogItem('apple', 15)">
+              <div class="catalog-item-icon">🍎</div>
+              <div class="catalog-item-name">Maçã</div>
+              <div class="catalog-item-cost">💎 15</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('orange', 15)">
+              <div class="catalog-item-icon">🍊</div>
+              <div class="catalog-item-name">Laranja</div>
+              <div class="catalog-item-cost">💎 15</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('bread', 20)">
+              <div class="catalog-item-icon">🍞</div>
+              <div class="catalog-item-name">Pão</div>
+              <div class="catalog-item-cost">💎 20</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('cheese', 25)">
+              <div class="catalog-item-icon">🧀</div>
+              <div class="catalog-item-name">Queijo</div>
+              <div class="catalog-item-cost">💎 25</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('milk', 20)">
+              <div class="catalog-item-icon">🥛</div>
+              <div class="catalog-item-name">Leite</div>
+              <div class="catalog-item-cost">💎 20</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('cake', 50)">
+              <div class="catalog-item-icon">🎂</div>
+              <div class="catalog-item-name">Bolo</div>
+              <div class="catalog-item-cost">💎 50</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="catalog-section">
+          <div class="catalog-section-title">🐾 Animais</div>
+          <div class="catalog-grid">
+            <div class="catalog-item" onclick="selectCatalogItem('cow', 60)">
+              <div class="catalog-item-icon">🐄</div>
+              <div class="catalog-item-name">Vaca</div>
+              <div class="catalog-item-cost">💎 60</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('ox', 60)">
+              <div class="catalog-item-icon">🐂</div>
+              <div class="catalog-item-name">Boi</div>
+              <div class="catalog-item-cost">💎 60</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('horse', 70)">
+              <div class="catalog-item-icon">🐴</div>
+              <div class="catalog-item-name">Cavalo</div>
+              <div class="catalog-item-cost">💎 70</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('chicken', 40)">
+              <div class="catalog-item-icon">🐔</div>
+              <div class="catalog-item-name">Galinha</div>
+              <div class="catalog-item-cost">💎 40</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('pig', 50)">
+              <div class="catalog-item-icon">🐷</div>
+              <div class="catalog-item-name">Porco</div>
+              <div class="catalog-item-cost">💎 50</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="catalog-section">
+          <div class="catalog-section-title">⭐ NPCs</div>
+          <div class="catalog-grid">
+            <div class="catalog-item" onclick="selectCatalogItem('npc_man', 50)">
+              <div class="catalog-item-icon">👨</div>
+              <div class="catalog-item-name">Homem</div>
+              <div class="catalog-item-cost">💎 50</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('npc_woman', 50)">
+              <div class="catalog-item-icon">👩</div>
+              <div class="catalog-item-name">Mulher</div>
+              <div class="catalog-item-cost">💎 50</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('npc_mtrans', 50)">
+              <div class="catalog-item-icon">🏳️⚧️</div>
+              <div class="catalog-item-name">M. Trans</div>
+              <div class="catalog-item-cost">💎 50</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('npc_htrans', 50)">
+              <div class="catalog-item-icon">🏳️‍⚧️</div>
+              <div class="catalog-item-name">H. Trans</div>
+              <div class="catalog-item-cost">💎 50</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('npc_boy', 50)">
+              <div class="catalog-item-icon">👦</div>
+              <div class="catalog-item-name">Menino</div>
+              <div class="catalog-item-cost">💎 50</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('npc_girl', 50)">
+              <div class="catalog-item-icon">👧</div>
+              <div class="catalog-item-name">Menina</div>
+              <div class="catalog-item-cost">💎 50</div>
+            </div>
+            <div class="catalog-item" onclick="selectCatalogItem('npc_dog', 75)">
+              <div class="catalog-item-icon">🐕</div>
+              <div class="catalog-item-name">Cachorro</div>
+              <div class="catalog-item-cost">💎 75</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+        RIGHT DRAWER - FERRAMENTAS
+        ═══════════════════════════════════════════════════════════════════════════ -->
+    <div class="drawer drawer-right" id="tools-drawer">
+      <div class="drawer-header">
+        <div class="drawer-title">🔧 Ferramentas</div>
+        <button class="drawer-close" onclick="toggleToolsDrawer()">✕</button>
+      </div>
+      <div class="drawer-content">
+        <div class="catalog-grid">
+          <div class="action-btn" onclick="duplicateSelected()">📋 Duplicar</div>
+          <div class="action-btn" id="btn-dialogue" onclick="openDialogueModal()" style="display:none;">💬 Falas</div>
+        </div>
+        <div class="action-btn danger" onclick="deleteSelected()" style="margin-top:12px;">🗑️ Excluir</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+        MISSIONS DRAWER
+        ═══════════════════════════════════════════════════════════════════════════ -->
+    <div class="missions-drawer" id="missions-drawer">
+      <div class="drawer-header" style="margin: -20px -20px 16px -20px;">
+        <div class="drawer-title">🎯 Missões de Aprendizagem</div>
+        <button class="drawer-close" onclick="toggleMissions()">✕</button>
+      </div>
+
+      <div class="catalog-section-title">💻 BNCC Computação</div>
+
+      <div class="mission-card" onclick="openMission('algoritmo')">
+        <div class="mission-icon">🧩</div>
+        <div class="mission-info">
+          <div class="mission-title">Ilha dos Algoritmos</div>
+          <div class="mission-desc">Pensamento Computacional</div>
+        </div>
+        <div class="mission-reward">+20 💎</div>
+      </div>
+
+      <div class="mission-card" onclick="openMission('hardware')">
+        <div class="mission-icon">🖥️</div>
+        <div class="mission-info">
+          <div class="mission-title">Mundo Digital</div>
+          <div class="mission-desc">Hardware e componentes</div>
+        </div>
+        <div class="mission-reward">+20 💎</div>
+      </div>
+
+      <div class="mission-card" onclick="openMission('seguranca')">
+        <div class="mission-icon">🛡️</div>
+        <div class="mission-info">
+          <div class="mission-title">Cultura Digital</div>
+          <div class="mission-desc">Segurança na internet</div>
+        </div>
+        <div class="mission-reward">+20 💎</div>
+      </div>
+
+      <div class="catalog-section-title" style="margin-top:16px; opacity:0.5;">🔒 Em breve</div>
+
+      <div class="mission-card" style="opacity:0.5;">
+        <div class="mission-icon">🔢</div>
+        <div class="mission-info">
+          <div class="mission-title">Matemática</div>
+          <div class="mission-desc">Em desenvolvimento</div>
         </div>
       </div>
-      <button class="mode-toggle" id="mode-toggle-btn" onclick="toggleMode()">
-        <span id="mode-icon">🌌</span>
-        <span id="mode-text">Modo Visualização</span>
-      </button>
-      <div class="resource">💎 <span id="crystals">1000</span></div>
+
+      <div class="mission-card" style="opacity:0.5;">
+        <div class="mission-icon">🔬</div>
+        <div class="mission-info">
+          <div class="mission-title">Ciências</div>
+          <div class="mission-desc">Em desenvolvimento</div>
+        </div>
+      </div>
+
     </div>
-    <div class="top-right">
-      <button class="icon-btn" onclick="saveWorld()" title="Salvar mundo">💾</button>
-      <button class="icon-btn" onclick="loadWorld()" title="Carregar mundo">📂</button>
-      <button class="icon-btn" onclick="clearPlaza()" title="Limpar praça">🗑️</button>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+        BOTTOM BAR - CONTROLES
+        ═══════════════════════════════════════════════════════════════════════════ -->
+    <div id="bottom-bar">
+      <div class="bottom-panel">
+        <div class="camera-controls">
+          <button class="cam-btn active" id="btn-3rd" onclick="setCameraMode('third')" title="Visão geral">👁️</button>
+          <button class="cam-btn" id="btn-avatar" onclick="setCameraMode('avatar')" title="Seguir avatar">🧍</button>
+          <button class="cam-btn" id="btn-1st" onclick="setCameraMode('first')" title="Primeira pessoa">🚶</button>
+        </div>
+      </div>
+
+      <div class="bottom-panel">
+        <button class="mission-btn" onclick="toggleMissions()" title="Missões">🎯</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+        FLOATING ACTION BUTTONS
+        ═══════════════════════════════════════════════════════════════════════════ -->
+    <div class="fab-container">
+      <button class="fab" onclick="saveWorld()" title="Salvar">💾</button>
+      <button class="fab" onclick="loadWorld()" title="Carregar">📂</button>
+      <button class="fab" onclick="clearPlaza()" title="Limpar">🗑️</button>
+      <button class="fab" onclick="showModal('help-modal')" title="Ajuda">❓</button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+        INDICADORES E HINTS
+        ═══════════════════════════════════════════════════════════════════════════ -->
+    <div id="mode-indicator"></div>
+    <div id="interaction-prompt" onclick="openNPCDialogue()">💬 Falar com NPC</div>
+    <div id="riding-hint">🐴 Pressione [E] ou Clique para Montar/Desmontar</div>
+    <div id="avatar-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Mover | <kbd>Mouse</kbd> Olhar | <kbd>Shift</kbd> Correr</div>
+    <div id="crosshair"></div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════════
+      MOBILE CONTROLS
+      ═══════════════════════════════════════════════════════════════════════════════ -->
+  <div id="mobile-controls">
+    <div class="joystick-container" id="joystick">
+      <div class="joystick-knob" id="joystick-knob"></div>
+    </div>
+  </div>
+  <div id="action-buttons">
+    <button class="action-btn-mobile" id="btn-run" ontouchstart="toggleRun()">⚡</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════════
+      BLOCKER (POINTER LOCK)
+      ═══════════════════════════════════════════════════════════════════════════════ -->
+  <div id="blocker">
+    <div id="instructions-fp">
+      <h1>🧍 Clique para controlar o Avatar</h1>
+      <p style="margin-top:15px; opacity:0.8;">(WASD = Mover | MOUSE = Olhar | SHIFT = Correr | ESC = Sair)</p>
     </div>
   </div>
 
-  <div id="time-indicator">
-    <span id="time-icon">☀️</span>
-    <span id="time-text">Dia</span>
-  </div>
-  <div id="mode-indicator"></div>
+  <!-- ═══════════════════════════════════════════════════════════════════════════════
+      SPEECH BUBBLE
+      ═══════════════════════════════════════════════════════════════════════════════ -->
+  <div id="npc-speech-bubble"></div>
 
-  <div id="side-menu">
-    <div class="menu-header">
-      <h3>🎨 Catálogo</h3>
-      <button class="close-menu" onclick="toggleCatalog()" title="Fechar catálogo">✖</button>
+  <!-- ═══════════════════════════════════════════════════════════════════════════════
+      MODAIS DE MINIGAMES
+      ═══════════════════════════════════════════════════════════════════════════════ -->
+  <div id="minigame-algoritmo" class="modal-overlay">
+    <div class="modal-content">
+      <h2>🧩 Ilha dos Algoritmos</h2>
+      <span class="bncc-tag">BNCC: Pensamento Computacional</span>
+      <p style="margin-bottom:16px; color:#555;">Ordene: "Fazer um Sanduíche"</p>
+      <button class="minigame-option" onclick="checkAlgo(this, 2)">2. Colocar recheio</button>
+      <button class="minigame-option" onclick="checkAlgo(this, 1)">1. Pegar pão</button>
+      <button class="minigame-option" onclick="checkAlgo(this, 3)">3. Fechar sanduíche</button>
+      <p id="algo-feedback" style="margin-top:15px; font-weight:bold;"></p>
+      <button class="action-btn primary" style="width:100%; margin-top:15px;" onclick="closeMinigame('minigame-algoritmo')">Voltar</button>
     </div>
-    <div class="catalog-title">🌳 Natureza</div>
-    <div class="catalog-item" onclick="selectCatalogItem('tree', 10)">🌳 Árvore <span>💎 10</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('palmTree', 15)">🌴 Palmeira <span>💎 15</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('decorativeTree', 20)">🌸 Árvore Floral <span>💎 20</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('rock', 5)">🪨 Pedra <span>💎 5</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('grass', 3)">🌿 Grama <span>💎 3</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('flower', 5)">🌺 Flor <span>💎 5</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('pond', 80)">🏞️ Lago <span>💎 80</span></div>
-    <div class="catalog-title">🏠 Construções</div>
-    <div class="catalog-item" onclick="selectCatalogItem('house', 150)">🏠 Casa <span>💎 150</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('bench', 30)">🪑 Banco Simples <span>💎 30</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('parkBench', 40)">🪑 Banco de Praça <span>💎 40</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('bridge', 100)">🌉 Ponte <span>💎 100</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('fence', 15)">🚧 Cerca <span>💎 15</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('path', 10)">🛤️ Caminho <span>💎 10</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('fountain', 120)">⛲ Fonte <span>💎 120</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('lampPost', 35)">💡 Poste de Luz <span>💎 35</span></div>
-    <div class="catalog-title">🌾 Agricultura</div>
-    <div class="catalog-item" onclick="selectCatalogItem('wheat', 8)">🌾 Trigo <span>💎 8</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('carrot', 10)">🥕 Cenoura <span>💎 10</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('corn', 12)">🌽 Milho <span>💎 12</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('tomato', 10)">🍅 Tomate <span>💎 10</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('lettuce', 8)">🥬 Alface <span>💎 8</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('garden', 50)">🌱 Horta <span>💎 50</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('barn', 300)">🏚️ Celeiro <span>💎 300</span></div>
-    <div class="catalog-title">🍎 Alimentos</div>
-    <div class="catalog-item" onclick="selectCatalogItem('apple', 15)">🍎 Maçã <span>💎 15</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('orange', 15)">🍊 Laranja <span>💎 15</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('bread', 20)">🍞 Pão <span>💎 20</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('cheese', 25)">🧀 Queijo <span>💎 25</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('milk', 20)">🥛 Leite <span>💎 20</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('cake', 50)">🎂 Bolo <span>💎 50</span></div>
-    <div class="catalog-title">🐾 Animais</div>
-    <div class="catalog-item" onclick="selectCatalogItem('cow', 60)">🐄 Vaca <span>💎 60</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('ox', 60)">🐂 Boi <span>💎 60</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('horse', 70)">🐴 Cavalo <span>💎 70</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('chicken', 40)">🐔 Galinha <span>💎 40</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('pig', 50)">🐷 Porco <span>💎 50</span></div>
-    <div class="catalog-title">⭐ NPCs</div>
-    <div class="catalog-item" onclick="selectCatalogItem('npc_man', 50)">👨 Homem <span>💎 50</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('npc_woman', 50)">👩 Mulher <span>💎 50</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('npc_mtrans', 50)">🏳️‍⚧️ M. Trans <span>💎 50</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('npc_htrans', 50)">🏳️‍️ H. Trans <span>💎 50</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('npc_boy', 50)">👦 Menino <span>💎 50</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('npc_girl', 50)">👧 Menina <span>💎 50</span></div>
-    <div class="catalog-item" onclick="selectCatalogItem('npc_dog', 75)">🐕 Cachorro <span>💎 75</span></div>
-    <hr style="border: none; border-top: 1px solid rgba(14, 116, 144, 0.15); margin: 18px 0;">
-    <button class="action-btn primary" style="width: 100%;" onclick="showModal('help-modal')">❓ Ajuda</button>
   </div>
 
-  <div id="tools-panel" class="pointer-events-auto">
-    <div class="panel-title">🔧 Ferramentas <button style="background:none; border:none; color:var(--ink-500); cursor:pointer;" onclick="deselectObject()">✖</button></div>
-    <div class="tool-grid">
-      <div class="action-btn" onclick="duplicateSelected()">📋 Duplicar</div>
-      <div class="action-btn" id="btn-dialogue" onclick="openDialogueModal()" style="display:none;">💬 Falas</div>
+  <div id="minigame-hardware" class="modal-overlay">
+    <div class="modal-content">
+      <h2>🖥️ Ilha do Mundo Digital</h2>
+      <span class="bncc-tag">BNCC: Mundo Digital</span>
+      <p style="margin-bottom:16px; color:#555;">"Cérebro" do computador?</p>
+      <button class="minigame-option" onclick="checkHardware(this, false)">Memória RAM</button>
+      <button class="minigame-option" onclick="checkHardware(this, true)">CPU</button>
+      <button class="minigame-option" onclick="checkHardware(this, false)">HD</button>
+      <p id="hw-feedback" style="margin-top:15px; font-weight:bold;"></p>
+      <button class="action-btn primary" style="width:100%; margin-top:15px;" onclick="closeMinigame('minigame-hardware')">Voltar</button>
     </div>
-    <div class="action-btn danger" onclick="deleteSelected()">🗑️ Excluir</div>
   </div>
 
-  <div id="camera-controls" class="pointer-events-auto">
-    <button class="cam-btn active" id="btn-3rd" onclick="setCameraMode('third')">👁️</button>
-    <button class="cam-btn" id="btn-avatar" onclick="setCameraMode('avatar')">🧍</button>
-    <button class="cam-btn" id="btn-1st" onclick="setCameraMode('first')">🎯</button>
-  </div>
-
-  <div id="avatar-hint">
-    <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Mover | <kbd>Mouse</kbd> Olhar | <kbd>Shift</kbd> Correr
-  </div>
-  <div id="crosshair"></div>
-</div>
-
-<div id="mobile-controls">
-  <div class="joystick-container" id="joystick">
-    <div class="joystick-knob" id="joystick-knob"></div>
-  </div>
-</div>
-<div id="action-buttons">
-  <button class="action-btn-mobile" id="btn-run" ontouchstart="toggleRun()">⚡</button>
-</div>
-
-<div id="blocker">
-  <div id="instructions-fp">
-    <h1>🧍 Clique para controlar o Avatar</h1>
-    <p style="margin-top:15px; opacity:0.8; color: var(--ink-500);">(WASD = Mover | MOUSE = Olhar | SHIFT = Correr | ESC = Sair)</p>
-  </div>
-</div>
-
-<div id="npc-speech-bubble"></div>
-
-<!-- Minigames -->
-<div id="minigame-algoritmo" class="modal-overlay pointer-events-auto">
-  <div class="modal-content">
-    <h2>🧩 Ilha dos Algoritmos</h2>
-    <span class="bncc-tag">BNCC: Pensamento Computacional</span>
-    <p>Ordene: "Fazer um Sanduíche"</p>
-    <button class="minigame-option" onclick="checkAlgo(this, 2)">2. Colocar recheio</button>
-    <button class="minigame-option" onclick="checkAlgo(this, 1)">1. Pegar pão</button>
-    <button class="minigame-option" onclick="checkAlgo(this, 3)">3. Fechar sanduíche</button>
-    <p id="algo-feedback" style="margin-top:15px; font-weight:bold;"></p>
-    <button class="action-btn primary" style="width:100%; margin-top:15px;" onclick="closeMinigame('minigame-algoritmo')">Voltar</button>
-  </div>
-</div>
-
-<div id="minigame-hardware" class="modal-overlay pointer-events-auto">
-  <div class="modal-content">
-    <h2>🖥️ Ilha do Mundo Digital</h2>
-    <span class="bncc-tag">BNCC: Mundo Digital</span>
-    <p>"Cérebro" do computador?</p>
-    <button class="minigame-option" onclick="checkHardware(this, false)">Memória RAM</button>
-    <button class="minigame-option" onclick="checkHardware(this, true)">CPU</button>
-    <button class="minigame-option" onclick="checkHardware(this, false)">HD</button>
-    <p id="hw-feedback" style="margin-top:15px; font-weight:bold;"></p>
-    <button class="action-btn primary" style="width:100%; margin-top:15px;" onclick="closeMinigame('minigame-hardware')">Voltar</button>
-  </div>
-</div>
-
-<div id="minigame-seguranca" class="modal-overlay pointer-events-auto">
-  <div class="modal-content">
-    <h2>🛡️ Ilha da Cultura Digital</h2>
-    <span class="bncc-tag">BNCC: Segurança</span>
-    <p>E-mail: "Ganhou iPhone. Clique e digite senha"</p>
-    <button class="minigame-option" onclick="checkSecurity(this, false)">Clico e digito</button>
-    <button class="minigame-option" onclick="checkSecurity(this, true)">Ignoro - Phishing!</button>
-    <p id="sec-feedback" style="margin-top:15px; font-weight:bold;"></p>
-    <button class="action-btn primary" style="width:100%; margin-top:15px;" onclick="closeMinigame('minigame-seguranca')">Voltar</button>
-  </div>
-</div>
-
-<div id="dialogue-modal" class="modal-overlay pointer-events-auto">
-  <div class="modal-content">
-    <h2>💬 Personalizar Falas</h2>
-    <div class="dialogue-box">
-      <label>👋 Cumprimentos</label>
-      <textarea id="dialogue-greet"></textarea>
-      <button class="action-btn primary" style="margin-top:8px; width:100%;" onclick="saveDialogue('greet')">Salvar</button>
+  <div id="minigame-seguranca" class="modal-overlay">
+    <div class="modal-content">
+      <h2>🛡️ Ilha da Cultura Digital</h2>
+      <span class="bncc-tag">BNCC: Segurança</span>
+      <p style="margin-bottom:16px; color:#555;">E-mail: "Ganhou iPhone. Clique e digite senha"</p>
+      <button class="minigame-option" onclick="checkSecurity(this, false)">Clico e digito</button>
+      <button class="minigame-option" onclick="checkSecurity(this, true)">Ignoro - Phishing!</button>
+      <p id="sec-feedback" style="margin-top:15px; font-weight:bold;"></p>
+      <button class="action-btn primary" style="width:100%; margin-top:15px;" onclick="closeMinigame('minigame-seguranca')">Voltar</button>
     </div>
-    <div class="dialogue-box">
-      <label>😴 Descanso</label>
-      <textarea id="dialogue-rest"></textarea>
-      <button class="action-btn primary" style="margin-top:8px; width:100%;" onclick="saveDialogue('rest')">Salvar</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════════
+      MODAL DE DIÁLOGO
+      ═══════════════════════════════════════════════════════════════════════════════ -->
+  <div id="dialogue-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h2>💬 Personalizar Falas</h2>
+      <div class="dialogue-box">
+        <label>👋 Cumprimentos</label>
+        <textarea id="dialogue-greet"></textarea>
+        <button class="action-btn primary" style="margin-top:8px; width:100%;" onclick="saveDialogue('greet')">Salvar</button>
+      </div>
+      <div class="dialogue-box">
+        <label>😴 Descanso</label>
+        <textarea id="dialogue-rest"></textarea>
+        <button class="action-btn primary" style="margin-top:8px; width:100%;" onclick="saveDialogue('rest')">Salvar</button>
+      </div>
+      <button class="action-btn" style="width:100%; margin-top:10px;" onclick="closeModal('dialogue-modal')">Fechar</button>
     </div>
-    <button class="action-btn" style="width:100%; margin-top:10px;" onclick="closeModal('dialogue-modal')">Fechar</button>
   </div>
-</div>
 
-<div id="help-modal" class="modal-overlay pointer-events-auto">
-  <div class="modal-content">
-    <h2>🌌 Bem-vindo ao Horizonte da Aprendizagem</h2>
-    <p style="line-height:1.7; margin-bottom: 10px; color: var(--ink-700);">🌍 <strong style="color:var(--sky-700)">Modo Normal:</strong> Explore o mundo e observe os NPCs com IA inteligente!</p>
-    <p style="line-height:1.7; margin-bottom: 10px; color: var(--ink-700);">🧍 <strong style="color:var(--sky-700)">Modo Avatar:</strong> Controle seu personagem em 3ª pessoa.</p>
-    <p style="line-height:1.7; margin-bottom: 10px; color: var(--ink-700);">🛠️ <strong style="color:var(--sky-700)">Modo Edição:</strong> Construa com o catálogo.</p>
-    <p style="line-height:1.7; margin-bottom: 18px; color: var(--ink-700);">💎 Cristais custam objetos. Excluir devolve o valor.</p>
-    <button class="action-btn primary" style="width:100%;" onclick="closeModal('help-modal')">Começar!</button>
+  <!-- ═══════════════════════════════════════════════════════════════════════════════
+      MODAL DE INTERAÇÃO COM NPC
+      ═══════════════════════════════════════════════════════════════════════════════ -->
+  <div id="npc-interaction-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h2 id="npc-interact-title">💬 Conversar</h2>
+      <div id="npc-questions" style="margin-bottom:15px;"></div>
+      <button class="action-btn" style="width:100%;" onclick="closeModal('npc-interaction-modal')">Fechar</button>
+    </div>
   </div>
-</div>
 
-<!--Javascript-->
-{% include "atividadesPedagogicas/includes/ilha/_javascript_ilha.html" %}
+  <!-- ═══════════════════════════════════════════════════════════════════════════════
+      MODAL DE AJUDA
+      ═══════════════════════════════════════════════════════════════════════════════ -->
+  <div id="help-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h2>🌌 Bem-vindo ao Horizonte Digital</h2>
+      <p style="line-height:1.6; color:#555;">🌍 <strong>Modo Explorar:</strong> Descubra o mundo e interaja com os NPCs!</p>
+      <p style="line-height:1.6; color:#555;">🧍 <strong>Modo Avatar:</strong> Controle seu personagem em 3ª pessoa.</p>
+      <p style="line-height:1.6; color:#555;">🛠️ <strong>Modo Construir:</strong> Crie com o catálogo lateral.</p>
+      <p style="line-height:1.6; color:#555;">🎯 <strong>Missões:</strong> Complete desafios educacionais.</p>
+      <p style="line-height:1.6; color:#555;">💎 Cristais custam objetos. Excluir devolve o valor.</p>
+      <button class="action-btn primary" style="width:100%; margin-top:15px;" onclick="closeModal('help-modal')">Começar Aventura!</button>
+    </div>
+  </div>
+  {% include "atividadesPedagogicas/includes/ilha/_javascript_ilha.html" %}
 
 </body>
 </html>
