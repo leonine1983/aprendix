@@ -52,9 +52,12 @@ def startSme(request):
 def loginMerendaEscolar(request):
     return render(request, 'Admin_Acessos/index_merendaEscolar.html')
 
+def loginAprendix(request):
+    return render(request,  'Admin_Acessos/index_aprendix.html')
+
 
 class CreateLoginView(LoginView):
-    template_name = 'Admin_Acessos/starSme.html'
+    template_name = 'Admin_Acessos/index_aprendix.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

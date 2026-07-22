@@ -12,7 +12,8 @@ from .views import (
     startSme, 
     loginMerendaEscolar, 
     push_subscribe,
-    push_unsubscribe
+    push_unsubscribe,
+    loginAprendix
 )
 
 app_name = 'admin_acessos'
@@ -20,7 +21,10 @@ app_name = 'admin_acessos'
 urlpatterns = [
     path('', startSme, name='starsme' ),
     path('merendaEscolar', loginMerendaEscolar, name='loginMerendaEscolar' ),
-    path('loginAprendix', CreateLoginView.as_view(), name='login_create' ),
+    path('loginAprendix', loginAprendix, name='login_aprendix' ),
+    
+    
+    path('login', CreateLoginView.as_view(), name='login_create' ),
 
     path('logout', LogoutView_logout.as_view(), name='logout' ),
     

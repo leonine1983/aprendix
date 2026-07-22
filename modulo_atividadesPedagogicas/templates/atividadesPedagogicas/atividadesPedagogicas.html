@@ -124,6 +124,41 @@
     box-shadow: var(--sombra-chunky); pointer-events: none;
   }
 
+  /* NOVO (Etapa 1 — Revolução do Combate): barra de vida (HP) do jogador,
+     dentro do painel de perfil. Reaproveita a classe .barra/.preenchida
+     já usada por #barra-ciclo (dia/noite) — só a cor muda (vermelho). */
+  #barra-vida-container { margin-top: 3px; display: flex; flex-direction: column; gap: 2px; }
+  #barra-vida-container .barra { width: 100%; }
+  #barra-vida { transition: width 0.25s ease; }
+
+  /* NOVO (Etapa 1): flash vermelho de feedback ao levar dano. Fica
+     transparente por padrão; a classe .ativo dispara a animação de fade
+     (ver aplicarFlashDanoTela em JS). pointer-events:none para nunca
+     bloquear cliques/toques do jogo por baixo. */
+  #flash-dano-jogador {
+    position: fixed; inset: 0; z-index: 90; pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(255,0,0,0) 40%, rgba(255,0,0,0.35) 100%);
+    opacity: 0; transition: opacity 0.08s ease-out;
+  }
+  #flash-dano-jogador.ativo { opacity: 1; transition: opacity 0.03s ease-out; }
+
+  /* NOVO (Etapa 1, parte B): flash dourado de feedback ao acertar o bônus
+     de combo (4º acerto seguido no mesmo alvo). Usa animação (não
+     transição) porque o próprio JS re-dispara a classe .ativo via reflow
+     forçado (ver dispararFlashCombo), permitindo repetir o flash mesmo em
+     combos consecutivos rápidos. */
+  #flash-combo {
+    position: fixed; inset: 0; z-index: 91; pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(255,210,0,0) 45%, rgba(255,210,0,0.4) 100%);
+    opacity: 0;
+  }
+  #flash-combo.ativo { animation: flashComboPulso 0.45s ease-out; }
+  @keyframes flashComboPulso {
+    0% { opacity: 0; }
+    15% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
   /* ===================== HUD ===================== */
   #hud { position: fixed; inset: 0; pointer-events: none; z-index: 10; color: var(--cor-texto-hud); }
   #hud-top {
@@ -1501,6 +1536,82 @@
     font-size: 12px; font-weight: 700; color: #7ff2e6;
   }
   #enciclopedia-corpo { overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+
+  /* ===================== PROGRESSÃO (Nível/Atributos/Talentos) — ETAPA 2 v162 =====================
+     Paleta roxo/dourado para diferenciar dos demais painéis (ciano=enciclopédia,
+     dourado puro=missões, azul=lua/mapa). */
+  #painel-progressao-completo {
+    position: fixed; inset: 0; z-index: 60;
+    display: none; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px);
+    animation: fadeInScale 0.3s ease;
+  }
+  #progressao-cartao {
+    width: min(620px, 92vw); max-height: 82vh;
+    display: flex; flex-direction: column;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(168,85,247,0.18), transparent 40%),
+      linear-gradient(135deg, #241633, #150d1f);
+    border: 3px solid #a855f7;
+    border-radius: var(--raio-chunky);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.35), 0 0 24px rgba(168,85,247,0.3), inset 0 0 30px rgba(0,0,0,0.2);
+    overflow: hidden; animation: slideUp 0.3s ease; color: #f0e6fb;
+  }
+  #progressao-cabecalho {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; padding: 16px 20px;
+    background: linear-gradient(135deg, rgba(168,85,247,0.25), rgba(21,13,31,0.4));
+    border-bottom: 2px solid #a855f7;
+  }
+  #progressao-cabecalho h2 { font-size: 18px; font-weight: 800; color: #d9b3ff; letter-spacing: 0.5px; }
+  #botao-fechar-progressao {
+    background: rgba(255,255,255,0.08); border: var(--borda-chunky) solid #a855f7;
+    color: #f0e6fb; border-radius: var(--raio-chunky-pequeno); padding: 6px 16px;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    box-shadow: var(--sombra-chunky); transition: var(--transicao-padrao);
+  }
+  #botao-fechar-progressao:hover { transform: translateY(var(--deslocamento-chunky-hover)) scale(1.05); box-shadow: var(--sombra-chunky-hover); }
+  #botao-fechar-progressao:active { transform: translateY(var(--deslocamento-chunky-ativa)); box-shadow: var(--sombra-chunky-ativa); }
+  #progressao-cabecalho-info {
+    margin: 12px 20px 0; padding: 10px 14px; font-size: 12px; font-weight: 700;
+    background: rgba(168,85,247,0.15); border: 1.5px solid #a855f7; border-radius: var(--raio-chunky-pequeno);
+    color: #d9b3ff;
+  }
+  #progressao-abas { display: flex; gap: 8px; margin: 12px 20px 0; }
+  .progressao-aba {
+    flex: 1; text-align: center; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+    border: 1.5px solid rgba(168,85,247,0.35); border-radius: var(--raio-chunky-pequeno);
+    background: rgba(255,255,255,0.04); color: #d9b3ff; transition: var(--transicao-padrao);
+  }
+  .progressao-aba.ativa { background: rgba(168,85,247,0.3); border-color: #a855f7; }
+  #progressao-corpo { overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+  .progressao-linha-atributo {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    background: rgba(255,255,255,0.04); border: 1.5px solid rgba(168,85,247,0.35);
+    border-radius: var(--raio-chunky-pequeno); padding: 10px 14px;
+  }
+  .progressao-atributo-desc { font-size: 11px; opacity: 0.75; font-weight: 400; margin-top: 2px; }
+  .progressao-botao-mais {
+    background: #a855f7; border: none; color: #fff; border-radius: var(--raio-chunky-pequeno);
+    padding: 6px 14px; font-size: 13px; font-weight: 800; cursor: pointer; transition: var(--transicao-padrao);
+  }
+  .progressao-botao-mais:hover:not(:disabled) { transform: translateY(-2px); }
+  .progressao-botao-mais:disabled { opacity: 0.35; cursor: default; }
+  #progressao-corpo:has(.progressao-coluna-talento) { flex-direction: row; align-items: flex-start; flex-wrap: wrap; }
+  .progressao-coluna-talento { flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 8px; }
+  .progressao-titulo-ramo { font-size: 12px; font-weight: 800; color: #d9b3ff; text-align: center; margin-bottom: 2px; }
+  .progressao-talento-item {
+    background: rgba(255,255,255,0.04); border: 1.5px solid rgba(168,85,247,0.35);
+    border-radius: var(--raio-chunky-pequeno); padding: 10px 12px; transition: var(--transicao-padrao);
+  }
+  .progressao-talento-nome { font-size: 12px; font-weight: 700; }
+  .progressao-talento-desc { font-size: 11px; opacity: 0.8; margin-top: 3px; }
+  .progressao-talento-item.desbloqueado { border-color: #3DDC97; background: rgba(61,220,151,0.1); }
+  .progressao-talento-item.disponivel { border-color: #a855f7; cursor: pointer; }
+  .progressao-talento-item.disponivel:hover { background: rgba(168,85,247,0.15); }
+  .progressao-talento-item.bloqueado { opacity: 0.5; }
+  #barra-xp-container { margin-top: 3px; display: flex; flex-direction: column; gap: 2px; }
   .enciclopedia-item {
     background: rgba(255,255,255,0.04); border: 1.5px solid rgba(47,209,198,0.35);
     border-radius: var(--raio-chunky-pequeno); padding: 12px 14px;
@@ -1664,13 +1775,29 @@
 <div id="hud">
   <!-- NOVO (pós-v141): badge compacto sempre visível — ver CSS
        #hud-moedas-compacto. Independente de #hud-top.visivel. -->
-  <div id="hud-moedas-compacto">💎 <span id="valor-creditos-compacto">1000</span> &nbsp;🪙 <span id="valor-moedas-compacto">1000</span></div>
+  <div id="hud-moedas-compacto">💎 <span id="valor-creditos-compacto">1000</span> &nbsp;🪙 <span id="valor-moedas-compacto">1000</span> &nbsp;❤️ <span id="valor-vida-compacto">100</span> &nbsp;🌟Nv.<span id="valor-nivel-compacto">1</span></div>
   <div id="hud-top">
     <div class="painel" id="painel-perfil">
       <div id="avatar-mini"></div>
       <div>
         <div class="nome" id="nome-jogador">Explorador</div>
         <div class="creditos">💎 <span id="valor-creditos">1000</span> &nbsp;🪙 <span id="valor-moedas">1000</span></div>
+        <!-- NOVO (Etapa 1 — Revolução do Combate): barra de vida (HP). Mesmo
+             padrão visual de .barra/.preenchida já usado em #barra-ciclo. -->
+        <div id="barra-vida-container" title="Vida">
+          <div class="barra" style="width:100%;">
+            <div class="preenchida" id="barra-vida" style="width:100%; background:linear-gradient(90deg,#ff5555,#ff8888);"></div>
+          </div>
+          <span id="valor-vida-texto" style="font-size:10px;">100/100 ❤️</span>
+        </div>
+        <!-- NOVO (Etapa 2 — Progressão, v162): barra de XP, mesmo padrão
+             visual de .barra/.preenchida usado por #barra-vida acima. -->
+        <div id="barra-xp-container" title="Experiência">
+          <div class="barra" style="width:100%;">
+            <div class="preenchida" id="barra-xp" style="width:0%; background:linear-gradient(90deg,#a855f7,#d9b3ff);"></div>
+          </div>
+          <span id="valor-xp-texto" style="font-size:10px;">Nv.1 · 0/100 XP</span>
+        </div>
       </div>
     </div>
     <div class="painel" id="painel-squad">
@@ -1682,7 +1809,7 @@
   <div id="hud-bottom">
     <div class="painel" id="painel-inventario"></div>
     <div style="display:flex; gap:8px; align-items:center; justify-content:center; flex-wrap:wrap;">
-      <div id="controles-info" style="font-size:10px; opacity:0.6; white-space:nowrap;">WASD · ESPAÇO · MOUSE · E interage/entra no Exocraft · V · M · N · G cava/nivela · 1-9/Scroll na hotbar troca item · arraste para reordenar slots · Clique atira (equipe arma) · F3 debug de performance</div>
+      <div id="controles-info" style="font-size:10px; opacity:0.6; white-space:nowrap;">WASD · ESPAÇO · MOUSE · E interage/entra no Exocraft · V · M · N · G cava/nivela · X esquiva · Z bloqueia (com arma) · T progressão (nível/atributos/talentos) · E perto de um cavalo selvagem doma · B monta/desmonta · R viagem rápida · 1-9/Scroll na hotbar troca item · arraste para reordenar slots · Clique atira (equipe arma) · F3 debug de performance</div>
       <div id="indicador-ciclo">
         <span class="icone" id="icone-ciclo">☀️</span>
         <span id="fase-ciclo" style="font-size:10px;">Dia</span>
@@ -1697,7 +1824,19 @@
       </div>
       <div class="painel" id="indicador-caverna" style="display:none; align-items:center; gap:4px;">🕳️ Na Caverna</div>
       <div class="painel" id="indicador-exocraft" style="display:none; align-items:center; gap:4px;">🚙 Dirigindo Exocraft</div>
+      <!-- NOVO (Etapa 3 — Locomoção, v164): indicador de montaria, mesmo
+           padrão visual/estrutural do indicador-exocraft acima. -->
+      <div class="painel" id="indicador-montaria" style="display:none; align-items:center; gap:4px;">🐴 Montando</div>
+      <!-- NOVO (Etapa 4 — Retenção Diária, v165): indicador de evento de
+           invasão, mesmo padrão visual/estrutural do indicador-montaria
+           acima. Texto (contagem regressiva) atualizado a cada frame por
+           atualizarEventoInvasao(). -->
+      <div class="painel" id="indicador-invasao" style="display:none; align-items:center; gap:4px; border-color:#ff4d4d;">⚠️ Invasão</div>
       <div class="painel" id="indicador-voo" style="display:none; align-items:center; gap:4px; border-color: var(--cor-dourado); box-shadow: var(--sombra-magica);">🪽 Voando</div>
+      <!-- NOVO — auréola de fogo/gelo (Flores Coletáveis, 60s): mesmo padrão
+           visual do indicador-voo acima; a cor da borda muda dinamicamente
+           entre fogo/gelo em atualizarAuraElementalFlor(). -->
+      <div class="painel" id="indicador-aura-flor" style="display:none; align-items:center; gap:4px;"></div>
     </div>
     <div id="hotbar" title="Teclas 1-9 · Scroll para trocar"></div>
   </div>
@@ -1763,6 +1902,12 @@
   <div id="painel-estrela-fechar">Fechar</div>
 </div>
 
+<!-- NOVO (Etapa 1 — Revolução do Combate): flash vermelho de feedback ao
+     levar dano — sempre presente no DOM, opacidade controlada via classe
+     .ativo (mesmo padrão de toggles do projeto), nunca style.display. -->
+<div id="flash-dano-jogador"></div>
+<div id="flash-combo"></div>
+
 <div id="mira"><div class="ponto-central"></div></div>
 
 <div id="rotulos-mundo"></div>
@@ -1798,6 +1943,7 @@
   <button id="botao-galeria" class="botao-dock" style="--acento:#7C4DFF" title="Galeria" data-label="Galeria">🖼</button>
   <button id="botao-editor-avatar" class="botao-dock" style="--acento:#3DDC97" title="Editor de avatar" data-label="Avatar">🧑‍🎨</button>
   <button id="botao-enciclopedia" class="botao-dock" style="--acento:#2fd1c6" title="Enciclopédia da Segurança Digital" data-label="Enciclopédia">📖</button>
+  <button id="botao-progressao" class="botao-dock" style="--acento:#a855f7" title="Progressão: Nível, Atributos e Talentos (T)" data-label="Progressão">🌟</button>
   <button id="botao-salvar-local" class="botao-dock" style="--acento:#FF7043" title="Salvar local atual" data-label="Salvar Local">📍</button>
 </div>
 
@@ -1961,6 +2107,22 @@
   </div>
 </div>
 
+<!-- ===================== PROGRESSÃO (Nível/Atributos/Talentos) — ETAPA 2 v162 ===================== -->
+<div id="painel-progressao-completo">
+  <div id="progressao-cartao">
+    <div id="progressao-cabecalho">
+      <h2>🌟 Progressão</h2>
+      <button id="botao-fechar-progressao">Fechar</button>
+    </div>
+    <div id="progressao-cabecalho-info">Nível 1 · 0/100 XP · 🔷 0 pontos de atributo · 🌟 0 pontos de talento</div>
+    <div id="progressao-abas">
+      <div class="progressao-aba ativa" id="aba-progressao-atributos">🔷 Atributos</div>
+      <div class="progressao-aba" id="aba-progressao-talentos">🌟 Árvore de Talentos</div>
+    </div>
+    <div id="progressao-corpo"></div>
+  </div>
+</div>
+
 <!-- ===================== QUIZ BNCC ===================== -->
 <div id="quiz-bncc-overlay" style="position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);">
   <div id="quiz-bncc-card" style="background:#fff;border-radius:20px;padding:30px 28px;max-width:600px;width:92vw;max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.3);border:2px solid #7C4DFF;color:#0d2733;">
@@ -2020,6 +2182,24 @@ function estadoPadrao(){
     semente: Math.floor(Math.random()*2147483647),
     creditos: 1000, // DIAMANTES
     moedas: 1000,   // MOEDAS
+    // NOVO (Etapa 1 — Revolução do Combate): vida real do jogador. Vale só
+    // para os NOVOS sistemas de combate (esquiva, bloqueio, chefes, poções).
+    // Os malignos antigos (ver ia.danoMoeda/danoDiamante) continuam roubando
+    // moeda como sempre — não mexemos neles nesta etapa (mudança aditiva).
+    // vidaMax cresce com nível (ver Etapa 2 — Progressão, ainda não feita).
+    vida: 100,
+    vidaMax: 100,
+    // NOVO (Etapa 2 — Progressão, v162): nível/XP do jogador, pontos para
+    // gastar em atributos e na árvore de talentos. Aditivo sobre a Etapa 1
+    // — nenhum sistema de combate existente foi alterado, só "escutado"
+    // (ganho de XP ao derrotar) e usado como multiplicador extra nas
+    // fórmulas já existentes (dano, cooldown de esquiva, dano recebido).
+    nivel: 1,
+    xp: 0,
+    pontosAtributo: 0,
+    pontosTalento: 0,
+    atributos: { vigor: 0, forca: 0, destreza: 0 },
+    talentos: [],
     favoritos: [],
     recentes: [],
     avatar: { corPele:'#e0a978', corRoupa:'#2fd1c6', acessorio:'nenhum' },
@@ -2106,7 +2286,29 @@ function estadoPadrao(){
     // Sem migração explícita: saves antigos sem este campo já ficam com
     // null por causa do Object.assign(estadoPadrao(), dados) em
     // carregarEstado() (mesmo padrão dos campos acima).
-    localSalvo: null
+    localSalvo: null,
+    // NOVO (Etapa 3 — Locomoção, v164): montaria domesticada pelo jogador
+    // (só uma por vez, mesma filosofia simples da Etapa 2) e marcos do
+    // mundo já descobertos (usados no painel de Viagem Rápida). Sem
+    // migração explícita: saves antigos sem esses campos já ficam com os
+    // padrões abaixo por causa do Object.assign(estadoPadrao(), dados) em
+    // carregarEstado() (mesmo padrão de portaisJogador/memoriaNPCs/
+    // localSalvo, acima).
+    temMontaria: false,
+    nomeMontaria: 'Trovão',
+    marcosDescobertos: [],
+    // NOVO (Etapa 4 — Retenção Diária, v165): login diário (sequência de
+    // até 7 dias), missões diárias (resetadas por dia) e data da última
+    // invasão (no máx. 1 evento de invasão por dia de calendário). Sem
+    // migração explícita: saves antigos sem esses campos já ficam com os
+    // padrões abaixo por causa do Object.assign(estadoPadrao(), dados) em
+    // carregarEstado() (mesmo padrão de temMontaria/marcosDescobertos, acima).
+    ultimoLoginData: null,
+    sequenciaLogin: 0,
+    loginBonusColetadoHoje: false,
+    missoesDiarias: {},
+    dataMissoesDiarias: null,
+    dataUltimaInvasao: null
   };
 }
 
@@ -2145,6 +2347,19 @@ function carregarEstado(){
     // Migrar saldo se for um save antigo com valores menores
     if (dados.creditos === undefined) dados.creditos = 1000;
     if (dados.moedas === undefined) dados.moedas = 1000;
+    // NOVO (Etapa 1): migração de saves anteriores ao sistema de vida/HP.
+    if (typeof dados.vidaMax !== 'number' || !isFinite(dados.vidaMax) || dados.vidaMax <= 0) dados.vidaMax = 100;
+    if (typeof dados.vida !== 'number' || !isFinite(dados.vida)) dados.vida = dados.vidaMax;
+    dados.vida = Math.max(0, Math.min(dados.vida, dados.vidaMax));
+    // NOVO (Etapa 2 — Progressão, v162): migração de saves anteriores ao
+    // sistema de nível/XP/atributos/talentos.
+    if (typeof dados.nivel !== 'number' || !isFinite(dados.nivel) || dados.nivel < 1) dados.nivel = 1;
+    if (typeof dados.xp !== 'number' || !isFinite(dados.xp) || dados.xp < 0) dados.xp = 0;
+    if (typeof dados.pontosAtributo !== 'number' || !isFinite(dados.pontosAtributo)) dados.pontosAtributo = 0;
+    if (typeof dados.pontosTalento !== 'number' || !isFinite(dados.pontosTalento)) dados.pontosTalento = 0;
+    if (!dados.atributos || typeof dados.atributos !== 'object') dados.atributos = { vigor:0, forca:0, destreza:0 };
+    else { for (const k of ['vigor','forca','destreza']) if (typeof dados.atributos[k] !== 'number') dados.atributos[k] = 0; }
+    if (!Array.isArray(dados.talentos)) dados.talentos = [];
     return Object.assign(estadoPadrao(), dados);
   }catch(e){
     console.warn('Falha ao carregar save, usando padrão.', e);
@@ -3824,6 +4039,194 @@ const OBSTACULOS_VEGETACAO_POR_CHUNK = new Map();
 // ocas eram só decoração visual: o avatar atravessava as paredes.
 const OBSTACULOS_ALDEIA_POR_CHUNK = new Map();
 
+// =====================================================================
+// [NOVO v156 — Etapa 1/9 "Vermes da Areia"] DECORAÇÃO DO BIOMA DESERTO
+// =====================================================================
+// Pedido do usuário: um grande deserto (dunas, rochas gigantescas
+// esculpidas pelo vento, cânions, pedras espalhadas, fósseis parcialmente
+// enterrados, pouca vegetação) para servir de cenário à nova região
+// "Vermes da Areia" (metáfora de ransomware — ver plano completo no
+// CHECKPOINT-v156.md). Esta Etapa 1 cobre SÓ o cenário/decoração; o verme,
+// a IA, a detecção por vibração, o combate e a mecânica educativa são
+// etapas futuras separadas (ver checkpoint), propositalmente.
+//
+// DECISÃO DE ARQUITETURA: em vez de criar uma região nova isolada (como a
+// Ilha Flutuante, ligada por portal), reaproveitamos o bioma DESERTO que
+// já existe desde a Fase 1 do mundo procedural por chunks (obterBioma,
+// TIPOS_BIOMA.DESERTO) — ele já nasce "depois das montanhas" sempre que o
+// jogador anda para fora do mapa fixo (LIMITE_MAPA_FIXO) em qualquer
+// direção onde o ruído classifique o clima como quente/seco. Isso atende
+// literalmente ao pedido ("depois das montanhas, [...] deserto") sem
+// duplicar o sistema de chunks nem inventar uma segunda forma de
+// world-building só para esta feature.
+//
+// "Cânions" nesta etapa são formações rochosas altas e alongadas
+// (visual, não recortam o terreno de verdade) — recortar o terreno por
+// chunk exigiria mexer em alturaTerrenoChunk()/malha do chunk, risco
+// maior de quebrar a costura com o mapa fixo. Se o teste visual pedir
+// cânions "de verdade" (vales cavados no chão), isso vira uma etapa
+// própria depois, mexendo em alturaTerrenoChunk() com cuidado.
+const geoRochaDesertoA = new THREE.IcosahedronGeometry(1, 0);
+const geoRochaDesertoB = new THREE.ConeGeometry(0.9, 2.6, 6);
+const matRochaDeserto = new THREE.MeshStandardMaterial({ color:0x9c7f5a, roughness:1, flatShading:true });
+const matRochaDesertoClaro = new THREE.MeshStandardMaterial({ color:0xb79572, roughness:1, flatShading:true });
+const geoPedraSoltaDeserto = new THREE.IcosahedronGeometry(0.28, 0);
+const matPedraSoltaDeserto = new THREE.MeshStandardMaterial({ color:0xc9a874, roughness:0.95, flatShading:true });
+const geoFossil = new THREE.TorusGeometry(0.32, 0.045, 5, 8, Math.PI * 1.3);
+const matFossil = new THREE.MeshStandardMaterial({ color:0xe8ddc3, roughness:0.8 });
+const geoTroncoCacto = new THREE.CylinderGeometry(0.16, 0.19, 1.5, 7);
+const geoBracoCacto = new THREE.CylinderGeometry(0.1, 0.12, 0.7, 6);
+const matCacto = new THREE.MeshStandardMaterial({ color:0x4f7d4a, roughness:0.85 });
+const geoArbustoSeco = new THREE.IcosahedronGeometry(0.3, 0);
+const matArbustoSeco = new THREE.MeshStandardMaterial({ color:0x8a6d4b, roughness:1, flatShading:true });
+
+// Cria um cacto tipo "saguaro" simplificado: um tronco central + 0-2
+// braços curtos, todos com leve variação de rotação/escala pra não
+// parecer "carimbado" quando repetido pelo deserto.
+function criarCactoDeserto(){
+  const grupo = new THREE.Group();
+  const tronco = new THREE.Mesh(geoTroncoCacto, matCacto);
+  tronco.position.y = 0.75;
+  grupo.add(tronco);
+  const numBracos = Math.random() < 0.55 ? (Math.random() < 0.5 ? 1 : 2) : 0;
+  for(let i=0;i<numBracos;i++){
+    const braco = new THREE.Mesh(geoBracoCacto, matCacto);
+    const lado = i === 0 ? 1 : -1;
+    braco.position.set(lado*0.22, 0.55 + Math.random()*0.35, 0);
+    braco.rotation.z = lado * (0.9 + Math.random()*0.3);
+    grupo.add(braco);
+  }
+  grupo.castShadow = true;
+  return grupo;
+}
+
+// Formação rochosa "esculpida pelo vento" — cluster de 2-4 rochas
+// empilhadas/deslocadas com escalas bem diferentes entre si (o contraste
+// de tamanho é o que lê como "esculpido", não a geometria em si).
+function criarFormacaoRochosaDeserto(grande){
+  const grupo = new THREE.Group();
+  const nBlocos = grande ? (3 + Math.floor(Math.random()*2)) : (2 + Math.floor(Math.random()*2));
+  let yAcumulado = 0;
+  for(let i=0;i<nBlocos;i++){
+    const usaCone = Math.random() < 0.4;
+    const mesh = new THREE.Mesh(
+      usaCone ? geoRochaDesertoB : geoRochaDesertoA,
+      Math.random() < 0.5 ? matRochaDeserto : matRochaDesertoClaro
+    );
+    const escala = (grande ? (1.6 + Math.random()*1.8) : (0.5 + Math.random()*0.6)) * (1 - i*0.18);
+    mesh.scale.set(escala*(0.8+Math.random()*0.5), escala, escala*(0.8+Math.random()*0.5));
+    mesh.position.set((Math.random()-0.5)*escala*0.6, yAcumulado + escala*0.35, (Math.random()-0.5)*escala*0.6);
+    mesh.rotation.set(Math.random()*0.4, Math.random()*Math.PI*2, Math.random()*0.4);
+    mesh.castShadow = mesh.receiveShadow = true;
+    grupo.add(mesh);
+    yAcumulado += escala * 0.55;
+  }
+  return { grupo, raioColisao: grande ? 1.8 : 0.7, alturaTopo: yAcumulado };
+}
+
+// Versão desértica de criarVegetacaoChunk: chamada em vez da vegetação
+// genérica (árvores/flores verdes, que não fariam sentido num deserto)
+// sempre que o bioma do centro do chunk é DESERTO. Densidade de
+// vegetação continua vindo de TIPOS_BIOMA.DESERTO.densidadeVegetacao
+// (0.05 — "pouca vegetação", já era esse o valor antes desta sessão),
+// só que agora aplicada a cactos/arbustos secos em vez de árvores.
+function criarDecoracaoDesertoChunk(cx, cz, centroX, centroZ, densidade){
+  const grupo = new THREE.Group();
+  const obstaculos = [];
+
+  // Rochas gigantescas / formações esculpidas pelo vento — 1 a 3 por
+  // chunk, sem depender da densidade de vegetação (são feições do
+  // terreno, não vegetação). ~20% delas "grandes" (mais alta, colisão
+  // maior), lendo como landmark do cânion à distância.
+  const nFormacoes = 1 + Math.floor(Math.random()*3);
+  for(let i=0;i<nFormacoes;i++){
+    const xLocal = (Math.random()-0.5) * TAMANHO_CHUNK;
+    const zLocal = (Math.random()-0.5) * TAMANHO_CHUNK;
+    const xMundo = centroX + xLocal, zMundo = centroZ + zLocal;
+    const y = alturaTerrenoChunk(xMundo, zMundo);
+    if(y < NIVEL_OCEANO) continue;
+    const grande = Math.random() < 0.2;
+    const { grupo: formacao, raioColisao } = criarFormacaoRochosaDeserto(grande);
+    formacao.position.set(xLocal, y, zLocal);
+    formacao.rotation.y = Math.random()*Math.PI*2;
+    grupo.add(formacao);
+    obstaculos.push({ x: xMundo, z: zMundo, raio: raioColisao });
+  }
+
+  // Pedras soltas espalhadas — pequenas, sem colisão (mesmo critério das
+  // flores no resto do mundo).
+  const numPedras = 4 + Math.floor(Math.random()*5);
+  for(let i=0;i<numPedras;i++){
+    const xLocal = (Math.random()-0.5) * TAMANHO_CHUNK;
+    const zLocal = (Math.random()-0.5) * TAMANHO_CHUNK;
+    const xMundo = centroX + xLocal, zMundo = centroZ + zLocal;
+    const y = alturaTerrenoChunk(xMundo, zMundo);
+    if(y < NIVEL_OCEANO) continue;
+    const pedra = new THREE.Mesh(geoPedraSoltaDeserto, matPedraSoltaDeserto);
+    pedra.position.set(xLocal, y + 0.1, zLocal);
+    pedra.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+    const escalaP = 0.6 + Math.random()*1.1;
+    pedra.scale.setScalar(escalaP);
+    pedra.castShadow = true;
+    grupo.add(pedra);
+  }
+
+  // Fósseis parcialmente enterrados — raros (1 em cada ~3 chunks), só um
+  // arco de "osso" saindo da areia, sem colisão (puramente decorativo,
+  // curiosidade visual).
+  if(Math.random() < 0.35){
+    const xLocal = (Math.random()-0.5) * TAMANHO_CHUNK;
+    const zLocal = (Math.random()-0.5) * TAMANHO_CHUNK;
+    const xMundo = centroX + xLocal, zMundo = centroZ + zLocal;
+    const y = alturaTerrenoChunk(xMundo, zMundo);
+    if(y >= NIVEL_OCEANO){
+      const fossil = new THREE.Mesh(geoFossil, matFossil);
+      fossil.position.set(xLocal, y + 0.05, zLocal);
+      fossil.rotation.x = Math.PI/2 + (Math.random()-0.5)*0.3;
+      fossil.rotation.z = Math.random()*Math.PI*2;
+      const escalaF = 0.8 + Math.random()*0.9;
+      fossil.scale.setScalar(escalaF);
+      grupo.add(fossil);
+    }
+  }
+
+  // Cactos e arbustos secos — "pouca vegetação", por isso continuam
+  // escalados pela mesma densidade baixa do bioma (0.05), só que a
+  // espécie agora é desértica em vez das árvores/flores genéricas.
+  const numCactos = Math.round(densidade * 10 * (0.6 + Math.random()*0.8));
+  for(let i=0;i<numCactos;i++){
+    const xLocal = (Math.random()-0.5) * TAMANHO_CHUNK;
+    const zLocal = (Math.random()-0.5) * TAMANHO_CHUNK;
+    const xMundo = centroX + xLocal, zMundo = centroZ + zLocal;
+    const y = alturaTerrenoChunk(xMundo, zMundo);
+    if(y < NIVEL_OCEANO) continue;
+    const cacto = criarCactoDeserto();
+    cacto.position.set(xLocal, y, zLocal);
+    cacto.rotation.y = Math.random()*Math.PI*2;
+    const escalaC = (0.7 + Math.random()*0.6) * FATOR_ESCALA_MUNDO;
+    cacto.scale.setScalar(escalaC);
+    grupo.add(cacto);
+    obstaculos.push({ x: xMundo, z: zMundo, raio: 0.18*escalaC });
+  }
+  const numArbustos = Math.round(densidade * 8 * (0.6 + Math.random()*0.8));
+  for(let i=0;i<numArbustos;i++){
+    const xLocal = (Math.random()-0.5) * TAMANHO_CHUNK;
+    const zLocal = (Math.random()-0.5) * TAMANHO_CHUNK;
+    const xMundo = centroX + xLocal, zMundo = centroZ + zLocal;
+    const y = alturaTerrenoChunk(xMundo, zMundo);
+    if(y < NIVEL_OCEANO) continue;
+    const arbusto = new THREE.Mesh(geoArbustoSeco, matArbustoSeco);
+    arbusto.position.set(xLocal, y + 0.15, zLocal);
+    arbusto.rotation.y = Math.random()*Math.PI*2;
+    const escalaA = (0.5 + Math.random()*0.5) * FATOR_ESCALA_MUNDO;
+    arbusto.scale.set(escalaA, escalaA*0.7, escalaA);
+    grupo.add(arbusto);
+  }
+
+  grupo.position.set(centroX, 0, centroZ);
+  return { grupo, obstaculos };
+}
+
 // Cria a vegetação (árvores + flores) de um chunk fora do mapa fixo. Usa o
 // bioma amostrado no centro do chunk para decidir a densidade (mesmo
 // critério simples já usado para o metadado `bioma` de cada chunk).
@@ -3834,6 +4237,11 @@ function criarVegetacaoChunk(cx, cz){
   const centroZ = cz*TAMANHO_CHUNK + TAMANHO_CHUNK/2;
   const bioma = obterBioma(centroX, centroZ);
   const densidade = bioma.tipo.densidadeVegetacao;
+  // [NOVO v156 — Etapa 1/9 "Vermes da Areia"] desvia pra decoração
+  // temática de deserto em vez da vegetação genérica — ver função acima.
+  if(bioma.tipo.id === 'deserto'){
+    return criarDecoracaoDesertoChunk(cx, cz, centroX, centroZ, densidade);
+  }
   const grupo = new THREE.Group();
   const obstaculos = [];
   if(densidade <= 0) return { grupo, obstaculos };
@@ -6188,7 +6596,17 @@ function atualizarAnimacaoArvoresPomar(delta){
 // distribuição, não só o espaçamento entre árvores (que a v135 já tinha
 // tratado). Ambas mudanças juntas produzem um mundo com menos árvores,
 // mas cobrindo mais território.
-const NUM_ARVORES_MUNDO = 140;
+// [v150] ALTERADO — pedido do usuário: "remova pela metade as árvores
+// que estão próximas à vila principal". Como TODAS as árvores do mundo já
+// nascem dentro de RAIO_ARVORES_CORTAVEIS_VILA (raio 90 a partir do centro
+// do mapa, onde fica a vila principal — ver comentário logo acima e o
+// filtro `if(dist > RAIO_ARVORES_CORTAVEIS_VILA) continue` no laço de
+// geração abaixo), "árvores próximas à vila" e "árvores do mundo" são hoje
+// o mesmo conjunto — não sobrou nenhuma árvore fora desse raio para
+// diferenciar. Por isso a redução pela metade foi aplicada diretamente
+// aqui: 140 / 2 = 70. RAIO_ARVORES_CORTAVEIS_VILA (área de distribuição)
+// NÃO foi alterado — só a quantidade de árvores dentro dela.
+const NUM_ARVORES_MUNDO = 70;
 const arvoresMundoObjetos = [];
 const arvoresMundoEstados = [];
 // NOVO (pedido do usuário: "diminuir o processamento" — reverte a decisão
@@ -8145,6 +8563,21 @@ function criarAnimalSelvagem(){
 for(let i=0;i<NUM_ANIMAIS_SELVAGENS;i++) animaisSelvagens.push(criarAnimalSelvagem());
 
 function atualizarFaunaSelvagem(delta){
+  // NOVO (Etapa 3 — Locomoção, v164): reaproveita este mesmo loop (já
+  // percorre todo animaisSelvagens a cada frame) para achar o cavalo
+  // selvagem mais próximo dentro do raio de domesticação, em vez de criar
+  // um segundo loop por cima do mesmo array. Só recalculado se o jogador
+  // ainda não tem montaria (depois de domesticar, nunca mais precisa
+  // procurar — RAIO_DOMESTICAR_CAVALO está definido na seção ETAPA 3).
+  cavaloSelvagemProximo = null;
+  if(!estadoJogador.temMontaria){
+    let menorDist = RAIO_DOMESTICAR_CAVALO;
+    animaisSelvagens.forEach((a, i)=>{
+      if(a.especie.subtipo !== 'cavalo') return;
+      const d = grupoAvatar.position.distanceTo(a.obj.position);
+      if(d <= menorDist){ menorDist = d; cavaloSelvagemProximo = i; }
+    });
+  }
   animaisSelvagens.forEach(animal=>{
     const p = animal.obj.position;
     const distAvatar = grupoAvatar.position.distanceTo(p);
@@ -10757,6 +11190,355 @@ function atualizarVoo(delta){
   botaoPularToque?.classList.toggle('no-ar', alturaExtraPulo > 0.05);
 }
 
+// =====================================================================
+// FLORES COLETÁVEIS — FLOR DE FOGO E FLOR DE GELO (ETAPA 1/4)
+// Pedido do usuário: espalhar pelo terreno flores coletáveis, com o
+// design inspirado no HTML/CSS que ele colou na conversa (pétalas
+// radiais ao redor de um caule, com brilho e partículas de luz — aqui
+// recriado em geometria 3D real, já que o jogo é Three.js, não
+// HTML/CSS), em duas variantes: Flor de Fogo (efeito: aura + velocidade
+// alta ao consumir) e Flor de Gelo (efeito: habilidade de arremessar
+// bolas de neve que deixam o alvo lento), ~100 flores no total, com
+// respawn ligado às ESTAÇÕES DO PRÓPRIO JOGO (ver ESTACOES_DO_ANO/
+// diaAtualJogo mais acima — NUNCA a data real do sistema): fogo volta na
+// Primavera do jogo, gelo no Outono do jogo.
+// Pedido explícito do usuário: separar em etapas, cada etapa concluída
+// ganha seu próprio checkpoint + hub versionado, pra dar pra continuar
+// em outro chat/IA a qualquer momento. Plano de 4 etapas (detalhes de
+// cada uma no CHECKPOINT-v151.md):
+//   Etapa 1 (ESTA VERSÃO): geometria 3D das duas variantes, ~100 flores
+//     espalhadas pelo terreno (50 fogo + 50 gelo), coleta por
+//     proximidade (some da cena + partícula + toast), estado por flor
+//     guardado em floresMundoEstados (tipo/coletada/posição) para as
+//     próximas etapas reagirem. NENHUM efeito de jogo ainda — consumir a
+//     flor por enquanto só mostra o toast, sem aura/velocidade/bola de
+//     neve/lentidão.
+//   Etapa 2 (PENDENTE): efeito da Flor de Fogo — aura visível ao redor
+//     do avatar + velocidade de movimento aumentada por alguns segundos.
+//   Etapa 3 (PENDENTE): efeito da Flor de Gelo — habilidade de arremessar
+//     bolas de neve em qualquer ser (NPC/fauna/maligno/soldado), com
+//     lentidão temporária no alvo atingido.
+//   Etapa 4 (PENDENTE): respawn sazonal — hook em verificarMudancaEstacao()
+//     (já existe, ver bloco "ESTAÇÕES DO ANO" acima) para religar as
+//     flores de fogo coletadas quando a estação virar 'primavera' e as
+//     de gelo quando virar 'outono'.
+// =====================================================================
+const NUM_FLORES_COLETAVEIS = 100;
+// [NOVO — pedido do usuário: "deixa as flores de fogo e gelo maiores"]
+// Fator aplicado por CIMA de FATOR_ESCALA_MUNDO (que já escala o mundo
+// todo em +5%) só para estas flores — deixa a silhueta (pétalas + caule
+// + centro + brilho + partículas) ~75% maior, sem tocar nas geometrias
+// compartilhadas (geoPetalaFlorColetavel etc.) nem nos valores internos
+// de escala de cada pétala/caule dentro de criarFlorColetavel(): só a
+// escala do GRUPO inteiro de cada flor plantada é multiplicada por este
+// fator (ver uso em flor.grupo.scale.setScalar(...) no laço de plantio).
+const ESCALA_VISUAL_FLOR_COLETAVEL = 1.75;
+// Raio de coleta reavaliado na mesma proporção do aumento visual, pra não
+// dar a impressão de que o avatar "atravessa" a flor (agora bem maior)
+// sem coletar.
+const RAIO_COLETA_FLOR = 1.5 * FATOR_ESCALA_MUNDO * ESCALA_VISUAL_FLOR_COLETAVEL;
+
+// Geometrias compartilhadas por TODAS as flores (pétala, caule, centro) —
+// só o material (cor/emissivo) muda por tipo, evitando recriar geometria
+// 600+ vezes (100 flores × 6 pétalas cada).
+const geoPetalaFlorColetavel = new THREE.SphereGeometry(0.5, 6, 5, 0, Math.PI*2, 0, Math.PI*0.55);
+const geoCauleFlorColetavel = new THREE.CylinderGeometry(0.025, 0.035, 1, 5);
+const geoCentroFlorColetavel = new THREE.SphereGeometry(0.14, 8, 6);
+const matCauleFlorColetavel = new THREE.MeshStandardMaterial({ color:0x2f6b2a, roughness:0.85 });
+
+const MATERIAIS_FLOR_COLETAVEL = {
+  fogo: {
+    petala: new THREE.MeshStandardMaterial({ color:0xff5a2e, emissive:0xaa2200, emissiveIntensity:0.35, roughness:0.5, side:THREE.DoubleSide }),
+    centro: new THREE.MeshStandardMaterial({ color:0xfff2b0, emissive:0xffb020, emissiveIntensity:0.9, roughness:0.3 }),
+    brilho: 0xff7a3d,
+  },
+  gelo: {
+    petala: new THREE.MeshStandardMaterial({ color:0x7fd4ff, emissive:0x2277aa, emissiveIntensity:0.3, roughness:0.35, side:THREE.DoubleSide }),
+    centro: new THREE.MeshStandardMaterial({ color:0xffffff, emissive:0x9fe8ff, emissiveIntensity:0.8, roughness:0.2 }),
+    brilho: 0x8fe1ff,
+  }
+};
+
+// Monta UMA flor (grupo Three.js) do tipo pedido. `tipo` é 'fogo' ou
+// 'gelo' — controla só as cores/emissivo (ver MATERIAIS_FLOR_COLETAVEL),
+// a forma é idêntica pros dois tipos (mesma silhueta, pétalas + centro +
+// brilho + partículas), reaproveitando texturaAura (mesma textura da
+// aura do avatar/Asinhas Mágicas) e obterTexturaEstrela (mesma textura
+// da explosão de coleta dos cristais) em vez de criar texturas novas.
+function criarFlorColetavel(tipo, x, z){
+  const mats = MATERIAIS_FLOR_COLETAVEL[tipo];
+  const grupo = new THREE.Group();
+
+  const caule = new THREE.Mesh(geoCauleFlorColetavel, matCauleFlorColetavel);
+  caule.scale.y = 0.4 + Math.random()*0.12;
+  caule.position.y = caule.scale.y * 0.5;
+  caule.rotation.z = (Math.random()-0.5)*0.15;
+  caule.castShadow = true;
+  grupo.add(caule);
+
+  const alturaCabeca = caule.scale.y;
+  const nPetalas = 6;
+  for(let i=0;i<nPetalas;i++){
+    const petala = new THREE.Mesh(geoPetalaFlorColetavel, mats.petala);
+    petala.scale.set(0.3, 0.7, 0.14);
+    const ang = (i/nPetalas) * Math.PI*2;
+    petala.position.set(Math.cos(ang)*0.02, alturaCabeca, Math.sin(ang)*0.02);
+    petala.rotation.y = ang;
+    petala.rotation.x = Math.PI*0.42; // inclina a pétala pra fora, "desabrochada"
+    grupo.add(petala);
+  }
+
+  const centro = new THREE.Mesh(geoCentroFlorColetavel, mats.centro);
+  centro.position.y = alturaCabeca + 0.03;
+  grupo.add(centro);
+
+  // Brilho aditivo (mesma texturaAura da aura do avatar/Asinhas Mágicas).
+  const brilho = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: texturaAura, color: mats.brilho, transparent:true, depthWrite:false,
+    blending:THREE.AdditiveBlending, opacity:0.55
+  }));
+  brilho.scale.set(0.9,0.9,1);
+  brilho.position.y = alturaCabeca;
+  grupo.add(brilho);
+
+  // Partículas de luz flutuantes ao redor da flor — equivalente ao
+  // ".flower__light" do design colado, aqui como sprites orbitando.
+  const motas = [];
+  const nMotas = 2 + Math.floor(Math.random()*2);
+  for(let i=0;i<nMotas;i++){
+    const mota = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: obterTexturaEstrela(), color: mats.brilho, transparent:true, depthWrite:false,
+      blending:THREE.AdditiveBlending, opacity:0.7
+    }));
+    mota.scale.setScalar(0.12 + Math.random()*0.08);
+    grupo.add(mota);
+    motas.push({ sprite: mota, fase: Math.random()*Math.PI*2, raio: 0.25+Math.random()*0.15, velFase: 0.6+Math.random()*0.6 });
+  }
+
+  grupo.position.set(x, 0, z);
+  return { grupo, brilho, motas, alturaCabeca, fase: Math.random()*Math.PI*2 };
+}
+
+// Estado de cada flor plantada — array PARALELO a floresMundoObjetos
+// (mesmo índice), guardando só dados simples (serializáveis), no mesmo
+// espírito de arvoresMundoEstados. `coletada` é o que a Etapa 4 (respawn
+// sazonal) vai precisar ler/escrever para religar a flor certa na
+// estação certa.
+const floresMundoObjetos = [];
+const floresMundoEstados = [];
+{
+  let plantadas = 0, tentativas = 0;
+  const alvoFogo = Math.round(NUM_FLORES_COLETAVEIS/2); // 50 fogo + 50 gelo
+  while(plantadas < NUM_FLORES_COLETAVEIS && tentativas < NUM_FLORES_COLETAVEIS*10){
+    tentativas++;
+    const ang = Math.random()*Math.PI*2;
+    const dist = 12 + Math.random()*155;
+    const x = Math.cos(ang)*dist, z = Math.sin(ang)*dist;
+    if(pertoDeAreaLivre(x,z)) continue;
+    const y = alturaTerreno(x,z);
+    if(y < NIVEL_OCEANO) continue; // não nasce dentro d'água
+    const tipo = plantadas < alvoFogo ? 'fogo' : 'gelo';
+    const flor = criarFlorColetavel(tipo, x, z);
+    flor.grupo.position.y = y;
+    // [NOVO — flores maiores] Antes: FATOR_ESCALA_MUNDO sozinho (mesma
+    // escala de qualquer outro objeto do mundo). Agora multiplica também
+    // por ESCALA_VISUAL_FLOR_COLETAVEL, deixando só estas flores maiores
+    // que os demais elementos do cenário, como pedido.
+    flor.grupo.scale.setScalar(FATOR_ESCALA_MUNDO * ESCALA_VISUAL_FLOR_COLETAVEL);
+    cena.add(flor.grupo);
+    floresMundoObjetos.push(flor);
+    floresMundoEstados.push({ tipo, coletada:false, x, z, y });
+    plantadas++;
+  }
+}
+
+// Chamada todo frame (ver animarInterno) enquanto o jogador está fora de
+// casa. Anima o brilho/partículas de cada flor NÃO coletada e detecta
+// coleta por proximidade. ETAPA 1: coleta só remove a flor da cena,
+// mostra partícula + toast — nenhum efeito de jogo ainda (ver Etapas
+// 2/3 pendentes no comentário do topo deste bloco).
+function atualizarFloresColetaveis(delta, tempoTotal){
+  const pontoAvatar = grupoAvatar.position.clone();
+  pontoAvatar.y += 0.6;
+  for(let i=0;i<floresMundoObjetos.length;i++){
+    const estado = floresMundoEstados[i];
+    if(estado.coletada) continue;
+    const flor = floresMundoObjetos[i];
+    flor.grupo.rotation.y += delta*0.15;
+    flor.brilho.material.opacity = 0.4 + Math.sin(tempoTotal*2 + flor.fase)*0.2;
+    for(const m of flor.motas){
+      m.fase += delta*m.velFase;
+      m.sprite.position.set(Math.cos(m.fase)*m.raio, flor.alturaCabeca + Math.sin(m.fase*1.7)*0.12, Math.sin(m.fase)*m.raio);
+      m.sprite.material.opacity = 0.4 + Math.sin(m.fase*2)*0.3;
+    }
+    if(pontoAvatar.distanceTo(flor.grupo.position) < RAIO_COLETA_FLOR){
+      coletarFlor(i);
+    }
+  }
+}
+
+function coletarFlor(indice){
+  const flor = floresMundoObjetos[indice];
+  const estado = floresMundoEstados[indice];
+  estado.coletada = true;
+  flor.grupo.visible = false;
+  const corParticula = estado.tipo === 'fogo' ? 0xff7a3d : 0x8fe1ff;
+  explodirEstrelas(flor.grupo.position.clone().add(new THREE.Vector3(0, flor.alturaCabeca, 0)), corParticula);
+  // [NOVO — pedido do usuário: "quando o avatar consumir uma das flores
+  // ele fica com uma auréola de fogo ou de gelo cobrindo o corpo, por 60
+  // segundos"] Ativa a auréola elemental de verdade (ver bloco "AURÉOLA
+  // ELEMENTAR" logo abaixo) — este pedido é uma versão SIMPLIFICADA das
+  // antigas Etapas 2/3 do plano de 4 etapas (CHECKPOINT-v151.md), que
+  // também incluíam velocidade aumentada e bola de neve com mira; por
+  // enquanto só o efeito visual da auréola foi implementado.
+  ativarAuraElementalFlor(estado.tipo);
+  if(estado.tipo === 'fogo'){
+    mostrarToast('🔥 Flor de Fogo coletada! Auréola de fogo ativa por ' + DURACAO_AURA_FLOR + 's.');
+  } else {
+    mostrarToast('❄️ Flor de Gelo coletada! Auréola de gelo ativa por ' + DURACAO_AURA_FLOR + 's.');
+  }
+}
+
+// =====================================================================
+// AURÉOLA ELEMENTAR TEMPORÁRIA (fogo/gelo) — ativada ao coletar uma Flor
+// de Fogo ou Flor de Gelo (ver coletarFlor() acima). Pedido do usuário:
+// o avatar fica coberto por uma auréola visual (fogo ou neve/gelo) por
+// 60 segundos, desligando sozinha ao fim desse tempo. Sistema PRÓPRIO e
+// independente da `auraAvatar` dourada permanente/decorativa já
+// existente (nunca a substitui nem interfere nela — as duas convivem
+// quando o buff estiver ativo). Reaproveita texturaAura/obterTexturaEstrela
+// já existentes (mesmo espírito da aura dourada e das partículas de
+// coleta) e as MESMAS cores já definidas em MATERIAIS_FLOR_COLETAVEL
+// (única fonte de verdade de cor fogo/gelo — não duplicar valores aqui).
+// IMPORTANTE (ver CHECKPOINT-v153.md seção 8): este é o efeito VISUAL
+// apenas — SEM aumento de velocidade e SEM habilidade de bola de neve/
+// mira, que seriam as antigas Etapas 2/3 do plano de 4 etapas mais amplo
+// (CHECKPOINT-v151.md), não pedidas nesta sessão.
+const DURACAO_AURA_FLOR = 60; // segundos que a auréola dura
+let auraFlorTipoAtivo = null;  // 'fogo' | 'gelo' | null (nenhuma auréola ativa)
+let auraFlorRestante = 0;
+
+// Monta a auréola de UM tipo (fogo ou gelo): um "tubo" translúcido
+// aditivo envolvendo o avatar dos pés até acima da cabeça (pra cobrir o
+// corpo de verdade, diferente de um sprite plano único), mais 3 brilhos
+// aditivos empilhados em alturas diferentes e partículas subindo
+// (brasas pro fogo, flocos pro gelo). Começa sempre invisível — só liga
+// durante o buff (ver ativarAuraElementalFlor).
+function criarAuraElementalCorpo(corPrincipal, corClara){
+  const grupo = new THREE.Group();
+
+  const geoTubo = new THREE.CylinderGeometry(0.42, 0.34, 1.85, 14, 1, true);
+  const matTubo = new THREE.MeshBasicMaterial({
+    color: corPrincipal, transparent:true, opacity:0.24, side:THREE.DoubleSide,
+    blending:THREE.AdditiveBlending, depthWrite:false,
+  });
+  const tubo = new THREE.Mesh(geoTubo, matTubo);
+  tubo.position.y = 0.95;
+  grupo.add(tubo);
+
+  const alturasBrilho = [0.15, 0.95, 1.6]; // pés, tronco, cabeça
+  const sprites = [];
+  for(const h of alturasBrilho){
+    const spr = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: texturaAura, color: corClara, transparent:true, depthWrite:false,
+      blending:THREE.AdditiveBlending, opacity:0.5
+    }));
+    spr.scale.set(1.3, 1.3, 1);
+    spr.position.y = h;
+    grupo.add(spr);
+    sprites.push(spr);
+  }
+
+  const nParticulas = 8;
+  const particulas = [];
+  for(let i=0;i<nParticulas;i++){
+    const p = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: obterTexturaEstrela(), color: corClara, transparent:true, depthWrite:false,
+      blending:THREE.AdditiveBlending, opacity:0.8
+    }));
+    p.scale.setScalar(0.09 + Math.random()*0.06);
+    grupo.add(p);
+    particulas.push({
+      sprite: p, fase: Math.random()*Math.PI*2, raio: 0.3 + Math.random()*0.15,
+      velSubida: 0.35 + Math.random()*0.35, alturaBase: Math.random()*1.85
+    });
+  }
+
+  // [OTIMIZAÇÃO v155 — "deixar o jogo leve"] Removida a THREE.PointLight
+  // real que existia aqui (mesmo padrão de luzAuraAvatar) — o projeto já
+  // tem uma regra estabelecida numa sessão de performance anterior ("sem
+  // PointLight nova por objeto decorativo", ver comentários em
+  // criarCristalFlutuante/criarTocha/etc.) e esta auréola tinha ficado de
+  // fora dela por descuido. O brilho "cobrindo o corpo" continua vindo só
+  // do material aditivo do cilindro + sprites (nenhuma luz de verdade é
+  // necessária pra isso, já é como o resto do projeto faz há várias
+  // sessões). Efeito colateral: se em algum teste real a auréola parecer
+  // "escura demais" sem o reflexo extra no chão, a correção é subir
+  // `opacity` do `matTubo`/sprites acima, nunca reintroduzir PointLight.
+  grupo.visible = false;
+  return { grupo, tubo, sprites, particulas };
+}
+
+// Cores reaproveitadas de MATERIAIS_FLOR_COLETAVEL (.brilho) — mesma
+// fonte de verdade já usada pelas próprias flores, para consistência
+// visual entre a flor no chão e a auréola no corpo do avatar.
+const auraElementalFogo = criarAuraElementalCorpo(0xff5a2e, MATERIAIS_FLOR_COLETAVEL.fogo.brilho);
+const auraElementalGelo = criarAuraElementalCorpo(0x7fd4ff, MATERIAIS_FLOR_COLETAVEL.gelo.brilho);
+grupoModeloAvatar.add(auraElementalFogo.grupo, auraElementalGelo.grupo);
+
+// Ativa a auréola do tipo pedido por DURACAO_AURA_FLOR segundos. Se já
+// houver uma auréola ativa (do mesmo tipo ou do tipo oposto), esta
+// chamada substitui a anterior e reinicia o cronômetro para 60s — nunca
+// empilha duração nem deixa fogo e gelo ativos ao mesmo tempo.
+function ativarAuraElementalFlor(tipo){
+  auraFlorTipoAtivo = tipo;
+  auraFlorRestante = DURACAO_AURA_FLOR;
+  auraElementalFogo.grupo.visible = (tipo === 'fogo');
+  auraElementalGelo.grupo.visible = (tipo === 'gelo');
+}
+
+// Chamada todo frame no loop principal (ver animarInterno, perto de
+// atualizarVoo) — anima a auréola ativa (se houver), atualiza o
+// indicador de HUD (#indicador-aura-flor, mesmo padrão de
+// #indicador-voo) e desliga tudo sozinha ao fim dos 60s.
+function atualizarAuraElementalFlor(delta, tempoTotalAtual){
+  const indicador = document.getElementById('indicador-aura-flor');
+  if(!auraFlorTipoAtivo){
+    if(indicador) indicador.style.display = 'none';
+    return;
+  }
+  auraFlorRestante -= delta;
+  const aura = auraFlorTipoAtivo === 'fogo' ? auraElementalFogo : auraElementalGelo;
+  const pulso = 0.85 + Math.sin(tempoTotalAtual*3)*0.15;
+  aura.tubo.material.opacity = 0.2 + Math.sin(tempoTotalAtual*2.4)*0.08;
+  aura.tubo.rotation.y += delta*0.5;
+  for(const s of aura.sprites){
+    s.material.opacity = 0.4 + Math.sin(tempoTotalAtual*3 + s.position.y)*0.2;
+    s.scale.setScalar(1.3 * pulso);
+  }
+  for(const p of aura.particulas){
+    p.fase += delta*1.4;
+    const altura = (p.alturaBase + tempoTotalAtual*p.velSubida) % 1.85;
+    p.sprite.position.set(Math.cos(p.fase)*p.raio, altura, Math.sin(p.fase)*p.raio);
+    p.sprite.material.opacity = 0.85 * (1 - altura/1.85);
+  }
+
+  if(indicador){
+    indicador.style.display = 'flex';
+    indicador.style.borderColor = (auraFlorTipoAtivo === 'fogo') ? '#ff7a3d' : '#8fe1ff';
+    indicador.textContent = (auraFlorTipoAtivo === 'fogo' ? '🔥 Auréola de Fogo (' : '❄️ Auréola de Gelo (')
+      + Math.max(0, Math.ceil(auraFlorRestante)) + 's)';
+  }
+
+  if(auraFlorRestante <= 0){
+    aura.grupo.visible = false;
+    mostrarToast(auraFlorTipoAtivo === 'fogo' ? '🔥 A auréola de fogo se apagou...' : '❄️ A auréola de gelo derreteu...');
+    auraFlorTipoAtivo = null;
+    auraFlorRestante = 0;
+    if(indicador) indicador.style.display = 'none';
+  }
+}
+
 let faseCaminhada = 0;
 let faseNado = 0;
 let faseVoo = 0; // NOVO (sessão #19): fase contínua para dar "vida" à pose de voo
@@ -10838,10 +11620,35 @@ function animarMembrosAvatar(delta, andando, magnitude, correndo=false, noAr=fal
       alvoPernaEsq = -0.1 + oscPerna * 0.08; alvoPernaDir = -0.1 + oscPerna * 0.08;
     }
   } else if(noAr){
-    // Pose de impulso no ar: joelhos recolhem, braços sobem — fixa (sem
-    // ciclo), só relaxa suavemente de volta à pose neutra ao pousar.
-    alvoBracoEsq = -0.55; alvoBracoDir = -0.55;
-    alvoPernaEsq = -0.45; alvoPernaDir = -0.45;
+    // [ALTERADO v155] Pose do MORTAL (giroAcrobaticoTempoRestante>0) agora
+    // segue a referência pedida pelo usuário (salto ornamental tipo
+    // wikiHow): braços abrem/sobem no instante do giro e o corpo fecha
+    // numa "bolinha" (tuck) — joelhos junto ao peito, braços dobrados por
+    // cima das pernas — enquanto gira, abrindo de novo perto do fim pra
+    // aterrissar esticado. Sem giro ativo, mantém a pose simples de sempre
+    // (impulso comum, sem mortal).
+    if(giroAcrobaticoTempoRestante > 0){
+      const progressoGiro = 1 - (giroAcrobaticoTempoRestante / DURACAO_GIRO_ACROBATICO);
+      if(progressoGiro < 0.15){
+        // abertura inicial: braços jogados pra cima, como o impulso antes de fechar
+        alvoBracoEsq = -2.6; alvoBracoDir = -2.6;
+        alvoPernaEsq = -0.3; alvoPernaDir = -0.3;
+      } else if(progressoGiro < 0.85){
+        // bolinha (tuck): silhueta compacta durante a maior parte do giro
+        alvoBracoEsq = -2.25; alvoBracoDir = -2.25;
+        alvoPernaEsq = -2.15; alvoPernaDir = -2.15;
+      } else {
+        // abre de novo pra terminar esticado, pronto pra aterrissar
+        alvoBracoEsq = -0.4; alvoBracoDir = -0.4;
+        alvoPernaEsq = -0.2; alvoPernaDir = -0.2;
+      }
+    } else {
+      // Pose de impulso no ar (pulo comum, sem mortal): joelhos recolhem,
+      // braços sobem — fixa (sem ciclo), só relaxa suavemente de volta à
+      // pose neutra ao pousar.
+      alvoBracoEsq = -0.55; alvoBracoDir = -0.55;
+      alvoPernaEsq = -0.45; alvoPernaDir = -0.45;
+    }
   } else if(conversando){
     // NOVO (sessão #32): gesto de conversa — braços gesticulando fora de
     // fase um do outro (mesmos coeficientes de _updateTalk() da
@@ -10917,6 +11724,25 @@ window.addEventListener('keydown', e=>{
     e.preventDefault(); // evita rolar a página com as setas
   }
   if(tecla === 'g') acionarMultitool();
+  // NOVO (Etapa 1 — Revolução do Combate): X = esquiva/rolamento (dash +
+  // invulnerabilidade curta). Z = segurar para bloquear (ver keyup abaixo
+  // e atualizarSistemaCombateJogador/podeAgirEmCombate).
+  if(tecla === 'x' && !e.repeat) tentarEsquivar();
+  // NOVO (Etapa 2 — Progressão, v162): T abre/fecha o painel de Nível/
+  // Atributos/Talentos (tecla livre, confirmada no checkpoint v161).
+  if(tecla === 't' && !e.repeat) alternarPainelProgressao();
+  // NOVO (Etapa 3 — Locomoção, v164): B monta/desmonta a montaria
+  // domesticada; R abre/fecha o painel de Viagem Rápida entre marcos já
+  // descobertos (teclas livres, confirmadas nos checkpoints v161/v162).
+  if(tecla === 'b' && !e.repeat) alternarMontaria();
+  if(tecla === 'r' && !e.repeat) alternarPainelViagemRapida();
+  // NOVO (Etapa 4 — Retenção Diária, v165): H abre/fecha o painel de
+  // Missões Diárias (tecla livre, confirmada no CHECKPOINT-v164.md).
+  if(tecla === 'h' && !e.repeat) alternarPainelMissoesDiarias();
+  if(tecla === 'z' && podeAgirEmCombate()){
+    const itemAtual = itemEquipadoAtualHotbar();
+    bloqueandoAtivo = !!(itemAtual && (itemAtual.tipo === 'arma' || itemAtual.tipo === 'ferramenta'));
+  }
   // NOVO (correção pós-teste v14): tecla dedicada pra ligar/desligar a
   // câmera livre por movimento do mouse, sem precisar clicar de novo na
   // tela toda vez. Usuário relatou que o controle por mouse "atrapalha"
@@ -10955,6 +11781,8 @@ window.addEventListener('keyup', e=>{
   teclas[tecla] = false;
   const equivalente = MAPA_SETAS_PARA_WASD[tecla];
   if(equivalente) teclas[equivalente] = false;
+  // NOVO (Etapa 1): soltar Z para de bloquear.
+  if(tecla === 'z') bloqueandoAtivo = false;
 });
 
 // NOVO (v51): controles de toque dedicados à Batalha 2D — mapeiam
@@ -11312,6 +12140,21 @@ let pontosIntro = [];     // preenchido em iniciarIntroCinematica()
 const posIntroAtual = new THREE.Vector3();
 const alvoIntroAtual = new THREE.Vector3();
 const segmentoLegendaAnterior = { indice: -1 };
+// [NOVO — pedido do usuário: "deixa a introdução mais lisa, com passagem
+// suave"] ANTES, a câmera interpolava (lerp) trecho por trecho entre os 4
+// waypoints de pontosIntro, aplicando smoothstep (suavizar()) DENTRO de
+// cada trecho — isso faz a câmera desacelerar até quase parar ao chegar
+// em cada waypoint e acelerar de novo do zero no próximo trecho, criando
+// uma sensação de "solavanco"/pausa a cada troca de legenda. A correção
+// substitui isso por UMA curva Catmull-Rom contínua ligando todos os
+// waypoints (posição da câmera e do alvo/lookAt), percorrida com um único
+// easing global (suavizar(progressoIntro) aplicado UMA vez, não por
+// trecho) e amostrada por comprimento de arco (getPointAt) para
+// velocidade uniforme ao longo de toda a curva — dando um voo cinemático
+// contínuo, sem paradas entre as legendas. `pontosIntro`/`fracao` são
+// mantidos só para decidir QUAL legenda mostrar (ver atualizarIntroCinematica).
+let curvaPosicaoIntro = null;
+let curvaAlvoIntro = null;
 
 // [NOVO v56 — pedido do usuário: personagem surge no céu após a abertura
 // de um portal e cai enquanto a câmera faz o sobrevoo já existente]
@@ -11371,6 +12214,11 @@ function construirPontosIntro(){
 
 function iniciarIntroCinematica(){
   pontosIntro = construirPontosIntro();
+  // [NOVO — intro mais lisa] Monta as duas curvas contínuas (posição da
+  // câmera e alvo/lookAt) a partir dos mesmos 4 waypoints de sempre — ver
+  // comentário completo na declaração de curvaPosicaoIntro acima.
+  curvaPosicaoIntro = new THREE.CatmullRomCurve3(pontosIntro.map(p => p.pos), false, 'catmullrom', 0.5);
+  curvaAlvoIntro = new THREE.CatmullRomCurve3(pontosIntro.map(p => p.alvo), false, 'catmullrom', 0.5);
   progressoIntro = 0;
   introCinematicaAtiva = true;
   segmentoLegendaAnterior.indice = -1;
@@ -11421,13 +12269,16 @@ function atualizarIntroCinematica(delta){
     finalizarIntroCinematica();
     return;
   }
+  // [NOVO — intro mais lisa] `i` agora só serve pra saber qual legenda
+  // mostrar (a legenda continua trocando nos mesmos 4 momentos de sempre);
+  // a câmera em si não usa mais lerp por trecho — ver curvaPosicaoIntro/
+  // curvaAlvoIntro, amostradas com UM único easing global logo abaixo.
   let i = 0;
   while(i < pontosIntro.length - 2 && progressoIntro > pontosIntro[i+1].fracao) i++;
-  const a = pontosIntro[i], b = pontosIntro[i+1];
-  const span = Math.max(0.0001, b.fracao - a.fracao);
-  const tLocal = suavizar(THREE.MathUtils.clamp((progressoIntro - a.fracao) / span, 0, 1));
-  posIntroAtual.lerpVectors(a.pos, b.pos, tLocal);
-  alvoIntroAtual.lerpVectors(a.alvo, b.alvo, tLocal);
+  const a = pontosIntro[i];
+  const tSuaveGlobal = THREE.MathUtils.clamp(suavizar(progressoIntro), 0, 1);
+  posIntroAtual.copy(curvaPosicaoIntro.getPointAt(tSuaveGlobal));
+  alvoIntroAtual.copy(curvaAlvoIntro.getPointAt(tSuaveGlobal));
   camera.position.copy(posIntroAtual);
   camera.lookAt(alvoIntroAtual);
 
@@ -11843,7 +12694,13 @@ function atualizarAvatar(delta){
   const impulsionandoNado = nadando && impulsoNadoTimer > 0;
   // [ALTERADO v140] agachado anda mais devagar (metade da velocidade
   // normal), mesmo espírito do VEL reduzido em j.agachado na Batalha 2D.
-  const velocidadeAtual = VELOCIDADE_AVATAR * (correndoAtivo ? MULTIPLICADOR_CORRIDA : (nadando ? (impulsionandoNado ? 1.0 : 0.55) : (agachadoAtivo ? MULTIPLICADOR_VELOCIDADE_AGACHADO : 1)));
+  // NOVO (Etapa 1 — Revolução do Combate): esquiva (tecla X) tem prioridade
+  // sobre corrida/agachar/nado — é um dash curto e rápido de 0,3s (ver
+  // esquivaAtivaTimer, decrementado em atualizarSistemaCombateJogador).
+  const esquivandoAgora = esquivaAtivaTimer > 0;
+  // NOVO (Etapa 2 — Progressão, v162): multiplicador extra do talento
+  // "Passo Leve" (exploracao1), aplicado por cima da fórmula original.
+  const velocidadeAtual = VELOCIDADE_AVATAR * multiplicadorVelocidadeTalento() * multiplicadorVelocidadeMontaria() * (esquivandoAgora ? MULTIPLICADOR_ESQUIVA : (correndoAtivo ? MULTIPLICADOR_CORRIDA : (nadando ? (impulsionandoNado ? 1.0 : 0.55) : (agachadoAtivo ? MULTIPLICADOR_VELOCIDADE_AGACHADO : 1))));
 
   // NOVO (sessão #32): gesto de "conversar" — só ativo quando o jogador
   // está parado e não está nadando/voando/pulando (ver animarMembrosAvatar).
@@ -12118,8 +12975,16 @@ function atualizarAvatar(delta){
   }
 
   revelarAreaAoRedor(grupoAvatar.position.x, grupoAvatar.position.z);
-
-  // NOVO (pedido do usuário): agachar (Q / botão no celular) perto de uma
+  // NOVO (Etapa 3 — Locomoção, v164): montaria "gruda" na posição do
+  // jogador enquanto montada + descoberta de marcos para Viagem Rápida.
+  // Mesmo ponto do loop principal onde revelarAreaAoRedor já roda todo
+  // frame — sem criar um segundo gancho novo no loop.
+  atualizarMontariaJogador(delta);
+  atualizarDescobertaDeMarcos(grupoAvatar.position.x, grupoAvatar.position.z);
+  // NOVO (Etapa 4 — Retenção Diária, v165): mesmo ponto do loop principal
+  // onde revelarAreaAoRedor/atualizarMontariaJogador já rodam todo frame —
+  // sem criar um segundo gancho novo no loop.
+  atualizarEventoInvasao(delta);
   // árvore esconde o jogador do dragão (ver jogadorEstaEscondido/
   // atualizarDragoes). [ALTERADO v140] agora usa agachadoAtivo (o novo
   // estado global de agachar de verdade, com velocidade reduzida — ver
@@ -15107,6 +15972,11 @@ function criarObscuron(x, z, anguloY){
   const sprite = criarSpriteTexto('Obscuron');
   sprite.position.y = 2.75;
   grupo.add(sprite);
+  // NOVO (v161 — combate do Obscuron): guardado pra que o sistema de
+  // combate possa reescrever o texto do sprite (nome + HP) sem precisar
+  // criar um segundo sprite por cima. Antes da batalha começar, o texto
+  // continua sendo só "Obscuron" (nada muda visualmente até o 1º dano).
+  grupo.userData._spriteNome = sprite;
 
   // Guardado pra atualizarObscuron() animar o brilho (olhos + orbe) sem
   // precisar de nenhuma THREE.PointLight nova (mesma regra de sempre) —
@@ -15508,6 +16378,526 @@ const PORTAIS_TELEPORTE = [
 PORTAIS_TELEPORTE.forEach(def => criarPortalTeleporte(def));
 
 // =====================================================================
+// ETAPA 3 — LOCOMOÇÃO (v164): MONTARIAS + VIAGEM RÁPIDA
+// =====================================================================
+// Filosofia "camada por cima" (mesma da Etapa 2): nada do sistema de
+// movimento/fauna/portais já existente foi reescrito. Montaria multiplica
+// a velocidade já calculada; Viagem Rápida reaproveita 100% o
+// transportarViaPortal() já usado pelos portais de teleporte.
+
+// --- MONTARIAS -------------------------------------------------------
+// Reaproveita a fauna selvagem já existente (FAUNA_ESPECIES, ver acima):
+// só a espécie 'cavalo' (foge:false) pode ser domesticada. Só uma
+// montaria por vez, de propósito — mesma simplicidade de design das
+// "duas rédeas" da Etapa 2 (um ponto de atributo por vez, não um
+// inventário inteiro de montarias). Ao domesticar, o cavalo escolhido sai
+// do array `animaisSelvagens` (para de vagar sozinho) e vira
+// `montariaJogador.obj` — quando NÃO montado, ele simplesmente fica
+// parado onde foi deixado (comportamento simples e prevsummível de
+// "montaria pessoal", sem IA de seguir o dono a pé).
+const RAIO_DOMESTICAR_CAVALO = 4.5 * FATOR_ESCALA_MUNDO;
+const MULTIPLICADOR_VELOCIDADE_MONTARIA = 1.6;
+let cavaloSelvagemProximo = null; // índice em animaisSelvagens, ou null
+const montariaJogador = { obj: null, montando: false };
+
+function criarObjetoMontaria(x, z){
+  const obj = criarAnimalNFT({ subtipo: 'cavalo', cor: '#7a5a36' });
+  obj.position.set(x, alturaTerreno(x, z), z);
+  cena.add(obj);
+  return obj;
+}
+
+// Chamada pelo dispatcher de interação (tentarInteragir, tecla E) quando
+// `cavaloSelvagemProximo` aponta para um cavalo selvagem ao alcance.
+function domesticarCavalo(){
+  if(cavaloSelvagemProximo === null) return;
+  const alvo = animaisSelvagens[cavaloSelvagemProximo];
+  if(!alvo) { cavaloSelvagemProximo = null; return; }
+  animaisSelvagens.splice(cavaloSelvagemProximo, 1); // sai da fauna errante
+  cavaloSelvagemProximo = null;
+  montariaJogador.obj = alvo.obj; // reaproveita o mesmo modelo 3D, sem recriar
+  estadoJogador.temMontaria = true;
+  salvarEstado();
+  mostrarToast(`🐴 Você domesticou ${estadoJogador.nomeMontaria}! Aperte B perto dela para montar.`);
+}
+
+// Monta/desmonta (tecla B). Mesmo padrão de guarda de estado já usado em
+// alternarVooLivre/entrarNoExocraft — bloqueia em qualquer tela/modo que já
+// ocupa o controle do jogador.
+function alternarMontaria(){
+  if(!estadoJogador.temMontaria || !montariaJogador.obj) return;
+  if(mapaAberto || galeriaAberta || editorAvatarAberto || quizAberto || dentroExocraft ||
+     dentroDeCasa || nadando || voando || construcaoAtiva || modoEditarAtivo || seletorPortalAberto) return;
+  if(!montariaJogador.montando){
+    // Monta: se a montaria estiver longe, ela "atende ao chamado" e
+    // aparece do lado do jogador (evita precisar de pathfinding/IA de
+    // aproximação só para isso — decisão de escopo, documentada no
+    // checkpoint).
+    const distante = grupoAvatar.position.distanceTo(montariaJogador.obj.position) > RAIO_DOMESTICAR_CAVALO;
+    if(distante){
+      const ladoX = Math.cos(anguloAvatar), ladoZ = -Math.sin(anguloAvatar);
+      const px = grupoAvatar.position.x - ladoX*2.4, pz = grupoAvatar.position.z - ladoZ*2.4;
+      montariaJogador.obj.position.set(px, alturaTerreno(px, pz), pz);
+    }
+    montariaJogador.montando = true;
+    if(indicadorMontariaEl) indicadorMontariaEl.style.display = 'flex';
+    mostrarToast(`🐴 Você montou em ${estadoJogador.nomeMontaria}!`);
+  }else{
+    montariaJogador.montando = false;
+    if(indicadorMontariaEl) indicadorMontariaEl.style.display = 'none';
+    mostrarToast('🐴 Você desmontou.');
+  }
+}
+
+// Lido em multiplicadorDanoAtributo (não!) — na verdade lido diretamente na
+// fórmula de velocidadeAtual (ver seção de movimento do avatar), seguindo
+// o mesmo padrão de multiplicadorVelocidadeTalento() da Etapa 2: nunca
+// reescrever VELOCIDADE_AVATAR em si, só multiplicar por cima.
+function multiplicadorVelocidadeMontaria(){
+  return montariaJogador.montando ? MULTIPLICADOR_VELOCIDADE_MONTARIA : 1;
+}
+
+// Chamada a cada frame (ver animarInterno/atualização do avatar) —
+// enquanto montado, a montaria "gruda" na posição do jogador um passo
+// atrás (sem física própria, mesmo espírito simplificado do resto da
+// fauna); se o jogador entrar em um estado incompatível (nadar, voar,
+// Exocraft, casa, mapa etc.), desmonta automaticamente em vez de deixar a
+// montaria "grudada" fazendo algo visualmente errado — mesma filosofia
+// defensiva de autorrecuperação já usada em outros sistemas do projeto
+// (ex.: batalha2DAtiva sem batalha2D válido).
+function atualizarMontariaJogador(delta){
+  if(!montariaJogador.montando) return;
+  if(nadando || voando || dentroExocraft || dentroDeCasa || mapaAberto || galeriaAberta || quizAberto){
+    montariaJogador.montando = false;
+    if(indicadorMontariaEl) indicadorMontariaEl.style.display = 'none';
+    return;
+  }
+  const ladoX = Math.cos(anguloAvatar), ladoZ = -Math.sin(anguloAvatar);
+  const alvoX = grupoAvatar.position.x - ladoX*1.6;
+  const alvoZ = grupoAvatar.position.z - ladoZ*1.6;
+  montariaJogador.obj.position.x += (alvoX - montariaJogador.obj.position.x) * Math.min(1, delta*10);
+  montariaJogador.obj.position.z += (alvoZ - montariaJogador.obj.position.z) * Math.min(1, delta*10);
+  montariaJogador.obj.position.y = alturaTerreno(montariaJogador.obj.position.x, montariaJogador.obj.position.z);
+  let diff = anguloAvatar - montariaJogador.obj.rotation.y;
+  diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+  montariaJogador.obj.rotation.y += diff * Math.min(1, delta*8);
+}
+
+// Restaura a montaria já domesticada em sessões anteriores. Igual a
+// `nomesAldeias`/outros campos "recalculados deterministicamente" do
+// projeto: não guardamos a posição/instância 3D exata entre sessões (não
+// precisa — é só um cavalo em pé em algum lugar), só QUE o jogador já tem
+// uma. Recriada perto do ponto de spawn do avatar.
+function restaurarMontariaJogador(){
+  if(!estadoJogador.temMontaria) return;
+  const px = estadoJogador.posicaoHub.x + 3, pz = estadoJogador.posicaoHub.z + 3;
+  montariaJogador.obj = criarObjetoMontaria(px, pz);
+}
+
+// --- VIAGEM RÁPIDA ----------------------------------------------------
+// Marcos fixos do mundo, reaproveitando 100% coordenadas já existentes
+// (portal da montanha, ilha flutuante, castelo sombrio) + o centro da
+// vila. Um marco fica disponível pra Viagem Rápida assim que o jogador
+// chega perto dele ao menos uma vez (ver atualizarDescobertaDeMarcos,
+// chamada a cada frame perto de revelarAreaAoRedor). O teleporte em si
+// reaproveita transportarViaPortal(), sem nenhuma lógica de movimento
+// nova — mesmo "motor" já usado pelos portais fixos e pelos Portais de
+// Viagem do jogador.
+const MARCOS_VIAGEM_RAPIDA = [
+  { id:'vila',     nome:'🏡 Vila Indígena',     posicao:new THREE.Vector3(0, 0, 10) },
+  { id:'montanha', nome:'⛰️ Topo da Montanha',   posicao:POS_PORTAL_MONTANHA },
+  { id:'ilha',     nome:'🏝️ Ilha Flutuante',     posicao:DESTINO_NA_ILHA_FLUTUANTE },
+  { id:'castelo',  nome:'🏰 Castelo Sombrio',    posicao:DESTINO_NO_CASTELO_NUVEM }
+];
+const RAIO_DESCOBERTA_MARCO = 16 * FATOR_ESCALA_MUNDO;
+
+function atualizarDescobertaDeMarcos(x, z){
+  let houveNovaDescoberta = false;
+  MARCOS_VIAGEM_RAPIDA.forEach(marco=>{
+    if(estadoJogador.marcosDescobertos.includes(marco.id)) return;
+    const dx = x - marco.posicao.x, dz = z - marco.posicao.z;
+    if(Math.hypot(dx, dz) <= RAIO_DESCOBERTA_MARCO){
+      estadoJogador.marcosDescobertos.push(marco.id);
+      houveNovaDescoberta = true;
+      mostrarToast(`🚀 Novo marco descoberto: ${marco.nome} (disponível na Viagem Rápida)`);
+    }
+  });
+  if(houveNovaDescoberta) salvarEstado();
+}
+
+// Painel simples criado sob demanda, direto no body — mesmo padrão
+// defensivo já usado em abrirSeletorDestinoPortal (sem tocar no HTML
+// estático, então zero risco de desbalancear tags).
+let painelViagemRapidaAberto = false;
+
+function abrirPainelViagemRapida(){
+  if(painelViagemRapidaAberto) return;
+  if(mapaAberto || galeriaAberta || editorAvatarAberto || quizAberto || dentroExocraft ||
+     dentroDeCasa || seletorPortalAberto || construcaoAtiva || modoEditarAtivo) return;
+  painelViagemRapidaAberto = true;
+
+  const disponiveis = MARCOS_VIAGEM_RAPIDA.filter(m => estadoJogador.marcosDescobertos.includes(m.id));
+
+  let painel = document.getElementById('painel-viagem-rapida');
+  if(!painel){
+    painel = document.createElement('div');
+    painel.id = 'painel-viagem-rapida';
+    painel.style.cssText = 'position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; background:rgba(10,14,20,0.55); backdrop-filter:blur(3px);';
+    document.body.appendChild(painel);
+  }
+
+  let html = '<div style="background:var(--cor-fundo-hud,#1c222b); color:var(--cor-texto,#fff); border-radius:16px; padding:20px; max-width:320px; width:88vw; max-height:70vh; overflow-y:auto; box-shadow:0 8px 30px rgba(0,0,0,0.45); border:var(--borda-chunky,2px) solid var(--cor-borda,#333);">';
+  html += '<div style="font-weight:700; font-size:16px; margin-bottom:12px; text-align:center;">🚀 Viagem Rápida</div>';
+  if(disponiveis.length === 0){
+    html += '<div style="opacity:0.7; font-size:13px; text-align:center; padding:8px 0 4px;">Nenhum marco descoberto ainda. Explore o mundo para desbloquear destinos!</div>';
+  }
+  disponiveis.forEach((m,i)=>{
+    html += `<button data-idx="${i}" class="btn-destino-viagem-rapida" style="display:block; width:100%; text-align:left; padding:12px 14px; margin-bottom:8px; border-radius:10px; border:2px solid var(--cor-borda,#444); background:rgba(255,255,255,0.06); color:inherit; font-size:14px; cursor:pointer;">${m.nome}</button>`;
+  });
+  html += '<button id="btn-cancelar-viagem-rapida" style="display:block; width:100%; text-align:center; padding:10px; margin-top:6px; border-radius:10px; border:none; background:transparent; color:inherit; opacity:0.7; font-size:13px; cursor:pointer;">Cancelar</button>';
+  html += '</div>';
+  painel.innerHTML = html;
+  painel.style.display = 'flex';
+
+  painel.querySelectorAll('.btn-destino-viagem-rapida').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const m = disponiveis[parseInt(btn.dataset.idx, 10)];
+      fecharPainelViagemRapida();
+      transportarViaPortal({ destino: m.posicao, anguloChegada: 0 });
+    });
+  });
+  document.getElementById('btn-cancelar-viagem-rapida').addEventListener('click', fecharPainelViagemRapida);
+}
+
+function fecharPainelViagemRapida(){
+  painelViagemRapidaAberto = false;
+  const painel = document.getElementById('painel-viagem-rapida');
+  if(painel) painel.style.display = 'none';
+}
+
+function alternarPainelViagemRapida(){
+  if(painelViagemRapidaAberto) fecharPainelViagemRapida();
+  else abrirPainelViagemRapida();
+}
+
+// =====================================================================
+// ETAPA 4 — RETENÇÃO DIÁRIA (v165): LOGIN BÔNUS + MISSÕES DIÁRIAS +
+// EVENTO DE INVASÃO
+// =====================================================================
+// Mesma filosofia "camada por cima" das Etapas 2 e 3: nenhum sistema
+// existente (missões permanentes, spawn de malignos, HUD) foi reescrito —
+// só reaproveitado (transportarViaPortal, mostrarToast, spawnMaligno,
+// atualizarCreditosHUD, padrão de painel 100% via JS já usado em
+// abrirSeletorDestinoPortal/abrirPainelViagemRapida).
+
+// --- Utilitário de data (compartilhado pelos 3 subsistemas) -----------
+// Data no fuso do próprio dispositivo do jogador (não em UTC) — o critério
+// de "novo dia" é o mesmo que o jogador vê no relógio de casa, o que faz
+// mais sentido para um sistema de retenção diária do que um corte em UTC.
+function dataDeHojeStr(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function dataDeOntemStr(){
+  const d = new Date(Date.now() - 86400000);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+// --- LOGIN BÔNUS (sequência de até 7 dias) -----------------------------
+const RECOMPENSAS_LOGIN_DIARIO = [
+  { dia:1, moeda:'moeda',    valor:50  },
+  { dia:2, moeda:'moeda',    valor:70  },
+  { dia:3, moeda:'moeda',    valor:90  },
+  { dia:4, moeda:'diamante', valor:5   },
+  { dia:5, moeda:'moeda',    valor:120 },
+  { dia:6, moeda:'moeda',    valor:150 },
+  { dia:7, moeda:'diamante', valor:20  }
+];
+
+// Chamada uma vez em iniciar(). Se hoje já foi processado, não faz nada
+// (loginBonusColetadoHoje já reflete se o jogador já coletou ou não). Se
+// o último login foi ontem, avança a sequência (voltando a 1 depois do
+// dia 7 — ciclo, não trava em 7 para sempre). Se houve uma lacuna de mais
+// de 1 dia (ou é o 1º login), a sequência reinicia em 1 — decisão
+// consciente de simplicidade: sem "perdão" de faltas, mesmo padrão direto
+// já usado em outros sistemas do projeto (ex.: cofreMaligno sem
+// tolerância especial).
+function verificarLoginDiario(){
+  const hoje = dataDeHojeStr();
+  if(estadoJogador.ultimoLoginData === hoje) return; // já processado hoje
+  if(estadoJogador.ultimoLoginData === dataDeOntemStr()){
+    estadoJogador.sequenciaLogin = (estadoJogador.sequenciaLogin % 7) + 1;
+  }else{
+    estadoJogador.sequenciaLogin = 1;
+  }
+  estadoJogador.ultimoLoginData = hoje;
+  estadoJogador.loginBonusColetadoHoje = false;
+  salvarEstado();
+}
+
+let painelLoginAberto = false;
+
+// Painel criado sob demanda, direto no body — mesmo padrão defensivo já
+// usado em abrirSeletorDestinoPortal/abrirPainelViagemRapida (sem tocar o
+// HTML estático). Bloqueia nos mesmos estados que já bloqueiam outros
+// painéis modais do jogo.
+function abrirPainelLoginDiario(){
+  if(painelLoginAberto || estadoJogador.loginBonusColetadoHoje) return;
+  if(mapaAberto || galeriaAberta || editorAvatarAberto || quizAberto || dentroExocraft ||
+     dentroDeCasa || seletorPortalAberto || construcaoAtiva || modoEditarAtivo ||
+     painelViagemRapidaAberto || painelMissoesDiariasAberto) return;
+  painelLoginAberto = true;
+
+  let painel = document.getElementById('painel-login-diario');
+  if(!painel){
+    painel = document.createElement('div');
+    painel.id = 'painel-login-diario';
+    painel.style.cssText = 'position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; background:rgba(10,14,20,0.55); backdrop-filter:blur(3px);';
+    document.body.appendChild(painel);
+  }
+
+  const diaAtual = estadoJogador.sequenciaLogin;
+  let html = '<div style="background:var(--cor-fundo-hud,#1c222b); color:var(--cor-texto,#fff); border-radius:16px; padding:20px; max-width:360px; width:90vw; box-shadow:0 8px 30px rgba(0,0,0,0.45); border:var(--borda-chunky,2px) solid var(--cor-borda,#333);">';
+  html += '<div style="font-weight:700; font-size:17px; margin-bottom:4px; text-align:center;">🎁 Bônus de Login Diário</div>';
+  html += `<div style="opacity:0.75; font-size:12px; text-align:center; margin-bottom:14px;">Sequência: dia ${diaAtual} de 7</div>`;
+  html += '<div style="display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:14px;">';
+  RECOMPENSAS_LOGIN_DIARIO.forEach(r=>{
+    const icone = r.moeda === 'diamante' ? '💎' : '🪙';
+    const ativo = r.dia === diaAtual;
+    const passado = r.dia < diaAtual;
+    const estilo = ativo
+      ? 'border:2px solid #ffd54a; background:rgba(255,213,74,0.18);'
+      : passado
+        ? 'border:2px solid var(--cor-borda,#444); opacity:0.45;'
+        : 'border:2px solid var(--cor-borda,#444); opacity:0.8;';
+    html += `<div style="border-radius:8px; padding:6px 2px; text-align:center; font-size:11px; ${estilo}">`;
+    html += `<div style="font-weight:700;">D${r.dia}</div><div style="font-size:14px;">${icone}</div><div>${r.valor}</div></div>`;
+  });
+  html += '</div>';
+  html += '<button id="btn-coletar-login-diario" style="display:block; width:100%; text-align:center; padding:12px; border-radius:12px; border:none; background:#7C4DFF; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">Coletar recompensa de hoje</button>';
+  html += '</div>';
+  painel.innerHTML = html;
+  painel.style.display = 'flex';
+
+  document.getElementById('btn-coletar-login-diario').addEventListener('click', coletarLoginDiario);
+}
+
+function fecharPainelLoginDiario(){
+  painelLoginAberto = false;
+  const painel = document.getElementById('painel-login-diario');
+  if(painel) painel.style.display = 'none';
+}
+
+function coletarLoginDiario(){
+  if(estadoJogador.loginBonusColetadoHoje) return;
+  const rec = RECOMPENSAS_LOGIN_DIARIO[estadoJogador.sequenciaLogin - 1];
+  if(!rec) return;
+  if(rec.moeda === 'diamante') estadoJogador.creditos += rec.valor;
+  else estadoJogador.moedas += rec.valor;
+  estadoJogador.loginBonusColetadoHoje = true;
+  salvarEstado();
+  atualizarCreditosHUD();
+  fecharPainelLoginDiario();
+  const icone = rec.moeda === 'diamante' ? '💎' : '🪙';
+  mostrarToast(`🎁 Bônus do dia ${rec.dia} coletado: +${rec.valor} ${icone}`);
+}
+
+// --- MISSÕES DIÁRIAS ----------------------------------------------------
+// Estrutura deliberadamente paralela a DEFINICAO_MISSOES/estadoJogador.
+// missoes (Sistema de Missões original), mas com progresso resetado a
+// cada novo dia de calendário em vez de ser permanente — reaproveita o
+// mesmo padrão de "progresso/concluida/coletada" já validado nas missões
+// de zona, só trocando o gatilho de reset.
+const DEFINICAO_MISSOES_DIARIAS = [
+  { id:'diaria_derrotar', tipo:'derrotar_qualquer',    meta:3, titulo:'Neutralize 3 ameaças digitais', descricao:'Derrote 3 malignos de qualquer tipo hoje.',            recompensa:{ moeda:'moeda',    valor:60 } },
+  { id:'diaria_explorar', tipo:'explorar_mapa',        meta:8, titulo:'Explore novas áreas',            descricao:'Revele 8 novas células do mapa hoje.',                 recompensa:{ moeda:'moeda',    valor:50 } },
+  { id:'diaria_comprar',  tipo:'comprar_qualquer_dia', meta:1, titulo:'Visite a Galeria',                descricao:'Compre 1 item na Galeria hoje.',                       recompensa:{ moeda:'diamante', valor:5  } },
+  { id:'diaria_quiz',     tipo:'quiz_qualquer_dia',    meta:1, titulo:'Estude um pouco',                 descricao:'Acerte 1 pergunta do Quiz BNCC hoje.',                 recompensa:{ moeda:'moeda',    valor:40 } }
+];
+
+// Chamada em iniciar() e (defensivamente) sempre que qualquer função de
+// progresso diário roda — se a data mudou desde o último save, zera
+// progresso/concluida/coletada de todas as missões diárias. Mesmo
+// princípio de "recalculado deterministicamente" já usado em nomesAldeias
+// /temMontaria: não precisamos guardar histórico de dias antigos, só o
+// estado do dia atual.
+function garantirMissoesDiariasDoDia(){
+  const hoje = dataDeHojeStr();
+  if(estadoJogador.dataMissoesDiarias !== hoje){
+    estadoJogador.missoesDiarias = {};
+    DEFINICAO_MISSOES_DIARIAS.forEach(def=>{
+      estadoJogador.missoesDiarias[def.id] = { progresso:0, concluida:false, coletada:false };
+    });
+    estadoJogador.dataMissoesDiarias = hoje;
+    salvarEstado();
+  }else{
+    DEFINICAO_MISSOES_DIARIAS.forEach(def=>{
+      if(!estadoJogador.missoesDiarias[def.id]) estadoJogador.missoesDiarias[def.id] = { progresso:0, concluida:false, coletada:false };
+    });
+  }
+}
+
+function avancarMissaoDiaria(id, incremento){
+  garantirMissoesDiariasDoDia(); // defensivo: garante que o dia não virou "no meio" de um progresso
+  const def = DEFINICAO_MISSOES_DIARIAS.find(m=> m.id === id);
+  const prog = estadoJogador.missoesDiarias[id];
+  if(!def || !prog || prog.concluida) return;
+  prog.progresso = Math.min(def.meta, prog.progresso + incremento);
+  if(prog.progresso >= def.meta){
+    prog.concluida = true;
+    mostrarToast(`✅ Missão diária concluída: ${def.titulo}`);
+  }
+  salvarEstado();
+  if(painelMissoesDiariasAberto) renderizarPainelMissoesDiarias();
+}
+
+function avancarMissoesDiariasPorTipo(tipo, incremento){
+  DEFINICAO_MISSOES_DIARIAS.filter(m=> m.tipo === tipo).forEach(m=> avancarMissaoDiaria(m.id, incremento || 1));
+}
+
+function coletarRecompensaMissaoDiaria(id){
+  const def = DEFINICAO_MISSOES_DIARIAS.find(m=> m.id === id);
+  const prog = estadoJogador.missoesDiarias[id];
+  if(!def || !prog || !prog.concluida || prog.coletada) return;
+  prog.coletada = true;
+  if(def.recompensa.moeda === 'diamante') estadoJogador.creditos += def.recompensa.valor;
+  else estadoJogador.moedas += def.recompensa.valor;
+  salvarEstado();
+  atualizarCreditosHUD();
+  renderizarPainelMissoesDiarias();
+  const icone = def.recompensa.moeda === 'diamante' ? '💎' : '🪙';
+  mostrarToast(`🎁 +${def.recompensa.valor} ${icone} recebido!`);
+}
+
+let painelMissoesDiariasAberto = false;
+
+function abrirPainelMissoesDiarias(){
+  if(painelMissoesDiariasAberto) return;
+  if(mapaAberto || galeriaAberta || editorAvatarAberto || quizAberto || dentroExocraft ||
+     dentroDeCasa || seletorPortalAberto || construcaoAtiva || modoEditarAtivo ||
+     painelViagemRapidaAberto || painelLoginAberto) return;
+  garantirMissoesDiariasDoDia();
+  painelMissoesDiariasAberto = true;
+
+  let painel = document.getElementById('painel-missoes-diarias');
+  if(!painel){
+    painel = document.createElement('div');
+    painel.id = 'painel-missoes-diarias';
+    painel.style.cssText = 'position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; background:rgba(10,14,20,0.55); backdrop-filter:blur(3px);';
+    document.body.appendChild(painel);
+  }
+  renderizarPainelMissoesDiarias();
+  painel.style.display = 'flex';
+}
+
+function renderizarPainelMissoesDiarias(){
+  const painel = document.getElementById('painel-missoes-diarias');
+  if(!painel) return;
+  let html = '<div style="background:var(--cor-fundo-hud,#1c222b); color:var(--cor-texto,#fff); border-radius:16px; padding:20px; max-width:340px; width:90vw; max-height:70vh; overflow-y:auto; box-shadow:0 8px 30px rgba(0,0,0,0.45); border:var(--borda-chunky,2px) solid var(--cor-borda,#333);">';
+  html += '<div style="font-weight:700; font-size:16px; margin-bottom:12px; text-align:center;">📅 Missões Diárias</div>';
+  DEFINICAO_MISSOES_DIARIAS.forEach(def=>{
+    const prog = estadoJogador.missoesDiarias[def.id] || { progresso:0, concluida:false, coletada:false };
+    const pct = Math.min(100, Math.round((prog.progresso/def.meta)*100));
+    const icone = def.recompensa.moeda === 'diamante' ? '💎' : '🪙';
+    let rodape;
+    if(prog.coletada) rodape = '<span style="opacity:0.7; font-size:12px;">✔ recompensa coletada</span>';
+    else if(prog.concluida) rodape = `<button data-missao-diaria="${def.id}" style="padding:6px 12px; border-radius:8px; border:none; background:#7C4DFF; color:#fff; font-weight:700; font-size:12px; cursor:pointer;">Coletar ${icone}${def.recompensa.valor}</button>`;
+    else rodape = `<span style="opacity:0.75; font-size:12px;">${prog.progresso}/${def.meta}</span>`;
+    html += `<div style="margin-bottom:12px; border-radius:10px; padding:10px 12px; background:rgba(255,255,255,0.05);">`;
+    html += `<div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700;"><span>${def.titulo}</span><span>${icone} ${def.recompensa.valor}</span></div>`;
+    html += `<div style="font-size:12px; opacity:0.75; margin:4px 0 8px;">${def.descricao}</div>`;
+    html += `<div style="height:6px; border-radius:4px; background:rgba(255,255,255,0.1); overflow:hidden; margin-bottom:8px;"><div style="height:100%; width:${pct}%; background:${prog.concluida?'#4ade80':'#7C4DFF'};"></div></div>`;
+    html += `<div style="text-align:right;">${rodape}</div></div>`;
+  });
+  html += '<button id="btn-fechar-missoes-diarias" style="display:block; width:100%; text-align:center; padding:10px; margin-top:4px; border-radius:10px; border:none; background:transparent; color:inherit; opacity:0.7; font-size:13px; cursor:pointer;">Fechar</button>';
+  html += '</div>';
+  painel.innerHTML = html;
+
+  painel.querySelectorAll('[data-missao-diaria]').forEach(btn=>{
+    btn.addEventListener('click', ()=> coletarRecompensaMissaoDiaria(btn.dataset.missaoDiaria));
+  });
+  document.getElementById('btn-fechar-missoes-diarias').addEventListener('click', fecharPainelMissoesDiarias);
+}
+
+function fecharPainelMissoesDiarias(){
+  painelMissoesDiariasAberto = false;
+  const painel = document.getElementById('painel-missoes-diarias');
+  if(painel) painel.style.display = 'none';
+}
+
+function alternarPainelMissoesDiarias(){
+  if(painelMissoesDiariasAberto) fecharPainelMissoesDiarias();
+  else abrirPainelMissoesDiarias();
+}
+
+// --- EVENTO DE INVASÃO ---------------------------------------------------
+// No máximo 1 invasão por dia de calendário (estadoJogador.
+// dataUltimaInvasao). Dispara automaticamente um pouco depois do jogador
+// entrar no mundo (ATRASO_INICIO_INVASAO), evitando atropelar a tela de
+// carregamento/intro. Durante a invasão, o teto de malignos simultâneos
+// sobe para o mesmo teto noturno (ver bypass em spawnMaligno) e força
+// spawns extras em intervalos regulares — sem inventar um sistema de
+// spawn novo, só reaproveitando spawnMaligno() já existente com mais
+// frequência. Ao final, dá um bônus de moedas proporcional a quantos
+// malignos foram derrotados durante a janela do evento.
+let eventoInvasaoAtivo = false;
+let tempoRestanteInvasao = 0;
+let malignosDerrotadosNaInvasao = 0;
+let tempoDeSessaoInvasao = 0;
+const DURACAO_INVASAO = 90; // segundos de jogo
+const ATRASO_INICIO_INVASAO = 25; // segundos de jogo antes de poder disparar
+const INTERVALO_SPAWN_FORCADO_INVASAO = 7; // segundos entre spawns forçados
+let timerSpawnForcadoInvasao = 0;
+
+function atualizarEventoInvasao(delta){
+  tempoDeSessaoInvasao += delta;
+
+  if(eventoInvasaoAtivo){
+    tempoRestanteInvasao -= delta;
+    timerSpawnForcadoInvasao -= delta;
+    if(timerSpawnForcadoInvasao <= 0){
+      timerSpawnForcadoInvasao = INTERVALO_SPAWN_FORCADO_INVASAO;
+      spawnMaligno();
+    }
+    if(indicadorInvasaoEl) indicadorInvasaoEl.textContent = `⚠️ Invasão! ${Math.max(0, Math.ceil(tempoRestanteInvasao))}s`;
+    if(tempoRestanteInvasao <= 0) finalizarEventoInvasao();
+    return;
+  }
+
+  if(estadoJogador.dataUltimaInvasao !== dataDeHojeStr() && tempoDeSessaoInvasao >= ATRASO_INICIO_INVASAO){
+    iniciarEventoInvasao();
+  }
+}
+
+function iniciarEventoInvasao(){
+  eventoInvasaoAtivo = true;
+  tempoRestanteInvasao = DURACAO_INVASAO;
+  timerSpawnForcadoInvasao = 0; // força 1 spawn já no próximo frame
+  malignosDerrotadosNaInvasao = 0;
+  estadoJogador.dataUltimaInvasao = dataDeHojeStr();
+  salvarEstado();
+  if(indicadorInvasaoEl){
+    indicadorInvasaoEl.style.display = 'flex';
+    indicadorInvasaoEl.textContent = `⚠️ Invasão! ${DURACAO_INVASAO}s`;
+  }
+  mostrarToast('⚠️ Invasão de Sombras Digitais! Malignos extras apareceram — derrote-os para ganhar um bônus de moedas antes que a invasão acabe!');
+}
+
+function finalizarEventoInvasao(){
+  eventoInvasaoAtivo = false;
+  if(indicadorInvasaoEl) indicadorInvasaoEl.style.display = 'none';
+  if(malignosDerrotadosNaInvasao > 0){
+    const bonus = malignosDerrotadosNaInvasao * 15;
+    estadoJogador.moedas += bonus;
+    salvarEstado();
+    atualizarCreditosHUD();
+    mostrarToast(`🛡️ Invasão repelida! Bônus de +${bonus} 🪙 por ${malignosDerrotadosNaInvasao} malignos derrotados.`);
+  }else{
+    mostrarToast('🛡️ A invasão terminou.');
+  }
+}
+
+// =====================================================================
 // SISTEMA DE MISSÕES
 // =====================================================================
 const DEFINICAO_MISSOES = [
@@ -15811,6 +17201,9 @@ function revelarAreaAoRedor(x, z){
     }
   }
   if(novasCelulas.length) registrarProgressoExploracaoMissoes(novasCelulas);
+  // NOVO (Etapa 4 — Retenção Diária, v165): progresso da missão diária de
+  // exploração (contagem bruta de novas células, sem filtro de zona).
+  if(novasCelulas.length) avancarMissoesDiariasPorTipo('explorar_mapa', novasCelulas.length);
   // Tesouros: cada nova célula revelada tem uma chance (determinística,
   // baseada no índice da célula) de conter um tesouro enterrado. Ver seção
   // "SISTEMA DE TESOUROS ENTERRADOS" para a função que gera/registra.
@@ -15953,6 +17346,14 @@ const CATALOGO_GALERIA = [
   { id:'maligno_virus', tipo:'maligno', subtipo:'virus', nome:'Vírus de Código', icone:'🧬', preco:110, descricao:'Um humanoide magro feito de linhas de código quebrado, com rachaduras verdes brilhantes.', raridade:'epico', categoria:'nfts', moeda:'diamante', tipoColocacao:'mundo', corCorpo:0x0a1f0a, corOlhos:0x39ff6a, corAura:0x113311, hp:9, velocidade:2.4, danoMoeda:6, danoDiamante:0, termoComputacao:'Vírus (Virus)', explicacaoBreve:'Código malicioso que se anexa a um arquivo e só se espalha quando esse arquivo é executado.' },
   { id:'maligno_trojano', tipo:'maligno', subtipo:'trojano', nome:'Cavalo de Troia', icone:'🎁', preco:170, descricao:'Parece um NPC amigável carregando presentes — até se aproximar e revelar placas metálicas e espinhos digitais.', raridade:'epico', categoria:'nfts', moeda:'diamante', tipoColocacao:'mundo', corCorpo:0x5a4a2a, corOlhos:0xff2200, corAura:0x331100, hp:14, velocidade:1.8, danoMoeda:8, danoDiamante:1, termoComputacao:'Trojan (Cavalo de Troia)', explicacaoBreve:'Programa disfarçado de algo útil ou desejável que, ao ser instalado, esconde uma ameaça.' },
   { id:'maligno_ransomware', tipo:'maligno', subtipo:'ransomware', nome:'Ransomware', icone:'🔒', preco:240, descricao:'Um humanoide gigante feito de cadeados e correntes criptografadas. Bloqueia temporariamente arma e mochila em vez de roubar.', raridade:'lendario', categoria:'nfts', moeda:'diamante', tipoColocacao:'mundo', corCorpo:0x2a2a3a, corOlhos:0xffcc00, corAura:0x443300, hp:22, velocidade:1.1, danoMoeda:0, danoDiamante:0, bloqueiaFerramentas:true, termoComputacao:'Ransomware', explicacaoBreve:'Malware que bloqueia o acesso a arquivos e exige um resgate (pagamento) para liberá-los de volta.' },
+  // ---- Etapa 1 (parte B) — Revolução do Combate: 5 novos malignos que
+  // causam dano de HP real (danoJogador) via aplicarDanoJogador() em vez de
+  // roubar moeda/diamante (ver DECISÕES DE ARQUITETURA no checkpoint v157).
+  { id:'maligno_zumbi', tipo:'maligno', subtipo:'zumbi', nome:'Zumbi Digital', icone:'🧟', preco:180, descricao:'Um dispositivo infectado, controlado à distância por um invasor. Anda cambaleando, sem vontade própria.', raridade:'epico', categoria:'nfts', moeda:'diamante', tipoColocacao:'mundo', corCorpo:0x3a4a2a, corOlhos:0x88ff33, corAura:0x223311, hp:16, velocidade:1.6, danoJogador:6, termoComputacao:'Dispositivo Zumbi (Botnet)', explicacaoBreve:'Um aparelho infectado que passa a obedecer ordens remotas de um invasor, sem o dono perceber, formando uma rede de "zumbis" (botnet).' },
+  { id:'maligno_robo_defeituoso', tipo:'maligno', subtipo:'robo_defeituoso', nome:'Robô Defeituoso', icone:'🤖', preco:160, descricao:'Uma máquina que trava, repete movimentos e ataca por erro de programação.', raridade:'epico', categoria:'nfts', moeda:'diamante', tipoColocacao:'mundo', corCorpo:0x6a6a6a, corOlhos:0xff3333, corAura:0x332222, hp:14, velocidade:2.2, danoJogador:5, termoComputacao:'Bug de Software', explicacaoBreve:'Um erro (bug) no código faz o programa se comportar de um jeito que ninguém planejou, às vezes causando problemas sérios.' },
+  { id:'maligno_cavaleiro_sombrio', tipo:'maligno', subtipo:'cavaleiro_sombrio', nome:'Cavaleiro Sombrio', icone:'🗡️', preco:260, descricao:'Um vulto blindado que age escondido em cantos obscuros da rede, vendendo dados roubados.', raridade:'lendario', categoria:'nfts', moeda:'diamante', tipoColocacao:'mundo', corCorpo:0x1a1a24, corOlhos:0x9933ff, corAura:0x220a44, hp:24, velocidade:2.0, danoJogador:9, termoComputacao:'Cibercrime / Dark Web', explicacaoBreve:'Área escondida da internet, acessível só com ferramentas especiais, usada por criminosos para negociar dados roubados e ataques.' },
+  { id:'maligno_aranha_dados', tipo:'maligno', subtipo:'aranha_dados', nome:'Aranha de Dados', icone:'🕷️', preco:190, descricao:'Tece teias invisíveis pela rede, capturando informações pessoais sem pedir permissão.', raridade:'epico', categoria:'nfts', moeda:'diamante', tipoColocacao:'mundo', corCorpo:0x2a1a3a, corOlhos:0xff66ff, corAura:0x330a44, hp:13, velocidade:2.9, danoJogador:5, termoComputacao:'Coleta de Dados sem Consentimento', explicacaoBreve:'Programas que vasculham sites e perfis para juntar dados pessoais das pessoas sem autorização, muitas vezes para vender depois.' },
+  { id:'maligno_golem_codigo', tipo:'maligno', subtipo:'golem_codigo', nome:'Golem de Código', icone:'🗿', preco:280, descricao:'Um colosso feito de blocos de código quebrado, explora falhas de segurança para crescer cada vez mais forte.', raridade:'lendario', categoria:'nfts', moeda:'diamante', tipoColocacao:'mundo', corCorpo:0x4a3a1a, corOlhos:0xffaa33, corAura:0x442a0a, hp:30, velocidade:1.3, danoJogador:10, termoComputacao:'Exploit (Falha Explorada)', explicacaoBreve:'Uma técnica que aproveita uma falha de segurança conhecida em um sistema para invadi-lo ou causar danos.' },
   { id:'arma_escudo', tipo:'arma', subtipo:'escudo', nome:'Escudo de Verificação', icone:'🛡️', preco:80, descricao:'Protege contra Fake News. Ao atacar, emite uma onda de verificação.', raridade:'raro', categoria:'armas', moeda:'moeda', tipoColocacao:'equipar', eficazContra:['sussurrador'], danoBase:3, danoEficaz:999 },
   { id:'arma_antivirus', tipo:'arma', subtipo:'antivirus', nome:'Antivírus', icone:'💉', preco:120, descricao:'Elimina Malwares com um disparo certeiro.', raridade:'epico', categoria:'armas', moeda:'moeda', tipoColocacao:'equipar', eficazContra:['verme'], danoBase:3, danoEficaz:999 },
   { id:'arma_firewall', tipo:'arma', subtipo:'firewall', nome:'Rede de Firewall', icone:'🔥', preco:150, descricao:'Cria uma barreira de fogo que neutraliza ataques de Phishing.', raridade:'epico', categoria:'armas', moeda:'diamante', tipoColocacao:'equipar', eficazContra:['sombra'], danoBase:3, danoEficaz:999 },
@@ -16090,6 +17491,320 @@ function atualizarCreditosHUD(){
   const elCompactoMoeda = document.getElementById('valor-moedas-compacto');
   if(elCompactoCred) elCompactoCred.textContent = estadoJogador.creditos;
   if(elCompactoMoeda) elCompactoMoeda.textContent = estadoJogador.moedas;
+}
+
+// =====================================================================
+// ETAPA 1 — REVOLUÇÃO DO COMBATE (parte A: núcleo de vida/HP, esquiva,
+// bloqueio). Sistema aditivo: não mexe na convenção antiga "dano = perda
+// de moeda" usada pelos malignos já existentes (ver ia.danoMoeda em
+// atualizarMalignos) — essa convenção continua intocada. Este bloco cria
+// a NOVA infraestrutura de HP que os próximos itens da Etapa 1 (novos
+// inimigos, combos, chefes) e a Etapa 5 (poção de cura) vão usar.
+//
+// Teclas escolhidas: o prompt original pedia Shift (esquiva) e Q
+// (bloqueio), mas AMBAS já estavam em uso no jogo (Shift = correr,
+// Q = agachar). Para não quebrar nada já existente, usamos:
+//   X = Esquiva/Rolamento (tecla livre, confirmado sem conflito)
+//   Z = Bloqueio (livre fora do atalho Ctrl+Z do Modo Editar)
+// =====================================================================
+const DURACAO_ESQUIVA = 0.3;           // segundos de invulnerabilidade + dash
+const COOLDOWN_ESQUIVA = 1.0;          // segundos até poder esquivar de novo
+const MULTIPLICADOR_ESQUIVA = 3.0;     // velocidade durante a esquiva (x VELOCIDADE_AVATAR)
+const DURACAO_INVULNERAVEL_POS_DANO = 0.5; // "hit stun" — evita levar 2 hits no mesmo frame/segundo
+const REDUCAO_DANO_BLOQUEIO = 0.8;     // bloqueio absorve 80% do dano recebido
+
+let invulneravelTimer = 0;   // >0 = jogador imune a dano (esquiva OU pós-hit)
+let esquivaAtivaTimer = 0;   // >0 = dash da esquiva em andamento (afeta velocidade)
+let esquivaCooldownTimer = 0;
+let bloqueandoAtivo = false; // true enquanto Z está segurado E há arma/ferramenta equipada
+
+function itemEquipadoAtualHotbar(){
+  // Pequeno helper: reaproveita itemDoSlotHotbar (já existe no sistema de
+  // hotbar) para saber o que o jogador tem na mão agora, sem duplicar a
+  // lógica de leitura da hotbar.
+  if(typeof itemDoSlotHotbar !== 'function') return null;
+  return itemDoSlotHotbar(estadoJogador.hotbarSelecionado);
+}
+
+function podeAgirEmCombate(){
+  // Mesmo conjunto de bloqueios usado por outras ações do jogador (menus
+  // abertos, dentro de veículo/casa etc.) — esquiva e bloqueio não devem
+  // funcionar nesses estados.
+  return !dentroExocraft && !dentroDeCasa && !mapaAberto && !galeriaAberta &&
+         !editorAvatarAberto && !quizAberto && !batalha2DAtiva && !construcaoAtiva;
+}
+
+function tentarEsquivar(){
+  if(!podeAgirEmCombate()) return;
+  if(esquivaCooldownTimer > 0 || nadando || voando || pulando) return;
+  esquivaAtivaTimer = DURACAO_ESQUIVA;
+  invulneravelTimer = Math.max(invulneravelTimer, DURACAO_ESQUIVA);
+  // NOVO (Etapa 2): cooldown efetivo considera Destreza + talento Reflexos
+  // (ver cooldownEsquivaEfetivo), em vez da constante fixa direto.
+  esquivaCooldownTimer = cooldownEsquivaEfetivo();
+  mostrarToast('💨 Esquiva!');
+}
+
+function atualizarBarraVida(){
+  const pct = Math.max(0, Math.min(100, (estadoJogador.vida / estadoJogador.vidaMax) * 100));
+  const elBarra = document.getElementById('barra-vida');
+  if(elBarra) elBarra.style.width = pct + '%';
+  const elTexto = document.getElementById('valor-vida-texto');
+  if(elTexto) elTexto.textContent = `${Math.round(estadoJogador.vida)}/${estadoJogador.vidaMax} ❤️`;
+  const elCompacto = document.getElementById('valor-vida-compacto');
+  if(elCompacto) elCompacto.textContent = Math.round(estadoJogador.vida);
+}
+atualizarBarraVida();
+
+function aplicarFlashDanoTela(){
+  const el = document.getElementById('flash-dano-jogador');
+  if(!el) return;
+  el.classList.add('ativo');
+  setTimeout(()=> el.classList.remove('ativo'), 140);
+}
+
+// Função central de dano ao JOGADOR para os NOVOS sistemas de combate
+// (novos inimigos, combos, chefes — Etapa 1, itens seguintes). Respeita
+// esquiva (invulnerabilidade), bloqueio (reduz 80%) e um pequeno "hit
+// stun" pós-dano para não descontar HP várias vezes no mesmo instante.
+// Retorna true se o dano foi de fato aplicado.
+function aplicarDanoJogador(quantidade, origemNome){
+  if(estadoJogador.vida <= 0) return false;
+  if(invulneravelTimer > 0) return false; // esquivou ou está no hit-stun
+
+  let danoFinal = quantidade;
+  if(bloqueandoAtivo){
+    // NOVO (Etapa 2, talento combate3 "Contra-Ataque"): 90% de redução em
+    // vez dos 80% padrão, se desbloqueado.
+    const reducaoBloqueio = temTalento('combate3') ? 0.9 : REDUCAO_DANO_BLOQUEIO;
+    danoFinal = Math.max(0, Math.round(quantidade * (1 - reducaoBloqueio)));
+    mostrarToast(`🛡️ Bloqueou! Dano reduzido de ${origemNome}.`);
+  }
+  // NOVO (Etapa 2, talento sobrevivencia2 "Resistência"): -10% de todo
+  // dano recebido, aplicado por cima do bloqueio (nunca antes dele).
+  danoFinal = Math.round(danoFinal * multiplicadorDanoRecebido());
+
+  if(danoFinal > 0){
+    estadoJogador.vida = Math.max(0, estadoJogador.vida - danoFinal);
+    aplicarFlashDanoTela();
+    if(!bloqueandoAtivo) mostrarToast(`💥 ${origemNome} te acertou! (-${danoFinal} HP)`);
+    atualizarBarraVida();
+    tempoDesdeUltimoDanoJogador = 0; // NOVO (Etapa 2): reinicia a janela de regen passiva
+    salvarEstado();
+  }
+
+  invulneravelTimer = Math.max(invulneravelTimer, DURACAO_INVULNERAVEL_POS_DANO);
+
+  if(estadoJogador.vida <= 0) desmaiarJogador();
+  return true;
+}
+
+// Cura o jogador (usada pela futura Poção de Cura da Etapa 5 — Crafting —
+// e por qualquer outro sistema que precise devolver HP), sem nunca passar
+// de vidaMax.
+function curarJogador(quantidade, motivo){
+  if(estadoJogador.vida >= estadoJogador.vidaMax) return false;
+  estadoJogador.vida = Math.min(estadoJogador.vidaMax, estadoJogador.vida + quantidade);
+  atualizarBarraVida();
+  salvarEstado();
+  mostrarToast(`💚 ${motivo || 'Curou'} +${quantidade} HP!`);
+  return true;
+}
+
+// "Nocaute" em vez de morte — mantém o tom não-violento do jogo (mesmo
+// espírito da convenção antiga "dano = perda de moeda, nunca morte real").
+// Jogador é levado de volta a um ponto seguro, recupera metade do HP e
+// ganha uma janela de invulnerabilidade para não ser atingido de novo
+// imediatamente ao reaparecer.
+function desmaiarJogador(){
+  mostrarToast('😵 Você foi nocauteado! Recuperando o fôlego no Hub Central...');
+  const pos = estadoJogador.localSalvo || estadoJogador.posicaoHub || { x:0, y:0, z:18 };
+  if(grupoAvatar){
+    grupoAvatar.position.set(pos.x, pos.y || 0, pos.z);
+  }
+  // NOVO (Etapa 2, talento sobrevivencia3 "Segunda Chance"): recupera 75%
+  // da vida ao nocautear em vez dos 50% padrão, se desbloqueado.
+  const fracaoRecuperada = temTalento('sobrevivencia3') ? 0.75 : 0.5;
+  estadoJogador.vida = Math.round(estadoJogador.vidaMax * fracaoRecuperada);
+  invulneravelTimer = 2.0;
+  atualizarBarraVida();
+  salvarEstado();
+}
+
+// Decrementa os timers de combate uma vez por frame — chamada a partir de
+// animarInterno() (perto de atualizarCooldownAtaque), independente de
+// dentroDeCasa/exocraft/etc., pra cooldowns continuarem correndo mesmo
+// que o jogador esteja num menu.
+function atualizarSistemaCombateJogador(delta){
+  if(invulneravelTimer > 0) invulneravelTimer = Math.max(0, invulneravelTimer - delta);
+  if(esquivaAtivaTimer > 0) esquivaAtivaTimer = Math.max(0, esquivaAtivaTimer - delta);
+  if(esquivaCooldownTimer > 0) esquivaCooldownTimer = Math.max(0, esquivaCooldownTimer - delta);
+}
+
+// =====================================================================
+// PROGRESSÃO DO JOGADOR — ETAPA 2 (v162): XP, Níveis, Atributos, Talentos
+// =====================================================================
+// Filosofia (mesma da Etapa 1): tudo ADITIVO. Nenhuma fórmula de combate
+// existente foi reescrita — este sistema apenas "escuta" derrotas (ganho
+// de XP) e entra como um FATOR/BÔNUS EXTRA multiplicado ou somado sobre
+// os cálculos já existentes (calcularDanoContraMaligno, COOLDOWN_ESQUIVA,
+// REDUCAO_DANO_BLOQUEIO, VELOCIDADE_AVATAR), nunca os substitui.
+
+function xpParaProximoNivel(nivel){
+  return 100 + (nivel - 1) * 50;
+}
+
+// Concede XP ao jogador e processa quantos níveis forem necessários (loop,
+// para o caso raro de uma recompensa grande pular mais de um nível de
+// uma vez). Cada nível: +10 vidaMax, +2 pontos de atributo, +1 ponto de
+// talento, e cura total (recompensa, mesmo espírito não-punitivo do resto
+// do jogo).
+function ganharXP(quantidade, motivo){
+  if(quantidade <= 0) return;
+  estadoJogador.xp += quantidade;
+  mostrarToast(`✨ +${quantidade} XP (${motivo})`);
+  let subiuDeNivel = false;
+  while(estadoJogador.xp >= xpParaProximoNivel(estadoJogador.nivel)){
+    estadoJogador.xp -= xpParaProximoNivel(estadoJogador.nivel);
+    estadoJogador.nivel += 1;
+    estadoJogador.pontosAtributo += 2;
+    estadoJogador.pontosTalento += 1;
+    estadoJogador.vidaMax += 10;
+    estadoJogador.vida = estadoJogador.vidaMax;
+    subiuDeNivel = true;
+  }
+  if(subiuDeNivel){
+    mostrarToast(`🎉 Subiu para o Nível ${estadoJogador.nivel}! +10 HP máx (cura total), +2 pontos de atributo, +1 de talento.`);
+    atualizarBarraVida();
+    if(typeof renderizarPainelProgressao === 'function') renderizarPainelProgressao();
+  }
+  atualizarBarraXP();
+  salvarEstado();
+}
+
+function atualizarBarraXP(){
+  const precisa = xpParaProximoNivel(estadoJogador.nivel);
+  const pct = Math.max(0, Math.min(100, (estadoJogador.xp / precisa) * 100));
+  const elBarra = document.getElementById('barra-xp');
+  if(elBarra) elBarra.style.width = pct + '%';
+  const elTexto = document.getElementById('valor-xp-texto');
+  if(elTexto) elTexto.textContent = `Nv.${estadoJogador.nivel} · ${Math.floor(estadoJogador.xp)}/${precisa} XP`;
+  const elNivelCompacto = document.getElementById('valor-nivel-compacto');
+  if(elNivelCompacto) elNivelCompacto.textContent = estadoJogador.nivel;
+}
+atualizarBarraXP();
+
+// ---- ATRIBUTOS ----
+// Vigor: +5 vidaMax por ponto (aplicado na hora, não depende de fórmula
+// externa). Força: bônus de dano lido por multiplicadorDanoAtributo().
+// Destreza: redução de cooldown de esquiva lida por cooldownEsquivaEfetivo().
+function investirAtributo(nomeAtributo){
+  if(estadoJogador.pontosAtributo <= 0) return false;
+  if(!estadoJogador.atributos || !(nomeAtributo in estadoJogador.atributos)) return false;
+  estadoJogador.atributos[nomeAtributo] += 1;
+  estadoJogador.pontosAtributo -= 1;
+  if(nomeAtributo === 'vigor'){
+    estadoJogador.vidaMax += 5;
+    estadoJogador.vida += 5;
+    atualizarBarraVida();
+  }
+  salvarEstado();
+  if(typeof renderizarPainelProgressao === 'function') renderizarPainelProgressao();
+  return true;
+}
+
+// Fator de dano extra usado por calcularDanoContraMaligno (Etapa 1) — a
+// função original não foi reescrita, só passou a multiplicar pelo
+// resultado desta aqui (ver edição em calcularDanoContraMaligno).
+function multiplicadorDanoAtributo(){
+  return 1 + (estadoJogador.atributos.forca * 0.03) + (temTalento('combate1') ? 0.10 : 0);
+}
+
+// Cooldown de esquiva efetivo (Destreza + talento Reflexos), com piso de
+// 70% de redução máxima para não zerar o cooldown por completo.
+function cooldownEsquivaEfetivo(){
+  const reducao = (estadoJogador.atributos.destreza * 0.03) + (temTalento('combate2') ? 0.20 : 0);
+  return Math.max(0.3, COOLDOWN_ESQUIVA * (1 - Math.min(0.7, reducao)));
+}
+
+// Fator de redução de dano recebido (talento Resistência), lido dentro de
+// aplicarDanoJogador como um multiplicador extra sobre o dano já calculado.
+function multiplicadorDanoRecebido(){
+  return temTalento('sobrevivencia2') ? 0.9 : 1;
+}
+
+// Fator de velocidade de corrida (talento Passo Leve), multiplicado sobre
+// VELOCIDADE_AVATAR já existente, sem alterar a fórmula original.
+function multiplicadorVelocidadeTalento(){
+  return temTalento('exploracao1') ? 1.15 : 1;
+}
+
+// Fator de recompensa de moedas/diamantes ao derrotar malignos (talento
+// Faro para Recompensas), multiplicado dentro de removerMaligno.
+function multiplicadorRecompensaTalento(){
+  return temTalento('exploracao2') ? 1.2 : 1;
+}
+
+// ---- ÁRVORE DE TALENTOS ----
+// 3 ramos × 3 níveis, desbloqueio sequencial (precisa do nó anterior do
+// MESMO ramo já desbloqueado), custo fixo de 1 ponto de talento por nó.
+const ARVORE_TALENTOS = {
+  combate1:       { ramo:'combate',       ordem:1, nome:'Fúria Inicial',           desc:'+10% de dano contra malignos.',                          requer:null },
+  combate2:       { ramo:'combate',       ordem:2, nome:'Reflexos',                desc:'-20% no cooldown de esquiva.',                           requer:'combate1' },
+  combate3:       { ramo:'combate',       ordem:3, nome:'Contra-Ataque',          desc:'Bloqueio reduz 90% do dano (em vez de 80%).',            requer:'combate2' },
+  exploracao1:    { ramo:'exploracao',    ordem:1, nome:'Passo Leve',              desc:'+15% de velocidade ao correr.',                          requer:null },
+  exploracao2:    { ramo:'exploracao',    ordem:2, nome:'Faro para Recompensas',   desc:'+20% de moedas/diamantes ao derrotar malignos.',         requer:'exploracao1' },
+  exploracao3:    { ramo:'exploracao',    ordem:3, nome:'Instinto de Sobrevivência', desc:'Regenera 1 HP a cada 5s fora de combate.',             requer:'exploracao2' },
+  sobrevivencia1: { ramo:'sobrevivencia', ordem:1, nome:'Vigor Extra',             desc:'+20 de vida máxima (imediato).',                         requer:null },
+  sobrevivencia2: { ramo:'sobrevivencia', ordem:2, nome:'Resistência',            desc:'-10% de todo dano recebido.',                            requer:'sobrevivencia1' },
+  sobrevivencia3: { ramo:'sobrevivencia', ordem:3, nome:'Segunda Chance',         desc:'Nocaute recupera 75% da vida (em vez de 50%).',          requer:'sobrevivencia2' }
+};
+
+function temTalento(id){
+  return estadoJogador.talentos.includes(id);
+}
+
+function podeDesbloquearTalento(id){
+  const t = ARVORE_TALENTOS[id];
+  if(!t) return false;
+  if(temTalento(id)) return false;
+  if(estadoJogador.pontosTalento <= 0) return false;
+  if(t.requer && !temTalento(t.requer)) return false;
+  return true;
+}
+
+function desbloquearTalento(id){
+  if(!podeDesbloquearTalento(id)) return false;
+  estadoJogador.talentos.push(id);
+  estadoJogador.pontosTalento -= 1;
+  if(id === 'sobrevivencia1'){
+    estadoJogador.vidaMax += 20;
+    estadoJogador.vida += 20;
+    atualizarBarraVida();
+  }
+  mostrarToast(`🌟 Talento desbloqueado: ${ARVORE_TALENTOS[id].nome}!`);
+  salvarEstado();
+  if(typeof renderizarPainelProgressao === 'function') renderizarPainelProgressao();
+  return true;
+}
+
+// Regeneração passiva fora de combate (talento Instinto de Sobrevivência).
+// Chamada a partir de animarInterno() a cada frame, com acumuladores
+// próprios — não interfere em nenhum outro timer/sistema existente.
+let acumuladorRegenPassiva = 0;
+let tempoDesdeUltimoDanoJogador = 999;
+function atualizarRegeneracaoPassiva(delta){
+  tempoDesdeUltimoDanoJogador += delta;
+  if(!temTalento('exploracao3')) return;
+  if(estadoJogador.vida <= 0 || estadoJogador.vida >= estadoJogador.vidaMax) return;
+  if(tempoDesdeUltimoDanoJogador < 3) return; // só regenera se não tomou dano recentemente
+  acumuladorRegenPassiva += delta;
+  if(acumuladorRegenPassiva >= 5){
+    acumuladorRegenPassiva = 0;
+    estadoJogador.vida = Math.min(estadoJogador.vidaMax, estadoJogador.vida + 1);
+    atualizarBarraVida();
+    salvarEstado();
+  }
 }
 
 // =====================================================================
@@ -16392,6 +18107,7 @@ function comprarItem(item){
   atualizarCreditosHUD();
   avancarMissoesPorTipo('comprar', m=> m.categoriaAlvo === item.categoria);
   if(item.moeda === 'moeda') avancarMissoesPorTipo('comprar_qualquer');
+  avancarMissoesDiariasPorTipo('comprar_qualquer_dia'); // NOVO (Etapa 4, v165)
   return true;
 }
 
@@ -16414,6 +18130,7 @@ function comprarSemente(item){
   mostrarToast(`${item.icone} ${item.nome} adicionada ao inventário!`);
   avancarMissoesPorTipo('comprar', m=> m.categoriaAlvo === item.categoria);
   if(item.moeda === 'moeda') avancarMissoesPorTipo('comprar_qualquer');
+  avancarMissoesDiariasPorTipo('comprar_qualquer_dia'); // NOVO (Etapa 4, v165)
   return true;
 }
 
@@ -16854,6 +18571,104 @@ function criarNftMaligno(item) {
         const olhoGeo = new THREE.SphereGeometry(0.05, 6, 6);
         const olho1 = new THREE.Mesh(olhoGeo, matOlhos); olho1.position.set(-0.1, 2.0, 0.26); g.add(olho1);
         const olho2 = new THREE.Mesh(olhoGeo, matOlhos); olho2.position.set(0.1, 2.0, 0.26); g.add(olho2);
+    } else if (item.subtipo === 'zumbi') {
+        // Humanoide cambaleante, braços caídos para a frente, cabeça
+        // pendendo de lado — visual de "controlado à distância".
+        const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.24, 0.6, 4, 8), matCorpo);
+        torso.position.y = 0.85; torso.castShadow = true; g.add(torso);
+        const cabeca = new THREE.Mesh(new THREE.SphereGeometry(0.19, 8, 8), matCorpo);
+        cabeca.position.set(0.05, 1.35, 0); cabeca.rotation.z = 0.25; cabeca.castShadow = true; g.add(cabeca);
+        const bracoGeo = new THREE.CylinderGeometry(0.05, 0.06, 0.55, 5);
+        const bracoEsq = new THREE.Mesh(bracoGeo, matCorpo);
+        bracoEsq.position.set(-0.26, 0.7, 0.15); bracoEsq.rotation.x = -0.9; g.add(bracoEsq);
+        const bracoDir = new THREE.Mesh(bracoGeo, matCorpo);
+        bracoDir.position.set(0.26, 0.7, 0.15); bracoDir.rotation.x = -0.9; g.add(bracoDir);
+        // Antena/sinal no topo da cabeça, simbolizando controle remoto.
+        const antena = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.22, 4), new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 0.6 }));
+        antena.position.set(0.05, 1.58, 0); g.add(antena);
+        const sinal = new THREE.Mesh(new THREE.SphereGeometry(0.04, 6, 6), matOlhos);
+        sinal.position.set(0.05, 1.7, 0); g.add(sinal);
+        const olhoGeo = new THREE.SphereGeometry(0.035, 6, 6);
+        const olho1 = new THREE.Mesh(olhoGeo, matOlhos); olho1.position.set(-0.03, 1.36, 0.16); g.add(olho1);
+        const olho2 = new THREE.Mesh(olhoGeo, matOlhos); olho2.position.set(0.13, 1.36, 0.16); g.add(olho2);
+    } else if (item.subtipo === 'robo_defeituoso') {
+        // Corpo quadrado de robô com peças levemente desalinhadas
+        // (assimetria proposital, representando o "defeito").
+        const torso = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.6, 0.35), matCorpo);
+        torso.position.y = 0.9; torso.rotation.z = 0.06; torso.castShadow = true; g.add(torso);
+        const cabeca = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.3, 0.3), matCorpo);
+        cabeca.position.set(-0.03, 1.38, 0); cabeca.rotation.z = -0.1; cabeca.castShadow = true; g.add(cabeca);
+        const matJunta = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, metalness: 0.7, roughness: 0.4 });
+        const pernaGeo = new THREE.CylinderGeometry(0.07, 0.07, 0.5, 6);
+        const pernaEsq = new THREE.Mesh(pernaGeo, matJunta); pernaEsq.position.set(-0.15, 0.35, 0); g.add(pernaEsq);
+        const pernaDir = new THREE.Mesh(pernaGeo, matJunta); pernaDir.position.set(0.17, 0.32, 0); g.add(pernaDir);
+        const olhoGeo = new THREE.BoxGeometry(0.06, 0.06, 0.02);
+        const olho1 = new THREE.Mesh(olhoGeo, matOlhos); olho1.position.set(-0.11, 1.4, 0.16); g.add(olho1);
+        const olho2 = new THREE.Mesh(olhoGeo, matOlhos); olho2.position.set(0.04, 1.36, 0.16); g.add(olho2);
+        // Faísca/erro piscando no ombro, sinal visual do "bug".
+        const faisca = new THREE.Mesh(new THREE.OctahedronGeometry(0.05), new THREE.MeshStandardMaterial({ color: 0xffff33, emissive: 0xffff33, emissiveIntensity: 1.2 }));
+        faisca.position.set(0.22, 1.05, 0.12); g.add(faisca);
+    } else if (item.subtipo === 'cavaleiro_sombrio') {
+        // Vulto alto e blindado, capa longa, sem rosto visível — a
+        // aparência de quem "age escondido".
+        const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.22, 0.95, 8), matCorpo);
+        torso.position.y = 1.15; torso.castShadow = true; g.add(torso);
+        const cabeca = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 8), matCorpo);
+        cabeca.position.y = 1.78; cabeca.castShadow = true; g.add(cabeca);
+        const capa = new THREE.Mesh(new THREE.ConeGeometry(0.42, 1.3, 8, 1, true), new THREE.MeshStandardMaterial({ color: 0x0d0d14, roughness: 0.85, side: THREE.DoubleSide }));
+        capa.position.set(0, 0.95, -0.1); g.add(capa);
+        const espadaGeo = new THREE.BoxGeometry(0.06, 0.85, 0.02);
+        const espada = new THREE.Mesh(espadaGeo, new THREE.MeshStandardMaterial({ color: 0x555566, metalness: 0.7, roughness: 0.3 }));
+        espada.position.set(0.36, 1.1, 0.1); espada.rotation.z = 0.25; g.add(espada);
+        const olhoGeo = new THREE.SphereGeometry(0.045, 6, 6);
+        const olho1 = new THREE.Mesh(olhoGeo, matOlhos); olho1.position.set(-0.08, 1.82, 0.17); g.add(olho1);
+        const olho2 = new THREE.Mesh(olhoGeo, matOlhos); olho2.position.set(0.08, 1.82, 0.17); g.add(olho2);
+    } else if (item.subtipo === 'aranha_dados') {
+        // Corpo de aranha: abdômen central + 8 pernas finas em ângulo,
+        // simbolizando teias de coleta se espalhando em várias direções.
+        const abdomen = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 8), matCorpo);
+        abdomen.position.y = 0.35; abdomen.scale.set(1, 0.8, 1.3); abdomen.castShadow = true; g.add(abdomen);
+        const cabeca = new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 8), matCorpo);
+        cabeca.position.set(0, 0.32, 0.24); cabeca.castShadow = true; g.add(cabeca);
+        const pernaGeo = new THREE.CylinderGeometry(0.018, 0.03, 0.5, 4);
+        for (let i = 0; i < 8; i++) {
+            const perna = new THREE.Mesh(pernaGeo, matCorpo);
+            const lado = i < 4 ? -1 : 1;
+            const idx = i % 4;
+            const anguloZ = lado * (0.5 + idx * 0.18);
+            perna.position.set(lado * 0.28, 0.28 - idx * 0.02, -0.15 + idx * 0.14);
+            perna.rotation.z = anguloZ;
+            perna.rotation.x = 0.3;
+            g.add(perna);
+        }
+        const olhoGeo = new THREE.SphereGeometry(0.03, 6, 6);
+        for (let i = 0; i < 4; i++) {
+            const olho = new THREE.Mesh(olhoGeo, matOlhos);
+            olho.position.set(-0.06 + i * 0.04, 0.36, 0.34);
+            g.add(olho);
+        }
+    } else if (item.subtipo === 'golem_codigo') {
+        // Colosso feito de blocos empilhados de tamanhos irregulares
+        // (representando "código quebrado" empilhado), escala grande.
+        const matBloco2 = new THREE.MeshStandardMaterial({ color: item.corCorpo, roughness: 0.8, emissive: item.corAura, emissiveIntensity: 0.15 });
+        const blocosBase = [
+            { s: [0.9, 0.55, 0.6], p: [0, 0.4, 0] },
+            { s: [0.7, 0.5, 0.55], p: [0.08, 0.92, 0.02] },
+            { s: [0.55, 0.45, 0.45], p: [-0.05, 1.38, -0.02] },
+            { s: [0.4, 0.38, 0.4], p: [0.02, 1.78, 0] },
+        ];
+        blocosBase.forEach(b => {
+            const bloco = new THREE.Mesh(new THREE.BoxGeometry(b.s[0], b.s[1], b.s[2]), matBloco2);
+            bloco.position.set(b.p[0], b.p[1], b.p[2]);
+            bloco.rotation.y = (Math.random() - 0.5) * 0.15;
+            bloco.castShadow = true; g.add(bloco);
+        });
+        const bracoGeo = new THREE.BoxGeometry(0.25, 0.7, 0.28);
+        const bracoEsq = new THREE.Mesh(bracoGeo, matBloco2); bracoEsq.position.set(-0.58, 0.85, 0); g.add(bracoEsq);
+        const bracoDir = new THREE.Mesh(bracoGeo, matBloco2); bracoDir.position.set(0.6, 0.85, 0); g.add(bracoDir);
+        const olhoGeo = new THREE.BoxGeometry(0.08, 0.06, 0.03);
+        const olho1 = new THREE.Mesh(olhoGeo, matOlhos); olho1.position.set(-0.08, 1.8, 0.21); g.add(olho1);
+        const olho2 = new THREE.Mesh(olhoGeo, matOlhos); olho2.position.set(0.12, 1.8, 0.21); g.add(olho2);
     }
     return g;
 }
@@ -19720,6 +21535,7 @@ function iniciarQuiz() {
         recompensaEl.textContent = `🎉 +${recomp.valor} ${icone} de recompensa!`;
         mostrarToast(`🎉 Você ganhou +${recomp.valor} ${icone} no Quiz!`);
         avancarMissoesPorTipo('quiz', m => m.tipo === 'quiz');
+        avancarMissoesDiariasPorTipo('quiz_qualquer_dia'); // NOVO (Etapa 4, v165)
       } else {
         feedback.style.display = 'block';
         feedback.style.background = '#FFEBEE';
@@ -21555,6 +23371,586 @@ function tocarJatoDeFogoDragao(){
 }
 
 // =====================================================================
+// CHEFE DE MUNDO: DRAGÃO ANCIÃO (v160 — Etapa 1, parte B, item 3, pedido
+// do "PROMPT PARA IMPLEMENTAÇÃO DAS MELHORIAS"). PERGUNTADO explicitamente
+// ao usuário como esse chefe deveria se relacionar com os dois sistemas
+// de dragão já existentes (dragoesMontanha ambiente / dragaoMatriarca do
+// ninho) — resposta: entidade TOTALMENTE NOVA e SEPARADA. Por isso este
+// bloco não toca em nenhum array/estado de nenhum dos dois; a única coisa
+// reaproveitada é a função PURA (sem estado) criarModeloDragao() para a
+// geometria, e os recursos genéricos de fogo (grupoFogoDragao/
+// particulasFogoDragao/MATERIAIS_FOGO_DRAGAO/tocarJatoDeFogoDragao/
+// tocarRugidoDragao), que já eram pools/efeitos compartilhados, não
+// pertencentes a um dragão específico.
+//
+// Duas fases, exatamente como pedido no prompt de melhorias:
+//   Fase 1 (hp > 50%): voa em círculo sobre seu próprio pico; ao detectar
+//     o jogador, passa a persegui-lo em voo e cospe fogo à distância.
+//   Fase 2 (hp <= 50%): pousa definitivamente e ataca por mordida/garra
+//     corpo a corpo — mais rápido, mais perigoso de perto.
+// Dano ao jogador SEMPRE via aplicarDanoJogador (API central de HP da
+// Etapa 1) — nunca rouba moeda (diferente da convenção antiga do dragão
+// ambiente). "Derrota" = adormece por um tempo e depois renasce com HP
+// cheio (mesmo espírito não-violento de desmaiarJogador: nunca morte real).
+// =====================================================================
+const CENTRO_CHEFE_DRAGAO_ANCIAO = new THREE.Vector3(420, 0, 420); // pico isolado — fora do anel de dragões ambiente (raio 150-195) e longe do eixo do Castelo (z=-650)
+const ESCALA_CHEFE_DRAGAO_ANCIAO = 2.2; // "Ancião" = bem maior que o dragão ambiente comum
+const RAIO_PATRULHA_CHEFE_DRAGAO = 26;
+const RAIO_ALERTA_CHEFE_DRAGAO = 55;
+const RAIO_DESISTENCIA_CHEFE_DRAGAO = 85; // além disso, desiste da perseguição e volta a patrulhar
+const RAIO_FOGO_CHEFE_DRAGAO = 16;
+const RAIO_GARRA_CHEFE_DRAGAO = 5;
+const ALTURA_VOO_CHEFE_DRAGAO = 30;
+const HP_MAX_CHEFE_DRAGAO_ANCIAO = 220;
+const DANO_FOGO_CHEFE_DRAGAO = 14;
+const DANO_GARRA_CHEFE_DRAGAO = 18;
+const COOLDOWN_FOGO_CHEFE_DRAGAO = 3.2;
+const COOLDOWN_GARRA_CHEFE_DRAGAO = 1.6;
+const TEMPO_RENASCER_CHEFE_DRAGAO = 600; // 10min "adormecido" após derrota, depois volta com HP cheio
+
+function criarChefeDragaoAnciao(){
+  const obj = criarModeloDragao(); // geometria pura reaproveitada (sem estado compartilhado)
+  obj.scale.setScalar(FATOR_ESCALA_MUNDO * ESCALA_CHEFE_DRAGAO_ANCIAO);
+  obj.position.copy(CENTRO_CHEFE_DRAGAO_ANCIAO);
+  obj.position.y = ALTURA_VOO_CHEFE_DRAGAO;
+
+  // Auréola dourada (sprite Canvas 2D — NUNCA THREE.PointLight, mesma
+  // regra do projeto inteiro) sinaliza "chefe ancião" sem precisar clonar
+  // ou alterar os materiais M_DRAGAO compartilhados com o dragão ambiente
+  // e a Matriarca.
+  const canvasAura = document.createElement('canvas');
+  canvasAura.width = 128; canvasAura.height = 128;
+  const ctxAura = canvasAura.getContext('2d');
+  const grad = ctxAura.createRadialGradient(64,64,10,64,64,64);
+  grad.addColorStop(0, 'rgba(255,214,102,0.55)');
+  grad.addColorStop(1, 'rgba(255,214,102,0)');
+  ctxAura.fillStyle = grad;
+  ctxAura.fillRect(0,0,128,128);
+  const texAura = new THREE.CanvasTexture(canvasAura);
+  const spriteAura = new THREE.Sprite(new THREE.SpriteMaterial({ map: texAura, transparent: true, depthWrite: false }));
+  spriteAura.scale.set(9, 9, 1);
+  spriteAura.position.set(0, 3, 0);
+  obj.add(spriteAura);
+
+  const sprite = criarSpriteTexto('🐲 Dragão Ancião');
+  sprite.position.y = 8;
+  obj.add(sprite);
+  obj.userData._spriteChefe = sprite;
+
+  cena.add(obj);
+  return obj;
+}
+
+const chefeDragaoAnciaoObj = criarChefeDragaoAnciao();
+const chefeDragaoAnciao = {
+  obj: chefeDragaoAnciaoObj,
+  uid: 'chefe_dragao_anciao', // fixo — chefe único, não é instância de spawn repetível
+  item: { nome: 'Dragão Ancião', subtipo: 'chefe_dragao_anciao' },
+  ia: {
+    fase: 1,
+    estado: 'patrulhar', // patrulhar | perseguir | pousando | pousado | derrotado
+    hp: HP_MAX_CHEFE_DRAGAO_ANCIAO,
+    hpMax: HP_MAX_CHEFE_DRAGAO_ANCIAO,
+    sprite: chefeDragaoAnciaoObj.userData._spriteChefe,
+    faseVooLocal: Math.random() * Math.PI * 2,
+    cooldownFogo: 0,
+    cooldownGarra: 0,
+    timerRenascer: 0
+  }
+};
+// Array PRÓPRIO e separado de malignosAtivos (decisão confirmada com o
+// usuário) — atirar() escaneia este array ADICIONALMENTE, sem misturar
+// com a lista de malignos comuns.
+const chefesAtivos = [chefeDragaoAnciao];
+
+// Jato de fogo do chefe: mesma técnica visual/sonora de cuspirFogoDragao
+// (reaproveita o pool genérico de partículas), mas o dano usa a API
+// central de HP em vez de roubar moeda (convenção NOVA da Etapa 1).
+function cuspirFogoChefeDragao(chefe){
+  const origem = new THREE.Vector3();
+  chefe.obj.userData._partes.boca.getWorldPosition(origem);
+  const direcao = new THREE.Vector3(0,0,1).applyQuaternion(chefe.obj.quaternion);
+
+  for(let i=0;i<18;i++){
+    const tamanho = 0.5+Math.random()*0.8;
+    const particula = new THREE.Mesh(new THREE.SphereGeometry(tamanho,8,8), MATERIAIS_FOGO_DRAGAO[Math.floor(Math.random()*MATERIAIS_FOGO_DRAGAO.length)]);
+    particula.position.copy(origem);
+    particula.position.add(new THREE.Vector3((Math.random()-0.5)*0.8,(Math.random()-0.5)*0.8,(Math.random()-0.5)*0.8));
+    particula.userData.velocidade = direcao.clone().multiplyScalar(0.6+Math.random()*0.5);
+    particula.userData.vida = 1;
+    particula.userData.decaimento = 0.018+Math.random()*0.02;
+    grupoFogoDragao.add(particula);
+    particulasFogoDragao.push(particula);
+  }
+
+  const mandibula = chefe.obj.userData._partes.mandibula;
+  if(mandibula){ mandibula.rotation.x = 0.5; setTimeout(()=>{ mandibula.rotation.x = 0; }, 500); }
+
+  tocarJatoDeFogoDragao();
+
+  const distJogador = origem.distanceTo(grupoAvatar.position);
+  if(distJogador < RAIO_FOGO_CHEFE_DRAGAO){
+    aplicarDanoJogador(DANO_FOGO_CHEFE_DRAGAO, 'Dragão Ancião');
+  }
+}
+
+// "Derrota" = adormece e renasce depois (nunca morte real), com
+// recompensa — chamada por atirar() no lugar de removerMaligno() quando
+// o alvo é o chefe (ver extensão aditiva dentro de atirar()).
+function derrotarChefeDragaoAnciao(){
+  const ia = chefeDragaoAnciao.ia;
+  ia.estado = 'derrotado';
+  ia.timerRenascer = TEMPO_RENASCER_CHEFE_DRAGAO;
+  chefeDragaoAnciao.obj.visible = false;
+  comboAlvoUid = null; comboContador = 0;
+
+  const recompensaMoedas = 120;
+  const recompensaDiamantes = 40;
+  estadoJogador.moedas += recompensaMoedas;
+  estadoJogador.creditos += recompensaDiamantes;
+  atualizarCreditosHUD();
+  salvarEstado();
+  mostrarToast(`🏆 Você derrotou o Dragão Ancião! +${recompensaMoedas} 🪙 +${recompensaDiamantes} 💎`);
+  ganharXP(150, 'Dragão Ancião derrotado'); // NOVO (Etapa 2 — Progressão, v162)
+}
+
+function atualizarChefeDragaoAnciao(delta, elapsedTotal){
+  const chefe = chefeDragaoAnciao;
+  const ia = chefe.ia;
+  const p = chefe.obj.position;
+
+  if(ia.estado === 'derrotado'){
+    ia.timerRenascer -= delta;
+    if(ia.timerRenascer <= 0){
+      ia.hp = ia.hpMax;
+      ia.fase = 1;
+      ia.estado = 'patrulhar';
+      p.copy(CENTRO_CHEFE_DRAGAO_ANCIAO);
+      p.y = ALTURA_VOO_CHEFE_DRAGAO;
+      chefe.obj.visible = true;
+      if(ia.sprite) ia.sprite.userData.atualizarTexto('🐲 Dragão Ancião');
+      mostrarToast('🐲 O Dragão Ancião desperta novamente em seu pico...');
+    }
+    return;
+  }
+
+  const partes = chefe.obj.userData._partes;
+  if(ia.cooldownFogo > 0) ia.cooldownFogo -= delta;
+  if(ia.cooldownGarra > 0) ia.cooldownGarra -= delta;
+
+  const distJogador = p.distanceTo(grupoAvatar.position);
+
+  // --- Transição de fase (item pedido: Fase 1 voo/fogo -> Fase 2 pouso/garras) ---
+  if(ia.fase === 1 && ia.hp <= ia.hpMax * 0.5){
+    ia.fase = 2;
+    ia.estado = 'pousando';
+    mostrarToast('🐲 O Dragão Ancião está ferido e pousa, furioso!');
+    tocarRugidoDragao();
+  }
+
+  if(ia.fase === 1){
+    if(ia.estado === 'patrulhar'){
+      if(distJogador < RAIO_ALERTA_CHEFE_DRAGAO){
+        ia.estado = 'perseguir';
+        mostrarToast('🐉 O Dragão Ancião despertou e avançou!');
+        tocarRugidoDragao();
+      } else {
+        ia.faseVooLocal += delta * 0.5;
+        p.x = CENTRO_CHEFE_DRAGAO_ANCIAO.x + Math.cos(ia.faseVooLocal) * RAIO_PATRULHA_CHEFE_DRAGAO;
+        p.z = CENTRO_CHEFE_DRAGAO_ANCIAO.z + Math.sin(ia.faseVooLocal) * RAIO_PATRULHA_CHEFE_DRAGAO;
+        const alturaAlvo = alturaTerreno(p.x, p.z) + ALTURA_VOO_CHEFE_DRAGAO;
+        p.y += (alturaAlvo - p.y) * Math.min(1, delta*1.2);
+        chefe.obj.rotation.y = -ia.faseVooLocal + Math.PI/2;
+      }
+    } else if(ia.estado === 'perseguir'){
+      if(distJogador > RAIO_DESISTENCIA_CHEFE_DRAGAO){
+        ia.estado = 'patrulhar';
+      } else {
+        const alvoPos = grupoAvatar.position;
+        const dir = new THREE.Vector3(alvoPos.x-p.x, 0, alvoPos.z-p.z);
+        if(dir.length() > 0.01) dir.normalize();
+        const velVoo = 12;
+        p.x += dir.x * velVoo * delta;
+        p.z += dir.z * velVoo * delta;
+        const alturaAlvo = alturaTerreno(alvoPos.x, alvoPos.z) + ALTURA_VOO_CHEFE_DRAGAO;
+        p.y += (alturaAlvo - p.y) * Math.min(1, delta*1.2);
+        const anguloAlvo = Math.atan2(dir.x, dir.z);
+        let diff = anguloAlvo - chefe.obj.rotation.y;
+        diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+        chefe.obj.rotation.y += diff * Math.min(1, delta*2.2);
+
+        if(distJogador < RAIO_FOGO_CHEFE_DRAGAO && ia.cooldownFogo <= 0){
+          ia.cooldownFogo = COOLDOWN_FOGO_CHEFE_DRAGAO;
+          cuspirFogoChefeDragao(chefe);
+        }
+      }
+    }
+  } else {
+    if(ia.estado === 'pousando'){
+      const alturaChao = alturaTerreno(p.x, p.z);
+      p.y += (alturaChao - p.y) * Math.min(1, delta*1.5);
+      if(Math.abs(p.y - alturaChao) < 0.4){
+        p.y = alturaChao;
+        ia.estado = 'pousado';
+      }
+    } else if(ia.estado === 'pousado'){
+      const alvoPos = grupoAvatar.position;
+      const dir = new THREE.Vector3(alvoPos.x-p.x, 0, alvoPos.z-p.z);
+      const dXZ = dir.length();
+      if(dXZ > RAIO_GARRA_CHEFE_DRAGAO && dXZ > 0.01){
+        dir.normalize();
+        const velAndar = 5;
+        p.x += dir.x * velAndar * delta;
+        p.z += dir.z * velAndar * delta;
+        p.y = alturaTerreno(p.x, p.z);
+        const anguloAlvo = Math.atan2(dir.x, dir.z);
+        let diff = anguloAlvo - chefe.obj.rotation.y;
+        diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+        chefe.obj.rotation.y += diff * Math.min(1, delta*3);
+      } else if(dXZ <= RAIO_GARRA_CHEFE_DRAGAO && ia.cooldownGarra <= 0){
+        ia.cooldownGarra = COOLDOWN_GARRA_CHEFE_DRAGAO;
+        if(partes.mandibula){ partes.mandibula.rotation.x = 0.6; setTimeout(()=>{ partes.mandibula.rotation.x = 0; }, 250); }
+        aplicarDanoJogador(DANO_GARRA_CHEFE_DRAGAO, 'Dragão Ancião');
+        tocarRugidoDragao();
+      }
+    }
+  }
+
+  // --- Animações contínuas (bater de asas/cauda/respiração — mesmo
+  // padrão visual já usado em atualizarDragoes). ---
+  const perseguindo = ia.estado === 'perseguir';
+  const emVoo = ia.fase === 1;
+  const batidaAsa = emVoo ? Math.sin(elapsedTotal*(perseguindo?7:4)) * (perseguindo?0.6:0.5) : Math.sin(elapsedTotal*1.5)*0.15;
+  partes.asaEsq.rotation.z = batidaAsa;
+  partes.asaDir.rotation.z = -batidaAsa;
+  partes.segmentosCauda.forEach((seg,i)=>{
+    seg.rotation.x = Math.sin(elapsedTotal*2+i*0.3)*0.12;
+    seg.rotation.z = Math.sin(elapsedTotal*1.5+i*0.4)*0.1;
+  });
+  partes.corpo.scale.x = 1.5 + Math.sin(elapsedTotal*2)*0.02;
+  partes.corpo.scale.z = 1.2 + Math.sin(elapsedTotal*2)*0.02;
+
+  if(ia.sprite){
+    ia.sprite.userData.atualizarTexto(`🐲 Dragão Ancião ❤️${Math.max(0, Math.round(ia.hp))}/${ia.hpMax}`);
+  }
+}
+
+// =====================================================================
+// COMBATE DO OBSCURON — CHEFE FINAL (v161 — Etapa 1, parte B, item 4,
+// ÚLTIMO item pendente da Etapa 1/Combate do "PROMPT PARA IMPLEMENTAÇÃO
+// DAS MELHORIAS"). O Obscuron JÁ EXISTE por inteiro — modelo 3D, posição
+// na sala do topo da torre central, colisão física
+// (empurrarForaDoObscuron) e fala de aviso ao interagir
+// (interagirComObscuron) — desde a ETAPA 7.1/N. NADA disso é recriado
+// aqui; este bloco só ACRESCENTA a camada de combate (HP, fases,
+// investida à distância, invocação de lacaios, teleporte + ataque em
+// área), seguindo o MESMO padrão já usado no Dragão Ancião (v160):
+// objeto de combate próprio empurrado no array chefesAtivos (já
+// existente, reaproveitado sem alterações estruturais), dano ao jogador
+// sempre via aplicarDanoJogador, derrota com função própria (nunca
+// removerMaligno) que adormece e depois renasce com HP cheio — mesma
+// filosofia não-violenta do projeto inteiro (nunca morte real).
+//
+// Diferença chave em relação ao Dragão Ancião: obscuronCombate.obj
+// REFERENCIA diretamente obscuron.obj já existente (não cria nenhum
+// THREE.Group novo). A batalha de verdade só começa no primeiro tiro
+// que o acerta (ia.emBatalha = true) — antes disso ele continua
+// reagindo só com as falas de aviso já existentes via
+// interagirComObscuron, intocado, então quem só quer conversar/explorar
+// não é atacado sem provocar.
+// =====================================================================
+const HP_MAX_OBSCURON = 260; // chefe final: mais resistente que o Dragão Ancião (220)
+const LIMIAR_FASE2_OBSCURON = 0.6; // 60% de HP — mais cedo que o Dragão Ancião (50%), dando mais tempo de fase 2 num chefe final com 3 mecânicas
+const DANO_INVESTIDA_OBSCURON = 12;
+const DANO_AREA_OBSCURON = 20;
+const DANO_CONTATO_LACAIO = 8;
+const RAIO_INVESTIDA_OBSCURON = 13 * ESCALA_CASTELO; // cobre toda a sala do topo da torre (LADO_TORRE_CENTRAL = 12*ESCALA_CASTELO de lado)
+const RAIO_AREA_OBSCURON = 6 * ESCALA_CASTELO;
+const RAIO_TELEPORTE_OBSCURON = 4.5 * ESCALA_CASTELO; // mantém o pouso sempre dentro dos limites seguros da sala
+const COOLDOWN_INVESTIDA_OBSCURON = 3.6;
+const COOLDOWN_INVOCACAO_OBSCURON = 12;
+const COOLDOWN_TELEPORTE_OBSCURON = 9;
+const MAX_LACAIOS_OBSCURON = 3;
+const HP_LACAIO_OBSCURON = 18;
+const TEMPO_RENASCER_OBSCURON = 900; // 15min "adormecido" — chefe final, cooldown maior que o Dragão Ancião (10min)
+
+const obscuronCombate = {
+  obj: obscuron.obj, // reaproveita o modelo/posição/colisão já existentes — NÃO cria um novo THREE.Group
+  uid: 'chefe_obscuron',
+  item: { nome: 'Obscuron', subtipo: 'chefe_obscuron' },
+  ia: {
+    emBatalha: false, // só vira true no 1º dano recebido — ver atirar()
+    fase: 1,
+    estado: 'ativo', // ativo | derrotado
+    hp: HP_MAX_OBSCURON,
+    hpMax: HP_MAX_OBSCURON,
+    sprite: obscuron.obj.userData._spriteNome, // reaproveita o sprite de nome já existente (não cria um 2º)
+    cooldownInvestida: 0,
+    cooldownInvocacao: COOLDOWN_INVOCACAO_OBSCURON * 0.5, // 1ª invocação demora um pouco menos, pra a batalha não começar "vazia"
+    cooldownTeleporte: 0,
+    timerRenascer: 0
+  }
+};
+// Array PRÓPRIO já existente (criado pelo Dragão Ancião, v160) — reaproveitado
+// sem alterações estruturais, exatamente como recomendado no checkpoint v160.
+chefesAtivos.push(obscuronCombate);
+
+// --- Lacaios Sombrios (invocados pelo Obscuron) -----------------------
+// Entidades pequenas e fracas, próprias (array isolado, NUNCA misturado
+// com malignosAtivos, mesma filosofia de isolamento do chefe): perseguem
+// o jogador a pé e causam dano de contato. Removidas por função própria
+// (removerLacaioObscuron), nunca por removerMaligno (que mexe em
+// cofreMaligno/missões/enciclopédia — sistemas que não fazem sentido
+// para um lacaio temporário de invocação).
+const lacaiosObscuronAtivos = [];
+let contadorLacaioObscuronUid = 0;
+const matCorpoLacaioObscuron = new THREE.MeshStandardMaterial({ color: 0x3a1f4d, roughness: 0.4, emissive: 0x6a1fbf, emissiveIntensity: 0.5 });
+const matOlhoLacaioObscuron = new THREE.MeshStandardMaterial({ color: 0xff2255, emissive: 0xff2255, emissiveIntensity: 1.6 });
+
+function criarLacaioObscuron(){
+  const g = new THREE.Group();
+  const corpo = new THREE.Mesh(new THREE.IcosahedronGeometry(0.4, 0), matCorpoLacaioObscuron);
+  corpo.castShadow = true;
+  g.add(corpo);
+  const olho = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), matOlhoLacaioObscuron);
+  olho.position.set(0, 0.05, 0.32);
+  g.add(olho);
+  const sprite = criarSpriteTexto('Lacaio Sombrio');
+  sprite.position.y = 0.85;
+  sprite.scale.set(1.0, 0.28, 1);
+  g.add(sprite);
+  g.userData._spriteLacaio = sprite;
+  cena.add(g);
+  return g;
+}
+
+function invocarLacaiosObscuron(){
+  const wp = posicaoMundoObscuron();
+  const qtd = Math.min(2, MAX_LACAIOS_OBSCURON - lacaiosObscuronAtivos.length);
+  if(qtd <= 0) return;
+  for(let i=0; i<qtd; i++){
+    const ang = Math.random() * Math.PI * 2;
+    const raio = 2 + Math.random() * 2;
+    const obj = criarLacaioObscuron();
+    obj.position.set(wp.x + Math.cos(ang)*raio, wp.y + 0.5, wp.z + Math.sin(ang)*raio);
+    const ent = {
+      obj,
+      uid: 'lacaio_obscuron_' + (++contadorLacaioObscuronUid),
+      item: { nome: 'Lacaio Sombrio', subtipo: 'lacaio_obscuron' },
+      ia: { hp: HP_LACAIO_OBSCURON, hpMax: HP_LACAIO_OBSCURON, sprite: obj.userData._spriteLacaio, cooldownContato: 0 }
+    };
+    lacaiosObscuronAtivos.push(ent);
+  }
+  mostrarToast('👥 Obscuron invoca lacaios sombrios!');
+  tocarSomInvocacaoObscuron();
+}
+
+function removerLacaioObscuron(ent){
+  cena.remove(ent.obj);
+  const idx = lacaiosObscuronAtivos.indexOf(ent);
+  if(idx !== -1) lacaiosObscuronAtivos.splice(idx, 1);
+}
+
+function atualizarLacaiosObscuron(delta){
+  // .slice() porque removerLacaioObscuron pode alterar o array durante o
+  // loop (mesmo cuidado já tomado noutros pontos do projeto com arrays
+  // de entidades que se removem sozinhas).
+  for(const ent of lacaiosObscuronAtivos.slice()){
+    if(ent.ia.cooldownContato > 0) ent.ia.cooldownContato -= delta;
+    const p = ent.obj.position;
+    const dir = new THREE.Vector3(grupoAvatar.position.x - p.x, 0, grupoAvatar.position.z - p.z);
+    const dist = dir.length();
+    if(dist > 0.4){
+      dir.normalize();
+      p.x += dir.x * 3.2 * delta;
+      p.z += dir.z * 3.2 * delta;
+    }
+    ent.obj.position.y = p.y + Math.sin(performance.now()*0.004 + p.x) * 0.15 * delta;
+    ent.obj.rotation.y += delta * 1.5;
+    if(ent.ia.sprite) ent.ia.sprite.userData.atualizarTexto(`Lacaio Sombrio ❤️${Math.max(0, Math.round(ent.ia.hp))}`);
+    if(dist < 0.9 && ent.ia.cooldownContato <= 0){
+      ent.ia.cooldownContato = 1.2;
+      aplicarDanoJogador(DANO_CONTATO_LACAIO, 'Lacaio Sombrio');
+    }
+  }
+}
+
+// --- Sons procedurais do combate do Obscuron (Web Audio API, mesmo
+// padrão de tocarRugidoDragao/tocarJatoDeFogoDragao acima — nunca
+// arquivo de áudio externo) ---
+function tocarSomInvestidaObscuron(){
+  if(!ctxAudio) return;
+  const t0 = ctxAudio.currentTime;
+  const osc = ctxAudio.createOscillator();
+  const g = ctxAudio.createGain();
+  osc.type = 'sawtooth';
+  osc.connect(g); g.connect(masterGainAudio);
+  osc.frequency.setValueAtTime(260, t0);
+  osc.frequency.exponentialRampToValueAtTime(90, t0+0.35);
+  g.gain.setValueAtTime(0, t0);
+  g.gain.linearRampToValueAtTime(0.1, t0+0.03);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0+0.4);
+  osc.start(t0); osc.stop(t0+0.42);
+}
+function tocarSomInvocacaoObscuron(){
+  if(!ctxAudio) return;
+  const t0 = ctxAudio.currentTime;
+  const osc = ctxAudio.createOscillator();
+  const g = ctxAudio.createGain();
+  osc.type = 'sine';
+  osc.connect(g); g.connect(masterGainAudio);
+  osc.frequency.setValueAtTime(60, t0);
+  osc.frequency.linearRampToValueAtTime(35, t0+0.8);
+  g.gain.setValueAtTime(0, t0);
+  g.gain.linearRampToValueAtTime(0.11, t0+0.15);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0+0.9);
+  osc.start(t0); osc.stop(t0+0.92);
+}
+function tocarSomTeleporteObscuron(){
+  if(!ctxAudio) return;
+  const t0 = ctxAudio.currentTime;
+  const osc = ctxAudio.createOscillator();
+  const g = ctxAudio.createGain();
+  osc.type = 'sine';
+  osc.connect(g); g.connect(masterGainAudio);
+  osc.frequency.setValueAtTime(200, t0);
+  osc.frequency.exponentialRampToValueAtTime(900, t0+0.25);
+  g.gain.setValueAtTime(0.08, t0);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0+0.3);
+  osc.start(t0); osc.stop(t0+0.32);
+}
+function tocarSomAtaqueAreaObscuron(){
+  if(!ctxAudio) return;
+  const t0 = ctxAudio.currentTime;
+  const ruido = ctxAudio.createBufferSource();
+  const tamanhoBuffer = Math.floor(ctxAudio.sampleRate*0.4);
+  const buffer = ctxAudio.createBuffer(1, tamanhoBuffer, ctxAudio.sampleRate);
+  const dados = buffer.getChannelData(0);
+  for(let i=0;i<tamanhoBuffer;i++) dados[i] = (Math.random()*2-1)*(1-i/tamanhoBuffer);
+  ruido.buffer = buffer;
+  const filtro = ctxAudio.createBiquadFilter();
+  filtro.type = 'lowpass'; filtro.frequency.value = 400;
+  const g = ctxAudio.createGain();
+  g.gain.setValueAtTime(0.15, t0);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0+0.4);
+  ruido.connect(filtro); filtro.connect(g); g.connect(masterGainAudio);
+  ruido.start(t0);
+}
+
+// --- Investida arcana (ataque à distância, ambas as fases) ------------
+function dispararInvestidaObscuron(){
+  tocarSomInvestidaObscuron();
+  const b = obscuron.obj.userData._brilho;
+  if(b){
+    b.orbeCajado.material.emissiveIntensity = 3.2;
+    setTimeout(()=>{ if(b.orbeCajado) b.orbeCajado.material.emissiveIntensity = 1.4; }, 250);
+  }
+  mostrarToast('🔮 Obscuron dispara uma investida sombria!');
+  aplicarDanoJogador(DANO_INVESTIDA_OBSCURON, 'Obscuron');
+}
+
+// --- Teleporte + ataque em área (só na fase 2, hp <= 60%) --------------
+// Reposiciona o Obscuron pra um ponto aleatório dentro da sala do topo
+// (raio seguro RAIO_TELEPORTE_OBSCURON, em torno do centro Z_TORRE_CENTRAL_
+// CASTELO) e, após um curto atraso (telegraphed — dá tempo do jogador se
+// afastar), dispara uma onda de choque que só acerta quem estiver perto
+// da NOVA posição.
+function teleportarObscuron(){
+  mostrarToast('💨 Obscuron se teleporta!');
+  tocarSomTeleporteObscuron();
+  const ang = Math.random() * Math.PI * 2;
+  const raio = Math.random() * RAIO_TELEPORTE_OBSCURON;
+  obscuron.obj.position.x = Math.cos(ang) * raio;
+  obscuron.obj.position.z = Z_TORRE_CENTRAL_CASTELO + Math.sin(ang) * raio;
+  setTimeout(()=>{
+    if(obscuronCombate.ia.estado === 'derrotado') return; // evita atacar depois de já derrotado no meio do delay
+    const wp = posicaoMundoObscuron();
+    const dist = Math.hypot(grupoAvatar.position.x - wp.x, grupoAvatar.position.z - wp.z);
+    tocarSomAtaqueAreaObscuron();
+    if(dist < RAIO_AREA_OBSCURON){
+      mostrarToast('💥 Onda de choque sombria!');
+      aplicarDanoJogador(DANO_AREA_OBSCURON, 'Obscuron');
+    }
+  }, 500);
+}
+
+// --- Derrota (nunca removerMaligno — mesmo espírito não-violento do
+// Dragão Ancião: adormece e renasce, nunca morte real) -----------------
+function derrotarObscuron(){
+  const ia = obscuronCombate.ia;
+  ia.estado = 'derrotado';
+  ia.timerRenascer = TEMPO_RENASCER_OBSCURON;
+  obscuron.obj.visible = false;
+  comboAlvoUid = null; comboContador = 0;
+  lacaiosObscuronAtivos.slice().forEach(removerLacaioObscuron);
+
+  const recompensaMoedas = 300;
+  const recompensaDiamantes = 100;
+  estadoJogador.moedas += recompensaMoedas;
+  estadoJogador.creditos += recompensaDiamantes;
+  atualizarCreditosHUD();
+  salvarEstado();
+  mostrarToast(`👑 Você derrotou Obscuron! +${recompensaMoedas} 🪙 +${recompensaDiamantes} 💎`);
+  ganharXP(400, 'Obscuron derrotado'); // NOVO (Etapa 2 — Progressão, v162)
+}
+
+function atualizarObscuronCombate(delta){
+  const ia = obscuronCombate.ia;
+
+  if(ia.estado === 'derrotado'){
+    ia.timerRenascer -= delta;
+    if(ia.timerRenascer <= 0){
+      ia.hp = ia.hpMax;
+      ia.fase = 1;
+      ia.estado = 'ativo';
+      ia.emBatalha = false; // volta a só reagir com fala de aviso, até o próximo 1º tiro
+      obscuron.obj.visible = true;
+      if(ia.sprite) ia.sprite.userData.atualizarTexto('Obscuron');
+      mostrarToast('🔮 Obscuron retorna ao seu trono, recomposto...');
+    }
+    return;
+  }
+
+  // Antes do 1º dano, o Obscuron só reage com as falas de aviso já
+  // existentes (interagirComObscuron, intocado) — nenhuma mecânica de
+  // combate roda ainda.
+  if(!ia.emBatalha) return;
+
+  if(ia.cooldownInvestida > 0) ia.cooldownInvestida -= delta;
+  if(ia.cooldownInvocacao > 0) ia.cooldownInvocacao -= delta;
+  if(ia.cooldownTeleporte > 0) ia.cooldownTeleporte -= delta;
+
+  // Transição de fase por HP — mesmo padrão do Dragão Ancião (v160).
+  if(ia.fase === 1 && ia.hp <= ia.hpMax * LIMIAR_FASE2_OBSCURON){
+    ia.fase = 2;
+    mostrarToast('🔮 Obscuron canaliza seu poder sombrio! Cuidado com os teleportes!');
+    tocarSomInvocacaoObscuron();
+  }
+
+  const wp = posicaoMundoObscuron();
+  const distJogador = Math.hypot(grupoAvatar.position.x - wp.x, grupoAvatar.position.z - wp.z);
+
+  if(distJogador < RAIO_INVESTIDA_OBSCURON && ia.cooldownInvestida <= 0){
+    ia.cooldownInvestida = COOLDOWN_INVESTIDA_OBSCURON;
+    dispararInvestidaObscuron();
+  }
+
+  if(ia.cooldownInvocacao <= 0 && lacaiosObscuronAtivos.length < MAX_LACAIOS_OBSCURON){
+    ia.cooldownInvocacao = ia.fase === 2 ? COOLDOWN_INVOCACAO_OBSCURON * 0.6 : COOLDOWN_INVOCACAO_OBSCURON;
+    invocarLacaiosObscuron();
+  }
+
+  if(ia.fase === 2 && ia.cooldownTeleporte <= 0){
+    ia.cooldownTeleporte = COOLDOWN_TELEPORTE_OBSCURON;
+    teleportarObscuron();
+  }
+
+  if(ia.sprite){
+    ia.sprite.userData.atualizarTexto(`Obscuron ❤️${Math.max(0, Math.round(ia.hp))}/${ia.hpMax}`);
+  }
+}
+
+// =====================================================================
 // DRAGÃO FÊMEA DAS ILHAS FLUTUANTES + NINHO + CICLO DE VIDA (v61)
 // Pedido do usuário: uma dragoa com moradia (ninho) numa das ilhas
 // flutuantes mais distantes; ela sobrevoa as ilhas, a terra e as
@@ -21895,6 +24291,26 @@ const COOLDOWN_ATAQUE = 0.5;
 // próximo mesmo que o alvo tenha sido outra coisa.
 let ultimoTiroJogadorTempo = -999;
 
+// NOVO (Etapa 1, parte B — Revolução do Combate): sistema de combo. Conta
+// acertos CONSECUTIVOS no MESMO alvo (por uid); reseta ao errar o tiro, ao
+// acertar um alvo diferente do anterior, ou ao derrotar o alvo atual. Ao
+// atingir o 4º acerto seguido no mesmo alvo, aquele tiro causa dano DOBRADO
+// e dispara um flash visual de combo (reaproveita o mesmo tipo de overlay
+// do flash de dano do jogador, mas com cor própria — ver #flash-combo no
+// HTML/CSS e a função dispararFlashCombo()).
+let comboAlvoUid = null;
+let comboContador = 0;
+const COMBO_ACERTOS_PARA_BONUS = 4; // no 4º acerto seguido, dano dobrado
+const COMBO_MULTIPLICADOR_BONUS = 2;
+
+function dispararFlashCombo(){
+  const el = document.getElementById('flash-combo');
+  if(!el) return;
+  el.classList.remove('ativo');
+  void el.offsetWidth; // força reflow para poder reativar a animação em sequência
+  el.classList.add('ativo');
+}
+
 function atirar(){
   if (!estadoJogador.armaEquipada) {
     mostrarToast('⚠️ Equipe uma arma primeiro!');
@@ -21947,9 +24363,38 @@ function atirar(){
       alvoPrincipal = ent;
     }
   }
+  // Etapa 1 (parte B, item 3) — CHEFES: array PRÓPRIO e separado de
+  // malignosAtivos (chefeDragaoAnciao é entidade nova, não reaproveita os
+  // sistemas de dragão existentes — decisão confirmada com o usuário).
+  // Mesmo teste de hitscan acima, com raio maior (o chefe é bem maior que
+  // um maligno comum, ver ESCALA_CHEFE_DRAGAO_ANCIAO).
+  for (const ent of chefesAtivos) {
+    if (!ent.obj.visible) continue;
+    const pos = ent.obj.position;
+    const raio = 3.0;
+    const distancia = new THREE.Line3(origem, alvo).distanceToPoint(pos);
+    if (distancia < raio + 0.5 && distancia < menorDist) {
+      menorDist = distancia;
+      alvoPrincipal = ent;
+    }
+  }
+  // v161 (combate do Obscuron, item 4) — lacaios invocados: array PRÓPRIO
+  // (lacaiosObscuronAtivos), mesmo espírito de isolamento do chefesAtivos;
+  // raio pequeno, coerente com o tamanho miúdo do lacaio.
+  for (const ent of lacaiosObscuronAtivos) {
+    const pos = ent.obj.position;
+    const raio = 0.6;
+    const distancia = new THREE.Line3(origem, alvo).distanceToPoint(pos);
+    if (distancia < raio + 0.5 && distancia < menorDist) {
+      menorDist = distancia;
+      alvoPrincipal = ent;
+    }
+  }
 
   if (!alvoPrincipal) {
     mostrarToast('🔫 Tiro perdido!');
+    comboAlvoUid = null;
+    comboContador = 0;
     return;
   }
 
@@ -21965,18 +24410,56 @@ function atirar(){
     }
   }
 
+  // Atualiza o combo com base no alvo PRINCIPAL (armas de área continuam
+  // atingindo os alvos secundários normalmente, mas o bônus de combo é
+  // exclusivo de quem está sendo focado tiro após tiro).
+  if (alvoPrincipal.uid === comboAlvoUid) {
+    comboContador++;
+  } else {
+    comboAlvoUid = alvoPrincipal.uid;
+    comboContador = 1;
+  }
+  const comboBonusAtivo = comboContador >= COMBO_ACERTOS_PARA_BONUS;
+  if (comboBonusAtivo) {
+    // Bônus aplicado neste tiro; reinicia a contagem para um novo ciclo de
+    // combo no mesmo alvo (se o jogador continuar acertando-o).
+    comboContador = 0;
+  }
+
   for (const ent of alvosAtingidos) {
-    const dano = calcularDanoContraMaligno(armaItem, ent.item);
+    let dano = calcularDanoContraMaligno(armaItem, ent.item);
     const eficaz = armaItem && Array.isArray(armaItem.eficazContra) && armaItem.eficazContra.includes(ent.item.subtipo);
+    const comboNesteAlvo = comboBonusAtivo && ent === alvoPrincipal;
+    if (comboNesteAlvo) {
+      dano *= COMBO_MULTIPLICADOR_BONUS;
+      dispararFlashCombo();
+    }
+    // v161 (combate do Obscuron, item 4) — o 1º dano recebido "liga" a
+    // batalha de verdade (investida à distância, invocação de lacaios,
+    // teleporte+área na fase 2). Até aqui ele só reagia com as falas de
+    // aviso já existentes (interagirComObscuron, intocado).
+    if (ent === obscuronCombate) obscuronCombate.ia.emBatalha = true;
+
     ent.ia.hp -= dano;
 
     if (ent.ia.hp <= 0) {
-      removerMaligno(ent);
+      if (ent === alvoPrincipal) { comboAlvoUid = null; comboContador = 0; }
+      if (ent === chefeDragaoAnciao) {
+        derrotarChefeDragaoAnciao();
+      } else if (ent === obscuronCombate) {
+        derrotarObscuron();
+      } else if (lacaiosObscuronAtivos.includes(ent)) {
+        removerLacaioObscuron(ent);
+      } else {
+        removerMaligno(ent);
+      }
     } else {
       if (ent.ia.sprite) ent.ia.sprite.userData.atualizarTexto(`${ent.item.nome} ❤️${Math.max(0, Math.round(ent.ia.hp))}`);
-      mostrarToast(eficaz
-        ? `🎯 Acertou o ${ent.item.nome}! (-${dano} HP)`
-        : `〰️ Pouco efeito em ${ent.item.nome} (-${dano} HP). Use a ferramenta certa!`);
+      mostrarToast(comboNesteAlvo
+        ? `💥 COMBO x${COMBO_MULTIPLICADOR_BONUS}! ${ent.item.nome} (-${dano} HP)`
+        : (eficaz
+          ? `🎯 Acertou o ${ent.item.nome}! (-${dano} HP)`
+          : `〰️ Pouco efeito em ${ent.item.nome} (-${dano} HP). Use a ferramenta certa!`));
     }
   }
 }
@@ -21987,7 +24470,7 @@ function atirar(){
 // Nota: hp/velocidade/danoMoeda/danoDiamante de cada maligno vivem no
 // próprio item do CATALOGO_GALERIA (padrão "dados no item"), não mais
 // numa lista separada por tipo.
-const SUBTIPOS_MALIGNOS = ['sussurrador', 'verme', 'sombra', 'enxame', 'virus', 'trojano', 'ransomware'];
+const SUBTIPOS_MALIGNOS = ['sussurrador', 'verme', 'sombra', 'enxame', 'virus', 'trojano', 'ransomware', 'zumbi', 'robo_defeituoso', 'cavaleiro_sombrio', 'aranha_dados', 'golem_codigo'];
 
 // =====================================================================
 // ENCICLOPÉDIA DA SEGURANÇA DIGITAL (sistema "Sombras Digitais")
@@ -22045,6 +24528,41 @@ const DADOS_ENCICLOPEDIA = {
     comoFunciona: 'Bloqueia o acesso a arquivos importantes e exige pagamento (geralmente em criptomoeda) para "devolver" o acesso.',
     exemplos: 'Ataques que travam hospitais, empresas e órgãos públicos até que um resgate seja pago.',
     prevencao: 'Mantenha backups regulares dos seus arquivos em outro lugar e nunca pague resgate — isso incentiva novos ataques.'
+  },
+  zumbi: {
+    nome: 'Zumbi Digital (Dispositivo Zumbi)', emoji: '🧟',
+    representa: 'Um aparelho infectado que passa a obedecer ordens remotas de um invasor, sem o dono perceber.',
+    comoFunciona: 'Depois de infectado por um malware, o dispositivo entra numa rede de "zumbis" (botnet) que o invasor controla à distância, usando-o para atacar outros alvos.',
+    exemplos: 'Câmeras e roteadores domésticos infectados usados em ataques em massa contra sites.',
+    prevencao: 'Troque senhas padrão de aparelhos conectados à internet e mantenha o firmware sempre atualizado.'
+  },
+  robo_defeituoso: {
+    nome: 'Robô Defeituoso (Bug de Software)', emoji: '🤖',
+    representa: 'Um erro de programação (bug) que faz um programa se comportar de forma inesperada.',
+    comoFunciona: 'Uma falha na lógica ou no código escapa dos testes e só aparece durante o uso real, às vezes travando o sistema ou abrindo brechas de segurança.',
+    exemplos: 'Aplicativos que travam sozinhos, sites que mostram informações erradas por causa de um erro de código.',
+    prevencao: 'Sempre instale atualizações — elas costumam trazer correções (patches) para bugs já descobertos.'
+  },
+  cavaleiro_sombrio: {
+    nome: 'Cavaleiro Sombrio (Cibercrime / Dark Web)', emoji: '🗡️',
+    representa: 'Uma área escondida da internet, acessível só com ferramentas especiais, usada por criminosos digitais.',
+    comoFunciona: 'Criminosos negociam ali dados roubados, senhas vazadas e ferramentas de ataque, longe da vigilância comum da internet.',
+    exemplos: 'Venda de listas de senhas vazadas, contratação de serviços de ataque cibernético.',
+    prevencao: 'Use senhas diferentes para cada serviço e verifique se seus dados apareceram em vazamentos conhecidos.'
+  },
+  aranha_dados: {
+    nome: 'Aranha de Dados (Coleta sem Consentimento)', emoji: '🕷️',
+    representa: 'Programas que vasculham a internet juntando dados pessoais das pessoas sem pedir autorização.',
+    comoFunciona: 'Varre perfis, sites e formulários públicos coletando nomes, fotos e outras informações, muitas vezes para vender ou usar em golpes.',
+    exemplos: 'Perfis falsos criados a partir de fotos e dados copiados de redes sociais.',
+    prevencao: 'Configure seu perfil como privado e pense bem antes de deixar dados pessoais em sites desconhecidos.'
+  },
+  golem_codigo: {
+    nome: 'Golem de Código (Exploit)', emoji: '🗿',
+    representa: 'Uma técnica que aproveita uma falha de segurança conhecida em um sistema para invadi-lo.',
+    comoFunciona: 'Quanto mais tempo uma falha fica sem correção, mais forte e perigoso o ataque baseado nela pode ficar.',
+    exemplos: 'Ataques que exploram versões antigas de programas que nunca foram atualizadas.',
+    prevencao: 'Mantenha sempre a versão mais recente de sistemas e programas — é a principal defesa contra exploits conhecidos.'
   }
 };
 
@@ -22108,13 +24626,114 @@ function fecharPainelEnciclopedia(){
 document.getElementById('botao-enciclopedia').addEventListener('click', () => abrirJanelaEnciclopedia(null, false));
 document.getElementById('botao-fechar-enciclopedia').addEventListener('click', fecharPainelEnciclopedia);
 
+// =====================================================================
+// PAINEL DE PROGRESSÃO — ETAPA 2 (v162): Nível/XP, Atributos, Talentos
+// =====================================================================
+let painelProgressaoAberto = false;
+let abaProgressaoAtiva = 'atributos'; // 'atributos' | 'talentos'
+
+function alternarPainelProgressao(){
+  painelProgressaoAberto = !painelProgressaoAberto;
+  const el = document.getElementById('painel-progressao-completo');
+  if(el) el.style.display = painelProgressaoAberto ? 'flex' : 'none';
+  if(painelProgressaoAberto) renderizarPainelProgressao();
+}
+function fecharPainelProgressao(){
+  painelProgressaoAberto = false;
+  const el = document.getElementById('painel-progressao-completo');
+  if(el) el.style.display = 'none';
+}
+
+function renderizarPainelProgressao(){
+  const cabecalho = document.getElementById('progressao-cabecalho-info');
+  if(cabecalho){
+    cabecalho.textContent = `Nível ${estadoJogador.nivel} · ${Math.floor(estadoJogador.xp)}/${xpParaProximoNivel(estadoJogador.nivel)} XP · 🔷 ${estadoJogador.pontosAtributo} pontos de atributo · 🌟 ${estadoJogador.pontosTalento} pontos de talento`;
+  }
+  const corpo = document.getElementById('progressao-corpo');
+  if(!corpo) return;
+  corpo.innerHTML = '';
+
+  if(abaProgressaoAtiva === 'atributos'){
+    const DESC_ATRIBUTOS = {
+      vigor: { emoji:'❤️', nome:'Vigor', desc:'+5 de vida máxima por ponto.' },
+      forca: { emoji:'💪', nome:'Força', desc:'+3% de dano contra malignos por ponto.' },
+      destreza: { emoji:'💨', nome:'Destreza', desc:'-3% no cooldown de esquiva por ponto.' }
+    };
+    for(const chave of ['vigor','forca','destreza']){
+      const d = DESC_ATRIBUTOS[chave];
+      const linha = document.createElement('div');
+      linha.className = 'progressao-linha-atributo';
+      linha.innerHTML = `
+        <div class="progressao-atributo-info">
+          <b>${d.emoji} ${d.nome}</b> — nível ${estadoJogador.atributos[chave]}
+          <div class="progressao-atributo-desc">${d.desc}</div>
+        </div>
+        <button class="progressao-botao-mais" ${estadoJogador.pontosAtributo <= 0 ? 'disabled' : ''}>+1</button>
+      `;
+      linha.querySelector('.progressao-botao-mais').addEventListener('click', () => investirAtributo(chave));
+      corpo.appendChild(linha);
+    }
+  } else {
+    const RAMOS = [
+      { chave:'combate', emoji:'⚔️', nome:'Combate' },
+      { chave:'exploracao', emoji:'🧭', nome:'Exploração' },
+      { chave:'sobrevivencia', emoji:'❤️‍🩹', nome:'Sobrevivência' }
+    ];
+    for(const ramo of RAMOS){
+      const coluna = document.createElement('div');
+      coluna.className = 'progressao-coluna-talento';
+      coluna.innerHTML = `<div class="progressao-titulo-ramo">${ramo.emoji} ${ramo.nome}</div>`;
+      const idsDoRamo = Object.keys(ARVORE_TALENTOS).filter(id => ARVORE_TALENTOS[id].ramo === ramo.chave)
+        .sort((a,b) => ARVORE_TALENTOS[a].ordem - ARVORE_TALENTOS[b].ordem);
+      for(const id of idsDoRamo){
+        const t = ARVORE_TALENTOS[id];
+        const desbloqueado = temTalento(id);
+        const disponivel = podeDesbloquearTalento(id);
+        const item = document.createElement('div');
+        item.className = 'progressao-talento-item' + (desbloqueado ? ' desbloqueado' : (disponivel ? ' disponivel' : ' bloqueado'));
+        item.innerHTML = `
+          <div class="progressao-talento-nome">${desbloqueado ? '✅' : (disponivel ? '🔓' : '🔒')} ${t.nome}</div>
+          <div class="progressao-talento-desc">${t.desc}</div>
+        `;
+        if(disponivel){
+          item.addEventListener('click', () => desbloquearTalento(id));
+          item.title = 'Clique para desbloquear (1 ponto de talento)';
+        } else if(!desbloqueado){
+          item.title = t.requer ? `Requer: ${ARVORE_TALENTOS[t.requer].nome}` : 'Sem pontos de talento disponíveis';
+        }
+        coluna.appendChild(item);
+      }
+      corpo.appendChild(coluna);
+    }
+  }
+}
+
+document.getElementById('botao-progressao').addEventListener('click', alternarPainelProgressao);
+document.getElementById('botao-fechar-progressao').addEventListener('click', fecharPainelProgressao);
+document.getElementById('aba-progressao-atributos').addEventListener('click', () => {
+  abaProgressaoAtiva = 'atributos';
+  document.getElementById('aba-progressao-atributos').classList.add('ativa');
+  document.getElementById('aba-progressao-talentos').classList.remove('ativa');
+  renderizarPainelProgressao();
+});
+document.getElementById('aba-progressao-talentos').addEventListener('click', () => {
+  abaProgressaoAtiva = 'talentos';
+  document.getElementById('aba-progressao-talentos').classList.add('ativa');
+  document.getElementById('aba-progressao-atributos').classList.remove('ativa');
+  renderizarPainelProgressao();
+});
+
 // Calcula o dano de um tiro contra um maligno, considerando a arma
 // equipada. Sem arma compatível, dano reduzido (danoBase); com a arma
 // certa (eficazContra inclui o subtipo do maligno), dano alto (danoEficaz).
 function calcularDanoContraMaligno(armaItem, malignoItem) {
   if (!armaItem) return 1;
   const eficaz = Array.isArray(armaItem.eficazContra) && armaItem.eficazContra.includes(malignoItem.subtipo);
-  return eficaz ? (armaItem.danoEficaz ?? 999) : (armaItem.danoBase ?? 1);
+  const danoBase = eficaz ? (armaItem.danoEficaz ?? 999) : (armaItem.danoBase ?? 1);
+  // NOVO (Etapa 2 — Progressão, v162): multiplicador extra de Força/talento
+  // Fúria Inicial, aplicado por cima do dano já calculado (fórmula original
+  // intocada).
+  return danoBase * multiplicadorDanoAtributo();
 }
 
 // Remove um maligno derrotado: efeitos visuais, recompensa parcial do
@@ -22128,8 +24747,8 @@ function removerMaligno(ent) {
   if (idxM !== -1) malignosAtivos.splice(idxM, 1);
   estadoJogador.mundoColocado = estadoJogador.mundoColocado.filter(r => r.uid !== ent.uid);
 
-  const recuperadoMoeda = Math.floor(estadoJogador.cofreMaligno.moedas * 0.3);
-  const recuperadoDiamante = Math.floor(estadoJogador.cofreMaligno.diamantes * 0.3);
+  const recuperadoMoeda = Math.floor(estadoJogador.cofreMaligno.moedas * 0.3 * multiplicadorRecompensaTalento());
+  const recuperadoDiamante = Math.floor(estadoJogador.cofreMaligno.diamantes * 0.3 * multiplicadorRecompensaTalento());
   estadoJogador.moedas += recuperadoMoeda;
   estadoJogador.creditos += recuperadoDiamante;
   estadoJogador.cofreMaligno.moedas -= recuperadoMoeda;
@@ -22137,7 +24756,15 @@ function removerMaligno(ent) {
   if (estadoJogador.cofreMaligno.moedas < 0) estadoJogador.cofreMaligno.moedas = 0;
   if (estadoJogador.cofreMaligno.diamantes < 0) estadoJogador.cofreMaligno.diamantes = 0;
 
+  // NOVO (Etapa 2 — Progressão, v162): XP por derrotar um maligno comum.
+  ganharXP(15, ent.item.nome || 'maligno derrotado');
+
   avancarMissoesPorTipo('derrotar', m => m.subtipoAlvo === ent.item.subtipo);
+  // NOVO (Etapa 4 — Retenção Diária, v165): progresso da missão diária
+  // "derrote N ameaças" (qualquer subtipo) + contador de derrotas durante
+  // um evento de invasão ativo (usado para calcular o bônus final).
+  avancarMissoesDiariasPorTipo('derrotar_qualquer');
+  if(eventoInvasaoAtivo) malignosDerrotadosNaInvasao++;
 
   const eDescobertaNova = registrarDescobertaEnciclopedia(ent.item.subtipo);
   if (eDescobertaNova) {
@@ -22223,7 +24850,11 @@ function spawnMaligno() {
   // de verdade (ehNoiteDeSpawn, ver definição perto de faseAtual).
   // Bloco 4: antes só espreitava à noite; agora também pode aparecer de
   // dia, com um teto (MAX_MALIGNOS_DIA) bem menor que o noturno.
-  const capAtual = ehNoiteDeSpawn() ? MAX_MALIGNOS : MAX_MALIGNOS_DIA;
+  // NOVO (Etapa 4 — Retenção Diária, v165): durante um evento de invasão
+  // ativo, usa sempre o teto noturno (mais alto), de dia ou de noite —
+  // um OR a mais na mesma condição, sem tocar na lógica original de
+  // dia/noite (Bloco 4).
+  const capAtual = (ehNoiteDeSpawn() || eventoInvasaoAtivo) ? MAX_MALIGNOS : MAX_MALIGNOS_DIA;
   if (malignosAtivos.length >= capAtual) return;
 
   const subtipo = SUBTIPOS_MALIGNOS[Math.floor(Math.random() * SUBTIPOS_MALIGNOS.length)];
@@ -22379,6 +25010,13 @@ function atualizarMalignos(delta) {
           bloqueioRansomwareAtivo = true;
           bloqueioRansomwareTimer = DURACAO_BLOQUEIO_RANSOMWARE;
           mostrarToast(`🔒 ${ent.item.nome} bloqueou suas ferramentas por ${DURACAO_BLOQUEIO_RANSOMWARE}s!`);
+        } else if (ent.item.danoJogador > 0) {
+          // Etapa 1 (parte B) — Revolução do Combate: os 5 novos malignos
+          // (zumbi, robo_defeituoso, cavaleiro_sombrio, aranha_dados,
+          // golem_codigo) NÃO roubam moeda/diamante — causam dano de HP
+          // real ao jogador via a API central aplicarDanoJogador(), que já
+          // respeita invulnerabilidade e bloqueio (tecla Z).
+          aplicarDanoJogador(ent.item.danoJogador, ent.item.nome);
         } else {
         let roubado = false;
         if (ia.danoMoeda > 0 && estadoJogador.moedas >= ia.danoMoeda) {
@@ -23651,6 +26289,8 @@ areaLook.addEventListener('touchcancel', soltarLook);
 
 const indicadorCavernaEl = document.getElementById('indicador-caverna');
 const indicadorExocraftEl = document.getElementById('indicador-exocraft');
+const indicadorMontariaEl = document.getElementById('indicador-montaria'); // NOVO (Etapa 3 — Locomoção, v164)
+const indicadorInvasaoEl = document.getElementById('indicador-invasao'); // NOVO (Etapa 4 — Retenção Diária, v165)
 botaoCavarToque.addEventListener('touchstart', (e) => {
   e.preventDefault();
   acionarMultitool();
@@ -23827,6 +26467,10 @@ function tentarInteragir(){
   if(recursoColetavelProximo !== null){ pegarRecursoColetavel(); return; }
   if(luaProximaParaConversa){ conversarComLua(); return; }
   if(estrelaProximaParaDesejo){ fazerDesejo(); return; }
+  // NOVO (Etapa 3 — Locomoção, v164): prioridade baixa de propósito — só
+  // doma o cavalo selvagem se nenhuma outra interação acima já tomou conta
+  // do toque em E neste frame.
+  if(cavaloSelvagemProximo !== null){ domesticarCavalo(); return; }
 }
 
 window.addEventListener('keydown', e=>{
@@ -24196,8 +26840,10 @@ function animarInterno(){
   }
   atualizarFisicaPulo(delta);
   atualizarVoo(delta);
+  atualizarAuraElementalFlor(delta, tempoTotal); // NOVO — auréola de fogo/gelo (Flores Coletáveis, 60s)
   atualizarCooldownAtaque(delta);
   atualizarCooldownMultitool(delta);
+  atualizarSistemaCombateJogador(delta); // NOVO (Etapa 1): timers de esquiva/invulnerabilidade
   atualizarPortas(delta);
   atualizarCasasPapelao(delta);
 
@@ -24207,6 +26853,27 @@ function animarInterno(){
   if(dentroDeCasa && !painelMoveisAberto) atualizarMovelPoseProximo();
 
   if(!dentroDeCasa){
+    // [v150 — parte 2 — pedido do usuário: "melhore a intro, está travando um
+    // pouquinho como se perdesse FPS"] Durante os ~11s de
+    // introCinematicaAtiva, o jogador não tem controle nenhum (câmera
+    // 100% roteirizada, ver atualizarIntroCinematica/construirPontosIntro)
+    // e o HUD inteiro fica escondido (ver CSS "body.intro-ativa"). Mesmo
+    // assim, TODOS os sistemas de IA/simulação do mundo abaixo (fauna,
+    // NPCs, índios, aldeias com vida social, dragões, robô do quiz, sons
+    // naturais, soldados do castelo) continuavam rodando em complexidade
+    // total desde o primeiro frame — bem no momento em que a cena acabou
+    // de ser montada (GPU ainda absorvendo texturas/shadow maps recém-
+    // criados pela tela de carregamento). A soma dos dois picos de custo
+    // no mesmo instante é a causa mais provável do engasgo relatado.
+    // Pausar este bloco durante a intro não muda nada visível: nenhuma
+    // dessas entidades depende de estar "em dia" nesses segundos (o
+    // jogador só reencontra o mundo depois que finalizarIntroCinematica()
+    // já rodou), e todas retomam a atualização normal no frame seguinte
+    // ao fim da intro. Sistemas puramente cosméticos (clima, oceano,
+    // cachoeiras, pássaros, nuvens, céu, portais) NÃO entraram neste
+    // bloco — continuam animando normalmente para a intro não parecer
+    // uma cena "congelada".
+    if(!introCinematicaAtiva){
     atualizarMalignos(delta);
     atualizarInfoProximidadeMaligno(delta);
     atualizarNPCs(delta);
@@ -24217,6 +26884,10 @@ function animarInterno(){
     atualizarVidaSocialAldeia(delta, tempoTotal);
     atualizarDragoes(delta, tempoTotal);
     atualizarDragaoMatriarca(delta);
+    atualizarChefeDragaoAnciao(delta, tempoTotal); // NOVO (Etapa 1, parte B, item 3): chefe de mundo Dragão Ancião, entidade separada
+    atualizarObscuronCombate(delta); // NOVO (v161, Etapa 1, parte B, item 4): camada de combate do Obscuron (HP/fases/investida/invocação/teleporte)
+    atualizarLacaiosObscuron(delta); // NOVO (v161): lacaios sombrios invocados pelo Obscuron (perseguem e causam dano de contato)
+    atualizarRegeneracaoPassiva(delta); // NOVO (Etapa 2 — Progressão, v162): regen passiva do talento Instinto de Sobrevivência
     atualizarFaunaCaverna(delta);
     atualizarRoboQuiz(delta);
     atualizarSonsNaturais(delta);
@@ -24226,6 +26897,7 @@ function animarInterno(){
     atualizarTeleporteTorreCentral(delta); // NOVO (Etapa 7.8/N): teleporte automático térreo<->sala do topo da torre central
     atualizarObscuron(delta); // NOVO (ETAPA 7.1/N): brilho, proximidade e fala de aviso do Obscuron
     atualizarBaloesFala();
+    } // fim if(!introCinematicaAtiva) [v150 — parte 2]
   }
 
   if(introCinematicaAtiva){
@@ -24257,6 +26929,7 @@ function animarInterno(){
     atualizarParticulasCortePomar(delta); // NOVO (Etapa 3/5): lascas de madeira
     atualizarCogumelosPequenos();
     atualizarRecursosColetaveis();
+    atualizarFloresColetaveis(delta, tempoTotal); // NOVO (Etapa 1/4 — flores coletáveis fogo/gelo)
     atualizarAsasMagicas(delta, tempoTotal);
     atualizarEntidadesMundo(delta);
     // NOVO (sessão #31, CORREÇÃO DE BUG): chamada por último, depois de
@@ -24463,7 +27136,18 @@ function iniciar(){
   construirVila();
   restaurarMundoColocado();
   restaurarPortaisJogador();
+  restaurarMontariaJogador(); // NOVO (Etapa 3 — Locomoção, v164)
   inicializarTesouros();
+  // NOVO (Etapa 4 — Retenção Diária, v165): checa login diário (atualiza
+  // sequência + libera bônus do dia) e garante que as missões diárias do
+  // dia de hoje existam (resetando progresso se o dia mudou desde o
+  // último save). O painel de bônus de login abre sozinho um pouco depois
+  // (setTimeout), só se ainda não foi coletado hoje — dá tempo da tela de
+  // carregamento sumir primeiro, mesmo espírito de espera já usado por
+  // iniciarIntroCinematica() acima.
+  verificarLoginDiario();
+  garantirMissoesDiariasDoDia();
+  setTimeout(()=>{ if(!estadoJogador.loginBonusColetadoHoje) abrirPainelLoginDiario(); }, 1800);
 
   // CORREÇÃO DE BUG (relatada pelo usuário: "sempre que ele está no
   // castelo e eu fecho o jogo e abro novamente, ele está fora do
