@@ -1,601 +1,1016 @@
 {% extends 'gestao_escolar/template.html' %}
 {% load static %}
+
 {% block script_head %}
- {% include 'gestao_escolar/links_modal.html' %}
-<script src="{% static 'select2/js/select2.full.min.js' %}"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+    {% include 'gestao_escolar/links_modal.html' %}
+    <script src="{% static 'select2/js/select2.full.min.js' %}"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Importação da família de fontes Nunito -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
     <link href="{% static 'global/css/geral_styler.css' %}" rel="stylesheet">
     <link href="{% static 'global/css/modals.css' %}" rel="stylesheet">
     <link href="{% static 'global/css/table_win11.css' %}" rel="stylesheet">
 
     <style>
-        .anime-h{height: 5rem !important;}
-        /* Define o estilo geral para os cards */
-        .cards-container {
+        .anime-h { height: 5rem !important; }
+        
+        /* --- NAVBAR MODERNO --- */
+        .navbar-custom {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-bottom: 3px solid #0078d4;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.08);
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar-custom .nav-link {
+            color: #495057;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 110px;
+            text-align: center;
+        }
+
+        .navbar-custom .nav-link:hover,
+        .navbar-custom .nav-link.show {
+            color: #0078d4;
+            background-color: rgba(0, 120, 212, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .navbar-custom .dropdown-menu {
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 0.75rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            padding: 0.5rem;
+            margin-top: 0.5rem !important;
+            animation: fadeInDropdown 0.25s ease-out;
+        }
+
+        @keyframes fadeInDropdown {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .navbar-custom .dropdown-item {
+            border-radius: 0.5rem;
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+            color: #343a40;
+            transition: all 0.2s ease;
             display: flex;
-            flex-wrap: wrap;
-            gap: 20px;  /* Espaçamento entre os cards */
-            justify-content: center;
-            width: 100%; /* Garantir que a largura da container seja total */
+            align-items: center;
         }
 
-        /* Estilo para cada card */
-        .card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 100%; /* Ocupa 100% da largura por padrão */
-            max-width: 800px; /* Limita a largura máxima dos cards */
-            padding: 10px;
+        .navbar-custom .dropdown-item:hover {
+            background-color: #e9ecef;
+            color: #0078d4;
+            padding-left: 1.25rem;
         }
 
-        /* Responsividade: quando a tela for maior que 576px, exibe 2 colunas */
-        @media (min-width: 1000px) {
-            .card {
-                width: 48%; /* Ocupa 48% da largura, permitindo que dois cards fiquem lado a lado */
+        .navbar-custom .dropdown-item svg {
+            transition: transform 0.2s ease;
+        }
+
+        .navbar-custom .dropdown-item:hover svg {
+            transform: scale(1.15);
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar-custom .nav-link {
+                padding: 0.75rem 1rem;
+                border-bottom: 1px solid #e9ecef;
+                text-align: start;
+                flex-direction: row;
+                gap: 10px;
+            }
+            .navbar-custom .nav-link svg {
+                margin-bottom: 0 !important;
+            }
+            .navbar-custom .dropdown-menu {
+                box-shadow: none;
+                border: 1px solid #e9ecef;
+                margin-top: 0 !important;
+                background-color: #f8f9fa;
+            }
+            .navbar-custom .dropdown-item:hover {
+                padding-left: 1rem;
             }
         }
 
+        /* --- ESTILOS DO BOTÃO E MODAL DE BUSCA ATIVA --- */
+        .table-risco tr[data-cor="par"] { background-color: #f5b3b3ff; }
+        .table-risco tr[data-cor="impar"] { background-color: #e0e0e0; }
+        .table-risco tr:hover { background-color: #d0d0d0; }
+
+        .btn-busca-ativa {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            width: 100%;
+            max-width: 280px;
+            height: 70px;
+            background: rgba(160, 160, 160, 0.9);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #f5f5f5;
+            border-bottom-left-radius: 50%;
+            border-bottom-right-radius: 50%;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.3), 0 4px 10px rgba(0,0,0,0.4);
+            cursor: pointer;
+            font-family: 'Segoe UI', sans-serif;
+            transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-busca-ativa:hover, .btn-busca-ativa:focus {
+            background: #0056b3;
+            color: #ffffff;
+            box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+        }
+
+        .modal-busca-ativa {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow-y: auto;
+            background-color: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 1rem;
+            z-index: 40;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .modal-busca-ativa-content {
+            background-color: #f8f9fa;
+            color: #000;
+            padding: 1.5rem;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 95%;
+            margin: 2rem auto;
+        }
+
+        @media (min-width: 768px) {
+            .modal-busca-ativa { padding: 40px; }
+            .modal-busca-ativa-content { max-width: 90%; padding: 2rem; }
+        }
+
+        /* --- MODAL RESPONSIVO (TELA CHEIA EM MOBILE) --- */
+        .modal-fullscreen-mobile {
+            padding: 0 !important;
+        }
+        .modal-fullscreen-mobile .modal-dialog {
+            margin: 0;
+            width: 100%;
+            max-width: 100%;
+            height: 100vh;
+        }
+        .modal-fullscreen-mobile .modal-content {
+            border-radius: 0;
+            height: 100vh;
+            background: #f8f9fa;
+        }
+
+        @media (max-width: 767.98px) {
+            .modal-fullscreen-mobile .modal-header,
+            .modal-fullscreen-mobile .modal-footer {
+                padding: 0.75rem 1rem;
+            }
+            .modal-fullscreen-mobile .modal-body {
+                padding: 1rem;
+                overflow-y: auto;
+            }
+        }
+
+        /* Ajustes para o modal de escola/ano */
+        .modal-escola-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 1rem;
+            backdrop-filter: blur(4px);
+        }
+        .modal-escola-overlay .modal-content {
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-escola-overlay .modal-header {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border-bottom: none;
+            padding: 1rem 1.5rem;
+            flex-shrink: 0;
+        }
+        .modal-escola-overlay .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+            background: #f8fafc;
+        }
+        .modal-escola-overlay .modal-footer {
+            background: #fff;
+            border-top: 1px solid #e2e8f0;
+            padding: 0.75rem 1.5rem;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 575.98px) {
+            .modal-escola-overlay {
+                padding: 0;
+            }
+            .modal-escola-overlay .modal-content {
+                max-height: 100vh;
+                border-radius: 0;
+                max-width: 100%;
+            }
+            .modal-escola-overlay .modal-header {
+                padding: 0.75rem 1rem;
+            }
+            .modal-escola-overlay .modal-header h2 {
+                font-size: 1.1rem !important;
+            }
+            .modal-escola-overlay .modal-body {
+                padding: 1rem;
+            }
+            .modal-escola-overlay .modal-footer {
+                padding: 0.5rem 1rem;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .modal-escola-overlay .modal-footer .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .modal-escola-overlay .modal-footer .d-flex {
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+            }
+        }
+
+        .btn-close-window {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #fff;
+            background: linear-gradient(135deg, #6c757d, #495057);
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.25s ease-in-out;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+        .btn-close-window i { font-size: 1.1rem; }
+        .btn-close-window:hover {
+            background: linear-gradient(135deg, #495057, #343a40);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+        }
+        .btn-close-window:active { transform: scale(0.97); }
+        .btn-close-window:focus { outline: none; box-shadow: 0 0 0 3px rgba(108, 117, 125, 0.4); }
+
+        .escolaEano {
+            background: rgba(0,0,0,0.5);
+        }
     </style>
 {% endblock script_head %} 
+
 {% block main %}
-    <div class="shadow-sm p-3 mb-3  w-100 bg-light " >
+    <div class="container-fluid py-3">
         {% if messages %}                
             {% include 'Escola/partials/mensagens.html' %}          
         {% endif %}
-        <div class='p-4 h5 ' style='margin:-2.5rem -1rem 0 -1rem'></div>   
-            {% if escolaMatriculaOnline %}
-                {% include "Escola/matriculaOnline/partial_alunosEmPre_matricula.html" %}
-            {% endif %}
-            <div class=" rounded-top-2  bg-body-tertiary " style='margin:-1.2rem 0rem 1rem 0rem !important'>
-                <div class='mb-2'>
-                    {% include 'gestao_escolar/navbars/index.html' %} 
-                </div>
+        
+        {% if escolaMatriculaOnline %}
+            {% include "Escola/matriculaOnline/partial_alunosEmPre_matricula.html" %}
+        {% endif %}
 
-                <div class="cards-container">
-                    <!-- Primeiro Card -->
-                    <div class="card">
-                        <div class="card-header bg-info text-light text-uppercase">
+        <div class="rounded-3 bg-body-tertiary p-3 mb-4 shadow-sm">
+            
+            <!-- NAVBAR MODERNO COM SVG -->
+            <nav class="navbar navbar-expand-lg navbar-custom mb-3">
+                <div class="container-fluid">
+                    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                        <span class="ms-2 fw-semibold text-primary">Menu</span>
+                    </button>
+                    
+                    <div class="collapse navbar-collapse" id="mainNavbar">
+                        <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-1">
+                            
+                            <!-- Parâmetros -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex flex-column align-items-center py-2 px-3" href="#" id="navbarDropdownParametros" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#0078d4" class="mb-1" viewBox="0 0 16 16">
+                                        <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+                                    </svg>
+                                    <span>Parâmetros</span>
+                                </a>
+                                <ul class="dropdown-menu shadow-lg border-0" aria-labelledby="navbarDropdownParametros">
+                                    <li><a class="dropdown-item" href="{% if request.session.escola_nome_query.prefeitura.id %}{% url 'Gestao_Escolar:PrefeituraEditar' request.session.escola_nome_query.prefeitura.id %}{% endif %}">Prefeitura</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'Gestao_Escolar:cria_ano' %}">Ano Letivo</a></li>          
+                                    <li><a class="dropdown-item" href="#">Série</a></li>
+                                    <li><a class="dropdown-item" href="#">Grau/Nível Escolar</a></li>
+                                    <li><a class="dropdown-item" href="#">Tipo de Remanejamentos</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'Gestao_Escolar:GE_Disciplina_create' %}">Disciplinas</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- Encerramento e Migração -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex flex-column align-items-center py-2 px-3" href="#" id="navbarDropdownMigracao" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#a68500" class="mb-1" viewBox="0 0 16 16">
+                                        <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
+                                        <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
+                                    </svg>
+                                    <span>Encerramento</span>
+                                </a>
+                                <ul class="dropdown-menu shadow-lg border-0" aria-labelledby="navbarDropdownMigracao">
+                                    <li><a class="dropdown-item" href='{% url "Gestao_Escolar:apuracaoSelecTurma" %}'>Apuração Final | Ata de Notas</a></li>
+                                    <li><a class="dropdown-item" href='{% url "Gestao_Escolar:exportar_turmas" %}'>Exportação de Turmas</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- Relatórios -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex flex-column align-items-center py-2 px-3" href="#" id="navbarDropdownRelatorios" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#0078d4" class="mb-1" viewBox="0 0 16 16">
+                                        <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+                                        <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                                    </svg>
+                                    <span>Relatórios</span>
+                                </a>
+                                <ul class="dropdown-menu shadow-lg border-0" aria-labelledby="navbarDropdownRelatorios">
+                                    <li><a class="dropdown-item" href='{% url "Gestao_Escolar:imprime_list_turmas" %}'>Relação de Turmas</a></li>
+                                    <li><a class="dropdown-item" href='{% url "Gestao_Escolar:imprime_turmas_filtros" %}'>Relação de Turmas detalhado</a></li>
+                                    <li><a class="dropdown-item" href='{% url "Gestao_Escolar:imprime_list_escolas" %}'>Relação de Escolas</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- Localização -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex flex-column align-items-center py-2 px-3" href="#" id="navbarDropdownLocalizacao" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#dc3545" class="mb-1" viewBox="0 0 16 16">
+                                        <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                                    </svg>
+                                    <span>Localização</span>
+                                </a>
+                                <ul class="dropdown-menu shadow-lg border-0" aria-labelledby="navbarDropdownLocalizacao">
+                                    <li><a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Cidade</a></li>
+                                    <li><a class="dropdown-item" href='{% url "Gestao_Escolar:bairro-create" %}'>Bairros</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- Contratos e Decretos -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex flex-column align-items-center py-2 px-3" href="#" id="navbarDropdownContratos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#198754" class="mb-1" viewBox="0 0 16 16">
+                                        <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM4.5 9a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7zM4 10.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1h-4z"/>
+                                    </svg>
+                                    <span>Contratos</span>
+                                </a>
+                                <ul class="dropdown-menu shadow-lg border-0" aria-labelledby="navbarDropdownContratos">
+                                    <li><a class="dropdown-item" href='{% url "Gestao_Escolar:pessoas-create" %}'>Pessoas e Contratos</a></li>
+                                    <li><a class="dropdown-item" href='{% url "Gestao_Escolar:decreto-create" %}'>Decretos</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- Apoio/Suporte -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex flex-column align-items-center py-2 px-3" href="#" id="navbarDropdownSuporte" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#6f42c1" class="mb-1" viewBox="0 0 16 16">
+                                        <path d="M8 1a5 5 0 0 0-5 5v1h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a6 6 0 1 1 12 0v6a2.5 2.5 0 0 1-2.5 2.5H9.366a1 1 0 0 1-.866.5h-1a1 1 0 1 1 0-2h1a1 1 0 0 1 .866.5H11.5A1.5 1.5 0 0 0 13 12h-1a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h1V6a5 5 0 0 0-5-5z"/>
+                                    </svg>
+                                    <span>Suporte</span>
+                                </a>
+                                <ul class="dropdown-menu shadow-lg border-0" aria-labelledby="navbarDropdownSuporte">
+                                    <li>
+                                        <a class="dropdown-item" href='{% url "Gestao_Escolar:GE_anoLetivo" %}'>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#0078d4" class="me-2" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5zm14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5z"/></svg>
+                                            Alternar Ano Letivo <span class="badge bg-success ms-auto">{{ request.session.anoLetivo_nome }}</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href='{% url "Gestao_Escolar:GE_inicio" %}'>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#a68500" class="me-2" viewBox="0 0 16 16"><path d="M4 2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM4 5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zM7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zM4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1z"/><path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V1zm11 0H3v14h3v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V15h3V1z"/></svg>
+                                            Alternar Escola
+                                        </a>
+                                    </li>
+                                    
+                                    {% if user.is_superuser %}
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item text-primary fw-semibold" href='{% url "Gestao_Escolar:CreateEscola" %}'>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+                                                Criar nova Escola
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-primary fw-semibold" href='{% url "admin_acessos:notificacao" %}'>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16"><path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/></svg>
+                                                Notificações
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href='{% url "admin_acessos:CreateUsers" %}'>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="me-2" viewBox="0 0 16 16"><path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/></svg>
+                                            Criar novo usuário
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            <!-- FIM DO NAVBAR -->
+
+            <div class="row g-3">
+                <!-- Primeiro Card -->
+                <div class="col-12 col-xl-6">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-info text-light text-uppercase fw-bold">
                             {% include "Escola/partials/resumos/resumos.html" %}
                         </div>
                         <div class="card-body">
-                            <table class="win11-table">
-                                <thead>
-                                    <tr>
-                                        <th>Turmas   </th>                                    
-                                        <th>Alunos matriculados</th>
-                                        <th>Concluída</th>
-                                        <th>Limite de Vagas</th>
-                                        <th>Vagas disponíveis</th>
-                                        <th>Autistas </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    
-                                    {% for turma in matriculas_all %}
-                                    <tr>
-                                        <td>{{ turma.nome }} <span class='text-uppercase'>{{ turma.descritivo_turma }}</span></td>
-                                        <td>{{ turma.matriculas }} </td>                                    
-                                        <td>{% if turma.concluida %}<i class="fa-solid fa-check text-success"></i>{% endif %} </td>
-                                        <td>{{ turma.quantidade_vagas }}</td>
-                                        <td>{{ turma.vagas_disponiveis }}</td>
-                                        <td>{{ turma.autistas }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                    
-                                    <!-- Linha de Totais -->
-                                    <tr class='bg-success-subtle text-black fs-2'>
-                                        <td><strong>Total</strong></td>
-                                        <td>{{ vagas_disponiveis_total.total_matriculas }}</td>
-                                        <td> {{ total_concluidas}}</td>
-                                        <td>{{ vagas_disponiveis_total.total_vagas }}</td>
-                                        <td>{{ vagas_disponiveis_total.vagas_disponiveis_total }}</td>
-                                        <td>{{ vagas_disponiveis_total.total_autistas }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="table win11-table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Turmas</th>                                    
+                                            <th>Alunos matriculados</th>
+                                            <th>Concluída</th>
+                                            <th>Limite de Vagas</th>
+                                            <th>Vagas disponíveis</th>
+                                            <th>Autistas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for turma in matriculas_all %}
+                                        <tr>
+                                            <td>{{ turma.nome }} <span class="text-uppercase small text-muted">{{ turma.descritivo_turma }}</span></td>
+                                            <td>{{ turma.matriculas }}</td>                                    
+                                            <td>{% if turma.concluida %}<i class="fa-solid fa-check text-success"></i>{% endif %}</td>
+                                            <td>{{ turma.quantidade_vagas }}</td>
+                                            <td>{{ turma.vagas_disponiveis }}</td>
+                                            <td>{{ turma.autistas }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        
+                                        <!-- Linha de Totais -->
+                                        <tr class="bg-success-subtle text-black fw-bold">
+                                            <td>Total</td>
+                                            <td>{{ vagas_disponiveis_total.total_matriculas }}</td>
+                                            <td>{{ total_concluidas }}</td>
+                                            <td>{{ vagas_disponiveis_total.total_vagas }}</td>
+                                            <td>{{ vagas_disponiveis_total.vagas_disponiveis_total }}</td>
+                                            <td>{{ vagas_disponiveis_total.total_autistas }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <!-- Segundo Card -->
-                    <div class="card">
-                        <div class="card-header bg-danger-subtle text-light text-start text-uppercase">
-                            <i class="fa-duotone fa-solid fa-chart-simple"></i> Gráficos
-                        </div>
-                        <div class="card-body">
-                        </div>
-                        <div class="card-footer text-muted">
-                            {{ graph|safe }}
-                            <p>Data e horário do acesso: {{ now }}</p>
-                        </div>                   
                     </div>
                 </div>
                 
-            </div>
-        
-            {% if alunos_em_risco %}
-            <!-- Botão estilizado -->
-            <button id="btnBuscaAtiva" style="
-                position: fixed;
-                top: 0;
-                left: 50%;
-                transform: translateX(-50%);
-                z-index: 2000;
-                width: 280px;
-                height: 70px;
-                background: rgba(160, 160, 160, 0.1);
-                backdrop-filter: blur(6px);
-                border: 1px solid rgba(255,255,255,0.3);
-                color: #f5f5f5;
-                border-bottom-left-radius: 50%;
-                border-bottom-right-radius: 50%;
-                border-top-left-radius: 0;
-                border-top-right-radius: 0;
-                box-shadow: inset 0 1px 2px rgba(255,255,255,0.3),
-                            0 4px 10px rgba(0,0,0,0.4);
-                cursor: pointer;
-                font-family: 'Segoe UI', sans-serif;
-                transition: all 0.4s ease;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-            ">
-                <div style="display:flex; align-items:center; gap:8px; font-size:18px; font-weight:600;">
-                    ⚠️ <span>Risco de Evasão</span>
+                <!-- Segundo Card -->
+                <div class="col-12 col-xl-6">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-danger-subtle text-dark text-start text-uppercase fw-bold">
+                            <i class="fa-duotone fa-solid fa-chart-simple me-2"></i> Gráficos
+                        </div>
+                        <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                            <!-- Espaço reservado para o gráfico -->
+                        </div>
+                        <div class="card-footer text-muted small bg-transparent border-0">
+                            {{ graph|safe }}
+                            <p class="mb-0 mt-2"><i class="fa-regular fa-clock me-1"></i> Data e horário do acesso: {{ now }}</p>
+                        </div>                   
+                    </div>
                 </div>
-                <small style="font-size:12px; font-weight:400; color:#e0e0e0;">Fazer busca ativa </small>
+            </div>
+        </div>
+    
+        {% if alunos_em_risco %}
+            <!-- Botão estilizado -->
+            <button id="btnBuscaAtiva" class="btn-busca-ativa" type="button">
+                <div class="d-flex align-items-center gap-2 fs-6 fw-bold">
+                    <span>️</span> <span>Risco de Evasão</span>
+                </div>
+                <small class="fw-normal" style="font-size: 12px; color: #e0e0e0;">Fazer busca ativa</small>
             </button>
 
             <!-- Painel flutuante com transição suave -->
-            <div id="divBuscaAtiva" style="
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                overflow-y: auto;
-                background-color: rgba(0,0,0,0.8);
-                color: #fff;
-                padding: 40px;
-                z-index: 1999;
-                opacity: 0;
-                transition: opacity 0.5s ease;
-            ">
-                <div style="
-                    background-color: #f8f9fa;
-                    color: #000;
-                    padding: 20px;
-                    border-radius: 10px;
-                    max-width: 90%;
-                    margin: auto;
-                ">
-                    <h1>{{ title }}</h1>
-                    <p>{{ descricao }}</p>
-            <style>
-            .table tr[data-cor="par"] {
-            background-color: #f5b3b3ff;
-            }
-            .table tr[data-cor="impar"] {
-            background-color: #e0e0e0;
-            }
-            .table tr:hover {
-            background-color: #d0d0d0;
-            }
-            </style>
-            <table class="table table-bordered">
-            <tr style="background-color: #ccc;">
-                <th>Aluno</th>
-                <th>Turma</th>
-                <th>Disciplina</th>
-                <th>Trimestre</th>
-                <th>Faltas </br> Trimestral</th>
-                <th>% Faltas </br> Trimestral</th>
-                <th>Faltas</br> Anual</th>
-                <th>% Faltas </br> Anual</th>
-                <th>Carga Horária </br>Disciplina</th>    
-                <th>Notas</th>
-            </tr>
+            <div id="divBuscaAtiva" class="modal-busca-ativa">
+                <div class="modal-busca-ativa-content shadow">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="h4 mb-0 text-primary">{{ title }}</h2>
+                        <button type="button" class="btn-close" id="btnFecharBuscaAtiva" aria-label="Close"></button>
+                    </div>
+                    <p class="mb-3 text-muted">{{ descricao }}</p>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-risco align-middle">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>Aluno</th>
+                                    <th>Turma</th>
+                                    <th>Disciplina</th>
+                                    <th>Trimestre</th>
+                                    <th>Faltas<br>Trimestral</th>
+                                    <th>% Faltas<br>Trimestral</th>
+                                    <th>Faltas<br>Anual</th>
+                                    <th>% Faltas<br>Anual</th>
+                                    <th>Carga Horária<br>Disciplina</th>    
+                                    <th>Notas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% regroup alunos_em_risco by matricula_id as grupos_alunos %}
+                                {% for grupo in grupos_alunos %}
+                                    {% cycle 'par' 'impar' as cor %}
+                                    {% for aluno in grupo.list %}
+                                    <tr data-cor="{{ cor }}">
+                                        <td>{{ aluno.aluno }}</td>
+                                        <td>{{ aluno.turma }}</td>
+                                        <td>{{ aluno.disciplina }}</td>
+                                        <td>{{ aluno.trimestre }}</td>
+                                        <td>{{ aluno.faltas }}</td>
+                                        <td>{{ aluno.percentual_faltas }}%</td>
 
-            {% regroup alunos_em_risco by matricula_id as grupos_alunos %}
+                                        {% if forloop.first %}
+                                            <td rowspan="{{ grupo.list|length }}" class="text-center align-middle fw-bold">{{ aluno.faltas_total }}</td>
+                                            <td rowspan="{{ grupo.list|length }}" class="text-center align-middle fw-bold">{{ aluno.percentual_faltas_anual }}%</td>
+                                            <td rowspan="{{ grupo.list|length }}" class="text-center align-middle fw-bold">{{ aluno.carga_horaria_anual }} h/a</td>
+                                        {% endif %}
+
+                                        <td>{{ aluno.notas }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Conteúdos Condicionais -->
+        {% if conteudo_page == 'create_users' %}
+            {% include 'Escola/partials/usuarios/createUsers.html' %}
+        {% endif %}
+
+        {% if conteudo_page == 'criar Ano Letivo' %}
+            {% include 'Escola/partials/ano/cria_ano.html' %}
+        {% endif %}
+        
+        {% if conteudo_page == 'Nome das Escolas' %}
+            {% include 'Escola/partials/seleciona_escola.html' %}
+        {% endif %}
+        
+        {% if conteudo_page == 'Ano Letivo' %}
+            {% include 'Escola/partials/seleciona_anoLetivo.html' %}
+        {% endif %}
+
+        {% if conteudo_page == 'prefeituraUdate' %}
+            {% include 'Escola/partials/prefeitura/PrefeituraUpdate.html' %}
+        {% endif %}    
+        
+        {% if conteudo_page == 'Atualiza Escola' %}
+            {% include 'Escola/partials/minhaEscola/seleciona_escola.html' %}
+        {% endif %}
+        
+        {% if conteudo_page == 'CreateEscola' %}
+            {% include 'Escola/partials/minhaEscola/createEscola.html' %}
+        {% endif %}
+        
+        {% if conteudo_page == 'Criar Turmas' %}
+            {% include 'Escola/partials/seleciona_turma.html' %}
+        {% endif %}
+        
+        {% if conteudo_page == 'Criar Turmas update' %}
+            {% include 'Escola/partials/turmas/update_or_delete.html' %}
+        {% endif %}
+        
+        {% if conteudo_page == 'Registrar Alunos' %}
+            {% include 'Escola/partials/seleciona_aluno.html' %}
+        {% endif %}   
+        
+        {% if conteudo_page == 'Registrar Alunos Documento' %}
+            {% include 'Escola/partials/seleciona_aluno_documento.html' %}
+        {% endif %}
+        
+        {% if conteudo_page == 'Todas as matriculas' %}
+            {% include 'Escola/partials/seleciona_matricula_turmas.html' %}
+        {% endif %}  
+        
+        {% if conteudo_page == 'Matricular Aluno' %}
+            {% include 'Escola/partials/matriculas/seleciona_matricular_aluno.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == 'matricula_update_or_delete' %}
+            {% include 'Escola/partials/matriculas/update_or_delete.html' %}
+        {% endif %} 
+
+        {% if conteudo_page == 'Remaneja Aluno' %}
+            {% include 'Escola/partials/seleciona_matricular_remanejamento.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == 'Professores' %}
+            {% include 'Escola/partials/seleciona_professores.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == 'Professores-Pessoas' %}
+            {% include 'Escola/partials/partials_professores/seleciona_pessoas.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == 'Professores-Pessoas-Vinculo' %}
+            {% include 'Escola/partials/partials_professores/seleciona_pessoas-vinculo.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == 'seleciona_pessoas-vinculo_contrato' %}
+            {% include 'Escola/partials/partials_professores/seleciona_pessoas-vinculo_contrato.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == 'encaminha_para_escola' %}
+            {% include 'Escola/partials/partials_professores/encaminhamentos/encaminha_para_escola.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == 'encaminha_para_escola_deleteORupdate' %}
+            {% include 'Escola/partials/partials_professores/encaminhamentos/update_or_delete.html' %}
+        {% endif %} 
+
+        {% if conteudo_page == 'Criar Disciplina' %}
+            {% include 'Escola/partials/seleciona_disciplinas.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == 'Grades' %}
+            {% include 'Escola/partials/seleciona_grades.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == 'QR_code' %}
+            {% include 'Escola/partials/seleciona_qrCode.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == 'Turmas Escolha' %}
+            {% include 'Escola/partials/seleciona_Turma_retorno_aluno.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == 'Pessoa Create' %}
+            {% include 'Escola/partials/pessoas/pessoa_create.html' %}
+        {% endif %}
+        
+        {% if conteudo_page == 'Update_Delete' %}
+            {% include 'Escola/partials/pessoas/update_or_delete.html' %}
+        {% endif %}
+        
+        {% if conteudo_page == 'Contrato Create' %}
+            {% include 'Escola/partials/pessoasContrato/pessoaContrato_create.html' %}
+        {% endif %}
+        
+        {% if conteudo_page == 'Contrato Update_Delete' %}
+            {% include 'Escola/partials/pessoasContrato/update_or_delete.html' %}
+        {% endif %}
+       
+        {% if conteudo_page == 'Decreto Create' %}
+            {% include 'Escola/partials/decreto/decreto_create.html' %}
+        {% endif %}
+        
+        {% if conteudo_page == 'Decreto Update or Delete' %}
+            {% include 'Escola/partials/decreto/decreto_create.html' %}
+        {% endif %}  
+
+        {% if conteudo_page == 'Decreto Ativo' %}
+            {% include 'Escola/partials/decreto/decreto_createAtivo.html' %}
+        {% endif %}   
+        
+        {% if conteudo_page == 'Todas as turmas-grade' %}
+            {% include 'Escola/partials/grades/seleciona_grade_turma.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == "Updade_or_Delete Grade" %}
+            {% include 'Escola/partials/grades/update_or_delete.html' %}
+        {% endif %}
+
+        {% if conteudo_page == "relatorio_planoAula" %}
+            {% include 'Escola/partials/gestao_turmas/planoAula/planoAula.html' %}
+        {% endif %}
+
+        {% if conteudo_page == 'cargos/funcionarios' %}
+            {% include 'Escola/partials/selecionar_cargos_funcionarios.html' %}
+        {% endif %}    
+        
+        {% if conteudo_page == 'Gestão Turmas' %}
+            {% include 'Escola/partials/gestao_turmas/gestao_.html' %}
+        {% endif %}  
+        
+        {% if conteudo_page == "Gestão Turmas - Notas Aluno" %}
+            {% include 'Escola/partials/gestao_turmas/notas.html' %}
+        {% endif %}  
+
+        {% if conteudo_page == "Gestão Turmas - Parecer" %}
+            {% include 'Escola/partials/gestao_turmas/parecer_descritivo/parecer.html' %}
+        {% endif %}  
+
+        {% if conteudo_page == "Gestão Turmas - Notas Update" %}
+            {% include 'Escola/partials/gestao_turmas/notasFORM.html' %}
+        {% endif %}  
+        
+        {% if conteudo_page == "Gestão Turmas - Notas Recupera Update" %}
+            {% include 'Escola/partials/gestao_turmas/notasRecuperForm.html' %}
+        {% endif %}  
+
+        {% if conteudo_page == "Gestão Turmas - GerarHorario" %}
+            {% include 'Escola/partials/gestao_turmas/horarioAula.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == "Gestão Turmas - DefineValidadeHorario" %}
+            {% include 'Escola/partials/gestao_turmas/defineValidadeHorario.html' %}
+        {% endif %} 
+
+        {% if conteudo_page == "imprime_escolas" %}
+            {% include 'Escola/partials/impressos/impresso_escolas.html' %}
+        {% endif %}   
             
-            {% for grupo in grupos_alunos %}
-                {% cycle 'par' 'impar' as cor %}
-                {% for aluno in grupo.list %}
-                <tr data-cor="{{ cor }}">
-                    <td>{{ aluno.aluno }}</td>
-                    <td>{{ aluno.turma }}</td>
-                    <td>{{ aluno.disciplina }}</td>
-                    <td>{{ aluno.trimestre }}</td>
-                    <td>{{ aluno.faltas }}</td>
-                    <td>{{ aluno.percentual_faltas }}%</td>
+        {% if conteudo_page == "imprime_turma" %}
+            {% include 'Escola/partials/impressos/impresso_turmas.html' %}
+        {% endif %}   
+        
+        {% if conteudo_page == "imprime_turma_filtros" %}
+            {% include 'Escola/partials/impressos/impressoTurmasFiltros.html' %}
+        {% endif %}   
+        
+        {% if conteudo_page == "imprime_all_horario" %}
+            {% include 'Escola/partials/impressos/horarios/geral.html' %}
+        {% endif %}   
+            
+        {% if conteudo_page == "imprime_turma_matricula" %}
+            {% include 'Escola/partials/impressos/impresso_turmas_matricula.html' %}
+        {% endif %}   
+        
+        {% if conteudo_page == "imprime_comprovante_matricula" %}
+            {% include 'Escola/partials/impressos/impresso_comprovante_matricula.html' %}
+        {% endif %}   
 
-                    {% if forloop.first %}
-                        <!-- Mesclando as colunas anuais com alinhamento vertical -->
-                        <td rowspan="{{ grupo.list|length }}" style="text-align:center; vertical-align: middle;">{{ aluno.faltas_total }}</td>
-                        <td rowspan="{{ grupo.list|length }}" style="text-align:center; vertical-align: middle;">{{ aluno.percentual_faltas_anual }}%</td>
-                        <td rowspan="{{ grupo.list|length }}" style="text-align:center; vertical-align: middle;">{{ aluno.carga_horaria_anual }} horas aula</td>
-                    {% endif %}
+        {% if conteudo_page == 'delete' %}
+            {% include 'Escola/partials/seleciona_DELETE.html' %}
+        {% endif %}    
+        
+        {% if conteudo_page == 'update' %}
+            {% include 'Escola/partials/seleciona_UPDATE.html' %}
+        {% endif %}   
 
+        {% if conteudo_page == 'Criar Bairros' %}
+            {% include 'Escola/partials/bairros/seleciona_bairros.html' %}
+        {% endif %}    
+        
+        {% if conteudo_page == 'update_or_delete' %}
+            {% include 'Escola/partials/bairros/update_or_delete.html' %}
+        {% endif %}  
 
-                    <td>{{ aluno.notas }}</td>
-                </tr>
-                {% endfor %}
-            {% endfor %}
-            </table>
-        </div>
+        {% if conteudo_page == 'Criar Cidade' %}
+            {% include 'Escola/partials/cidade/seleciona_cidade.html' %}
+        {% endif %}    
+        
+        {% if conteudo_page == 'update_or_delete' %}
+            {% include 'Escola/partials/cidade/update_or_delete.html' %}
+        {% endif %}    
+        
+        {% if conteudo_page == 'imagem-docx' %}
+            {% include 'Escola/partials/bairros/seleciona_bairros.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == "freqenciaImpressa" %}
+            {% include 'Escola/partials/feriados_frequencia/calendario_mes.html' %}
+        {% endif %} 
+
+        {% if conteudo_page == "boletim" %}
+            {% include 'docsGestao_escolar/boletins/seleciona_turma_boletim.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == "boletim_aluno" %}
+            {% include 'docsGestao_escolar/boletins/seleciona_aluno_boletim.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == "boletim_trimestral" %}
+            {% include 'docsGestao_escolar/boletins/seleciona_trimestral_boletim.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == "historicoAluno" %}
+            {% include 'Escola/impressos/historico_escolar.html' %}
+        {% endif %}  
+
+        {% if conteudo_page == 'EnviaNotifica' %}
+            {% include 'Admin_Acessos/notifica_e_msg/notifica.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == 'SelecinaTurmaApuração' %}
+            {% include 'Escola/partials/apuracaoFinal/apuracaoFinalTurmas.html' %}
+        {% endif %}  
+        
+        {% if conteudo_page == 'ApuraçãoFinal' %}
+            {% include 'Escola/partials/apuracaoFinal/apuracaoFinal.html' %}
+        {% endif %}  
+
+        {% if conteudo_page == "500" %}    
+            {% include 'docsGestao_escolar/boletins/seleciona_trimestral_boletim.html' %}
+        {% endif %} 
+
+        {% if conteudo_page == "Add Matricula Online" %}    
+            {% include 'Escola/partials/escolaMatriculaOnline/adicionar_escola.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == "Add Series Online" %}    
+            {% include 'Escola/partials/escolaMatriculaOnline/adicionar_serie.html' %}
+        {% endif %} 
+        
+        {% if conteudo_page == 'impugnarConfirmar' %}    
+            {% include 'Escola/matriculaOnline/confirmarOUimpuganar.html' %}
+        {% endif %} 
+        
+        {% if 'escola_id' not in request.session %}
+            {% include 'Escola/partials/seleciona_escola.html' %}        
+        {% endif %} 
+
+        {% if conteudo_page == 'exportar Turmas' %}    
+            {% include 'Escola/partials/migrar_e_exprotar/exportar_turmas.html' %}
+        {% endif %} 
     </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const btnBuscaAtiva = document.getElementById('btnBuscaAtiva');
-        const divBuscaAtiva = document.getElementById('divBuscaAtiva');
+   
+             
+            
+ 
 
-        btnBuscaAtiva.addEventListener('click', function() {
-            if (divBuscaAtiva.style.display === 'none' || divBuscaAtiva.style.display === '') {
-                divBuscaAtiva.style.display = 'block';
-                setTimeout(() => divBuscaAtiva.style.opacity = 1, 10); // suaviza a transição
-                btnBuscaAtiva.textContent = 'Ocultar alunos em busca ativa';
-            } else {
-                divBuscaAtiva.style.opacity = 0;
-                setTimeout(() => divBuscaAtiva.style.display = 'none', 500); // aguarda a transição
-                btnBuscaAtiva.textContent = 'Mostrar alunos em busca ativa';
+    <style>
+        /* Ajustes extra para o modal responsivo */
+        .modal-escola-overlay .modal-content {
+            max-height: 95vh;
+        }
+        @media (max-width: 575.98px) {
+            .modal-escola-overlay .modal-content {
+                max-height: 100vh;
+                border-radius: 0;
+            }
+            .modal-escola-overlay .modal-header h2 {
+                font-size: 0.95rem !important;
+                word-break: break-word;
+            }
+            .modal-escola-overlay .modal-footer .btn {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.8rem;
+            }
+            .modal-escola-overlay .modal-footer .btn i {
+                font-size: 0.9rem;
+            }
+            .modal-escola-overlay .modal-body {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const overlay = document.getElementById('modalEscolaOverlay');
+            const btnFechar = document.getElementById('btnFecharModalEscola');
+            
+            if (overlay) {
+                // Fechar ao clicar no X
+                if (btnFechar) {
+                    btnFechar.addEventListener('click', function() {
+                        overlay.style.display = 'none';
+                    });
+                }
+                // Fechar ao clicar fora do modal (no overlay)
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        overlay.style.display = 'none';
+                    }
+                });
+                // Fechar com tecla ESC
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && overlay.style.display !== 'none') {
+                        overlay.style.display = 'none';
+                    }
+                });
             }
         });
-
-        // Botão hover efeito
-        btnBuscaAtiva.addEventListener('mouseover', () => {
-            btnBuscaAtiva.style.backgroundColor = '#0056b3';
-            btnBuscaAtiva.style.boxShadow = '0 6px 8px rgba(0,0,0,0.3)';
-        });
-        btnBuscaAtiva.addEventListener('mouseout', () => {
-            btnBuscaAtiva.style.backgroundColor = '#007bff';
-            btnBuscaAtiva.style.boxShadow = '0 4px 6px rgba(0,0,0,0.2)';
-        });
-    });
     </script>
-{% endif %}
-
-   
-    {% if  conteudo_page == 'create_users'  %}
-        {% include 'Escola/partials/usuarios/createUsers.html' %}
-    {% endif %}
-
-    <!-- Ano letivo -->
-    {% if  conteudo_page == 'criar Ano Letivo' %}
-        {% include 'Escola/partials/ano/cria_ano.html' %}
-    {% endif %}
-    
-    <!-- End informações-->    
-    {% if  conteudo_page == 'Nome das Escolas' %}
-        {% include 'Escola/partials/seleciona_escola.html' %}
-    {% endif %}
-    {% if  conteudo_page == 'Ano Letivo' %}
-        {% include 'Escola/partials/seleciona_anoLetivo.html' %}
-    {% endif %}
-
-    <!--Prefeitura-->
-    {% if  conteudo_page == 'prefeituraUdate' %}
-        {% include 'Escola/partials/prefeitura/PrefeituraUpdate.html' %}
-    {% endif %}    
-    
-    <!--Dados Escola-->
-    {% if  conteudo_page == 'Atualiza Escola'  %}
-        {% include 'Escola/partials/minhaEscola/seleciona_escola.html' %}
-    {% endif %}
-    {% if  conteudo_page == 'CreateEscola'  %}
-        {% include 'Escola/partials/minhaEscola/createEscola.html' %}
-    {% endif %}
-    <!--Turmas-->
-    {% if  conteudo_page == 'Criar Turmas' %}
-        {% include 'Escola/partials/seleciona_turma.html' %}
-    {% endif %}
-    {% if  conteudo_page == 'Criar Turmas update' %}
-        {% include 'Escola/partials/turmas/update_or_delete.html' %}
-    {% endif %}
-    {% if  conteudo_page == 'Registrar Alunos' %}
-        {% include 'Escola/partials/seleciona_aluno.html' %}
-    {% endif %}   
-    {% if  conteudo_page == 'Registrar Alunos Documento' %}
-        {% include 'Escola/partials/seleciona_aluno_documento.html' %}
-    {% endif %}
-    {% if  conteudo_page == 'Todas as matriculas' %}
-        {% include 'Escola/partials/seleciona_matricula_turmas.html' %}
-    {% endif %}  
-    <!--Matriculas-->
-    {% if  conteudo_page == 'Matricular Aluno' %}
-        {% include 'Escola/partials/matriculas/seleciona_matricular_aluno.html' %}
-    {% endif %} 
-    {% if  conteudo_page == 'matricula_update_or_delete' %}
-        {% include 'Escola/partials/matriculas/update_or_delete.html' %}
-    {% endif %} 
-    <!--Matriculas END-->
-
-    {% if  conteudo_page == 'Remaneja Aluno' %}
-        {% include 'Escola/partials/seleciona_matricular_remanejamento.html' %}
-    {% endif %} 
-    <!-- Professores -->
-    {% if  conteudo_page == 'Professores' %}
-        {% include 'Escola/partials/seleciona_professores.html' %}
-    {% endif %} 
-    {% if  conteudo_page == 'Professores-Pessoas' %}
-        {% include 'Escola/partials/partials_professores/seleciona_pessoas.html' %}
-    {% endif %} 
-    {% if  conteudo_page == 'Professores-Pessoas-Vinculo' %}
-        {% include 'Escola/partials/partials_professores/seleciona_pessoas-vinculo.html' %}
-    {% endif %} 
-    {% if  conteudo_page == 'seleciona_pessoas-vinculo_contrato' %}
-        {% include 'Escola/partials/partials_professores/seleciona_pessoas-vinculo_contrato.html' %}
-    {% endif %} 
-    {% if  conteudo_page == 'encaminha_para_escola' %}
-        {% include 'Escola/partials/partials_professores/encaminhamentos/encaminha_para_escola.html' %}
-    {% endif %} 
-    {% if  conteudo_page == 'encaminha_para_escola_deleteORupdate' %}
-        {% include 'Escola/partials/partials_professores/encaminhamentos/update_or_delete.html' %}
-    {% endif %} 
-
-    <!-- Professores -->
-    {% if  conteudo_page == 'Criar Disciplina' %}
-        {% include 'Escola/partials/seleciona_disciplinas.html' %}
-    {% endif %} 
-    {% if  conteudo_page == 'Grades' %}
-        {% include 'Escola/partials/seleciona_grades.html' %}
-    {% endif %} 
-    {% if  conteudo_page == 'QR_code' %}
-        {% include 'Escola/partials/seleciona_qrCode.html' %}
-    {% endif %} 
-    {% if  conteudo_page == 'Turmas Escolha' %}
-        {% include 'Escola/partials/seleciona_Turma_retorno_aluno.html' %}
-    {% endif %} 
-    
-    <!--Pessoas para uso de decreto e outros-->
-    {% if  conteudo_page ==  'Pessoa Create' %}
-        {% include 'Escola/partials/pessoas/pessoa_create.html' %}
-    {% endif %}
-    {% if  conteudo_page ==  'Update_Delete' %}
-        {% include 'Escola/partials/pessoas/update_or_delete.html' %}
-    {% endif %}
-    
-    <!--PessoasContrato para uso de decreto e outros-->
-    {% if  conteudo_page ==  'Contrato Create' %}
-        {% include 'Escola/partials/pessoasContrato/pessoaContrato_create.html' %}
-    {% endif %}
-    {% if  conteudo_page ==  'Contrato Update_Delete' %}
-        {% include 'Escola/partials/pessoasContrato/update_or_delete.html' %}
-    {% endif %}
-    
-   
-    <!--Decreto-->
-    {% if  conteudo_page ==  'Decreto Create'  %}
-        {% include 'Escola/partials/decreto/decreto_create.html' %}
-    {% endif %}
-    {% if  conteudo_page ==  'Decreto Update or Delete' %}
-        {% include 'Escola/partials/decreto/decreto_create.html' %}
-    {% endif %}  
-
-    <!--Decreto ativo-->    
-    {% if  conteudo_page ==  'Decreto Ativo' %}
-        {% include 'Escola/partials/decreto/decreto_createAtivo.html' %}
-    {% endif %}   
-    
-    <!--Grades-->
-    {% if  conteudo_page == 'Todas as turmas-grade' %}
-        {% include 'Escola/partials/grades/seleciona_grade_turma.html' %}
-    {% endif %} 
-    {% if  conteudo_page == "Updade_or_Delete Grade" %}
-        {% include 'Escola/partials/grades/update_or_delete.html' %}
-    {% endif %}
-    <!--Grades End-->
-
-    <!-- Plano de Aula -->     
-    {% if  conteudo_page == "relatorio_planoAula" %}
-        {% include 'Escola/partials/gestao_turmas/planoAula/planoAula.html' %}
-    {% endif %}
-
-    {% if  conteudo_page == 'cargos/funcionarios' %}
-        {% include 'Escola/partials/selecionar_cargos_funcionarios.html' %}
-    {% endif %}    
-    {% if  conteudo_page == 'Gestão Turmas' %}
-        {% include 'Escola/partials/gestao_turmas/gestao_.html' %}
-    {% endif %}  
-    {% if  conteudo_page ==  "Gestão Turmas - Notas Aluno"   %}
-        {% include 'Escola/partials/gestao_turmas/notas.html' %}
-    {% endif %}  
-
-    <!-- Parecer Descritivo do Aluno-->
-    {% if  conteudo_page ==  "Gestão Turmas - Parecer"   %}
-        {% include 'Escola/partials/gestao_turmas/parecer_descritivo/parecer.html' %}
-    {% endif %}  
-
-    {% if  conteudo_page ==  "Gestão Turmas - Notas Update"   %}
-        {% include 'Escola/partials/gestao_turmas/notasFORM.html' %}
-    {% endif %}  
-    {% if  conteudo_page ==  "Gestão Turmas - Notas Recupera Update"  %}
-        {% include 'Escola/partials/gestao_turmas/notasRecuperForm.html' %}
-    {% endif %}  
-
-    {% if  conteudo_page ==  "Gestão Turmas - GerarHorario"   %}
-        {% include 'Escola/partials/gestao_turmas/horarioAula.html' %}
-    {% endif %} 
-    {% if  conteudo_page ==  "Gestão Turmas - DefineValidadeHorario"   %}
-        {% include 'Escola/partials/gestao_turmas/defineValidadeHorario.html' %}
-    {% endif %} 
-
-    
-    <!--Impressos **************-->
-
-    {% if  conteudo_page == "imprime_escolas" %}
-        {% include 'Escola/partials/impressos/impresso_escolas.html' %}
-    {% endif %}   
-        
-    {% if  conteudo_page == "imprime_turma" %}
-        {% include 'Escola/partials/impressos/impresso_turmas.html' %}
-    {% endif %}   
-    {% if  conteudo_page == "imprime_turma_filtros"     %}
-        {% include 'Escola/partials/impressos/impressoTurmasFiltros.html' %}
-    {% endif %}   
-    {% if  conteudo_page == "imprime_all_horario"     %}
-        {% include 'Escola/partials/impressos/horarios/geral.html' %}
-    {% endif %}   
-    
-    
-        
-    {% if  conteudo_page == "imprime_turma_matricula" %}
-        {% include 'Escola/partials/impressos/impresso_turmas_matricula.html' %}
-    {% endif %}   
-    {% if  conteudo_page == "imprime_comprovante_matricula" %}
-        {% include 'Escola/partials/impressos/impresso_comprovante_matricula.html' %}
-    {% endif %}   
-
-    <!--END Impressos **************-->
-    {% if  conteudo_page == 'delete' %}
-        {% include 'Escola/partials/seleciona_DELETE.html' %}
-    {% endif %}    
-    {% if  conteudo_page == 'update' %}
-        {% include 'Escola/partials/seleciona_UPDATE.html' %}
-    {% endif %}   
-
-    <!-- Bairros -->
-    {% if  conteudo_page == 'Criar Bairros' %}
-        {% include 'Escola/partials/bairros/seleciona_bairros.html' %}
-    {% endif %}    
-    {% if  conteudo_page == 'update_or_delete' %}
-        {% include 'Escola/partials/bairros/update_or_delete.html' %}
-    {% endif %}  
-
-    <!-- Cidade -->
-    {% if  conteudo_page == 'Criar Cidade' %}
-        {% include 'Escola/partials/cidade/seleciona_cidade.html' %}
-    {% endif %}    
-    {% if  conteudo_page == 'update_or_delete' %}
-        {% include 'Escola/partials/cidade/update_or_delete.html' %}
-    {% endif %}    
-    <!--Ferramentas-->
-    {% if  conteudo_page == 'imagem-docx' %}
-        {% include 'Escola/partials/bairros/seleciona_bairros.html' %}
-    {% endif %} 
-    
-    <!--Ferramentas-->
-    {% if  conteudo_page == "freqenciaImpressa"  %}
-        {% include 'Escola/partials/feriados_frequencia/calendario_mes.html' %}
-    {% endif %} 
-
-    <!--Documentos-->
-    {% if  conteudo_page == "boletim"  %}
-        {% include 'docsGestao_escolar/boletins/seleciona_turma_boletim.html' %}
-    {% endif %} 
-    {% if  conteudo_page == "boletim_aluno" %}
-        {% include 'docsGestao_escolar/boletins/seleciona_aluno_boletim.html' %}
-    {% endif %} 
-    {% if  conteudo_page == "boletim_trimestral"%}
-        {% include 'docsGestao_escolar/boletins/seleciona_trimestral_boletim.html' %}
-    {% endif %} 
-    
-    {% if  conteudo_page == "historicoAluno"  %}
-        {% include 'Escola/impressos/historico_escolar.html' %}
-    {% endif %}  
-
-    <!--Notificação do sistema-->
-    {% if  conteudo_page == 'EnviaNotifica'   %}
-        {% include 'Admin_Acessos/notifica_e_msg/notifica.html' %}
-    {% endif %} 
-    
-    <!-- Apuraçao final -->
-     {% if  conteudo_page == 'SelecinaTurmaApuração'  %}
-        {% include 'Escola/partials/apuracaoFinal/apuracaoFinalTurmas.html' %}
-    {% endif %}  
-    {% if  conteudo_page == 'ApuraçãoFinal' %}
-        {% include 'Escola/partials/apuracaoFinal/apuracaoFinal.html' %}
-    {% endif %}  
-
-    
-
-    <!--Errors 400, 403, 404, 500-->
-
-    {% if  conteudo_page == "500" %}    
-        {% include 'docsGestao_escolar/boletins/seleciona_trimestral_boletim.html' %}
-    {% endif %} 
-
-    <!--Matricula online VERIFICAR  --> 
-    {% if  conteudo_page == "Add Matricula Online"%}    
-        {% include 'Escola/partials/escolaMatriculaOnline/adicionar_escola.html' %}
-    {% endif %} 
-    {% if  conteudo_page == "Add Series Online" %}    
-        {% include 'Escola/partials/escolaMatriculaOnline/adicionar_serie.html' %}
-    {% endif %} 
-    {% if  conteudo_page == 'impugnarConfirmar' %}    
-        {% include 'Escola/matriculaOnline/confirmarOUimpuganar.html' %}
-    {% endif %} 
-    
-        
-    
-    <!-- Condiciionais-->
-    {% if 'escola_id' not in request.session %}
-        {% include 'Escola/partials/seleciona_escola.html' %}        
-    {% endif %} 
-
-    
-    <!-- MIGRAR, EXPORTAR, FINALIZAR ANO LETIVO -->
-    <!-- Exportar Turmas -->     
-    {% if  conteudo_page == 'exportar Turmas'  %}    
-        {% include 'Escola/partials/migrar_e_exprotar/exportar_turmas.html' %}
-    {% endif %} 
-</div>
-
-
+{% endblock main %}
 
 {% block script_footer %}
-<script>
-    $(document).ready(function(){
-        $('#modal_escola').modal("show");
-
-        // Adiciona um evento de clique ao botão de fechar
-        $('.close, .modal').click(function(e) {
-            if (e.target === this) {
-                $('#modal_escola').modal('hide');
-                window.location.href = "{% url 'Gestao_Escolar:GE_Escola_inicio' %}";
+    <!-- Scripts existentes... -->
+    <script>
+        $(document).ready(function(){
+            if ($('#modal_escola').length) {
+                $('#modal_escola').modal("show");
+                $('.close, .modal').click(function(e) {
+                    if (e.target === this) {
+                        $('#modal_escola').modal('hide');
+                        window.location.href = "{% url 'Gestao_Escolar:GE_Escola_inicio' %}";
+                    }
+                });
             }
         });
-    });
-</script>
+    </script>
 
-<script>
-    // Small using Bootstrap 5 classes
-$("#form-select-sm").select2({
-    theme: "bootstrap-5",
-    dropdownParent: $("#form-select-sm").parent(), // Required for dropdown styling
-});
-</script>
+    <script>
+        $(document).ready(function() {
+            if ($("#form-select-sm").length) {
+                $("#form-select-sm").select2({
+                    theme: "bootstrap-5",
+                    dropdownParent: $("#form-select-sm").parent(),
+                    width: '100%'
+                });
+            }
+        });
+    </script>
 
-<script>
-var datepickers = [].slice.call(document.querySelectorAll('[data-datepicker]'))
-var datepickersList = datepickers.map(function (el) {
-    return new Datepicker(el, {
-        buttonClass: 'btn'
-    });
-});
-</script>
-<!--Esconde e exibe detalhes-->
-<script>
-    function toggleDetails(button) {
-        var details = button.nextElementSibling;
-        if (details.style.display === "none" || details.style.display === "") {
-            details.style.display = "block";
-            button.innerHTML = "Fechar";
-        } else {
-            details.style.display = "none";
-            button.innerHTML = "Leia mais...";
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var datepickers = [].slice.call(document.querySelectorAll('[data-datepicker]'));
+            var datepickersList = datepickers.map(function (el) {
+                return new Datepicker(el, {
+                    buttonClass: 'btn'
+                });
+            });
+        });
+    </script>
+
+    <script>
+        function toggleDetails(button) {
+            var details = button.nextElementSibling;
+            if (details.style.display === "none" || details.style.display === "") {
+                details.style.display = "block";
+                button.innerHTML = "Fechar";
+            } else {
+                details.style.display = "none";
+                button.innerHTML = "Leia mais...";
+            }
         }
-    }
-</script>  
-<!-- Parabens ao aniversariante -->
-<link rel="stylesheet" href="{% static 'global/css/happy birtday.css' %}" />  
-<canvas id="c"></canvas>
-    
-{% endblock script_footer %} 
-{% endblock main %}
+    </script>  
+
+    {% if alunos_em_risco %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnBuscaAtiva = document.getElementById('btnBuscaAtiva');
+            const divBuscaAtiva = document.getElementById('divBuscaAtiva');
+            const btnFecharBuscaAtiva = document.getElementById('btnFecharBuscaAtiva');
+
+            function toggleBuscaAtiva() {
+                if (divBuscaAtiva.style.display === 'none' || divBuscaAtiva.style.display === '') {
+                    divBuscaAtiva.style.display = 'block';
+                    setTimeout(() => divBuscaAtiva.style.opacity = 1, 10);
+                    btnBuscaAtiva.innerHTML = '<div class="d-flex align-items-center gap-2 fs-6 fw-bold"><span>⚠️</span> <span>Ocultar Busca Ativa</span></div>';
+                } else {
+                    divBuscaAtiva.style.opacity = 0;
+                    setTimeout(() => divBuscaAtiva.style.display = 'none', 500);
+                    btnBuscaAtiva.innerHTML = '<div class="d-flex align-items-center gap-2 fs-6 fw-bold"><span>️</span> <span>Risco de Evasão</span></div><small class="fw-normal" style="font-size: 12px; color: #e0e0e0;">Fazer busca ativa</small>';
+                }
+            }
+
+            if (btnBuscaAtiva) btnBuscaAtiva.addEventListener('click', toggleBuscaAtiva);
+            if (btnFecharBuscaAtiva) btnFecharBuscaAtiva.addEventListener('click', toggleBuscaAtiva);
+        });
+    </script>
+    {% endif %}
+{% endblock script_footer %}

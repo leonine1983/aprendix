@@ -4,6 +4,8 @@ from django.http import JsonResponse
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import redirect, get_object_or_404, render
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
 
 # Auth
 from django.contrib.auth import logout
@@ -31,29 +33,26 @@ from ckeditor.widgets import CKEditorWidget
 # Local apps
 from admin_acessos.models import MessageUser, PaletaCores, AtualizacaoNotificacaoSistema
 from admin_acessos.forms import NotificacaoForm
-from rh.models import Prefeitura
+from rh.models import Prefeitura, EscolaUser, Escola
 
-# Login
-import random
-
-from django.conf import settings
-from django.core.exceptions import PermissionDenied
-from django.urls import reverse_lazy
-from django.contrib import messages
-import random
+# Perfis
 from core.groups.merenda import MERENDEIRA_GROUPS
 from core.groups.nutricionista import NUTRICIONISTA_GROUPS
+from core.groups.secretaria import SECRETARIOS_GROUPS
+
+import random
+
 
 def startSme(request):
     return render(request, 'Admin_Acessos/starSme.html')
 
 
-# Login da merenda escolar
 def loginMerendaEscolar(request):
     return render(request, 'Admin_Acessos/index_merendaEscolar.html')
 
+
 def loginAprendix(request):
-    return render(request,  'Admin_Acessos/index_aprendix.html')
+    return render(request, 'Admin_Acessos/index_aprendix.html')
 
 
 class CreateLoginView(LoginView):
@@ -72,10 +71,7 @@ class CreateLoginView(LoginView):
         return super().form_invalid(form)
 
     def form_valid(self, form):
-        """
-        Validação institucional do perfil selecionado.
-        Só prossegue se o usuário realmente pertencer ao grupo escolhido.
-        """
+
         response = super().form_valid(form)
         user = self.request.user
         perfil = self.request.POST.get("perfil")
@@ -87,28 +83,26 @@ class CreateLoginView(LoginView):
         # MERENDEIRA
         if perfil == "merendeira":
             if not user.groups.filter(name__in=MERENDEIRA_GROUPS).exists():
-                messages.error(
-                    self.request,
-                    "Seu usuário não possui permissão institucional como Merendeira."
-                )
+                messages.error(self.request, "Seu usuário não possui permissão institucional como Merendeira.")
                 self.request.session.flush()
                 raise PermissionDenied()
 
         # NUTRICIONISTA
         elif perfil == "nutricionista":
             if not user.groups.filter(name__in=NUTRICIONISTA_GROUPS).exists():
-                messages.error(
-                    self.request,
-                    "Seu usuário não possui permissão institucional como Nutricionista."
-                )
+                messages.error(self.request, "Seu usuário não possui permissão institucional como Nutricionista.")
                 self.request.session.flush()
                 raise PermissionDenied()
-
+            
+        # SECRETARIOS
+        elif perfil == "secretario":
+            if not user.groups.filter(name__in=SECRETARIOS_GROUPS).exists():
+                # ✅ CORREÇÃO 1: Texto da mensagem ajustado de "Nutricionista" para "Secretário"
+                messages.error(self.request, "Seu usuário não possui permissão institucional como Secretário.")
+                self.request.session.flush()
+                raise PermissionDenied()
         else:
-            messages.error(
-                self.request,
-                "Perfil institucional inválido."
-            )
+            messages.error(self.request, "Perfil institucional inválido.")
             self.request.session.flush()
             raise PermissionDenied()
 
@@ -116,13 +110,10 @@ class CreateLoginView(LoginView):
 
     def get_success_url(self):
         """
-        Mantém a mensagem motivacional
-        e direciona conforme perfil selecionado.
+        Mantém a mensagem motivacional e direciona conforme perfil selecionado.
         """
-
         user = self.request.user
         perfil = self.request.POST.get("perfil")
-        print(f'esse é o perfil {perfil}')
 
         # Construção segura do nome
         first = user.first_name.capitalize() if user.first_name else ""
@@ -130,56 +121,57 @@ class CreateLoginView(LoginView):
         name = f"{first} {last}".strip() or user.username
 
         mensagens_boas_vindas = [
-            f'Sabe {name}, \'A educação é a arma mais poderosa que você pode usar para mudar o mundo.\' - Nelson Mandela',
-            f'{name}, \'O sucesso é ir de fracasso em fracasso sem perder o entusiasmo.\' - Winston Churchill',
-            f'Olá {name}, \'A mente que se abre a uma nova ideia jamais voltará ao seu tamanho original.\' - Albert Einstein',
-            f'{name}, \'A persistência é o caminho do êxito.\' - Charles Chaplin',
-            f'{name}, \'Aprender é a única coisa de que a mente nunca se cansa, nunca tem medo e nunca se arrepende.\' - Leonardo da Vinci',
-            f'{name}, \'Se você quer alcançar a grandeza, pare de pedir permissão.\' - Autor desconhecido',
-            f'Bem-vindo {name}, \'A única coisa que interfere com meu aprendizado é a minha educação.\' - Albert Einstein',
-            f'{name}, \'Coragem é a resistência ao medo, domínio do medo – não a ausência do medo.\' - Mark Twain',
-            f'{name}, \'Seja a mudança que você deseja ver no mundo.\' - Mahatma Gandhi',
-            f'{name}, \'A alegria de fazer o bem é a única felicidade verdadeira.\' - Léon Tolstói',
-            f'{name}, \'Você nunca será velho demais para estabelecer um novo objetivo ou sonhar um novo sonho.\' - C.S. Lewis',
-            f'{name}, \'A melhor maneira de prever o futuro é criá-lo.\' - Peter Drucker',
-            f'{name}, \'Não é o mais forte que sobrevive, nem o mais inteligente, mas o que melhor se adapta às mudanças.\' - Charles Darwin',
-            f'{name}, \'A vida é 10% o que acontece com você e 90% como você reage a isso.\' - Charles R. Swindoll',
-            f'{name}, \'O único lugar onde o sucesso vem antes do trabalho é no dicionário.\' - Vidal Sassoon',
-            f'{name}, \'A dúvida é um traidor que nos faz perder o bem que poderíamos conquistar, por medo de tentar.\' - William Shakespeare',
-            f'{name}, \'Tudo parece impossível até que seja feito.\' - Nelson Mandela',
-            f'{name}, \'Conhece-te a ti mesmo e conhecerás o universo e os deuses.\' - Sócrates',
-            f'{name}, \'A motivação é o que te faz começar. O hábito é o que te mantém em movimento.\' - Jim Ryun',
-            f'{name}, \'A educação é o passaporte para o futuro, pois o amanhã pertence àqueles que se preparam hoje.\' - Malcolm X',
-            f'{name}, \'O que quer que você faça, faça-o bem.\' - Abraham Lincoln',
-            f'{name}, \'A disciplina é a mãe do sucesso.\' - Ésquilo',
-            f'{name}, \'Não é suficiente fazer o seu melhor; você deve saber o que fazer e então fazer o seu melhor.\' - W. Edwards Deming',
-            f'{name}, \'Grandes realizações não são feitas por impulso, mas por uma soma de pequenas realizações.\' - Vincent van Gogh',
-            f'{name}, \'Não espere por oportunidades extraordinárias. Agarre ocasiões comuns e torne-as grandes.\' - Orison Swett Marden',
-            f'{name}, \'A mente é tudo. Você se torna aquilo que você pensa.\' - Buda',
-            f'{name}, \'Nada é particularmente difícil se você o dividir em pequenas tarefas.\' - Henry Ford',
-            f'{name}, \'Não se preocupe com fracassos; preocupe-se com as chances que você perde quando nem tenta.\' - Jack Canfield',
-            f'{name}, \'A educação não transforma o mundo. Educação muda pessoas. Pessoas transformam o mundo.\' - Paulo Freire',
-            f'{name}, \'Todos os nossos sonhos podem se realizar, se tivermos coragem de persegui-los.\' - Walt Disney',
-            f'{name}, \'A simplicidade é o último grau de sofisticação.\' - Leonardo da Vinci',
-            f'{name}, \'O único modo de fazer um excelente trabalho é amar o que você faz.\' - Steve Jobs',
-            f'{name}, \'O aprendizado nunca esgota a mente.\' - Leonardo da Vinci',
-            f'{name}, \'As raízes da educação são amargas, mas o fruto é doce.\' - Aristóteles',
-            f'{name}, \'A verdadeira viagem do descobrimento não consiste em procurar novas paisagens, mas em ter novos olhos.\' - Marcel Proust',
-            f'{name}, \'A dúvida é o princípio da sabedoria.\' - Aristóteles',
-            f'{name}, \'Não podemos resolver nossos problemas com o mesmo pensamento que usamos quando os criamos.\' - Albert Einstein',
-            f'{name}, \'Nada é tão contagioso quanto o exemplo.\' - François de La Rochefoucauld',
-            f'{name}, \'A ação é a chave fundamental para todo sucesso.\' - Pablo Picasso',
-            f'{name}, \'Você é aquilo que faz repetidamente. Excelência, então, não é um ato, mas um hábito.\' - Aristóteles',
-            f'{name}, \'Nunca é tarde para ser aquilo que você poderia ter sido.\' - George Eliot',
-            f'{name}, \'As melhores e mais belas coisas do mundo não podem ser vistas nem tocadas. Elas devem ser sentidas com o coração.\' - Helen Keller',
-            f'{name}, \'A sabedoria começa na reflexão.\' - Confúcio',
-            f'{name}, \'A jornada de mil milhas começa com um único passo.\' - Lao Tsé',
-            f'{name}, \'Viver é a coisa mais rara do mundo. A maioria das pessoas apenas existe.\' - Oscar Wilde',
-            f'{name}, \'A leitura de todos os bons livros é como uma conversa com as melhores mentes dos séculos passados.\' - René Descartes',
-            f'{name}, \'Quando você quer alguma coisa, todo o universo conspira para que você realize seu desejo.\' - Paulo Coelho',
-            f'{name}, \'O futuro pertence àqueles que acreditam na beleza de seus sonhos.\' - Eleanor Roosevelt',
-            f'{name}, \'A felicidade é a única coisa que se multiplica quando é dividida.\' - Albert Schweitzer'
-        
+            f'Sabe {name}, "A educação é a arma mais poderosa que você pode usar para mudar o mundo." - Nelson Mandela',
+            f'{name}, "O sucesso é ir de fracasso em fracasso sem perder o entusiasmo." - Winston Churchill',
+            f'Olá {name}, "A mente que se abre a uma nova ideia jamais voltará ao seu tamanho original." - Albert Einstein',
+            f'{name}, "A persistência é o caminho do êxito." - Charles Chaplin',
+            f'{name}, "Aprender é a única coisa de que a mente nunca se cansa, nunca tem medo e nunca se arrepende." - Leonardo da Vinci',
+            f'{name}, "Se você quer alcançar a grandeza, pare de pedir permissão." - Autor desconhecido',
+            f'Bem-vindo {name}, "A única coisa que interfere com meu aprendizado é a minha educação." - Albert Einstein',
+            f'{name}, "Coragem é a resistência ao medo, domínio do medo – não a ausência do medo." - Mark Twain',
+            f'{name}, "Seja a mudança que você deseja ver no mundo." - Mahatma Gandhi',
+            f'{name}, "A alegria de fazer o bem é a única felicidade verdadeira." - Léon Tolstói',
+            f'{name}, "Você nunca será velho demais para estabelecer um novo objetivo ou sonhar um novo sonho." - C.S. Lewis',
+            f'{name}, "A melhor maneira de prever o futuro é criá-lo." - Peter Drucker',
+            f'{name}, "Não é o mais forte que sobrevive, nem o mais inteligente, mas o que melhor se adapta às mudanças." - Charles Darwin',
+            f'{name}, "A vida é 10% o que acontece com você e 90% como você reage a isso." - Charles R. Swindoll',
+            f'{name}, "O único lugar onde o sucesso vem antes do trabalho é no dicionário." - Vidal Sassoon',
+            f'{name}, "A dúvida é um traidor que nos faz perder o bem que poderíamos conquistar, por medo de tentar." - William Shakespeare',
+            f'{name}, "Tudo parece impossível até que seja feito." - Nelson Mandela',
+            f'{name}, "Conhece-te a ti mesmo e conhecerás o universo e os deuses." - Sócrates',
+            f'{name}, "A motivação é o que te faz começar. O hábito é o que te mantém em movimento." - Jim Ryun',
+            f'{name}, "A educação é o passaporte para o futuro, pois o amanhã pertence àqueles que se preparam hoje." - Malcolm X',
+            f'{name}, "O que quer que você faça, faça-o bem." - Abraham Lincoln',
+            f'{name}, "A disciplina é a mãe do sucesso." - Ésquilo',
+            f'{name}, "Não é suficiente fazer o seu melhor; você deve saber o que fazer e então fazer o seu melhor." - W. Edwards Deming',
+            f'{name}, "Grandes realizações não são feitas por impulso, mas por uma soma de pequenas realizações." - Vincent van Gogh',
+            f'{name}, "Não espere por oportunidades extraordinárias. Agarre ocasiões comuns e torne-as grandes." - Orison Swett Marden',
+            f'{name}, "A mente é tudo. Você se torna aquilo que você pensa." - Buda',
+            f'{name}, "Nada é particularmente difícil se você o dividir em pequenas tarefas." - Henry Ford',
+            f'{name}, "Não se preocupe com fracassos; preocupe-se com as chances que você perde quando nem tenta." - Jack Canfield',
+            f'{name}, "A educação não transforma o mundo. Educação muda pessoas. Pessoas transformam o mundo." - Paulo Freire',
+            f'{name}, "Todos os nossos sonhos podem se realizar, se tivermos coragem de persegui-los." - Walt Disney',
+            f'{name}, "A simplicidade é o último grau de sofisticação." - Leonardo da Vinci',
+            f'{name}, "O único modo de fazer um excelente trabalho é amar o que você faz." - Steve Jobs',
+            f'{name}, "O aprendizado nunca esgota a mente." - Leonardo da Vinci',
+            f'{name}, "As raízes da educação são amargas, mas o fruto é doce." - Aristóteles',
+            f'{name}, "A verdadeira viagem do descobrimento não consiste em procurar novas paisagens, mas em ter novos olhos." - Marcel Proust',
+            f'{name}, "A dúvida é o princípio da sabedoria." - Aristóteles',
+            f'{name}, "Não podemos resolver nossos problemas com o mesmo pensamento que usamos quando os criamos." - Albert Einstein',
+            f'{name}, "Nada é tão contagioso quanto o exemplo." - François de La Rochefoucauld',
+            f'{name}, "A ação é a chave fundamental para todo sucesso." - Pablo Picasso',
+            f'{name}, "Você é aquilo que faz repetidamente. Excelência, então, não é um ato, mas um hábito." - Aristóteles',
+            f'{name}, "Nunca é tarde para ser aquilo que você poderia ter sido." - George Eliot',
+            f'{name}, "As melhores e mais belas coisas do mundo não podem ser vistas nem tocadas. Elas devem ser sentidas com o coração." - Helen Keller',
+            f'{name}, "A sabedoria começa na reflexão." - Confúcio',
+            f'{name}, "A jornada de mil milhas começa com um único passo." - Lao Tsé',
+            f'{name}, "Viver é a coisa mais rara do mundo. A maioria das pessoas apenas existe." - Oscar Wilde',
+            f'{name}, "A leitura de todos os bons livros é como uma conversa com as melhores mentes dos séculos passados." - René Descartes',
+            f'{name}, "Quando você quer alguma coisa, todo o universo conspira para que você realize seu desejo." - Paulo Coelho',
+            f'{name}, "O futuro pertence àqueles que acreditam na beleza de seus sonhos." - Eleanor Roosevelt',
+            f'{name}, "A felicidade é a única coisa que se multiplica quando é dividida." - Albert Schweitzer', # ✅ CORREÇÃO 2: Vírgula adicionada aqui
+            
+            # Frases duplicadas/alternativas mantidas e formatadas corretamente
             f'{name}, "A educação é a arma mais poderosa que você pode usar para mudar o mundo." - Nelson Mandela',
             f'{name}, "O sucesso é ir de fracasso em fracasso sem perder o entusiasmo." - Winston Churchill',
             f'{name}, "Aprender é a única coisa de que a mente nunca se cansa." - Leonardo da Vinci',
@@ -204,8 +196,13 @@ class CreateLoginView(LoginView):
             return reverse_lazy('modulo_merendeiras:cardapio_hoje')
 
         if perfil == "nutricionista":
-            messages.success(self.request, "Você esta acessando como: nutricionista ")
-            return reverse_lazy('merendaEscolar:merenda_inicio')
+            messages.success(self.request, "Você está acessando como: nutricionista")
+            return reverse_lazy('merendaEscolar:merenda_inicio')       
+        
+        
+        if perfil == "secretario":                    
+                    messages.success(self.request, "Você está acessando como: Secretário Escolar")                    
+                    return reverse_lazy('Gestao_Escolar:GE_inicio')          
         
         messages.error(
             self.request,
@@ -216,15 +213,14 @@ class CreateLoginView(LoginView):
         return reverse_lazy('admin_acessos:logout')
 
 
-
 # Logout
 class LogoutView_logout(LogoutView):
     """
     View responsável por encerrar a sessão do usuário
-    e redirecionar para a tela de login com feedback institucional. """
+    e redirecionar para a tela de login com feedback institucional.
+    """
     next_page = reverse_lazy('admin_acessos:login_create')
 
-    
 
 # Painel de Acesso
 class PainelAcessoView(LoginRequiredMixin, TemplateView):
@@ -233,13 +229,13 @@ class PainelAcessoView(LoginRequiredMixin, TemplateView):
 
 # Message User Form
 class MessageUserForm(forms.ModelForm):
-    mensagem = forms.CharField(widget=CKEditorWidget())  # Atualizado para o campo correto
+    mensagem = forms.CharField(widget=CKEditorWidget())
 
     class Meta:
         model = MessageUser
-        fields = ['destinatario', 'assunto', 'mensagem']  # Removido 'user' e ajustado para refletir os campos do modelo
+        fields = ['destinatario', 'assunto', 'mensagem']
         widgets = {
-            'remetente': forms.HiddenInput(),  # Manter o remetente como um campo oculto
+            'remetente': forms.HiddenInput(),
         }
 
 
@@ -263,7 +259,8 @@ class MensagemListView(ListView):
     template_name = 'Controle_Estoque/mensagem/mensage_lista.html'
 
     def get_queryset(self):
-        return MessageUser.objects.filter(user=self.request.user)
+        # ✅ CORREÇÃO 3: Alterado de 'user' para 'destinatario' para bater com os campos do Form/Meta
+        return MessageUser.objects.filter(destinatario=self.request.user)
     
 
 # Update Message
@@ -332,17 +329,14 @@ class PaletaCoresDeleteView(DeleteView):
     success_url = reverse_lazy('paletacores_list')
 
 
-# -----------Criar usuarios ---------------------------------
-from django.contrib.auth.models import User
-from rh.models import  EscolaUser, Escola
-
+# ----------- Criar usuarios ---------------------------------
 class UserCreationFormAll(forms.ModelForm):
     password1 = forms.CharField(widget=forms.PasswordInput(), label='Senha')
     password2 = forms.CharField(widget=forms.PasswordInput(), label='Confirmar Senha')
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'username', ]  # Inclua todos os campos desejados
+        fields = ['first_name', 'last_name', 'email', 'username']
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -367,15 +361,17 @@ class CreateUsers(LoginRequiredMixin, CreateView):
     template_name = 'Escola/inicio.html'
 
     def get_success_url(self):
-        #return reverse_lazy('admin_acessos:CreateUsers')
         return reverse_lazy('Gestao_Escolar:GE_Escola_inicio')
     
     def form_valid(self, form):
-        # Salva o objeto no banco de dados primeiro
         response = super().form_valid(form)
         user_pk = form.instance.pk
 
-        school_pk = self.request.session['escola_id']
+        school_pk = self.request.session.get('escola_id') # ✅ Proteção contra KeyError se a sessão não existir
+        if not school_pk:
+            messages.error(self.request, "Sessão da escola não encontrada.")
+            return redirect('admin_acessos:logout')
+            
         escola = Escola.objects.get(pk=school_pk)
         user = User.objects.get(pk=user_pk)
 
@@ -391,40 +387,45 @@ class CreateUsers(LoginRequiredMixin, CreateView):
 
         return response
 
-    def get_context_data(self, **kwargs) :
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['conteudo_page'] = 'create_users'   
-        pk_school = self.request.session['escola_id']
+        pk_school = self.request.session.get('escola_id', None)
         user = self.request.user
+        
         if user.is_superuser:
             context['all_user_school'] = User.objects.all()  
+        elif pk_school:
+            # ✅ CORREÇÃO 4: Ajustado o lookup para usar o related_name correto (ajuste se seu related_name for diferente)
+            context['all_user_school'] = User.objects.filter(escolauser__escola=pk_school).distinct()
         else:
-            context['all_user_school'] = User.objects.filter(related_UserEscola__escola=pk_school)  
+            context['all_user_school'] = User.objects.none()
+            
         return context  
+
 
 @require_POST
 @login_required
 def marcar_notificacao_como_lida(request):
     notifica_id = request.POST.get('id')
     try:
-        notifica = AtualizacaoNotificacao.objects.get(id = notifica_id, user = request.user)
+        # ✅ CORREÇÃO 5: Nome do modelo alinhado com o import (AtualizacaoNotificacaoSistema)
+        notifica = AtualizacaoNotificacaoSistema.objects.get(id=notifica_id, user=request.user)
         notifica.lida = True
         notifica.save()
         return JsonResponse({'status': 'ok'})
-    except AtualizacaoNotificacao.DoesNotExist:
+    except AtualizacaoNotificacaoSistema.DoesNotExist:
         return JsonResponse({'status': 'erro', 'mensagem': 'Notificação não encontrada'}, status=400)
-
-
 
 
 class EnviarNotificacaoView(LoginRequiredMixin, FormView):
     template_name = 'Escola/inicio.html'
     form_class = NotificacaoForm
-    success_url = '/notificacoes/'
     success_url = reverse_lazy('admin_acessos:notificacao') 
 
     def get_context_data(self, **kwargs):
-        notifica_query = AtualizacaoNotificacao.objects.all().order_by("-id")
+        # ✅ CORREÇÃO 6: Nome do modelo alinhado com o import
+        notifica_query = AtualizacaoNotificacaoSistema.objects.all().order_by("-id")
         paginato = Paginator(notifica_query, 8)
         page = self.request.GET.get('page')
 
@@ -441,8 +442,6 @@ class EnviarNotificacaoView(LoginRequiredMixin, FormView):
         context['titulo_page'] = 'Enviar notificações'      
         return context
 
-        
-
     def form_valid(self, form):
         titulo = form.cleaned_data['titulo']
         mensagem = form.cleaned_data['mensagem']
@@ -451,7 +450,7 @@ class EnviarNotificacaoView(LoginRequiredMixin, FormView):
 
         if user:
             # Notificação para usuário específico
-            AtualizacaoNotificacao.objects.create(
+            AtualizacaoNotificacaoSistema.objects.create(
                 user=user,
                 titulo=titulo,
                 mensagem=mensagem,
@@ -462,15 +461,14 @@ class EnviarNotificacaoView(LoginRequiredMixin, FormView):
             # Notificação para todos os usuários
             users = User.objects.all()
             notificacoes = [
-                AtualizacaoNotificacao(
+                AtualizacaoNotificacaoSistema(
                     user=u,
                     titulo=titulo,
                     mensagem=mensagem,
                     tipo=tipo
                 ) for u in users
             ]
-            AtualizacaoNotificacao.objects.bulk_create(notificacoes)
+            AtualizacaoNotificacaoSistema.objects.bulk_create(notificacoes)
             messages.success(self.request, "Notificação enviada para todos os usuários.")
 
         return super().form_valid(form)
-

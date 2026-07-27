@@ -156,33 +156,7 @@
             {% endif %}
       
           </a>
-          <!--
-          {% for n in usuario %}                  
-                  {% if n.aberta %}   
-                  <a class="dropdown-item m-0 p-0 text-secondary " href=" {% url 'admin_acessos:mensagem_detalhe' n.pk %} " >
-                    <div class=' p-1 m-0 d-flex'>
-                      <span class="w-100" ><img src="{% static n.remetente.foto %}" alt="mdo" width="32" height="32" class="rounded-circle"> {{n.assunto}} </span>
-                      <span class="w-25 " style="padding-left: 1rem;">
-                        <i class="fa-regular fa-eye"></i>
-                      </span>
-                    </div>
-                  </a>               
-                  {% else %}   
-                  <a class=" dropdown-item m-0 p-0  txt-p" href="{% url 'admin_acessos:mensagem_update' n.pk %} ">                 
-                    <div class='p-1 m-0 d-flex'>
-                      <div class="w-100" ><img src="{% static n.remetente.foto %}" alt="mdo" width="32" height="32" class="rounded-circle"><i class="w-25 fa-solid fa-volume-high"></i> {{n.assunto}}  </div>
-                      <div class="w-25 " style="padding-left: 1rem;">
-                        <i class="fa-solid fa-envelope fa-beat text-info  "></i>
-                      </div>
-                    </div>
-                    </a>
-                  {% endif %} 
-                {% endfor %}
-              
-          <a class="dropdown-item txt-p bg-transparent" href="{% url 'admin_acessos:mensagem'%}">
-            <i class="fa-regular fa-envelope"></i>
-            <span>Enviar mensagem dddd</span>        
-          </a> -->
+          
           
           
           <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}">

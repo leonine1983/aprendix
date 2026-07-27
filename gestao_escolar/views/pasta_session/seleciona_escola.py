@@ -49,6 +49,12 @@ def Seleciona_escola(request, pk):
     escola = Escola.objects.get(pk=pk)    
     request.session['escola_id'] = escola.id        
     request.session['escola_nome'] = escola.nome_escola
+    request.session['sigla_escola'] = escola.sigla_escola
+    # Salva o caminho da imagem (se existir)
+    if hasattr(escola, 'related_dadosEscola') and escola.related_dadosEscola.imagem:
+        request.session['escola_imagem'] = escola.related_dadosEscola.imagem.url
+    else:
+        request.session['escola_imagem'] = ''
 
     # Guarda só os IDs
     nomeclatura = NomeclaturaJanelas.objects.latest('id')

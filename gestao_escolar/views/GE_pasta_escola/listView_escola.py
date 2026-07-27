@@ -10,8 +10,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import datetime
 from gestao_escolar.utils import processar_dados
 
+from core.views.baseSecretarios import BaseSecretariosView
 
-class ListView_Escola(LoginRequiredMixin, TemplateView):
+
+class ListView_Escola(BaseSecretariosView, TemplateView):
     model = Escola
     template_name = 'Escola/inicio.html'
     context_object_name = 'escolas'

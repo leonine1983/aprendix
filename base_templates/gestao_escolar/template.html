@@ -5,13 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- Meta Tags de SEO -->
-    <title>APRENDIX - Solução Completa para Escolas</title>
+    <!-- Meta Tags de SEO -->
+    <title>{% block title_page %}APRENDIX - Solução Completa para Escolas{% endblock title_page %}</title>
     <meta name="description" content="APRENDIX é um sistema ERP completo para gestão escolar, ideal para secretarias municipais de educação e escolas particulares. Melhore a administração, pedagogia e comunicação escolar com nossa solução integrada.">
     <meta name="keywords" content="ERP escolar, gestão escolar, sistema de ensino, software para escolas, secretaria de educação, APRENDIX, evasão escolar, caderneta digital, gestão pedagógica">
     <meta name="author" content="CAUAN's Solutions | Dev. Rogério Cerqueira da Silva">
-    
-  <!-- Canonical URL -->
+
+    <!-- Canonical URL -->
     <link rel="canonical" href="https://aprendix.cauans-solutions.icu">
 
     <!-- Open Graph / Social Media Meta Tags -->
@@ -27,10 +27,9 @@
     <meta name="twitter:title" content="Sistema ERP para Gestão Escolar APRENDIX">
     <meta name="twitter:description" content="Solução completa para gestão escolar com IA integrada para secretarias e escolas particulares.">
     <meta name="twitter:image" content="https://aprendix.cauans-solutions.icu/static/logo.png">
-    <meta name="twitter:site" content="@SeuPerfilTwitter"> <!-- opcional -->
-    <meta name="twitter:creator" content="@CriadorTwitter"> <!-- opcional -->
+    <meta name="twitter:site" content="@SeuPerfilTwitter">
+    <meta name="twitter:creator" content="@CriadorTwitter">
 
-        
     <!-- Favicon e Ícones -->
     <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
@@ -38,7 +37,6 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
     <link rel="manifest" href="{% static 'site.webmanifest' %}">
 
- 
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -65,21 +63,27 @@
     }
     </script>
 
-
+    <!-- Vendor: jQuery / jQuery UI / Select2 / Bootstrap / FontAwesome / Intro.js -->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
+    <!-- Tipografia: Inter (texto/UI) + Poppins (destaques do header) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=El+Messiri&family=Gruppo&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0">
 
     <link href="{% static 'global/css/partials/sidebars.css' %}" rel="stylesheet">
     <link href="{% static 'global/css/partials/headers.css' %}" rel="stylesheet">
     <link href="{% static 'global/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'global/css/styles_google.css' %}" rel="stylesheet">
 
     <link rel="stylesheet" href="{% static 'fontawesome/css/all.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/fontWaseome_pro.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/PRO/sharp.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/PRO/sharp_regular.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/PRO/sharp_light.css' %}">
 
     <link rel="stylesheet" href="{% static 'select2/select2.min.css' %}" />
     <link rel="stylesheet" href="{% static 'select2/select2-bootstrap-5-theme.min.css' %}" />
@@ -98,721 +102,1310 @@
     <script src="https://cdn.jsdelivr.net/npm/intro.js/minified/intro.min.js"></script>
 
     <style>
-        body {
-            font-family: 'El Messiri', sans-serif !important;
-            font-family: 'Gruppo', sans-serif;
-            font-weight: 200 !important;
+        /* ======================================================================
+           APRENDIX — DESIGN SYSTEM
+           ====================================================================== */
+
+        /* ---------- 1. VARIÁVEIS / TOKENS ---------- */
+        :root {
+            --color-bg: #F8FAFC;
+            --color-surface: #FFFFFF;
+            --color-primary: #2563EB;
+            --color-primary-dark: #1D4ED8;
+            --color-secondary: #14B8A6;
+            --color-success: #16A34A;
+            --color-warning: #F59E0B;
+            --color-danger: #DC2626;
+            --color-text: #0F172A;
+            --color-text-secondary: #64748B;
+            --color-border: #E2E8F0;
+            --color-hover: #EEF4FF;
+
+            --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-display: 'Poppins', 'Inter', sans-serif;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-pill: 999px;
+
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.5rem;
+            --space-6: 2rem;
+
+            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+            --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.12);
+
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
+            --sidebar-w: 264px;
         }
 
-        body,
-        html {
+        /* ---------- 2. RESET ---------- */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body, html {
             overflow-x: hidden;
             max-width: 100%;
+            background: var(--color-bg);
         }
 
-        .bd-placeholder-img {
-            font-size: 1.125rem;
-            text-anchor: middle;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            user-select: none;
+        img { max-width: 100%; }
+        a { color: inherit; }
+        button { font-family: inherit; }
+
+        ::selection { background: var(--color-hover); color: var(--color-primary-dark); }
+
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+            border-radius: var(--radius-sm);
         }
 
-        @media (min-width: 768px) {
-            .bd-placeholder-img-lg {
-                font-size: 3.5rem;
-            }
+        @media (prefers-reduced-motion: reduce) {
+            * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
         }
 
-        .btn-bd-primary {
-            --bd-violet-bg: #712cf9;
-            --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
-            --bs-btn-font-weight: 600;
-            --bs-btn-color: var(--bs-white);
-            --bs-btn-bg: var(--bd-violet-bg);
-            --bs-btn-border-color: var(--bd-violet-bg);
-            --bs-btn-hover-color: var(--bs-white);
-            --bs-btn-hover-bg: #6528e0;
-            --bs-btn-hover-border-color: #6528e0;
-            --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
-            --bs-btn-active-color: var(--bs-btn-hover-color);
-            --bs-btn-active-bg: #5a23c8;
-            --bs-btn-active-border-color: #5a23c8;
+        /* ---------- 3. TIPOGRAFIA ---------- */
+        body {
+            font-family: var(--font-ui) !important;
+            font-weight: 400;
+            color: var(--color-text);
+            font-size: 0.95rem;
+            line-height: 1.55;
         }
 
-        .bg-silver {
-            background: #d3dfdf !important;
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-display) !important;
+            color: var(--color-text);
+            font-weight: 600;
+            letter-spacing: -0.01em;
         }
 
-        .bg-silver-2 {
-            background: #bbd8d8 !important;
-        }
-
-        .bd-mode-toggle {
-            z-index: 1500;
-        }
-
-        #oculto {
-            display: none;
-            width: 0;
-            overflow: hidden;
-            transition: width 0.5s ease-in-out !important;
-        }
-
-        #oculto.exibindo {
-            width: 200px;
-        }
-
-        #sidebar {
-            box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
-        }
-
-        .shadow-bottom {
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            margin-left: -1rem !important;
-            margin-right: -1rem !important;
-            width: calc(100% + 2rem) !important;
-        }
-
-        h1 {
-            font-family: 'Darker Grotesque', sans-serif !important;
-            font-size: 1.6rem;
-        }
-
-        h2 {
-            font-family: 'Darker Grotesque', sans-serif !important;
-            font-size: 1.3rem;
-        }
+        h1 { font-size: 1.6rem; }
+        h2 { font-size: 1.3rem; }
 
         table thead tr th {
-            font-family: 'Darker Grotesque', sans-serif !important;
-            font-size: 1rem;
-        }
-
-        input {
+            font-family: var(--font-ui) !important;
+            font-size: 0.8rem;
             text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-weight: 600;
+            color: var(--color-text-secondary);
         }
 
-        /*paleta*/
-        .bg-verde-1 {
-            background: #b4d6c1;
-        }
+        input { text-transform: uppercase; }
+        .fs-vw { font-size: 0.1vw; }
 
-        .bg-verde-2 {
-            background: #dfeae2;
-        }
-
-        /** Padrão cinza */
-        .bg-p-1 {
-            background-color: #1e312a;
-            /* Cor de fundo clara, base neutra */
-            color: #c5c5c5;
-            /* Cor do texto principal */
-            border: 1px solid #d1d1d1;
-            /* Borda suave cinza */
-            border-radius: 10px;
-            /* Bordas arredondadas */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-            /* Sombra sutil */
-            padding: 1rem;
-            /* Espaçamento interno */
-            transition: background-color 2s, box-shadow 0.3s, border-color 0.3s !important;
-            /* Transições suaves para interações */
-        }
-
-        /* Efeito de hover para bg-p-1 */
-        .bg-p-1:hover {
-            background-color: #e0dbbf;
-            /* Fundo ligeiramente mais escuro ao passar o mouse */
-            border-color: #ccfa76;
-            /* Cor da borda muda para um laranja suave */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08);
-            /* Sombra mais pronunciada ao passar o mouse */
-            color: #191b22;
-        }
-
-        /* Adicionando uma borda laranja sutil para foco */
-        .bg-p-1:focus-within {
-            border-color: #f9a825;
-            /* Cor da borda muda para um laranja suave quando em foco */
-        }
-
-        /* Estilo para a classe txt-p */
-        .txt-p {
-            color: #acaaaa !important;
-            /* Cor do texto principal, boa para legibilidade */
-            line-height: 1.5 !important;
-            /* Espaçamento entre linhas para melhor leitura */
-            text-align: left !important;
-            /* Alinhamento do texto */
-            margin: 0 !important;
-            /* Remover margens adicionais */
-            padding: 0 !important;
-            /* Remover padding adicional */
-            transition: color 0.3s !important;
-            /* Transição suave para a cor do texto */
-        }
-
-        /* Efeito de hover para txt-p, se aplicável */
-        .txt-p:hover {
-            color: #0078d4 !important;
-            /* Cor de texto azul clara similar ao Windows 11 ao passar o mouse */
-        }
-
-        /* Efeito para texto secundário */
-        .txt-p.secondary {
-            color: #666 !important;
-            /* Cor de texto secundária para menos destaque */
-            font-size: 0.875rem !important;
-            /* Tamanho da fonte menor para texto secundário */
-        }
-
-        /* Efeito para texto de destaque ou título */
-        .txt-p.highlight {
-            color: #0078d4 !important;
-            /* Cor de destaque azul clara */
-            font-weight: bold !important;
-            /* Texto em negrito para destacar */
-        }
-
-        /* Efeito para texto de link */
-        .txt-p a {
-            color: #0078d4 !important;
-            /* Cor azul clara para links */
-            text-decoration: none !important;
-            /* Remover sublinhado padrão */
-            transition: color 0.3s !important;
-            /* Transição suave para a cor do link */
-        }
-
-        .txt-p a:hover {
-            text-decoration: underline !important;
-            /* Sublinhado ao passar o mouse para links */
-        }
-
-        .bg-p-2 {
-            --s: 50px;
-            --c: #191b22;
-            --_s: calc(2*var(--s)) calc(2*var(--s));
-            --_g: 35.36% 35.36% at;
-            --_c: #0000 66%, #20222a 68% 70%, #0000 72%;
-            background:
-                radial-gradient(var(--_g) 100% 25%, var(--_c)) var(--s) var(--s)/var(--_s),
-                radial-gradient(var(--_g) 0 75%, var(--_c)) var(--s) var(--s)/var(--_s),
-                radial-gradient(var(--_g) 100% 25%, var(--_c)) 0 0/var(--_s),
-                radial-gradient(var(--_g) 0 75%, var(--_c)) 0 0/var(--_s),
-                repeating-conic-gradient(var(--c) 0 25%, #0000 0 50%) 0 0/var(--_s),
-                radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s) var(--c);
-            background-attachment: fixed;
-        }
-
-        .bg-p-3 {
-            background-color: #f3f3f3;
-            /* Cor de fundo clara, base neutra */
-            color: #333;
-            /* Cor do texto principal */
-            border: 1px solid #cf7021;
-            /* Borda suave cinza */
-            border-radius: 10px;
-            /* Bordas arredondadas */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-            /* Sombra sutil */
-            padding: 1rem;
-            /* Espaçamento interno */
-            transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
-            /* Transições suaves para interações */
-        }
-
-        /* Efeito de hover para bg-p-3 */
-        .bg-p-3:hover {
-            background-color: #f3fcf3;
-            /* Fundo ligeiramente mais escuro ao passar o mouse */
-            border-color: #4caf50;
-            /* Cor da borda muda para um verde suave */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08);
-            /* Sombra mais pronunciada ao passar o mouse */
-        }
-
-        /* Adicionando uma borda verde sutil para foco */
-        .bg-p-3:focus-within {
-            border-color: #4caf50;
-            /* Cor da borda muda para um verde suave quando em foco */
-        }
-
-        .bg-p-4 {
-            background-color: #f3f3f3;
-            /* Cor de fundo clara, base neutra */
-            color: #333;
-            /* Cor do texto principal */
-            border: 1px solid #d1d1d1;
-            /* Borda suave cinza */
-            border-radius: 10px;
-            /* Bordas arredondadas */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-            /* Sombra sutil */
-            padding: 1rem;
-            /* Espaçamento interno */
-            transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
-            /* Transições suaves para interações */
-        }
-
-        /* Efeito de hover para bg-p-3 */
-        .bg-p-4:hover {
-            background: linear-gradient(to bottom, #fceff3, #f5d9e2);
-            border-color: #e91e63;
-            /* Cor da borda muda para um rosa suave */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08);
-            /* Sombra mais pronunciada ao passar o mouse */
-        }
-
-
-        /* Adicionando uma borda rosa sutil para foco */
-        .bg-p-4:focus-within {
-            border-color: #e91e63;
-            /* Cor da borda muda para um rosa suave quando em foco */
-        }
-
-        .bg-p-4 {
-            background: linear-gradient(to bottom, #e2e7fa, #f5f5f7);
-            /* Gradiente de fundo inicial */
-            color: #333;
-            /* Cor do texto principal */
-            border: 1px solid #d1d1d1;
-            /* Borda suave cinza */
-            border-radius: 10px;
-            /* Bordas arredondadas */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-            /* Sombra sutil */
-            padding: 1rem;
-            /* Espaçamento interno */
-            transition: background 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            /* Transições suaves para fundo, borda e sombra */
-        }
-
-        /* Efeito de hover para bg-p-4 */
-        .bg-p-4:hover {
-            background: linear-gradient(to bottom, #fceff3, #f5d9e2);
-            /* Gradiente de fundo no hover */
-            border-color: #e91e63;
-            /* Cor da borda muda para rosa suave no hover */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08);
-            /* Sombra mais pronunciada no hover */
-        }
-
-
-        /* Adicionando uma borda rosa sutil para foco */
-        .bg-p-4:focus-within {
-            border-color: #e91e63;
-            /* Cor da borda muda para um rosa suave quando em foco */
-        }
-
-        .bg-p-5 {
-            background-color: transparent;
-            backdrop-filter: blur(20px);
-            color: #333;
-            /* Cor do texto principal */
-            border: 1px solid #d1d1d1;
-            /* Borda suave cinza */
-            border-radius: 10px;
-            /* Bordas arredondadas */
-            transition: border-color 0.3s, box-shadow 0.3s;
-            /* Transições suaves para interações */
+        /* ---------- 4. LAYOUT GERAL ---------- */
+        .app-shell {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
-            /* Garante que o pseudo-elemento não saia do container */
         }
 
-        /* Pseudo-elemento para o efeito de desfoque com fundo transparente */
-        .bg-p-5::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            /* Garante que o conteúdo fique acima do fundo desfocado */
-            transition: background 0.3s, filter 0.3s;
-            /* Transição suave para gradiente e desfoque */
+        .phone-frame { height: 100vh !important; }
+
+        .phone-screen {
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            height: 100vh !important;
         }
 
-        /* Efeito de hover para bg-p-5 */
-        .bg-p-5:hover::before {
-            background: rgba(0, 150, 255, 0.4);
-            /* Fundo transparente com tom azulado */
-            filter: blur(6px);
-            /* Efeito de desfoque mais forte */
+        #site-content { height: 100%; }
+
+        main#content-main {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: var(--color-bg) !important;
+            box-shadow: none !important;
         }
 
-        .bg-p-5:hover {
-            border-color: #1e07f0;
-            /* Cor da borda muda para azul escuro */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08);
-            /* Sombra mais pronunciada ao passar o mouse */
+        .app-body {
+            display: flex;
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: hidden;
         }
 
-        /* Adicionando uma borda azul escura sutil para foco */
-        .bg-p-5:focus-within {
-            border-color: #1e07f0;
-            /* Cor da borda muda para azul escuro quando em foco */
+        .app-main-content {
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow-y: auto;
+            padding: var(--space-5);
+            scroll-behavior: smooth;
         }
-
-        .bg-trimestre-1 {
-            background-color: #5b2b10;
-        }
-
-        .bg-trimestre-2 {
-            background-color: #a76036;
-        }
-
-        .bg-trimestre-3 {
-            background-color: #b68d7a;
-        }
-
-        .bg-trimestre-4 {
-            background-color: #85685a;
-        }
-
 
         #landscape-warning {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
+            background: rgba(15, 23, 42, 0.94);
+            color: #fff;
             font-size: 1.5rem;
             text-align: center;
             justify-content: center;
             align-items: center;
             z-index: 99999;
             padding: 20px;
+            font-family: var(--font-ui);
         }
 
-        /* Cores Verde */
-        .text-green {
-            color: #405a3f !important;
+        .shadow-bottom {
+            box-shadow: var(--shadow-sm);
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            width: 100% !important;
         }
 
-        .bg-green {
-            background-color: #405a3f !important;
+        /* ---------- 5. HEADER (CORRIGIDO: Z-INDEX ALTO) ---------- */
+        .app-header {
+            position: sticky; /* Alterado de relative para sticky */
+            top: 0;
+            width: 100%;
+            margin: 0;
+            padding: var(--space-2) 0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--color-border);
+            box-shadow: var(--shadow-xs);
+            color: var(--color-text);
+            font-family: var(--font-ui);
+            z-index: 1050; /* ADICIONADO: Garante que o header fique acima de elementos flutuantes */
+        }
+
+        .app-header a {
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.2s var(--ease);
+        }
+
+        .app-header a:hover, .app-header a:focus {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+
+        .app-header .dropdown-item, .app-header .btn, .app-header button {
+            color: var(--color-text-secondary);
+        }
+
+        .app-header .dropdown-item:hover, .app-header .btn:hover, .app-header button:hover {
+            color: var(--color-primary);
+            background-color: var(--color-hover);
+        }
+
+        .app-header i, .app-header svg {
+            fill: var(--color-text-secondary);
+            color: var(--color-text-secondary);
+            transition: color 0.2s var(--ease), fill 0.2s var(--ease);
+        }
+
+        .app-header a:hover i, .app-header a:hover svg {
+            fill: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .app-header .navbar { padding: 0.35rem 0; }
+
+        .header-container {
+            flex-wrap: wrap;
+            row-gap: var(--space-2);
+        }
+
+        .header-brand-zone { min-width: 0; }
+
+        .header-actions-group {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .header-divider {
+            width: 1px;
+            height: 22px;
+            background: var(--color-border);
+            margin: 0 0.25rem;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 767.98px) {
+            .header-actions-group {
+                flex-basis: 100%;
+                justify-content: space-evenly;
+                margin: var(--space-2) -1rem 0;
+                padding: var(--space-2) 1rem 0;
+                border-top: 1px solid var(--color-border);
+                background: var(--color-bg);
+            }
+            .header-top-row { flex: 1 1 auto; }
+        }
+
+        .header-cluster-label {
+            padding: 0.6rem 1rem 0.3rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--color-text-secondary);
+        }
+
+        .header-logo-frame {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 11.5rem;
+            height: 3.75rem;
+            padding: 0.25rem;
+        }
+
+        .header-logo-frame img { height: 100%; width: auto; object-fit: contain; }
+
+        @keyframes brilhoPulsante {
+            0%, 100% { filter: drop-shadow(0 0 2px rgba(37, 99, 235, 0.15)); }
+            50% { filter: drop-shadow(0 0 10px rgba(37, 99, 235, 0.28)); }
+        }
+
+        .pulsar-brilho { animation: brilhoPulsante 6s infinite ease-in-out; }
+
+        .header-action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-pill);
+            background: transparent;
+            border: none;
+            color: var(--color-text-secondary);
+            transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+            position: relative;
+        }
+
+        .header-action-btn:hover { background: var(--color-hover); color: var(--color-primary); transform: translateY(-1px); }
+        .header-action-btn:active { transform: translateY(0) scale(0.94); }
+
+        .header-icon {
+            width: 20px;
+            height: 20px;
+            display: block;
+            transition: transform 0.25s var(--ease);
+        }
+
+        .header-action-btn:hover .header-icon { transform: scale(1.08); }
+
+        .header-action-btn.has-alert:hover .header-icon {
+            animation: sinoBalanco 0.5s var(--ease);
+        }
+
+        @keyframes sinoBalanco {
+            0%, 100% { transform: rotate(0); }
+            20% { transform: rotate(-12deg); }
+            40% { transform: rotate(10deg); }
+            60% { transform: rotate(-6deg); }
+            80% { transform: rotate(4deg); }
+        }
+
+        .header-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            border-radius: var(--radius-pill);
+            background: var(--color-danger);
+            color: #fff;
+            font-size: 0.62rem;
+            font-weight: 700;
+            line-height: 16px;
+            text-align: center;
+            border: 2px solid var(--color-surface);
+            font-family: var(--font-ui);
+            box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.55);
+            animation: badgePulso 2.2s infinite;
+        }
+
+        @keyframes badgePulso {
+            0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.45); }
+            70% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+
+        .header-badge-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-secondary);
+            border: 2px solid var(--color-surface);
+            animation: badgePulsoDot 2.2s infinite;
+        }
+
+        @keyframes badgePulsoDot {
+            0% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.5); }
+            70% { box-shadow: 0 0 0 5px rgba(20, 184, 166, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0); }
+        }
+
+        .header-profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.3rem 0.6rem 0.3rem 0.3rem;
+            border-radius: var(--radius-pill);
+            background: transparent;
+            border: 1px solid transparent;
+            transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.2s var(--ease);
+            text-decoration: none;
+        }
+
+        .header-profile-btn:hover {
+            background: var(--color-hover);
+            border-color: var(--color-border);
+            transform: translateY(-1px);
+        }
+
+        .header-profile-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--color-text);
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .header-profile-btn .header-chevron {
+            width: 10px;
+            height: 10px;
+            color: var(--color-text-secondary);
+            transition: transform 0.2s var(--ease);
+        }
+
+        .header-profile-btn[aria-expanded="true"] .header-chevron { transform: rotate(180deg); }
+
+        .avatar-fallback {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-pill);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            color: #fff;
+            border: 2px solid var(--color-surface);
+            box-shadow: 0 0 0 1px var(--color-border);
+        }
+
+        .avatar-fallback svg { width: 17px; height: 17px; }
+
+        /* ---------- Painéis suspensos (CORRIGIDO: Z-INDEX AINDA MAIOR) ---------- */
+        .dropdown-menu.notif-panel,
+        .dropdown-menu.profile-panel {
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 0;
+            overflow: hidden;
+            animation: painelEntrada 0.18s var(--ease);
+            font-family: var(--font-ui);
+            z-index: 1060 !important; /* ADICIONADO: Garante que os dropdowns fiquem acima do header e de tudo mais */
+        }
+
+        @keyframes painelEntrada {
+            from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .notif-panel { width: 340px; max-width: 90vw; }
+
+        .notif-panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-bg);
+            border-bottom: 1px solid var(--color-border);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .notif-count-pill {
+            background: var(--color-primary);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.1rem 0.5rem;
+            border-radius: var(--radius-pill);
+        }
+
+        .notif-panel-body { max-height: 340px; overflow-y: auto; }
+
+        .notif-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            padding: var(--space-3) var(--space-4);
+            border-bottom: 1px solid var(--color-border);
+            transition: background-color 0.15s var(--ease);
+            position: relative;
+        }
+
+        .notif-item:last-child { border-bottom: none; }
+        .notif-item:hover { background: var(--color-hover); }
+
+        .notif-item-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 6px;
+            flex-shrink: 0;
+            background: var(--color-primary);
+        }
+
+        .notif-item--urgente .notif-item-dot { background: var(--color-danger); }
+        .notif-item--info .notif-item-dot { background: var(--color-danger); }
+        .notif-item--atualizado .notif-item-dot { background: var(--color-primary); }
+        .notif-item--aviso .notif-item-dot { background: var(--color-success); }
+
+        .notif-item-content { flex: 1; min-width: 0; font-size: 0.85rem; }
+        .notif-item-content strong { display: block; color: var(--color-text); font-size: 0.87rem; margin-bottom: 0.1rem; }
+        .notif-item-msg { color: var(--color-text-secondary); font-size: 0.8rem; line-height: 1.4; }
+
+        .notif-item-close {
+            background: transparent;
+            border: none;
+            color: var(--color-text-secondary);
+            font-size: 1rem;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0 0.2rem;
+            border-radius: var(--radius-sm);
+            transition: color 0.15s var(--ease), background-color 0.15s var(--ease);
+        }
+
+        .notif-item-close:hover { color: var(--color-danger); background: #FEF2F2; }
+
+        .notif-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: var(--space-6) var(--space-4);
+            color: var(--color-text-secondary);
+            text-align: center;
+        }
+
+        .notif-empty svg { width: 34px; height: 34px; opacity: 0.5; }
+        .notif-empty p { margin: 0; font-size: 0.85rem; }
+
+        .profile-panel { width: 260px; }
+
+        .profile-panel-head {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: var(--space-4);
+            background: linear-gradient(135deg, var(--color-hover), var(--color-surface));
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .profile-panel-head .avatar-fallback,
+        .profile-panel-head img.header-avatar {
+            width: 42px;
+            height: 42px;
+        }
+
+        .profile-panel-head-name { font-weight: 700; font-size: 0.92rem; color: var(--color-text); }
+        .profile-panel-head-role { font-size: 0.75rem; color: var(--color-text-secondary); }
+
+        .profile-panel-body { padding: var(--space-2); }
+
+        .profile-panel-body .dropdown-item {
+            border-radius: var(--radius-sm);
+            padding: 0.55rem 0.75rem;
+            font-size: 0.87rem;
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            color: var(--color-text-secondary);
+        }
+
+        .profile-panel-body .dropdown-item:hover { background: var(--color-hover); color: var(--color-primary); }
+        .profile-panel-body .dropdown-item svg { width: 16px; height: 16px; }
+
+        .header-avatar {
+            border-radius: var(--radius-pill);
+            border: 2px solid var(--color-surface);
+            box-shadow: 0 0 0 1px var(--color-border);
+            object-fit: cover;
+        }
+
+        /* ---------- 6. SIDEBAR / NAVEGAÇÃO ---------- */
+        .app-sidebar {
+            flex: 0 0 var(--sidebar-w);
+            width: var(--sidebar-w);
+            display: flex;
+            flex-direction: column;
+            padding: var(--space-4);
+            background: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+            overflow-y: auto;
+            transition: transform 0.3s var(--ease);
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            color: var(--color-primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: var(--space-5);
+            margin-bottom: var(--space-1);
+            padding-left: 0.6rem;
+            border-left: 3px solid var(--color-primary);
+            pointer-events: none;
+        }
+
+        .app-sidebar .nav-pills li { box-shadow: none; }
+
+        .app-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            color: var(--color-text-secondary) !important;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 0.65rem 0.75rem !important;
+            border-radius: var(--radius-md);
+            transition: background-color 0.18s var(--ease), color 0.18s var(--ease), transform 0.18s var(--ease);
+        }
+
+        .app-nav-link:hover {
+            background: var(--color-hover);
+            color: var(--color-primary) !important;
+            transform: translateX(2px);
+        }
+
+        .app-nav-link.active, .app-nav-link:active {
+            background: var(--color-primary);
+            color: #fff !important;
+        }
+
+        .app-nav-link.active svg { color: #fff !important; }
+
+        .app-nav-link svg {
+            color: var(--color-primary);
+            flex-shrink: 0;
+            width: 19px;
+            height: 19px;
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-3);
+            border-radius: var(--radius-md);
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+        }
+
+        .sidebar-drawer-head { display: none; align-items: center; justify-content: space-between; margin-bottom: var(--space-3); }
+
+        .sidebar-close-btn {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-pill);
+            border: none;
+            background: var(--color-bg);
+            color: var(--color-text-secondary);
+            transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+        }
+
+        .sidebar-close-btn:hover { background: var(--color-hover); color: var(--color-primary); }
+        .sidebar-close-btn svg { width: 18px; height: 18px; }
+
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(1px);
+            z-index: 1040;
+            opacity: 0;
+            transition: opacity 0.25s var(--ease);
+        }
+
+        .sidebar-backdrop.is-open { display: block; opacity: 1; }
+        .sidebar-toggle-btn { display: none; }
+
+        /* ---------- 7. CARDS ---------- */
+        .bg-p-1, .bg-p-3, .bg-p-4, .card-aprendix {
+            background: var(--color-surface);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: var(--space-4);
+            transition: box-shadow 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.25s var(--ease);
+        }
+
+        .bg-p-1:hover, .bg-p-3:hover, .bg-p-4:hover, .card-aprendix:hover {
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-md);
+            color: var(--color-text);
+        }
+
+        .bg-p-1:focus-within, .bg-p-3:focus-within, .bg-p-4:focus-within {
+            border-color: var(--color-primary);
+        }
+
+        .bg-p-2 {
+            background: repeating-linear-gradient(45deg, #F1F5F9 0 2px, transparent 2px 12px);
+            background-attachment: fixed;
+        }
+
+        .bg-p-5 {
+            background-color: var(--color-surface);
+            backdrop-filter: blur(20px);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+            overflow: hidden;
+        }
+
+        .bg-p-5:hover {
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .bg-p-5:focus-within { border-color: var(--color-primary); }
+
+        .txt-p {
+            color: var(--color-text-secondary) !important;
+            line-height: 1.5 !important;
+            text-align: left !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            transition: color 0.2s var(--ease) !important;
+        }
+
+        .txt-p:hover { color: var(--color-primary) !important; }
+        .txt-p.secondary { color: var(--color-text-secondary) !important; font-size: 0.875rem !important; }
+        .txt-p.highlight { color: var(--color-primary) !important; font-weight: 600 !important; }
+        .txt-p a { color: var(--color-primary) !important; text-decoration: none !important; transition: color 0.2s var(--ease) !important; }
+        .txt-p a:hover { text-decoration: underline !important; }
+
+        /* ---------- 8. BOTÕES ---------- */
+        .btn {
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            transition: all 0.2s var(--ease);
+        }
+
+        .btn:focus { box-shadow: 0 0 0 3px var(--color-hover); }
+
+        .btn-bd-primary {
+            --bd-violet-bg: var(--color-primary);
+            --bs-btn-font-weight: 600;
+            --bs-btn-color: #fff;
+            --bs-btn-bg: var(--color-primary);
+            --bs-btn-border-color: var(--color-primary);
+            --bs-btn-hover-color: #fff;
+            --bs-btn-hover-bg: var(--color-primary-dark);
+            --bs-btn-hover-border-color: var(--color-primary-dark);
+            --bs-btn-active-bg: #1E40AF;
+            --bs-btn-active-border-color: #1E40AF;
+        }
+
+        /* ---------- 9. INPUTS / SELECT2 ---------- */
+        input.form-control, select.form-select, textarea.form-control {
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            padding: 0.6rem 0.85rem;
+            font-size: 0.9rem;
+            transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+        }
+
+        input.form-control:focus, select.form-select:focus, textarea.form-control:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-hover);
+        }
+
+        .select2-container--bootstrap-5 .select2-selection {
+            border-radius: var(--radius-sm) !important;
+            border-color: var(--color-border) !important;
+        }
+
+        /* ---------- 10. TABELAS ---------- */
+        .table {
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .table > :not(caption) > * > * {
+            border-bottom-color: var(--color-border);
+            padding: 0.75rem 0.9rem;
+        }
+
+        .table-striped > tbody > tr:nth-of-type(odd) > * {
+            background-color: var(--color-bg);
+        }
+
+        .table > tbody > tr:hover > * {
+            background-color: var(--color-hover);
+        }
+
+        /* ---------- 11. NOTIFICAÇÕES / TOASTS ---------- */
+        .container-notify {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 9999;
+            width: 100%;
+            max-width: 420px;
+            pointer-events: none;
+        }
+
+        .notification--info { --bg: #EFF6FF; --primary: var(--color-primary); }
+        .notification--finalised { --bg: #F5F3FF; --primary: #7C3AED; }
+        .notification--failure { --bg: #FEF2F2; --primary: var(--color-danger); }
+        .notification--warning { --bg: #FFFBEB; --primary: var(--color-warning); }
+        .notification--success { --bg: #F0FDF4; --primary: var(--color-success); }
+
+        .notification {
+            position: relative;
+            background: var(--bg);
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            pointer-events: auto;
+            opacity: 1;
+            visibility: visible;
+            transition: all 0.3s var(--ease);
+            margin-bottom: var(--space-2);
+            font-family: var(--font-ui);
+        }
+
+        .notification h3, .notification h5 { font-family: var(--font-ui); font-size: 0.95rem; margin: 0 0 0.15rem; }
+        .notification__icon { height: 1.625rem; width: 1.625rem; margin-right: 0.45rem; }
+
+        .notification__body {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 0.85rem 2rem 0.85rem 1rem;
+        }
+
+        .notification__close {
+            position: absolute;
+            top: 0.35rem;
+            right: 0.5rem;
+            background: transparent;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .notification__progress { display: none; }
+
+        /* ---------- 12. COMPONENTES UTILITÁRIOS ---------- */
+        .bg-silver { background: #EDF1F5 !important; }
+        .bg-silver-2 { background: #E2E8F0 !important; }
+        .bg-verde-1 { background: #E6F4EC; }
+        .bg-verde-2 { background: #F0F9F3; }
+        .bg-trimestre-1 { background-color: #2563EB; }
+        .bg-trimestre-2 { background-color: #14B8A6; }
+        .bg-trimestre-3 { background-color: #F59E0B; }
+        .bg-trimestre-4 { background-color: #64748B; }
+        .text-green { color: var(--color-success) !important; }
+        .bg-green { background-color: var(--color-success) !important; }
+        .bd-mode-toggle { z-index: 1500; }
+
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg { font-size: 3.5rem; }
+        }
+
+        #oculto {
+            display: none;
+            width: 0;
+            overflow: hidden;
+            transition: width 0.4s var(--ease) !important;
+        }
+
+        #oculto.exibindo { width: 200px; }
+        #sidebar { box-shadow: var(--shadow-xs); }
+        .fica-oculto_em_mobile { display: inline; }
+
+        /* ---------- 13. RESPONSIVIDADE ---------- */
+        @media (max-width: 991.98px) {
+            .app-sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                z-index: 1050;
+                width: min(84vw, 320px);
+                transform: translateX(-100%);
+                box-shadow: var(--shadow-lg);
+                border-right: none;
+            }
+
+            .app-sidebar.is-open { transform: translateX(0); }
+            .sidebar-drawer-head { display: flex; }
+            .sidebar-close-btn { display: inline-flex; }
+            .sidebar-toggle-btn { display: inline-flex; }
+
+            /* REMOVIDO: z-index: 20 do header no mobile, pois o global 1050 já resolve */
+
+            .app-main-content { padding: var(--space-4); }
+            .header-profile-name { max-width: 90px; }
+        }
+
+        @media (max-width: 575.98px) {
+            .app-main-content { padding: var(--space-3); }
+            .header-profile-name { display: none; }
+            .header-logo-frame svg { width: 96px; height: 34px; }
+            .header-divider { display: none; }
+            .header-actions-group { gap: 0.1rem; }
+            .notif-panel, .profile-panel { position: fixed !important; top: 60px !important; right: var(--space-2) !important; left: var(--space-2) !important; width: auto !important; inset: auto var(--space-2) auto var(--space-2) !important; }
+        }
+
+        @media (min-width: 1400px) {
+            .app-main-content { padding: var(--space-6) var(--space-6); }
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            .app-header { padding: 0.25rem 0; }
+            .header-container { flex-wrap: nowrap; row-gap: 0; }
+            .header-top-row { flex-shrink: 0; }
+            .header-logo-frame { width: auto; height: 30px; padding: 0; }
+            .header-logo-frame svg, .header-logo-frame img { height: 30px; width: auto; }
+            .fica-oculto_em_mobile { display: none; }
+            .header-actions-group {
+                flex-basis: auto;
+                flex-wrap: nowrap;
+                margin: 0;
+                padding: 0;
+                border-top: none;
+                background: transparent;
+                gap: 0.1rem;
+            }
+            .header-divider { display: none; }
+            .header-action-btn, .sidebar-toggle-btn { width: 32px; height: 32px; }
+            .header-icon { width: 16px; height: 16px; }
+            .header-profile-btn { padding: 0.15rem 0.4rem 0.15rem 0.15rem; }
+            .header-profile-name, .header-chevron { display: none; }
+            .header-profile-btn .header-avatar, .header-profile-btn .avatar-fallback { width: 30px; height: 30px; }
+            .header-badge { top: 0; right: 0; }
+            .app-main-content { padding: var(--space-2) var(--space-3); }
+            .app-sidebar { padding: var(--space-3); }
         }
     </style>
 
     {% block css %}{% endblock css %}
     {% block script_head %}{% endblock script_head %}
-    <title>{% block title_page %}{% endblock title_page %}</title>
 </head>
 
-<body> 
-
-    <!-- SPINNER DE CARREGAMENTO 
-        <div id="spinner-loading" class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white" style="z-index: 1050;">
-        <div class="d-flex flex-wrap gap-3 justify-content-center align-items-center">
-            <div class="spinner-grow text-primary" role="status"><span class="sr-only">Carregando...</span></div>
-            <div class="spinner-grow text-secondary" role="status"><span class="sr-only">Carregando...</span></div>
-            <div class="spinner-grow text-success" role="status"><span class="sr-only">Carregando...</span></div>
-            <div class="spinner-grow text-danger" role="status"><span class="sr-only">Carregando...</span></div>
-            <div class="spinner-grow text-warning" role="status"><span class="sr-only">Carregando...</span></div>
-            <div class="spinner-grow text-info" role="status"><span class="sr-only">Carregando...</span></div>
-            <div class="spinner-grow text-light" role="status"><span class="sr-only">Carregando...</span></div>
-            <div class="spinner-grow text-dark" role="status"><span class="sr-only">Carregando...</span></div>
-        </div>
-        </div>
-     <FIM  SPINNER DE CARREGAMENTO -->
-
-
-
-    <div id="landscape-warning" class="bg-black" style="background-color: #191b22;">
-        <img width='150px' src="{% static 'Vire.gif' %}" alt="">
+<body>
+    <div id="landscape-warning" role="alert" aria-live="assertive">
+        <img width="150px" src="{% static 'Vire.gif' %}" alt="Gire o dispositivo para a orientação paisagem">
     </div>
-    <style>
-        .phone-frame {
-            height: 100vh !important;
-        }
-
-        .phone-screen {
-            align-items: center;
-            overflow: hidden;
-            perspective: 460px;
-            position: relative;
-            height: 100vh !important;
-        }
-
-        .menu {
-            position: sticky;
-            /* fixado no canto inferior */
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 180px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-            background: linear-gradient(180deg, #1f1f1f 0%, #2b2b2b 100%);
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
-            transform: translateY(180px);
-            transition: transform 300ms ease-in-out;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            z-index: 1000;
-        }
-
-        .active .menu {
-            transform: translateY(0);
-        }
-
-        .option {
-            width: 70px;
-            height: 70px;
-            margin: 10px;
-            background-color: #dfe9e3b9;
-            border-radius: 14px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 12px;
-            font-family: 'Segoe UI', sans-serif;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-            transition: background-color 0.2s;
-        }
-
-        .option:active {
-            background-color: #444;
-        }
-
-        .option svg,
-        .food {
-            width: 32px;
-            height: 32px;
-            margin-bottom: 6px;
-        }
-
-        .button-menu1 {
-            bottom: 100px;
-            right: 50%;
-            position: fixed;
-            z-index: 2000;
-            cursor: pointer;
-            height: 56px;
-            width: 56px;
-            border-radius: 50%;
-            background-color: #0e3024;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s;
-        }
-
-        .button-menu1:active {
-            background-color: #132e25;
-        }
-
-        .bg {
-            fill: none;
-        }
-
-        .line {
-            stroke: white;
-            stroke-width: 2;
-            transition: transform 300ms ease, stroke 300ms ease;
-            transform-origin: 50%;
-        }
-
-        .active .line1 {
-            stroke: #fff;
-            transform: translateY(6px) rotate(45deg);
-        }
-
-        .active .line2 {
-            stroke: #fff;
-            transform: scale(0);
-        }
-
-        .active .line3 {
-            stroke: #fff;
-            transform: translateY(-6px) rotate(-45deg);
-        }
-
-        .modal-backdrop {
-            all: unset;
-        }
-
-        /* Esconde por padrão */
-        .button-menu1,
-        .menu {
-            display: none;
-        }
-
-        .fica-oculto_em_mobile {
-            display: inline
-        }
-
-        /* Exibe apenas em telas menores que 768px (mobile) */
-        @media (max-width: 450px) {
-            .fica-oculto_em_mobile {
-                display: none
-            }
-
-            .button-menu1 {
-                display: flex;
-                bottom: 0;
-                right: 30%;
-                position: absolute;
-                z-index: 1100;
-                cursor: pointer;
-                height: 30px;
-                width: 120px;
-                padding-top: 0.5rem;
-                padding-left: 3rem;
-                border-top-right-radius: 1rem;
-                border-top-left-radius: 1rem;
-                border-bottom-left-radius: 0;
-                border-bottom-right-radius: 0;
-                background-color: #405a3f;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-                align-items: center;
-                justify-content: center;
-                transition: background-color 0.3s;
-            }
-
-            .button-menu1:active {
-                background-color: #3baf8a;
-            }
-
-            .menu {
-                display: flex;
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                height: 180px;
-                flex-wrap: wrap;
-                justify-content: space-around;
-                background: linear-gradient(180deg, #eff1f159 0%, #405a3f6b 100%);
-                box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
-                transform: translateY(180px);
-                transition: transform 300ms ease-in-out;
-                border-top-left-radius: 20px;
-                border-top-right-radius: 20px;
-                z-index: 1000;
-            }
-
-            .active .menu {
-                transform: translateY(0);
-            }
-        }
-
-        /* Linhas do ícone (hambúrguer) */
-        .line {
-            stroke: white;
-            stroke-width: 2;
-            transition: transform 300ms ease, stroke 300ms ease;
-            transform-origin: 50%;
-        }
-
-        .active .line1 {
-            stroke: #fff;
-            transform: translateY(6px) rotate(45deg);
-        }
-
-        .active .line2 {
-            stroke: #fff;
-            transform: scale(0);
-        }
-
-        .active .line3 {
-            stroke: #fff;
-            transform: translateY(-6px) rotate(-45deg);
-        }
-    </style>
 
     <div class="phone-frame">
         <div class="phone-screen">
             <div class="imageContainer">
-
                 <div id="site-content">
-                    <main id="content-main" class='shadow mb-2 bg-white rounded'>
-                        {% comment "Head" %} Cabeçalho ----------------------------------------------- {% endcomment %}
-                        {% include 'gestao_escolar/headers/index.html' %}
+                    <main id="content-main" class="app-shell">
 
-                        <div class="d-flex" style="overflow-y: auto;">
+                        <!-- ===================== HEADER ===================== --><!-- ===================== HEADER ===================== -->
+<header class="app-header" role="banner">
+    <nav class="navbar navbar-expand-lg rounded-0 p-0" aria-label="Barra de navegação principal">
+        <div class="container-fluid d-flex align-items-center justify-content-between px-3 header-container">
 
-                            {% comment "Sidebar" %} Menu lateral esquerdo ------------------------------- {% endcomment %}
-                            {% include 'gestao_escolar/sidebars/index.html' %}
-                            {% comment "Main" %} Conteudo Principal{% endcomment %}
-                            {% block main %}{% endblock main %}
-                        </div>
-                        {% comment "Footer" %} Rodape do site ----------------------------------------- {% endcomment %}
-                        {% block footer %}
+            <!-- ===== LOGO + INFORMAÇÕES DA ESCOLA ===== -->
+            <div class="d-flex align-items-center gap-2 header-top-row" style="flex: 1 1 auto; min-width: 0; max-width: 70%;">
+                <!-- Botão do menu (mobile) -->
+                <button type="button" class="header-action-btn sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="Abrir menu" aria-controls="appSidebar" aria-expanded="false" onclick="toggleSidebar(true)">
+                    <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/>
+                    </svg>
+                </button>
 
-                        {% endblock footer %}
-                        {% comment "Scripts" %} Área pra scripts fim da pagina {% endcomment %}
-                        {% block script_footer %}{% endblock script_footer %}
-                    </main>
-                </div>
-
-
-            </div>
-            <svg class="button-menu button-menu1" height="24" width="24"
-                onclick="document.querySelector('.phone-screen').classList.toggle('active')">
-                <circle class="bg" r="12" cx="12" cy="12" />
-                <path class="line line1" d="M 6,8 H 18" />
-                <path class="line line2" d="M 6,12 H 18" />
-                <path class="line line3" d="M 6,16 H 18" />
-
-            </svg>
-
-            <div class="menu">
-                <div class="option">
-                    {% if request.session.escola_id %}
-                    <a href="{% url 'Gestao_Escolar:DadosEscola' request.session.escola_id %}"
-                        class="nav-link link-light rounded-3 txt-p-nav" title="Cadstro de Escola"
-                        alt="Cadstro de Escola" data-bs-toggle="tooltip" data-bs-placement="right">
-                        <i class="fa-duotone fa-solid fa-school-flag text-green fs-4"></i>
-                    </a>
+                <!-- Logo (menor em mobile) -->
+                <div class="header-logo-frame" style="flex-shrink: 0; width: auto; min-width: 80px;">
+                    {% if not request.session.escola_imagem %}
+                        <svg class="pulsar-brilho" width="90" height="32" viewBox="0 0 160 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="APRENDIX">
+                            <rect x="1" y="1" width="42" height="42" rx="12" fill="#2563EB"/>
+                            <path d="M22 10 L34 34 H28 L22 21 L16 34 H10 Z" fill="#fff"/>
+                            <text x="48" y="28" font-family="Poppins, sans-serif" font-size="16" font-weight="700" fill="#0F172A">APRENDIX</text>
+                        </svg>
+                    {% else %}
+                        <img src="{{ request.session.escola_imagem }}" alt="Logo" style="max-height: 36px; width: auto;">
                     {% endif %}
                 </div>
-                <div class="option">
-                    <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_create' %}"
-                        class="nav-link link-light rounded-3 txt-p-nav" title="Cadastro de Alunos"
-                        data-bs-toggle="tooltip" data-bs-placement="right">
-                        <i class="fa-sharp fa-solid fa-people fs-5 text-green"></i>
-                    </a>
+
+                <!-- Nome da escola (apenas desktop) + informações -->
+                <div class="d-flex flex-column" style="flex: 1 1 auto; min-width: 0; overflow: hidden;">
+                    
+                    <!-- LINHA 1: Nome completo (desktop) / Sigla (mobile/tablet) -->
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Desktop: nome completo -->
+                        <span class="text-uppercase txt-p fw-bold d-none d-md-block text-truncate" style="font-size: 1rem;" title="{{ request.session.escola_nome }}">
+                            {{ request.session.escola_nome }}
+                        </span>
+                        <!-- Mobile/tablet: sigla -->
+                        <span class="text-uppercase txt-p fw-bold d-md-none text-truncate" style="font-size: 1.1rem;" title="{{ request.session.sigla_escola }}">
+                            {{ request.session.sigla_escola }}
+                        </span>
+                        <!-- Ano letivo: apenas em tablet para cima (>=576px) -->
+                        <span class="badge bg-primary bg-opacity-10 text-primary d-none d-sm-inline-flex align-items-center gap-1" style="font-size: 0.7rem; font-weight: 600; white-space: nowrap; padding: 0.15rem 0.5rem;">
+                            <i class="fa-regular fa-calendar"></i> {{ request.session.anoLetivo_nome }}
+                        </span>
+                        <!-- Ano letivo em mobile: ainda menor, sem ícone -->
+                        <span class="badge bg-primary bg-opacity-10 text-primary d-sm-none" style="font-size: 0.6rem; font-weight: 600; white-space: nowrap; padding: 0.1rem 0.4rem;">
+                            {{ request.session.anoLetivo_nome }}
+                        </span>
+                    </div>
+
+                    <!-- LINHA 2: Diretor e Secretário (apenas desktop) -->
+                    <div class="d-none d-md-flex flex-wrap align-items-center gap-2 mt-1" style="font-size: 0.7rem; color: var(--color-text-secondary);">
+                        <span>
+                            <i class="fa-regular fa-user"></i> Dir.: 
+                            {% if diretor %}{{ diretor }}{% else %}<a href="{% url 'Gestao_Escolar:decreto-create' %}" class="text-decoration-none" style="color: var(--color-primary);">definir</a>{% endif %}
+                        </span>
+                        <span>
+                            <i class="fa-regular fa-user"></i> Sec.: 
+                            {% if secretario %}{{ secretario }}{% else %}<a href="{% url 'Gestao_Escolar:decreto-create' %}" class="text-decoration-none" style="color: var(--color-primary);">definir</a>{% endif %}
+                        </span>
+                        {% if diretor.ano_decreto.id != request.session.anoLetivo_id or secretario.ano_decreto.id != request.session.anoLetivo_id %}
+                            <span class="text-warning-emphasis" style="font-size:0.65rem;">
+                                <i class="fa-regular fa-clock"></i> (extensão)
+                            </span>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="option">
-                    <a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}" class="nav-link rounded-3 txt-p-nav"
-                        title="Cadastro de Turmas data-bs-toggle=" tooltip" data-bs-placement="right">
-                        <i class="fa-solid fa-people-roof fs-4 text-green"></i>
-                    </a>
-                </div>
-                <div class="option">
-                    <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}"
-                        class="nav-link rounded-3 txt-p-nav" title="Matrícula de alunos nas turmas"
-                        data-bs-toggle="tooltip" data-bs-placement="right">
-                        <i class="fs-4 fa-solid fa-screen-users text-green"></i>
-                    </a>
-                </div>
-                <div class="option">
-                    <a href="{% url 'Gestao_Escolar:Grades_turmas' %}" class="nav-link rounded-3 txt-p-nav"
-                        title="Grade de disciplinas" data-bs-toggle="tooltip" data-bs-placement="right">
-                        <i class="fs-4 fa-duotone fa-chart-network text-green" style="font-size: 1.65rem;"></i>
-                    </a>
-                </div>
-                <div class="option">
-                    <a href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}" class="nav-link rounded-3 txt-p-nav"
-                        title="Gestão das Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
-                        <i class="fs-4 fa-solid fa-users-gear text-green" style="font-size: 1.65rem;"></i>
-                    </a>
-                </div>
-                <div class="option">
-                    <a href="{% url 'Gestao_Escolar:adicionar_escola' %}" class="nav-link rounded-3 txt-p-nav"
-                        title="Espaço reservado para a matricula online" data-bs-toggle="tooltip"
-                        data-bs-placement="right">
-                        <img src="{% static 'svg/matriOn.svg' %}" alt="">
-                    </a>
+            </div>
+
+            <!-- ===== AÇÕES RÁPIDAS (ÍCONES) ===== -->
+            <div class="header-actions-group" role="toolbar" aria-label="Ações rápidas" style="flex-shrink: 0;">
+
+                                    <!-- menus do sistems ------------------------------------------------------>
+                                    <div class="header-actions-group" role="toolbar" aria-label="Ações rápidas">
+                                        <!-- Cluster: Ajuda -->
+                                        <div class="dropdown">
+                                            <button type="button" class="header-action-btn" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Ajuda e materiais de apoio">
+                                                <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                                                </svg>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-end profile-panel" aria-label="Menu de ajuda">
+                                                <div class="header-cluster-label">Ajuda</div>
+                                                <div class="profile-panel-body">
+                                                    <a href="{% url 'Gestao_Escolar:tutorial_pdf' %}" class="dropdown-item" target="__parent">
+                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                                        Apostila do sistema
+                                                    </a>
+                                                    <button type="button" id="btn-ver-tutorial" class="dropdown-item w-100 text-start">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M476-280q21 0 35.5-14.5T526-330q0-21-14.5-35.5T476-380q-21 0-35.5 14.5T426-330q0 21 14.5 35.5T476-280Zm-36-154h74q0-17 1.5-29t6.5-23q5-11 12.5-20.5T556-530q35-35 49.5-58.5T620-642q0-53-36-85.5T487-760q-55 0-93.5 27T340-658l66 26q7-27 28-43.5t49-16.5q27 0 45 14.5t18 38.5q0 17-11 36t-37 42q-17 14-27.5 27.5T453-505q-7 15-10 31.5t-3 39.5Zm40 394L360-160H200q-33 0-56.5-23.5T120-240v-560q0-33 23.5-56.5T200-880h560q33 0 56.5 23.5T840-800v560q0 33-23.5 56.5T760-160H600L480-40ZM200-240h192l88 88 88-88h192v-560H200v560Zm280-280Z"/></svg>
+                                                        Tour guiado
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <span class="header-divider" aria-hidden="true"></span>
+
+                                        <!-- Ícone de Notificações -->
+                                        <div class="dropdown">
+                                            <button type="button" class="header-action-btn{% if notifica %} has-alert{% endif %}" title="Notificações" aria-label="Notificações{% if notifica %}, {{ notifica|length }} não lidas{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                                </svg>
+                                                {% if notifica %}
+                                                <span class="header-badge">{{ notifica|length }}</span>
+                                                {% endif %}
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-end notif-panel" aria-label="Lista de notificações">
+                                                <div class="notif-panel-head">
+                                                    <span>Notificações</span>
+                                                    {% if notifica %}<span class="notif-count-pill">{{ notifica|length }}</span>{% endif %}
+                                                </div>
+                                                <div class="notif-panel-body">
+                                                    {% for not in notifica %}
+                                                    <div class="notif-item notif-item--{{ not.tipo }}">
+                                                        <span class="notif-item-dot"></span>
+                                                        <div class="notif-item-content">
+                                                            <strong>{{ not.titulo }}</strong>
+                                                            <div class="notif-item-msg">{{ not.mensagem|safe }}</div>
+                                                        </div>
+                                                        <button type="button" class="notif-item-close" aria-label="Marcar notificação como lida" onclick="fecharNotificacao({{ not.id }}, this)">&times;</button>
+                                                    </div>
+                                                    {% empty %}
+                                                    <div class="notif-empty">
+                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                                            <line x1="3" y1="3" x2="21" y2="21"/>
+                                                        </svg>
+                                                        <p>Tudo em dia! Nenhuma notificação pendente.</p>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Ícone de Mensagens -->
+                                        <div class="dropdown">
+                                            <button type="button" class="header-action-btn" data-bs-toggle="dropdown" aria-expanded="false" title="Mensagens" aria-label="Mensagens{% if aberto %}, novas mensagens{% endif %}">
+                                                {% if not aberto %}
+                                                <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                                                </svg>
+                                                {% else %}
+                                                <svg class="header-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">
+                                                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                                                </svg>
+                                                <span class="header-badge-dot"></span>
+                                                {% endif %}
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-end notif-panel" aria-label="Mensagens">
+                                                <div class="notif-panel-head">
+                                                    <span>Mensagens</span>
+                                                </div>
+                                                <div class="notif-panel-body">
+                                                    <div class="notif-empty">
+                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                                                        </svg>
+                                                        <p>Nenhuma conversa por aqui ainda.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <span class="header-divider" aria-hidden="true"></span>
+
+                                        <!-- Cluster: Atalhos -->
+                                        <div class="dropdown">
+                                            <button type="button" class="header-action-btn" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Atalhos rápidos">
+                                                <svg class="header-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                                    <circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/>
+                                                    <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+                                                    <circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/>
+                                                </svg>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-end profile-panel" aria-label="Atalhos rápidos">
+                                                <div class="header-cluster-label">Atalhos</div>
+                                                <div class="profile-panel-body">
+                                                    <a href="{% url 'Gestao_Escolar:imprime_all_horarios' %}" class="dropdown-item">
+                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+                                                        Grade de horários
+                                                    </a>
+                                                    <a href="{% url 'Gestao_Escolar:calendario_mes_atual' %}" class="dropdown-item" title="Impressão de frequência impressa">
+                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                                        Frequência
+                                                    </a>
+                                                    <a href="{% url 'docsGestao_escolar:boletim' %}" class="dropdown-item" title="Impressão de boletim">
+                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="5"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                                                        Boletins
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <span class="header-divider" aria-hidden="true"></span>
+
+                                        <!-- Perfil do usuário -->
+                                        <div class="dropdown">
+                                            <button type="button" class="header-profile-btn" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Perfil do usuário{% if user.is_authenticated %}, {{ user.username }}{% endif %}">
+                                                {% if user.foto is not None %}
+                                                <img src="{% static user.foto %}" alt="Foto do usuário" width="32" height="32" class="header-avatar">
+                                                {% else %}
+                                                <span class="avatar-fallback" aria-hidden="true">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                                </span>
+                                                {% endif %}
+                                                {% if user.is_authenticated %}
+                                                <span class="header-profile-name text-capitalize">{{ user.username }}</span>
+                                                {% endif %}
+                                                <svg class="header-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-end profile-panel" aria-label="Menu do perfil">
+                                                <div class="profile-panel-head">
+                                                    {% if user.foto is not None %}
+                                                    <img src="{% static user.foto %}" alt="Foto do usuário" width="42" height="42" class="header-avatar">
+                                                    {% else %}
+                                                    <span class="avatar-fallback" aria-hidden="true">
+                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                                    </span>
+                                                    {% endif %}
+                                                    <div>
+                                                        {% if user.is_authenticated %}
+                                                        <div class="profile-panel-head-name text-capitalize">{{ user.username }}</div>
+                                                        <div class="profile-panel-head-role">Conta ativa</div>
+                                                        {% else %}
+                                                        <div class="profile-panel-head-role">Você ainda não está logado.</div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="profile-panel-body">
+                                                    <form id="logoutFormPerfil" method="post" action="{% url 'admin_acessos:logout' %}" class="m-0">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="dropdown-item w-100 text-start">
+                                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                                            Sair
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </nav>
+                        </header>
+                        <!-- ===================== FIM HEADER ===================== -->
+
+                        <div class="app-body">
+                            <!-- ===================== SIDEBAR ===================== -->
+                            <aside id="appSidebar" class="app-sidebar" aria-label="Menu principal">
+                                <div class="sidebar-drawer-head">
+                                    <span class="nav-section-title" style="margin:0; padding-left:0; border-left:none;">Navegação</span>
+                                    <button type="button" class="sidebar-close-btn" aria-label="Fechar menu" onclick="toggleSidebar(false)">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                    </button>
+                                </div>
+
+                                <ul class="nav nav-pills flex-column mb-auto" style="gap:0.15rem;">
+                                    {% if request.session.escola_id %}
+                                    <li>
+                                        <a href="{% url 'Gestao_Escolar:DadosEscola' request.session.escola_id %}" class="app-nav-link txt-p-nav" title="Escola" data-bs-toggle="tooltip" data-bs-placement="right">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/></svg>
+                                            Escola
+                                        </a>
+                                    </li>
+                                    {% endif %}
+
+                                    <li class="nav-section-title">Cadastros Institucionais</li>
+                                    <li>
+                                        <a href="{% url 'Gestao_Escolar:GE_Escola_alunos_create' %}" class="app-nav-link txt-p-nav" title="Alunos" data-bs-toggle="tooltip" data-bs-placement="right">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                            Cadastro de Alunos
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'Gestao_Escolar:GE_Escola_turmas' %}" class="app-nav-link txt-p-nav" title="Turmas" data-bs-toggle="tooltip" data-bs-placement="right">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                                            Cadastro de Turmas
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'Gestao_Escolar:pessoas-create' %}" class="app-nav-link txt-p-nav" title="Professores" data-bs-toggle="tooltip" data-bs-placement="right">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 21h8"/><path d="M12 16v5"/></svg>
+                                            Cadastro de Profissionais
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-section-title">Gestão Acadêmica</li>
+                                    <li>
+                                        <a href="{% url 'Gestao_Escolar:GE_Escola_Matricula_Turmas_lista' %}" class="app-nav-link txt-p-nav" title="Matricular alunos nas turmas" data-bs-toggle="tooltip" data-bs-placement="right">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="m9 13 2 2 4-4"/></svg>
+                                            Matrículas
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'Gestao_Escolar:Grades_turmas' %}" class="app-nav-link txt-p-nav" title="Adiciona professor e disciplinas na turma" data-bs-toggle="tooltip" data-bs-placement="right">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7.3 11 16"/><path d="M16 7.3 13 16"/></svg>
+                                            Grade de disciplinas
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'Gestao_Escolar:NotasAluno_all_create' %}" class="app-nav-link txt-p-nav" title="Registro e acompanhamento de notas, frequência e desempenho acadêmico" data-bs-toggle="tooltip" data-bs-placement="right">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                                            Gestão de Turmas
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-section-title">Matrícula</li>
+                                    <li>
+                                        <a href="{% url 'Gestao_Escolar:adicionar_escola' %}" class="app-nav-link txt-p-nav" title="Espaço reservado para a matricula online" data-bs-toggle="tooltip" data-bs-placement="right">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                            Matricula Online
+                                        </a>
+                                    </li>
+                                </ul>
+
+                                <hr class="my-3">
+
+                                <div class="dropdown">
+                                    <a href="#" class="sidebar-user text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        {% if user.foto is not None %}
+                                        <img src="{% static user.foto %}" alt="Foto do usuário" width="32" height="32" class="header-avatar">
+                                        {% else %}
+                                        <span class="avatar-fallback" aria-hidden="true">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                        </span>
+                                        {% endif %}
+                                        <strong class="text-capitalize mx-1" style="font-size:0.85rem;">{{ request.user }}</strong>
+                                    </a>
+                                    <ul class="dropdown-menu text-small shadow rounded-3">
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form id="logoutForm" method="post" action="{% url 'admin_acessos:logout' %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="w-100">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                                    Sair
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </aside>
+
+                            <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
+                            <!-- ===================== FIM SIDEBAR ===================== -->
+
+                            <div class="app-main-content" id="main-content" role="main">
+                                {% block main %}{% endblock main %}
+                            </div>
+                        </div>
+
+                        {% block footer %}{% endblock footer %}
+                        {% block script_footer %}{% endblock script_footer %}
+                    </main>
                 </div>
             </div>
         </div>
@@ -830,20 +1423,46 @@
         }
     </script>
 
+    <!-- Drawer de navegação (sidebar responsiva única) -->
+    <script>
+        function toggleSidebar(forcarAberto) {
+            var sidebar = document.getElementById('appSidebar');
+            var backdrop = document.getElementById('sidebarBackdrop');
+            var botao = document.getElementById('sidebarToggleBtn');
+            if (!sidebar || !backdrop) return;
+
+            var abrir = (typeof forcarAberto === 'boolean') ? forcarAberto : !sidebar.classList.contains('is-open');
+            sidebar.classList.toggle('is-open', abrir);
+            backdrop.classList.toggle('is-open', abrir);
+            document.body.style.overflow = abrir ? 'hidden' : '';
+            if (botao) { botao.setAttribute('aria-expanded', abrir ? 'true' : 'false'); }
+        }
+
+        document.addEventListener('keydown', function (evento) {
+            if (evento.key === 'Escape') { toggleSidebar(false); }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var sidebar = document.getElementById('appSidebar');
+            if (!sidebar) return;
+            sidebar.querySelectorAll('a.app-nav-link').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    if (window.innerWidth < 992) { toggleSidebar(false); }
+                });
+            });
+        });
+
+        window.addEventListener('resize', function () {
+            if (window.innerWidth >= 992) { toggleSidebar(false); }
+        });
+    </script>
+
     <script>
         function verificarOrientacao() {
             const aviso = document.getElementById('landscape-warning');
             const conteudo = document.getElementById('site-content');
-
-            if (window.innerHeight > window.innerWidth) {
-                // Modo retrato
-                aviso.style.display = 'flex';
-                conteudo.style.display = 'none';
-            } else {
-                // Modo paisagem
-                aviso.style.display = 'none';
-                conteudo.style.display = 'block';
-            }
+            if (aviso) { aviso.style.display = 'none'; }
+            if (conteudo) { conteudo.style.display = 'block'; }
         }
 
         window.addEventListener('load', verificarOrientacao);
@@ -851,217 +1470,103 @@
         window.addEventListener('orientationchange', verificarOrientacao);
     </script>
 
-<!-- SCRIPT LOALDING-->
     <script>
         window.addEventListener('load', function () {
             const spinner = document.getElementById('spinner-loading');
             if (spinner) {
-            spinner.style.transition = 'opacity 0.5s ease-out';
-            spinner.style.opacity = '0';
-            setTimeout(() => spinner.remove(), 500);
+                spinner.style.transition = 'opacity 0.5s ease-out';
+                spinner.style.opacity = '0';
+                setTimeout(() => spinner.remove(), 500);
             }
         });
     </script>
 
-
-<!-- FIM SCRIPT LOALDING-->
-
-
-<style>
-:root {
-    --bg: #fff;
-}
-
-.container-notify {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    z-index: 9999;
-    width: 100%;
-    max-width: 600px;
-    pointer-events: none;
-}
-
-.notification--info {
-    --bg: #F0FBFE;
-    --primary: #0EA1E7;
-}
-
-.notification--finalised {
-    --bg: #F7F6FB;
-    --primary: #9077DF;
-}
-
-.notification--failure {
-    --bg: #FFF1F6;
-    --primary: #C43060;
-}
-
-.notification--warning {
-    --bg: #FFF9EB;
-    --primary: #d6a024;
-}
-
-.notification--success {
-    --bg: #ECFBF2;
-    --primary: #335D48;
-}
-
-.notification {
-    position: relative;
-    background: var(--bg);
-    color: var(--primary);
-    border-left: 0.25rem solid var(--primary);
-    border-radius: 4px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    pointer-events: auto;
-    opacity: 1;
-    visibility: visible;
-    transition: all 0.3s ease-in-out;
-}
-
-.notification__icon {
-    height: 1.625rem;
-    width: 1.625rem;
-    margin-right: 0.45rem;
-}
-
-.notification__body {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 1rem 0.5rem 1rem 1rem;
-}
-
-.notification__close {
-    position: absolute;
-    top: 0.3rem;
-    right: 0.5rem;
-    background: transparent;
-    border: none;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: var(--primary);
-    cursor: pointer;
-}
-
-.notification__progress {
-    display: none;
-}
-</style>
-
-<div class="container-notify">
-    {% for not in notifica %} 
-        {% if not.tipo == 'aviso' %}
-        <div class="notification notification--success" role="status" aria-live="polite">
-            <button class="notification__close" aria-label="Fechar notificação" onclick="fecharNotificacao({{ not.id }}, this)">&times;</button>
-            <div class="notification__body">
-                <h5>{{not.titulo}}</h3>
-                {{not.mensagem|safe}}
+    <div class="container-notify">
+        {% for not in notifica %}
+            {% if not.tipo == 'aviso' %}
+            <div class="notification notification--success" role="status" aria-live="polite">
+                <button class="notification__close" aria-label="Fechar notificação" onclick="fecharNotificacao({{ not.id }}, this)">&times;</button>
+                <div class="notification__body">
+                    <div>
+                        <h5>{{ not.titulo }}</h5>
+                        {{ not.mensagem|safe }}
+                    </div>
+                </div>
             </div>
-        </div>
-        {% endif %}
+            {% endif %}
 
-        {% if not.tipo == 'info' %}     
-        <div class="notification notification--failure" role="alert" aria-live="assertive">
-            <button class="notification__close" aria-label="Fechar notificação" onclick="fecharNotificacao({{ not.id }}, this)">&times;</button>
-            <div class="notification__body">
-                <h3>{{not.titulo}}</h3>
-                {{not.mensagem|safe}}
+            {% if not.tipo == 'info' %}
+            <div class="notification notification--failure" role="alert" aria-live="assertive">
+                <button class="notification__close" aria-label="Fechar notificação" onclick="fecharNotificacao({{ not.id }}, this)">&times;</button>
+                <div class="notification__body">
+                    <div>
+                        <h3>{{ not.titulo }}</h3>
+                        {{ not.mensagem|safe }}
+                    </div>
+                </div>
             </div>
-        </div>
-        {% endif %}  
-        
-        {% if not.tipo == 'urgente' %}    
-        <div class="notification notification--warning" role="alert" aria-live="assertive">
-            <button class="notification__close" aria-label="Fechar notificação" onclick="fecharNotificacao({{ not.id }}, this)">&times;</button>
-            <div class="notification__body">
-                <h3>{{not.titulo}}</h3>
-                {{not.mensagem|safe}}
+            {% endif %}
+
+            {% if not.tipo == 'urgente' %}
+            <div class="notification notification--warning" role="alert" aria-live="assertive">
+                <button class="notification__close" aria-label="Fechar notificação" onclick="fecharNotificacao({{ not.id }}, this)">&times;</button>
+                <div class="notification__body">
+                    <div>
+                        <h3>{{ not.titulo }}</h3>
+                        {{ not.mensagem|safe }}
+                    </div>
+                </div>
             </div>
-        </div>
-        {% endif %} 
-        
-        {% if not.tipo == 'atualizado' %}
-        <div class="notification notification--info" role="status" aria-live="polite">
-            <button class="notification__close" aria-label="Fechar notificação" onclick="fecharNotificacao({{ not.id }}, this)">&times;</button>
-            <div class="notification__body text-center">
-                <h3>{{not.titulo}}</h3>
-                {{not.mensagem|safe}}
+            {% endif %}
+
+            {% if not.tipo == 'atualizado' %}
+            <div class="notification notification--info" role="status" aria-live="polite">
+                <button class="notification__close" aria-label="Fechar notificação" onclick="fecharNotificacao({{ not.id }}, this)">&times;</button>
+                <div class="notification__body text-center">
+                    <div>
+                        <h3>{{ not.titulo }}</h3>
+                        {{ not.mensagem|safe }}
+                    </div>
+                </div>
             </div>
-        </div>
-        {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div>
 
-                <!--
-        <div class="notification notification--finalised" role="status" aria-live="polite">
-            <button class="notification__close" aria-label="Fechar notificação">&times;</button>
-            <div class="notification__body">
-                
-                The data export has been finalised!
-            </div>
-        </div>
-        -->
-    {% endfor %}
-</div>
-<!-- Exibe notificações para o usuário-->
-<script>
-  function fecharNotificacao(notificacaoId, elemento) {
-    console.log(`resultado ${notificacaoId}`)
-    fetch("{% url 'admin_acessos:notificacao_lida' %}", {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': '{{ csrf_token }}',
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: `id=${notificacaoId}`
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.status === 'ok') {
-        elemento.closest('.notification').remove();  // Remove visualmente
-      }
-    });
-  }
-</script>
+    <script>
+        function fecharNotificacao(notificacaoId, elemento) {
+            console.log(`resultado ${notificacaoId}`);
+            fetch("{% url 'admin_acessos:notificacao_lida' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `id=${notificacaoId}`
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        const alvo = elemento.closest('.notification, .notif-item');
+                        if (alvo) { alvo.remove(); }
+                    }
+                });
+        }
+    </script>
 
+    <script>
+        document.querySelectorAll('.notification__close').forEach(button => {
+            button.addEventListener('click', function () {
+                const notification = this.parentElement;
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 300);
+            });
+        });
+    </script>
 
-<script>
-document.querySelectorAll('.notification__close').forEach(button => {
-    button.addEventListener('click', function () {
-        const notification = this.parentElement;
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateY(10px)';
-        setTimeout(() => {
-            notification.style.display = 'none';
-        }, 300);
-    });
-});
-</script>
-
-
-
-<!--
-<script
-    data-name="BMC-Widget"
-    data-cfasync="false"
-    src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
-    data-id="er.robin"
-    data-description="Support me on Buy me a coffee!"
-    data-message=""
-    data-color="#BD5FFF"
-    data-position="Right"
-    data-x_margin="18"
-    data-y_margin="18">
-</script>-->
-<!--Baloes de aniversario -->
-<script src="{% static 'global/js/happy birtday.js' %}"></script>
-
-
-
-
-
-
-
-
+    <script src="{% static 'global/js/happy birtday.js' %}"></script>
 </body>
 </html>

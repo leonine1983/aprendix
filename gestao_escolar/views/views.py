@@ -14,12 +14,9 @@ from django.contrib import messages
 from .contexto_dados_escolares import get_contexto_escola
 from django.db.models import Count, Q
 from gestao_escolar.views.gestao_turma.faltas.busca_ativa import obter_alunos_risco_evasao
+from core.views.baseSecretarios import BaseSecretariosView
 
-MERENDA_GROUPS = [
-    "Nutricionista",
-    "Merendeira",
-    "Admin",
-]
+
 
 class MatriculasOnlineForm(forms.ModelForm):
     class Meta:
@@ -40,7 +37,7 @@ class MatriculasOnlineForm(forms.ModelForm):
     
 from gestao_escolar.utils import processar_dados
 
-class Pagina_inicio(LoginRequiredMixin, TemplateView):
+class Pagina_inicio(BaseSecretariosView, TemplateView):
     model = Escola
     template_name = 'Escola/inicio.html'
 
@@ -79,9 +76,6 @@ class Pagina_inicio(LoginRequiredMixin, TemplateView):
         context['now'] = datetime.now()
         context['conteudo_page'] = 'info_escola'
         
-        # Notificações não lidas para o usuário
-        context['notifica'] = AtualizacaoNotificacao.objects.filter(user=user, lida=False)
-        context['EnviaNotifica'] = AtualizacaoNotificacao.objects.filter(user=user, lida=False)
 
         # =====================================================
         # 2️⃣ Informações da escola
