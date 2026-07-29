@@ -5,8 +5,9 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
 from .escola_form import Escola_form, EscolaDados_form
+from core.views.baseSecretarios import BaseSecretariosView
 
-class UpdateEscola(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class UpdateEscola(BaseSecretariosView, UpdateView):
     model = Escola
     form_class = Escola_form
     template_name = 'Escola/inicio.html'

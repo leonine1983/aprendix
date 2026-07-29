@@ -1,49 +1,345 @@
 {% include "Escola/partials/modal_partials/modal_top.html" %}
 {% load static %}
-<div class="text-center mb-4">
-    <h5 class="card-title">Escolha uma escola</h5>
-    <p class="text-muted">Selecione uma das escolas disponíveis abaixo para continuar.</p>
-</div>
 
-<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 gap-3 justify-content-center">
-    {% for n in object_list %}    
-        {% if n.fund2 %}
-            <div class="col m-0 p-0 order-1">
-                <a href="{% url 'Gestao_Escolar:escola-selecionar' n.id %}" class="text-decoration-none">
-                    <div class="card h-100 w-100 shadow-sm border-0 hover-shadow transition p-1 bg-success-subtle ">
-                        <!-- Imagem ilustrativa -->
-                        <img src="{% static 'schooll.png' %}" class="card-img-top" alt="Imagem da escola {{ n.nome_escola }}">
-                        <div class="card-body text-center">
-                            <h6 class="card-title mb-0">{{ n.nome_escola }}</h6>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            {% else %}
-                <div class="col m-0 p-0 ">
-                        <a href="{% url 'Gestao_Escolar:escola-selecionar' n.id %}" class="text-decoration-none">
-                            <div class="card h-100 w-100 shadow-sm border-0 hover-shadow transition p-1">
-                                <!-- Imagem ilustrativa -->
-                                <img src="{% static 'schooll.png' %}" class="card-img-top" alt="Imagem da escola {{ n.nome_escola }}">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title mb-0">{{ n.nome_escola }}</h6>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                {% endif %}
-        
-    {% endfor %}
-</div>
+<!-- ============================================================
+     DESIGN SYSTEM TOKENS (específicos para esta tela)
+     ============================================================ -->
 <style>
-    .hover-shadow:hover {
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        transition: box-shadow 0.3s ease-in-out;
-    }
+  :root {
+    /* Cores */
+    --ds-primary: #1a73e8;
+    --ds-primary-light: #e8f0fe;
+    --ds-primary-dark: #1557b0;
+    --ds-success: #10b981;
+    --ds-success-light: #d1fae5;
+    --ds-gray-50: #f8fafc;
+    --ds-gray-100: #f1f5f9;
+    --ds-gray-200: #e2e8f0;
+    --ds-gray-300: #cbd5e1;
+    --ds-gray-400: #94a3b8;
+    --ds-gray-500: #64748b;
+    --ds-gray-600: #475569;
+    --ds-gray-700: #334155;
+    --ds-gray-800: #1e293b;
+    --ds-gray-900: #0f172a;
+    --ds-white: #ffffff;
 
-    .card-img-top {
-        height: 120px;
-        object-fit: cover;
+    /* Tipografia */
+    --ds-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+    /* Espaçamento */
+    --ds-space-1: 0.25rem;
+    --ds-space-2: 0.5rem;
+    --ds-space-3: 0.75rem;
+    --ds-space-4: 1rem;
+    --ds-space-5: 1.25rem;
+    --ds-space-6: 1.5rem;
+    --ds-space-8: 2rem;
+    --ds-space-10: 2.5rem;
+
+    /* Bordas */
+    --ds-radius-sm: 6px;
+    --ds-radius-md: 12px;
+    --ds-radius-lg: 16px;
+    --ds-radius-full: 9999px;
+
+    /* Sombras */
+    --ds-shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+    --ds-shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --ds-shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+    --ds-shadow-lg: 0 12px 40px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
+
+    /* Transições */
+    --ds-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* ============================================================
+     RESET E BASE
+     ============================================================ */
+  .school-selector * {
+    box-sizing: border-box;
+  }
+
+  .school-selector {
+    font-family: var(--ds-font-family);
+    padding: var(--ds-space-2) 0;
+  }
+
+  /* ============================================================
+     CABEÇALHO
+     ============================================================ */
+  .selector-header {
+    text-align: center;
+    margin-bottom: var(--ds-space-6);
+    padding: 0 var(--ds-space-4);
+  }
+  .selector-header h5 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ds-gray-900);
+    margin-bottom: var(--ds-space-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ds-space-2);
+  }
+  .selector-header h5 i {
+    color: var(--ds-primary);
+    font-size: 1.8rem;
+  }
+  .selector-header p {
+    font-size: 1rem;
+    color: var(--ds-gray-500);
+    margin: 0;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ============================================================
+     GRADE DE CARDS (Mobile First)
+     ============================================================ */
+  .school-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--ds-space-4);
+    padding: 0 var(--ds-space-2);
+    justify-content: center;
+  }
+
+  /* ---- Card individual ---- */
+  .school-card {
+    display: block;
+    text-decoration: none !important;
+    background: var(--ds-white);
+    border-radius: var(--ds-radius-md);
+    border: 1px solid var(--ds-gray-200);
+    box-shadow: var(--ds-shadow-xs);
+    transition: var(--ds-transition);
+    overflow: hidden;
+    height: 100%;
+    position: relative;
+    animation: fadeUp 0.4s ease both;
+  }
+  .school-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--ds-shadow-md);
+    border-color: var(--ds-primary);
+  }
+  .school-card:active {
+    transform: scale(0.97);
+  }
+  .school-card:focus-visible {
+    outline: 2px solid var(--ds-primary);
+    outline-offset: 2px;
+  }
+
+  /* ---- Imagem ---- */
+  .school-card .card-img {
+    width: 50%;
+    height:auto;
+    margin:auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    background: var(--ds-gray-100);
+    display: block;
+  }
+
+  /* ---- Corpo ---- */
+  .school-card .card-body {
+    padding: var(--ds-space-3) var(--ds-space-4) var(--ds-space-4);
+    text-align: center;
+  }
+  .school-card .card-body .school-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ds-gray-800);
+    margin: 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ---- Badge (Fund2) ---- */
+  .school-card .badge-fund2 {
+    position: absolute;
+    top: var(--ds-space-2);
+    right: var(--ds-space-2);
+    background: var(--ds-success);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--ds-radius-full);
+    box-shadow: var(--ds-shadow-sm);
+  }
+  /* Variação visual para escolas com fund2 */
+  .school-card.is-fund2 {
+    border-color: var(--ds-success);
+    background: var(--ds-success-light);
+  }
+  .school-card.is-fund2 .card-body .school-name {
+    color: #065f46;
+  }
+
+  /* ============================================================
+     ESTADO VAZIO
+     ============================================================ */
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--ds-space-10) var(--ds-space-4);
+    color: var(--ds-gray-500);
+  }
+  .empty-state i {
+    font-size: 3rem;
+    color: var(--ds-gray-300);
+    display: block;
+    margin-bottom: var(--ds-space-4);
+  }
+  .empty-state h6 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--ds-gray-700);
+    margin-bottom: var(--ds-space-2);
+  }
+
+  /* ============================================================
+     ANIMAÇÃO
+     ============================================================ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Atraso progressivo (aplicado via inline style no loop) */
+  .school-card:nth-child(1) { animation-delay: 30ms; }
+  .school-card:nth-child(2) { animation-delay: 60ms; }
+  .school-card:nth-child(3) { animation-delay: 90ms; }
+  .school-card:nth-child(4) { animation-delay: 120ms; }
+  .school-card:nth-child(5) { animation-delay: 150ms; }
+  .school-card:nth-child(6) { animation-delay: 180ms; }
+  .school-card:nth-child(7) { animation-delay: 210ms; }
+  .school-card:nth-child(8) { animation-delay: 240ms; }
+
+  /* ============================================================
+     RESPONSIVIDADE (Mobile First)
+     ============================================================ */
+  @media (max-width: 480px) {
+    .school-grid {
+      gap: var(--ds-space-3);
+      padding: 0;
     }
+    .school-card .card-body {
+      padding: var(--ds-space-2) var(--ds-space-3) var(--ds-space-3);
+    }
+    .school-card .card-body .school-name {
+      font-size: 0.85rem;
+    }
+    .selector-header h5 {
+      font-size: 1.25rem;
+    }
+    .selector-header p {
+      font-size: 0.9rem;
+    }
+    .school-card .badge-fund2 {
+      font-size: 0.55rem;
+      padding: 0.1rem 0.5rem;
+      top: var(--ds-space-1);
+      right: var(--ds-space-1);
+    }
+  }
+
+  @media (min-width: 640px) {
+    .school-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--ds-space-5);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .school-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--ds-space-6);
+    }
+    .school-card .card-body .school-name {
+      font-size: 1rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .school-grid {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+
+  /* ============================================================
+     AJUSTES PARA O MODAL (se aplicável)
+     ============================================================ */
+  .modal-body {
+    padding: var(--ds-space-4) var(--ds-space-4) var(--ds-space-6);
+  }
 </style>
+
+<!-- ============================================================
+     CONTEÚDO PRINCIPAL
+     ============================================================ -->
+<div class="school-selector">
+
+  <!-- CABEÇALHO -->
+  <header class="selector-header">
+    <h5>
+      <i class="fa-regular fa-school"></i>
+      Escolha uma escola
+    </h5>
+    <p>Selecione uma das escolas disponíveis abaixo para continuar.</p>
+  </header>
+
+  <!-- GRADE DE CARDS -->
+  <div class="school-grid">
+    {% for escola in object_list %}
+      <a href="{% url 'Gestao_Escolar:escola-selecionar' escola.id %}"
+         class="school-card {% if escola.fund2 %}is-fund2{% endif %}"
+         style="animation-delay: {{ forloop.counter0|add:1|stringformat:"s" }}00ms;">
+        <!-- Imagem -->
+        {% if escola.related_dadosEscola.imagem %}
+        <img src="{% static escola.related_dadosEscola.imagem %}"
+             class="card-img"
+             alt="Imagem ilustrativa da escola {{ escola.nome_escola }}"
+             loading="lazy">
+             {% else %}
+             <img src="{% static 'schooll.png' %}"
+             class="card-img"
+             alt="Imagem ilustrativa da escola {{ escola.nome_escola }}"
+             loading="lazy">
+        {% endif %}
+        <!-- Badge para escolas com Fund2 -->
+
+
+        {% if escola.fund2 %}
+          <span class="badge-fund2">
+            <i class="fa-regular fa-star" style="margin-right: 0.15rem;"></i> Fund II
+          </span>
+        {% endif %}
+        <!-- Nome -->
+        <div class="card-body">
+          <p class="school-name">{{ escola.nome_escola }}</p>
+        </div>
+      </a>
+    {% empty %}
+      <div class="empty-state">
+        <i class="fa-regular fa-inbox"></i>
+        <h6>Nenhuma escola disponível</h6>
+        <p style="font-size:0.95rem; color:var(--ds-gray-500);">
+          Entre em contato com o administrador para adicionar escolas.
+        </p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
 {% include "Escola/partials/modal_partials/modal_bottom.html" %}

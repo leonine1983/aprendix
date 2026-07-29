@@ -1,150 +1,603 @@
-<h2>Dados de Funcionamento</h2>
-                      Obs.: Alguns campos possuem a atualização de dados automática com base nas informações das turmas.
-                      <div>
-                        <section>
-                          {{escola_dados_form.data_fundacao.label_tag}}
-                          {{escola_dados_form.data_fundacao}}    <br>
-                          {{escola_dados_form.data_fundacao.error}}
-                        </section>        
-                        <section>
-                          {{escola_dados_form.turno.label_tag}}
-                          {{escola_dados_form.turno}}   <br>
-                          {{escola_dados_form.turno.error}}
-                        </section>     
-                        <section>
-                          {{escola_dados_form.num_alunos.label_tag}}
-                          {{escola_dados_form.num_alunos}}  <br>
-                          {{escola_dados_form.num_alunos.error}}
-                        </section>    
-                        <section>
-                          {{escola_dados_form.num_funcionarios_n_docente.label_tag}}
-                          {{escola_dados_form.num_funcionarios_n_docente}}  <br>
-                          {{escola_dados_form.num_funcionarios_n_docente.error}}
-                        </section>   
-                        <section>
-                          {{escola_dados_form.num_funcionarios_docente.label_tag}}
-                          {{escola_dados_form.num_funcionarios_docente }}  <br>
-                          {{escola_dados_form.num_funcionarios_docente.error}}
-                        </section>    
-                        <section>
-                          {{escola_dados_form.num_funcionarios_total.label_tag}}
-                          {{escola_dados_form.num_funcionarios_total }}<br>
-                          {{escola_dados_form.num_funcionarios_total.error}}
-                        </section>  
-                        <section>
-                          {{escola_dados_form.numero_turmas.label_tag}}
-                          {{escola_dados_form.numero_turmas }}<br>
-                          {{escola_dados_form.numero_turmas.error}}
-                        </section>    
-                      </div>
-                      <h2>Dados da Infraestrutura</h2>
-                      <div class="row row-cols-1 ">
-                        <section class="row row-cols-4">
-                          <section>
-                            {{escola_dados_form.qtd_salas.label_tag}}
-                            {{escola_dados_form.qtd_salas }}<br>
-                            {{escola_dados_form.qtd_salas.error}}
-                          </section>  
-                          <section>
-                            {{escola_dados_form.qtd_bibliotecas.label_tag}}
-                            {{escola_dados_form.qtd_bibliotecas }}<br>
-                            {{escola_dados_form.qtd_bibliotecas.error}}
-                          </section>  
-                          <section>
-                            {{escola_dados_form.qtd_laboratorios.label_tag}}
-                            {{escola_dados_form.qtd_laboratorios }}<br>
-                            {{escola_dados_form.qtd_laboratorios.error}}
-                          </section>  
-                          <section>
-                            {{escola_dados_form.qtd_quadras.label_tag}}
-                            {{escola_dados_form.qtd_quadras}}<br>
-                            {{escola_dados_form.qtd_quadras.error}}
-                          </section>  
-                          <section>
-                            {{escola_dados_form.qtd_auditorios.label_tag}}
-                            {{escola_dados_form.qtd_auditorios}}<br>
-                            {{escola_dados_form.qtd_auditorios.error}}
-                          </section> 
-                          <section>
-                            {{escola_dados_form.qtd_refeitórios.label_tag}}
-                            {{escola_dados_form.qtd_refeitórios }}<br>
-                            {{escola_dados_form.qtd_refeitórios.error}}
-                          </section> 
-                          <section>
-                            {{escola_dados_form.qtd_areas_verdes.label_tag}}
-                            {{escola_dados_form.qtd_areas_verdes }}<br>
-                            {{escola_dados_form.qtd_areas_verdes.error}}
-                          </section> 
-                        </section>
-                      </div>                  
-                      <h2>Dados de Curso</h2>
-                      <div class="row row-cols-1 ">
-                        <section class="row row-cols-4">
-                          <section>
-                            {{escola_dados_form.possui_educacao_infantil.label_tag}}
-                            {{escola_dados_form.possui_educacao_infantil}}<br>
-                            {{escola_dados_form.possui_educacao_infantil.error}}
-                          </section>  
-                          <section>
-                            {{escola_dados_form.possui_ensino_fundamental.label_tag}}
-                            {{escola_dados_form.possui_ensino_fundamental}}<br>
-                            {{escola_dados_form.possui_ensino_fundamental.error}}
-                          </section>  
-                          <section>
-                            {{escola_dados_form.possui_ensino_medio.label_tag}}
-                            {{escola_dados_form.possui_ensino_medio }}<br>
-                            {{escola_dados_form.possui_ensino_medio.error}}
-                          </section>  
-                          <section>
-                            {{escola_dados_form.possui_ensino_tecnico.label_tag}}
-                            {{escola_dados_form.possui_ensino_tecnico}}<br>
-                            {{escola_dados_form.possui_ensino_tecnico.error}}
-                          </section>                            
-                        </section>
-                      </div>  
-                      <h2>Dados de Convênios e Parcerias</h2>
-                      <div>
-                        <section>
-                          {{escola_dados_form.convenios.label_tag}}
-                          {{escola_dados_form.convenios}}<br>
-                          {{escola_dados_form.convenios.error}}
-                        </section>  
-                      </div>
-                      <h2>Dados de Segurança e Acessibilidade</h2>
-                      <div>
-                        <section>
-                          {{escola_dados_form.possui_acessibilidade.label_tag}}
-                          {{escola_dados_form.possui_acessibilidade}}<br>
-                          {{escola_dados_form.possui_acessibilidade.error}}
-                        </section>  
-                        <section>
-                          {{escola_dados_form.possui_sistema_seguranca.label_tag}}
-                          {{escola_dados_form.possui_sistema_seguranca}}<br>
-                          {{escola_dados_form.possui_sistema_seguranca.error}}
-                        </section> 
-                      </div>
-                      <h2>Dados de Segurança e Acessibilidade</h2>
-                      <div>
-                        <section>
-                          {{escola_dados_form.possui_acessibilidade.label_tag}}
-                          {{escola_dados_form.possui_acessibilidade}}<br>
-                          {{escola_dados_form.possui_acessibilidade.error}}
-                        </section>  
-                        <section>
-                          {{escola_dados_form.possui_sistema_seguranca.label_tag}}
-                          {{escola_dados_form.possui_sistema_seguranca}}<br>
-                          {{escola_dados_form.possui_sistema_seguranca.error}}
-                        </section> 
-                        <section>
-                          {{escola_dados_form.observacoes.label_tag}}
-                          {{escola_dados_form.observacoes}}<br>
-                          {{escola_dados_form.observacoes.error}}
-                        </section> 
-                      </div>
+{% load static %}
 
+<!-- ============================================================
+     DESIGN SYSTEM TOKENS (mesmo usado nos outros componentes)
+     ============================================================ -->
+<style>
+  /* ===== Reset Moderno ===== */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
+  /* ===== Design Tokens ===== */
+  :root {
+    /* Cores */
+    --ds-primary: #1a73e8;
+    --ds-primary-light: #e8f0fe;
+    --ds-primary-dark: #1557b0;
+    --ds-success: #10b981;
+    --ds-danger: #ef4444;
+    --ds-gray-50: #f8fafc;
+    --ds-gray-100: #f1f5f9;
+    --ds-gray-200: #e2e8f0;
+    --ds-gray-300: #cbd5e1;
+    --ds-gray-400: #94a3b8;
+    --ds-gray-500: #64748b;
+    --ds-gray-600: #475569;
+    --ds-gray-700: #334155;
+    --ds-gray-800: #1e293b;
+    --ds-gray-900: #0f172a;
+    --ds-white: #ffffff;
 
-                    
-                      
-                    
-                      <button type="submit" class="btn btn-sm btn-success w-100">Atualizar Outros <i class="fa-solid fa-people-roof"></i></button>     
+    /* Tipografia */
+    --ds-font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+    /* Espaçamento (escala 4) */
+    --ds-space-1: 0.25rem;   /* 4px */
+    --ds-space-2: 0.5rem;    /* 8px */
+    --ds-space-3: 0.75rem;   /* 12px */
+    --ds-space-4: 1rem;      /* 16px */
+    --ds-space-5: 1.25rem;   /* 20px */
+    --ds-space-6: 1.5rem;    /* 24px */
+    --ds-space-8: 2rem;      /* 32px */
+    --ds-space-10: 2.5rem;   /* 40px */
+
+    /* Bordas */
+    --ds-radius-sm: 6px;
+    --ds-radius-md: 12px;
+    --ds-radius-lg: 16px;
+    --ds-radius-full: 9999px;
+
+    /* Sombras */
+    --ds-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --ds-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --ds-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --ds-shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.10);
+
+    /* Transições */
+    --ds-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* ===== Base ===== */
+  body {
+    font-family: var(--ds-font);
+    background: var(--ds-gray-50);
+    color: var(--ds-gray-800);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ============================================================
+     COMPONENTES REUTILIZÁVEIS (com tags semânticas)
+     ============================================================ */
+
+  /* ---- Card (article) ---- */
+  .card-modern {
+    background: var(--ds-white);
+    border-radius: var(--ds-radius-md);
+    border: 1px solid var(--ds-gray-200);
+    padding: var(--ds-space-5);
+    box-shadow: var(--ds-shadow-xs);
+    transition: var(--ds-transition);
+  }
+  .card-modern:hover {
+    box-shadow: var(--ds-shadow-md);
+    border-color: var(--ds-gray-300);
+  }
+
+  /* ---- Campo de formulário (section) ---- */
+  .field-group {
+    margin-bottom: var(--ds-space-4);
+  }
+  .field-group:last-child {
+    margin-bottom: 0;
+  }
+  .field-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--ds-gray-700);
+    margin-bottom: var(--ds-space-1);
+  }
+  .field-group .field-input,
+  .field-group select,
+  .field-group textarea {
+    width: 100%;
+    padding: var(--ds-space-3) var(--ds-space-4);
+    font-size: 1rem;
+    font-family: var(--ds-font);
+    border: 1.5px solid var(--ds-gray-200);
+    border-radius: var(--ds-radius-sm);
+    background: var(--ds-white);
+    transition: var(--ds-transition);
+    color: var(--ds-gray-900);
+  }
+  .field-group .field-input:focus,
+  .field-group select:focus,
+  .field-group textarea:focus {
+    outline: none;
+    border-color: var(--ds-primary);
+    box-shadow: 0 0 0 3px var(--ds-primary-light);
+  }
+  .field-group .field-input.is-invalid,
+  .field-group select.is-invalid,
+  .field-group textarea.is-invalid {
+    border-color: var(--ds-danger);
+  }
+  .field-group .field-input.is-invalid:focus,
+  .field-group select.is-invalid:focus,
+  .field-group textarea.is-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+  }
+  .field-group .error-text {
+    font-size: 0.8rem;
+    color: var(--ds-danger);
+    margin-top: var(--ds-space-1);
+    display: flex;
+    align-items: center;
+    gap: var(--ds-space-1);
+  }
+  .field-group .error-text i {
+    font-size: 0.9rem;
+  }
+
+  /* ---- Nota auxiliar (p) ---- */
+  .field-note {
+    font-size: 0.85rem;
+    color: var(--ds-gray-500);
+    margin-top: var(--ds-space-1);
+  }
+
+  /* ---- Checkbox / Switch (section) ---- */
+  .switch-group {
+    display: flex;
+    align-items: center;
+    gap: var(--ds-space-3);
+    padding: var(--ds-space-2) 0;
+    cursor: pointer;
+  }
+  .switch-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--ds-primary);
+    cursor: pointer;
+    border-radius: var(--ds-radius-sm);
+    border: 1.5px solid var(--ds-gray-300);
+    transition: var(--ds-transition);
+    flex-shrink: 0;
+  }
+  .switch-group input[type="checkbox"]:checked {
+    border-color: var(--ds-primary);
+  }
+  .switch-group label {
+    font-weight: 500;
+    color: var(--ds-gray-700);
+    margin: 0;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+
+  /* ---- Botão primário (com ripple) ---- */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ds-space-2);
+    padding: var(--ds-space-3) var(--ds-space-6);
+    background: var(--ds-primary);
+    color: var(--ds-white);
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    border-radius: var(--ds-radius-full);
+    cursor: pointer;
+    transition: var(--ds-transition);
+    box-shadow: var(--ds-shadow-sm);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    min-height: 48px;
+    min-width: 48px;
+    width: 100%;
+  }
+  .btn-primary:hover {
+    background: var(--ds-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--ds-shadow-md);
+  }
+  .btn-primary:active {
+    transform: scale(0.97);
+  }
+  .btn-primary:focus-visible {
+    outline: 2px solid var(--ds-primary);
+    outline-offset: 2px;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .btn-primary:active::after {
+    opacity: 1;
+    transition: opacity 0s;
+  }
+
+  /* ---- Título de seção (header) ---- */
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--ds-gray-900);
+    display: flex;
+    align-items: center;
+    gap: var(--ds-space-2);
+    margin: var(--ds-space-8) 0 var(--ds-space-4);
+    padding-bottom: var(--ds-space-2);
+    border-bottom: 2px solid var(--ds-gray-200);
+  }
+  .section-title i {
+    color: var(--ds-primary);
+    font-size: 1.3rem;
+  }
+  .section-title:first-of-type {
+    margin-top: 0;
+  }
+
+  /* ---- Grids responsivos (mantidos como classes) ---- */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--ds-space-4);
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--ds-space-4);
+  }
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--ds-space-3) var(--ds-space-4);
+  }
+
+  /* ============================================================
+     LAYOUT PRINCIPAL (section)
+     ============================================================ */
+  .form-other-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--ds-space-4);
+  }
+
+  /* ============================================================
+     RESPONSIVIDADE (Mobile First)
+     ============================================================ */
+  @media (min-width: 640px) {
+    .grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .grid-3 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .grid-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .btn-primary {
+      width: auto;
+      min-width: 200px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .form-other-section {
+      padding: var(--ds-space-8);
+    }
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .form-other-section {
+      padding: var(--ds-space-3);
+    }
+    .card-modern {
+      padding: var(--ds-space-4);
+    }
+    .section-title {
+      font-size: 1.1rem;
+      margin-top: var(--ds-space-6);
+    }
+    .grid-4 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* ============================================================
+     ANIMAÇÕES
+     ============================================================ */
+  .animate-fade {
+    animation: fadeUp 0.4s ease both;
+  }
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .card-modern {
+    animation: fadeUp 0.4s ease both;
+  }
+  .card-modern:nth-child(1) {
+    animation-delay: 50ms;
+  }
+  .card-modern:nth-child(2) {
+    animation-delay: 100ms;
+  }
+  .card-modern:nth-child(3) {
+    animation-delay: 150ms;
+  }
+  .card-modern:nth-child(4) {
+    animation-delay: 200ms;
+  }
+  .card-modern:nth-child(5) {
+    animation-delay: 250ms;
+  }
+</style>
+
+<!-- ============================================================
+     FORMULÁRIO "OUTROS" – DADOS COMPLEMENTARES DA ESCOLA
+     ============================================================ -->
+<section class="form-other-section">
+
+  <form method="post" enctype="multipart/form-data" class="animate-fade">
+    {% csrf_token %}
+
+    <!-- ==========================================================
+         SEÇÃO 1 – DADOS DE FUNCIONAMENTO
+         ========================================================== -->
+    <header class="section-title">
+      <i class="fa-regular fa-calendar-days"></i>
+      <h2 style="font-size:inherit; margin:0; display:inline;">Dados de Funcionamento</h2>
+    </header>
+
+    <p class="field-note" style="margin-bottom: var(--ds-space-4);">
+      <i class="fa-regular fa-circle-info" style="color: var(--ds-primary);"></i>
+      Preencha os dados operacionais da escola. O total de funcionários é calculado automaticamente.
+    </p>
+
+    <section class="grid-2">
+      <article class="card-modern">
+        <section class="field-group">
+          {{ escola_dados_form.data_fundacao.label_tag }}
+          {{ escola_dados_form.data_fundacao }}
+          {{ escola_dados_form.data_fundacao.errors }}
+        </section>
+        <section class="field-group">
+          {{ escola_dados_form.turno.label_tag }}
+          {{ escola_dados_form.turno }}
+          {{ escola_dados_form.turno.errors }}
+        </section>
+        <section class="field-group">
+          {{ escola_dados_form.num_alunos.label_tag }}
+          {{ escola_dados_form.num_alunos }}
+          {{ escola_dados_form.num_alunos.errors }}
+        </section>
+      </article>
+
+      <article class="card-modern">
+        <section class="field-group">
+          {{ escola_dados_form.num_funcionarios_n_docente.label_tag }}
+          {{ escola_dados_form.num_funcionarios_n_docente }}
+          {{ escola_dados_form.num_funcionarios_n_docente.errors }}
+        </section>
+        <section class="field-group">
+          {{ escola_dados_form.num_funcionarios_docente.label_tag }}
+          {{ escola_dados_form.num_funcionarios_docente }}
+          {{ escola_dados_form.num_funcionarios_docente.errors }}
+        </section>
+        <section class="field-group">
+          {{ escola_dados_form.num_funcionarios_total.label_tag }}
+          {{ escola_dados_form.num_funcionarios_total }}
+          {{ escola_dados_form.num_funcionarios_total.errors }}
+        </section>
+        <section class="field-group">
+          {{ escola_dados_form.numero_turmas.label_tag }}
+          {{ escola_dados_form.numero_turmas }}
+          {{ escola_dados_form.numero_turmas.errors }}
+        </section>
+      </article>
+    </section>
+
+    <!-- ==========================================================
+         SEÇÃO 2 – INFRAESTRUTURA
+         ========================================================== -->
+    <header class="section-title">
+      <i class="fa-regular fa-building-columns"></i>
+      <h2 style="font-size:inherit; margin:0; display:inline;">Dados de Infraestrutura</h2>
+    </header>
+
+    <p class="field-note" style="margin-bottom: var(--ds-space-4);">
+      <i class="fa-regular fa-circle-info" style="color: var(--ds-primary);"></i>
+      Informe a quantidade de cada tipo de espaço disponível na escola.
+    </p>
+
+    <article class="card-modern">
+      <section class="grid-4">
+        <section class="field-group">
+          {{ escola_dados_form.qtd_salas.label_tag }}
+          {{ escola_dados_form.qtd_salas }}
+          {{ escola_dados_form.qtd_salas.errors }}
+        </section>
+        <section class="field-group">
+          {{ escola_dados_form.qtd_bibliotecas.label_tag }}
+          {{ escola_dados_form.qtd_bibliotecas }}
+          {{ escola_dados_form.qtd_bibliotecas.errors }}
+        </section>
+        <section class="field-group">
+          {{ escola_dados_form.qtd_laboratorios.label_tag }}
+          {{ escola_dados_form.qtd_laboratorios }}
+          {{ escola_dados_form.qtd_laboratorios.errors }}
+        </section>
+        <section class="field-group">
+          {{ escola_dados_form.qtd_quadras.label_tag }}
+          {{ escola_dados_form.qtd_quadras }}
+          {{ escola_dados_form.qtd_quadras.errors }}
+        </section>
+        <section class="field-group">
+          {{ escola_dados_form.qtd_auditorios.label_tag }}
+          {{ escola_dados_form.qtd_auditorios }}
+          {{ escola_dados_form.qtd_auditorios.errors }}
+        </section>
+        <section class="field-group">
+          {{ escola_dados_form.qtd_refeitórios.label_tag }}
+          {{ escola_dados_form.qtd_refeitórios }}
+          {{ escola_dados_form.qtd_refeitórios.errors }}
+        </section>
+        <section class="field-group">
+          {{ escola_dados_form.qtd_areas_verdes.label_tag }}
+          {{ escola_dados_form.qtd_areas_verdes }}
+          {{ escola_dados_form.qtd_areas_verdes.errors }}
+        </section>
+        <!-- ATENÇÃO: NENHUM CAMPO DE FUNCIONÁRIOS OU TURMAS AQUI -->
+      </section>
+    </article>
+
+    <!-- ==========================================================
+         SEÇÃO 3 – CURSOS OFERECIDOS
+         ========================================================== -->
+    <header class="section-title">
+      <i class="fa-regular fa-graduation-cap"></i>
+      <h2 style="font-size:inherit; margin:0; display:inline;">Cursos Oferecidos</h2>
+    </header>
+
+    <p class="field-note" style="margin-bottom: var(--ds-space-4);">
+      <i class="fa-regular fa-circle-info" style="color: var(--ds-primary);"></i>
+      Marque os níveis de ensino oferecidos pela escola.
+    </p>
+
+    <article class="card-modern">
+      <section class="grid-2">
+        <section class="switch-group">
+          {{ escola_dados_form.possui_educacao_infantil }}
+          {{ escola_dados_form.possui_educacao_infantil.label_tag }}
+          {{ escola_dados_form.possui_educacao_infantil.errors }}
+        </section>
+        <section class="switch-group">
+          {{ escola_dados_form.possui_ensino_fundamental }}
+          {{ escola_dados_form.possui_ensino_fundamental.label_tag }}
+          {{ escola_dados_form.possui_ensino_fundamental.errors }}
+        </section>
+        <section class="switch-group">
+          {{ escola_dados_form.possui_ensino_medio }}
+          {{ escola_dados_form.possui_ensino_medio.label_tag }}
+          {{ escola_dados_form.possui_ensino_medio.errors }}
+        </section>
+        <section class="switch-group">
+          {{ escola_dados_form.possui_ensino_tecnico }}
+          {{ escola_dados_form.possui_ensino_tecnico.label_tag }}
+          {{ escola_dados_form.possui_ensino_tecnico.errors }}
+        </section>
+        <!-- ATENÇÃO: NENHUM CAMPO DE QUANTIDADE DE SALAS AQUI -->
+      </section>
+    </article>
+
+    <!-- ==========================================================
+         SEÇÃO 4 – CONVÊNIOS E PARCERIAS
+         ========================================================== -->
+    <header class="section-title">
+      <i class="fa-regular fa-handshake"></i>
+      <h2 style="font-size:inherit; margin:0; display:inline;">Convênios e Parcerias</h2>
+    </header>
+
+    <article class="card-modern">
+      <section class="field-group">
+        {{ escola_dados_form.convenios.label_tag }}
+        {{ escola_dados_form.convenios }}
+        {{ escola_dados_form.convenios.errors }}
+      </section>
+    </article>
+
+    <!-- ==========================================================
+         SEÇÃO 5 – SEGURANÇA E ACESSIBILIDADE
+         ========================================================== -->
+    <header class="section-title">
+      <i class="fa-regular fa-shield-halved"></i>
+      <h2 style="font-size:inherit; margin:0; display:inline;">Segurança e Acessibilidade</h2>
+    </header>
+
+    <article class="card-modern">
+      <section class="grid-2">
+        <section class="switch-group">
+          {{ escola_dados_form.possui_acessibilidade }}
+          {{ escola_dados_form.possui_acessibilidade.label_tag }}
+          {{ escola_dados_form.possui_acessibilidade.errors }}
+        </section>
+        <section class="switch-group">
+          {{ escola_dados_form.possui_sistema_seguranca }}
+          {{ escola_dados_form.possui_sistema_seguranca.label_tag }}
+          {{ escola_dados_form.possui_sistema_seguranca.errors }}
+        </section>
+      </section>
+    </article>
+
+    <!-- ==========================================================
+         SEÇÃO 6 – OBSERVAÇÕES
+         ========================================================== -->
+    <header class="section-title">
+      <i class="fa-regular fa-comment"></i>
+      <h2 style="font-size:inherit; margin:0; display:inline;">Observações</h2>
+    </header>
+
+    <article class="card-modern">
+      <section class="field-group">
+        {{ escola_dados_form.observacoes.label_tag }}
+        {{ escola_dados_form.observacoes }}
+        {{ escola_dados_form.observacoes.errors }}
+      </section>
+    </article>
+
+    <!-- ==========================================================
+         BOTÃO DE ENVIO (footer)
+         ========================================================== -->
+    <footer style="margin-top: var(--ds-space-8); display: flex; justify-content: flex-end;">
+      <button type="submit" class="btn-primary">
+        <i class="fa-regular fa-floppy-disk"></i> Atualizar Outros
+      </button>
+    </footer>
+
+  </form>
+</section>
+
+<!-- ============================================================
+     SCRIPT – AUTO‑CÁLCULO DO TOTAL DE FUNCIONÁRIOS
+     ============================================================ -->
+<script>
+  (function() {
+    const docentes = document.getElementById('{{ escola_dados_form.num_funcionarios_docente.id_for_label }}');
+    const naoDocentes = document.getElementById('{{ escola_dados_form.num_funcionarios_n_docente.id_for_label }}');
+    const total = document.getElementById('{{ escola_dados_form.num_funcionarios_total.id_for_label }}');
+
+    if (docentes && naoDocentes && total) {
+      function updateTotal() {
+        const d = parseInt(docentes.value) || 0;
+        const nd = parseInt(naoDocentes.value) || 0;
+        total.value = d + nd;
+      }
+      docentes.addEventListener('input', updateTotal);
+      naoDocentes.addEventListener('input', updateTotal);
+      updateTotal(); // sincroniza valores iniciais
+    }
+  })();
+</script>

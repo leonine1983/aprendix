@@ -1,156 +1,601 @@
 {% load static %}
+
+<!-- ============================================================
+     DESIGN SYSTEM TOKENS
+     ============================================================ -->
 <style>
-    /* Estilização geral do formulário */
-#brasaoEscolar {
-    border: 1px solid #d3d3d3;
-    border-radius: 8px;
-    padding: 15px;
-    margin: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #e9f5fb;
-}
+  :root {
+    /* Cores */
+    --ds-primary: #1a73e8;
+    --ds-primary-light: #e8f0fe;
+    --ds-primary-dark: #1557b0;
+    --ds-success: #10b981;
+    --ds-warning: #f59e0b;
+    --ds-danger: #ef4444;
+    --ds-gray-50: #f8fafc;
+    --ds-gray-100: #f1f5f9;
+    --ds-gray-200: #e2e8f0;
+    --ds-gray-300: #cbd5e1;
+    --ds-gray-400: #94a3b8;
+    --ds-gray-500: #64748b;
+    --ds-gray-600: #475569;
+    --ds-gray-700: #334155;
+    --ds-gray-800: #1e293b;
+    --ds-gray-900: #0f172a;
+    --ds-white: #ffffff;
 
-/* Estilo da imagem exibida */
-#brasaoEscolar img {
-    border-radius: 8px;
-    max-width: 100%;
-    height: auto;
+    /* Tipografia */
+    --ds-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+    /* Espaçamento (escala 4) */
+    --ds-space-1: 0.25rem;
+    --ds-space-2: 0.5rem;
+    --ds-space-3: 0.75rem;
+    --ds-space-4: 1rem;
+    --ds-space-5: 1.25rem;
+    --ds-space-6: 1.5rem;
+    --ds-space-8: 2rem;
+    --ds-space-10: 2.5rem;
+    --ds-space-12: 3rem;
+
+    /* Bordas */
+    --ds-radius-sm: 6px;
+    --ds-radius-md: 12px;
+    --ds-radius-lg: 16px;
+    --ds-radius-full: 9999px;
+
+    /* Sombras */
+    --ds-shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+    --ds-shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --ds-shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+    --ds-shadow-lg: 0 12px 40px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
+
+    /* Transições */
+    --ds-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* ============================================================
+     RESET E BASE
+     ============================================================ */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--ds-font-family);
+    background: var(--ds-gray-50);
+    color: var(--ds-gray-800);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ============================================================
+     COMPONENTES REUTILIZÁVEIS
+     ============================================================ */
+
+  /* ---- Card ---- */
+  .card-modern {
+    background: var(--ds-white);
+    border-radius: var(--ds-radius-md);
+    box-shadow: var(--ds-shadow-sm);
+    border: 1px solid var(--ds-gray-200);
+    padding: var(--ds-space-5);
+    transition: var(--ds-transition);
+  }
+  .card-modern:hover {
+    box-shadow: var(--ds-shadow-md);
+    border-color: var(--ds-gray-300);
+  }
+
+  /* ---- Input ---- */
+  .field-group {
+    margin-bottom: var(--ds-space-4);
+  }
+  .field-group label {
     display: block;
-    margin-bottom: 10px;
-}
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--ds-gray-700);
+    margin-bottom: var(--ds-space-1);
+  }
+  .field-group .field-input {
+    width: 100%;
+    padding: var(--ds-space-3) var(--ds-space-4);
+    font-size: 1rem;
+    font-family: var(--ds-font-family);
+    border: 1.5px solid var(--ds-gray-200);
+    border-radius: var(--ds-radius-sm);
+    background: var(--ds-white);
+    transition: var(--ds-transition);
+    color: var(--ds-gray-900);
+  }
+  .field-group .field-input:focus {
+    outline: none;
+    border-color: var(--ds-primary);
+    box-shadow: 0 0 0 3px var(--ds-primary-light);
+  }
+  .field-group .field-input:hover {
+    border-color: var(--ds-gray-300);
+  }
+  .field-group .field-input.is-invalid {
+    border-color: var(--ds-danger);
+  }
+  .field-group .field-input.is-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+  }
+  .field-group .error-text {
+    font-size: 0.8rem;
+    color: var(--ds-danger);
+    margin-top: var(--ds-space-1);
+    display: flex;
+    align-items: center;
+    gap: var(--ds-space-1);
+  }
+  .field-group .error-text i {
+    font-size: 0.9rem;
+  }
 
-/* Estilo para o link da imagem */
-#brasaoEscolar a {
-    color: #007bff;
+  /* ---- Badge ---- */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ds-space-1);
+    padding: 0.15rem 0.65rem;
+    border-radius: var(--ds-radius-full);
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: var(--ds-gray-200);
+    color: var(--ds-gray-700);
+  }
+  .badge-primary {
+    background: var(--ds-primary-light);
+    color: var(--ds-primary);
+  }
+
+  /* ---- Botão primário (com ripple) ---- */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ds-space-2);
+    padding: var(--ds-space-3) var(--ds-space-6);
+    background: var(--ds-primary);
+    color: var(--ds-white);
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    border-radius: var(--ds-radius-full);
+    cursor: pointer;
+    transition: var(--ds-transition);
+    box-shadow: var(--ds-shadow-sm);
+    position: relative;
+    overflow: hidden;
     text-decoration: none;
-    font-weight: bold;
-}
+    min-height: 48px;
+    min-width: 48px;
+    width: 100%;
+  }
+  .btn-primary:hover {
+    background: var(--ds-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--ds-shadow-md);
+  }
+  .btn-primary:active {
+    transform: scale(0.97);
+  }
+  .btn-primary:focus-visible {
+    outline: 2px solid var(--ds-primary);
+    outline-offset: 2px;
+  }
+  /* Ripple */
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .btn-primary:active::after {
+    opacity: 1;
+    transition: opacity 0s;
+  }
 
-#brasaoEscolar a:hover {
-    text-decoration: underline;
-}
+  /* ---- Grid responsivo ---- */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--ds-space-4);
+  }
 
-/* Estilo do checkbox e do label */
-#brasaoEscolar .form-check {
-    margin-bottom: 15px;
-}
-
-#brasaoEscolar .form-check-input {
-    margin-right: 10px;
-}
-
-#brasaoEscolar .form-check-label {
-    font-weight: 600;
-}
-
-/* Estilo do input de arquivo */
-#brasaoEscolar .form-control {
-    border-radius: 8px;
-    border: 1px solid #ced4da;
-}
-
-/* Estilo dos labels */
-#brasaoEscolar .form-label {
-    font-weight: 600;
-    margin-bottom: 5px;
+  /* ============================================================
+     SEÇÃO DE UPLOAD DE IMAGEM
+     ============================================================ */
+  .upload-area {
+    border: 2px dashed var(--ds-gray-300);
+    border-radius: var(--ds-radius-md);
+    padding: var(--ds-space-5);
+    text-align: center;
+    transition: var(--ds-transition);
+    background: var(--ds-gray-50);
+    position: relative;
+    cursor: pointer;
+  }
+  .upload-area:hover {
+    border-color: var(--ds-primary);
+    background: var(--ds-primary-light);
+  }
+  .upload-area .preview-img {
+    max-width: 150px;
+    max-height: 150px;
+    border-radius: var(--ds-radius-sm);
+    border: 1px solid var(--ds-gray-200);
+    margin-bottom: var(--ds-space-3);
+    object-fit: cover;
+  }
+  .upload-area .placeholder-icon {
+    font-size: 3rem;
+    color: var(--ds-gray-400);
     display: block;
-}
+    margin-bottom: var(--ds-space-2);
+  }
+  .upload-area .file-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .upload-area .file-label {
+    display: inline-block;
+    background: var(--ds-primary);
+    color: white;
+    padding: var(--ds-space-2) var(--ds-space-4);
+    border-radius: var(--ds-radius-full);
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: var(--ds-transition);
+  }
+  .upload-area .file-label:hover {
+    background: var(--ds-primary-dark);
+  }
 
+  /* ============================================================
+     LAYOUT PRINCIPAL
+     ============================================================ */
+  .form-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--ds-space-4);
+  }
 
+  /* Cabeçalho */
+  .form-header {
+    margin-bottom: var(--ds-space-6);
+  }
+  .form-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ds-gray-900);
+    display: flex;
+    align-items: center;
+    gap: var(--ds-space-2);
+  }
+  .form-header h2 i {
+    color: var(--ds-primary);
+  }
+  .form-header p {
+    font-size: 0.95rem;
+    color: var(--ds-gray-600);
+    margin-top: var(--ds-space-2);
+    line-height: 1.6;
+  }
 
+  /* Erros não-campo */
+  .non-field-errors {
+    background: #fef2f2;
+    border-left: 4px solid var(--ds-danger);
+    padding: var(--ds-space-3) var(--ds-space-4);
+    border-radius: var(--ds-radius-sm);
+    margin-bottom: var(--ds-space-4);
+  }
+  .non-field-errors p {
+    color: var(--ds-danger);
+    margin: 0;
+    font-weight: 500;
+  }
+
+  /* ============================================================
+     RESPONSIVIDADE (Mobile First)
+     ============================================================ */
+  @media (min-width: 640px) {
+    .grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .btn-primary {
+      width: auto;
+      min-width: 200px;
+    }
+    .form-header h2 {
+      font-size: 1.75rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .form-section {
+      padding: var(--ds-space-8);
+    }
+    .grid-2 {
+      gap: var(--ds-space-5);
+    }
+    .field-group .field-input {
+      padding: var(--ds-space-3) var(--ds-space-5);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .form-section {
+      padding: var(--ds-space-3);
+    }
+    .form-header h2 {
+      font-size: 1.25rem;
+    }
+    .form-header p {
+      font-size: 0.85rem;
+    }
+    .card-modern {
+      padding: var(--ds-space-4);
+    }
+    .upload-area .preview-img {
+      max-width: 120px;
+      max-height: 120px;
+    }
+  }
+
+  /* ============================================================
+     ANIMAÇÃO DE ENTRADA
+     ============================================================ */
+  .animate-fade {
+    animation: fadeUp 0.4s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Atraso para os cards (opcional) */
+  .card-modern:nth-child(1) { animation-delay: 50ms; }
+  .card-modern:nth-child(2) { animation-delay: 100ms; }
+  .card-modern:nth-child(3) { animation-delay: 150ms; }
 </style>
 
-  <section>
-    {% if escola_dados_form.non_field_errors %}
-        <div class="form-errors">
-            {% for error in escola_dados_form.non_field_errors %}
-                <p class="error">{{ error }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
-    <h2>Atualizar as informações cadastrais da escola</h2>
+<!-- ============================================================
+     FORMULÁRIO DE INFORMAÇÕES GERAIS
+     ============================================================ -->
+<section class="form-section">
+
+  <!-- CABEÇALHO -->
+  <header class="form-header">
+    <h2>
+      <i class="fa-regular fa-pen-to-square"></i>
+      Atualizar Informações Cadastrais
+    </h2>
     <p>
-      Este formulário é destinado à atualização das informações cadastrais da escola. 
-      Por meio dele, você pode revisar e corrigir dados essenciais, garantindo que as informações sobre a 
-      instituição estejam sempre precisas e atualizadas. Inclua detalhes como endereço, contatos, dados administrativos e 
+      Este formulário é destinado à atualização das informações cadastrais da escola.
+      Por meio dele, você pode revisar e corrigir dados essenciais, garantindo que as informações sobre a
+      instituição estejam sempre precisas e atualizadas. Inclua detalhes como endereço, contatos, dados administrativos e
       outros aspectos relevantes. Complete todos os campos necessários para assegurar que a atualização seja feita de forma completa e correta.
     </p>
-  </section>
-  <div class='win11-form p-3'>  
-    <section>
-      {{escola_dados_form.cnpj.label_tag}}
-      {{escola_dados_form.cnpj}}   <br>
-      {{escola_dados_form.cnpj.error}}
-    </section>
-    <section>
-      {{escola_dados_form.endereco.label_tag}} 
-      {{escola_dados_form.endereco}}   <br>
-      {{escola_dados_form.endereco.error}}
-    </section>
-    <section>
-      {{escola_dados_form.numero.label_tag}} 
-      {{escola_dados_form.numero}}   <br>
-      {{escola_dados_form.numero.error}}
-    </section>
-    <section>
-      {{escola_dados_form.complemento.label_tag}} 
-      {{escola_dados_form.complemento}}   <br>
-      {{escola_dados_form.complemento.error}}
-    </section>
-    <section>
-      {{escola_dados_form.bairro.label_tag}} 
-      {{escola_dados_form.bairro}}   <br>
-      {{escola_dados_form.bairro.error}}
-    </section>    
-    <section>
-      {{escola_dados_form.cidade.label_tag}} 
-      {{escola_dados_form.cidade}}   <br>
-      {{escola_dados_form.cidade.error}}
-    </section>
-    <section>
-      {{escola_dados_form.estado.label_tag}} 
-      {{escola_dados_form.estado}}   <br>
-      {{escola_dados_form.estado.error}}
-    </section>
-    <section>
-      {{escola_dados_form.cep.label_tag}} 
-      {{escola_dados_form.cep}}   <br>
-      {{escola_dados_form.cep.error}}
-    </section>
-    <section>
-      {{escola_dados_form.telefone.label_tag}} 
-      {{escola_dados_form.telefone}}   <br>
-      {{escola_dados_form.telefone.error}}
-    </section>
-    <section>
-      {{escola_dados_form.email.label_tag}} 
-      {{escola_dados_form.email}}   <br>
-      {{escola_dados_form.email.error}}
-    </section>
-    <section>
-      {{escola_dados_form.codigo_mec.label_tag}} 
-      {{escola_dados_form.codigo_mec}}   <br>
-      {{escola_dados_form.codigo_mec.error}}
-    </section>
-    <section>
-      {{escola_dados_form.tipo.label_tag}}
-      {{escola_dados_form.tipo}}   <br>
-      {{escola_dados_form.tipo.error}}
-    </section>
-    <section id="brasaoEscolar" class="border p-3 m-3 bg-light-subtle">
-        <section class="mb-3">
-            {{ escola_dados_form.imagem.label_tag }} 
-            {% if object.related_dadosEscola.imagem %}
-                <img src="{{ object.related_dadosEscola.imagem.url }}" alt="Imagem atual" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">                
-            {% else %}
-                <p>Nenhuma imagem disponível.</p>
-            {% endif %}   
-            <section class='p-2 border border-secondary m-2'>   
-                {{ escola_dados_form.imagem }} 
-                {{ escola_dados_form.imagem.error }}
-            </section>
-        </section>
-    </section>
+  </header>
 
-  </div>
-  <button type="submit" class="btn btn-sm btn-success w-100">Atualizar Gerais <i class="fa-solid fa-people-roof"></i></button>     
+  <!-- ERROS NÃO-CAMPO -->
+  {% if escola_dados_form.non_field_errors %}
+    <section class="non-field-errors">
+      {% for error in escola_dados_form.non_field_errors %}
+        <p><i class="fa-regular fa-circle-exclamation"></i> {{ error }}</p>
+      {% endfor %}
+    </section>
+  {% endif %}
+
+  <!-- FORMULÁRIO -->
+  <form method="post" enctype="multipart/form-data" class="animate-fade">
+    {% csrf_token %}
+
+    <!-- CARDS EM GRID -->
+    <section class="grid-2">
+
+      <!-- Card: Identificação -->
+      <article class="card-modern">
+        <header>
+          <h3 style="font-size:1rem; font-weight:600; margin-bottom:var(--ds-space-4); display:flex; align-items:center; gap:var(--ds-space-2);">
+            <i class="fa-regular fa-building" style="color:var(--ds-primary);"></i> Identificação
+          </h3>
+        </header>
+
+        <section class="field-group">
+          {{ escola_dados_form.cnpj.label_tag }}
+          {{ escola_dados_form.cnpj }}
+          {{ escola_dados_form.cnpj.errors }}
+        </section>
+
+        <section class="field-group">
+          {{ escola_dados_form.tipo.label_tag }}
+          {{ escola_dados_form.tipo }}
+          {{ escola_dados_form.tipo.errors }}
+        </section>
+
+        <section class="field-group">
+          {{ escola_dados_form.codigo_mec.label_tag }}
+          {{ escola_dados_form.codigo_mec }}
+          {{ escola_dados_form.codigo_mec.errors }}
+        </section>
+      </article>
+
+      <!-- Card: Endereço -->
+      <article class="card-modern">
+        <header>
+          <h3 style="font-size:1rem; font-weight:600; margin-bottom:var(--ds-space-4); display:flex; align-items:center; gap:var(--ds-space-2);">
+            <i class="fa-regular fa-location-dot" style="color:var(--ds-primary);"></i> Endereço
+          </h3>
+        </header>
+
+        <section class="field-group">
+          {{ escola_dados_form.endereco.label_tag }}
+          {{ escola_dados_form.endereco }}
+          {{ escola_dados_form.endereco.errors }}
+        </section>
+
+        <section class="field-group">
+          {{ escola_dados_form.numero.label_tag }}
+          {{ escola_dados_form.numero }}
+          {{ escola_dados_form.numero.errors }}
+        </section>
+
+        <section class="field-group">
+          {{ escola_dados_form.complemento.label_tag }}
+          {{ escola_dados_form.complemento }}
+          {{ escola_dados_form.complemento.errors }}
+        </section>
+
+        <section class="field-group">
+          {{ escola_dados_form.bairro.label_tag }}
+          {{ escola_dados_form.bairro }}
+          {{ escola_dados_form.bairro.errors }}
+        </section>
+
+        <section class="field-group">
+          {{ escola_dados_form.cidade.label_tag }}
+          {{ escola_dados_form.cidade }}
+          {{ escola_dados_form.cidade.errors }}
+        </section>
+
+        <section class="field-group">
+          {{ escola_dados_form.estado.label_tag }}
+          {{ escola_dados_form.estado }}
+          {{ escola_dados_form.estado.errors }}
+        </section>
+
+        <section class="field-group">
+          {{ escola_dados_form.cep.label_tag }}
+          {{ escola_dados_form.cep }}
+          {{ escola_dados_form.cep.errors }}
+        </section>
+      </article>
+
+      <!-- Card: Contato -->
+      <article class="card-modern">
+        <header>
+          <h3 style="font-size:1rem; font-weight:600; margin-bottom:var(--ds-space-4); display:flex; align-items:center; gap:var(--ds-space-2);">
+            <i class="fa-regular fa-phone" style="color:var(--ds-primary);"></i> Contato
+          </h3>
+        </header>
+
+        <section class="field-group">
+          {{ escola_dados_form.telefone.label_tag }}
+          {{ escola_dados_form.telefone }}
+          {{ escola_dados_form.telefone.errors }}
+        </section>
+
+        <section class="field-group">
+          {{ escola_dados_form.email.label_tag }}
+          {{ escola_dados_form.email }}
+          {{ escola_dados_form.email.errors }}
+        </section>
+      </article>
+
+      <!-- Card: Brasão / Logo -->
+      <article class="card-modern">
+        <header>
+          <h3 style="font-size:1rem; font-weight:600; margin-bottom:var(--ds-space-4); display:flex; align-items:center; gap:var(--ds-space-2);">
+            <i class="fa-regular fa-image" style="color:var(--ds-primary);"></i> Brasão / Logo
+          </h3>
+        </header>
+
+        <section class="upload-area">
+          <!-- Preview da imagem atual -->
+          {% if object.related_dadosEscola.imagem %}
+            <img src="{{ object.related_dadosEscola.imagem.url }}"
+                 alt="Imagem atual da escola"
+                 class="preview-img">
+          {% else %}
+            <i class="fa-regular fa-image placeholder-icon"></i>
+            <p style="color:var(--ds-gray-500); font-size:0.9rem; margin-bottom:var(--ds-space-3);">
+              Nenhuma imagem disponível
+            </p>
+          {% endif %}
+
+          <!-- Input file (oculto) -->
+          {{ escola_dados_form.imagem }}
+          {{ escola_dados_form.imagem.errors }}
+
+          <label for="{{ escola_dados_form.imagem.id_for_label }}" class="file-label">
+            <i class="fa-regular fa-upload"></i> Escolher imagem
+          </label>
+          <p style="font-size:0.75rem; color:var(--ds-gray-500); margin-top:var(--ds-space-2);">
+            Formatos: PNG, JPG, SVG (máx. 5MB)
+          </p>
+        </section>
+      </article>
+
+    </section><!-- fim .grid-2 -->
+
+    <!-- BOTÃO DE ENVIO -->
+    <footer style="margin-top: var(--ds-space-6); display: flex; justify-content: flex-end;">
+      <button type="submit" class="btn-primary">
+        <i class="fa-regular fa-floppy-disk"></i> Atualizar Informações
+      </button>
+    </footer>
+
+  </form>
+</section>
+
+<!-- ============================================================
+     SCRIPT PARA PREVIEW DA IMAGEM (opcional)
+     ============================================================ -->
+<script>
+  (function() {
+    const fileInput = document.getElementById('{{ escola_dados_form.imagem.id_for_label }}');
+    const previewContainer = document.querySelector('.upload-area');
+
+    if (fileInput) {
+      fileInput.addEventListener('change', function(e) {
+        const file = this.files[0];
+        if (!file) return;
+
+        // Verifica se é imagem
+        if (!file.type.startsWith('image/')) {
+          alert('Por favor, selecione um arquivo de imagem válido.');
+          this.value = '';
+          return;
+        }
+
+        // Limita tamanho (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          alert('A imagem deve ter no máximo 5MB.');
+          this.value = '';
+          return;
+        }
+
+        // Cria preview
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          // Remove preview anterior se existir
+          const oldImg = previewContainer.querySelector('.preview-img');
+          if (oldImg) oldImg.remove();
+
+          const placeholderIcon = previewContainer.querySelector('.placeholder-icon');
+          if (placeholderIcon) placeholderIcon.remove();
+
+          const img = document.createElement('img');
+          img.src = ev.target.result;
+          img.alt = 'Pré-visualização da nova imagem';
+          img.className = 'preview-img';
+          previewContainer.insertBefore(img, previewContainer.querySelector('.file-label'));
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  })();
+</script>

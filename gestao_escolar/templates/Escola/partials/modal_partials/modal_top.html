@@ -46,11 +46,40 @@
     outline: none;
     box-shadow: 0 0 0 3px rgba(108, 117, 125, 0.4);
 }
-</style>
-{% load static %}
 
 
- <!-- ================================ -->
+        /* Override: modal ocupando 95% da tela e centralizado */
+        .modal-escola-overlay {
+            position: fixed !important;
+            inset: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 9999 !important;
+        }
+
+        .modal-escola-overlay .modal-content {
+            width: 95vw !important;
+            height: 95vh !important;
+            max-width: 95vw !important;
+            max-height: 95vh !important;
+            margin: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+
+        .modal-escola-overlay .modal-body {
+            flex: 1 1 auto !important;
+            overflow-y: auto !important;
+        }
+        .modal-body{
+            margin: 0px !important;
+            padding: 20px !important;
+            width: 100% !important;
+        }
+    </style>
+
+    <!-- ================================ -->
     <!-- MODAL RESPONSIVO (Seleção de Escola / Ano) -->
     <!-- ================================ -->
     <div class="modal-escola-overlay" id="modalEscolaOverlay">
@@ -62,6 +91,6 @@
                 </h2>
                 <button type="button" class="btn-close btn-close-white" id="btnFecharModalEscola" aria-label="Fechar"></button>
             </div>
-            
             <!-- Corpo -->
             <div class="modal-body bg-light">
+                       
