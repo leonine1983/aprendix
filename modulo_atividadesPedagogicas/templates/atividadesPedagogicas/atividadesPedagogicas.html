@@ -35184,41 +35184,22 @@ function criarLetreiroMontanha() {
   const grupo = new THREE.Group();
   grupo.position.set(picoX, y, picoZ);
 
-  // Placa base (como um letreiro)
-  const matPlaca = new THREE.MeshStandardMaterial({ color: 0x1a2a3a, roughness: 0.6, metalness: 0.2 });
-  const placa = new THREE.Mesh(new THREE.BoxGeometry(8, 3, 0.4), matPlaca);
+  // Placa base (como um letreiro) — agora com textura PNG (imagem estática do Django)
+  const texturaPlaca = new THREE.TextureLoader().load('/media/prefeitura.png');
+  const matPlaca = new THREE.MeshStandardMaterial({
+    map: texturaPlaca,
+    transparent: true,
+    side: THREE.DoubleSide
+  });
+  const placa = new THREE.Mesh(new THREE.PlaneGeometry(8, 3), matPlaca);
   placa.position.y = 2.5;
   placa.castShadow = true;
   grupo.add(placa);
 
-  // Estrutura de suporte
-  const matSuporte = new THREE.MeshStandardMaterial({ color: 0x4a5a6a, roughness: 0.8 });
-  for (let i = -1; i <= 1; i += 2) {
-    const suporte = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, 2.5, 6), matSuporte);
-    suporte.position.set(i * 2.5, 1.25, 0);
-    suporte.castShadow = true;
-    grupo.add(suporte);
-  }
 
-  // Nome do jogo usando sprite de texto em escala grande com emissividade
-  const spriteNome = criarSpriteTexto('🏔️ HUB: HORIZONTE DO CONHECIMENTO');
-  spriteNome.position.set(0, 3.1, 0.3);
-  spriteNome.scale.set(8, 2, 1);
-  // Tornar mais visível à noite (emissive)
-  if (spriteNome.material) {
-    spriteNome.material.map = spriteNome.material.map; // já está configurado
-    spriteNome.material.color.set(0xffffff);
-  }
-  grupo.add(spriteNome);
 
-  // TODO: substituir por textura real do logotipo da prefeitura (PNG retangular, proporção 2:1)
-  const logoPrefeituraPlaceholder = new THREE.Mesh(
-    new THREE.PlaneGeometry(4, 2),
-    new THREE.MeshStandardMaterial({ color: 0xcccccc, emissive: 0x888888, emissiveIntensity: 0.1 })
-  );
-  logoPrefeituraPlaceholder.position.set(0, 1.3, 0.3);
-  logoPrefeituraPlaceholder.rotation.y = 0;
-  grupo.add(logoPrefeituraPlaceholder);
+ 
+
 
   // Adicionar luzes para destacar à noite
   const luzLetreiro = new THREE.PointLight(0x88aaff, 1.2, 25);
